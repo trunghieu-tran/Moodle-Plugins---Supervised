@@ -90,8 +90,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_ASSOC_LEFT         = 64;   // The test should be used for left-associative matchers.
     const TAG_ASSOC_RIGHT        = 128;  // The test should be used for right-associative matchers.
 
-    const TAG_DONT_CHECK_PARTIAL = 256;  // Indicates that if there's no full match, the cross-tester skips partial match checking.
-    const TAG_DEBUG_MODE         = 512;  // Informs matchers that it's debug mode.
+    const TAG_MODE_PCRE          = 256;  // PCRE compatibility mode which is default.
+    const TAG_MODE_POSIX         = 512;  // POSIX compatibility mode.
+
+    const TAG_DONT_CHECK_PARTIAL = 1024; // Indicates that if there's no full match, the cross-tester skips partial match checking.
+    const TAG_DEBUG_MODE         = 2048; // Informs matchers that it's debug mode.
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
@@ -142,7 +145,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         $regex = '(a*)(ab)*(b*)';
 
-        // Create a matcher in POSIX mode.
+        // Create a matcher in POSIX mode for categorization tests.
         $options = new qtype_preg_matching_options();
         $options->mode = qtype_preg_handling_options::MODE_POSIX;
         $matcher = $this->question->get_matcher($enginename, $regex, false, false, null, self::NOTATION_NATIVE);
@@ -480,7 +483,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                 // Try to get matcher for the regex.
                 try {
-                    $options->mode = in_array(self::TAG_FROM_PCRE, $regextags) ? qtype_preg_handling_options::MODE_PCRE : qtype_preg_handling_options::MODE_POSIX;
+                    $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
                     $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
                     $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
                     $matcher->set_options($options);

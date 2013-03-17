@@ -11,7 +11,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_1() {
@@ -23,7 +23,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_2() {
@@ -35,7 +35,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_3() {
@@ -47,7 +47,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_4() {
@@ -59,7 +59,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_5() {
@@ -71,7 +71,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_6() {
@@ -83,7 +83,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_7() {
@@ -95,7 +95,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_8() {
@@ -107,7 +107,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_9() {
@@ -119,7 +119,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_10() {
@@ -131,7 +131,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_11() {
@@ -143,7 +143,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_12() {
@@ -155,7 +155,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_13() {
@@ -167,7 +167,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_nullsubexpr_14() {
@@ -179,7 +179,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_15() {
@@ -191,7 +191,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_16() {
@@ -203,7 +203,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_17() {
@@ -215,7 +215,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_18() {
@@ -227,7 +227,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_19() {
@@ -239,7 +239,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_20() {
@@ -251,7 +251,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_21() {
@@ -263,7 +263,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_22() {
@@ -275,7 +275,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_23() {
@@ -287,7 +287,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_24() {
@@ -299,7 +299,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_25() {
@@ -311,7 +311,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_26() {
@@ -323,7 +323,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_27() {
@@ -335,7 +335,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_28() {
@@ -347,7 +347,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_29() {
@@ -359,7 +359,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_30() {
@@ -371,7 +371,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_31() {
@@ -383,7 +383,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_32() {
@@ -395,7 +395,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_33() {
@@ -407,7 +407,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_34() {
@@ -419,7 +419,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_35() {
@@ -431,7 +431,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_36() {
@@ -443,7 +443,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_37() {
@@ -455,7 +455,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_38() {
@@ -467,7 +467,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_39() {
@@ -479,7 +479,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_40() {
@@ -491,7 +491,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"((z)+|a)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_41() {
@@ -503,7 +503,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"a+?",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_42() {
@@ -515,7 +515,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_43() {
@@ -527,7 +527,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*?)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_44() {
@@ -539,7 +539,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a)*?",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_45() {
@@ -551,7 +551,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*?)*?",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_46() {
@@ -563,7 +563,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_47() {
@@ -575,7 +575,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_48() {
@@ -587,7 +587,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_49() {
@@ -599,7 +599,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_50() {
@@ -611,7 +611,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_51() {
@@ -623,7 +623,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_52() {
@@ -635,7 +635,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_53() {
@@ -647,7 +647,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_54() {
@@ -659,7 +659,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_55() {
@@ -671,7 +671,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_56() {
@@ -683,7 +683,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_57() {
@@ -695,7 +695,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_58() {
@@ -707,7 +707,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_59() {
@@ -719,7 +719,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_60() {
@@ -731,7 +731,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_61() {
@@ -743,7 +743,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_nullsubexpr_62() {
@@ -755,6 +755,6 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 }
