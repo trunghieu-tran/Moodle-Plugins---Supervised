@@ -11,7 +11,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_1() {
@@ -23,7 +23,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_2() {
@@ -35,7 +35,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_3() {
@@ -47,7 +47,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_4() {
@@ -59,7 +59,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_5() {
@@ -71,7 +71,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_6() {
@@ -83,7 +83,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_7() {
@@ -95,7 +95,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_8() {
@@ -107,7 +107,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_9() {
@@ -119,7 +119,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_10() {
@@ -131,7 +131,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_11() {
@@ -143,7 +143,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_12() {
@@ -155,7 +155,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_13() {
@@ -167,7 +167,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_14() {
@@ -179,7 +179,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_15() {
@@ -191,7 +191,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_16() {
@@ -203,7 +203,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_17() {
@@ -215,7 +215,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_18() {
@@ -227,7 +227,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_19() {
@@ -239,7 +239,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_20() {
@@ -251,7 +251,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_21() {
@@ -263,7 +263,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_22() {
@@ -275,7 +275,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_23() {
@@ -287,7 +287,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_24() {
@@ -299,7 +299,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_25() {
@@ -311,7 +311,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_26() {
@@ -323,7 +323,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_27() {
@@ -335,7 +335,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_28() {
@@ -347,7 +347,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_29() {
@@ -359,7 +359,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_30() {
@@ -371,7 +371,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_31() {
@@ -383,7 +383,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_32() {
@@ -395,7 +395,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_33() {
@@ -407,7 +407,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_34() {
@@ -419,7 +419,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_35() {
@@ -431,7 +431,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_36() {
@@ -443,7 +443,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_37() {
@@ -455,7 +455,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_38() {
@@ -467,7 +467,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_39() {
@@ -479,7 +479,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_40() {
@@ -491,7 +491,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_41() {
@@ -503,7 +503,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_42() {
@@ -515,7 +515,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_43() {
@@ -527,7 +527,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_44() {
@@ -539,7 +539,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_45() {
@@ -551,7 +551,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_46() {
@@ -563,7 +563,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_47() {
@@ -575,7 +575,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_48() {
@@ -587,7 +587,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_49() {
@@ -599,7 +599,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){0,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_50() {
@@ -611,7 +611,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){1,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_51() {
@@ -623,7 +623,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){2,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_52() {
@@ -635,7 +635,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){3,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_53() {
@@ -647,7 +647,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){4,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_54() {
@@ -659,7 +659,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){5,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_55() {
@@ -671,7 +671,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){6,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_56() {
@@ -683,7 +683,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){7,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_57() {
@@ -695,7 +695,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){8,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_58() {
@@ -707,7 +707,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){0,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_59() {
@@ -719,7 +719,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){1,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_60() {
@@ -731,7 +731,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){2,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_61() {
@@ -743,7 +743,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){3,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_62() {
@@ -755,7 +755,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){4,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_63() {
@@ -767,7 +767,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){5,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_64() {
@@ -779,7 +779,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){6,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_65() {
@@ -791,7 +791,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){7,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_66() {
@@ -803,7 +803,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){8,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_67() {
@@ -815,7 +815,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){0,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_68() {
@@ -827,7 +827,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){1,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_69() {
@@ -839,7 +839,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){2,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_70() {
@@ -851,7 +851,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){3,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_71() {
@@ -863,7 +863,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){4,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_72() {
@@ -875,7 +875,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){0,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_73() {
@@ -887,7 +887,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){1,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_74() {
@@ -899,7 +899,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){2,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_75() {
@@ -911,7 +911,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){3,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_76() {
@@ -923,7 +923,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd){4,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_77() {
@@ -935,7 +935,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd)*(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_78() {
@@ -947,7 +947,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(a|ab|c|bcd)+(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_79() {
@@ -959,7 +959,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){0,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_80() {
@@ -971,7 +971,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){1,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_81() {
@@ -983,7 +983,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){2,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_82() {
@@ -995,7 +995,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){3,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_83() {
@@ -1007,7 +1007,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){4,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_84() {
@@ -1019,7 +1019,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){0,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_85() {
@@ -1031,7 +1031,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){1,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_86() {
@@ -1043,7 +1043,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){2,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_87() {
@@ -1055,7 +1055,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){3,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_88() {
@@ -1067,7 +1067,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd){4,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_89() {
@@ -1079,7 +1079,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd)*(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_repetition_90() {
@@ -1091,6 +1091,6 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"(ab|a|c|bcd)+(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 }

@@ -173,7 +173,7 @@ function process_file($filename) {
         do_correction($regex, $string, $index2write, $length2write);
 
         // Define tags.
-        $tags = 'qtype_preg_cross_tester::TAG_FROM_ATT';
+        $tags = 'qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX';
         if ($indexes == '') {
             $is_match = 'false';
             $full = 'false';
