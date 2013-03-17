@@ -1,9 +1,15 @@
 <?php
 /**
  * Contains source info for generating lexer.
- * Lexer can return error tokens as leafs or fill the "casual" node's error field - depends on the node type.
- * A node's error field is usually filled if the it contains semantic errors but the syntax is correct:
- * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc. Error leafs returned otherwise.
+ *
+ * If there are names subexpressions or backreferences, the returning nodes will contain not than names but
+ * their automatically-assigned numbers. To deal with names, the lexer saves a map name => number.
+ *
+ * As for error tokens, errors may be returned in 2 ways, depending on the node type:
+ *   a) as leafs;
+ *   b) as "correct" nodes with non-null error field.
+ * The error field is usually filled if the node contains semantic errors but the syntax is correct:
+ * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -555,13 +561,8 @@ class qtype_preg_lexer extends JLexBase  {
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
         }
-        $node = new qtype_preg_leaf_backref($name);
-        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
-            $node->caseinsensitive = true;
-        }
-        $this->backrefs[] = $node;
-        return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $node);
+        $number = array_key_exists($name, $this->subexpr_map) ? $this->subexpr_map[$name] : null;
+        return $this->form_backref($text, $pos, $length, $number);
     }
     /**
      * Returns a backreference token.
@@ -626,7 +627,7 @@ class qtype_preg_lexer extends JLexBase  {
         if ($number[2] === 'R') {
             $node->number = 0;
         } else {
-            $node->number = qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
+            $node->number = (int)qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
         }
         return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $node);
     }
@@ -823,16 +824,13 @@ class qtype_preg_lexer extends JLexBase  {
         $this->errors[] = $error;
     }
     // Check for backreferences to unexisting subexpressions.
-    if (count($this->backrefs) > 0) {
-        $maxbackrefnumber = -1;
-        foreach ($this->backrefs as $leaf) {
-            $number = $leaf->number;
-            $error = false;
-            if ((is_int($number) && $number > $this->max_subexpr) || (is_string($number) && !array_key_exists($number, $this->subexpr_map))) {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $leaf->number);
-                $error->set_user_info($leaf->indfirst, $leaf->indlast, new qtype_preg_userinscription());
-                $this->errors[] = $error;
-            }
+    foreach ($this->backrefs as $leaf) {
+        $number = $leaf->number;
+        $error = false;
+        if (!is_int($number) || $number > $this->max_subexpr) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $leaf->number);
+            $error->set_user_info($leaf->indfirst, $leaf->indlast, new qtype_preg_userinscription());
+            $this->errors[] = $error;
         }
     }
 		}
