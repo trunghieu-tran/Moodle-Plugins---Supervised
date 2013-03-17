@@ -366,7 +366,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
     public function &create_graph($id = -1) {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
 
-        if ($this->pregnode->type == 'node_concat') {
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_CONCAT) {
             $left = $this->operands[0]->create_graph($id);
             $right = $this->operands[1]->create_graph($id);
 
@@ -377,7 +377,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
             $graph->entries[] = end($left->entries);
             $graph->exits[] = end($right->exits);
-        } else if ($this->pregnode->type == 'node_alt') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $left = $this->operands[0]->create_graph($id);
             $right = $this->operands[1]->create_graph($id);
 
@@ -393,10 +393,10 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->exits[] = end($graph->nodes);
-        } else if ($this->pregnode->type == 'node_finite_quant' || $this->pregnode->type == 'node_infinite_quant') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $this->pregnode->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
             $operand = $this->operands[0]->create_graph($id);
 
-            if ($this->pregnode->type == 'node_finite_quant') {
+            if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
                 $label = 'from ' . $this->pregnode->leftborder . ' to ';
                 if ($this->pregnode->rightborder == 1)
                     $label .= $this->pregnode->rightborder . ' time';
@@ -412,7 +412,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->subgraphs[] = $quant;
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
-        } else if ($this->pregnode->type == 'node_subexpr') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
             $operand = $this->operands[0]->create_graph($id);
 
             $label = get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number;

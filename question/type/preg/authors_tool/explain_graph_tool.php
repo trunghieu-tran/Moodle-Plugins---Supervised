@@ -64,18 +64,18 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
     protected function get_engine_node_name($pregname) {
         switch($pregname) {
-        case 'node_finite_quant':
-        case 'node_infinite_quant':
-        case 'node_concat':
-        case 'node_alt':
-        case 'node_subexpr':
+        case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
+        case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
+        case qtype_preg_node::TYPE_NODE_CONCAT:
+        case qtype_preg_node::TYPE_NODE_ALT:
+        case qtype_preg_node::TYPE_NODE_SUBEXPR:
             return 'qtype_preg_author_tool_operator';
 
-        case 'leaf_charset':
-        case 'leaf_meta':
-        case 'leaf_assert':
-        case 'leaf_backref':
-        case 'leaf_recursion':
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+        case qtype_preg_node::TYPE_LEAF_META:
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+        case qtype_preg_node::TYPE_LEAF_RECURSION:
             return 'qtype_preg_author_tool_leaf';
         }
 
