@@ -550,7 +550,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Only generated subpatterns can be passed.
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
-                        $length = $this->length($transition->pregleaf->number);
+                        $length = $curstate->length($transition->pregleaf->number);
                     }
 
                     if ($length == qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -666,7 +666,7 @@ if (1 == 0) {
 
                     $path = null;
                     // TODO: if ($this->options === null || $this->options->extensionneeded).
-                    $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
+                    $path = $this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                     if ($path !== null) {
                         $partialmatch->left = $path->length() - $partialmatch->length();
                         $partialmatch->extendedmatch = $path->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
