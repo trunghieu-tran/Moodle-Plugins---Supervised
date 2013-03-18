@@ -2529,7 +2529,7 @@ class poasassignment_model {
         ksort($pluginsbyname);
         foreach ($pluginsbyname as $pluginname => $plugin) {
             $settings = new admin_settingpage($subtype . '_'.$plugin,
-                $pluginname, 'moodle/site:config', !$module->visible);
+                $pluginname, 'moodle/site:config', !$module->is_enabled());
             if ($admin->fulltree) {
                 include($plugins[$plugin]);
             }
