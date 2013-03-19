@@ -1,0 +1,607 @@
+Index: form/editor.php
+===================================================================
+RCS file: /cvsroot/moodle/moodle/lib/form/editor.php,v
+retrieving revision 1.52
+diff -u -r1.52 editor.php
+--- form/editor.php	11 Nov 2010 18:33:11 -0000	1.52
++++ form/editor.php	30 Dec 2010 06:54:12 -0000
+@@ -203,13 +203,14 @@
+ 
+         $rows = empty($this->_attributes['rows']) ? 15 : $this->_attributes['rows'];
+         $cols = empty($this->_attributes['cols']) ? 80 : $this->_attributes['cols'];
++        $class = empty($this->_attributes['class']) ? '' : $this->_attributes['class'];
+ 
+-        $str .= '<div><textarea id="'.$id.'" name="'.$elname.'[text]" rows="'.$rows.'" cols="'.$cols.'">';
++        $str .= '<div><textarea class="'.$class.'" id="'.$id.'" name="'.$elname.'[text]" rows="'.$rows.'" cols="'.$cols.'">';
+         $str .= s($text);
+         $str .= '</textarea></div>';
+ 
+         $str .= '<div>';
+-        $str .= '<select name="'.$elname.'[format]">';
++        $str .= '<select class="'.$class.'" name="'.$elname.'[format]">';
+         foreach ($formats as $key=>$desc) {
+             $selected = ($format == $key) ? 'selected="selected"' : '';
+             $str .= '<option value="'.s($key).'" '.$selected.'>'.$desc.'</option>';
+@@ -237,7 +238,7 @@
+                     'sesskey'=>sesskey(),
+                     ));
+                 $str .= '<noscript>';
+-                $str .= "<div><object type='text/html' data='$editorurl' height='160' width='600' style='border:1px solid #000'></object></div>";
++                $str .= "<div><object class='itemid' type='text/html' data='$editorurl' height='160' width='600' style='border:1px solid #000'></object></div>";
+                 $str .= '</noscript>';
+             }
+         }
+Index: form/filepicker.php
+===================================================================
+RCS file: /cvsroot/moodle/moodle/lib/form/filepicker.php,v
+retrieving revision 1.57
+diff -u -r1.57 filepicker.php
+--- form/filepicker.php	21 Oct 2010 04:46:05 -0000	1.57
++++ form/filepicker.php	25 Dec 2010 09:15:31 -0000
+@@ -6,13 +6,13 @@
+ require_once($CFG->dirroot.'/repository/lib.php');
+ 
+ /**
+- * HTML class for a single filepicker element (based on button)
+- *
+- * @author       Moodle.com
+- * @version      1.0
+- * @since        Moodle 2.0
+- * @access       public
+- */
++* HTML class for a single filepicker element (based on button)
++*
++* @author       Moodle.com
++* @version      1.0
++* @since        Moodle 2.0
++* @access       public
++*/
+ class MoodleQuickForm_filepicker extends HTML_QuickForm_input {
+     public $_helpbutton = '';
+     protected $_options    = array('maxbytes'=>0, 'accepted_types'=>'*', 'return_types'=>FILE_INTERNAL);
+Index: formslib.php
+===================================================================
+RCS file: /cvsroot/moodle/moodle/lib/formslib.php,v
+retrieving revision 1.227
+diff -u -r1.227 formslib.php
+--- formslib.php	21 Sep 2010 08:07:46 -0000	1.227
++++ formslib.php	30 Dec 2010 12:04:26 -0000
+@@ -852,20 +852,20 @@
+      *                          'helpbutton' - helpbutton params array is value
+      *                          'disabledif' - last three moodleform::disabledIf()
+      *                                           params are value as an array
+-     * @param string $repeathiddenname name for hidden element storing no of repeats in this form
+-     * @param string $addfieldsname name for button to add more fields
++     * @param string $prefix prefix for additional form elements, added by the repeat_elements function
+      * @param int $addfieldsno how many fields to add at a time
+      * @param string $addstring name of button, {no} is replaced by no of blanks that will be added.
+      * @param boolean $addbuttoninside if true, don't call closeHeaderBefore($addfieldsname). Default false.
+      * @return int no of repeats of element in this page
+      */
+-    function repeat_elements($elementobjs, $repeats, $options, $repeathiddenname,
+-            $addfieldsname, $addfieldsno=5, $addstring=null, $addbuttoninside=false){
+-        if ($addstring===null){
++    function repeat_elements($elementobjs, $repeats, $options, $prefix, $addfieldsno=5, $addstring=null, $addbuttoninside=false) {
++        if ($addstring === null) {
+             $addstring = get_string('addfields', 'form', $addfieldsno);
+         } else {
+             $addstring = str_ireplace('{no}', $addfieldsno, $addstring);
+         }
++        $repeathiddenname = $prefix.'_repeats';
++        $addfieldsname = $prefix.'_add_button';
+         $repeats = optional_param($repeathiddenname, $repeats, PARAM_INT);
+         $addfields = optional_param($addfieldsname, '', PARAM_TEXT);
+         if (!empty($addfields)){
+@@ -878,34 +878,65 @@
+         //value not to be overridden by submitted value
+         $mform->setConstants(array($repeathiddenname=>$repeats));
+         $namecloned = array();
++
++        $usejs = TRUE;
++
++        $containsords = false;
++        foreach ($elementobjs as $elementobj) {
++            if (($elementobj instanceof  MoodleQuickForm_hidden) && ($elementobj->_attributes['name'] == $prefix.'_ord')) {
++                $containsords = true;
++            }
++        }
++
++        if(!$containsords){
++            $elementobjs []=  $this->_form->createElement('hidden', $prefix.'_ord', -1);
++        }
++        foreach ($elementobjs as $elementobj) {
++            if ($elementobj->_type === 'hidden') {
++                $elementobj->_attributes['class'] = ' hidden_repeated_'.$prefix.' ';
++            } else {
++                $elementobj->_attributes['class'] = ' repeated_'.$prefix.' ';
++            }
++        }
++
+         for ($i = 0; $i < $repeats; $i++) {
+             foreach ($elementobjs as $elementobj){
+                 $elementclone = fullclone($elementobj);
++
++                if (is_a($elementclone, 'MoodleQuickForm_filepicker') || is_a($elementclone, 'MoodleQuickForm_filemanager') ||
++                    is_a($elementclone, 'MoodleQuickForm_editor') || is_a($elementclone, 'MoodleQuickForm_htmleditor')) {
++                    $usejs = FALSE;
++                }
++
++                if (is_a($elementclone, 'MoodleQuickForm_hidden') && ($elementclone->_attributes['name'] == 'ord') && $i < $repeats - $addfieldsno ) {
++                    $elementclone->_attributes['value'] = $i;
++                    die;
++                }
++                $elementclone->_attributes['class'] .= ' rpt'.$i;
+                 $name = $elementclone->getName();
+                 $namecloned[] = $name;
+                 if (!empty($name)) {
+                     $elementclone->setName($name."[$i]");
+                 }
+-                if (is_a($elementclone, 'HTML_QuickForm_header')) {
++                if (is_a($elementclone,'HTML_QuickForm_header')) {
+                     $value = $elementclone->_text;
+                     $elementclone->setValue(str_replace('{no}', ($i+1), $value));
+ 
+                 } else {
+                     $value=$elementclone->getLabel();
+                     $elementclone->setLabel(str_replace('{no}', ($i+1), $value));
+-
+                 }
+-
+                 $mform->addElement($elementclone);
+             }
+         }
++
+         for ($i=0; $i<$repeats; $i++) {
+             foreach ($options as $elementname => $elementoptions){
+                 $pos=strpos($elementname, '[');
+-                if ($pos!==FALSE){
++                if ($pos !== FALSE){
+                     $realelementname = substr($elementname, 0, $pos+1)."[$i]";
+                     $realelementname .= substr($elementname, $pos+1);
+-                }else {
++                } else {
+                     $realelementname = $elementname."[$i]";
+                 }
+                 foreach ($elementoptions as  $option => $params){
+@@ -935,17 +966,26 @@
+                             $params = array_merge(array($realelementname), $params);
+                             call_user_func_array(array(&$mform, 'addRule'), $params);
+                             break;
+-
+                     }
+                 }
+             }
+         }
++
+         $mform->addElement('submit', $addfieldsname, $addstring);
+ 
+         if (!$addbuttoninside) {
+             $mform->closeHeaderBefore($addfieldsname);
+         }
+ 
++
++        if (ajaxenabled() && $usejs && $repeats > 1 && (is_a($this->_form->defaultRenderer(),'MoodleQuickForm_Renderer'))) {
++            $message = get_string('not_empty_blank','form');
++            global $PAGE;
++            $PAGE->requires->js('/lib/form/repeat_elements.js');
++            $PAGE->requires->css('/lib/form/repeat_elements.css');
++            $PAGE->requires->js_function_call('repeat_elements_init', array($prefix,$repeats,$message));
++        }
++
+         return $repeats;
+     }
+ 
+--- repeat_elements.css
++++ repeat_elements.css
+@@ -0,0 +1,29 @@
++div.rpt_remove {
++     background-image: url('/lib/form/images/remove.png');
++     width:24px;
++     height:24px;
++     float:left;
++     cursor: pointer;
++}
++div.rpt_remove_disabled {
++     background-image: url('/lib/form/images/remove_disabled.png');
++     width:24px;
++     height:24px;
++     float:left;
++}
++
++div.rpt_move {
++     background-image: url('/lib/form/images/move.png');
++     width:24px;
++     height:24px;
++     float:left;
++     cursor: move;
++}
++div.rpt_border {
++    border: 1px solid black; /* ѕараметры границы */
++    margin: 5px;
++    padding: 10px; /* ѕол€ вокруг текста */
++}
++.rpt_hidden {
++    display:none;
++}
+
+--- repeat_elements.js
++++ repeat_elements.js
+@@ -0,0 +1,376 @@
++var message;
++//find parent and mark it using child marker
++function getParent(node) {
++    var reg =/rpt\d+/;
++    var class = node.getAttribute('class').match(reg);
++    var parent = node.get('parentNode');
++    if (parent) {
++        parent.addClass(class);
++    } else {
++        parent = false;
++    }
++    return parent;
++}
++
++//clears all ids on node and it's subtree
++function clear(node) {
++    if (node) {
++        node.setAttribute('id',node.get('id')+Math.floor(Math.random()*110));
++        if (node.get('children').size()>0) {
++            node.get('children').each(function(item) {
++                clear(item);
++            });
++        }
++    }
++}
++
++//initialize drag&drop and all events
++function init_dd(prefix) {
++    YUI().use('dd-constrain', 'dd-proxy', 'dd-drop','node-base','node', function(Y) {
++        var goingUp = false, lastY = 0;
++        //Initialize drag items
++        var drag_nodes = Y.Node.all(".rpt_drag_"+prefix);
++        var i=0;
++        drag_nodes.each(function(v, k) {
++            var dd = new Y.DD.Drag({
++                node: v,
++                target: {
++                    padding: '0 0 0 20'
++                }
++            }).plug(Y.Plugin.DDProxy, {
++                moveOnEnd: false
++            }).plug(Y.Plugin.DDConstrained, {
++                constrain2node: ".rpt_drop_"+prefix
++            }).plug(Y.Plugin.DDWinScroll)
++            .plug(Y.Plugin.DDProxy);
++            v.dd.addHandle('.rpt_move');
++        });
++
++        //Initialize drop item
++        var drop_item = Y.Node.all(".rpt_drop_"+prefix);
++        drop_item.each(function(v, k) {
++            var tar = new Y.DD.Drop({
++                node: v
++            });
++        });
++
++        //Listen for all drop:over events
++        Y.DD.DDM.on('drop:over', function(e) {
++            var drag = e.drag.get('node'),
++                drop = e.drop.get('node');
++            if (drop.hasClass("rpt_drag_"+prefix)) {
++                if (!goingUp) {
++                    drop = drop.get('nextSibling');
++                }
++                e.drop.get('node').get('parentNode').insertBefore(drag, drop);
++                e.drop.sizeShim();
++            }
++        });
++
++        //Listen for all drag:drag events
++        Y.DD.DDM.on('drag:drag', function(e) {
++            //Get the last y point
++            var y = e.target.lastXY[1];
++            if (y < lastY) {
++                //We are going up
++                goingUp = true;
++            } else {
++                //We are going down.
++                goingUp = false;
++            }
++            //Cache for next check
++            lastY = y;
++        });
++
++        //Listen for all drag:start events
++        Y.DD.DDM.on('drag:start', function(e) {
++            var drag = e.target;
++        });
++
++        //Listen for a drag:end events
++        Y.DD.DDM.on('drag:end', function(e) {
++            var drag = e.target;
++            drag.get('node').setStyles({
++                visibility: '',
++                opacity: '1'
++            });
++            remove_controls(drag.get('node'));
++            init_blank(drag.get('node'));
++            sort(prefix);
++        });
++
++        //Listen for all drag:drophit events
++        Y.DD.DDM.on('drag:drophit', function(e) {
++            var drop = e.drop.get('node'),
++                drag = e.drag.get('node');
++            if (!drop.hasClass("rpt_drop_"+prefix)) {
++                if (!drop.contains(drag)) {
++                    drop.appendChild(drag);
++                }
++            }
++        });
++    });
++}
++
++//init repeat_elements js interface
++function repeat_elements_init(prefix, repeat_count, msg) {
++    var drop_item;
++    message = msg;
++    YUI().use('node',function(Y) {
++        Y.Node.one('input[name='+prefix+'_add_button]').setAttribute('value','add '+prefix);
++        var elements = Y.Node.all(".repeated_"+prefix);
++        var parent_node = find_parent(elements,prefix);                 //Ancestor element for blank
++        var drag_items_arr = [];
++        for (var i=0;i<repeat_count;i++) {
++            var nodes = Y.Node.all(".superparent_"+prefix+" > .rpt"+i); // Get blank's fields
++            var rpt_drag =Y.Node.create("<div class='rpt_drag_"+prefix+" rpt_border'></div>"); // Creating container for fields and controls
++            parent_node.insert(rpt_drag,nodes.item(0));                 // Moving blank fields to container
++            nodes.each(function(item) {
++                rpt_drag.append(item);
++            });
++            drag_items_arr[i] = rpt_drag;
++        }
++        drop_item = Y.Node.create("<div class='rpt_drop_"+prefix+"'></div>"); // Creating parent container for blocks
++        parent_node.insert(drop_item,drag_items_arr[0]);                      // Moving all blanks containers to parent container
++        for (var i=0; i<drag_items_arr.length;i++) {
++            drop_item.append(drag_items_arr[i]);
++            drag_items_arr[i].insert('<div class="rpt_remove"></div>',0);
++            drag_items_arr[i].insert('<div class="rpt_move"></div>',0);
++            //Delete blank
++            drag_items_arr[i].one(".rpt_remove").on("click", function(e) {    // Delete blank listener initialization
++                e.halt();
++                var parentnode = this.get('parentNode');                       // Get blank's container
++                var nodes = Y.Node.all('.rpt_drag_'+prefix);
++                if(nodes.size() > 2) {                                         // If blank is not last
++                    var x = is_clear(parentnode);
++                    if(is_clear(parentnode)) {
++                        parentnode.remove();
++                        var repeats_count = Y.Node.one("[name="+prefix+"_repeats]");
++                        repeats_count.setAttribute("value",(parseInt(repeats_count.getAttribute("value")) - 1));// counter decrement
++                        var index = this.get('parentNode').one(".repeated_"+prefix).getAttribute('name').match(/\[\d+\]/);
++                        hidden = Y.Node.all(".hidden_repeated_"+prefix+"[name*='"+index+"']"); // hidden fields search
++                        hidden.each(function(h_item) {                                         // delete hidden fiekds
++                            h_item.remove();
++                        });
++                        nodes = Y.Node.all('.rpt_drag_'+prefix);
++                        if (nodes.size() == 2) {
++                            nodes.each(function(item) {
++                                item.all('div.rpt_remove').addClass('rpt_remove_disabled');
++                            })
++                        }
++                    } else {
++                        alert(message);
++                    }
++                }
++            });
++        }
++        var blank_item = drag_items_arr[drag_items_arr.length -1];
++        blank_item.addClass('rpt_hidden');
++        //add blank
++        Y.on("click", function(e) {                          // add empty blank event listener
++            nodes = Y.Node.all('.rpt_drag_'+prefix);
++                nodes.each(function(item) {
++                    item.all('div.rpt_remove').removeClass('rpt_remove_disabled');
++                })
++            e.halt();
++            var drag_items = drop_item.get('children');     // get draggable items list
++            template_blank = drag_items.item(drag_items.size() -1);     //get blank from list
++            remove_controls(template_blank);
++            var blank = template_blank.cloneNode(true);     //make blank copy
++            drop_item.insert(blank,template_blank);         //insert copy to the blank list
++            blank.removeClass('rpt_hidden');
++            var repeats_count = Y.Node.one("[name="+prefix+"_repeats]");        //get repeats count
++            repeats_count.setAttribute("value",(parseInt(repeats_count.getAttribute("value")) + 1)); // repeats count incrementation
++            var b_name = template_blank.one(".repeated_"+prefix).getAttribute('name'); // get blank index by name
++            var index = b_name.match(/\[\d+\]/).toString().match(/\d+/).toString();
++            var template_index = parseInt(index) +1;
++            template_blank.all(".repeated_"+prefix).each(function(t_b_item){
++                t_b_item.setAttribute('name',t_b_item.getAttribute('name').replace(/\[\d+\]/,'['+template_index+']')); // set new index
++            });
++            hidden = Y.Node.all(".hidden_repeated_"+prefix+"[name*='["+index+"]']");
++            var h_parent = hidden.get('parentNode');
++            hidden.each(function(blank_h_item) {                // change fields indexes
++                new_hidden = blank_h_item.cloneNode(true);
++                h_parent.insert(new_hidden,blank_h_item);
++                var name = blank_h_item.getAttribute('name');
++                var new_name = name.replace(/\[\d+\]/,'['+template_index+']');
++                blank_h_item.setAttribute('name', new_name);
++            });
++            blank.one(".rpt_remove").on("click", function(e) { // delete event listener
++                e.halt();
++                var parentnode = this.get('parentNode');                       //get blank container
++                var nodes = Y.Node.all('.rpt_drag_'+prefix);
++                if(nodes.size() > 2) {
++                    var x = is_clear(parentnode);
++                    if(is_clear(parentnode)) {
++                        parentnode.remove();                                    //remove blank
++                        var repeats_count = Y.Node.one("[name="+prefix+"_repeats]");
++                        repeats_count.setAttribute("value",(parseInt(repeats_count.getAttribute("value")) - 1));
++                        var index = this.get('parentNode').one(".repeated_"+prefix).getAttribute('name').match(/\[\d+\]/);
++                        hidden = Y.Node.all(".hidden_repeated_"+prefix+"[name*='"+index+"']");
++                        hidden.each(function(h_item) {                          //remove hiddden fields
++                            h_item.remove();
++                        });
++                        nodes = Y.Node.all('.rpt_drag_'+prefix);
++                        if (nodes.size() == 2) {
++                            nodes.each(function(item) {
++                                item.all('div.rpt_remove').addClass('rpt_remove_disabled');
++                            })
++                        }
++                    } else {
++                        alert(message);
++                    }
++                }
++            });
++            clear(blank);
++            init_blank(blank);
++            init_dd(prefix);
++        }, Y.Node.one("[name="+prefix+"_add_button]"));
++    });
++    init_dd(prefix);
++}
++
++//find least common parent
++function find_parent(nodeList,prefix) {
++    node = nodeList.item(0);
++    var pNode = node;
++    var count = nodeList.size();
++    if (count) {
++        for (var i=1;i<count;i++) {
++            var curItem = nodeList.item(i);
++            if (!(is_parent(curItem,pNode,prefix))) {
++                pNode = least_common_parent(pNode, curItem, prefix);
++            }
++        }
++    }
++    pNode.addClass("superparent_"+prefix);
++    return pNode;
++}
++
++//return true if parent is an item parent
++function is_parent(item,parent,prefix) {
++    var curParent = getParent(item);
++    if (curParent) {
++        if (curParent == parent) {
++            return true;
++        } else {
++            return is_parent(curParent,parent,prefix);
++        }
++    } else {
++        return false;
++    }
++}
++
++//find least common parent for 2 items
++function least_common_parent(item1, item2, prefix) {
++    var h1 = depth(item1);          // depth(x) = глубина вершины x
++    var h2 = depth(item2);
++    while (h1 != h2) {
++        if (h1 > h2) {
++            item1 = getParent(item1);
++            h1 = h1 - 1;
++        } else {
++            item2 = getParent(item2);
++            h2 = h2 - 1;
++        }
++    }
++    while( item1 != item2) {
++        item1 = getParent(item1);    // parent(x) = непосредственный предок вершины x
++        item2 = getParent(item2);
++    }
++    return item1;
++}
++
++//return node depth from tree root
++function depth(node) {
++    var depth=0;
++    var pNode = node.get('parentNode');
++    while(pNode) {
++            pNode = pNode.get('parentNode');
++            depth++;
++    }
++    return depth;
++}
++
++//sort blanks and reinitialize their indexes
++function sort(prefix) {
++    var reg =/\[\d+\]/;
++    var name, number, hidden;
++    YUI().use('node',function(Y) {
++        var hidden_list = Y.Node.all(".hidden_repeated_"+prefix);
++        hidden_list.addClass("unsorted");
++        var dragList = Y.Node.all(".rpt_drag_"+prefix);
++        for(var i=0;i<dragList.size();i++) {
++            var drag_item = dragList.item(i);
++            var items = drag_item.all(".repeated_"+prefix+"[name*=']']");
++            items.each(function(item) {
++                number = item.getAttribute('name').match(reg);
++                item.setAttribute('name', item.getAttribute('name').replace(/\[\d+\]/,'['+i+']'));
++                hidden = Y.Node.all(".unsorted.hidden_repeated_"+prefix+"[name*='"+number+"']");
++                hidden.each(function(h_item) {
++                    h_item.setAttribute('name', h_item.getAttribute('name').replace(/\[\d+\]/,'['+i+']'));
++                    h_item.removeClass("unsorted");
++                });
++            });
++        }
++    });
++}
++
++//JS widgets initialization
++function init_blank(blank) {
++    YUI().use('node',function(Y) {
++        var textarea_list = blank.all(".feditor textarea");
++        textarea_list.each( function(item) {
++            Y.use('editor_tinymce', function(Y) {
++                M.editor_tinymce.init_editor(Y, item.get("id"), {"mode":"exact", "elements":item.get("id"), "relative_urls":false, "document_base_url":"http:\/\/moodle.test1.ru", "content_css":"http:\/\/moodle.test1.ru\/theme\/styles.php?theme=standard&rev=172&type=editor", "language":"en", "directionality":"ltr","plugin_insertdate_dateFormat ":"%A, %d %B %Y","plugin_insertdate_timeFormat ":"%I:%M %p","theme":"advanced","skin":"o2k7","skin_variant":"silver","apply_source_formatting":true,"remove_script_host":false,"entity_encoding":"raw","plugins":"moodlemedia,advimage,safari,table,style,layer,advhr,advlink,emotions,inlinepopups,searchreplace,paste,directionality,fullscreen,moodlenolink,nonbreaking,contextmenu,insertdatetime,save,iespell,preview,print,noneditable,visualchars,xhtmlxtras,template,pagebreak,spellchecker","theme_advanced_font_sizes":"1,2,3,4,5,6,7","theme_advanced_layout_manager":"SimpleLayout","theme_advanced_toolbar_align":"left","theme_advanced_buttons1":"fontselect,fontsizeselect,formatselect","theme_advanced_buttons1_add":"|,undo,redo,|,search,replace,|,fullscreen","theme_advanced_buttons2":"bold,italic,underline,strikethrough,sub,sup,|,justifyleft,justifycenter,justifyright","theme_advanced_buttons2_add":"|,cleanup,removeformat,pastetext,pasteword,|,forecolor,backcolor,|,ltr,rtl","theme_advanced_buttons3":"bullist,numlist,outdent,indent,|,link,unlink,moodlenolink,|,image,moodlemedia,nonbreaking,charmap","theme_advanced_buttons3_add":"table,|,code,spellchecker","theme_advanced_fonts":"Trebuchet=Trebuchet MS,Verdana,Arial,Helvetica,sans-serif;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;Georgia=georgia,times new roman,times,serif;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times,serif;Verdana=verdana,arial,helvetica,sans-serif;Impact=impact;Wingdings=wingdings","theme_advanced_resize_horizontal":true,"theme_advanced_resizing":true,"theme_advanced_toolbar_location":"top","theme_advanced_statusbar_location":"bottom","spellchecker_rpc_url":"http:\/\/moodle.test1.ru\/lib\/editor\/tinymce\/tiny_mce\/3.3.9.2\/plugins\/spellchecker\/rpc.php","valid_elements":"*[*]","invalid_elements":""
++                });
++            });
++        });
++        var textarea_list = blank.all(".fhtmleditor textarea");
++        textarea_list.each( function(item) {
++            Y.use('editor_tinymce', function(Y) {
++                M.editor_tinymce.init_editor(Y, item.get("id"), {"mode":"exact","elements":item.get("id"),"relative_urls":false,"document_base_url":"http:\/\/moodle.test1.ru","content_css":"http:\/\/moodle.test1.ru\/theme\/styles.php?theme=standard&rev=172&type=editor","language":"en","directionality":"ltr","plugin_insertdate_dateFormat ":"%A, %d %B %Y","plugin_insertdate_timeFormat ":"%I:%M %p","theme":"advanced","skin":"o2k7","skin_variant":"silver","apply_source_formatting":true,"remove_script_host":false,"entity_encoding":"raw","plugins":"moodlemedia,advimage,safari,table,style,layer,advhr,advlink,emotions,inlinepopups,searchreplace,paste,directionality,fullscreen,moodlenolink,nonbreaking,contextmenu,insertdatetime,save,iespell,preview,print,noneditable,visualchars,xhtmlxtras,template,pagebreak,spellchecker","theme_advanced_font_sizes":"1,2,3,4,5,6,7","theme_advanced_layout_manager":"SimpleLayout","theme_advanced_toolbar_align":"left","theme_advanced_buttons1":"fontselect,fontsizeselect,formatselect","theme_advanced_buttons1_add":"|,undo,redo,|,search,replace,|,fullscreen","theme_advanced_buttons2":"bold,italic,underline,strikethrough,sub,sup,|,justifyleft,justifycenter,justifyright","theme_advanced_buttons2_add":"|,cleanup,removeformat,pastetext,pasteword,|,forecolor,backcolor,|,ltr,rtl","theme_advanced_buttons3":"bullist,numlist,outdent,indent,|,link,unlink,moodlenolink,|,image,moodlemedia,nonbreaking,charmap","theme_advanced_buttons3_add":"table,|,code,spellchecker","theme_advanced_fonts":"Trebuchet=Trebuchet MS,Verdana,Arial,Helvetica,sans-serif;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;Georgia=georgia,times new roman,times,serif;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times,serif;Verdana=verdana,arial,helvetica,sans-serif;Impact=impact;Wingdings=wingdings","theme_advanced_resize_horizontal":true,"theme_advanced_resizing":true,"theme_advanced_toolbar_location":"top","theme_advanced_statusbar_location":"bottom","spellchecker_rpc_url":"http:\/\/moodle.test1.ru\/lib\/editor\/tinymce\/tiny_mce\/3.3.9.2\/plugins\/spellchecker\/rpc.php","valid_elements":"*[*]","invalid_elements":""
++                });
++            });
++        });
++    });
++}
++
++//removes tinyMCE from blank
++function remove_controls(blank) {
++    YUI().use('node',function(Y) {
++        var textarea_list = blank.all(".feditor textarea");
++        textarea_list.each( function(item) {
++            try{
++                tinyMCE.get(item.get("id")).remove();
++            } catch(e) {}
++        });
++        var textarea_list = blank.all(".fhtmleditor textarea");
++        textarea_list.each( function(item) {
++            try{
++                tinyMCE.get(item.get("id")).remove();
++            } catch(e) {}
++        });
++    });
++}
++
++//generate new random id's for elements
++function is_clear(node) {
++        var result = true;
++        node.all('input[type="text"]').each(function(item){
++            if(!isEmpty(item.get('value'))) result = false;
++        });
++        node.all('input[type="textarea"]').each(function(item){
++            //if(!isEmpty(item.get('value'))) result = false;
++            //var content = tinyMCE.get(item.get("id")).getContent();
++            //alert(content);
++        });
++        node.all('input[type="password"]').each(function(item){
++            if(!isEmpty(item.get('value'))) result = false;
++        });
++        return result;
++}
++
++function isEmpty( inputStr ) {
++    return !(inputStr && inputStr.length)
++}
+
+
