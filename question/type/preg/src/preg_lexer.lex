@@ -2,9 +2,15 @@
 
 /**
  * Contains source info for generating lexer.
- * Lexer can return error tokens as leafs or fill the "casual" node's error field - depends on the node type.
- * A node's error field is usually filled if the it contains semantic errors but the syntax is correct:
- * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc. Error leafs returned otherwise.
+ *
+ * If there are names subexpressions or backreferences, the returning nodes will contain not than names but
+ * their automatically-assigned numbers. To deal with names, the lexer saves a map name => number.
+ *
+ * As for error tokens, errors may be returned in 2 ways, depending on the node type:
+ *   a) as leafs;
+ *   b) as "correct" nodes with non-null error field.
+ * The error field is usually filled if the node contains semantic errors but the syntax is correct:
+ * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -36,16 +42,16 @@ class qtype_preg_token {
     }
 }
 
-class qtype_preg_optstack_item {
+class qtype_preg_opt_stack_item {
     public $modifiers;
-    public $subpattnum;
-    public $subpattname;
+    public $subexpr_num;
+    public $subexpr_name;
     public $parennum;
 
-    public function __construct($modifiers, $subpattnum, $subpattname, $parennum) {
+    public function __construct($modifiers, $subexpr_num, $subexpr_name, $parennum) {
         $this->modifiers = $modifiers;
-        $this->subpattnum = $subpattnum;
-        $this->subpattname = $subpattname;
+        $this->subexpr_num = $subexpr_num;
+        $this->subexpr_name = $subexpr_name;
         $this->parennum = $parennum;
     }
 }
@@ -59,59 +65,56 @@ class qtype_preg_optstack_item {
 NOTSPECIALO = [^"\^$.[|()?*+{"]                          // Special characters outside character sets.
 NOTSPECIALI = [^"\^-[]"]                                 // Special characters inside character sets.
 MODIFIER    = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
-ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\backreference names.
+ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
 %init{
-    $this->errors                    = array();
-    $this->lastsubpatt               = 0;
-    $this->maxsubpatt                = 0;
-    $this->subpatternmap             = array();
-    $this->backrefs                  = array();
-    $this->optstack                  = array();
-    $this->optstack[0]               = new qtype_preg_optstack_item(array('i' => false), -1, null, -1);
-    $this->optcount                  = 1;
-    $this->charset                   = null;
-    $this->charsetcount              = 0;
-    $this->charsetset                = '';
-    $this->charsetuserinscription    = null;
-    $this->charsetuserinscriptionraw = null;
-    $this->handlingoptions           = new qtype_preg_handling_options();
+    $this->errors                      = array();
+    $this->last_subexpr                = 0;
+    $this->max_subexpr                 = 0;
+    $this->subexpr_map                 = array();
+    $this->backrefs                    = array();
+    $this->opt_stack                   = array();
+    $this->opt_stack[0]                = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
+    $this->opt_count                   = 1;
+    $this->charset                     = null;
+    $this->charset_count               = 0;
+    $this->charset_set                 = '';
+    $this->charset_userinscription     = null;
+    $this->charset_userinscription_raw = null;
+    $this->handlingoptions             = new qtype_preg_handling_options();
 
 %init}
 %eof{
     // End of the expression inside a character class.
     if ($this->charset !== null) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET/*, $this->charsetuserinscription*/);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET/*, $this->charset_userinscription*/);
         $error->set_user_info($this->charset->indfirst, $this->yychar - 1, new qtype_preg_userinscription());
         $this->errors[] = $error;
     }
-    // Check for backreferences to unexisting subpatterns.
-    if (count($this->backrefs) > 0) {
-        $maxbackrefnumber = -1;
-        foreach ($this->backrefs as $leaf) {
-            $number = $leaf->number;
-            $error = false;
-            if ((is_int($number) && $number > $this->maxsubpatt) || (is_string($number) && !array_key_exists($number, $this->subpatternmap))) {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->number);
-                $error->set_user_info($leaf->indfirst, $leaf->indlast, new qtype_preg_userinscription());
-                $this->errors[] = $error;
-            }
+    // Check for backreferences to unexisting subexpressions.
+    foreach ($this->backrefs as $leaf) {
+        $number = $leaf->number;
+        $error = false;
+        if (!is_int($number) || $number > $this->max_subexpr) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $leaf->number);
+            $error->set_user_info($leaf->indfirst, $leaf->indlast, new qtype_preg_userinscription());
+            $this->errors[] = $error;
         }
     }
 %eof}
 %{
     public $handlingoptions;                // Regex handling options set from the outside.
     protected $errors;                      // Array of lexical errors found.
-    protected $lastsubpatt;                 // Number of the last lexed subpattern, used to deal with (?| ... ) constructions.
-    protected $maxsubpatt;                  // Max subpattern number.
-    protected $subpatternmap;               // Map of subpatterns name => number.
-    protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subpatterns.
-    protected $optstack;                    // Stack containing additional information about subpatterns (modifiers, current subpattern name, etc).
-    protected $optcount;                    // Number of items in the above stack.
+    protected $last_subexpr;                // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
+    protected $max_subexpr;                 // Max subexpression number.
+    protected $subexpr_map;                 // Map of subexpression names => numbers.
+    protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
+    protected $opt_stack;                   // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
+    protected $opt_count;                   // Number of items in the above stack.
     protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
-    protected $charsetcount;                // Number of characters in the charset excluding flags.
-    protected $charsetset;                  // Characters of the charset.
-    protected $charsetuserinscription;      // User inscriptions for flags and ranges.
-    protected $charsetuserinscriptionraw;   // User inscriptions char by char (can also be \x... or anything representing one character).
+    protected $charset_count;               // Number of characters in the charset excluding flags.
+    protected $charset_set;                 // Characters of the charset.
+    protected $charset_userinscription;     // User inscriptions for flags and ranges.
+    protected $charset_userinscription_raw; // User inscriptions char by char (can also be \x... or anything representing one character).
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -252,12 +255,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         return $this->errors;
     }
 
-    public function get_max_subpattern() {
-        return $this->maxsubpatt;
+    public function get_max_subexpr() {
+        return $this->max_subexpr;
     }
 
-    public function get_subpattern_map() {
-        return $this->subpatternmap;
+    public function get_subexpr_map() {
+        return $this->subexpr_map;
     }
 
     public function get_backrefs() {
@@ -304,13 +307,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             for ($i = 0; $i < $set->length(); $i++) {
                 $modname = $set[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = true;
+                    $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = true;
                 }
             }
             for ($i = 0; $i < $unset->length(); $i++) {
                 $modname = $unset[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = false;
+                    $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = false;
                 }
             }
         }
@@ -437,7 +440,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
             // Error: empty name.
             if ($name === '') {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, htmlspecialchars($text));
                 $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
                 return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
             }
@@ -473,14 +476,14 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     }
 
     /**
-     * Returns a named subpattern token.
+     * Returns a named subexpression token.
      */
-    protected function form_named_subpatt($text, $pos, $length, $namestartpos, $closetype) {
+    protected function form_named_subexpr($text, $pos, $length, $namestartpos, $closetype) {
         $this->push_opt_lvl();
 
         // Error: missing closing characters.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, htmlspecialchars($text));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
         }
@@ -489,56 +492,56 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
         // Error: empty name.
         if ($name === '') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
-        $num = $this->map_subpattern($name);
+        $num = $this->map_subexpr($name);
 
-        // Error: subpatterns with same names should have different numbers.
+        // Error: subexpressions with same names should have different numbers.
         if ($num === null) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, htmlspecialchars($name));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, htmlspecialchars($name));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
         // Are we inside a (?| group?
-        $insidedup = ($this->optcount > 1 && $this->optstack[$this->optcount - 2]->subpattnum !== -1);
+        $insidedup = ($this->opt_count > 1 && $this->opt_stack[$this->opt_count - 2]->subexpr_num !== -1);
 
-        // First occurence of a named subpattern inside a (?| group.
-        if ($insidedup && $this->optstack[$this->optcount - 2]->subpattname === null) {
-            $this->optstack[$this->optcount - 2]->subpattname = $name;
+        // First occurence of a named subexpression inside a (?| group.
+        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name === null) {
+            $this->opt_stack[$this->opt_count - 2]->subexpr_name = $name;
         }
 
-        // Error: different names for subpatterns of the same number.
-        if ($insidedup && $this->optstack[$this->optcount - 2]->subpattname !== $name) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, htmlspecialchars($text));
+        // Error: different names for subexpressions of the same number.
+        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name !== $name) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
-        return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $num));
+        return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $num));
     }
 
     /**
-     * Returns a conditional subpattern token.
+     * Returns a conditional subexpression token.
      */
-    protected function form_cond_subpatt($text, $pos, $length, $subtype, $ending = '', $numeric = true, $namestartpos = 0) {
+    protected function form_cond_subexpr($text, $pos, $length, $subtype, $ending = '', $numeric = true, $namestartpos = 0) {
         $this->push_opt_lvl();
 
-        // Conditional subpatterns with assertions is a separate story.
-        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
-            $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
+        // Conditional subexpressions with assertions is a separate story.
+        if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+            $subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
             $this->push_opt_lvl();
-            return new qtype_preg_token(qtype_preg_yyParser::CONDSUBPATT, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
+            return new qtype_preg_token(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
         }
 
         $endlength = strlen($ending);
 
         // Error: unclosed condition.
         if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, htmlspecialchars($text));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
         }
@@ -547,19 +550,19 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $secondnode = new qtype_preg_lexem(null, -1, -1, null);
 
         // Recursion.
-        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION) {
+        if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
             if (qtype_poasquestion_string::substr($text, 4, 1) === '&') {   // (?(R&
                 $data = qtype_poasquestion_string::substr($text, 5, $length - 6);
                 // Error: empty name.
                 if ($data === '') {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, htmlspecialchars($text));
                     $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
                 }
             } else {                                                        // (?(Rnumber)
                 $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
                 // Error: digits expected.
                 if ($tmp !== '' && !ctype_digit($tmp)) {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($tmp));
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER, htmlspecialchars($tmp));
                     $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
                     $data = 0;
                 }
@@ -567,8 +570,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             }
         }
 
-        // Subpattern.
-        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT && $numeric) {
+        // Subexpression.
+        if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR && $numeric) {
             $str = qtype_poasquestion_string::substr($text, 3, $length - 4);
             $tmp = qtype_poasquestion_string::substr($str, 0, 1);
             $sign = 0;
@@ -579,11 +582,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             }
             if ($str !== '' && !ctype_digit($str)) {
                 // Error: digits expected.
-                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($str));
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER, htmlspecialchars($str));
                 $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             } else {
                 if ($sign !== 0) {
-                    $data = $sign * (int)$str + $this->lastsubpatt;
+                    $data = $sign * (int)$str + $this->last_subexpr;
                     if ($sign < 0) {
                         $data++;
                     }
@@ -592,24 +595,24 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
                 }
                 // Error: reference to the whole expression.
                 if ($data === 0) {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, htmlspecialchars($data));
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, htmlspecialchars($data));
                     $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
                 }
             }
         }
 
-        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT && !$numeric) {
+        if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR && !$numeric) {
             $data = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - $endlength);
             // Error: empty name.
             if ($data === '') {
-                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, htmlspecialchars($text));
                 $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             }
         }
 
         // Subtype "DEFINE" has no need to be processed.
 
-        return array(new qtype_preg_token(qtype_preg_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $data)),
+        return array(new qtype_preg_token(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem_subexpr($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $data)),
                      new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $secondnode),
                      new qtype_preg_token(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
@@ -636,18 +639,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
         // Error: empty name.
         if ($name === '') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription());
             return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
         }
 
-        $node = new qtype_preg_leaf_backref($name);
-        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
-            $node->caseinsensitive = true;
-        }
-        $this->backrefs[] = $node;
-        return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $node);
+        $number = array_key_exists($name, $this->subexpr_map) ? $this->subexpr_map[$name] : null;
+        return $this->form_backref($text, $pos, $length, $number);
     }
 
     /**
@@ -663,7 +661,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $this->backrefs[] = $node;
@@ -688,7 +686,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $node = new qtype_preg_leaf_charset();
         $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
         $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $node->subtype = $subtype;
@@ -711,13 +709,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         if ($number[2] === 'R') {
             $node->number = 0;
         } else {
-            $node->number = qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
+            $node->number = (int)qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
         }
         return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $node);
     }
@@ -729,33 +727,33 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
      */
     protected function form_num_interval() {
         // Check if there are enough characters in before.
-        if ($this->charsetcount < 3 || qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 2, 1) !== '-') {
+        if ($this->charset_count < 3 || qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 2, 1) !== '-') {
             return null;
         }
-        $startchar = qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 3, 1);
-        $endchar = qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 1, 1);
+        $startchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 3, 1);
+        $endchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 1, 1);
 
         // Modify userinscription;
-        $userinscriptionend = array_pop($this->charsetuserinscriptionraw);
-        array_pop($this->charsetuserinscriptionraw);
-        $userinscriptionstart = array_pop($this->charsetuserinscriptionraw);
-        $this->charsetuserinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
+        $userinscriptionend = array_pop($this->charset_userinscription_raw);
+        array_pop($this->charset_userinscription_raw);
+        $userinscriptionstart = array_pop($this->charset_userinscription_raw);
+        $this->charset_userinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
 
         if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
             // Replace last 3 characters by all the characters between them.
-            $this->charsetset = qtype_poasquestion_string::substr($this->charsetset, 0, $this->charsetcount - 3);
-            $this->charsetcount -= 3;
+            $this->charset_set = qtype_poasquestion_string::substr($this->charset_set, 0, $this->charset_count - 3);
+            $this->charset_count -= 3;
             $curord = qtype_poasquestion_string::ord($startchar);
             $endord = qtype_poasquestion_string::ord($endchar);
             while ($curord <= $endord) {
-                $this->charsetset .= qtype_poasquestion_string::code2utf8($curord++);
-                $this->charsetcount++;
+                $this->charset_set .= qtype_poasquestion_string::code2utf8($curord++);
+                $this->charset_count++;
             }
             return null;
         } else {
             // Delete last 3 characters.
-            $this->charsetcount -= 3;
-            $this->charsetset = qtype_poasquestion_string::substr($this->charsetset, 0, $this->charsetcount);
+            $this->charset_count -= 3;
+            $this->charset_set = qtype_poasquestion_string::substr($this->charset_set, 0, $this->charset_count);
             // Return the error node.
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, htmlspecialchars($startchar . '-' . $endchar));
             $error->set_user_info($this->yychar - 2, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
@@ -763,53 +761,52 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         }
     }
 
-    protected function push_opt_lvl($subpattnum = -1) {
-        if ($this->optcount > 0) {
-            $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount - 1];
-            if ($subpattnum !== -1) {
-                $this->optstack[$this->optcount]->subpattnum = $subpattnum;
-                $this->optstack[$this->optcount]->parennum = $this->optcount;
+    protected function push_opt_lvl($subexpr_num = -1) {
+        if ($this->opt_count > 0) {
+            $this->opt_stack[$this->opt_count] = clone $this->opt_stack[$this->opt_count - 1];
+            if ($subexpr_num !== -1) {
+                $this->opt_stack[$this->opt_count]->subexpr_num = $subexpr_num;
+                $this->opt_stack[$this->opt_count]->parennum = $this->opt_count;
             }
-            $this->optstack[$this->optcount]->subpattname = null;   // Reset it anyway.
-            $this->optcount++;
+            $this->opt_stack[$this->opt_count]->subexpr_name = null;   // Reset it anyway.
+            $this->opt_count++;
         } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
     }
 
     protected function pop_opt_lvl() {
-        if ($this->optcount > 0) {
-            $item = $this->optstack[$this->optcount - 1];
-            $this->optcount--;
+        if ($this->opt_count > 0) {
+            $item = $this->opt_stack[$this->opt_count - 1];
+            $this->opt_count--;
             // Is it a pair for some opening paren?
-            if ($item->parennum === $this->optcount) {
+            if ($item->parennum === $this->opt_count) {
                 // Are we out of a (?|...) block?
-                if ($this->optstack[$this->optcount - 1]->subpattnum !== -1) {
+                if ($this->opt_stack[$this->opt_count - 1]->subexpr_num !== -1) {
                     // Inside.
-                    $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    // Reset subpattern numeration.
+                    $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;    // Reset subexpression numeration.
                 } else {
                     // Outside.
-                    $this->lastsubpatt = $this->maxsubpatt;
+                    $this->last_subexpr = $this->max_subexpr;
                 }
             }
         }
     }
 
     /**
-     * Adds a named subpattern to the map.
-     * @param name subpattern to be mapped.
+     * Adds a named subexpression to the map.
      */
-    protected function map_subpattern($name) {
-        if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
-            $num = ++$this->lastsubpatt;
-            $this->subpatternmap[$name] = $num;
-        } else {                                                // Subpatterns with same names should have same numbers.
-            if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum === -1) {
+    protected function map_subexpr($name) {
+        if (!array_key_exists($name, $this->subexpr_map)) {   // This subexpression does not exists.
+            $num = ++$this->last_subexpr;
+            $this->subexpr_map[$name] = $num;
+        } else {                                                // Subexpressions with same names should have same numbers.
+            if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num === -1) {
                 return null;
             }
-            $num = $this->subpatternmap[$name];
-            $this->lastsubpatt++;
+            $num = $this->subexpr_map[$name];
+            $this->last_subexpr++;
 
         }
-        $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+        $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
         return (int)$num;
     }
 
@@ -839,12 +836,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     protected function add_flag_to_charset($text, $type, $data, $negative = false, $appendtoend = true) {
         switch ($type) {
         case qtype_preg_charset_flag::SET:
-            $this->charsetuserinscriptionraw[] = new qtype_preg_userinscription($text);
-            $this->charsetcount++;
+            $this->charset_userinscription_raw[] = new qtype_preg_userinscription($text);
+            $this->charset_count++;
             if ($appendtoend) {
-                $this->charsetset .= $data;
+                $this->charset_set .= $data;
             } else {
-                $this->charsetset = $data . $this->charsetset;
+                $this->charset_set = $data . $this->charset_set;
             }
             $error = $this->form_num_interval();
             if ($error !== null) {
@@ -853,7 +850,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
-            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
@@ -967,20 +964,20 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $this->charset->negative = ($text === '[^' || $text === '[^]');
     $this->charset->error = array();
     $this->charset->userinscription = array();
-    $this->charsetcount = 0;
-    $this->charsetset = '';
-    $this->charsetuserinscription = array();
-    $this->charsetuserinscriptionraw = array();
+    $this->charset_count = 0;
+    $this->charset_set = '';
+    $this->charset_userinscription = array();
+    $this->charset_userinscription_raw = array();
     if ($text === '[^]' || $text === '[]') {
         $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
     }
     $this->yybegin(self::CHARSET);
 }
-<YYINITIAL> "(" {                               // Beginning of a subpattern
+<YYINITIAL> "(" {                               // Beginning of a subexpression
     $this->push_opt_lvl();
-    $this->lastsubpatt++;
-    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, new qtype_preg_userinscription('('), $this->lastsubpatt));
+    $this->last_subexpr++;
+    $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->yychar, $this->yychar, new qtype_preg_userinscription('('), $this->last_subexpr));
 }
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
@@ -1001,63 +998,63 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 }
 <YYINITIAL> "(?>" {
     $this->push_opt_lvl();
-    $this->lastsubpatt++;
-    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), $this->lastsubpatt));
+    $this->last_subexpr++;
+    $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), $this->last_subexpr));
 }
-<YYINITIAL> "(?<"{ALNUM}*">"? {                 // Named subpattern (?<name>...)
-    return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
+<YYINITIAL> "(?<"{ALNUM}*">"? {                 // Named subexpression (?<name>...)
+    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
 }
-<YYINITIAL> "(?'"{ALNUM}*"'"? {                 // Named subpattern (?'name'...)
-    return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
+<YYINITIAL> "(?'"{ALNUM}*"'"? {                 // Named subexpression (?'name'...)
+    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
 }
-<YYINITIAL> "(?P<"{ALNUM}*">"? {                // Named subpattern (?P<name>...)
-    return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 4, '>');
+<YYINITIAL> "(?P<"{ALNUM}*">"? {                // Named subexpression (?P<name>...)
+    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 4, '>');
 }
 <YYINITIAL> "(?:" {
     $this->push_opt_lvl();
-    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
+    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
 }
-<YYINITIAL> "(?|" {                             // Duplicate subpattern numbers gropu
-    $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
+<YYINITIAL> "(?|" {                             // Duplicate subexpression numbers group
+    $this->push_opt_lvl($this->last_subexpr);    // Save the top-level subexpression number.
+    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
 }
 <YYINITIAL> "(?()" {                            // Error - empty condition
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED, htmlspecialchars($text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
-    return array(new qtype_preg_token(qtype_preg_yyParser::CONDSUBPATT, new qtype_preg_lexem(null, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription(''))),
+    return array(new qtype_preg_token(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem(null, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription(''))),
                  new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error),
                  new qtype_preg_token(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
 }
-<YYINITIAL> "(?(?=" {                           // Conditional subpattern - assertion
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
+<YYINITIAL> "(?(?=" {                           // Conditional subexpression - assertion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
 }
-<YYINITIAL> "(?(?!" {                           // Conditional subpattern - assertion
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_NLA);
+<YYINITIAL> "(?(?!" {                           // Conditional subexpression - assertion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
 }
-<YYINITIAL> "(?(?<=" {                          // Conditional subpattern - assertion
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLB);
+<YYINITIAL> "(?(?<=" {                          // Conditional subexpression - assertion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
 }
-<YYINITIAL> "(?(?<!" {                          // Conditional subpattern - assertion
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_NLB);
+<YYINITIAL> "(?(?<!" {                          // Conditional subexpression - assertion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
 }
-<YYINITIAL> "(?(R"[^"<>()'"]*")"? {             // Conditional subpattern - recursion
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, ')');
+<YYINITIAL> "(?(R"[^"<>()'"]*")"? {             // Conditional subexpression - recursion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, ')');
 }
-<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subpattern - define
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
+<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subexpression - define
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE, ')');
 }
-<YYINITIAL> "(?(<"[^"'<>()?!="]*(">)")? {       // Conditional subpattern - named
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '>)', false, 4);
+<YYINITIAL> "(?(<"[^"'<>()?!="]*(">)")? {       // Conditional subexpression - named
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '>)', false, 4);
 }
-<YYINITIAL> "(?('"[^"'<>()?!="]*("')")? {       // Conditional subpattern - named
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '\')', false, 4);
+<YYINITIAL> "(?('"[^"'<>()?!="]*("')")? {       // Conditional subexpression - named
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '\')', false, 4);
 }
-<YYINITIAL> "(?("[0-9+-]+")"? {                 // Conditional subpattern - numeric
-    return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', true);
+<YYINITIAL> "(?("[0-9+-]+")"? {                 // Conditional subexpression - numeric
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', true);
 }
-<YYINITIAL> "(?("[^"'<>()?!="]*")"? {           // Conditional subpattern - named or numeric
+<YYINITIAL> "(?("[^"'<>()?!="]*")"? {           // Conditional subexpression - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -1066,7 +1063,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     if ($sign === '+' || $sign === '-') {
         $data = qtype_poasquestion_string::substr($data, 1);    }
     $numeric = $data !== '' && ctype_digit($data);
-    return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
+    return $this->form_cond_subexpr($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', $numeric, 3);
 }
 <YYINITIAL> "(?=" {
     $this->push_opt_lvl();
@@ -1103,12 +1100,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     }
 }
 <YYINITIAL> "." {
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 <YYINITIAL> "|" {
-    // Reset subpattern numeration inside a (?|...) group.
-    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
-        $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
+    // Reset subexpressions numeration inside a (?|...) group.
+    if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num != -1) {
+        $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;
     }
     return new qtype_preg_token(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
@@ -1121,7 +1118,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $num = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     // Is it a relative backreference? Is so, convert it to an absolute one.
     if ($num < 0) {
-        $num = $this->lastsubpatt + $num + 1;
+        $num = $this->last_subexpr + $num + 1;
     }
     return $this->form_backref($text, $this->yychar, $this->yylength(), $num);
 }
@@ -1186,7 +1183,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $str = qtype_poasquestion_string::substr($str, 1);
     }
     if ($str === 'Any') {
-        $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+        $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
@@ -1243,31 +1240,31 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 }
 <YYINITIAL> "\d"|"\D" {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $text === '\D');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $text === '\D');
 }
 <YYINITIAL> "\h"|"\H" {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $text === '\H');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $text === '\H');
 }
 <YYINITIAL> "\s"|"\S" {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $text === '\S');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $text === '\S');
 }
 <YYINITIAL> "\v"|"\V" {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, $text === '\V');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $text === '\V');
 }
 <YYINITIAL> "\w"|"\W" {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $text === '\W');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $text === '\W');
 }
 <YYINITIAL> "\C" {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 <YYINITIAL> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 <YYINITIAL> "\K" {
     // TODO: reset start of match.
@@ -1353,11 +1350,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
             $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
             $res = array();
-            $res[] = new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+            $res[] = new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
             $res[] = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $node);
             return $res;
         } else {
-            return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+            return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
         }
     }
 }
@@ -1388,7 +1385,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
+    if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_backref($text, $this->yychar, $this->yylength(), (int)$str);
     } else {
@@ -1450,82 +1447,107 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
+<CHARSET> "\d"|"\D" {
+    $text = $this->yytext();
+    $negative = ($text === '\D');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
+}
+<CHARSET> "\h"|"\H" {
+    $text = $this->yytext();
+    $negative = ($text === '\H');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
+}
+<CHARSET> "\s"|"\S" {
+    $text = $this->yytext();
+    $negative = ($text === '\S');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
+}
+<CHARSET> "\v"|"\V" {
+    $text = $this->yytext();
+    $negative = ($text === '\V');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
+}
+<CHARSET> "\w"|"\W" {
+    $text = $this->yytext();
+    $negative = ($text === '\W');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
+}
 <CHARSET> "[:alnum:]"|"[:^alnum:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^alnum:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALNUM, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALNUM, $negative);
 }
 <CHARSET> "[:alpha:]"|"[:^alpha:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^alpha:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALPHA, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALPHA, $negative);
 }
 <CHARSET> "[:ascii:]"|"[:^ascii:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^ascii:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ASCII, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ASCII, $negative);
 }
-<CHARSET> "\h"|"\H"|"\v"|"\V"|"[:blank:]"|"[:^blank:]" {
+<CHARSET> "[:blank:]"|"[:^blank:]" {
     $text = $this->yytext();
-    $negative = ($text === '\H' || $text === '\V' || $text === '[:^blank:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $negative);
+    $negative = ($text === '[:^blank:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_BLANK, $negative);
 }
 <CHARSET> "[:cntrl:]"|"[:^cntrl:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^cntrl:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::CNTRL, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_CNTRL, $negative);
 }
-<CHARSET> "\d"|"\D"|"[:digit:]"|"[:^digit:]" {
+<CHARSET> "[:digit:]"|"[:^digit:]" {
     $text = $this->yytext();
-    $negative = ($text === '\D' || $text === '[:^digit:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $negative);
+    $negative = ($text === '[:^digit:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_DIGIT, $negative);
 }
 <CHARSET> "[:graph:]"|"[:^graph:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^graph:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::GRAPH, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_GRAPH, $negative);
 }
 <CHARSET> "[:lower:]"|"[:^lower:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^lower:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::LOWER, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_LOWER, $negative);
 }
 <CHARSET> "[:print:]"|"[:^print:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^print:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PRINT, $negative);
 }
 <CHARSET> "[:punct:]"|"[:^punct:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^punct:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PUNCT, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PUNCT, $negative);
 }
-<CHARSET> "\s"|"\S"|"[:space:]"|"[:^space:]"  {
+<CHARSET> "[:space:]"|"[:^space:]"  {
     $text = $this->yytext();
-    $negative = ($text === '\S' || $text === '[:^space:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $negative);
+    $negative = ($text === '[:^space:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_SPACE, $negative);
 }
 <CHARSET> "[:upper:]"|"[:^upper:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^upper:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::UPPER, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_UPPER, $negative);
 }
-<CHARSET> "\w"|"\W"|"[:word:]"|"[:^word:]" {
+<CHARSET> "[:word:]"|"[:^word:]" {
     $text = $this->yytext();
-    $negative = ($text === '\W' || $text === '[:^word:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $negative);
+    $negative = ($text === '[:^word:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_WORD, $negative);
 }
 <CHARSET> "[:xdigit:]"|"[:^xdigit:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^xdigit:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::XDIGIT, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_XDIGIT, $negative);
 }
 <CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     $this->charset->error[] = $error;
-    $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+    $this->charset_userinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
@@ -1536,7 +1558,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
         $this->charset->error[] = $error;
-        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -1551,14 +1573,14 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $str = qtype_poasquestion_string::substr($str, 1);
     }
     if ($str === 'Any') {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
             $this->charset->error[] = $error;
-            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -1579,7 +1601,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
             $this->charset->error[] = $error;
-            $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+            $this->charset_userinscription[] = new qtype_preg_userinscription($text);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
@@ -1597,7 +1619,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
         $this->charset->error[] = $error;
-        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+        $this->charset_userinscription[] = new qtype_preg_userinscription($text);
     } else if (0xd800 <= $code && $code <= 0xdfff) {
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
@@ -1616,7 +1638,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, htmlspecialchars($text));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
         $this->charset->error[] = $error;
-        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+        $this->charset_userinscription[] = new qtype_preg_userinscription($text);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
@@ -1632,7 +1654,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 }
 <CHARSET> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 <CHARSET> "\r" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));
@@ -1645,7 +1667,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     $this->charset->error[] = $error;
-    $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+    $this->charset_userinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> "\Q".*"\E" {
     $text = $this->yytext();
@@ -1663,33 +1685,33 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 <CHARSET> "]" {
     $this->charset->indlast = $this->yychar;
     $this->charset->israngecalculated = false;
-    if ($this->charsetset !== '') {
+    if ($this->charset_set !== '') {
         $flag = new qtype_preg_charset_flag;
-        $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charsetset));
+        $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charset_set));
         $this->charset->flags[] = array($flag);
     }
     $tmp = '';
-    foreach ($this->charsetuserinscriptionraw as $userinscription) {
+    foreach ($this->charset_userinscription_raw as $userinscription) {
         $tmp .= $userinscription->data;
     }
     if ($tmp !== '') {
         $this->charset->userinscription[] = new qtype_preg_userinscription($tmp);
     }
-    foreach ($this->charsetuserinscription as $userinscription) {
+    foreach ($this->charset_userinscription as $userinscription) {
         $this->charset->userinscription[] = $userinscription;
     }
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
-    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
+    if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
         $this->charset->caseinsensitive = true;
     }
     $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $this->charset);
     $this->charset = null;
-    $this->charsetcount = 0;
-    $this->charsetset = '';
-    $this->charsetuserinscription = array();
-    $this->charsetuserinscriptionraw = array();
+    $this->charset_count = 0;
+    $this->charset_set = '';
+    $this->charset_userinscription = array();
+    $this->charset_userinscription_raw = array();
     $this->yybegin(self::YYINITIAL);
     return $res;
 }

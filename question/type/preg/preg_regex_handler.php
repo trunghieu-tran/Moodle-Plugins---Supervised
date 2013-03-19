@@ -73,51 +73,6 @@ class qtype_preg_regex_handler {
     protected $anchor;
 
     /**
-     * Returns class name without 'qtype_preg_' prefix.
-     */
-    public function name() {
-        return 'regex_handler';
-    }
-
-    /**
-     * Returns the infix for DST node names which are named like 'qtype_preg_' . $infix . '_' . $pregnodename.
-     * Should be overloaded in child classes.
-     */
-    protected function node_infix() {
-        return '';
-    }
-
-    /**
-     * Returns the engine-specific node name for the given preg_node name.
-     * Overload in case of sophisticated node name schemes.
-     */
-    protected function get_engine_node_name($pregname) {
-        return 'qtype_preg_' . $this->node_infix() . '_' . $pregname;
-    }
-
-    /**
-     * Returns notation, actually used by matcher.
-     */
-    public function used_notation() {
-        return 'native'; // TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported.
-    }
-
-    /**
-     * Returns string of regular expression modifiers supported by this engine
-     */
-    public function get_supported_modifiers() {
-        return new qtype_poasquestion_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
-    }
-
-    /**
-     * Sets regex options.
-     * @param options an object containing options to handle the regex.
-     */
-    public function set_options($options) {
-        $this->options = $options;
-    }
-
-    /**
      * Parses the regex and does all necessary preprocessing.
      * @param string regex - regular expression to handle.
      * @param string modifiers - modifiers of the regular expression.
@@ -127,6 +82,10 @@ class qtype_preg_regex_handler {
         $this->errors = array();
         $this->lexer = null;
         $this->parser = null;
+
+        if ($regex === '') {
+            $regex = null;
+        }
 
         if ($regex === null) {
             return;
@@ -157,7 +116,7 @@ class qtype_preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subpatterns
+            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subexpressions
         } else {
             $this->ast_root = null;
             //In case with no parsing we should stick to accepting whole regex, not nodes
@@ -165,45 +124,40 @@ class qtype_preg_regex_handler {
         }
     }
 
-    protected function accept_regex() {
-        return true; // Accept anything by default.
+    /**
+     * Returns class name without 'qtype_preg_' prefix.
+     */
+    public function name() {
+        return 'regex_handler';
     }
 
     /**
-     * Returns subpatterns map.
+     * Returns notation, actually used by matcher.
      */
-    public function get_subpattern_map() {
-        if ($this->lexer !== null) {
-            return $this->lexer->get_subpattern_map();
-        } else {
-            return array();
-        }
+    public function used_notation() {
+        return 'native'; // TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported.
     }
 
     /**
-     * Returns max subpattern number.
+     * Returns string of regular expression modifiers supported by this engine
      */
-    public function get_max_subpattern() {
-        if ($this->lexer !== null) {
-            return $this->lexer->get_max_subpattern();
-        } else {
-            return 0;
-        }
+    public function get_supported_modifiers() {
+        return new qtype_poasquestion_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
-     * is this engine need a parsing of regular expression?
-     * @return bool if parsing needed
+     * Sets regex options.
+     * @param options an object containing options to handle the regex.
      */
-    protected function is_parsing_needed() {
-        return true;    // Most engines will need parsing.
+    public function set_options($options) {
+        $this->options = $options;
     }
 
     /**
      * Was there an errors in regex?
      * @return bool  errors exists
      */
-    public function is_error_exists() {
+    public function errors_exist() {
         return (!empty($this->errors));
     }
 
@@ -235,6 +189,39 @@ class qtype_preg_regex_handler {
         return $this->ast_root;
     }
 
+    /**
+     * Returns max subexpression number.
+     */
+    public function get_max_subexpr() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_max_subexpr();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns subexpressions map.
+     */
+    public function get_subexpr_map() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_subexpr_map();
+        } else {
+            return array();
+        }
+    }
+
+    /**
+     * Returns all backreference nodes in the regex.
+     */
+    public function get_backrefs() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_backrefs();
+        } else {
+            return array();
+        }
+    }
+
     public function is_regex_anchored($start = true) {
         if ($start) {
             return $this->anchor->start;
@@ -244,114 +231,15 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Is a preg_node_... or a preg_leaf_... supported by the engine?
-     * Returns true if node is supported or user interface string describing
-     *   what properties of node isn't supported.
-     */
-    protected function is_preg_node_acceptable($pregnode) {
-        // Do not show accepting errors for error nodes.
-        if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
-            return true;
-        }
-        return false;    // Should be overloaded by child classes
-    }
-
-    protected function look_for_circumflex($node, $wasconcat = false) {
-        if (is_a($node, 'qtype_preg_leaf')) {
-            // Expression starts from ^
-            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
-            // Expression starts from .*
-            $operand = $node->operands[0];
-            return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
-                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
-            // Check the first operand for concatenation and subpatterns.
-            return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
-            // Every branch of alternative is anchored.
-            $cf = true;
-            $empty = false;
-            foreach ($node->operands as $operand) {
-                $empty = $empty || isset($operand->subtype) && $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
-            }
-            $empty = $empty && !$wasconcat;
-            return $cf || $empty;
-        }
-        return false;
-    }
-
-    /**
      * Fill anchor field to show if regex is anchored using ast_root
-     *
      * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
      * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
      */
     public function look_for_anchors() {
-        //TODO(performance) - write real code, for now think no anchoring is in expressions
+        // TODO: is anchor->end needed?
         $this->anchor = new stdClass;
         $this->anchor->start = $this->look_for_circumflex($this->ast_root);
         $this->anchor->end = false;
-    }
-
-    /**
-     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
-     * @param string regex - regular expression for building tree.
-     */
-    protected function build_tree($regex) {
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
-        $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
-        $this->lexer->handlingoptions = $this->options;
-        $this->parser = new qtype_preg_yyParser;
-        $this->parser->handlingoptions = $this->options;
-        while (($token = $this->lexer->nextToken()) !== null) {
-            if (!is_array($token)) {
-                $this->parser->doParse($token->type, $token->value);
-            } else {
-                foreach ($token as $curtoken) {
-                    $this->parser->doParse($curtoken->type, $curtoken->value);
-                }
-            }
-        }
-        $this->parser->doParse(0, 0);
-        // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
-        $lexerrors = $this->lexer->get_errors();
-        foreach ($lexerrors as $node) {
-            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
-        }
-        // Parser contains other errors inside AST nodes.
-        $parseerrors = $this->parser->get_error_nodes();
-        foreach($parseerrors as $node) {
-            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
-        }
-        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
-            $this->ast_root = $this->parser->get_root();
-            $this->look_for_anchors();
-            $this->dst_root = clone $this->ast_root;
-            $this->dst_root = $this->from_preg_node($this->dst_root);
-        //}
-        fclose($pseudofile);
-    }
-
-    /**
-     * Copy Abstract Syntax Tree from another qtype_preg_regex_handler class and build DST on it
-     *
-     * Create handler with no parameters, than call this function to avoid re-parsing if you have
-     *   two handlers working on one regex.
-     * @deprecated since 28.07.2012 may not work. TODO - find a way to bypass protection on class members to create another handler from this
-     */
-    public function get_tree_from_another_handler($handler) {
-        $this->errors = $handler->get_error_objects();
-        if (!$this->is_error_exists()) {
-            $srcroot = $handler->get_ast_root();
-            $this->ast_root = clone $srcroot;
-            $this->dst_root = $this->from_preg_node($this->ast_root);
-            $this->look_for_anchors();
-        }
     }
 
     /**
@@ -359,7 +247,7 @@ class qtype_preg_regex_handler {
      * @param pregnode qtype_preg_node child class instance
      * @return corresponding xxx_preg_node child class instance
      */
-    public function &from_preg_node($pregnode) {
+    public function from_preg_node($pregnode) {
         if (is_a($pregnode,'qtype_preg_node')) {//checking that the node isn't already converted
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
@@ -409,10 +297,10 @@ class qtype_preg_regex_handler {
         if ($filename !== null) {
             $cmd .= ' -o' . escapeshellarg($filename);
         }
-        $descriptorspec = array(0 => array('pipe', 'r'), // Stdin is a pipe that the child will read from.
-                                1 => array('pipe', 'w'), // Stdout is a pipe that the child will write to.
-                                2 => array('pipe', 'w')  // Stderr is a pipe that the child will write to.
-                                );
+        $descriptorspec = array(0 => array('pipe', 'r'),  // Stdin is a pipe that the child will read from.
+                                1 => array('pipe', 'w'),  // Stdout is a pipe that the child will write to.
+                                2 => array('pipe', 'w')); // Stderr is a pipe that the child will write to.
+
         $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
         $output = null;
         if (is_resource($process)) {
@@ -420,15 +308,120 @@ class qtype_preg_regex_handler {
             fclose($pipes[0]);
             $output = stream_get_contents($pipes[1]);
             $err = stream_get_contents($pipes[2]);
-            if (!empty($err)) {
-                //echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
-            }
             fclose($pipes[1]);
             fclose($pipes[2]);
             proc_close($process);
-        } else {
-            //echo "failed to execute cmd \"$cmd\"";
         }
         return $output;
+    }
+
+    /**
+     * Returns the infix for DST node names which are named like 'qtype_preg_' . $infix . '_' . $pregnodename.
+     * Should be overloaded in child classes.
+     */
+    protected function node_infix() {
+        return '';
+    }
+
+    /**
+     * Returns the engine-specific node name for the given preg_node name.
+     * Overload in case of sophisticated node name schemes.
+     */
+    protected function get_engine_node_name($pregname) {
+        return 'qtype_preg_' . $this->node_infix() . '_' . $pregname;
+    }
+
+    protected function accept_regex() {
+        return true; // Accept anything by default.
+    }
+
+    /**
+     * is this engine need a parsing of regular expression?
+     * @return bool if parsing needed
+     */
+    protected function is_parsing_needed() {
+        return true;    // Most engines will need parsing.
+    }
+
+    /**
+     * Is a preg_node_... or a preg_leaf_... supported by the engine?
+     * Returns true if node is supported or user interface string describing
+     * what properties of node isn't supported.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        // Do not show accepting errors for error nodes.
+        if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            return true;
+        }
+        return false;    // Should be overloaded by child classes
+    }
+
+    protected function look_for_circumflex($node, $wasconcat = false) {
+        if (is_a($node, 'qtype_preg_leaf')) {
+            // Expression starts from ^
+            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+            // Expression starts from .*
+            $operand = $node->operands[0];
+            return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+            // Check the first operand for concatenation and subexpressions.
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
+            // Every branch of alternative is anchored.
+            $cf = true;
+            $empty = false;
+            foreach ($node->operands as $operand) {
+                $empty = $empty || isset($operand->subtype) && $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
+            }
+            $empty = $empty && !$wasconcat;
+            return $cf || $empty;
+        }
+        return false;
+    }
+
+    /**
+     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
+     * @param string regex - regular expression for building tree.
+     */
+    protected function build_tree($regex) {
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $this->lexer = new qtype_preg_lexer($pseudofile);
+        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
+        $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
+        $this->lexer->handlingoptions = $this->options;
+
+        $this->parser = new qtype_preg_yyParser($this->options);
+
+        while (($token = $this->lexer->nextToken()) !== null) {
+            if (!is_array($token)) {
+                $this->parser->doParse($token->type, $token->value);
+            } else {
+                foreach ($token as $curtoken) {
+                    $this->parser->doParse($curtoken->type, $curtoken->value);
+                }
+            }
+        }
+        $this->parser->doParse(0, 0);
+        // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
+        $lexerrors = $this->lexer->get_errors();
+        foreach ($lexerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        // Parser contains other errors inside AST nodes.
+        $parseerrors = $this->parser->get_error_nodes();
+        foreach($parseerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
+            $this->ast_root = $this->parser->get_root();
+            $this->look_for_anchors();
+            $this->dst_root = clone $this->ast_root;
+            $this->dst_root = $this->from_preg_node($this->dst_root);
+        //}
+        fclose($pseudofile);
     }
 }

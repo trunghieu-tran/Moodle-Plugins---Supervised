@@ -20,10 +20,10 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
 
     function draw($regex, $filename) {
         $matcher = new qtype_preg_nfa_matcher($regex);
-        if (!$matcher->is_error_exists()) {
+        if (!$matcher->errors_exist()) {
             $matcher->automaton->draw('png', $this->dir . $filename);
         } else {
-            $this->assertTrue(false, "nfa building failed <br/>");
+            $this->assertTrue(false, "nfa building failed\n");
         }
     }
 
@@ -67,8 +67,8 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
         $this->draw('(?:ab){4}', 'test_build_brace_finite_4.png');
     }
 
-    function test_build_subpatt() {
-        $this->draw('(a|b|cd|)', 'test_build_subpatt.png');
+    function test_build_subexpr() {
+        $this->draw('(a|b|cd|)', 'test_build_subexpr.png');
     }
 
     function test_build_complex_1() {
@@ -79,27 +79,35 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
         $this->draw('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|', 'test_build_complex_2.png');
     }
 
-    function test_build_subpatt_concat() {
-        $this->draw('ab(cd)(ef)g', 'test_build_subpatt_concat.png');
+    function test_build_subexpr_concat() {
+        $this->draw('ab(cd)(ef)g', 'test_build_subexpr_concat.png');
     }
 
-    function test_build_subpatt_alt() {
-        $this->draw('a|(bc)|(de)|f', 'test_build_subpatt_alt.png');
+    function test_build_subexpr_alt() {
+        $this->draw('a|(bc)|(de)|f', 'test_build_subexpr_alt.png');
     }
 
-    function test_build_subpatt_brace_finite() {
-        $this->draw('(a){3,6}', 'test_build_subpatt_brace_finite.png');
+    function test_build_subexpr_brace_finite() {
+        $this->draw('(a){3,6}', 'test_build_subexpr_brace_finite.png');
     }
 
-    function test_build_subpatt_brace_infinite() {
-        $this->draw('(a){3,}', 'test_build_subpatt_brace_infinite.png');
+    function test_build_subexpr_brace_finite_with_alt() {
+        $this->draw('(a|b|){3,6}', 'test_build_subexpr_brace_finite_with_alt.png');
     }
 
-    function test_build_subpatt_aster() {
-        $this->draw('(a*)*', 'test_build_subpatt_aster.png');
+    function test_build_subexpr_brace_infinite() {
+        $this->draw('(a){3,}', 'test_build_subexpr_brace_infinite.png');
     }
 
-    function test_build_subpatt_uncounted() {
-        $this->draw('(?:ab)+', 'test_build_subpatt_uncounted.png');
+    function test_build_subexpr_brace_infinite_with_alt() {
+        $this->draw('(a|b|){3,}', 'test_build_subexpr_brace_infinite_with_alt.png');
+    }
+
+    function test_build_subexpr_aster() {
+        $this->draw('(a*)*', 'test_build_subexpr_aster.png');
+    }
+
+    function test_build_subexpr_uncounted() {
+        $this->draw('(?:ab)+', 'test_build_subexpr_uncounted.png');
     }
 }

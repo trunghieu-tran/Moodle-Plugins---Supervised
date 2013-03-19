@@ -43,9 +43,9 @@ class qtype_preg_matching_results {
     ////Match data
     /** @var boolean Is match full or partial? */
     public $full;
-    /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
+    /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subexpression etc. */
     public $index_first;
-    /** @var array Length of the matches - array where 0 => full match, 1=> first subpattern etc. */
+    /** @var array Length of the matches - array where 0 => full match, 1=> first subexpression etc. */
     public $length;
     /** @var integer The number of characters left to complete matching. */
     public $left;
@@ -69,10 +69,10 @@ class qtype_preg_matching_results {
     ////Source data
     /** @var qtype_poasquestion_string A string being matched */
     protected $str;
-    /** @var integer Max number of a subpattern available in regular expression */
-    protected $maxsubpatt;
-    /** @var array A map where keys are subpattern names and values are their numbers */
-    protected $subpatternmap;
+    /** @var integer Max number of a subexpression available in regular expression */
+    protected $max_subexpr;
+    /** @var array A map where keys are subexpression names and values are their numbers */
+    protected $subexpr_map;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 $extendedmatch = null) {
@@ -87,10 +87,10 @@ class qtype_preg_matching_results {
     /**
      * Sets info about string and regular expression, that is needed for some functions to work
      */
-    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array()) {
+    public function set_source_info($str = null, $max_subexpr = 0, $subexpr_map = array()) {
         $this->str = clone $str;
-        $this->maxsubpatt = $maxsubpatt;
-        $this->subpatternmap = $subpatternmap;
+        $this->max_subexpr = $max_subexpr;
+        $this->subexpr_map = $subexpr_map;
     }
 
     public function str() {
@@ -98,48 +98,36 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns keys for all subpatterns in regular expression
+     * Returns keys for all subexpressions in regular expression
      *
-     * Use to enumerate subpatterns
+     * Use to enumerate subexpressions
      */
-    public function all_subpatterns() {
-        //Merge all numeric subpattern keys with named subpatterns from $subpatternman
-        return array_merge(array_keys($this->index_first), array_keys($this->subpatternmap));
+    public function all_subexpressions() {
+        //Merge all numeric subexpression keys with named subexpressions from $subexpr_map
+        return array_merge(array_keys($this->index_first), array_keys($this->subexpr_map));
     }
 
     /**
-     * Return subpattern index in the index_first and length arrays
+     * Return subexpression index in the index_first and length arrays
      *
-     * If it is subpattern name, use $subpatternmap to find appropriate index,
-     * otherwise (numbered subpattern) just return $subpattern.
+     * If it is subexpression name, use $subexpr_map to find appropriate index,
+     * otherwise (numbered subexpression) just return $subexpression.
      */
-    public function subpattern_number($subpattern) {
-        if (array_key_exists($subpattern, $this->subpatternmap)) {//named subpattern
-            return $this->subpatternmap[$subpattern];
+    public function subexpression_number($subexpression) {
+        if (array_key_exists($subexpression, $this->subexpr_map)) {//named subexpression
+            return $this->subexpr_map[$subexpression];
         }
-        return $subpattern;
+        return $subexpression;
     }
 
-    /**
-     * Returns true if subpattern is captured
-     * @param subpattern subpattern number
-     */
-    public function is_subpattern_captured($subpattern) {
-        $subpattern = $this->subpattern_number($subpattern);
-        if (!isset($this->length[$subpattern])) {
-            throw new qtype_preg_exception('Error: Asked for unexisting subpattern '.$subpattern);
-        }
-        return ($this->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
+    public function index_first($subexpression = 0) {
+        $subexpression = $this->subexpression_number($subexpression);
+        return $this->index_first[$subexpression];
     }
 
-    public function index_first($subpattern = 0) {
-        $subpattern = $this->subpattern_number($subpattern);
-        return $this->index_first[$subpattern];
-    }
-
-    public function length($subpattern = 0) {
-        $subpattern = $this->subpattern_number($subpattern);
-        return $this->length[$subpattern];
+    public function length($subexpression = 0) {
+        $subexpression = $this->subexpression_number($subexpression);
+        return $this->length[$subexpression];
     }
 
     /**
@@ -237,7 +225,7 @@ class qtype_preg_matching_results {
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
-        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
+        for ($i = 0; $i <= $this->max_subexpr; $i++) {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
@@ -258,18 +246,18 @@ class qtype_preg_matching_results {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
 
-            //Check that each subpattern lies inside overall match
+            //Check that each subexpression lies inside overall match
             foreach ($this->index_first as $i => $start) {
                 if ($start === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    //No need to check subpattern that wasn't matched
+                    //No need to check subexpression that wasn't matched
                     break;
                 }
                 if ($start < $this->index_first[0] || $start > $this->index_first[0] + $this->length[0]) {
-                    throw new qtype_preg_exception('Error: '.$i.' subpattern start '.$start.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                    throw new qtype_preg_exception('Error: '.$i.' subexpression start '.$start.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
                 }
                 $end = $start + $this->length[$i];
                 if ($end < $this->index_first[0] || $end > $this->index_first[0] + $this->length[0]) {
-                    throw new qtype_preg_exception('Error: '.$i.' subpattern end '.$end.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                    throw new qtype_preg_exception('Error: '.$i.' subexpression end '.$end.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
                 }
             }
         }
@@ -297,14 +285,14 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns non-matched heading before subpattern match
+     * Returns non-matched heading before subexpression match
      */
-    public function match_heading($subpattern = 0) {
-        $subpattern = $this->subpattern_number($subpattern);
+    public function match_heading($subexpression = 0) {
+        $subexpression = $this->subexpression_number($subexpression);
         $wronghead = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
-            if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
-                $wronghead = $this->str->substring(0, $this->index_first[$subpattern]);
+            if ($this->index_first[$subexpression] > 0) {//if there is wrong heading
+                $wronghead = $this->str->substring(0, $this->index_first[$subexpression]);
             }
         } else {//No match, assuming all string is wrong heading (to display hint after it)
             $wronghead = $this->str;
@@ -313,28 +301,28 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns matched part of the string for given subpattern
+     * Returns matched part of the string for given subexpression
      */
-    public function matched_part($subpattern = 0) {
-        $subpattern = $this->subpattern_number($subpattern);
+    public function matched_part($subexpression = 0) {
+        $subexpression = $this->subexpression_number($subexpression);
         $correctpart = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
-            if (isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $correctpart = $this->str->substring($this->index_first[$subpattern], $this->length[$subpattern]);
+            if (isset($this->index_first[$subexpression]) && $this->index_first[$subexpression] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $correctpart = $this->str->substring($this->index_first[$subexpression], $this->length[$subexpression]);
             }
         }
         return $correctpart->string();
     }
 
     /**
-     * Returns non-matched tail after subpattern match
+     * Returns non-matched tail after subexpression match
      */
-    public function match_tail($subpattern = 0) {
-        $subpattern = $this->subpattern_number($subpattern);
+    public function match_tail($subexpression = 0) {
+        $subexpression = $this->subexpression_number($subexpression);
         $wrongtail = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
-            if ($this->index_first[$subpattern] + $this->length[$subpattern] < qtype_poasquestion_string::strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail = $this->str->substring($this->index_first[$subpattern] + $this->length[$subpattern], $this->str->length() - $this->index_first[$subpattern] - $this->length[$subpattern]);
+            if ($this->index_first[$subexpression] + $this->length[$subexpression] < qtype_poasquestion_string::strlen($this->str) && $this->length[$subexpression]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail = $this->str->substring($this->index_first[$subexpression] + $this->length[$subexpression], $this->str->length() - $this->index_first[$subexpression] - $this->length[$subexpression]);
             }
         }
         return $wrongtail->string();
@@ -393,9 +381,9 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
     /** @var string Unicode property name for preferred characters for dot meta-character when generating extension.*/
     public $preferfordot = null;
 
-    /** @var boolean Should matcher look for subpattern captures or the whole match only? */
-    //TODO - does we need to specify subpatterns we are looking for or there is no sense in it?
-    public $capturesubpatterns = true;
+    /** @var boolean Should matcher look for subexpression captures or the whole match only? */
+    //TODO - does we need to specify subexpressions we are looking for or there is no sense in it?
+    public $capturesubexpressions = true;
 }
 
 /**
@@ -403,16 +391,16 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
  */
 class qtype_preg_matcher extends qtype_preg_regex_handler {
 
-    //Constants for the capabilities which could (or could not) be supported by matching engine
-    //Partial matching (returning the index of last matched character)
+    // Constants for the capabilities which could (or could not) be supported by matching engine
+    // Partial matching (returning the index of last matched character)
     const PARTIAL_MATCHING = 0;
-    //Returning next possible character(s) after partial match
+    // Returning next possible character(s) after partial match
     const CORRECT_ENDING = 1;
-    //Returning the smallest number of characters that needed to complete partial match
+    // Returning the smallest number of characters that needed to complete partial match
     const CHARACTERS_LEFT = 2;
-    //Subpattern capturing during matching
-    const SUBPATTERN_CAPTURING = 3;
-    //Always return full match as the correct ending (if at all possible)
+    // Subexpression capturing during matching
+    const SUBEXPRESSION_CAPTURING = 3;
+    // Always return full match as the correct ending (if at all possible)
     const CORRECT_ENDING_ALWAYS_FULL = 4;
 
     /**
@@ -456,14 +444,13 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             return;
         }
 
-        //If there were backreferences in regex, subpattern capturing should be forced.
-        if ($this->lexer !== null && !$this->options->capturesubpatterns) {
-            $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
+        //If there were backreferences in regex, subexpression capturing should be forced.
+        if ($this->lexer !== null && !$this->options->capturesubexpressions) {
+            $this->options->capturesubexpressions = (count($this->lexer->get_backrefs()) > 0);
         }
 
-
-        //Invalidate match called later to allow parser to count subpatterns
-        $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
+        //Invalidate match called later to allow parser to count subexpression
+        $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
         $this->matchresults->invalidate_match();
     }
 
@@ -487,7 +474,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Reset match data and perform matching.
             $this->matchresults = $this->match_inner($str);
             //Save source data for the match
-            $this->matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+            $this->matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
 
             //Set all string as incorrect if there were no matching
             if (!$this->matchresults->is_match()) {
@@ -523,7 +510,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
         $result->invalidate_match();
 
         if ($this->anchor->start) {

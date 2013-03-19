@@ -45,7 +45,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_no_match() {
         $regex = '(abc)';
         $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
@@ -69,7 +69,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_partial_match() {
         $regex = '(abc)';
         $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
@@ -93,7 +93,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_full_match() {
         $regex = '(abc)';
         $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
@@ -110,7 +110,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_empty_match() {
         $regex = '(^$)';
         $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('');
         $this->assertTrue($matcher->get_match_results()->full);
@@ -128,7 +128,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('ab');
         $backref = new qtype_preg_leaf_backref();
@@ -155,24 +155,26 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($handler->is_regex_anchored());
         $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('(?:a.+$)|.*cd|(^a|.*x)|^');
+        $handler = new qtype_preg_regex_handler('(?:a.+$)|.*cd|(^a|.*x)|^');        // (?:a.+$) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.+cd|(^a|.*x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.+cd|(^a|.*x)|^');       // .+cd breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.cd|(^a|.*x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.cd|(^a|.*x)|^');        // .cd breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(a|.*x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(a|.*x)|^');        // (a|.*x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|x)|^');         // (^a|x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.x)|^');        // (^a|.x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.?x)|^');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.?x)|^');       // (^a|.?x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|');
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');
-        $this->assertTrue($handler->is_regex_anchored());
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|');        // (|c) breaks anchoring
+        $this->assertFalse($handler->is_regex_anchored());
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) breaks anchoring
+        $this->assertFalse($handler->is_regex_anchored());
     }
 
     function test_syntax_errors() {
@@ -187,7 +189,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[2]->index_last == 6);
         $this->assertTrue($errors[3]->index_first == 7);  // Wrong closing paren.
         $this->assertTrue($errors[3]->index_last == 7);
-        $this->assertTrue($errors[4]->index_first == 9);  // Three alternatives in the conditional subpattern.
+        $this->assertTrue($errors[4]->index_first == 9);  // Three alternatives in the conditional subexpression.
         $this->assertTrue($errors[4]->index_last == 21);
         $this->assertTrue($errors[5]->index_first == 25); // Quantifier without operand.
         $this->assertTrue($errors[5]->index_last == 29);
@@ -206,7 +208,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 3);
         /*$this->assertTrue($errors[0]->index_first == 0);  // Wrong modifier.
         $this->assertTrue($errors[0]->index_last == 3);
-        $this->assertTrue($errors[1]->index_first == 10); // Backreference to unexisting subpattern.
+        $this->assertTrue($errors[1]->index_first == 10); // Backreference to unexisting subexpression.
         $this->assertTrue($errors[1]->index_last == 11);*/
 
     }

@@ -38,6 +38,134 @@ class qtype_preg_unicode extends textlib {
         return 0x10FFFD;
     }
 
+    public static function dot_ranges() {
+        return array(array(0=>0x0000, 1=>0x0009),
+                     array(0=>0x000B, 1=>0xD7FF),
+                     array(0=>0xE000, 1=>0xFDCF),
+                     array(0=>0xFDF0, 1=>0xFFFD),
+                     array(0=>0x10000, 1=>0x1FFFD),
+                     array(0=>0x20000, 1=>0x2FFFD),
+                     array(0=>0x30000, 1=>0x3FFFD),
+                     array(0=>0x40000, 1=>0x4FFFD),
+                     array(0=>0x50000, 1=>0x5FFFD),
+                     array(0=>0x60000, 1=>0x6FFFD),
+                     array(0=>0x70000, 1=>0x7FFFD),
+                     array(0=>0x80000, 1=>0x8FFFD),
+                     array(0=>0x90000, 1=>0x9FFFD),
+                     array(0=>0xA0000, 1=>0xAFFFD),
+                     array(0=>0xB0000, 1=>0xBFFFD),
+                     array(0=>0xC0000, 1=>0xCFFFD),
+                     array(0=>0xD0000, 1=>0xDFFFD),
+                     array(0=>0xE0000, 1=>0xEFFFD),
+                     array(0=>0xF0000, 1=>0xFFFFD),
+                     array(0=>0x100000, 1=>0x10FFFD));
+    }
+
+    public static function slashd_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039));
+    }
+
+    public static function slashh_ranges() {
+        return array(array(0=>0x0009, 1=>0x0009),
+                     array(0=>0x0020, 1=>0x0020),
+                     array(0=>0x00A0, 1=>0x00A0),
+                     array(0=>0x1680, 1=>0x1680),
+                     array(0=>0x180E, 1=>0x180E),
+                     array(0=>0x2000, 1=>0x200A),
+                     array(0=>0x202F, 1=>0x202F),
+                     array(0=>0x205F, 1=>0x205F),
+                     array(0=>0x3000, 1=>0x3000));
+    }
+
+    public static function slashs_ranges() {
+        return array(array(0=>0x0009, 1=>0x000A),
+                     array(0=>0x000C, 1=>0x000D),
+                     array(0=>0x0020, 1=>0x0020));
+    }
+
+    public static function slashv_ranges() {
+        return array(array(0=>0x000A, 1=>0x000D),
+                     array(0=>0x0085, 1=>0x0085),
+                     array(0=>0x2028, 1=>0x2029));
+    }
+
+    public static function slashw_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x005F, 1=>0x005F),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+
+    public static function alnum_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+
+    public static function alpha_ranges() {
+        return array(array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+
+    public static function ascii_ranges() {
+        return array(array(0=>0x0000, 1=>0x007F));
+    }
+
+    public static function blank_ranges() {
+        return array(array(0=>0x0009, 1=>0x0009),
+                     array(0=>0x0020, 1=>0x0020));
+    }
+
+    public static function cntrl_ranges() {
+        return array(array(0=>0x0000, 1=>0x001F),
+                     array(0=>0x007F, 1=>0x007F));
+    }
+
+    public static function digit_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039));
+    }
+
+    public static function graph_ranges() {
+        return array(array(0=>0x0021, 1=>0x007E));
+    }
+
+    public static function lower_ranges() {
+        return array(array(0=>0x0061, 1=>0x007A));
+    }
+
+    public static function print_ranges() {
+        return array(array(0=>0x0020, 1=>0x007E));
+    }
+
+    public static function punct_ranges() {
+        return array(array(0=>0x0021, 1=>0x002F),
+                     array(0=>0x003A, 1=>0x0040),
+                     array(0=>0x005B, 1=>0x0060),
+                     array(0=>0x007B, 1=>0x007E));
+    }
+
+    public static function space_ranges() {
+        return array(array(0=>0x0009, 1=>0x000D),
+                     array(0=>0x0020, 1=>0x0020));
+    }
+
+    public static function upper_ranges() {
+        return array(array(0=>0x0041, 1=>0x005A));
+    }
+
+    public static function word_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x005F, 1=>0x005F),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+
+    public static function xdigit_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x0046),
+                     array(0=>0x0061, 1=>0x0066));
+    }
+
     public static function C_ranges() {
         return array(array(0=>0x0000, 1=>0x001F),
                      array(0=>0x007F, 1=>0x009F),
@@ -305,7 +433,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2072, 1=>0x2073),
                      array(0=>0x208F, 1=>0x208F),
                      array(0=>0x209D, 1=>0x209F),
-                     array(0=>0x20BA, 1=>0x20CF),
+                     array(0=>0x20BB, 1=>0x20CF),
                      array(0=>0x20F1, 1=>0x20FF),
                      array(0=>0x218A, 1=>0x218F),
                      array(0=>0x23F4, 1=>0x23FF),
@@ -395,7 +523,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFBC2, 1=>0xFBD2),
                      array(0=>0xFD40, 1=>0xFD4F),
                      array(0=>0xFD90, 1=>0xFD91),
-                     array(0=>0xFDC8, 1=>0xFDEF),
+                     array(0=>0xFDC8, 1=>0xFDCF),
                      array(0=>0xFDFE, 1=>0xFDFF),
                      array(0=>0xFE1A, 1=>0xFE1F),
                      array(0=>0xFE27, 1=>0xFE2F),
@@ -411,7 +539,6 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFFDD, 1=>0xFFDF),
                      array(0=>0xFFE7, 1=>0xFFE7),
                      array(0=>0xFFEF, 1=>0xFFFB),
-                     array(0=>0xFFFE, 1=>0xFFFF),
                      array(0=>0x1000C, 1=>0x1000C),
                      array(0=>0x10027, 1=>0x10027),
                      array(0=>0x1003B, 1=>0x1003B),
@@ -575,12 +702,26 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x1F641, 1=>0x1F644),
                      array(0=>0x1F650, 1=>0x1F67F),
                      array(0=>0x1F6C6, 1=>0x1F6FF),
-                     array(0=>0x1F774, 1=>0x1FFFF),
+                     array(0=>0x1F774, 1=>0x1FFFD),
                      array(0=>0x2A6D7, 1=>0x2A6FF),
                      array(0=>0x2B735, 1=>0x2B73F),
                      array(0=>0x2B81E, 1=>0x2F7FF),
-                     array(0=>0x2FA1E, 1=>0xE00FF),
-                     array(0=>0xE01F0, 1=>0x10FFFD));
+                     array(0=>0x2FA1E, 1=>0x2FFFD),
+                     array(0=>0x30000, 1=>0x3FFFD),
+                     array(0=>0x40000, 1=>0x4FFFD),
+                     array(0=>0x50000, 1=>0x5FFFD),
+                     array(0=>0x60000, 1=>0x6FFFD),
+                     array(0=>0x70000, 1=>0x7FFFD),
+                     array(0=>0x80000, 1=>0x8FFFD),
+                     array(0=>0x90000, 1=>0x9FFFD),
+                     array(0=>0xA0000, 1=>0xAFFFD),
+                     array(0=>0xB0000, 1=>0xBFFFD),
+                     array(0=>0xC0000, 1=>0xCFFFD),
+                     array(0=>0xD0000, 1=>0xDFFFD),
+                     array(0=>0xE0000, 1=>0xE00FF),
+                     array(0=>0xE01F0, 1=>0xEFFFD),
+                     array(0=>0xF0000, 1=>0xFFFFD),
+                     array(0=>0x100000, 1=>0x10FFFD));
     }
 
     public static function Cc_ranges() {
@@ -867,7 +1008,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2072, 1=>0x2073),
                      array(0=>0x208F, 1=>0x208F),
                      array(0=>0x209D, 1=>0x209F),
-                     array(0=>0x20BA, 1=>0x20CF),
+                     array(0=>0x20BB, 1=>0x20CF),
                      array(0=>0x20F1, 1=>0x20FF),
                      array(0=>0x218A, 1=>0x218F),
                      array(0=>0x23F4, 1=>0x23FF),
@@ -956,7 +1097,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFBC2, 1=>0xFBD2),
                      array(0=>0xFD40, 1=>0xFD4F),
                      array(0=>0xFD90, 1=>0xFD91),
-                     array(0=>0xFDC8, 1=>0xFDEF),
+                     array(0=>0xFDC8, 1=>0xFDCF),
                      array(0=>0xFDFE, 1=>0xFDFF),
                      array(0=>0xFE1A, 1=>0xFE1F),
                      array(0=>0xFE27, 1=>0xFE2F),
@@ -973,7 +1114,6 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFFDD, 1=>0xFFDF),
                      array(0=>0xFFE7, 1=>0xFFE7),
                      array(0=>0xFFEF, 1=>0xFFF8),
-                     array(0=>0xFFFE, 1=>0xFFFF),
                      array(0=>0x1000C, 1=>0x1000C),
                      array(0=>0x10027, 1=>0x10027),
                      array(0=>0x1003B, 1=>0x1003B),
@@ -1135,15 +1275,26 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x1F641, 1=>0x1F644),
                      array(0=>0x1F650, 1=>0x1F67F),
                      array(0=>0x1F6C6, 1=>0x1F6FF),
-                     array(0=>0x1F774, 1=>0x1FFFF),
+                     array(0=>0x1F774, 1=>0x1FFFD),
                      array(0=>0x2A6D7, 1=>0x2A6FF),
                      array(0=>0x2B735, 1=>0x2B73F),
                      array(0=>0x2B81E, 1=>0x2F7FF),
-                     array(0=>0x2FA1E, 1=>0xE0000),
+                     array(0=>0x2FA1E, 1=>0x2FFFD),
+                     array(0=>0x30000, 1=>0x3FFFD),
+                     array(0=>0x40000, 1=>0x4FFFD),
+                     array(0=>0x50000, 1=>0x5FFFD),
+                     array(0=>0x60000, 1=>0x6FFFD),
+                     array(0=>0x70000, 1=>0x7FFFD),
+                     array(0=>0x80000, 1=>0x8FFFD),
+                     array(0=>0x90000, 1=>0x9FFFD),
+                     array(0=>0xA0000, 1=>0xAFFFD),
+                     array(0=>0xB0000, 1=>0xBFFFD),
+                     array(0=>0xC0000, 1=>0xCFFFD),
+                     array(0=>0xD0000, 1=>0xDFFFD),
+                     array(0=>0xE0000, 1=>0xE0000),
                      array(0=>0xE0002, 1=>0xE001F),
                      array(0=>0xE0080, 1=>0xE00FF),
-                     array(0=>0xE01F0, 1=>0xEFFFF),
-                     array(0=>0xFFFFE, 1=>0xFFFFF));
+                     array(0=>0xE01F0, 1=>0xEFFFD));
     }
 
     public static function Co_ranges() {
@@ -4627,7 +4778,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2052, 1=>0x2052),
                      array(0=>0x207A, 1=>0x207C),
                      array(0=>0x208A, 1=>0x208C),
-                     array(0=>0x20A0, 1=>0x20B9),
+                     array(0=>0x20A0, 1=>0x20BA),
                      array(0=>0x2100, 1=>0x2101),
                      array(0=>0x2103, 1=>0x2106),
                      array(0=>0x2108, 1=>0x2109),
@@ -4770,7 +4921,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x0BF9, 1=>0x0BF9),
                      array(0=>0x0E3F, 1=>0x0E3F),
                      array(0=>0x17DB, 1=>0x17DB),
-                     array(0=>0x20A0, 1=>0x20B9),
+                     array(0=>0x20A0, 1=>0x20BA),
                      array(0=>0xA838, 1=>0xA838),
                      array(0=>0xFDFC, 1=>0xFDFC),
                      array(0=>0xFE69, 1=>0xFE69),
@@ -6195,7 +6346,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x061E, 1=>0x061E),
                      array(0=>0x0620, 1=>0x063F),
                      array(0=>0x0641, 1=>0x064A),
-                     array(0=>0x0656, 1=>0x065E),
+                     array(0=>0x0656, 1=>0x065F),
                      array(0=>0x066A, 1=>0x066F),
                      array(0=>0x0671, 1=>0x06DC),
                      array(0=>0x06DE, 1=>0x06FF),
@@ -6711,7 +6862,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFBC2, 1=>0xFBD2),
                      array(0=>0xFD3E, 1=>0xFD4F),
                      array(0=>0xFD90, 1=>0xFD91),
-                     array(0=>0xFDC8, 1=>0xFDEF),
+                     array(0=>0xFDC8, 1=>0xFDCF),
                      array(0=>0xFDFD, 1=>0xFDFF),
                      array(0=>0xFE10, 1=>0xFE1F),
                      array(0=>0xFE27, 1=>0xFE6F),
@@ -6725,7 +6876,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xFFC8, 1=>0xFFC9),
                      array(0=>0xFFD0, 1=>0xFFD1),
                      array(0=>0xFFD8, 1=>0xFFD9),
-                     array(0=>0xFFDD, 1=>0xFFFF),
+                     array(0=>0xFFDD, 1=>0xFFFD),
                      array(0=>0x1000C, 1=>0x1000C),
                      array(0=>0x10027, 1=>0x10027),
                      array(0=>0x1003B, 1=>0x1003B),
@@ -6831,12 +6982,26 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x1EEAA, 1=>0x1EEAA),
                      array(0=>0x1EEBC, 1=>0x1EEEF),
                      array(0=>0x1EEF2, 1=>0x1F1FF),
-                     array(0=>0x1F201, 1=>0x1FFFF),
+                     array(0=>0x1F201, 1=>0x1FFFD),
                      array(0=>0x2A6D7, 1=>0x2A6FF),
                      array(0=>0x2B735, 1=>0x2B73F),
                      array(0=>0x2B81E, 1=>0x2F7FF),
-                     array(0=>0x2FA1E, 1=>0xE00FF),
-                     array(0=>0xE01F0, 1=>0x10FFFD));
+                     array(0=>0x2FA1E, 1=>0x2FFFD),
+                     array(0=>0x30000, 1=>0x3FFFD),
+                     array(0=>0x40000, 1=>0x4FFFD),
+                     array(0=>0x50000, 1=>0x5FFFD),
+                     array(0=>0x60000, 1=>0x6FFFD),
+                     array(0=>0x70000, 1=>0x7FFFD),
+                     array(0=>0x80000, 1=>0x8FFFD),
+                     array(0=>0x90000, 1=>0x9FFFD),
+                     array(0=>0xA0000, 1=>0xAFFFD),
+                     array(0=>0xB0000, 1=>0xBFFFD),
+                     array(0=>0xC0000, 1=>0xCFFFD),
+                     array(0=>0xD0000, 1=>0xDFFFD),
+                     array(0=>0xE0000, 1=>0xE00FF),
+                     array(0=>0xE01F0, 1=>0xEFFFD),
+                     array(0=>0xF0000, 1=>0xFFFFD),
+                     array(0=>0x100000, 1=>0x10FFFD));
     }
 
     public static function Coptic_ranges() {
@@ -7079,7 +7244,6 @@ class qtype_preg_unicode extends textlib {
         return array(array(0=>0x0300, 1=>0x036F),
                      array(0=>0x0485, 1=>0x0486),
                      array(0=>0x064B, 1=>0x0655),
-                     array(0=>0x065F, 1=>0x065F),
                      array(0=>0x0670, 1=>0x0670),
                      array(0=>0x0951, 1=>0x0952),
                      array(0=>0x1CD0, 1=>0x1CD2),
@@ -7521,94 +7685,6 @@ class qtype_preg_unicode extends textlib {
     public static function Yi_ranges() {
         return array(array(0=>0xA000, 1=>0xA48C),
                      array(0=>0xA490, 1=>0xA4C6));
-    }
-
-    public static function alnum_ranges() {
-        return array(array(0=>0x0030, 1=>0x0039),
-                     array(0=>0x0041, 1=>0x005A),
-                     array(0=>0x0061, 1=>0x007A));
-    }
-
-    public static function alpha_ranges() {
-        return array(array(0=>0x0041, 1=>0x005A),
-                     array(0=>0x0061, 1=>0x007A));
-    }
-
-    public static function ascii_ranges() {
-        return array(array(0=>0x0000, 1=>0x007F));
-    }
-
-    public static function blank_ranges() {
-        return array(array(0=>0x0009, 1=>0x0009),
-                     array(0=>0x0020, 1=>0x0020));
-    }
-
-    public static function cntrl_ranges() {
-        return array(array(0=>0x0000, 1=>0x001F),
-                     array(0=>0x007F, 1=>0x007F));
-    }
-
-    public static function digit_ranges() {
-        return array(array(0=>0x0030, 1=>0x0039));
-    }
-
-    public static function graph_ranges() {
-        return array(array(0=>0x0021, 1=>0x007E));
-    }
-
-    public static function lower_ranges() {
-        return array(array(0=>0x0061, 1=>0x007A));
-    }
-
-    public static function print_ranges() {
-        return array(array(0=>0x0020, 1=>0x007E));
-    }
-
-    public static function punct_ranges() {
-        return array(array(0=>0x0021, 1=>0x002F),
-                     array(0=>0x003A, 1=>0x0040),
-                     array(0=>0x005B, 1=>0x0060),
-                     array(0=>0x007B, 1=>0x007E));
-    }
-
-    public static function space_ranges() {
-        return array(array(0=>0x0009, 1=>0x000D),
-                     array(0=>0x0020, 1=>0x0020));
-    }
-
-    public static function upper_ranges() {
-        return array(array(0=>0x0041, 1=>0x005A));
-    }
-
-    public static function word_ranges() {
-        return array(array(0=>0x0030, 1=>0x0039),
-                     array(0=>0x0041, 1=>0x005A),
-                     array(0=>0x005F, 1=>0x005F),
-                     array(0=>0x0061, 1=>0x007A));
-    }
-
-    public static function xdigit_ranges() {
-        return array(array(0=>0x0030, 1=>0x0039),
-                     array(0=>0x0041, 1=>0x0046),
-                     array(0=>0x0061, 1=>0x0066));
-    }
-
-    public static function hspace_ranges() {
-        return array(array(0=>0x0009, 1=>0x0009),
-                     array(0=>0x0020, 1=>0x0020),
-                     array(0=>0x00A0, 1=>0x00A0),
-                     array(0=>0x1680, 1=>0x1680),
-                     array(0=>0x180E, 1=>0x180E),
-                     array(0=>0x2000, 1=>0x200A),
-                     array(0=>0x202F, 1=>0x202F),
-                     array(0=>0x205F, 1=>0x205F),
-                     array(0=>0x3000, 1=>0x3000));
-    }
-
-    public static function vspace_ranges() {
-        return array(array(0=>0x000A, 1=>0x000D),
-                     array(0=>0x0085, 1=>0x0085),
-                     array(0=>0x2028, 1=>0x2029));
     }
 
     protected static function compare_trivial_ranges($a, $b) {
