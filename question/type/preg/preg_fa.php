@@ -39,18 +39,36 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
+
+    public $number;
+
     /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
-    public $consumechars;
+    public $consumeschars;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
+    public function __construct(&$from, &$pregleaf, &$to, $number, $consumeschars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
-        $this->consumechars = $consumechars;
+        $this->number = $number;
+        $this->consumeschars = $consumeschars;
+    }
+
+    public function get_label_for_dot() {
+        $index1 = $this->from->number;
+        $index2 = $this->to->number;
+        $lab = $this->number . ':' . $this->pregleaf->tohr();
+        $lab = '"' . str_replace('"', '\"', $lab) . '"';
+
+        // Dummy transitions are displayed dotted.
+        if ($this->consumeschars) {
+            return "$index1->$index2" . "[label = $lab];";
+        } else {
+            return "$index1->$index2" . "[label = $lab, style = dotted];";
+        }
     }
 }
 
@@ -106,12 +124,10 @@ class qtype_preg_fa_state {
     }
 
     /**
-     * Moves transitions from one state to another.
-     *
-     * @param with a reference to an object of qtype_preg_fa_state to take transitions from.
+     * Removes all transitions from this state.
      */
-    public function merge_transition_set(&$with) {
-        $this->outtransitions = array_merge($this->outtransitions, $with->outtransitions);
+    public function remove_all_transitions() {
+        $this->outtransitions = array();
     }
 
     /**
@@ -363,20 +379,8 @@ abstract class qtype_preg_finite_automaton {
     public function numerate_states() {
         $result = array();
         $idcounter = 0;
-        $curstates = array($this->startstate);
-        while (count($curstates) !== 0) {
-            $newstates = array();
-            while (count($curstates) !== 0) {
-                $curstate = array_pop($curstates);
-                if ($curstate->number === -1) {
-                    $curstate->number = $idcounter;
-                    $result[$idcounter++] = $curstate;
-                    foreach ($curstate->outgoing_transitions() as $transition) {
-                        $newstates[] = $transition->to;
-                    }
-                }
-            }
-            $curstates = $newstates;
+        foreach ($this->states as $state) {
+            $state->number = $idcounter++;
         }
         return $result;
     }
@@ -466,44 +470,24 @@ abstract class qtype_preg_finite_automaton {
      * @param filename - name of the resulting image file.
      */
     public function draw($type, $filename) {
-        $result = "digraph {\nrankdir = LR;\n";
+        $result = 'digraph {rankdir = LR;';
         foreach ($this->states as $curstate) {
             $index1 = $curstate->number;
 
             if (count($curstate->outgoing_transitions()) == 0) {
                 // Draw a single state.
-                $result .= "$index1\n";
+                $result .= $index1 . ';';
             } else {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
-                    $index2 = $curtransition->to->number;
-                    $lab = $curtransition->pregleaf->tohr() . ',';
-
-                    // Information about subpatterns.
-                    if (count($curtransition->subpatt_start) > 0) {
-                        $lab = $lab . 'starts';
-                        foreach ($curtransition->subpatt_start as $node) {
-                            $lab = $lab . "{$node->number},";
-                        }
-                    }
-                    if (count($curtransition->subpatt_end) > 0) {
-                        $lab = $lab . 'ends';
-                        foreach ($curtransition->subpatt_end as $node) {
-                            $lab = $lab . "{$node->number},";
-                        }
-                    }
-                    $lab = substr($lab, 0, strlen($lab) - 1);
-                    $lab = '"' . str_replace('"', '\"', $lab) . '"';
-                    // Dummy transitions are displayed dotted.
-                    if ($curtransition->consumechars) {
-                        $result .= "$index1->$index2" . "[label = $lab];\n";
-                    } else {
-                        $result .= "$index1->$index2" . "[label = $lab, style = dotted];\n";
-                    }
+                    $result .= $curtransition->get_label_for_dot();
                 }
             }
         }
-        $result .= "};";
+        // Make start and end states more fancy.
+        $result .= $this->start_state()->number . '[shape=rarrow];';
+        $result .= $this->end_state()->number . '[shape=doublecircle];';
+        $result .= '};';
         qtype_preg_regex_handler::execute_dot($result, $type, $filename);
     }
 
@@ -511,7 +495,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Reads fa from a special code and modifies current object.
      * code format: i->abc->j;k->charset->l; e.t.c.
-     * maximum count of subpatterns when reading fa is 9 in current implementation.
+     * maximum count of subexpressions when reading fa is 9 in current implementation.
      * @param facode string with the code of the finite automaton.
      */
     public function input_fa($facode) {
@@ -577,11 +561,11 @@ abstract class qtype_preg_finite_automaton {
      */
     static protected function read_transition($facode, $start) {
         $i = $start;
-        $subpattstarts = array();
-        $subpattends = array();
+        $subexprstarts = array();
+        $subexprends = array();
         $charset = '';
         $error = false;
-        // Input subpatterns.
+        // Input subexpressions.
         if ($facode[$start] == '#') {
             $i = $start + 1;
             do {
@@ -590,9 +574,9 @@ abstract class qtype_preg_finite_automaton {
                     echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
                     // TODO: correct error message.
                 } else if ($facode[$i] == 's') {
-                    $subpattstarts[] = (int)$facode[$i + 1];
+                    $subexprstarts[] = (int)$facode[$i + 1];
                 } else if ($facode[$i] == 'e') {
-                    $subpattends[] = (int)$facode[$i + 1];
+                    $subexprends[] = (int)$facode[$i + 1];
                 } else {
                     $error = true;
                     echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
@@ -621,10 +605,10 @@ abstract class qtype_preg_finite_automaton {
         $trash =  new qtype_preg_fa_state();
         $transition = new qtype_preg_nfa_transition($trash, $leaf, $trash);
         $transition->tags = array();
-        foreach ($subpattstarts as $val) {
+        foreach ($subexprstarts as $val) {
             $transition->tags[] = $val * 2;
         }
-        foreach ($subpattends as $val) {
+        foreach ($subexprends as $val) {
             $transition->tags[] = $val * 2 + 1;
         }
         return $transition;

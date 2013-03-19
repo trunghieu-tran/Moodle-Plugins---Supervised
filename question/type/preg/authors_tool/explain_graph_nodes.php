@@ -9,7 +9,7 @@
  */
 
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -23,11 +23,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 abstract class qtype_preg_author_tool_node {
 
     public $pregnode; // a reference to the corresponding preg_node
-    
+
     public function __construct(&$node, &$handler) {
         $this->pregnode = $node;
     }
-    
+
     /**
      * Creates and returns subgraph which explaining part of regular expression.
      */
@@ -38,7 +38,7 @@ abstract class qtype_preg_author_tool_node {
             case qtype_preg_node::TYPE_ABSTRACT:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
             case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            case qtype_preg_node::TYPE_NODE_COND_SUBPATT:
+            case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
             case qtype_preg_node::TYPE_NODE_ERROR:
             case qtype_preg_node::TYPE_NODE_ASSERT:
                 return false;
@@ -47,7 +47,7 @@ abstract class qtype_preg_author_tool_node {
                 return true;
         }
     }
-    
+
 }
 
 /**
@@ -56,7 +56,7 @@ abstract class qtype_preg_author_tool_node {
 class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
 {
     /**
-     * Returns filling settings of node which will be in graph. 
+     * Returns filling settings of node which will be in graph.
      */
     public function get_filled() {
         if ($this->pregnode->caseinsensitive) {
@@ -67,7 +67,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     }
 
     /**
-     * Returns value of node which will be in graph. 
+     * Returns value of node which will be in graph.
      */
     public function get_value() {
         switch ($this->pregnode->type) {
@@ -113,9 +113,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
     }
-    
+
     /**
-     * Returns color of node which will be in graph. 
+     * Returns color of node which will be in graph.
      */
     public function get_color() {
         switch ($this->pregnode->type) {
@@ -144,9 +144,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 return 'pink';
         }
     }
-    
+
     /**
-     * Returns shape of node which will be in graph. 
+     * Returns shape of node which will be in graph.
      */
     public function get_shape() {
         if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT ||
@@ -163,17 +163,17 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 return 'ellipse';
         }
     }
-    
+
     /**
      * Implementation of abstract create_graph for leaf.
      */
     public function &create_graph($id = -1) {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-        
+
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->pregnode->id, $this->get_filled());
-        if ($this->pregnode->negative) 
+        if ($this->pregnode->negative)
             $graph->nodes[0]->invert = true;
-        
+
         if ($id == $this->pregnode->id) {
             $graph->style .= '; color=darkgreen';
 
@@ -188,7 +188,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
             $graph->entries[] = end($graph->nodes);
             $graph->exits[] = end($graph->nodes);
         }
-        
+
         return $graph;
     }
 
@@ -352,21 +352,21 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
  */
 class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
     public $operands = array(); // an array of operands
-    
+
     public function __construct($node, &$handler) {
         parent::__construct($node, $handler);
         foreach ($this->pregnode->operands as $operand) {
             array_push($this->operands, $handler->from_preg_node($operand));
         }
     }
-    
+
     /**
      * Implementation of abstract create_graph for concatenation.
      */
     public function &create_graph($id = -1) {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-        
-        if ($this->pregnode->type == 'node_concat') {
+
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_CONCAT) {
             $left = $this->operands[0]->create_graph($id);
             $right = $this->operands[1]->create_graph($id);
 
@@ -377,7 +377,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
             $graph->entries[] = end($left->entries);
             $graph->exits[] = end($right->exits);
-        } else if ($this->pregnode->type == 'node_alt') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $left = $this->operands[0]->create_graph($id);
             $right = $this->operands[1]->create_graph($id);
 
@@ -393,10 +393,10 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->exits[] = end($graph->nodes);
-        } else if ($this->pregnode->type == 'node_finite_quant' || $this->pregnode->type == 'node_infinite_quant') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $this->pregnode->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
             $operand = $this->operands[0]->create_graph($id);
 
-            if ($this->pregnode->type == 'node_finite_quant') {
+            if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
                 $label = 'from ' . $this->pregnode->leftborder . ' to ';
                 if ($this->pregnode->rightborder == 1)
                     $label .= $this->pregnode->rightborder . ' time';
@@ -412,15 +412,15 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->subgraphs[] = $quant;
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
-        } else if ($this->pregnode->type == 'node_subpatt') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
             $operand = $this->operands[0]->create_graph($id);
 
-            $label = get_string('explain_subpattern', 'qtype_preg') . $this->pregnode->number;
+            $label = get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number;
 
-            $subpatt = new qtype_preg_author_tool_explain_graph_subgraph($label, 'solid; color=black', $this->pregnode->id);
-            qtype_preg_author_tool_explain_graph::assume_subgraph($subpatt, $operand);
+            $subexpr = new qtype_preg_author_tool_explain_graph_subgraph($label, 'solid; color=black', $this->pregnode->id);
+            qtype_preg_author_tool_explain_graph::assume_subgraph($subexpr, $operand);
 
-            $graph->subgraphs[] = $subpatt;
+            $graph->subgraphs[] = $subexpr;
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
         }
@@ -433,10 +433,10 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->subgraphs = array();
             $graph->subgraphs[] = $marking;
         }
-        
+
         return $graph;
     }
-    
+
 }
 
 ?>

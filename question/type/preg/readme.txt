@@ -28,7 +28,7 @@ To work with hinting, Preg question type needs to behaviours: adaptivehints and 
 They all need to be installed in order for question to work. You could download question type and behaviours
 in one archive (from GoogleCode or GitHub) or separately.
 
-If you downloaded one archive, unpacking it you should found "question" and "blocks" folders. Copy them in the main 
+If you downloaded one archive, unpacking it you should found "question" and "blocks" folders. Copy them in the main
 directory of Moodle installation (the one containing config.php) - it will install everything in the correct places.
 
 If you downloaded all parts separately (for example because Moodle Plugins Directory don't allow
@@ -54,7 +54,7 @@ There is no 'best' matching enginge, so you could choose best fit for every ques
 choosing default engine, that could be set on the question type settings page.
 
 If you primary need is to use very complex regular expressions, than "PHP preg extension" is you most likely choice.
-By "very complex" we understand regular expression using complex assertions, conditional subpatterns, recursion etc.
+By "very complex" we understand regular expression using complex assertions, conditional subexpressions, recursion etc.
 
 If you regular expressions are not that hardcore, but you want to make heavy use of hinting facility, choose NFA engine instead.
 

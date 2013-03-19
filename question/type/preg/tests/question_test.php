@@ -17,7 +17,7 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
 
     protected $testquestion;
-    protected $subpattquestion;
+    protected $subexprquestion;
 
     /**
      * Creates a number of questions for testing
@@ -64,7 +64,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $answer0->fraction = 0;
         $answer0->feedback = 'Think harder!!!';
 
-        //Special answer with second subpattern that it's possible to not match while matching the whole string
+        //Special answer with second subexpression that it's possible to not match while matching the whole string
         $answer00 = new stdClass();
         $answer00->id = 104;
         $answer00->answer = 'Do ((dogs)|frogs|mice) eat (dogs|frogs|mice)\?';
@@ -74,48 +74,48 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $regular->answers = array(100=>$answer100, 101=>$answer90, 102=>$answer50, 103=>$answer0, 104=>$answer00);
         $this->testquestion = $regular;
 
-        //Special question to test subpattern capturing and inserting
-        $subpatt = new qtype_preg_question;
-        $subpatt->usecase = false;
-        $subpatt->correctanswer = 'cdefgh';
-        $subpatt->exactmatch = true;
-        $subpatt->usecharhint = true;
-        $subpatt->penalty = 0.1;
-        $subpatt->charhintpenalty = 0.2;
-        $subpatt->hintgradeborder = 0.6;
-        $subpatt->engine = 'nfa_matcher';
-        $subpatt->notation = 'native';
+        //Special question to test subexpression capturing and inserting
+        $subexpr = new qtype_preg_question;
+        $subexpr->usecase = false;
+        $subexpr->correctanswer = 'cdefgh';
+        $subexpr->exactmatch = true;
+        $subexpr->usecharhint = true;
+        $subexpr->penalty = 0.1;
+        $subexpr->charhintpenalty = 0.2;
+        $subexpr->hintgradeborder = 0.6;
+        $subexpr->engine = 'nfa_matcher';
+        $subexpr->notation = 'native';
 
-        //Answer where it is possible to not match last subpattern
+        //Answer where it is possible to not match last subexpression
         $answer1 = new stdClass;
         $answer1->id = 200;
         $answer1->answer = '(ab|cd(ef))gh';
         $answer1->fraction = 100;
         $answer1->feedback = '{$0}|{$1}|{$2}';
 
-        //Answer where it is possible to not match first subpattern
+        //Answer where it is possible to not match first subexpression
         $answer2 = new stdClass;
         $answer2->id = 201;
         $answer2->answer = '(12)|34(56)gh';
         $answer2->fraction = 100;
         $answer2->feedback = '{$0}|{$1}|{$2}';
 
-        //Answer where it is possible to not match middle subpattern
+        //Answer where it is possible to not match middle subexpression
         $answer3 = new stdClass;
         $answer3->id = 202;
         $answer3->answer = '(z|y(x))(w)';
         $answer3->fraction = 100;
         $answer3->feedback = '{$0}|{$1}|{$2}|{$3}';
 
-        //Answer with named subpattern
+        //Answer with named subexpression
         $answer4 = new stdClass;
         $answer4->id = 203;
         $answer4->answer = '(?P<name>value)nonvalue|(?P<noname>wrongvalue)';
         $answer4->fraction = 100;
         $answer4->feedback = '{$name}';
 
-        $subpatt->answers = array(200=>$answer1, 201=>$answer2, 202=>$answer3, 203=>$answer4);
-        $this->subpattquestion = $subpatt;
+        $subexpr->answers = array(200=>$answer1, 201=>$answer2, 202=>$answer3, 203=>$answer4);
+        $this->subexprquestion = $subexpr;
 
 
     }
@@ -290,95 +290,95 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($hintobj->could_show_hint($matchresults));
     }
 
-    function test_insert_subpatterns() {
+    function test_insert_subexpressions() {
         $testquestion = clone $this->testquestion;
 
-        //All subpattern is matched, or not matched by partial match
-        //Test inserting all subpatterns - anything is matched with some string
+        //All subexpression is matched, or not matched by partial match
+        //Test inserting all subexpressions - anything is matched with some string
         $response = array('answer' => 'Do cats eat bats?');
         $bestfit = $testquestion->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
+        $replaced = $testquestion->insert_subexpressions('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do cats eat bats?|cats|s|bats');
-        //Second subpattern is matched with empty string
+        //Second subexpression is matched with empty string
         $response = array('answer' => 'Do cat eat bat?');
         $bestfit = $testquestion->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
+        $replaced = $testquestion->insert_subexpressions('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do cat eat bat?|cat||bat');
-        //Second subpattern doesn't matched at all
+        //Second subexpression doesn't matched at all
         $response = array('answer' => 'Do frogs eat mice?');
         $bestfit = $testquestion->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
+        $replaced = $testquestion->insert_subexpressions('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do frogs eat mice?|frogs||mice');
 
-        //////Some subpatterns not matched while full match
+        //////Some subexpressions not matched while full match
         ////Engine using custom parser
-        $customengine = clone $this->subpattquestion;
-        //Last subpattern isn't captured
+        $customengine = clone $this->subexprquestion;
+        //Last subexpression isn't captured
         $response = array('answer' => 'abgh');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $customengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == 'abgh|ab|');
-        //First subpattern isn't captured
+        //First subexpression isn't captured
         $response = array('answer' => '3456gh');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $customengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '3456gh||56');
-        //Middle subpattern isn't captured
+        //Middle subexpression isn't captured
         $response = array('answer' => 'zw');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
+        $replaced = $customengine->insert_subexpressions('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'zw|z||w');
         //No match at all - then no string returned
         $response = array('answer' => '*&^%&^');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $customengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced === '||');
-        //Named subpattern test (matched and not matched one)
+        //Named subexpression test (matched and not matched one)
         $response = array('answer' => 'valuenonvalue');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$name}|{$noname}', $response, $matchresults);
+        $replaced = $customengine->insert_subexpressions('{$name}|{$noname}', $response, $matchresults);
         $this->assertTrue($replaced === 'value|');
 
         ////Engine using PHP preg_match function
-        $phpengine = clone $this->subpattquestion;
+        $phpengine = clone $this->subexprquestion;
         $phpengine->engine = 'php_preg_matcher';
-        //Last subpattern isn't captured
+        //Last subexpression isn't captured
         $response = array('answer' => 'abgh');
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $phpengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == 'abgh|ab|');
-        //First subpattern isn't captured
+        //First subexpression isn't captured
         $response = array('answer' => '3456gh');
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $phpengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '3456gh||56');
-        //Middle subpattern isn't captured
+        //Middle subexpression isn't captured
         $response = array('answer' => 'zw');
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
+        $replaced = $phpengine->insert_subexpressions('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'zw|z||w');
         //No match at all - then no string returned
         $response = array('answer' => '*&^%&^');
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $replaced = $phpengine->insert_subexpressions('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '||');
-        //Named subpattern test (matched and not matched one)
+        //Named subexpression test (matched and not matched one)
         $response = array('answer' => 'valuenonvalue');
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $phpengine->insert_subpatterns('{$name}|{$noname}', $response, $matchresults);
+        $replaced = $phpengine->insert_subexpressions('{$name}|{$noname}', $response, $matchresults);
         $this->assertTrue($replaced === 'value|');
         //'(ab|cd(ef))gh'
         //'(12)|34(56)gh'

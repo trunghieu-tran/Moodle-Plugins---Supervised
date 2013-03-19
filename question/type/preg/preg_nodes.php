@@ -71,10 +71,10 @@ class qtype_preg_lexem {
 }
 
 /**
- * Class for plain subpattern lexems.
+ * Class for plain subexpression lexems.
  */
-class qtype_preg_lexem_subpatt extends qtype_preg_lexem {
-    /** Number of the subpattern. */
+class qtype_preg_lexem_subexpr extends qtype_preg_lexem {
+    /** Number of the subexpression. */
     public $number;
 
     public function __construct($subtype, $indfirst, $indlast, $userinscription, $number) {
@@ -89,19 +89,19 @@ class qtype_preg_lexem_subpatt extends qtype_preg_lexem {
 interface qtype_preg_matcher_state {
 
     /**
-     * Returns index of the first character matched for the given subpattern.
+     * Returns index of the first character matched for the given subexpression.
      */
-    public function index_first($subpattern = 0);
+    public function index_first($subexpression = 0);
 
     /**
-     * Returns the length of the given subpattern.
+     * Returns the length of the given subexpression.
      */
-    public function length($subpattern = 0);
+    public function length($subexpression = 0);
 
     /**
-     * Returns whether the given subpattern is captured.
+     * Returns whether the given subexpression is captured.
      */
-    public function is_subpattern_captured($subpattern);
+    public function is_subexpr_captured($subexpression);
 }
 
 /**
@@ -117,7 +117,7 @@ abstract class qtype_preg_node {
     const TYPE_LEAF_META = 'leaf_meta';
     /** Simple assert: ^ $ or escape-sequence. */
     const TYPE_LEAF_ASSERT = 'leaf_assert';
-    /** Back reference to subpattern. */
+    /** Back reference to a subexpression. */
     const TYPE_LEAF_BACKREF = 'leaf_backref';
     /** Recursive match. */
     const TYPE_LEAF_RECURSION = 'leaf_recursion';
@@ -135,10 +135,10 @@ abstract class qtype_preg_node {
     const TYPE_NODE_ALT = 'node_alt';
     /** Assert with expression within. */
     const TYPE_NODE_ASSERT = 'node_assert';
-    /** Subpattern. */
-    const TYPE_NODE_SUBPATT = 'node_subpatt';
-    /** Conditional subpattern. */
-    const TYPE_NODE_COND_SUBPATT = 'node_cond_subpatt';
+    /** Subexpression. */
+    const TYPE_NODE_SUBEXPR = 'node_subexpr';
+    /** Conditional subexpression. */
+    const TYPE_NODE_COND_SUBEXPR = 'node_cond_subexpr';
     /** Error node. */
     const TYPE_NODE_ERROR = 'node_error';
 
@@ -155,10 +155,26 @@ abstract class qtype_preg_node {
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
+    /* Subpattern number. */
+    public $subpattern = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
     }
+
+    /**
+     * Is this node a subpattern? According to Fowler, a subpattern
+     * is a leaf, or a subexpression, or a quantifier.
+     */
+    abstract public function is_subpattern();
+
+    /**
+     * Returns the dot script corresponding to this node.
+     * @param styleprovider an object prividing styles for different node types.
+     * @param isroot if true, adds the "digraph {\n" to the start and "}" to the end.
+     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
+     */
+    abstract public function dot_script($styleprovider, $isroot = true);
 
     /**
      * Sets indexes and userinscription for the node.
@@ -176,15 +192,6 @@ abstract class qtype_preg_node {
     public function name() {
         return $this->type;
     }
-
-    /**
-     * Returns the dot script corresponding to this node.
-     * @param styleprovider an object prividing styles for different node types.
-     * @param isroot if true, adds the "digraph {\n" to the start and "}" to the end.
-     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
-     */
-    abstract public function dot_script($styleprovider, $isroot = true);
-
 
     /**
      * May be overloaded by childs to change name using data from $this->pregnode.
@@ -211,6 +218,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         foreach ($this->mergedassertions as $i => $mergedassertion) {
             $this->mergedassertions[$i] = clone $mergedassertion;
         }
+    }
+
+    public function is_subpattern() {
+        return true;    // Any leaf is a subpattern.
     }
 
     public function dot_script($styleprovider, $isroot = true) {
@@ -608,22 +619,31 @@ class qtype_preg_charset_flag {
     const CIRCUMFLEX             = 'circumflex';
     const DOLLAR                 = 'dollar';
 
-    // Flag types.
-    const DIGIT                  = 'digit';      // \d AND [:digit:]
-    const XDIGIT                 = 'xdigit';     // [:xdigit:]
-    const SPACE                  = 'space';      // \s AND [:space:]
-    const WORD                   = 'word';       // \w AND [:word:]
-    const ALNUM                  = 'alnum';      // [:alnum:]
-    const ALPHA                  = 'alpha';      // [:alpha:]
-    const ASCII                  = 'ascii';      // [:ascii:]
-    const CNTRL                  = 'cntrl';      // [:ctrl:]
-    const GRAPH                  = 'graph';      // [:graph:]
-    const LOWER                  = 'lower';      // [:lower:]
-    const UPPER                  = 'upper';      // [:upper:]
-    const PRIN                   = 'print';      // [:print:] PRIN, because PRINT is php keyword
-    const PUNCT                  = 'punct';      // [:punct:]
-    const HSPACE                 = 'hspace';     // \h
-    const VSPACE                 = 'vspace';     // \v
+    const META_DOT               = 'dot';
+
+    // Escape sequences.
+    const SLASH_D                = 'slashd';
+    const SLASH_H                = 'slashh';
+    const SLASH_S                = 'slashs';
+    const SLASH_V                = 'slashv';
+    const SLASH_W                = 'slashw';
+
+    // POSIX classes.
+    const POSIX_ALNUM            = 'alnum';      // [:alnum:]
+    const POSIX_ALPHA            = 'alpha';      // [:alpha:]
+    const POSIX_ASCII            = 'ascii';      // [:ascii:]
+    const POSIX_BLANK            = 'blank';      // [:blank:]
+    const POSIX_CNTRL            = 'cntrl';      // [:ctrl:]
+    const POSIX_DIGIT            = 'digit';      // [:digit:]
+    const POSIX_GRAPH            = 'graph';      // [:graph:]
+    const POSIX_LOWER            = 'lower';      // [:lower:]
+    const POSIX_PRINT            = 'print';      // [:print:]
+    const POSIX_PUNCT            = 'punct';      // [:punct:]
+    const POSIX_SPACE            = 'space';      // [:space:]
+    const POSIX_UPPER            = 'upper';      // [:upper:]
+    const POSIX_WORD             = 'word';       // [:word:]
+    const POSIX_XDIGIT           = 'xdigit';     // [:xdigit:]
+
     const UPROPCC                = 'Cc';         // Control
     const UPROPCF                = 'Cf';         // Format
     const UPROPCN                = 'Cn';         // Unassigned
@@ -1003,7 +1023,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
  * Defines backreferences.
  */
 class qtype_preg_leaf_backref extends qtype_preg_leaf {
-    /** The number of a subpattern to refer to. */
+    /** The number of a subexpression to refer to. */
     public $number;
 
     public function __construct($number = null) {
@@ -1012,7 +1032,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function consumes($matcherstateobj = null) {
-        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         }
         return $matcherstateobj->length($this->number);
@@ -1020,13 +1040,13 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-        $subpattlen = $matcherstateobj->length($this->number);
+        $subexprlen = $matcherstateobj->length($this->number);
         $start = $matcherstateobj->index_first($this->number);
-        $end = $start + $subpattlen - 1;
+        $end = $start + $subexprlen - 1;
 
-        if (!$matcherstateobj->is_subpattern_captured($this->number) || ($subpattlen > 0 && $pos >= $str->length())) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number) || ($subexprlen > 0 && $pos >= $str->length())) {
             return false;
-        } else if ($subpattlen === 0) {
+        } else if ($subexprlen === 0) {
             return true;
         }
 
@@ -1044,7 +1064,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
             }
         }
         // If the string has not enough characters.
-        if ($pos + $subpattlen - 1 >= $str->length()) {
+        if ($pos + $subexprlen - 1 >= $str->length()) {
             $result = false;
         }
         $length = $matchlen;
@@ -1053,7 +1073,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // TODO: check for assertions in case of $length == 0
-        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return new qtype_poasquestion_string('');
         }
         $start = $matcherstateobj->index_first($this->number);
@@ -1251,6 +1271,11 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         $this->greed = $greed;
         $this->possessive = $possessive;
     }
+
+    public function is_subpattern() {
+        return true;    // Finite quantifier is a subpattern.
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1275,6 +1300,11 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         $this->greed = $greed;
         $this->possessive = $possessive;
     }
+
+    public function is_subpattern() {
+        return true;    // Infinite quantifier is a subpattern.
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1286,6 +1316,10 @@ class qtype_preg_node_concat extends qtype_preg_operator {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
     }
+
+    public function is_subpattern() {
+        return false;    // Concatenation is not a subpattern.
+    }
 }
 
 /**
@@ -1295,6 +1329,10 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ALT;
+    }
+
+    public function is_subpattern() {
+        return false;    // Alternation is not a subpattern.
     }
 }
 
@@ -1321,69 +1359,78 @@ class qtype_preg_node_assert extends qtype_preg_operator {
         return 'node assert';
     }
 
-    //TODO - ui_nodename()
-}
-
-/**
- * Defines subpatterns, unary operator.
- */
-class qtype_preg_node_subpatt extends qtype_preg_operator {
-
-    /** Subpattern. */
-    const SUBTYPE_SUBPATT = 'subpatt_node_subpatt';
-    /** Once-only subpattern. */
-    const SUBTYPE_ONCEONLY = 'onceonly_node_subpatt';
-    /** Grouping node. For author's tools only.*/
-    const SUBTYPE_GROUPING = 'grouping_node_supbatt';
-    /** Duplicate subpatterns. For author's tools only.*/
-    const SUBTYPE_DUPLICATE_SUBPATTERNS = 'duplicate_node_subpatt';
-
-    /** Subpattern number. */
-    public $number = -1;
-    /** Array of numbers of nested subpatterns. */
-    public $nested = array();
-
-    public function __construct($number = -1, $nested = array()) {
-        $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
-        $this->number = $number;
-        $this->nested = $nested;
+    public function is_subpattern() {
+        return true;    // Lookaround assertion is a subpattern.
     }
 
     //TODO - ui_nodename()
 }
 
 /**
- * Defines conditional subpatterns, unary, binary or ternary operator.
+ * Defines subexpressions (yes, NOT a subpattern), unary operator.
+ */
+class qtype_preg_node_subexpr extends qtype_preg_operator {
+
+    /** Subexpression. */
+    const SUBTYPE_SUBEXPR = 'subexpr_node_subexpr';
+    /** Once-only subexpression. */
+    const SUBTYPE_ONCEONLY = 'onceonly_node_subexpr';
+    /** Grouping node. For author's tools only.*/
+    const SUBTYPE_GROUPING = 'grouping_node_supbatt';
+    /** Duplicate subexpressions. For authoring tools only.*/
+    const SUBTYPE_DUPLICATE_SUBEXPRESSIONS = 'duplicate_node_subexpr';
+
+    /** Subexpression number. */
+    public $number = -1;
+
+    public function __construct($number = -1) {
+        $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
+        $this->number = $number;
+    }
+
+    public function is_subpattern() {
+        return true;    // Subexpression is a subpattern.
+    }
+
+    //TODO - ui_nodename()
+}
+
+/**
+ * Defines conditional subexpressions, unary, binary or ternary operator.
  * The first operand yes-pattern, second - no-pattern, third - the lookaround assertion (if any).
  * Possible errors: there is no backreference with such number in expression
  */
-class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
+class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
-    /** Absolute/relative/named references to subpatterns. */
-    const SUBTYPE_SUBPATT = 'subpatt_node_cond_subpatt';
+    /** Absolute/relative/named references to subexpressions. */
+    const SUBTYPE_SUBEXPR = 'subexpr_node_cond_subexpr';
     /** Recursion condition. */
-    const SUBTYPE_RECURSION = 'recursion_node_cond_subpatt';
-    /** Define subpattern for reference. */
-    const SUBTYPE_DEFINE = 'define_node_cond_subpatt';
+    const SUBTYPE_RECURSION = 'recursion_node_cond_subexpr';
+    /** Define subexpression for reference. */
+    const SUBTYPE_DEFINE = 'define_node_cond_subexpr';
     /** Positive lookahead assert. */
-    const SUBTYPE_PLA = 'pla_node_cond_subpatt';
+    const SUBTYPE_PLA = 'pla_node_cond_subexpr';
     /** Negative lookahead assert. */
-    const SUBTYPE_NLA = 'nla_node_cond_subpatt';
+    const SUBTYPE_NLA = 'nla_node_cond_subexpr';
     /** Positive lookbehind assert. */
-    const SUBTYPE_PLB = 'plb_node_cond_subpatt';
+    const SUBTYPE_PLB = 'plb_node_cond_subexpr';
     /** Negative lookbehind assert. */
-    const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
+    const SUBTYPE_NLB = 'nlb_node_cond_subexpr';
 
-    /** Subpattern number. */
+    /** Subexpression number. */
     public $number = -1;
     /** Is condition satisfied?. */
     public $condbranch = null;
 
     public function __construct($subtype = null, $number = -1, $condbranch = null) {
-        $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
+        $this->type = qtype_preg_node::TYPE_NODE_COND_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
         $this->condbranch = $condbranch;
+    }
+
+    public function is_subpattern() {
+        return true;    // Conditional subexpression is a subpattern.
     }
 
     //TODO - ui_nodename()
@@ -1395,7 +1442,7 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
 class qtype_preg_node_error extends qtype_preg_operator {
 
     const SUBTYPE_UNKNOWN_ERROR                = 'unknown_error_node_error';                    // Unknown parse error.
-    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   = 'consubpatt_too_much_alter_node_error';        // Too much top-level alternatives in a conditional subpattern.
+    const SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   = 'consubexpr_too_much_alter_node_error';        // Too much top-level alternatives in a conditional subexpression.
     const SUBTYPE_WRONG_CLOSE_PAREN            = 'wrong_close_paren_node_error';                // Closing paren without opening  xxx).
     const SUBTYPE_WRONG_OPEN_PAREN             = 'wrong_open_paren_node_error';                 // Opening paren without closing  (xxx.
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';     // Quantifier at the start of the expression  - NOTE - currently incompatible with PCRE which treat it as a character.
@@ -1410,32 +1457,32 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_C_AT_END_OF_PATTERN          = 'c_at_end_of_pattern_node_error';              // \c at end of pattern.
     const SUBTYPE_INVALID_ESCAPE_SEQUENCE      = 'invalid_escape_sequence_node_error';          // Invalid escape sequence.
     const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      // POSIX class ouside of a character set.
-    const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               // Reference to unexisting subpattern.
+    const SUBTYPE_UNEXISTING_SUBEXPR           = 'unexisting_subexpr_node_error';               // Reference to unexisting subexpression.
     const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 // Unknown, wrong or unsupported modifier.
     const SUBTYPE_MISSING_COMMENT_ENDING       = 'missing_comment_ending_node_error';           // Missing ) after comment.
-    const SUBTYPE_MISSING_CONDSUBPATT_ENDING   = 'missing_condsubpatt_ending_node_error';       // Missing conditional subpattern name ending.
+    const SUBTYPE_MISSING_CONDSUBEXPR_ENDING   = 'missing_condsubexpr_ending_node_error';       // Missing conditional subexprern name ending.
     const SUBTYPE_MISSING_CALLOUT_ENDING       = 'missing_callout_ending_node_error';           // Missing ) after (?C.
-    const SUBTYPE_MISSING_SUBPATT_ENDING       = 'missing_subpatt_name_ending_node_error';      // Missing subpattern name ending.
+    const SUBTYPE_MISSING_SUBEXPR_ENDING       = 'missing_subexpr_name_ending_node_error';      // Missing subexpression name ending.
     const SUBTYPE_MISSING_BACKREF_ENDING       = 'missing_backref_name_ending_node_error';      // Missing backreference name ending.
     const SUBTYPE_MISSING_BACKREF_BEGINNING    = 'missing_backref_name_beginning_node_error';   // Missing backreference name beginning.
     const SUBTYPE_MISSING_CONTROL_ENDING       = 'missing_control_ending_node_error';           // Missing ) after control sequence.
-    const SUBTYPE_WRONG_CONDSUBPATT_NUMBER     = 'wrong_condsubpatt_number_node_error';         // Wrong conditional subpattern number, digits expected.
-    const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      // Assertion or condition expected.
+    const SUBTYPE_WRONG_CONDSUBEXPR_NUMBER     = 'wrong_condsubexpr_number_node_error';         // Wrong conditional subexpression number, digits expected.
+    const SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED  = 'condsubexpr_assert_expected_node_error';      // Assertion or condition expected.
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
     const SUBTYPE_CHAR_CODE_DISALLOWED         = 'char_code_disallowed_node_error';             // Character code disallowed.
-    const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       // Invalid condition (?(0).
+    const SUBTYPE_CONSUBEXPR_ZERO_CONDITION    = 'condsubexpr_zero_condition_node_error';       // Invalid condition (?(0).
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';               // Too big number in (?C...).
-    const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          // Two named subpatterns have the same name.
+    const SUBTYPE_DUPLICATE_SUBEXPR_NAMES      = 'duplicate_subexpr_names_node_error';          // Two named subexpressions have the same name.
     const SUBTYPE_BACKREF_TO_ZERO              = 'backref_to_zero_error';                       // Backreference to the whole expression.
-    const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          // Different subpattern names for subpatterns of the same number.
-    const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
+    const SUBTYPE_DIFFERENT_SUBEXPR_NAMES      = 'different_subexpr_names_node_error';          // Different subexpression names for subexpressions of the same number.
+    const SUBTYPE_SUBEXPR_NAME_EXPECTED        = 'subexpr_name_expected_node_error';            // Subexpression name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
     const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
     const SUBTYPE_UNRECOGNIZED_LBA             = 'unrecognized_lab_node_error';                 // Unrecognized character after (?<.
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
-                                   self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'error_threealtincondsubpatt',
+                                   self::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   => 'error_threealtincondsubexpr',
                                    self::SUBTYPE_WRONG_CLOSE_PAREN            => 'error_unopenedparen',
                                    self::SUBTYPE_WRONG_OPEN_PAREN             => 'error_unclosedparen',
                                    self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'error_quantifieratstart',
@@ -1450,25 +1497,25 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_C_AT_END_OF_PATTERN          => 'error_catendofpattern',
                                    self::SUBTYPE_INVALID_ESCAPE_SEQUENCE      => 'error_invalidescapesequence',
                                    self::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  => 'error_posixclassoutsidecharset',
-                                   self::SUBTYPE_UNEXISTING_SUBPATT           => 'error_unexistingsubpatt',
+                                   self::SUBTYPE_UNEXISTING_SUBEXPR           => 'error_unexistingsubexpr',
                                    self::SUBTYPE_UNKNOWN_MODIFIER             => 'error_unknownmodifier',
                                    self::SUBTYPE_MISSING_COMMENT_ENDING       => 'error_missingcommentending',
-                                   self::SUBTYPE_MISSING_CONDSUBPATT_ENDING   => 'error_missingcondsubpattending',
+                                   self::SUBTYPE_MISSING_CONDSUBEXPR_ENDING   => 'error_missingcondsubexprending',
                                    self::SUBTYPE_MISSING_CALLOUT_ENDING       => 'error_missingcalloutending',
-                                   self::SUBTYPE_MISSING_SUBPATT_ENDING       => 'error_missingsubpattending',
+                                   self::SUBTYPE_MISSING_SUBEXPR_ENDING       => 'error_missingsubexprending',
                                    self::SUBTYPE_MISSING_BACKREF_ENDING       => 'error_missingbackrefending',
                                    self::SUBTYPE_MISSING_BACKREF_BEGINNING    => 'error_missingbackrefbeginning',
                                    self::SUBTYPE_MISSING_CONTROL_ENDING       => 'error_missingcontrolending',
-                                   self::SUBTYPE_WRONG_CONDSUBPATT_NUMBER     => 'error_wrongcondsubpattnumber',
-                                   self::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  => 'error_condsubpattassertexpected',
+                                   self::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER     => 'error_wrongcondsubexprnumber',
+                                   self::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED  => 'error_condsubexprassertexpected',
                                    self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
                                    self::SUBTYPE_CHAR_CODE_DISALLOWED         => 'error_charcodedisallowed',
-                                   self::SUBTYPE_CONSUBPATT_ZERO_CONDITION    => 'error_condsubpattzerocondition',
+                                   self::SUBTYPE_CONSUBEXPR_ZERO_CONDITION    => 'error_condsubexprzerocondition',
                                    self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
-                                   self::SUBTYPE_DUPLICATE_SUBPATT_NAMES      => 'error_duplicatesubpattnames',
+                                   self::SUBTYPE_DUPLICATE_SUBEXPR_NAMES      => 'error_duplicatesubexprnames',
                                    self::SUBTYPE_BACKREF_TO_ZERO              => 'error_backreftozero',
-                                   self::SUBTYPE_DIFFERENT_SUBPATT_NAMES      => 'error_differentsubpattnames',
-                                   self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected',
+                                   self::SUBTYPE_DIFFERENT_SUBEXPR_NAMES      => 'error_differentsubexprnames',
+                                   self::SUBTYPE_SUBEXPR_NAME_EXPECTED        => 'error_subexprnameexpected',
                                    self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii',
                                    self::SUBTYPE_LNU_UNSUPPORTED              => 'error_lnuunsupported',
                                    self::SUBTYPE_UNRECOGNIZED_LBA             => 'error_unrecognizedlba'
@@ -1480,6 +1527,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->subtype = $subtype;
         $this->addinfo = $addinfo;
+    }
+
+    public function is_subpattern() {
+        return false;    // Of course it's not.
     }
 
     public function dot_script($styleprovider, $isroot = true) {

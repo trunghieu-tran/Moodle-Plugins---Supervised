@@ -645,7 +645,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
     }
-    function test_convert_tree_subpattern() {
+    function test_convert_tree_subexpression() {
         $this->qtype = new qtype_preg_dfa_matcher('(a|b)');
         $result1 = $this->qtype->compare('b', 0);
         $result2 = $this->qtype->compare('a', 0);
