@@ -3,7 +3,7 @@
 /**
  * Contains source info for generating lexer.
  *
- * If there are names subexpressions or backreferences, the returning nodes will contain not than names but
+ * If there are names subexpressions or backreferences, the returning nodes will contain not names but
  * their automatically-assigned numbers. To deal with names, the lexer saves a map name => number.
  *
  * As for error tokens, errors may be returned in 2 ways, depending on the node type:

@@ -56,8 +56,9 @@ class qtype_preg_userinscription {
 class qtype_preg_lexem {
     /** Subtype of the lexem. */
     public $subtype;
-    /** Indexes of first and last characters of the lexem. */
+    /** Index of the first character of the lexem. */
     public $indfirst = -1;
+    /** Index of the last character of the lexem. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
@@ -148,14 +149,15 @@ abstract class qtype_preg_node {
     public $subtype;
     /** Error data for the subtype. */
     public $error = null;
-    /** Indexes of first and last characters of the node in the regex. */
+    /** Index of the first character of this node in the regex. */
     public $indfirst = -1;
+    /** Index of the last character of this node in the regex. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
-    /* Subpattern number. */
+    /** Subpattern number. */
     public $subpattern = -1;
 
     public function __construct() {

@@ -204,7 +204,7 @@ abstract class qtype_preg_nfa_node {
         $this->create_automaton_inner($matcher, $automaton, $stack, $transitioncounter);
 
         // Don't augment transition if the node is not a subpattern.
-        if (!$this->pregnode->is_subpattern() && $this->pregnode !== $matcher->get_ast_root()) {
+        if ($this->pregnode->subpattern == -1) {
             return;
         }
 
@@ -223,9 +223,6 @@ abstract class qtype_preg_nfa_node {
             foreach ($state->outgoing_transitions() as $transition) {
                 if ($transition->to === $body['end']) {
                     $transition->subpatt_end[$this->pregnode->subpattern] = $this->pregnode;
-                    if ($transition->min_subpatt_node == null || $transition->min_subpatt_node->subpattern > $this->pregnode->subpattern) {
-                        //$transition->min_subpatt_node = $this->pregnode;
-                    }
                 }
             }
         }
