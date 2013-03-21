@@ -857,12 +857,10 @@ if (1 == 0) {
 
         // Return array of all possible matches.
         $result = array();
-        foreach ($states as $match) {
-            if ($match !== null) {
-                $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
-            }
-        }
-        if ($states[$endstate->number] == null) {
+        $endstatematch = $states[$endstate->number];
+        if ($endstatematch !== null) {
+            $result[] = $endstatematch->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
+        } else {
             foreach ($partialmatches as $match) {
                 $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
