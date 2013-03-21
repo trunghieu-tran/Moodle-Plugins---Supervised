@@ -110,7 +110,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      */
     public function create_dot() {
         $this->regenerate_id();
-        $instr = 'digraph { rankdir = LR;';
+        $instr = 'digraph { compound=true; rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
