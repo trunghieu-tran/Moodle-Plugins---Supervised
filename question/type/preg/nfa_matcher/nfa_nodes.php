@@ -198,13 +198,13 @@ abstract class qtype_preg_nfa_node {
      * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2),
      *                start and end states of parts of the resulting automaton.
      */
-    abstract public function create_automaton_inner(&$matcher, &$automaton, &$stack);
+    abstract public function create_automaton_inner($matcher, &$automaton, &$stack);
 
-    public function __construct($node, &$matcher) {
+    public function __construct($node, $matcher) {
         $this->pregnode = $node;
     }
 
-    public function create_automaton(&$matcher, &$automaton, &$stack)
+    public function create_automaton($matcher, &$automaton, &$stack)
     {
         $this->create_automaton_inner($matcher, $automaton, $stack);
 
@@ -248,7 +248,7 @@ abstract class qtype_preg_nfa_node {
  */
 class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
         $start = new qtype_preg_fa_state($automaton);
         $end = new qtype_preg_fa_state($automaton);
@@ -272,7 +272,7 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
 
     public $operands = array();    // Array of operands.
 
-    public function __construct($node, &$matcher) {
+    public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
         foreach ($this->pregnode->operands as $operand) {
             array_push($this->operands, $matcher->from_preg_node($operand));
@@ -306,7 +306,7 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
  */
 class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operands create their automatons.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         $this->operands[1]->create_automaton($matcher, $automaton, $stack);
@@ -331,7 +331,7 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
  */
 class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operands create their automatons.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         $this->operands[1]->create_automaton($matcher, $automaton, $stack);
@@ -373,7 +373,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
     /**
      * Creates an automaton for * or {0,} quantifier.
      */
-    private function create_aster(&$matcher, &$automaton, &$stack) {
+    private function create_aster($matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         $body = array_pop($stack);
@@ -402,7 +402,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
     /**
      * Creates an automaton for {m,} quantifier
      */
-    private function create_brace(&$matcher, &$automaton, &$stack) {
+    private function create_brace($matcher, &$automaton, &$stack) {
         // Operand creates its automaton m times.
         $leftborder = $this->pregnode->leftborder;
         for ($i = 0; $i < $leftborder; $i++) {
@@ -443,7 +443,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         $stack[] = $res;
     }
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         if ($this->pregnode->leftborder === 0) {
             return $this->create_aster($matcher, $automaton, $stack);
         } else {
@@ -467,7 +467,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
     /**
      * Creates an automaton for ? quantifier.
      */
-    private function create_qu(&$matcher, &$automaton, &$stack) {
+    private function create_qu($matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         $body = array_pop($stack);
@@ -493,7 +493,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
     /**
      * Creates an automaton for {m, n} quantifier.
      */
-    private function create_brace(&$matcher, &$automaton, &$stack) {
+    private function create_brace($matcher, &$automaton, &$stack) {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
@@ -543,7 +543,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         $stack[] = $res;
     }
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         if ($this->pregnode->rightborder === 0) {
             // Repeating 0 times means eps-transition.
             $start = new qtype_preg_fa_state($automaton);
@@ -573,7 +573,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
  */
 class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
 
-    public function create_automaton_inner(&$matcher, &$automaton, &$stack) {
+    public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
