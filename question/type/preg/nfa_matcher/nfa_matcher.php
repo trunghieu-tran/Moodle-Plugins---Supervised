@@ -871,8 +871,7 @@ if (1 == 0) {
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
             $stack = array();
-            $transitioncounter = 0;
-            $node->create_automaton($this, $result, $stack, $transitioncounter);
+            $node->create_automaton($this, $result, $stack);
             /*
             if (!$isassertion) {
                 // Add a dummy transitions to the beginning of the NFA.
