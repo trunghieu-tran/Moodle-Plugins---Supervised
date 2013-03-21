@@ -74,11 +74,13 @@ class qtype_preg_author_tool_explain_graph_link {
     public $source = null;      // source of link
     public $destination = null; // destination of link
     public $label = '';         // label of link on image
+    public $style = '';       // visual style of link (for image)
     
-    public function __construct($lbl, &$src, &$dst) {
+    public function __construct($lbl, &$src, &$dst, $stl = 'normal') {
         $this->label = $lbl;
         $this->source = $src;
         $this->destination = $dst;
+        $this->style = $stl;
     }
     
 }
@@ -125,7 +127,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         foreach ($this->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd';
 
-            $instr .= $iter->destination->id . '" [label="' . $iter->label . '"];';
+            $instr .= $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . '];';
         }
 
         $instr .= '}';
@@ -204,7 +206,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         foreach ($gr->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd';
 
-            $instr .= $iter->destination->id . '" [label="' . $iter->label . '"];';
+            $instr .= $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . '];';
         }
 
         $instr .= '}';
