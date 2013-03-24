@@ -27,13 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 global $app;
+global $PAGE;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
-
-MoodleQuickForm::registerElementType('text_and_button',
-    $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
-    'MoodleQuickForm_text_and_button');
 
 /**
  * Preg editing form definition.
