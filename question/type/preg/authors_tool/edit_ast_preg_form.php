@@ -11,20 +11,15 @@
 //defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-//global $PAGE;
+global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
-//require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
+require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
 //require_once($CFG->dirroot.'/question/type/preg/renderer.php');
-//require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
-//require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php');
-
-MoodleQuickForm::registerElementType('text_and_button',
-    $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
-    'MoodleQuickForm_text_and_button');
+require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 class qtype_preg_authors_tool_form extends moodleform {
 
@@ -36,7 +31,7 @@ class qtype_preg_authors_tool_form extends moodleform {
     function definition() {
         global $CFG;
         global $PAGE;
- 
+        
         $mform =& $this->_form;//Create form 
         
         //$PAGE->requires->js('/question/type/preg/authors_tool/author_tool.js');
@@ -47,8 +42,8 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('html', '<div align="center"><h2>Test regex</h2></div>');
         
         //Add widget on form
-        $mform->addElement('header', 'regex_edit_header', 'Input regex here:');
-        $mform->addHelpButton('regex_edit_header','regex_edit_header', 'qtype_preg');
+        $mform->addElement('header', 'regex_input_header', 'Regex');
+        $mform->addHelpButton('regex_input_header','regex_edit_header', 'qtype_preg');
         
         $mform->addElement('text', 'regex_text', 'Input regex', array('size' => 100));
         $mform->addElement('submit', 'regex_check', 'Check');
@@ -66,9 +61,40 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="Build graph..." /></div></br>');
         
         //Add description
-        $mform->addElement('header', 'regex_description_header', 'Description here:');
+        $mform->addElement('header', 'regex_description_header', 'Description');
         $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
+        
+        //----------------------TEST REGEX--------------------------
+        /*$renderer = $PAGE->get_renderer('qtype_preg');
+                
+        $regular = new qtype_preg_question;
+        $regular->usecase = false;
+        $regular->correctanswer = 'Do cats eat bats?';
+        $regular->exactmatch = true;
+        $regular->usecharhint = true;
+        $regular->penalty = 0.1;
+        $regular->charhintpenalty = 0.2;
+        $regular->hintgradeborder = 0.6;
+        $regular->engine = 'nfa_matcher';
+        $regular->notation = 'native';
+
+        //correct answer
+        $answer100 = new stdClass();
+        $answer100->id = 100;
+        $answer100->answer = 'Do ([cbr]at(s|)) eat ([cbr]at\2)\?';
+        $answer100->fraction = 1;
+        $answer100->feedback = 'Predator is {$1}. The prey is {$3}.';
+        
+        $regular->answers = array(100=>$answer100);
+        
+        $hintmatch = new qtype_preg_hintmatchingpart($regular);
+        
+        //$bestfit = $regular->get_best_fit_answer(array('answer' => 'Do bats eat cats?'));
+        $answerArr = array('answer' => 'Do bats eat cats?');
+        //var_dump($hintmatch->render_stringextension_hint($renderer, $answerArr));*/
+        
+        //$mform->addElement('html', $hintmatch->render_stringextension_hint($renderer, array('answer' => 'Do bats eat cats?')));
         
         //Add tool for check regexp match        
         /*$mform->addElement('header', 'regex_match_header', 'Input string for check here:');
@@ -90,11 +116,6 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('button', 'regex_check_not_match', 'Check no match');*/
         
     }
-    
-    /*function definition_inner($mform){
-        //$mform->addElement('button', 'testbuton1', 'PRESS ME!!!');
-        return true;
-    }*/
 
     //Custom validation should be added here
     function validation($data, $files) {
