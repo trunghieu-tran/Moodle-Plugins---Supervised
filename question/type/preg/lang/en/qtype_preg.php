@@ -199,14 +199,16 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** This is string for authors tool **********************/
-$string['regexeditheader'] = 'Input regex';
-$string['regexeditheader_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
-$string['regeximgheader'] = 'Interactive tree/explaining graph';
-$string['regeximgheader_help'] = 'Here you can see interactive tree and explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
-$string['regexdescriptionheader'] = 'Description';
-$string['regexdescriptionheader_help'] = 'Here you can see description of regular expression.';
-$string['regexmatchheader'] = 'Input string for check';
-$string['regexmatchheader_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+$string['regex_edit_header'] = 'Input regex';
+$string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_tree_header'] = 'Interactive tree';
+$string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_header'] = 'Explaining graph';
+$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_description_header'] = 'Description';
+$string['regex_description_header_help'] = 'Here you can see description of regular expression.';
+$string['regex_match_header'] = 'Input string for check';
+$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
 
 // Strings for node description
 
@@ -538,7 +540,6 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
-$string['explain_define'] = 'Definition';
 
 // Strings for tooltipe
 $string['authors_tool_tooltip_charset'] = 'character class';
