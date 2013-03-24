@@ -49,7 +49,7 @@ M.qtype_preg_authors_tool.init = function(Y) {
                 alert(o.responseText.substr(0,indexofbracket));
             }
             // allerting json array:
-            // alert(o.responseText.substr(indexofbracket));
+            //alert(o.responseText.substr(indexofbracket));
             // end of debug output !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             var jsonarray = Y.JSON.parse(o.responseText);
 
@@ -178,8 +178,8 @@ M.qtype_preg_authors_tool.init = function(Y) {
             Y.one('#dialog .message').load(preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1', function() {
                 //TODO: set empty src in all field
                 Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
-                Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
-                Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
+                //Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
+                //Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
                 load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1');
             })
 
@@ -187,8 +187,8 @@ M.qtype_preg_authors_tool.init = function(Y) {
             // if a dialog window is already generated we should fill it with new data
             //TODO: set empty src in all field
             Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
-            Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
-            Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
+            //Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
+            //Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
             load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1');
             dialog.show();
         }
