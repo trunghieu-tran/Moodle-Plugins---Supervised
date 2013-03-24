@@ -43,7 +43,8 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
      */
     function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
         $this->idbutton .= $elementButtonName;
-        $this->linkonpage .= $elementLinks['link_on_page'];
+        //TODO: transmit link on new page in java-script for this class
+        //$this->linkonpage .= $elementLinks['link_on_page'];
         $this->linkonbuttonimage .= $elementLinks['link_on_button_image'];
         
         //link js script and set parameters
