@@ -528,16 +528,16 @@ $string['description_empty_g'] = 'nothing(form g)';
 
 $string['author_tool_explain_graph'] = 'explain graph';
 
-$string['explain_subexpression'] = 'subexpression #';
-$string['explain_backref'] = 'the result of subexpression #';
-$string['explain_recursion'] = 'recursion';
-$string['explain_unknow_node'] = 'unknow node';
-$string['explain_unknow_meta'] = 'unknow meta';
-$string['explain_unknow_assert'] = 'unknow assert';
-$string['explain_unknow_charset_flag'] = 'unknow charset flag';
-$string['explain_not'] = 'not ';
-$string['explain_any_char'] = 'Any character from';
-$string['explain_any_char_except'] = 'Any character except';
+$string['explain_subexpression'] = 'подвыражение №';
+$string['explain_backref'] = 'результат подвыражения №';
+$string['explain_recursion'] = 'рекурсия';
+$string['explain_unknow_node'] = 'неизвестный узел';
+$string['explain_unknow_meta'] = 'неизвестный мета-узел';
+$string['explain_unknow_assert'] = 'неизвестное утверждение';
+$string['explain_unknow_charset_flag'] = 'неизвестный флаг набора символов';
+$string['explain_not'] = 'не ';
+$string['explain_any_char'] = 'Любой символ из';
+$string['explain_any_char_except'] = 'Любой символ кроме';
 
 // Strings for tooltipe
 $string['authors_tool_tooltip_charset'] = 'character class';
