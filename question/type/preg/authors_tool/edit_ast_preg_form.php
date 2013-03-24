@@ -39,29 +39,29 @@ class qtype_preg_authors_tool_form extends moodleform {
         //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
         
         //Add header
-        $mform->addElement('html', '<div align="center"><h2>Test regex</h2></div>');
+        $mform->addElement('html', '<div align="center"><h2>' . get_string('author_tool_page_header', 'qtype_preg')  . '</h2></div>');
         
         //Add widget on form
-        $mform->addElement('header', 'regex_input_header', 'Regex');
+        $mform->addElement('header', 'regex_input_header', get_string('regex_edit_header_text', 'qtype_preg'));
         $mform->addHelpButton('regex_input_header','regex_edit_header', 'qtype_preg');
         
-        $mform->addElement('text', 'regex_text', 'Input regex', array('size' => 100));
-        $mform->addElement('submit', 'regex_check', 'Check');
-        $mform->addElement('button', 'regex_back', 'Back (and save regex in this field)');
+        $mform->addElement('text', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('size' => 100));
+        $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
+        $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         
         //Add tree
-        $mform->addElement('header', 'regex_tree_header', 'Interactive tree');
+        $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
+        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
         
         //Add graph
-        $mform->addElement('header', 'regex_graph_header', 'Graph');
+        $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
         $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="Build graph..." /></div></br>');
+        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></br>');
         
         //Add description
-        $mform->addElement('header', 'regex_description_header', 'Description');
+        $mform->addElement('header', 'regex_description_header', get_string('regex_description_header', 'qtype_preg'));
         $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
         

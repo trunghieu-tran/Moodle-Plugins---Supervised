@@ -199,10 +199,17 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** This is string for authors tool **********************/
+$string['author_tool_page_header'] = 'Test regex';
+$string['regex_edit_header_text'] = 'Regex';
 $string['regex_edit_header'] = 'Input regex';
 $string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_text_text'] = 'Input regex';
+$string['regex_check_text'] = 'Check';
+$string['regex_back_text'] = 'Back (and save regex in this field)';
+$string['regex_tree_build'] = 'Build tree...';
 $string['regex_tree_header'] = 'Interactive tree';
 $string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_build'] = 'Build graph...';
 $string['regex_graph_header'] = 'Explaining graph';
 $string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
 $string['regex_description_header'] = 'Description';
