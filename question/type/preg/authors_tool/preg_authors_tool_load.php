@@ -36,7 +36,7 @@ abstract class author_json {
         
         $regextext = optional_param('regex', '', PARAM_TEXT);
 
-        if(!empty($regextext)) {//regex not empty (owervise can't build tree)
+        //if(!empty($regextext)) {//regex not empty (owervise can't build tree)
             $id = optional_param('id', '', PARAM_INT);
 
             //array with author tools
@@ -50,9 +50,9 @@ abstract class author_json {
             foreach($tools as $tool){
                 $tool->generate_json($json_array, $regextext, $id);
             }
-        } else {
+        /*} else {
             author_json::get_json_error($json_array);
-        }
+        }*/
         
         return $json_array;
     }
