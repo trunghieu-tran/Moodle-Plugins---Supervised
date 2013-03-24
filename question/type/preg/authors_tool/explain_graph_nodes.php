@@ -455,14 +455,14 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $cond_subexpr->subgraphs[0]->entries[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
             $cond_subexpr->subgraphs[0]->exits[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
 
-            $cond_subexpr->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? 'true' : '', 'dashed; color=purple', 0.2 + $this->pregnode->id);
+            $cond_subexpr->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? ''/*'true'*/ : '', 'dashed; color=purple', 0.2 + $this->pregnode->id);
             $tmp = $this->operands[0]->create_graph($id);
             qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[1], $tmp);
             $cond_subexpr->subgraphs[1]->entries[] = end($tmp->entries);
             $cond_subexpr->subgraphs[1]->exits[] = end($tmp->exits);
 
             if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-                $cond_subexpr->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('false', 'dashed; color=purple', 0.3 + $this->pregnode->id);
+                $cond_subexpr->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph(''/*'false'*/, 'dashed; color=purple', 0.3 + $this->pregnode->id);
                 $tmp = $this->operands[1]->create_graph($id);
                 qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[2], $tmp);
                 $cond_subexpr->subgraphs[2]->entries[] = end($tmp->entries);
@@ -478,14 +478,14 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 $graph->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
 
                 $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $cond_subexpr->subgraphs[0]->nodes[0], $graph->subgraphs[0]->nodes[1]);
-                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[1]->entries[0]);
+                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('true', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[1]->entries[0]);
                 $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $cond_subexpr->subgraphs[1]->exits[0], $graph->subgraphs[0]->nodes[0]);
 
-                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[2]->entries[0]);
+                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('false', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[2]->entries[0]);
                 $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $cond_subexpr->subgraphs[2]->exits[0], $graph->subgraphs[0]->nodes[0]);
             } else {
                 $graph->exits[] = $cond_subexpr->subgraphs[1]->exits[0];
-                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('', $cond_subexpr->subgraphs[0]->nodes[0], $cond_subexpr->subgraphs[1]->entries[0]);
+                $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('true', $cond_subexpr->subgraphs[0]->nodes[0], $cond_subexpr->subgraphs[1]->entries[0]);
             }
         } else if ($this->pregnode->type == 'node_assert') {
             $operand = $this->operands[0]->create_graph($id);
