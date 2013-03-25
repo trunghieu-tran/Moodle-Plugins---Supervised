@@ -388,7 +388,7 @@ function XMLRPC_request($site, $location, $methodName, $params = NULL, $user_age
         fclose($conn);
 
         #strip headers off of response
-        $data = XML_unserialize(substr($response, strpos($response, "\r\n\r\n")+4));
+        $data = @XML_unserialize(substr($response, strpos($response, "\r\n\r\n")+4));
 
         if(defined('XMLRPC_DEBUG') and XMLRPC_DEBUG){
             XMLRPC_debug('XMLRPC_request', "<p>Received the following response:</p>\n\n" . XMLRPC_show($response, 'print_r', true) . "<p>Which was serialized into the following data:</p>\n\n" . XMLRPC_show($data, 'print_r', true));
