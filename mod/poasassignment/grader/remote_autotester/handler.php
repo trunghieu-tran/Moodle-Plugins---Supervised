@@ -9,10 +9,12 @@ $xmlrpc_request = XMLRPC_parse($GLOBALS['HTTP_RAW_POST_DATA']);
 if ($xmlrpc_request) {
     $methodName = XMLRPC_getMethodName($xmlrpc_request);
     $params = XMLRPC_getParams($xmlrpc_request);
-    if (function_exists($methodName))
+    if (function_exists($methodName)) {
         call_user_func_array($methodName, $params);
-    else
+    }
+    else {
         XMLRPC_response(XMLRPC_prepare("404 Not found"));
+    }
 }
 else {
     XMLRPC_response(XMLRPC_prepare("404 Not found"));
