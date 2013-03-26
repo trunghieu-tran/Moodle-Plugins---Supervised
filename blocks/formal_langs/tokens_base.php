@@ -314,6 +314,45 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return int Damerau-Levenshtein distance
      */
     static public function damerau_levenshtein($str1, $str2) {
+        if ($str1 == $str2) 
+            return 0;//words identical
+        $str1_len = strlen($str1);
+        $str2_len = strlen($str2);
+        //zero length of words
+        if ($str1_len == 0) {
+            return $str2_len;
+        } 
+        else 
+            if ($str2_len == 0) {
+                return $str1_len;
+            }
+        //matrix [str1_len+1][str2_len+1]
+        for($i=0;$i<$str1_len;$i++)
+            for ($j=0;$j<$str2_len+1;$j++) 
+                    $mas[$i][$j]=0;
+        //fill in the first row and column  
+        for($i=0;$i<=$str1_len;$i++)
+            $mas[$i][0]=$i;
+        for($j=0;$j<=$str2_len;$j++)
+            $mas[0][$j]=$j;
+        //calculation
+        for($i=1;$i<=$str1_len;$i++)
+        {
+            for($j=1;$j<=$str2_len;$j++)
+            {
+                $up=$mas[$i-1][$j]+1;//deletion
+                $left=$mas[$i][$j-1]+1;//insertion
+                if($str1[$i-1]==$str2[$j-1])
+                    $cost=0;
+                else
+                    $cost=1;
+                $diag=$mas[$i-1][$j-1]+$cost;//replacement
+                $mas[$i][$j]=min(min($up,$left),$diag);
+                if($i>1 && $j>1 && $str1[$i-1]==$str2[$j-2] && $str1[$i-2]==$str2[$j-1])
+                    $mas[$i][$j]=min($mas[$i][$j], $mas[$i-2][$j-2]+$cost);//transposition
+            }
+        }
+        return $mas[$str1_len][$str2_len];
     }
 
     /**
