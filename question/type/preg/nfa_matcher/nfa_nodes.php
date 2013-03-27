@@ -385,7 +385,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         // Now, clone all transitions from the start state to the end state.
         $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
         foreach ($body['start']->outgoing_transitions() as $transition) {
-            $transition->quant = $quant;
+            $transition->quant = $quant;        // Set this field for all repetitions.
             $newtransition = clone $transition;
             $newtransition->is_loop = true;
             $newtransition->number = ++$transitioncounter;
@@ -424,8 +424,8 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             if ($i === $leftborder - 1) {
                 $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
                 foreach ($cur['start']->outgoing_transitions() as $transition) {
-                    $transition->quant = $quant;
                     $newtransition = clone $transition;
+                    $newtransition->quant = $quant; // Set this field for the last repetition.
                     $newtransition->is_loop = true;
                     $newtransition->number = ++$transitioncounter;
                     $cur['end']->add_transition($newtransition);    // "from" will be set here.
@@ -459,13 +459,13 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 }
 
 /**
- * Class for finite quantifiers {m, n}.
+ * Class for finite quantifiers {m,n}.
  */
 class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
 
     public function accept() {
-        if (!$this->pregnode->greed) {
-            return get_string('ungreedyquant', 'qtype_preg');
+        if ($this->pregnode->possessive) {
+            return get_string('ungreedyquant', 'qtype_preg');   // TODO: add a possessive quant error string.
         }
         return true;
     }
@@ -477,6 +477,12 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack, $transitioncounter);
         $body = array_pop($stack);
+
+        // Set the greediness.
+        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
+        foreach ($body['start']->outgoing_transitions() as $transition) {
+            $transition->quant = $quant;
+        }
 
         // The body automaton can be skipped by an eps-transition.
         qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body, $transitioncounter);
@@ -507,10 +513,15 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
+        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
                 self::add_ending_eps_transition_if_needed($automaton, $cur, $transitioncounter);
+                // Set the greediness.
+                foreach ($cur['start']->outgoing_transitions() as $transition) {
+                    $transition->quant = $quant;
+                }
                 $borderstates[] = $cur['start'];
             }
             if ($res === null) {
