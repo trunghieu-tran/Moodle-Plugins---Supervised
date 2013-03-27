@@ -443,7 +443,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             foreach ($curstate->state->outgoing_transitions() as $transition) {
                 $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
-                if ($transition->pregleaf->consumes($curstate) ||
+                if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY ||
+                    $transition->pregleaf->consumes($curstate) ||
                     !$transition->pregleaf->match($str, $curpos, $length, $curstate)) {
                     continue;
                 }
@@ -631,7 +632,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     protected function match_brute_force($str, $startpos) {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
-        $fullmatchfound = false;      // If a full match found, no need to store partial matches.
 
 if (1 == 0) {
     $styleprovider = new qtype_preg_dot_style_provider();
@@ -641,6 +641,7 @@ if (1 == 0) {
 }
 
         $curstates = array($this->create_initial_state($this->automaton->start_state(), $this->ast_root, $str, $startpos));    // States which the automaton is in at the current wave front.
+        $lazystates = array();       // States reached lazily.
 
         // Do search.
         while (count($curstates) != 0) {
@@ -666,12 +667,16 @@ if (1 == 0) {
 
                     // Saving the current match.
                     if (!$newstate->has_null_iterations()) {
-                        $curstates[] = $newstate;
+                        if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                            $lazystates[] = $newstate;
+                        } else {
+                            $curstates[] = $newstate;
+                        }
                         if ($newstate->full) {
                             $fullmatches[] = $newstate;
                         }
                     }
-                } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
+                } else if (count($fullmatches) == 0) {    // Transition not matched, save the partial match.
                     // If a backreference matched partially - set corresponding fields.
                     $partialmatch = clone $curstate;
                     $fulllastmatch = true;
@@ -695,13 +700,18 @@ if (1 == 0) {
                     $partialmatches[] = $partialmatch;
                 }
             }
+
+            // If there's no full match yet and no curstates remain, try the lazy ones.
+            if (count($fullmatches) == 0 && count($curstates) == 0 && count($lazystates) > 0) {
+                $curstates[] = array_pop($lazystates);
+            }
         }
 
         $result = array();
         foreach ($fullmatches as $match) {
             $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
         }
-        if (!$fullmatchfound) {
+        if (count($fullmatches) == 0) {
             foreach ($partialmatches as $match) {
                 $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
@@ -716,8 +726,9 @@ if (1 == 0) {
     public function match_fast($str, $startpos) {
         $states = array();           // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
+        $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
-        $fullmatchfound = false;
+        $endstate = $this->automaton->end_state();
 
         // Create an array of processing states for all nfa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
@@ -755,7 +766,7 @@ if (1 == 0) {
                         $newstate = clone $curstate;
                         $newstate->state = $transition->to;
 
-                        $newstate->full = ($newstate->state === $this->automaton->end_state());
+                        $newstate->full = ($newstate->state === $endstate);
                         $newstate->left = $newstate->full ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
                         $newstate->extendedmatch = null;
                         $newstate->last_transition = $transition;
@@ -767,12 +778,13 @@ if (1 == 0) {
                         // Saving the current result.
                         $closure = $this->epsilon_closure($newstate, $str);
                         foreach ($closure as $curclosure) {
-                            if ($curclosure->full) {
-                                $fullmatchfound = true;
+                            if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                                $lazystates[] = $curclosure;
+                            } else {
+                                $reached[] = $curclosure;
                             }
-                            $reached[] = $curclosure;
                         }
-                    } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
+                    } else if ($states[$endstate->number] == null) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
                         $partialmatch = clone $curstate;
                         $fulllastmatch = true;
@@ -811,8 +823,7 @@ if (1 == 0) {
                 }
             }
 
-            // Replace curstates with newstates.
-            $newstates = array();
+            // Replace curstates with reached.
             foreach ($reached as $curstate) {
                 if ($curstate == null) {
                     continue;
@@ -821,10 +832,16 @@ if (1 == 0) {
                 // In fact, the second check prevents from situations like \b*
                 if ($states[$curstate->state->number] === null || !$states[$curstate->state->number]->equals($curstate)) {
                     $states[$curstate->state->number] = $curstate;
-                    $newstates[$curstate->state->number] = true;
+                    $curstates[] = $curstate->state->number;
                 }
             }
-            $curstates = array_keys($newstates);
+
+            // If there's no full match yet and no curstates remain, try the lazy ones.
+            if ($states[$endstate->number] == null && count($curstates) == 0 && count($lazystates) > 0) {
+                $curstate = array_pop($lazystates);
+                $states[$curstate->state->number] = $curstate;
+                $curstates[] = $curstate->state->number;
+            }
         }
 
         // Return array of all possible matches.
@@ -834,7 +851,7 @@ if (1 == 0) {
                 $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
         }
-        if (!$fullmatchfound) {
+        if ($states[$endstate->number] == null) {
             foreach ($partialmatches as $match) {
                 $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }

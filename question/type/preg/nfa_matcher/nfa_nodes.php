@@ -35,6 +35,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
  */
 class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
+    const QUANT_NONE = 0;
+    const QUANT_LAZY = 1;
+    const QUANT_GREEDY = 2;
+    const QUANT_POSSESSIVE = 4;
+
     // Array of nodes representing subpatterns starting at this transition.
     public $subpatt_start;
 
@@ -46,6 +51,9 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     // Array of nodes representing subexpressions ending at this transition.
     public $subexpr_end;
+
+    // Type of the quantifier that this transition belongs to, one of the constants above.
+    public $quant;
 
     // Is this transition a "go-back" transition?
     public $is_loop;
@@ -59,6 +67,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         $this->subpatt_end = array();
         $this->subexpr_start = array();
         $this->subexpr_end = array();
+        $this->quant = self::QUANT_NONE;
         $this->is_loop = false;
         $this->min_subpatt_node = null;
     }
@@ -359,8 +368,8 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
     public function accept() {
-        if (!$this->pregnode->greed) {
-            return get_string('ungreedyquant', 'qtype_preg');
+        if ($this->pregnode->possessive) {
+            return get_string('ungreedyquant', 'qtype_preg');   // TODO: add a possessive quant error string.
         }
         return true;
     }
@@ -374,7 +383,9 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         $body = array_pop($stack);
 
         // Now, clone all transitions from the start state to the end state.
+        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
         foreach ($body['start']->outgoing_transitions() as $transition) {
+            $transition->quant = $quant;
             $newtransition = clone $transition;
             $newtransition->is_loop = true;
             $newtransition->number = ++$transitioncounter;
@@ -411,7 +422,9 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             $cur = array_pop($stack);
             // The last block is repeated.
             if ($i === $leftborder - 1) {
+                $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
                 foreach ($cur['start']->outgoing_transitions() as $transition) {
+                    $transition->quant = $quant;
                     $newtransition = clone $transition;
                     $newtransition->is_loop = true;
                     $newtransition->number = ++$transitioncounter;
