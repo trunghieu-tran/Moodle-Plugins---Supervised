@@ -1852,6 +1852,88 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_quant_lazy_4() {
+        $test1 = array('str'=>'',
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array(),
+                       'left'=>array(3),
+                       'next'=>'a');
+
+        $test2 = array('str'=>'a',
+                       'is_match'=>true,
+                       'full'=>false,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1),
+                       'left'=>array(2),
+                       'next'=>'a');
+
+        $test3 = array('str'=>'aaaaa',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>3));
+
+        return array('regex'=>'a{2,}?a',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_quant_lazy_5() {
+        $test1 = array('str'=>'',
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array(),
+                       'left'=>array(3),
+                       'next'=>'a');
+
+        $test2 = array('str'=>'a',
+                       'is_match'=>true,
+                       'full'=>false,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1),
+                       'left'=>array(2),
+                       'next'=>'a');
+
+        $test3 = array('str'=>'aaaaaaaaaa',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>3));
+
+        return array('regex'=>'a{2,10}?a',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_quant_lazy_6() {
+        $test1 = array('str'=>'',
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array(),
+                       'left'=>array(1),
+                       'next'=>'a');
+
+        $test2 = array('str'=>'a',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1));
+
+        $test3 = array('str'=>'aaaaa',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1));
+
+        return array('regex'=>'a??a',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     function data_for_test_quant_greedy() {
         $test1 = array('str'=>'abacd',
                        'is_match'=>true,    // TODO: TAGS - BACKTRACKING-SPECIFIC
