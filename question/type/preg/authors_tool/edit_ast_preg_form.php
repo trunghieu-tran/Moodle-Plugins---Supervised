@@ -18,7 +18,6 @@ require_once($CFG->dirroot.'/question/type/preg/question.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
 //require_once($CFG->dirroot.'/question/type/preg/renderer.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
-require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 class qtype_preg_authors_tool_form extends moodleform {
@@ -35,9 +34,15 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform =& $this->_form;//Create form 
         
         //$PAGE->requires->js('/question/type/preg/authors_tool/author_tool.js');
-        $mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
+        //$mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
         //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
         
+        /* ATTENTION! SHOULD USE 'NORMAL' SCRIPT INCLUDE */
+        $mform->addElement('html', '<script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js"></script>');
+        
+        //$PAGE->requires->js('/question/type/preg/authors_tool/preg_authors_tool_script.js');
+        //$mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
+
         //Add header
         $mform->addElement('html', '<div align="center"><h2>' . get_string('author_tool_page_header', 'qtype_preg')  . '</h2></div>');
         

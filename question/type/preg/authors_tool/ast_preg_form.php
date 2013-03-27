@@ -18,7 +18,6 @@ global $DB;
 
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
 require_once($CFG->libdir . '/questionlib.php');
-//require_once(dirname(__FILE__) . '/previewlib.php');
 
 // Get and validate question id.
 //$id = required_param('id', PARAM_INT);

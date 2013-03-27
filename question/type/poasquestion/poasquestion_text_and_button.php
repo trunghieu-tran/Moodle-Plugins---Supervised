@@ -7,14 +7,18 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
-//php_info(); 
+
 //defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-//global $PAGE;
+global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/form/text.php');
 
+MoodleQuickForm::registerElementType('text_and_button',
+    $CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php',
+    'MoodleQuickForm_text_and_button');
+    
 class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
     
     /** @var string html for help button, if empty then no help */
