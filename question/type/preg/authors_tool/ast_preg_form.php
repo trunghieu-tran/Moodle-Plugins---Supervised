@@ -14,6 +14,7 @@ require_once(dirname(__FILE__) . '/../../../../config.php');
 
 global $CFG;
 global $PAGE;
+global $DB;
 
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
 //require_once('preg_authors_tool_load.php');
@@ -41,7 +42,20 @@ if ($mform->no_submit_button_pressed()) {
     //Set default data (if any)
     //$mform->set_data($toform);
 
-    //displays the form
+    //displays the formzz
+    
+    $jsmodule = array(  'name' => 'preg_authors_tool_script',
+                        'fullpath' => '/question/type/preg/authors_tool/preg_authors_tool_script.js',
+                        'requires' => array('node', 'io-base')
+    );
+    $jsargs = array(
+        $CFG->wwwroot,
+        'M.poasquestion_text_and_button'
+    );
+    //var_dump($jsargs);
+    $PAGE->requires->js_init_call('M.preg_authors_tool_script.init', $jsargs, true, $jsmodule);
+    
+    
     $mform->display();
 
 }
