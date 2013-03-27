@@ -369,7 +369,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
     public function accept() {
         if ($this->pregnode->possessive) {
-            return get_string('ungreedyquant', 'qtype_preg');   // TODO: add a possessive quant error string.
+            return get_string('possessivequant', 'qtype_preg');
         }
         return true;
     }
@@ -465,7 +465,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
 
     public function accept() {
         if ($this->pregnode->possessive) {
-            return get_string('ungreedyquant', 'qtype_preg');   // TODO: add a possessive quant error string.
+            return get_string('possessivequant', 'qtype_preg');
         }
         return true;
     }
