@@ -424,7 +424,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-/*  function data_for_test_subexpression_and_alternative_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_subexpression_and_alternative_and_lazy_quantifiers() {
         $test1 = array( 'str'=>'bc',
                         'is_match'=>true,
                         'full'=>true,
@@ -511,7 +511,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(b+?|a){1,2}?c',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
-*/
+
     function data_for_test_subexpression_and_alternative_and_greedy_quantifiers() {
         $test1 = array( 'str'=>'bc',
                         'is_match'=>true,
@@ -600,7 +600,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 
-/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers() {
         $test1 = array( 'str'=>'bbc',
                         'is_match'=>true,
                         'full'=>true,
@@ -611,8 +611,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(b+|a){1,2}?bc',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_2() {
         $test1 = array( 'str'=>'babc',
                         'is_match'=>true,
                         'full'=>true,
@@ -664,8 +664,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(b*|ba){1,2}?bc',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
-*/
-/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_3() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_3() {
         $test1 = array( 'str'=>'babc',
                         'is_match'=>true,
                         'full'=>true,
@@ -717,8 +717,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(ba|b*){1,2}?bc',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
-*/
-/*  function data_for_test_escape_sequences_control() { //control escape-последовательности не поддерживаются
+/*
+    function data_for_test_escape_sequences_control() { //control escape-последовательности не поддерживаются
         $test1 = array( 'str'=>"\x01\x01\e;z",
                         'is_match'=>true,
                         'full'=>true,
@@ -1267,7 +1267,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_with_character_classes() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_with_character_classes() {
         $test1 = array( 'str'=>'x123',
                         'is_match'=>true,
                         'full'=>true,
@@ -1317,7 +1317,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^.+?[0-9][0-9][0-9]$',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
-*/
+
     function data_for_test_character_class_and_quantifiers_and_subexpressions() {
         $test1 = array( 'str'=>'abc!pqr=apquxz.ixr.zzz.ac.uk',
                         'is_match'=>true,
@@ -2101,7 +2101,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
-/*  function data_for_test_metacharacter_and_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_metacharacter_and_lazy_quantifier() {
         $test1 = array( 'str'=>'z',
                         'is_match'=>true,
                         'full'=>true,
@@ -2161,7 +2161,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^a*?\w',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
-*/
+
     function data_for_test_metacharacter_and_greedy_quantifier_2() {
         $test1 = array( 'str'=>'az',
                         'is_match'=>true,
@@ -2202,7 +2202,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_metacharacter_and_lazy_quantifier_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_metacharacter_and_lazy_quantifier_2() {
         $test1 = array( 'str'=>'az',
                         'is_match'=>true,
                         'full'=>true,
@@ -2241,7 +2241,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^a+?\w',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
-*/
+
     function data_for_test_digits_and_word_characters_in_quantifiers() {
         $test1 = array( 'str'=>'1234567890',
                         'is_match'=>true,
@@ -2337,7 +2337,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-/*  function data_for_test_character_class_in_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_character_class_in_lazy_quantifier() {
         $test1 = array( 'str'=>'uoie',
                         'is_match'=>true,
                         'full'=>true,
@@ -2376,7 +2376,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[aeiou\d]{4,5}?',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
-*/
+
     function data_for_test_back_reference() {
         $test1 = array( 'str'=>'abc=abcabc',
                         'is_match'=>true,
@@ -2771,7 +2771,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_character_class_in_lazy_quantifier_and_greedy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_character_class_in_lazy_quantifier_and_greedy_quantifier_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2782,8 +2782,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[ab]{1,3}?(ab*|b)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_character_class_in_lazy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_character_class_in_lazy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2794,8 +2794,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[ab]{1,3}?(ab*?|b)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_character_class_in_greedy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_character_class_in_greedy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2806,7 +2806,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[ab]{1,3}(ab*?|b)',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_O_O_WTF() { //наркоманство какое-то и модификатор x не поддерживается
         $test1 = array( 'str'=>'Alan Other <user@dom.ain>',
                         'is_match'=>true,
@@ -5063,7 +5063,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a{0}bc',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_null_quantifier() {
         $test1 = array( 'str'=>'xyz',
                         'is_match'=>true,
@@ -5497,7 +5497,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'\000\001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037\040\041\042\043\044\045\046\047\050\051\052\053\054\055\056\057\060\061\062\063\064\065\066\067\070\071\072\073\074\075\076\077\100\101\102\103\104\105\106\107\110\111\112\113\114\115\116\117\120\121\122\123\124\125\126\127\130\131\132\133\134\135\136\137\140\141\142\143\144\145\146\147\150\151\152\153\154\155\156\157\160\161\162\163\164\165\166\167\170\171\172\173\174\175\176\177\200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377',
                      'tests'=>array($test1));
     }
-*//* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+*/
     function data_for_test_negative_character_classes_and_lazy_quantifier() {
         $test1 = array( 'str'=>'xxxxxxxxxxxPSTAIREISLLxxxxxxxxx',
                         'is_match'=>true,
@@ -5509,7 +5509,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'P[^*]TAIRE[^*]{1,6}?LL',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_negative_character_classes_and_lazy_quantifier_without_right_limit() {
         $test1 = array( 'str'=>'xxxxxxxxxxxPSTAIREISLLxxxxxxxxx',
                         'is_match'=>true,
@@ -5622,7 +5622,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier() {
         $test1 = array( 'str'=>'The food is under the bar in the barn.',
                         'is_match'=>true,
                         'full'=>true,
@@ -5633,7 +5633,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'foo(.*?)bar',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
@@ -5658,7 +5658,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5669,8 +5669,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(.*?)(\d*)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_2() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5681,7 +5681,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(.*?)(\d+)',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
@@ -5694,7 +5694,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_before_end_of_line() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5705,7 +5705,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(.*?)(\d+)$',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions_and_word_boundary_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
@@ -7099,7 +7099,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1, $test2));
     }
-*//* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+*/
     function data_for_test_subexpression_and_alternative_and_lazy_quantifiers_2() {
         $test1 = array( 'str'=>'bac',
                         'is_match'=>true,
@@ -7139,8 +7139,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(b+?|a){1,2}?c',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_2() {
+
+    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_4() {
         $test1 = array( 'str'=>'bac',
                         'is_match'=>true,
                         'full'=>true,
@@ -7213,7 +7213,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'\x0{ab}',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_alternative_in_subexpression_in_lazy_quantifier() {
         $test1 = array( 'str'=>'CD',
                         'is_match'=>true,
@@ -7238,7 +7238,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subexpression_in_lazy_quantifier_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_subexpression_in_lazy_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'ABABAB',
                         'is_match'=>true,
                         'full'=>true,
@@ -7249,7 +7249,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(AB)*?\1',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_subexpression_in_greedy_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'ABABAB',
                         'is_match'=>true,
@@ -8925,7 +8925,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-/*  function data_for_test_character_class_in_quantifier_in_subexpression_in_quantifier() { //дальше идут какие-то странные, пустые тесты, хотя, вроде бы, не должны быть такими
+    function data_for_test_character_class_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -9132,7 +9132,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'([^ab]*?)*',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
+
 /*  function data_for_test_quantifier_in_atomic_group_in_quantifier_2() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
@@ -9171,7 +9171,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_lazy_quantifier_in_atomic_group_in_subexpression_in_quantifier() { //ленивые квантификаторы не поддерживаются
+    function data_for_test_lazy_quantifier_in_atomic_group_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -9189,7 +9189,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'((?>a*?))*',
                      'tests'=>array($test1, $test2));
     }
-*/
+
 /*  function data_for_test_digits_in_conditional_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'12-sep-98',
                         'is_match'=>true,
@@ -10995,20 +10995,20 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_backslash() { //по неизвестной мне причине вызывает PHP Fatal Error: Вызов неопределенного метода qtype_preg_node_error::match()
+    function data_for_test_backslash() {
         $test1 = array( 'str'=>'a\\b',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(2),
-                        'next'=>'\\',
+                        'next'=>'\\\\',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'a\\\\b',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_nested_subexpressions() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -11057,7 +11057,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_2() {
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11068,7 +11068,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a.+?c',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
@@ -11880,7 +11880,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i() {
         $test1 = array( 'str'=>'ABBBBC',
                         'is_match'=>true,
@@ -11893,7 +11893,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'ABBBBC',
                         'is_match'=>true,
@@ -11906,7 +11906,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_3() {
         $test1 = array( 'str'=>'ABBC',
                         'is_match'=>true,
@@ -11959,7 +11959,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_4() {
         $test1 = array( 'str'=>'ABBBBC',
                         'is_match'=>true,
@@ -11972,7 +11972,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_5() {
         $test1 = array( 'str'=>'ABBBBC',
                         'is_match'=>true,
@@ -11985,7 +11985,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_6() {
         $test1 = array( 'str'=>'ABBBBC',
                         'is_match'=>true,
@@ -11998,7 +11998,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_7() {
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>true,
@@ -12031,7 +12031,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_8() {
         $test1 = array( 'str'=>'ABBC',
                         'is_match'=>true,
@@ -12051,7 +12051,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_9() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
@@ -12064,7 +12064,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_10() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
@@ -12077,7 +12077,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_lazy_quantifier_modifier_i_11() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
@@ -12202,7 +12202,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_any_character_in_lazy_quantifier_modifier_i() {
         $test1 = array( 'str'=>'AXYZC',
                         'is_match'=>true,
@@ -12530,21 +12530,21 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_backslash_modifier_i() { //по неизвестной мне причине вызывает PHP Fatal Error: Вызов неопределенного метода qtype_preg_node_error::match()
+    function data_for_test_backslash_modifier_i() {
         $test1 = array( 'str'=>'A\\B',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'\\',
+                        'next'=>'\\\\',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'a\\\\b',
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_nested_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
@@ -12597,7 +12597,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_modifier_i_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'ABCABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12609,8 +12609,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_any_character_in_lazy_quantifier_modifier_i_3() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_any_character_in_lazy_quantifier_modifier_i_3() {
         $test1 = array( 'str'=>'ABCABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12622,8 +12622,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_any_character_in_lazy_quantifier_modifier_i_4() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_any_character_in_lazy_quantifier_modifier_i_4() {
         $test1 = array( 'str'=>'ABCABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12635,7 +12635,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
@@ -12714,7 +12714,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_quantifier_in_alternative_in_subexpression_in_lazy_quantifier_modifier_i() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_lazy_quantifier_modifier_i() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12726,7 +12726,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_negative_character_class_in_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'CDE',
                         'is_match'=>true,
@@ -13334,7 +13334,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
                         'full'=>true,
@@ -13352,7 +13352,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a(?:b|c|d)+?(.)',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_2() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
@@ -13389,7 +13389,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_2() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13400,7 +13400,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a(?:b|c|d){4,5}?(.)',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_subexpressions_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
@@ -13424,7 +13424,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a(?:b|c|d){6,7}(.)',
                      'tests'=>array($test1));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_3() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
@@ -13449,7 +13449,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_4() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_4() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13460,7 +13460,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a(?:b|c|d){5,6}?(.)',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_7() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
@@ -13473,7 +13473,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_5() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_5() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13484,7 +13484,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a(?:b|c|d){5,7}?(.)',
                      'tests'=>array($test1));
     }
-*//* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_alternative_in_subexpression_in_lazy_quantifier_in_alternatives_in_subexpression_in_lazy_quantifier_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
@@ -13702,7 +13702,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_characters_in_unnumbered_subexpression_in_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_characters_in_unnumbered_subexpression_in_lazy_quantifier() {
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -13713,7 +13713,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?:..)*?a',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_in_subexpression_in_positive_lookahead_assertion_in_alternative_in_unnumbered_subexpression_in_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -14676,7 +14676,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference_in_subexpression() {
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14687,7 +14687,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?=(a+?))(\1ab)',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_word_character_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'one:',
                         'is_match'=>true,
@@ -14712,7 +14712,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference() {
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -14732,7 +14732,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(?=(a+?))\1ab',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_negative_character_class_in_quantifier_and_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'aexycd',
                         'is_match'=>true,
@@ -15591,7 +15591,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_() {
+    function data_for_test_posix_1() {
         $test1 = array( 'str'=>"> \x09\x0a\x0c\x0d\x0b<",
                         'is_match'=>true,
                         'full'=>true,
@@ -15602,8 +15602,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'[[:space:]]+',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_posix_2() {
         $test1 = array( 'str'=>"> \x09\x0a\x0c\x0d\x0b<",
                         'is_match'=>true,
                         'full'=>true,
@@ -15614,7 +15614,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'[[:blank:]]+',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_space_character_in_character_class_in_quantifier() {
         $test1 = array( 'str'=>"> \x09\x0a\x0c\x0d\x0b<",
                         'is_match'=>true,
@@ -15682,7 +15682,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_() {
+    function data_for_test_qe_1() {
         $test1 = array( 'str'=>'abcabcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -15693,8 +15693,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'abc\Qabc\Eabc',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_2() {
         $test1 = array( 'str'=>'abc(*+|abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -15705,8 +15705,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'abc\Q(*+|\Eabc',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_3() {
         $test1 = array( 'str'=>'abc abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -15736,8 +15736,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'x',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_4() {
         $test1 = array( 'str'=>"abc#not comment\n    literal",
                         'is_match'=>true,
                         'full'=>true,
@@ -15749,8 +15749,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_5() {
         $test1 = array( 'str'=>"abc#not comment\n    literal",
                         'is_match'=>true,
                         'full'=>true,
@@ -15762,8 +15762,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_6() {
         $test1 = array( 'str'=>"abc#not comment\n    literal",
                         'is_match'=>true,
                         'full'=>true,
@@ -15775,8 +15775,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_7() {
         $test1 = array( 'str'=>"abc#not comment\n    literal",
                         'is_match'=>true,
                         'full'=>true,
@@ -15788,8 +15788,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_8() {
         $test1 = array( 'str'=>"abc\\\$xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -15800,8 +15800,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'\Qabc\$xyz\E',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_9() {
         $test1 = array( 'str'=>"abc\$xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -15812,8 +15812,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'\Qabc\E\$\Qxyz\E',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_10() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -15826,8 +15826,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
-                        'next'=>'',
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'xyzabc',
@@ -15835,14 +15835,14 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
-                        'next'=>'',
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\Gabc',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
+
 /*  function data_for_test_unnumbered_subexpression_modiier_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'XabcdY',
                         'is_match'=>true,
@@ -16173,7 +16173,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15));
     }
 */
-/*  function data_for_test_() {
+    function data_for_test_qe_11() {
         $test1 = array( 'str'=>'z',
                         'is_match'=>true,
                         'full'=>true,
@@ -16228,7 +16228,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'[z\Qa-d]\E]',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
-*/
+
     function data_for_test_escape_sequences_in_character_class() {
         $test1 = array( 'str'=>'z',
                         'is_match'=>true,
@@ -16751,7 +16751,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_() {
+  function data_for_test_e_without_q_1() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -16762,8 +16762,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^\Eabc',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+  function data_for_test_e_without_q_2() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -16792,8 +16792,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[\Eabc]',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_() {
+
+  function data_for_test_e_without_q_3() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -16831,8 +16831,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[a-\Ec]',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_e_without_q_4() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -16870,8 +16870,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[a\E\E-\Ec]',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_e_without_q_5() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -16900,8 +16900,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[\E\Qa\E-\Qz\E]+',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_e_without_q_6() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -16926,8 +16926,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[a\Q]bc\E]',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_qe_empty() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -16945,7 +16945,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[a-\Q\E]',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_empty_subexpression_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
@@ -17486,7 +17486,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый захватывающий квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_negative_character_class_in_possessive_quantifier_modifier_i() {
         $test1 = array( 'str'=>'12abc',
                         'is_match'=>true,
@@ -17507,7 +17507,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i() {
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
@@ -17539,8 +17539,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
@@ -17572,7 +17572,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i   ',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
+
     function data_for_test_negative_character_class_in_quantifier_modifier_i_4() {
         $test1 = array( 'str'=>'12aXbcX',
                         'is_match'=>true,
@@ -17600,7 +17600,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i_3() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i_3() {
         $test1 = array( 'str'=>'12aXbcX',
                         'is_match'=>true,
                         'full'=>true,
@@ -17626,8 +17626,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
-/*  function data_for_test_negative_character_class_in_possessive_quantifier_modifier_i_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_negative_character_class_in_possessive_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'12aXbcX',
                         'is_match'=>true,
                         'full'=>true,
@@ -17653,7 +17653,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3));
     }
-*/
+
     function data_for_test_negative_character_class_in_quantifier_modifier_i_5() {
         $test1 = array( 'str'=>'abcdef',
                         'is_match'=>true,
@@ -17673,7 +17673,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_negative_character_class_in_lazy_quantifier_modifier_i_4() {
         $test1 = array( 'str'=>'abcdef',
                         'is_match'=>true,
@@ -17693,7 +17693,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2));
     }
-/* следующая функция не закомментирована, несмотря на неподдерживаемый захватывающий квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
+
     function data_for_test_negative_character_class_in_possessive_quantifier_modifier_i_3() {
         $test1 = array( 'str'=>'abcdef',
                         'is_match'=>true,
@@ -17992,7 +17992,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_subexpression_in_positive_lookahead_assertion_in_lazy_quantifier_and_any_character() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_subexpression_in_positive_lookahead_assertion_in_lazy_quantifier_and_any_character() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -18010,7 +18010,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?=(a))??.',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_subroutine_reference_in_positive_lookahead_assertion_in_quantifier_and_character_class_and_character_class_in_subexpression() {
         $test1 = array( 'str'=>'abd',
                         'is_match'=>true,
@@ -18103,7 +18103,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_() {
+    /*function data_for_test_posix_3() {
         $test1 = array( 'str'=>'aaaa444:::Z',
                         'is_match'=>true,
                         'full'=>true,
@@ -18114,8 +18114,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^[:a[:digit:]]+',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_posix_4() {
         $test1 = array( 'str'=>'aaaa444:::bbbZ',
                         'is_match'=>true,
                         'full'=>true,
@@ -18125,8 +18125,8 @@ class qtype_preg_cross_tests_from_pcre {
 
         return array('regex'=>'^[:a[:digit:]:b]+',
                      'tests'=>array($test1));
-    }
-*/
+    }*/
+
     function data_for_test_character_classes_2() {
         $test1 = array( 'str'=>' :xxx:',
                         'is_match'=>true,
@@ -21444,7 +21444,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21455,8 +21455,8 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(?:a|bc)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    function data_for_test_() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21467,8 +21467,8 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(a|b(*THEN)c)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21479,8 +21479,8 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(a|bc)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    /*function data_for_test_() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21490,9 +21490,9 @@ however, we need the complication for Perl. */
 
         return array('regex'=>'\A.*?(?:a|b(*THEN)c)++',
                      'tests'=>array($test1));
-    }
-*/
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+    }*/
+
+    function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression_in_possessive_quantifier() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21503,8 +21503,8 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(?:a|bc)++',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_() {
+
+    /*function data_for_test_() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21514,9 +21514,9 @@ however, we need the complication for Perl. */
 
         return array('regex'=>'\A.*?(a|b(*THEN)c)++',
                      'tests'=>array($test1));
-    }
-*/
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+    }*/
+
+    function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression_in_possessive_quantifier() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21527,7 +21527,7 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(a|bc)++',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
@@ -21540,7 +21540,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternatives_in_unnumbered_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternatives_in_unnumbered_subexpression() {
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21551,7 +21551,7 @@ however, we need the complication for Perl. */
         return array('regex'=>'\A.*?(?:a|bc|d)',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_subexpression_in_unnumbered_subexpression_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'beetle',
                         'is_match'=>true,
@@ -23004,7 +23004,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -23015,8 +23015,8 @@ name were given. */
         return array('regex'=>'(?>.*?a)(?<=ba)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_any_character_in_lazy_quantifier_in_unnumbered_subexpression_and_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+
+    function data_for_test_any_character_in_lazy_quantifier_in_unnumbered_subexpression_and_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -23027,7 +23027,7 @@ name were given. */
         return array('regex'=>'(?:.*?a)(?<=ba)',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_() {
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
@@ -23093,7 +23093,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_1() {
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
                         'full'=>true,
@@ -23104,7 +23104,7 @@ name were given. */
         return array('regex'=>'(?>.*?a)b',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_begin_of_line_in_atomic_group_modifier_s() { //модификатор s не поддерживается
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
@@ -23120,7 +23120,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_subexpressions_in_alternative_in_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_subexpressions_in_alternative_in_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -23138,7 +23138,7 @@ name were given. */
         return array('regex'=>'(?>.*?)(?<=(abcd)|(wxyz))',
                      'tests'=>array($test1, $test2));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_subexpressions_in_alternative_in_positive_lookbehind_assertion() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,
@@ -23172,7 +23172,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_2() {
         $test1 = array( 'str'=>'abcdfooxyz',
                         'is_match'=>true,
                         'full'=>true,
@@ -23183,7 +23183,7 @@ name were given. */
         return array('regex'=>'(?>.*?)foo',
                      'tests'=>array($test1));
     }
-*//* следующие тесты со строки 2870 в testoutput1 */
+/* следующие тесты со строки 2870 в testoutput1 */
 /*  function data_for_test_() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
