@@ -890,7 +890,7 @@ if (1 == 0) {
      * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
     public function build_nfa($node, $isassertion = false) {
-        $result = new qtype_preg_nfa($this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_subexpr_map());
+        $result = new qtype_preg_nfa($this->parser->get_max_subpatt(), $this->get_max_subexpr());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
