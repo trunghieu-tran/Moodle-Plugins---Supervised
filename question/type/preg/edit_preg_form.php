@@ -22,18 +22,14 @@
  * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//php_info();
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-global $app;
+//global $app;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
-//require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
-
-MoodleQuickForm::registerElementType('preg_text_and_button',
-    $CFG->dirroot.'/question/type/preg/authors_tool/preg_text_and_button.php',
-    'MoodleQuickForm_preg_text_and_button');
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_text_and_button.php');
 
 /**
  * Preg editing form definition.
@@ -56,12 +52,12 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
             global $CFG;
-            global $app;
+            //global $app;
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
             $elementLinks = array(
-                'link_on_button_image' => $app . '/theme/image.php/standard/core/1359744739/t/edit',
-                'link_on_page' => $CFG->wwwroot.'/question/type/preg/authors_tool/ast_preg_form.php'
+                'link_on_button_image' => $CFG->wwwroot . '/theme/image.php/standard/core/1359744739/t/edit',
+                'link_on_page' => $CFG->wwwroot . '/question/type/preg/authors_tool/ast_preg_form.php'
                 );
             $tmp = & $mform->createElement('preg_text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), $elementLinks, array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
