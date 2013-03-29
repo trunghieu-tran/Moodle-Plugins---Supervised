@@ -1,6 +1,6 @@
 /**
  * Script for button "Check", "Back" and push in interactive tree
- * 
+ *
  * @copyright &copy; 2012  Terechov Grigory, Pahomov Dmitry
  * @author Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -13,21 +13,21 @@ M.preg_authors_tool_script = {
 
     /** @var string with www host of moodle (smth like 'http://moodle.site.ru/') */
     preg_www_root : null,
-    
+
     /** @var {string} name of qtype_preg_textbutton parent object */
     textbutton_widget : null,
-    
+
     check_btn : null,
     main_input : null,
     back_btn : null,
     Y : null,
-    
+
     /**
      * setups module
      * @param {object} Y yui object
-     * @param {string} _preg_www_root string with www host of moodle 
+     * @param {string} _preg_www_root string with www host of moodle
      * (smth like 'http://moodle.site.ru/')
-     * @param {string} poasquestion_text_and_button_objname name of 
+     * @param {string} poasquestion_text_and_button_objname name of
      * qtype_preg_textbutton parent object
      */
     init : function(Y, _preg_www_root, poasquestion_text_and_button_objname) {
@@ -41,7 +41,7 @@ M.preg_authors_tool_script = {
         //alert(1);
         this.setup_parent_object();
     },
-    
+
     /**
      * Sets up options of parent object
      */
@@ -61,19 +61,19 @@ M.preg_authors_tool_script = {
                     self.load_content();
                 })
             },
-            
+
             oneachpresscallback : function() {
                 M.preg_authors_tool_script.load_content();
             }
         };
         this.textbutton_widget.setup(options);
     },
-    
+
     /** Calls if request for information about new regex is successful */
     upd_dialog_Success : function(id, o, a) {
-        
+
         var obj = M.preg_authors_tool_script;
-        // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+        // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         var indexofbracket = o.responseText.indexOf("{");
         if (indexofbracket != 0) {
             alert(o.responseText.substr(0,indexofbracket));
@@ -106,9 +106,9 @@ M.preg_authors_tool_script = {
     upd_dialog_failure : function(id, o, a) {
        alert("ERROR " + id + " " + a);
     },
-    
+
     load_content_by_id : function(id) {
-        
+
         //var obj = M.preg_authors_tool_script;
         id += '';
         var regex = this.main_input.get('value');
@@ -127,25 +127,26 @@ M.preg_authors_tool_script = {
 
         var response = this.Y.io(url, cfg);
     },
-    
+
     load_content : function() {
         M.preg_authors_tool_script.load_content_by_id(-1);
     },
-    
+
     /**
      * Highlights part of text description of regex corresponding to giving id
      * @param {int} id id of node for which we should highlight part of description
      */
     highlight_description : function(id){
-        
+
         var highlightedclass = 'description_highlighted';
         var oldhighlighted = this.Y.one('.'+highlightedclass);
-        
+
         if(oldhighlighted!=null){
            oldhighlighted.removeClass(highlightedclass).setStyle('background-color','transparent');
         }
-        
-        this.Y.one('.description_node_'+id).addClass(highlightedclass).setStyle('background-color','yellow');
+        var targetspan = this.Y.one('.description_node_'+id);
+        targetspan.addClass(highlightedclass);
+        targetspan.setStyle('background','#FFFF00');
     },
 
     /** Handler of pressing on 'Back' button of dialog */
@@ -156,14 +157,14 @@ M.preg_authors_tool_script = {
         obj.textbutton_widget.data = new_regex;
         obj.textbutton_widget.close_and_set_new_data();
     },
-    
+
     /** Handler of pressing on 'Check' button of dialog */
     check_regex : function( e ) {
-        
+
         e.preventDefault();
         var obj = M.preg_authors_tool_script;
         obj.load_content();
-    },    
+    },
 
     /**
      * Handler of pressing on area of a map on regex tree image
@@ -174,7 +175,7 @@ M.preg_authors_tool_script = {
        obj.highlight_description(id);
        obj.load_content_by_id(id);
     },
-    
+
      /**
      * Handler of pressing on area of a map on regex tree image
      */
