@@ -246,10 +246,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Returns 1 if this beats other, -1 if other beats this, 0 otherwise.
      */
     public function leftmost_longest($other) {
-        // Iterate over all subpatterns skipping the first on which is the whole expression.
+        // Iterate over all subpatterns skipping the first which is the whole expression.
         for ($i = 2; $i <= $this->automaton->max_subpatt(); $i++) {
-            $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : self::empty_subpatt_match();
-            $other_match = array_key_exists($i, $other->matches) ? $other->matches[$i] : self::empty_subpatt_match();
+            $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : array(self::empty_subpatt_match());
+            $other_match = array_key_exists($i, $other->matches) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
             // Less number of iterations means that there is a longer match without epsilons.
             $this_count = count($this_match);
@@ -266,14 +266,30 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this_length = $this_match[$j][1];
                 $other_index = $other_match[$j][0];
                 $other_length = $other_match[$j][1];
-                if (($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                    ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index < $other_index) ||
-                    ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === $other_index && $this_length > $other_length)) {
-                    return 1;
+
+                // Continue if both iterations have no match.
+                if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND && $other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    continue;
                 }
-                if (($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                    ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index < $this_index) ||
-                    ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === $this_index && $other_length > $this_length)) {
+
+                // Match existance.
+                if ($other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    return 1;
+                } else if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    return -1;
+                }
+
+                // Leftmost.
+                if ($this_index < $other_index) {
+                    return 1;
+                } else if ($other_index < $this_index) {
+                    return -1;
+                }
+
+                // Longest.
+                if ($this_length > $other_length) {
+                    return 1;
+                } else if ($other_length > $this_length) {
                     return -1;
                 }
             }
