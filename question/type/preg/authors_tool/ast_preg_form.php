@@ -18,8 +18,9 @@ global $DB;
 
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
 require_once($CFG->libdir . '/questionlib.php');
-//$context = context::instance_by_id($category->contextid);
+
 $PAGE->set_context(context_system::instance());
+
 // Get and validate question id.
 //$id = required_param('id', PARAM_INT);
 /*$id = 1;
