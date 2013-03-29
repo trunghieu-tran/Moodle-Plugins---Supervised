@@ -1371,6 +1371,9 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     }
     return $res;
 }
+<YYINITIAL> "\E" {
+    return $this->nextToken();
+}
 <YYINITIAL> "\c" {
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, htmlspecialchars('\c'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
@@ -1671,7 +1674,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <CHARSET> "\Q".*"\E" {
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $this->recognize_qe_sequence($text));
+    $str = $this->recognize_qe_sequence($text);
+    if ($str != '') {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
+    }
+}
+<CHARSET> "\E" {
+    return $this->nextToken();
 }
 <CHARSET> \\. {
     $text = $this->yytext();
