@@ -111,14 +111,10 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Number of subexpressions in the regular expression.
     protected $max_subexpr;
 
-    // Map where keys are subexpression names, and values are their numbers.
-    protected $subexpr_name_to_number_map;
-
-    public function __construct($max_subpatt, $max_subexpr, $subexpr_name_to_number_map) {
+    public function __construct($max_subpatt, $max_subexpr) {
         parent::__construct();
         $this->max_subpatt = $max_subpatt;
         $this->max_subexpr = $max_subexpr;
-        $this->subexpr_name_to_number_map = $subexpr_name_to_number_map;
     }
 
     protected function set_limits() {
