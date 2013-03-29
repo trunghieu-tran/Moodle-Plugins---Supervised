@@ -682,7 +682,7 @@ if (1 == 0) {
                     $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
 
                     // Saving the current match.
-                    if (!$newstate->has_null_iterations()) {
+                    if (!($transition->is_loop && $newstate->has_null_iterations())) {
                         if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
                             $lazystates[] = $newstate;
                         } else {
