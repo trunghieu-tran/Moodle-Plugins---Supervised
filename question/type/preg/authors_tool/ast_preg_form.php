@@ -18,10 +18,11 @@ global $DB;
 
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
 require_once($CFG->libdir . '/questionlib.php');
-
+//$context = context::instance_by_id($category->contextid);
+$PAGE->set_context(context_system::instance());
 // Get and validate question id.
 //$id = required_param('id', PARAM_INT);
-$id = 1;
+/*$id = 1;
 $question = question_bank::load_question($id);
 
 // Were we given a particular context to run the question in?
@@ -42,7 +43,7 @@ if ($cmid = optional_param('cmid', 0, PARAM_INT)) {
     $context = context::instance_by_id($category->contextid);
     $PAGE->set_context($context);
     // Note that in the other cases, require_login will set the correct page context.
-}
+}*/
 
 //Instantiate simplehtml_form 
 $mform = new qtype_preg_authors_tool_form();

@@ -38,7 +38,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
         
         /* ATTENTION! SHOULD USE 'NORMAL' SCRIPT INCLUDE */
-        $mform->addElement('html', '<script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js"></script>');
+        //$mform->addElement('html', '<script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js"></script>');
         
         //$PAGE->requires->js('/question/type/preg/authors_tool/preg_authors_tool_script.js');
         //$mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
@@ -54,11 +54,11 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
         $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         
-        //Add tree
+        //Add tree    
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
+        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
         
         //Add graph
         $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
