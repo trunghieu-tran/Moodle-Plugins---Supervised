@@ -555,7 +555,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             while (count($curstates) != 0) {
                 $curstate = $states[array_pop($curstates)];
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
-
                     // Check for anchors.
                     // ^ is only valid on start position and thus can only be matched, but can't generate strings.
                     // $ is only valid at the end of regex. TODO: what's with eps-closure?
@@ -596,10 +595,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate->str->concatenate($newchr);
                     }
 
-                    // Save the current result.
+                    // Save all reached states.
                     $closure = $this->epsilon_closure(array($newstate->state->number => $newstate), $str);
                     foreach ($closure as $curclosure) {
-                        $reached[] = $curclosure;
+                        $number = $curclosure->state->number;
+                        if (!array_key_exists($number, $reached) || $reached[$number]->length > $newstate->length) {
+                            $reached[$number] = $curclosure;
+                        }
                     }
                 }
             }
