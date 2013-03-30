@@ -201,7 +201,7 @@
     protected function assign_ids_and_subpatts($node) {
         $node->id = ++$this->id_counter;
         if ($node->is_subpattern() || $node === $this->root) {
-            $node->subpattern = ++$this->subpatt_counter;
+            $node->subpattern = $this->subpatt_counter++;
         }
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {

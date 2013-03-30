@@ -217,7 +217,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $this->matches[$node->subpattern] = array(self::empty_subpatt_match());
         } else {
             // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
-            if (!($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND) && !($skipwholematch && $node->subpattern == 1)) {
+            if (!($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND) && !($skipwholematch && $node->subpattern == 0)) {
                 $this->matches[$node->subpattern][] = self::empty_subpatt_match();
             }
         }
@@ -247,7 +247,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      */
     public function leftmost_longest($other) {
         // Iterate over all subpatterns skipping the first which is the whole expression.
-        for ($i = 2; $i <= $this->automaton->max_subpatt(); $i++) {
+        for ($i = 1; $i <= $this->automaton->max_subpatt(); $i++) {
             $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : array(self::empty_subpatt_match());
             $other_match = array_key_exists($i, $other->matches) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
