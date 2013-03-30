@@ -243,9 +243,16 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     }
 
     /**
-     * Returns 1 if this beats other, -1 if other beats this, 0 otherwise.
+     * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
     public function leftmost_longest($other) {
+        // Check for full match.
+        if ($this->full && !$other->full) {
+            return true;
+        } else if (!$this->full && $other->full) {
+            return false;
+        }
+
         // Iterate over all subpatterns skipping the first which is the whole expression.
         for ($i = 1; $i <= $this->automaton->max_subpatt(); $i++) {
             $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : array(self::empty_subpatt_match());
@@ -255,9 +262,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $this_count = count($this_match);
             $other_count = count($other_match);
             if ($this_count < $other_count) {
-                return 1;
+                return true;
             } else if ($other_count < $this_count) {
-                return -1;
+                return false;
             }
 
             // Iterate over all repetitions.
@@ -274,46 +281,26 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
                 // Match existance.
                 if ($other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    return 1;
+                    return true;
                 } else if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    return -1;
+                    return false;
                 }
 
                 // Leftmost.
                 if ($this_index < $other_index) {
-                    return 1;
+                    return true;
                 } else if ($other_index < $this_index) {
-                    return -1;
+                    return false;
                 }
 
                 // Longest.
                 if ($this_length > $other_length) {
-                    return 1;
+                    return true;
                 } else if ($other_length > $this_length) {
-                    return -1;
+                    return false;
                 }
             }
         }
-        return 0;
-    }
-
-    public function worse_than($other) {
-        // Full match.
-        if ($this->full && !$other->full) {
-            return false;
-        } else if (!$this->full && $other->full) {
-            return true;
-        }
-
-        // Leftmost rule.
-        $leftmost = $this->leftmost_longest($other);
-        if ($leftmost == 1) {
-            return false;
-        } else if ($leftmost == -1) {
-            return true;
-        }
-
-        // Equal matches.
         return false;
     }
 
@@ -480,7 +467,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state->number;
-                if (!array_key_exists($number, $result) || $result[$number]->worse_than($newstate)) {
+                if (!array_key_exists($number, $result) || $newstate->leftmost_longest($result[$number])) {
                     $result[$number] = $newstate;
                     $curstates[] = $newstate;
                 }
@@ -785,7 +772,7 @@ if (1 == 0) {
                             $lazystates[] = $newstate;
                         } else {
                             $number = $newstate->state->number;
-                            if (!array_key_exists($number, $reached) || $reached[$number]->worse_than($newstate)) {
+                            if (!array_key_exists($number, $reached) || $newstate->leftmost_longest($reached[$number])) {
                                 $reached[$number] = $newstate;
                             }
                         }
