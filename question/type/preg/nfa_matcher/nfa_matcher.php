@@ -445,13 +445,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns an array of states which can be reached without consuming characters.
-     * @param qtype_preg_nfa_exec_state startstate state to go from.
+     * @param qtype_preg_nfa_exec_state startstates states to go from.
      * @param qtype_poasquestion_string str string being matched.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
-    public function epsilon_closure($startstate, $str) {
-        $curstates = array($startstate);
-        $result = array($startstate->state->number => $startstate);
+    public function epsilon_closure($startstates, $str) {
+        $curstates = $startstates;
+        $result = $startstates;
 
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
@@ -479,14 +479,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
 
                 // Resolve ambiguities if any.
-                if (array_key_exists($newstate->state->number, $result)) {
-                    $existing = $result[$newstate->state->number];
-                    if ($existing->worse_than($newstate)) {
-                        $result[$newstate->state->number] = $newstate;
-                        $curstates[] = $newstate;
-                    }
-                } else {
-                    $result[$newstate->state->number] = $newstate;
+                $number = $newstate->state->number;
+                if (!array_key_exists($number, $result) || $result[$number]->worse_than($newstate)) {
+                    $result[$number] = $newstate;
                     $curstates[] = $newstate;
                 }
             }
@@ -522,7 +517,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if ($transition->is_loop || $transition->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                     continue;
                 }
-                $closure = $this->epsilon_closure(/*$transition->to*/$laststate, $str);   // TODO!!!
+                $closure = $this->epsilon_closure(array($laststate->state->number => $laststate), $str);   // TODO!!!
                 foreach ($closure as $curclosure) {
                     if ($curclosure === $endstate) {
                         // The end state is reachable; return it immediately.
@@ -562,7 +557,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $resumestate->str->concatenate($newchr);
         }
 
-        $closure = $this->epsilon_closure($resumestate, $str);
+        $closure = $this->epsilon_closure(array($resumestate->state->number => $resumestate), $str);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state->number] = $curclosure;
             $curstates[] = $curclosure->state->number;
@@ -614,24 +609,22 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate->str->concatenate($newchr);
                     }
 
-                    // Saving the current result.
-                    $closure = $this->epsilon_closure($newstate, $str);
+                    // Save the current result.
+                    $closure = $this->epsilon_closure(array($newstate->state->number => $newstate), $str);
                     foreach ($closure as $curclosure) {
                         $reached[] = $curclosure;
                     }
                 }
             }
 
-            // Replace curstates with newstates.
-            $newstates = array();
+            // Replace curstates with reached.
             foreach ($reached as $curstate) {
-                $curnum = $curstate->state->number;
-                if ($states[$curnum] === null || $states[$curnum]->length > $curstate->length) {
-                    $states[$curnum] = $curstate;
-                    $newstates[] = $curnum;
+                $number = $curstate->state->number;
+                if ($states[$number] === null || $states[$number]->length > $curstate->length) {
+                    $states[$number] = $curstate;
+                    $curstates[] = $number;
                 }
             }
-            $curstates = $newstates;
         }
         return $states[$endstate->number];
     }
@@ -676,7 +669,7 @@ if (1 == 0) {
                     $newstate->length += $length;
                     $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
 
-                    // Saving the current match.
+                    // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
                         if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
                             $lazystates[] = $newstate;
@@ -739,6 +732,7 @@ if (1 == 0) {
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
+        $startstate = $this->automaton->start_state();
         $endstate = $this->automaton->end_state();
 
         // Create an array of processing states for all nfa states (the only initial state, other states are null yet).
@@ -751,8 +745,8 @@ if (1 == 0) {
             }
         }
 
-        // Get an epsilon-closure of the initial state. TODO: ambiguities?
-        $closure = $this->epsilon_closure($states[$this->automaton->start_state()->number], $str);
+        // Get an epsilon-closure of the initial state.
+        $closure = $this->epsilon_closure(array($startstate->number => $states[$startstate->number]), $str);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state->number] = $curclosure;
             $curstates[] = $curclosure->state->number;
@@ -786,13 +780,13 @@ if (1 == 0) {
                         $newstate->length += $length;
                         $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
 
-                        // Saving the current result.
-                        $closure = $this->epsilon_closure($newstate, $str);
-                        foreach ($closure as $curclosure) {
-                            if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
-                                $lazystates[] = $curclosure;
-                            } else {
-                                $reached[] = $curclosure;
+                        // Save the current result.
+                        if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                            $lazystates[] = $newstate;
+                        } else {
+                            $number = $newstate->state->number;
+                            if (!array_key_exists($number, $reached) || $reached[$number]->worse_than($newstate)) {
+                                $reached[$number] = $newstate;
                             }
                         }
                     } else if ($states[$endstate->number] == null) {    // Transition not matched, save the partial match.
@@ -820,38 +814,22 @@ if (1 == 0) {
                     }
                 }
             }
-            // Resolve ambiguities between the reached states.
-            foreach ($reached as $key1 => $reached1) {
-                foreach ($reached as $key2 => $reached2) {
-                    if ($reached1 == null || $reached2 == null || $reached1->state !== $reached2->state) {
-                        continue;
-                    }
-                    if ($reached1->worse_than($reached2)) {
-                        $reached[$key1] = null;
-                    } else if ($reached2->worse_than($reached1)) {
-                        $reached[$key2] = null;
-                    }
-                }
+
+            // If there's no full match yet and no states were reached, try the lazy ones.
+            if ($states[$endstate->number] == null && count($reached) == 0 && count($lazystates) > 0) {
+                $reached[] = array_pop($lazystates);
             }
+
+            $reached = $this->epsilon_closure($reached, $str);
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
-                if ($curstate == null) {
-                    continue;
-                }
                 // Currently stored state needs replacement if it's null, or if it's not the same as the new state.
                 // In fact, the second check prevents from situations like \b*
                 if ($states[$curstate->state->number] === null || !$states[$curstate->state->number]->equals($curstate)) {
                     $states[$curstate->state->number] = $curstate;
                     $curstates[] = $curstate->state->number;
                 }
-            }
-
-            // If there's no full match yet and no curstates remain, try the lazy ones.
-            if ($states[$endstate->number] == null && count($curstates) == 0 && count($lazystates) > 0) {
-                $curstate = array_pop($lazystates);
-                $states[$curstate->state->number] = $curstate;
-                $curstates[] = $curstate->state->number;
             }
         }
 
