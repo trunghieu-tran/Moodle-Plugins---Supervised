@@ -583,18 +583,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         continue;
                     }
 
-                    $length = $transition->pregleaf->consumes($curstate);
-
                     // Only generated subpatterns can be passed.
-                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
-                        $length = $curstate->length($transition->pregleaf->number);
-                    }
-
+                    $length = $transition->pregleaf->consumes($curstate);
                     if ($length == qtype_preg_matching_results::NO_MATCH_FOUND) {
                         continue;
                     }
 
-                    // Is it longer then an existing one?
+                    // Is it longer than existing one?
                     if ($states[$endstate->number] !== null && $curstate->length + $length > $states[$endstate->number]->length) {
                         continue;
                     }
