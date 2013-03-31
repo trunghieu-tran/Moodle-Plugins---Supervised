@@ -355,6 +355,28 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         return $mas[$str1_len][$str2_len];
     }
 
+    
+    /* Determines the possibility existence of a pair
+    *
+    * @return int Damerau-Levenstein distance or -1 if pair is not possible
+    */
+    public function possible_pair($token, $max)
+    {
+        $str1= $this->value;
+        $str2= $token->value;
+        $length_of_str1=strlen($str1);                 //define the length of str1
+        $length_of_str2=strlen($str2);                 //define the length of str2
+        if(!($length_of_str1-$max<=$length_of_str2 && $length_of_str2<=$length_of_str1+$max))
+            return -1;
+        //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
+        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2);
+        if($distance<=$max)
+            return $distance;
+        else
+            return -1;
+    }
+    
+    
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
