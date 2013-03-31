@@ -394,7 +394,54 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect) {
-        // TODO: generic mistakes handling
+        $result=strlen($this->value)-strlen($this->value)*$threshold;
+        $max=round($result);
+        $str='';
+        $possible_pairs=array();
+        for ($k=0; $k<count($other); $k++)
+        {
+            //подготовка неправильных слов к функции            
+            if($iscorrect==true)
+            {
+                //проверка на возможность пары (опечатка)
+                $dist=$this->possible_pair($other[$k],$max);
+                if($dist!=-1)
+                {
+                    $pair=new block_formal_langs_matched_tokens_pair(array($this->tokenindex),array($k),$dist);
+                    array_push($possible_pairs,$pair);
+                }
+                //проверка на возможность пары (лишний разделитель - склейка неправильных слов)
+                if($k+1!=count($other))
+                {
+                    $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                    $lexem=new block_formal_langs_token_base(null,'type',$str,null,0);
+                    $dist=$this->possible_pair($lexem, $max);
+                    if($dist!=-1)
+                    {
+                        $pair=new block_formal_langs_matched_tokens_pair(array($this->tokenindex),array($k, $k+1),$dist);
+                        array_push($possible_pairs, $pair);
+                    }
+                    $str='';
+                }
+            }
+            else
+            {
+                //проверка на возможность пары (пропущенный разделитель - склейка правильных слов)
+                if($k+1!=count($other))
+                {
+                    $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                    $lexem=new block_formal_langs_token_base(null,'type',$str,null,0);
+                    $dist=$this->possible_pair($lexem, $max);
+                    if($dist!=-1)
+                    {
+                        $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist);
+                        array_push($possible_pairs,$pair);
+                    }
+                    $str='';
+                }
+             }
+        }
+        return $possible_pairs;
     }
     
     
