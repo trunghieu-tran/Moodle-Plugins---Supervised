@@ -3,5 +3,7 @@ call phpunit block_formal_langs_simple_english_language_test blocks/formal_langs
 call phpunit block_formal_langs_token_base_is_same blocks/formal_langs/tests/test_is_same.php
 
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_damerau_levenshtein.php
+call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_possible_pair.php
+call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_look_for_matches.php
 pause
 
