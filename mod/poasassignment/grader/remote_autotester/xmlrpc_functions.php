@@ -7,7 +7,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param $attemptid
  * @param $compiled
  */
-function notify_compiled($loginHash, $passwordHash, $attemptid, $compiled) {
+function notify_compiled($loginHash, $passwordHash, $attemptid, $compiled, $compilemessage) {
     $config = get_config("poasassignment_remote_autotester");
     if (md5($config->login) != $loginHash || md5($config->password) != $passwordHash) {
         XMLRPC_response(XMLRPC_prepare("401 Unauthorized"));
@@ -17,10 +17,17 @@ function notify_compiled($loginHash, $passwordHash, $attemptid, $compiled) {
         $records = $DB->get_records('poasassignment_gr_ra', array('attemptid' => $attemptid), 'id DESC', 'id, attemptid');
         if (count($records) > 0) {
             $record = array_shift($records);
-            if ($compiled)
+            if ($compiled) {
                 $record->compiled = 1;
-            else
+            }
+            else {
                 $record->compiled = 0;
+            }
+
+            if ($compilemessage) {
+                $record->compilemessage = $compilemessage;
+            }
+
             $record->timecompiled = time();
             $DB->update_record('poasassignment_gr_ra', $record);
         }

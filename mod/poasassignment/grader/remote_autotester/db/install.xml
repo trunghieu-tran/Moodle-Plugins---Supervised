@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/grader/remote_autotester/db" VERSION="20130324" COMMENT="XMLDB file for Moodle mod/poasassignment/grader/remote_autotester"
+<XMLDB PATH="mod/poasassignment/grader/remote_autotester/db" VERSION="20130402" COMMENT="XMLDB file for Moodle mod/poasassignment/grader/remote_autotester"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -13,7 +13,9 @@
         <FIELD NAME="timecompilestarted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="serverresponse" NEXT="timecompiled"/>
         <FIELD NAME="timecompiled" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="timecompilestarted" NEXT="compiled"/>
         <FIELD NAME="compiled" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" PREVIOUS="timecompiled" NEXT="timeteststart"/>
-        <FIELD NAME="timeteststart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="compiled"/>
+        <FIELD NAME="timeteststart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="compiled" NEXT="compilemessage"/>
+        <FIELD NAME="compilemessage" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="timeteststart" NEXT="testsfound"/>
+        <FIELD NAME="testsfound" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" PREVIOUS="compilemessage"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
