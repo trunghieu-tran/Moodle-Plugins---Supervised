@@ -395,3 +395,7 @@ $string['reset_attempts'] = 'Reset all attempts';
 $string['reset_assignees'] = 'Reset all assignees';
 $string['attemptsdeleted'] = 'All attempts are deleted';
 $string['assigneesdeleted'] = 'All assignees are deleted';
+$string['testresults'] = 'Test results';
+$string['testresults_help'] = 'On this page you can see results of your program\'s testing';
+$string['wogroup'] = 'Without groups';
+$string['group'] = 'Group';

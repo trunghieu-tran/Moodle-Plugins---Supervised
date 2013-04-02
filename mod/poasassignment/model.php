@@ -68,6 +68,7 @@ class poasassignment_model {
                                     'taskedit' => 'pages/taskedit.php',
                                     'tasksimport' => 'pages/tasksimport.php',
                                     'auditortasks' => 'pages/auditortasks.php',
+                                    'testresults' => 'pages/testresults.php'
                                     );
     private static $flags = array(
                             'preventlatechoice' => PREVENT_LATE_CHOICE,
@@ -2122,6 +2123,25 @@ class poasassignment_model {
         $groups = $DB->get_records_sql($sql);
         return $groups;
     }
+
+    /**
+     * Get users groups
+     *
+     * @param $users array of users ids
+     * @return mixed array of used groups
+     */
+    public function get_users_groups($users) {
+        global $DB;
+        $courseid = $this->poasassignment->course;
+        list($insql, $inparams) = $DB->get_in_or_equal($users);
+        $sql = "SELECT gr.name, gr.description, gr.id
+                FROM {groups} gr
+                JOIN {groups_members} grmem
+                ON  grmem.groupid = gr.id
+                WHERE grmem.userid $insql AND courseid = $courseid";
+        $groups = $DB->get_records_sql($sql, $inparams);
+        return $groups;
+    }
     
     /**
      * Hide or show task by it's id 
@@ -2502,6 +2522,26 @@ class poasassignment_model {
         JOIN {poasassignment_assignee} on {poasassignment_assignee}.userid={user}.id
         WHERE {poasassignment_assignee}.id = ?';
         $result = $DB->get_record_sql($sql, array($assigneeid));
+        if ($result)
+            return $result;
+        else
+            return false;
+    }
+
+    /**
+     * Get extended assignee info (with user's table fields)
+     *
+     * @param $poasassignmentid poasassignment id
+     * @return array of assigneesinfo or boolean false
+     */
+    public function get_assignees_ext($poasassignmentid) {
+        global $DB;
+        $sql = '
+            SELECT {poasassignment_assignee}.*, firstname, lastname
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            WHERE {poasassignment_assignee}.poasassignmentid = ?';
+        $result = $DB->get_records_sql($sql, array($poasassignmentid));
         if ($result)
             return $result;
         else

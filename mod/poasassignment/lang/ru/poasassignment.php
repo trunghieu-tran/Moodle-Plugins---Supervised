@@ -331,3 +331,7 @@ $string['reset_attempts'] = 'Чистка попыток';
 $string['reset_assignees'] = 'Чистка студентов модуля';
 $string['attemptsdeleted'] = 'Все попытки удалены';
 $string['assigneesdeleted'] = 'Все студенты модуля удалены';
+$string['testresults'] = 'Результаты тестирования';
+$string['testresults_help'] = 'На этой странице вы можете увидеть результаты тестирования ваших попыток';
+$string['wogroup'] = 'Вне групп';
+$string['group'] = 'Группа';
