@@ -50,6 +50,23 @@ class qtype_preg_handling_options {
     public $debugmode = false;
 }
 
+/**
+ * Class with information about regular expression anchoring.
+ */
+class qtype_preg_regex_anchoring {
+
+    //TODO - comment accurately before every field which asserts under which modifiers will lead to it!
+    /** @var boolean Regex anchored from start. */
+    public $start = false;
+    /** @var boolean Regex anchored from start and after each line break.*/
+    public $startlinebreak = false;
+    /** @var boolean Regex anchored from end.*/
+    public $end = false;
+    /** @var boolean Regex anchored from end and before each line break.*/
+    public $endlinebreak = false;
+
+}
+
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
@@ -135,7 +152,7 @@ class qtype_preg_regex_handler {
      * Returns notation, actually used by matcher.
      */
     public function used_notation() {
-        return 'native'; // TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported.
+        return 'native';
     }
 
     /**
@@ -222,11 +239,19 @@ class qtype_preg_regex_handler {
         }
     }
 
-    public function is_regex_anchored($start = true) {
+    public function is_regex_anchored($start = true, $linebreak = true) {
         if ($start) {
-            return $this->anchor->start;
+            if ($linebreak) {
+                return $this->anchor->start && $this->anchor->startlinebreak;
+            } else {
+                return $this->anchor->start;
+            }
         } else {
-            return $this->anchor->end;
+            if ($linebreak) {
+                return $this->anchor->end && $this->anchor->endlinebreak;
+            } else {
+                return $this->anchor->end;
+            }
         }
     }
 
@@ -236,10 +261,9 @@ class qtype_preg_regex_handler {
      * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
      */
     public function look_for_anchors() {
-        // TODO: is anchor->end needed?
-        $this->anchor = new stdClass;
-        $this->anchor->start = $this->look_for_circumflex($this->ast_root);
-        $this->anchor->end = false;
+        $this->anchor = new qtype_preg_regex_anchoring;
+        $this->anchor->start = $this->look_for_circumflex($this->ast_root);//TODO - make $this->look_for_circumflex change $this->anchor instead of returning result.
+        $this->anchor->startlinebreak = $this->anchor->start;//TODO - temporary for compatibility reasons, remove when change in the string above will be made.
     }
 
     /**

@@ -514,25 +514,39 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $result->invalidate_match();
 
         if ($this->anchor->start) {
-            //The regex is anchored from start, so we really should check only one offset.
+            //The regex is anchored from start, so we really should check only start of the string and every line break if necessary.
             //Results for other offsets would be same.
-            $rightborder = 1;
-        } else {
-            // Match from all indexes
+            $rightborders = array(0);
+            if ($this->anchor->startlinebreak) {//Looking for line breaks.
+                $offset = 0;
+                $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
+                while ($pos !== false) {
+                    $rightborders[] = $pos + 1;//Starting matching after line break.
+                    $offset = $pos + 1;
+                    $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
+                }
+            }
+            //Starting positions loop.
+            foreach ($rightborders as $i) {
+                $tmp = $this->match_from_pos($str, $i);
+                if ($result->worse_than($tmp)) {
+                    $result = $tmp;
+                }
+                if ($result->best()) {
+                    break;
+                }
+            }
+        } else {// Match from all indexes.
             $rightborder = $str->length();
-            //Try matching an empty string at least once
-            if ($str->length() === 0) {
-                $rightborder = 1;
+            //Starting positions loop.
+            for ($i = 0; $i <= $rightborder && !$result->best(); $i++) {
+                $tmp = $this->match_from_pos($str, $i);
+                if ($result->worse_than($tmp)) {
+                    $result = $tmp;
+                }
             }
         }
 
-        //Starting positions loop
-        for ($j = 0; $j <= $rightborder && !$result->best(); $j++) {
-            $tmp = $this->match_from_pos($str, $j);
-            if ($result->worse_than($tmp)) {
-                $result = $tmp;
-            }
-        }
         return $result;
     }
 
