@@ -342,10 +342,6 @@ class qtype_preg_dfa_leaf_meta extends qtype_preg_dfa_leaf {
 }
 class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
     public function accept() {
-        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
-            $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
-            return $leafdesc . ' \G';
-        }
         return true;
 
     }
@@ -693,9 +689,9 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
     }
 }
 class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quant {
-	
+
 	const MAX_SIZE=50;
-	
+
     public function followpos(&$fpmap) {
         qtype_preg_dfa_operator::followpos($fpmap);
     }

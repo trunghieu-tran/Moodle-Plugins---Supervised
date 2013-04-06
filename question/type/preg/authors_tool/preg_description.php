@@ -679,9 +679,6 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
             case '\Z' :
                 $resultpattern = self::get_form_string('description_esc_z',$form);
                 break;
-            case '\G' :
-                $resultpattern = self::get_form_string('description_esc_g',$form);
-                break;
         }
         return $resultpattern;
     }
@@ -1305,7 +1302,7 @@ class qtype_preg_description_node_error extends qtype_preg_description_operator 
 			break;
 			case qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII :
 			break;
-			case qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED :
+			case qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED :
 			break;
 		}*/
     }

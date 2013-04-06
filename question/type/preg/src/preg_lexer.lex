@@ -1291,9 +1291,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $text = $this->yytext();
     return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z/*, $text === '\Z'*/);
 }
-<YYINITIAL> "\G" {
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
-}
 <YYINITIAL> "^" {
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
 }
@@ -1379,9 +1376,9 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-<YYINITIAL> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
+<YYINITIAL> "\G"|"\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
@@ -1667,7 +1664,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     $this->charset->error[] = $error;
     $this->charset_userinscription[] = new qtype_preg_userinscription($text);

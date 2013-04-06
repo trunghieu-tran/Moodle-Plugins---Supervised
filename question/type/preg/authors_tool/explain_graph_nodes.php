@@ -87,8 +87,6 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
                     return array(get_string('description_esc_a', 'qtype_preg'));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
-                    return array(get_string('description_esc_g', 'qtype_preg'));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
                     return array(get_string('description_esc_z', 'qtype_preg'));
                 else
@@ -432,7 +430,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
                 switch ($this->pregnode->subtype) {
                     case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
-                        $cond_subexpr->subgraphs[0]->nodes[] = 
+                        $cond_subexpr->subgraphs[0]->nodes[] =
                             new qtype_preg_author_tool_explain_graph_node(
                                 array(is_integer($this->pregnode->number) ? str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) : str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
                                 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
@@ -444,12 +442,12 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                     case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
                         $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
                         break;
-                } 
+                }
             } else {
                 $isAssert = TRUE; $index = 1;
                 if (count($this->operands) == 3) {$index = 2;}
                 $tmp = $this->operands[$index]->create_graph($id);
-                qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[0], $tmp);  
+                qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[0], $tmp);
             }
 
             $cond_subexpr->subgraphs[0]->entries[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
@@ -512,7 +510,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 default:
                     $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
             }
-            
+
 
             $graph->subgraphs[] = $subexpr;
             $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];

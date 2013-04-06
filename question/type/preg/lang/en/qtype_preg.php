@@ -103,7 +103,6 @@ $string['dollar_leaf_assert']          = 'end of the subject assertion';
 $string['esc_b_leaf_assert']           = 'word boundary assertion';
 $string['esc_a_leaf_assert']           = 'start of the subject assertion';
 $string['esc_z_leaf_assert']           = 'end of the subject assertion';
-$string['esc_g_leaf_assert']           = 'first matching position in the subject assertion';
 $string['accept_leaf_control']         = '';   // TODO
 $string['fail_leaf_control']           = '';
 $string['mark_name_leaf_control']      = '';
@@ -186,7 +185,7 @@ $string['error_backreftozero']                  = 'Backreference to the whole ex
 $string['error_differentsubexprnames']          = 'Different subexpression names for subexpressions of the same number.';
 $string['error_subexprnameexpected']            = 'subexpression name expected.';
 $string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
-$string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['error_glnuunsupported']                = 'Sequences \G, \L, \l, \N{name}, \U, and \u are not supported.';
 $string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
 
 /******* DFA and NFA limitations *******/
@@ -231,7 +230,6 @@ $string['description_wordbreak'] = 'at a word boundary';
 $string['description_wordbreak_neg'] = 'not at a word boundary';
 $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
-$string['description_esc_g'] = 'at the first matching position in the subject';
 // TYPE_LEAF_BACKREF
 $string['description_backref'] = 'back reference to subexpression #%number';
 $string['description_backref_name'] = 'back reference to subexpression "%name"';

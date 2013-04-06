@@ -925,8 +925,6 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
     /** \z */
     const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
-    /** \G */
-    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
 
     public function __construct($subtype = null, $negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
@@ -943,7 +941,6 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
         $length = 0;
         switch ($this->subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:    // There are no repetitive matching for now, so \G is equvivalent to \A.
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $result = ($pos === 0);
                 break;
@@ -973,7 +970,6 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if ($this->negative) {
                     return 'notstringstart';
@@ -1001,7 +997,6 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function tohr() {
         switch ($this->subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $type = '^';
                 break;
@@ -1479,7 +1474,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_DIFFERENT_SUBEXPR_NAMES      = 'different_subexpr_names_node_error';          // Different subexpression names for subexpressions of the same number.
     const SUBTYPE_SUBEXPR_NAME_EXPECTED        = 'subexpr_name_expected_node_error';            // Subexpression name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
-    const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
+    const SUBTYPE_GLNU_UNSUPPORTED             = 'glnu_unsupported_node_error';                  // \G, \L, \l, \N{name}, \U, and \u are unsupported.
     const SUBTYPE_UNRECOGNIZED_LBA             = 'unrecognized_lab_node_error';                 // Unrecognized character after (?<.
 
     /** Error strings names in qtype_preg.php lang file. */
@@ -1519,7 +1514,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_DIFFERENT_SUBEXPR_NAMES      => 'error_differentsubexprnames',
                                    self::SUBTYPE_SUBEXPR_NAME_EXPECTED        => 'error_subexprnameexpected',
                                    self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii',
-                                   self::SUBTYPE_LNU_UNSUPPORTED              => 'error_lnuunsupported',
+                                   self::SUBTYPE_GLNU_UNSUPPORTED             => 'error_glnuunsupported',
                                    self::SUBTYPE_UNRECOGNIZED_LBA             => 'error_unrecognizedlba'
                                    );
     /** Additional info. */
