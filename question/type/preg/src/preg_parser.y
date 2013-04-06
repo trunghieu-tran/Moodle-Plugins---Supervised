@@ -180,22 +180,26 @@
 
     protected function make_operator_leftassoc($node, $type) {
         if (!is_a($node, 'qtype_preg_operator')) {
-            return $node;
+            return;
         }
 
         if ($node->type == $type && count($node->operands) == 2 && $node->operands[1]->type == $type) {
-            $right = $node->operands[1];
-            $node->operands[1] = $right->operands[0];
-            $right->operands[0] = $node;
-            $node = $right;
+            // Take the operands in the order as they should go.
+            $operand1 = $node->operands[0];
+            $operand2 = $node->operands[1]->operands[0];
+            $operand3 = $node->operands[1]->operands[1];
+
+            // Swap the node operands.
+            $node->operands[0] = $node->operands[1];
+            $node->operands[0]->operands[0] = $operand1;
+            $node->operands[0]->operands[1] = $operand2;
+            $node->operands[1] = $operand3;
         }
 
         // Important: the transformation should go from the root to the leafs.
         foreach ($node->operands as $key => $operand) {
-            $node->operands[$key] = $this->make_operator_leftassoc($operand, $type);
+            $this->make_operator_leftassoc($operand, $type);
         }
-
-        return $node;
     }
 
     protected function assign_ids_and_subpatts($node) {
@@ -219,6 +223,7 @@
 %nonassoc ERROR_PREC_SHORT.
 %nonassoc ERROR_PREC.
 %nonassoc CLOSEBRACK.
+%left ALT_SHORT.
 %left ALT.
 %left CONC PARSLEAF.
 %nonassoc QUANT.
@@ -228,8 +233,8 @@ start ::= lastexpr(B). {
     // Set the root node.
     $this->root = B;
 
-    $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
-    $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_ALT);
+    $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
+    $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_ALT);
 
     // Numerate all nodes.
     $this->assign_ids_and_subpatts($this->root);
@@ -260,6 +265,11 @@ expr(A) ::= ALT expr(B). {
     A->operands[0] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     A->operands[0]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
     A->operands[1] = B;
+}
+
+expr(A) ::= ALT(B). [ALT_SHORT] {
+    A = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->set_user_info(B->indfirst, B->indlast, new qtype_preg_userinscription());
 }
 
 expr(A) ::= expr(B) QUANT(C). {

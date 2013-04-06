@@ -412,6 +412,27 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[1]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === 'a');
+        $parser = $this->run_parser('|', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $parser = $this->run_parser('||', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[1]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $parser = $this->run_parser('(?:|)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $parser = $this->run_parser('(|||||)', $errornodes);    // баян
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_META);   // TODO Add more checks.
+        $this->assertTrue($root->operands[0]->operands[1]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     }
     function test_parser_subexpressions() {
         $parser = $this->run_parser('((?:(?(?=a)(?>b)|a)))', $errornodes);
