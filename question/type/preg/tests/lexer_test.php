@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * Unit tests for question/type/preg/preg_lexer.lex.php.

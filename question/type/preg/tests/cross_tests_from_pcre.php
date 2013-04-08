@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Unit tests for matchers
  *
