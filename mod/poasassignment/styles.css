@@ -69,3 +69,50 @@ a:link.hiddentask, a:visited.hiddentask {
 .center {
     text-align: center;
 }
+
+/* new */
+.testresults {padding: 0 30px;}
+.testresults > form { margin: 0 auto; max-width: 800px;}
+.testresults .input-data {display: none;}
+.testresults table {width: 100%;}
+.testresults table,
+.testresults tr,
+.testresults td {padding: 10px 3px;}
+.testresults .fail,
+.testresults .ignor,
+.testresults .ok {text-align: center; background-color: #fff; width: 60px; padding-left: 0; padding-right: 0;}
+.testresults .tests,
+.testresults .compileerror {margin: 0 17px 20px 17px; background-color: #eee;}
+    .testresults .compileerror pre {padding: 5px;}
+.testresults .tests div {padding: 5px;}
+.testresults .tests .diff,
+.testresults .tests .input {padding-left: 20px;}
+.testresults .caption {font-weight: bold;}
+.testresults .testinfo .decision {float:right;}
+
+.testresults .testservice {border-bottom: 1px solid #000;}
+
+.testresults .showcompileerror,
+.testresults .input,
+.testresults .hideallinput,
+.testresults .hideinput,
+.testresults .showtests,
+.testresults .showall {display: none;}
+
+.testresults .ra-decision {font-weight: bold;}
+.testresults pre {margin: 0; padding: 7px 0;}
+
+/*Grade colors */
+.testresults .bad {background-color: #f66;}
+.testresults .normal {background-color: #faa;}
+.testresults .good {background-color: #ff0;}
+.testresults .ideal {background-color: #5f5;}
+
+/* Diff colors*/
+.testresults .diff .test{background-color: #ff0;}
+.testresults .diff .student{background-color: #f00;}
+.testresults .diff .same{background-color: #fff;}
+
+.testresults .fail.chosen {background-color: #ff3333;}
+.testresults .ignor.chosen {background-color: #888;}
+.testresults .ok.chosen {background-color: #33ff33;}
