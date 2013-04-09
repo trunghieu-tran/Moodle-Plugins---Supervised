@@ -2124,6 +2124,19 @@ class poasassignment_model {
         return $groups;
     }
 
+    public function get_users_by_groups($groups) {
+        global $DB;
+        $courseid = $this->poasassignment->course;
+        list($insql, $inparams) = $DB->get_in_or_equal($groups);
+        $sql = "SELECT grmem.userid
+                FROM {groups} gr
+                JOIN {groups_members} grmem
+                ON  grmem.groupid = gr.id
+                WHERE gr.id $insql AND courseid = $courseid";
+        $users = $DB->get_records_sql($sql, $inparams);
+        return $users;
+    }
+
     /**
      * Get users groups
      *
@@ -2134,7 +2147,7 @@ class poasassignment_model {
         global $DB;
         $courseid = $this->poasassignment->course;
         list($insql, $inparams) = $DB->get_in_or_equal($users);
-        $sql = "SELECT gr.name, gr.description, gr.id
+        $sql = "SELECT DISTINCT(gr.id), gr.name, gr.description
                 FROM {groups} gr
                 JOIN {groups_members} grmem
                 ON  grmem.groupid = gr.id
@@ -2534,14 +2547,22 @@ class poasassignment_model {
      * @param $poasassignmentid poasassignment id
      * @return array of assigneesinfo or boolean false
      */
-    public function get_assignees_ext($poasassignmentid) {
+    public function get_assignees_ext($poasassignmentid, $usersids = false) {
         global $DB;
         $sql = '
             SELECT {poasassignment_assignee}.*, firstname, lastname
             FROM {poasassignment_assignee}
             JOIN {user} on {poasassignment_assignee}.userid={user}.id
-            WHERE {poasassignment_assignee}.poasassignmentid = ?';
-        $result = $DB->get_records_sql($sql, array($poasassignmentid));
+            WHERE {poasassignment_assignee}.poasassignmentid = ' . $poasassignmentid;
+        $params = array();
+        if ($usersids) {
+            list($insql, $inparams) = $DB->get_in_or_equal($usersids);
+            $sql .= " AND {user}.id $insql";
+            $params = $inparams;
+        }
+        $sql .= ' ORDER BY {user}.lastname';
+
+        $result = $DB->get_records_sql($sql, $params);
         if ($result)
             return $result;
         else
@@ -2622,5 +2643,17 @@ class poasassignment_model {
             $DB->delete_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
         }
         $DB->delete_records('poasassignment_assignee', array('poasassignmentid' => $instanceid));
+    }
+
+    /**
+     * Disable penalty for attempt.
+     *
+     * @param $attemptid attempt ID
+     */
+    public static function disable_attempt_penalty($attemptid) {
+        global $DB;
+        $attempt = $DB->get_record('poasassignment_attempts', array('id'=>$attemptid), 'id, disablepenalty');
+        $attempt->disablepenalty = 1;
+        $DB->update_record('poasassignment_attempts',$attempt);
     }
 }
