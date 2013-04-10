@@ -227,10 +227,10 @@ function block_formal_langs_hex_to_decimal_char($matches) {
             $num_lines = count($lines);
             
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = strlen($lines[$num_lines -1]);
+            $end_col = textlib::strlen($lines[$num_lines -1]) - 1;
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + strlen($this->yytext());
+            $end_col = $begin_col + textlib::strlen($this->yytext()) - 1;
         }
         
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
@@ -250,7 +250,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 
     private function return_buffered_pos() {
         $this->endyyline = $this->yyline;
-        $this->endyycol = $this->yycol + textlib::strlen($this->yytext());
+        $this->endyycol = $this->yycol + textlib::strlen($this->yytext()) - 1;
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
     }
 
@@ -262,8 +262,8 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 
     private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
         $pos = $this->return_error_token_pos();
-        $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset);
-        $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend());
+        $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1);
+        $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1);
         $this->endstate = true;
 
         $realstring = $tokenstring;
@@ -289,7 +289,9 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 %eofval{
     if ($this->yy_lexical_state == self::SINGLELINE_COMMENT) {
         $this->yybegin(self::YYINITIAL);
+        $this->yycol--;
         $pos = $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
+        $this->yycol++;
         $t = $this->create_token_with_position('singleline_comment', $this->statestring, $pos);
         return $t;
     } else if ($this->yy_lexical_state == self::MULTILINE_COMMENT)  {
