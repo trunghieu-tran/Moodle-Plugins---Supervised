@@ -51,9 +51,9 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 0);
         $this->assertTrue(count($tokens) == 2);
         $this->assertTrue($tokens[0]->position()->colstart() == 0);
-        $this->assertTrue($tokens[0]->position()->colend() == 2);
+        $this->assertTrue($tokens[0]->position()->colend() == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 3);
-        $this->assertTrue($tokens[1]->position()->colend() == 7);
+        $this->assertTrue($tokens[1]->position()->colend() == 6);
     }
     /**
      * Tests singleline comment and identifier position
@@ -66,9 +66,9 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 0);
         $this->assertTrue(count($tokens) == 2);
         $this->assertTrue($tokens[0]->position()->colstart() == 0);
-        $this->assertTrue($tokens[0]->position()->colend() == 3);
+        $this->assertTrue($tokens[0]->position()->colend() == 2);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 10);
+        $this->assertTrue($tokens[1]->position()->colend() == 9);
     }
     /**
      * Test for computing multiple strings position computing
@@ -81,11 +81,11 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 0);
         $this->assertTrue(count($tokens) == 3);
         $this->assertTrue($tokens[0]->position()->colstart() == 0);
-        $this->assertTrue($tokens[0]->position()->colend() == 5);
+        $this->assertTrue($tokens[0]->position()->colend() == 4);
         $this->assertTrue($tokens[1]->position()->colstart() == 6);
-        $this->assertTrue($tokens[1]->position()->colend() == 12);
+        $this->assertTrue($tokens[1]->position()->colend() == 11);
         $this->assertTrue($tokens[2]->position()->colstart() == 13);
-        $this->assertTrue($tokens[2]->position()->colend() == 18);
+        $this->assertTrue($tokens[2]->position()->colend() == 17);
     }
     /**
      * Test for computing multiple strings position computing
@@ -98,11 +98,11 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 0);
         $this->assertTrue(count($tokens) == 3);
         $this->assertTrue($tokens[0]->position()->colstart() == 0);
-        $this->assertTrue($tokens[0]->position()->colend() == 3);
+        $this->assertTrue($tokens[0]->position()->colend() == 2);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 8);
+        $this->assertTrue($tokens[1]->position()->colend() == 7);
         $this->assertTrue($tokens[2]->position()->colstart() == 9);
-        $this->assertTrue($tokens[2]->position()->colend() == 12);
+        $this->assertTrue($tokens[2]->position()->colend() == 11);
     }
     /**
      * Test for computing multiple character literals position computing
@@ -115,11 +115,11 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 0);
         $this->assertTrue(count($tokens) == 3);
         $this->assertTrue($tokens[0]->position()->colstart() == 0);
-        $this->assertTrue($tokens[0]->position()->colend() == 3);
+        $this->assertTrue($tokens[0]->position()->colend() == 2);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 8);
+        $this->assertTrue($tokens[1]->position()->colend() == 7);
         $this->assertTrue($tokens[2]->position()->colstart() == 9);
-        $this->assertTrue($tokens[2]->position()->colend() == 12);
+        $this->assertTrue($tokens[2]->position()->colend() == 11);
     }
 
     // Tests scanning  errors in beginning
@@ -132,21 +132,21 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 0, 'First lexeme must be erroneous');
         $this->assertTrue($tokens[0]->position()->colstart() == 0, 'Error lexeme is at beginning');
-        $this->assertTrue($tokens[0]->position()->colend() == 1, 'Error lexeme must be one character long');
+        $this->assertTrue($tokens[0]->position()->colend() == 0, 'Error lexeme must be one character long');
         $processedstring = $lang->create_from_string('"abc asv ');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 0, 'First lexeme must be erroneous');
         $this->assertTrue($tokens[0]->position()->colstart() == 0, 'Error lexeme is at beginning');
-        $this->assertTrue($tokens[0]->position()->colend() == 1, 'Error lexeme must be one character long');
+        $this->assertTrue($tokens[0]->position()->colend() == 0, 'Error lexeme must be one character long');
         $processedstring = $lang->create_from_string('/*abc asv ');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 0, 'First lexeme must be erroneous');
         $this->assertTrue($tokens[0]->position()->colstart() == 0, 'Error lexeme is at beginning');
-        $this->assertTrue($tokens[0]->position()->colend() == 2, 'Error lexeme must be two characters long');
+        $this->assertTrue($tokens[0]->position()->colend() == 1, 'Error lexeme must be two characters long');
         //Multicharacter literal test
         $processedstring = $lang->create_from_string('\'abc\' asv ');
         $errors = $processedstring->stream->errors;
@@ -154,7 +154,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 0, 'First lexeme must be erroneous');
         $this->assertTrue($tokens[0]->position()->colstart() == 0, 'Error lexeme is at beginning');
-        $this->assertTrue($tokens[0]->position()->colend() == 5, 'Error lexeme must be five characters long');
+        $this->assertTrue($tokens[0]->position()->colend() == 4, 'Error lexeme must be five characters long');
     }
     // Tests scanning errors in the end
     public function test_scanning_error_in_end() {
@@ -165,21 +165,21 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
         $processedstring = $lang->create_from_string('asv "abc');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
         $processedstring = $lang->create_from_string('asv /*abc');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 6);
+        $this->assertTrue($tokens[1]->position()->colend() == 5);
         //Multicharacter literal test
         $processedstring = $lang->create_from_string('asv \'abc\'');
         $errors = $processedstring->stream->errors;
@@ -187,7 +187,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
-        $this->assertTrue($tokens[1]->position()->colend() == 9, 'Error lexeme must be five characters long');
+        $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
     }
     // Tests scanning errros in middle
     public function test_scanning_error_in_middle() {
@@ -198,21 +198,21 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
         $processedstring = $lang->create_from_string('asv "abc 1 + 1');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
         $processedstring = $lang->create_from_string('asv /*abc 1 + 1');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
-        $this->assertTrue($tokens[1]->position()->colend() == 6);
+        $this->assertTrue($tokens[1]->position()->colend() == 5);
         //Multicharacter literal test
         $processedstring = $lang->create_from_string('asv \'abc\' asv');
         $errors = $processedstring->stream->errors;
@@ -220,7 +220,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
-        $this->assertTrue($tokens[1]->position()->colend() == 9, 'Error lexeme must be five characters long');
+        $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
     }
     // Tests keywords
     public function test_keywords() {
