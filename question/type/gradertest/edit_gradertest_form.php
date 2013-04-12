@@ -89,7 +89,7 @@ class qtype_gradertest_edit_form extends question_edit_form {
     function validation($data, $files) {
         $errors = array();
 
-        $pattern = '/^([a-zA-Z0-9]+\/)+$/';
+        $pattern = '/^([a-zA-Z0-9_]+\/)+$/';
         // Провести валидацию введенных путей
         for ($i = 0; $i < $data['option_repeats']; $i++) {
             if ($data['testdirpath'][$i]) {

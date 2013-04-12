@@ -13,7 +13,6 @@ class qtype_gradertest_renderer extends qtype_renderer {
 		$options = array('subdirs' => 1, 
 						 'accepted_types' => '*', 
 						 'return_types' => FILE_INTERNAL);
-		$filemanager = &MoodleQuickForm::createElement('filemanager', 'files', get_string('files'), array('id' => 'submissionfilesid'), $options);
 		$question = $qa->get_question();
 		$result = html_writer::tag('div', $question->questiontext, array('class' => 'qtext'));
 		return $result . $filemanager->toHtml();
