@@ -54,3 +54,4 @@ $string['showtests'] = 'show tests';
 $string['hidetests'] = 'hide tests';
 $string['showallinput'] = 'show all inputs';
 $string['hideallinput'] = 'hide all inputs';
+$string['notestfilesfound'] = 'No test files found';

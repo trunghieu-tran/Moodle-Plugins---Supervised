@@ -176,7 +176,7 @@ class testresults_page extends abstract_page {
                 $graderesult = POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL;
         }
         ?>
-        <tr class="<?=$class?> attemptinfo" data-attempt="<?=$i?>">
+        <tr class="<?/*=$class*/?> attemptinfo" data-attempt="<?=$i?>">
             <td><a name="att<?=$i?>"></a><?=$i?></td>
             <td><?=date("d.m.Y H:i:s", $attemptresult->attemptdate)?></td>
             <td><?=remote_autotester::get_attempt_status($attemptresult)->status?></td>

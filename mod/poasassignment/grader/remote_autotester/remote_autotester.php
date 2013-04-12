@@ -29,6 +29,7 @@ class remote_autotester extends grader{
     }
 
     public function evaluate_attempt($attemptid) {
+        poasassignment_model::disable_attempt_penalty($attemptid);
         $error = $this->check_remote_server();
         if ($error !== TRUE) {
             return;
@@ -36,7 +37,7 @@ class remote_autotester extends grader{
         global $DB;
         // If server is online, prepare for sending and testing
         // Disable penalty for attempt
-        poasassignment_model::disable_attempt_penalty($attemptid);
+
         // get attempt files
         $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
         $assignee = $DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid));
@@ -199,23 +200,28 @@ class remote_autotester extends grader{
                 if (isset($attempt->timecompiled) && $attempt->timecompiled) {
                     if (isset($attempt->compiled) && $attempt->compiled == 1) {
                         $status = get_string("compiledsuccessfully", "poasassignment_remote_autotester");
-                        if (isset($attempt->timeteststart) && $attempt->timeteststart) {
-                            $status = get_string("testarerunning", "poasassignment_remote_autotester");
-                            if (isset($attempt->tests) && $attempt->tests) {
-                                $status =
-                                    get_string('testscompleted', 'poasassignment_remote_autotester') .
-                                        count($attempt->tests) .
-                                        ' ' .
-                                        get_string('of', 'poasassignment_remote_autotester') .
-                                        ' '.
-                                        $attempt->testsfound;
-                                if (isset($attempt->testsfound) && $attempt->testsfound) {
-                                    if ($attempt->testsfound > 0 && count($attempt->tests) == $attempt->testsfound) {
-                                        $status = get_string('alltestscompleted', 'poasassignment_remote_autotester');
-                                        $finalized = true;
+                        if (isset($attempt->testsfound) && $attempt->testsfound > 0) {
+                            if (isset($attempt->timeteststart) && $attempt->timeteststart) {
+                                $status = get_string("testarerunning", "poasassignment_remote_autotester");
+                                if (isset($attempt->tests) && $attempt->tests) {
+                                    $status =
+                                        get_string('testscompleted', 'poasassignment_remote_autotester') .
+                                            count($attempt->tests) .
+                                            ' ' .
+                                            get_string('of', 'poasassignment_remote_autotester') .
+                                            ' '.
+                                            $attempt->testsfound;
+                                    if (isset($attempt->testsfound) && $attempt->testsfound) {
+                                        if ($attempt->testsfound > 0 && count($attempt->tests) == $attempt->testsfound) {
+                                            $status = get_string('alltestscompleted', 'poasassignment_remote_autotester');
+                                            $finalized = true;
+                                        }
                                     }
                                 }
                             }
+                        }
+                        elseif (isset($attempt->testsfound) && $attempt->testsfound == 0) {
+                            $status = get_string('notestfilesfound', 'poasassignment_remote_autotester');
                         }
                     }
                     else {
