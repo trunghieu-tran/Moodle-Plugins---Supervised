@@ -301,4 +301,24 @@ class remote_autotester extends grader{
         return '<div class="ra-status">' . $img . ' ' . $status . '</div>';
     }
 
+    public static function get_diff_comment($diff, $strudentoutarray, $testoutarray) {
+        if (is_array($diff)) {
+            $s = array();
+            foreach ($strudentoutarray as $studentout) {
+                $s = array_merge($s, explode(' ', $studentout));
+            }
+            $t = array();
+            foreach ($testoutarray as $testout) {
+                $t = array_merge($t, explode(' ', $testout));
+            }
+            if (count($s) > 0 && count($t) > 0) {
+                $unordereddiff = array_diff($s, $t);
+                if (count($unordereddiff) == 0) {
+                    return '(' . get_string('differentorder', 'poasassignment_remote_autotester') . ') ';
+                }
+            }
+        }
+        return FALSE;
+    }
+
 }
