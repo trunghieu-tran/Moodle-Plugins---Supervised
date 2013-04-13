@@ -89,6 +89,50 @@ class testresults_page extends abstract_page {
         return $datagroups;
     }
 
+    private function get_statistics($attemptsresult) {
+        $statistics = array();
+        $statistics['firstpassedattempt'] = false;
+        $statistics['totalpenalty'] = 0;
+        $statistics['totaltestattempts'] = count($attemptsresult);
+        $statistics['ignoredtestattempts'] = 0;
+        $statistics['failedtestattempts'] = 0;
+        $statistics['bestresult'] = false;
+        $statistics['worstresult'] = false;
+
+        $i = count ($attemptsresult);
+        foreach ($attemptsresult as $attemptresult) {
+            if (isset($attemptresult->disablepenalty) && $attemptresult->disablepenalty == 1) {
+                $statistics['ignoredtestattempts']++;
+            }
+            else {
+                if ($attemptresult->result == 1) {
+                    $statistics['firstpassedattempt'] = $i;
+                }
+                elseif ($attemptresult->result == 0) {
+                    $statistics['failedtestattempts']++;
+                }
+                $oktest = 0;
+                foreach ($attemptresult->tests as $test) {
+                    if ($test->testpassed == 1) {
+                        $oktest++;
+                    }
+                }
+                if ($statistics['worstresult'] === false || $oktest < $statistics['worstresult']) {
+                    $statistics['worstresult'] = $oktest;
+                }
+                if ($statistics['bestresult'] === false || $oktest > $statistics['bestresult']) {
+                    $statistics['bestresult'] = $oktest;
+                }
+            }
+            $i--;
+        }
+        $penalty = poasassignment_model::get_instance()->poasassignment->penalty;
+        if ($statistics['failedtestattempts'] > 0 && $penalty > 0) {
+            $statistics['totalpenalty'] = $statistics['failedtestattempts'] * $penalty;
+        }
+        return $statistics;
+    }
+
     private function show_attempts_result($attemptsresult)
     {
         global $PAGE;
@@ -97,6 +141,21 @@ class testresults_page extends abstract_page {
         ?>
         <div class="testresults">
             <form action="">
+                <div class="report">
+                    <?
+                        $statistics = $this->get_statistics($attemptsresult);
+                    ?>
+                    <table class="poasassignment-table">
+                        <?foreach ($statistics as $key => $value): ?>
+                            <?if ($value !== false): ?>
+                                <tr>
+                                    <td class="header"><?=get_string($key, 'poasassignment_remote_autotester')?></td>
+                                    <td><?=$value?></td>
+                                </tr>
+                            <? endif?>
+                        <? endforeach?>
+                    </table>
+                </div>
                 <span><?=get_string('allattemptsactions', 'poasassignment_remote_autotester')?>:</span>
                 <span class="hideall"><a href="javascript:void(0)">[<?=get_string('hideall', 'poasassignment_remote_autotester')?>]</a></span>
                 <span class="showall"><a href="javascript:void(0)">[<?=get_string('showall', 'poasassignment_remote_autotester')?>]</a></span>
