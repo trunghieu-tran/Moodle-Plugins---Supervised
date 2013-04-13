@@ -72,6 +72,8 @@ a:link.hiddentask, a:visited.hiddentask {
 
 /* new */
 .testresults {padding: 0 30px;}
+.testresults input[type="checkbox"],
+.testresults input[type="radio"] {margin: 0;}
 .testresults > form { margin: 0 auto; max-width: 800px;}
 .testresults .input-data {display: none;}
 .testresults table {width: 100%;}
@@ -83,7 +85,7 @@ a:link.hiddentask, a:visited.hiddentask {
 .testresults .ok {text-align: center; background-color: #fff; width: 60px; padding-left: 0; padding-right: 0;}
 .testresults .tests,
 .testresults .compileerror {margin: 0 17px 20px 17px; background-color: #eee;}
-    .testresults .compileerror pre {padding: 5px;}
+    .testresults .compileerror pre {overflow: scroll; padding: 5px; width: 744px;}
 .testresults .tests div {padding: 5px;}
 .testresults .tests .diff,
 .testresults .tests .input {padding-left: 20px;}
