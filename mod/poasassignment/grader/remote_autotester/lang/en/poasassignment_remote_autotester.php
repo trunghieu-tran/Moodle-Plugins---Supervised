@@ -55,3 +55,5 @@ $string['hidetests'] = 'hide tests';
 $string['showallinput'] = 'show all inputs';
 $string['hideallinput'] = 'hide all inputs';
 $string['notestfilesfound'] = 'No test files found';
+$string['serverisonline'] = 'Server is online';
+$string['serverisoffline'] = 'Server is offline';

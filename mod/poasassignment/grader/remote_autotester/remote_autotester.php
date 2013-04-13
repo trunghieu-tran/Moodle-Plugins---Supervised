@@ -131,15 +131,14 @@ class remote_autotester extends grader{
     /**
      * Check remote test server via socket
      *
-     * @param $site
-     * @param $port
+     * @param $timeout timeout
      * @return bool|string TRUE if server is on and text of error if occured
      */
-    private function check_remote_server() {
+    private function check_remote_server($timeout = 3) {
         $errno = FALSE;
         $errstr = FALSE;
         $config = get_config("poasassignment_remote_autotester");
-        $conn = @fsockopen($config->ip, $config->port, $errno, $errstr, 10);
+        $conn = @fsockopen($config->ip, $config->port, $errno, $errstr, $timeout);
         if (!$conn) {
             return '[' . $errno . '] ' . $errstr;
         }
@@ -277,4 +276,23 @@ class remote_autotester extends grader{
         $attempt->disablepenalty = 0;
         $DB->update_record('poasassignment_attempts', $attempt);
     }
+
+    /**
+     * Get RA notes - if server is offline or not
+     *
+     * @param $assigneeid int assignee id
+     * @return bool
+     */
+    public function get_grader_notes($assigneeid) {
+        if ($this->check_remote_server(1) === true) {
+            $img = '<img src="/mod/poasassignment/grader/remote_autotester/pix/green.gif" alt="online"/>';
+            $status = get_string('serverisonline', 'poasassignment_remote_autotester');
+        }
+        else {
+            $img = '<img src="/mod/poasassignment/grader/remote_autotester/pix/grey.gif" alt="offline"/>';
+            $status = get_string('serverisoffline', 'poasassignment_remote_autotester');
+        }
+        return '<div class="ra-status">' . $img . ' ' . $status . '</div>';
+    }
+
 }

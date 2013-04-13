@@ -1196,6 +1196,41 @@ class poasassignment_model {
         $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
         return $rec;
     }
+
+    /**
+     * Get HTML for grader's notes on submission page.
+     *
+     * @param $assigneeid
+     * @return HTML for grader's notes on submission page.
+     */
+    public function get_grader_notes($assigneeid) {
+        $strings = array();
+        global $DB;
+        // Get graders list
+        $usedgraders = $DB->get_records('poasassignment_used_graders',
+            array('poasassignmentid' => $this->poasassignment->id));
+        if(count($usedgraders) == 0) {
+            return;
+        }
+        $graderids = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderids[] = $usedgrader->graderid;
+        }
+        $inorequal = $DB->get_in_or_equal($graderids);
+        $sql = "SELECT * FROM {poasassignment_graders} WHERE id" . $inorequal[0]. "";
+        $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
+
+
+        foreach ($graderrecords as $graderrecord) {
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            $grader = new $gradername;
+            $string = $grader->get_grader_notes($assigneeid);
+            if ($string)
+                $strings[] = $string;
+        }
+        return implode('<br>', $strings);
+    }
     public function evaluate_attempt($attemptid) {
         global $DB;
         // Get graders list
