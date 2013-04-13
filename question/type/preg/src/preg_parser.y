@@ -229,6 +229,7 @@ start ::= lastexpr(B). {
     $this->root = B;
 
     $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
+    $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_ALT);
 
     // Numerate all nodes.
     $this->assign_ids_and_subpatts($this->root);
@@ -246,9 +247,19 @@ expr(A) ::= expr(B) ALT expr(C). {
 }
 
 expr(A) ::= expr(B) ALT. {
-    A = new qtype_preg_node_finite_quant(0, 1, false, true, false);
+    A = new qtype_preg_node_alt();
     A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
+    A->operands[1] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->operands[1]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
+}
+
+expr(A) ::= ALT expr(B). {
+    A = new qtype_preg_node_alt();
+    A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
+    A->operands[0] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->operands[0]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
+    A->operands[1] = B;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
