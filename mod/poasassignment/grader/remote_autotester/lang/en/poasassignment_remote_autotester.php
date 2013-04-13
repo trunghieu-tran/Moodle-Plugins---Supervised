@@ -57,3 +57,4 @@ $string['hideallinput'] = 'hide all inputs';
 $string['notestfilesfound'] = 'No test files found';
 $string['serverisonline'] = 'Server is online';
 $string['serverisoffline'] = 'Server is offline';
+$string['unexpectedfailed'] = 'Unexpected fail. Try again.';

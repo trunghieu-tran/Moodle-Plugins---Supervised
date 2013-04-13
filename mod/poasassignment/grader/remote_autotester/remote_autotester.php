@@ -227,6 +227,12 @@ class remote_autotester extends grader{
                         $status = get_string("compilefailed", "poasassignment_remote_autotester");
                     }
                 }
+                elseif($attempt->timeclosed) {
+                    $status = get_string('unexpectedfailed', 'poasassignment_remote_autotester');
+                }
+            }
+            elseif($attempt->timeclosed) {
+                $status = get_string('unexpectedfailed', 'poasassignment_remote_autotester');
             }
         }
         $res = new stdClass();
