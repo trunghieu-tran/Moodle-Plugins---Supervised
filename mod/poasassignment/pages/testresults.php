@@ -272,21 +272,21 @@ class testresults_page extends abstract_page {
                 <span class="caption"><?=$test->test?></span>
                 <span class="decision">
                     <?if ($test->testpassed): ?>
-                        <img src="/mod/poasassignment/pix/yes.png" alt=""/> <span>Пройден</span>
+                        <img src="/mod/poasassignment/pix/yes.png" alt=""/> <span><?=get_string('testpassed', 'poasassignment_remote_autotester')?></span>
                     <? else: ?>
-                        <img src="/mod/poasassignment/pix/no.png" alt=""/> <span>Провален</span>
+                        <img src="/mod/poasassignment/pix/no.png" alt=""/> <span><?=get_string('testnotpassed', 'poasassignment_remote_autotester')?></span>
                     <? endif?>
                 </span>
             </div>
             <div class="testservice">
                 <?if (TRUE): ?>
-                    <span class="showinput"><a href="javascript:void(0)">[показать входные данные]</a></span>
-                    <span class="hideinput"><a href="javascript:void(0)">[скрыть входные данные]</a></span>
+                    <span class="showinput"><a href="javascript:void(0)">[<?=get_string('showinput', 'poasassignment_remote_autotester')?>]</a></span>
+                    <span class="hideinput"><a href="javascript:void(0)">[<?=get_string('hideinput', 'poasassignment_remote_autotester')?>]</a></span>
                 <? endif?>
             </div>
             <? if (TRUE): // TODO Проверка капабилити ?>
                 <div class="input">
-                    <div class="caption">Входные данные:</div>
+                    <div class="caption"><?=get_string('inputdata', 'poasassignment_remote_autotester')?>:</div>
                     <pre><?=$test->testin?></pre>
                 </div>
             <? endif ?>
@@ -298,7 +298,7 @@ class testresults_page extends abstract_page {
                         $testoutarray = array_values(array_diff($testoutarray, array("")));
                         $strudentoutarray = explode("\n", $test->studentout);
                         $strudentoutarray = array_values(array_diff($strudentoutarray, array("")));
-                        $diff = $this->diff($strudentoutarray, $testoutarray);;
+                        $diff = $this->diff($strudentoutarray, $testoutarray);
                     }
                 }
                 else {
@@ -308,22 +308,22 @@ class testresults_page extends abstract_page {
             ?>
             <? if ($diff): // TODO?>
                 <div class="diff">
-                    <div class="caption">Разница в ответах:</div>
+                    <div class="caption"><?=get_string('outdiff', 'poasassignment_remote_autotester')?> <?=remote_autotester::get_diff_comment($diff, $strudentoutarray, $testoutarray)?>:</div>
                     <?if (is_array($diff)): ?>
                         <? foreach ($diff as $element): ?>
                             <? if (is_array($element)): ?>
                                 <? foreach ($element["i"] as $sub): ?>
-                                    <pre class="test"><span>[t]:</span> <?=$sub?></pre>
+                                    <pre class="test"><span>[<?=get_string('difftestsymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$sub?></pre>
                                 <? endforeach ?>
                                 <? foreach ($element["d"] as $sub): ?>
-                                    <pre class="student"><span>[p]:</span> <?=$sub?></pre>
+                                    <pre class="student"><span>[<?=get_string('diffstudentsymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$sub?></pre>
                                 <? endforeach ?>
                             <? else: ?>
-                                <pre class="same"><span>[s]:</span> <?=$element?></pre>
+                                <pre class="same"><span>[<?=get_string('diffsamesymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$element?></pre>
                             <? endif ?>
                         <? endforeach ?>
                     <? else: ?>
-                        <div class="same">Ответы совпадают</div>
+                        <div class="same"><?=get_string('sameout', 'poasassignment_remote_autotester')?></div>
                     <?endif?>
                 </div>
             <? endif ?>
