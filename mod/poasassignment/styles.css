@@ -71,6 +71,7 @@ a:link.hiddentask, a:visited.hiddentask {
 }
 
 /* new */
+.report {margin-bottom: 20px;}
 .testresults {padding: 0 30px;}
 .testresults input[type="checkbox"],
 .testresults input[type="radio"] {margin: 0;}
