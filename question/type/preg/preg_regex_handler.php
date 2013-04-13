@@ -100,31 +100,27 @@ class qtype_preg_regex_handler {
         $this->lexer = null;
         $this->parser = null;
 
-        if ($regex === '') {
-            $regex = null;
+        if ($regex == '' || $regex === null) {
+            return;
         }
 
-        if ($regex === null) {
-            return;
+        // Are the passed modifiers supported?
+        if (is_string($modifiers)) {
+            $modifiers = new qtype_poasquestion_string($modifiers);
+        } else if (!is_a($modifiers, 'qtype_poasquestion_string')) {
+            $modifiers = new qtype_poasquestion_string('');
+        }
+        $supportedmodifiers = $this->get_supported_modifiers();
+        for ($i = 0; $i < $modifiers->length(); $i++) {
+            $mod = $modifiers[$i];
+            if ($supportedmodifiers->contains($mod) === false) {
+                $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod->string());
+            }
         }
 
         // Options should exist at least as a default object.
         if ($options === null) {
             $options = new qtype_preg_handling_options();
-        }
-
-        //Are passed modifiers supported?
-        if (is_string($modifiers)) {
-            $modifiers = new qtype_poasquestion_string($modifiers);
-            $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i = 0; $i < $modifiers->length(); $i++) {
-                $mod = $modifiers[$i];
-                if ($supportedmodifiers->contains($mod) === false) {
-                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod->string());
-                }
-            }
-        } else {
-            $modifiers = new qtype_poasquestion_string('');
         }
 
         $this->regex = new qtype_poasquestion_string($regex);
@@ -430,15 +426,23 @@ class qtype_preg_regex_handler {
             }
         }
         $this->parser->doParse(0, 0);
+
         // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
         $lexerrors = $this->lexer->get_errors();
         foreach ($lexerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
+
         // Parser contains other errors inside AST nodes.
         $parseerrors = $this->parser->get_error_nodes();
         foreach($parseerrors as $node) {
-            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+            // There can be a specific accepting error.
+            if ($node->subtype == qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED) {
+                $inscription = $node->addinfo;
+                $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, array('start' => $node->indfirst, 'end' => $node->indlast));
+            } else {
+                $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+            }
         }
         //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
