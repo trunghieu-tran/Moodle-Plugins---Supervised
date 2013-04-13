@@ -141,12 +141,36 @@ function notify_tested($loginHash, $passwordHash, $attemptid, $test, $testin, $t
             $DB->insert_record('poasassignment_gr_ra_tests', $testresult);
         }
         XMLRPC_response(XMLRPC_prepare("200 OK"));
-        // if it was last test, start grading
-        if (isset($recordremote->testsfound) && $recordremote->testsfound > 0 && isset($recordremote->id)) {
-            $testscount = $DB->count_records('poasassignment_gr_ra_tests', array('remote_id' => $recordremote->id));
-            if ($testscount == $recordremote->testsfound) {
-                require_once('remote_autotester.php');
-                remote_autotester::grade_attempt($attemptid);
+    }
+}
+
+/**
+ * Insert test session end time
+ *
+ * @param $attemptid
+ */
+function notify_thread_finished($loginHash, $passwordHash, $attemptid) {
+    $config = get_config("poasassignment_remote_autotester");
+    if (md5($config->login) != $loginHash || md5($config->password) != $passwordHash) {
+        XMLRPC_response(XMLRPC_prepare("401 Unauthorized"));
+    }
+    else {
+        global $DB;
+        $records = $DB->get_records('poasassignment_gr_ra', array('attemptid' => $attemptid), 'id DESC', 'id, attemptid, testsfound');
+        if (count($records) > 0) {
+            $record = array_shift($records);
+            $record->timeclosed = time();
+            $DB->update_record('poasassignment_gr_ra', $record);
+        }
+
+        XMLRPC_response(XMLRPC_prepare("200 OK"));
+        if (isset($record)) {
+            if (isset($record->testsfound) && $record->testsfound > 0 && isset($record->id)) {
+                $testscount = $DB->count_records('poasassignment_gr_ra_tests', array('remote_id' => $record->id));
+                if ($testscount == $record->testsfound) {
+                    require_once('remote_autotester.php');
+                    remote_autotester::grade_attempt($attemptid);
+                }
             }
         }
     }
