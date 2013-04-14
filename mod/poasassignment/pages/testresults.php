@@ -10,12 +10,16 @@ class testresults_page extends abstract_page {
     private $groupname;
     private $realassigneeid;
     private $id;
+    private $context;
 
     function __construct() {
         $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
         $this->groupid = optional_param('groupid', 0, PARAM_INT);
         $this->groupname = optional_param('groupname', '', PARAM_TEXT);
         $this->id = optional_param('id', 0, PARAM_INT);
+
+        $poasmodel = poasassignment_model::get_instance();
+        $this->context = $poasmodel->get_context();
     }
 
     function has_satisfying_parameters() {
@@ -23,7 +27,7 @@ class testresults_page extends abstract_page {
         $graders = $poasmodel->get_used_graders();
         foreach ($graders as $grader) {
             if ($grader->name == 'remote_autotester') {
-                if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+                if (has_capability('mod/poasassignment:grade', $this->context)) {
                     return true;
                 }
                 elseif ($poasmodel->assignee->id) {
@@ -44,7 +48,7 @@ class testresults_page extends abstract_page {
 
     function view() {
         $poasmodel = poasassignment_model::get_instance();
-        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+        if (has_capability('mod/poasassignment:grade', $this->context)) {
             $dataassignees = array(0 => '-');
             $datagroups = array(0 => '-');
             $attemptsresult = array();
@@ -97,6 +101,8 @@ class testresults_page extends abstract_page {
      * @return array statistics
      */
     private function get_statistics($attemptsresult) {
+        if (!$this->realassigneeid)
+            return array();
         $assignee = poasassignment_model::get_instance()->assignee_get_by_id($this->realassigneeid);
         $statistics = array();
         if (isset($assignee)) {
@@ -215,8 +221,7 @@ class testresults_page extends abstract_page {
      * single column with info
      */
     private function get_results_thead_td() {
-        $poasmodel = poasassignment_model::get_instance();
-        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+        if (has_capability('mod/poasassignment:grade', $this->context)) {
             ?>
             <td class="fail"><?=get_string('attemptfail', 'poasassignment_remote_autotester')?></td>
             <td class="ignor"><?=get_string('attemptignore', 'poasassignment_remote_autotester')?></td>
@@ -258,7 +263,7 @@ class testresults_page extends abstract_page {
                 $graderesult = POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL;
         }
         ?>
-        <tr attemptinfo" data-attempt="<?=$i?>">
+        <tr attemptinfo data-attempt="<?=$i?>">
             <td><a name="att<?=$i?>"></a><?=$i?></td>
             <td><?=date("d.m.Y H:i:s", $attemptresult->attemptdate)?></td>
             <td><?=remote_autotester::get_attempt_status($attemptresult)->status?></td>
@@ -283,7 +288,7 @@ class testresults_page extends abstract_page {
                 <?if (isset($attemptresult->tests) && is_array($attemptresult->tests)): ?>
                     <span class="showtests"><a href="javascript:void(0)">[<?=get_string('showtests', 'poasassignment_remote_autotester')?>]</a></span>
                     <span class="hidetests"><a href="javascript:void(0)">[<?=get_string('hidetests', 'poasassignment_remote_autotester')?>]</a></span>
-                    <? if (TRUE): ?>
+                    <? if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
                         <span class="showallinput"><a href="javascript:void(0)">[<?=get_string('showallinput', 'poasassignment_remote_autotester')?>]</a></span>
                         <span class="hideallinput"><a href="javascript:void(0)">[<?=get_string('hideallinput', 'poasassignment_remote_autotester')?>]</a></span>
                     <? endif ?>
@@ -312,8 +317,7 @@ class testresults_page extends abstract_page {
     }
 
     private function get_results_attempt_td($graderesult, $attemptid) {
-        $poasmodel = poasassignment_model::get_instance();
-        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+        if (has_capability('mod/poasassignment:grade', $this->context)) {
             ?>
                 <td class="fail">
                     <input
@@ -378,10 +382,17 @@ class testresults_page extends abstract_page {
      */
     private function show_test_html($test) {
         $class = $test->testpassed ?  "testpassed" : "testfailed";
+        $poasmodel = poasassignment_model::get_instance();
         ?>
         <div class="test">
             <div class="testinfo <?=$class?>">
-                <span class="caption"><?=$test->test?></span>
+                <span class="caption">
+                    <?if (has_capability('poasassignment/remote_autotester:seetestnames', $this->context)): ?>
+                        <?=$test->test?>
+                    <? else: ?>
+                        -
+                    <?endif?>
+                </span>
                 <span class="decision">
                     <?if ($test->testpassed): ?>
                         <img src="/mod/poasassignment/pix/yes.png" alt=""/> <span><?=get_string('testpassed', 'poasassignment_remote_autotester')?></span>
@@ -391,12 +402,12 @@ class testresults_page extends abstract_page {
                 </span>
             </div>
             <div class="testservice">
-                <?if (TRUE): ?>
+                <?if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
                     <span class="showinput"><a href="javascript:void(0)">[<?=get_string('showinput', 'poasassignment_remote_autotester')?>]</a></span>
                     <span class="hideinput"><a href="javascript:void(0)">[<?=get_string('hideinput', 'poasassignment_remote_autotester')?>]</a></span>
                 <? endif?>
             </div>
-            <? if (TRUE): // TODO Проверка капабилити ?>
+            <? if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)):?>
                 <div class="input">
                     <div class="caption"><?=get_string('inputdata', 'poasassignment_remote_autotester')?>:</div>
                     <pre><?=$test->testin?></pre>
@@ -418,7 +429,7 @@ class testresults_page extends abstract_page {
                 }
 
             ?>
-            <? if ($diff): // TODO?>
+            <? if ($diff && has_capability('poasassignment/remote_autotester:seediff', $this->context)):?>
                 <div class="diff">
                     <div class="caption"><?=get_string('outdiff', 'poasassignment_remote_autotester')?> <?=remote_autotester::get_diff_comment($diff, $strudentoutarray, $testoutarray)?>:</div>
                     <?if (is_array($diff)): ?>

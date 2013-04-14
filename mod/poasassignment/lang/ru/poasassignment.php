@@ -337,3 +337,4 @@ $string['wogroup'] = 'Вне групп';
 $string['group'] = 'Группа';
 $string['raisnotinstalled'] = 'Удаленный автотестер не подключен';
 $string['nothingtoshow'] = 'Нечего показывать';
+$string['pluginadministration'] = 'Управление плагином';
