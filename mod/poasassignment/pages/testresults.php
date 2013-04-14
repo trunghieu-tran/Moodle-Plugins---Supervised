@@ -90,13 +90,19 @@ class testresults_page extends abstract_page {
         }
     }
 
+    /**
+     * Get statistics array to display in table in top of the page
+     *
+     * @param $attemptsresult array of results to analyze
+     * @return array statistics
+     */
     private function get_statistics($attemptsresult) {
         $assignee = poasassignment_model::get_instance()->assignee_get_by_id($this->realassigneeid);
         $statistics = array();
         if (isset($assignee)) {
             $statistics['assignee'] = $assignee->firstname . ' ' . $assignee->lastname;
         }
-        $statistics['firstpassedattempt'] = false;
+        $statistics['firstpassedattempt'] = '-';
         $statistics['totalpenalty'] = 0;
         $statistics['totaltestattempts'] = count($attemptsresult);
         $statistics['ignoredtestattempts'] = 0;
@@ -133,11 +139,16 @@ class testresults_page extends abstract_page {
         }
         $penalty = poasassignment_model::get_instance()->poasassignment->penalty;
         if ($statistics['failedtestattempts'] > 0 && $penalty > 0) {
-            $statistics['totalpenalty'] = $statistics['failedtestattempts'] * $penalty;
+            $statistics['totalpenalty'] = ($statistics['failedtestattempts']  - 1) * $penalty;
         }
         return $statistics;
     }
 
+    /**
+     * Show all attempts
+     *
+     * @param $attemptsresult array of results
+     */
     private function show_attempts_result($attemptsresult)
     {
         global $PAGE;
@@ -171,9 +182,7 @@ class testresults_page extends abstract_page {
                         <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
                         <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
                         <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
-                        <td class="fail"><?=get_string('attemptfail', 'poasassignment_remote_autotester')?></td>
-                        <td class="ignor"><?=get_string('attemptignore', 'poasassignment_remote_autotester')?></td>
-                        <td class="ok"><?=get_string('attemptok', 'poasassignment_remote_autotester')?></td>
+                        <?$this->get_results_thead_td()?>
                     </tr>
                     </thead>
                     <tbody>
@@ -191,9 +200,7 @@ class testresults_page extends abstract_page {
                         <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
                         <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
                         <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
-                        <td class="fail"><?=get_string('attemptfail', 'poasassignment_remote_autotester')?></td>
-                        <td class="ignor"><?=get_string('attemptignore', 'poasassignment_remote_autotester')?></td>
-                        <td class="ok"><?=get_string('attemptok', 'poasassignment_remote_autotester')?></td>
+                        <?$this->get_results_thead_td()?>
                     </tr>
                     </tfoot>
                 </table>
@@ -202,31 +209,42 @@ class testresults_page extends abstract_page {
         <?
         return;
     }
+
+    /**
+     * Depending on capability, show three column headers for grading or
+     * single column with info
+     */
+    private function get_results_thead_td() {
+        $poasmodel = poasassignment_model::get_instance();
+        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+            ?>
+            <td class="fail"><?=get_string('attemptfail', 'poasassignment_remote_autotester')?></td>
+            <td class="ignor"><?=get_string('attemptignore', 'poasassignment_remote_autotester')?></td>
+            <td class="ok"><?=get_string('attemptok', 'poasassignment_remote_autotester')?></td>
+            <?
+        }
+        else {
+            ?>
+            <td colspan="3"><?=get_string('finaldecision', 'poasassignment_remote_autotester')?></td>
+            <?
+        }
+    }
+
+    /**
+     * Show single attempt info
+     *
+     * @param $attemptresult array of attempt's result
+     * @param $i number of attempt
+     */
     private function show_attempt_html($attemptresult, $i)
     {
         $totaltests = FALSE;
         $oktest = 0;
-        $class = FALSE;
         if (isset($attemptresult->tests) && is_array($attemptresult->tests)) {
             $totaltests = count($attemptresult->tests);
             foreach ($attemptresult->tests as $test) {
                 if ($test->testpassed == 1)
                     $oktest++;
-            }
-            if ($totaltests > 0) {
-                $percent = $oktest / $totaltests;
-                if ($percent == 1) {
-                    $class = "ideal";
-                }
-                elseif ($percent > 0.75) {
-                    $class = "good";
-                }
-                elseif ($percent > 0.5) {
-                    $class = "normal";
-                }
-                else {
-                    $class = "bad";
-                }
             }
         }
         $graderesult = false;
@@ -240,7 +258,7 @@ class testresults_page extends abstract_page {
                 $graderesult = POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL;
         }
         ?>
-        <tr class="<?/*=$class*/?> attemptinfo" data-attempt="<?=$i?>">
+        <tr attemptinfo" data-attempt="<?=$i?>">
             <td><a name="att<?=$i?>"></a><?=$i?></td>
             <td><?=date("d.m.Y H:i:s", $attemptresult->attemptdate)?></td>
             <td><?=remote_autotester::get_attempt_status($attemptresult)->status?></td>
@@ -254,36 +272,7 @@ class testresults_page extends abstract_page {
                     }
                 ?>
             </td>
-            <td class="fail">
-                <input
-                    type="radio"
-                    value="fail"
-                    title="<?=get_string('attemptfail', 'poasassignment_remote_autotester')?>"
-                    <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL): ?>
-                        checked="checked"
-                    <? endif?>
-                    name="attemptaction[<?=$attemptresult->attemptid?>]"/>
-            </td>
-            <td class="ignor">
-                <input
-                    type="radio"
-                    value="ignor"
-                    title="<?=get_string('attemptignore', 'poasassignment_remote_autotester')?>"
-                    <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_IGNORE): ?>
-                        checked="checked"
-                    <? endif?>
-                    name="attemptaction[<?=$attemptresult->attemptid?>]"/>
-            </td>
-            <td class="ok">
-                <input
-                    type="radio"
-                    value="ok"
-                    title="<?=get_string('attemptok', 'poasassignment_remote_autotester')?>"
-                    <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_OK): ?>
-                        checked="checked"
-                    <? endif?>
-                    name="attemptaction[<?=$attemptresult->attemptid?>]"/>
-            </td>
+            <?$this->get_results_attempt_td($graderesult, $attemptresult->attemptid)?>
         </tr>
         <tr class="attemptservice" data-for-attempt="<?=$i?>">
             <td colspan="7">
@@ -320,6 +309,65 @@ class testresults_page extends abstract_page {
             </tr>
         <? endif ?>
         <?
+    }
+
+    private function get_results_attempt_td($graderesult, $attemptid) {
+        $poasmodel = poasassignment_model::get_instance();
+        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+            ?>
+                <td class="fail">
+                    <input
+                        type="radio"
+                        value="fail"
+                        title="<?=get_string('attemptfail', 'poasassignment_remote_autotester')?>"
+                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL): ?>
+                        checked="checked"
+                    <? endif?>
+                        name="attemptaction[<?=$attemptid?>]"/>
+                </td>
+                <td class="ignor">
+                    <input
+                        type="radio"
+                        value="ignor"
+                        title="<?=get_string('attemptignore', 'poasassignment_remote_autotester')?>"
+                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_IGNORE): ?>
+                        checked="checked"
+                    <? endif?>
+                        name="attemptaction[<?=$attemptid?>]"/>
+                </td>
+                <td class="ok">
+                    <input
+                        type="radio"
+                        value="ok"
+                        title="<?=get_string('attemptok', 'poasassignment_remote_autotester')?>"
+                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_OK): ?>
+                        checked="checked"
+                    <? endif?>
+                        name="attemptaction[<?=$attemptid?>]"/>
+                </td>
+            <?
+        }
+        else {
+            switch($graderesult) {
+                case POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL:
+                    $message = get_string('attemptfail', 'poasassignment_remote_autotester');
+                    $class = 'fail';
+                    break;
+                case POASASSIGNMENT_REMOTE_AUTOTESTER_IGNORE:
+                    $message = get_string('attemptignore', 'poasassignment_remote_autotester');
+                    $class = 'ignor';
+                    break;
+                case POASASSIGNMENT_REMOTE_AUTOTESTER_OK:
+                    $message = get_string('attemptok', 'poasassignment_remote_autotester');
+                    $class = 'ok';
+                    break;
+            }
+            ?>
+            <td colspan="3" class="<?=$class?> result-for-student">
+                <?=$message?>
+            </td>
+            <?
+        }
     }
 
     /**

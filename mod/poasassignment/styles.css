@@ -116,6 +116,9 @@ a:link.hiddentask, a:visited.hiddentask {
 .testresults .diff .student{background-color: #f00;}
 .testresults .diff .same{background-color: #fff;}
 
-.testresults .fail.chosen {background-color: #ff3333;}
-.testresults .ignor.chosen {background-color: #888;}
-.testresults .ok.chosen {background-color: #33ff33;}
+.testresults .fail.chosen,
+.testresults .fail.result-for-student {background-color: #ff3333;}
+.testresults .ignor.chosen,
+.testresults .ignor.result-for-student {background-color: #888;}
+.testresults .ok.chosen,
+.testresults .ok.result-for-student {background-color: #33ff33;}

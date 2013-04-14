@@ -78,3 +78,4 @@ $string['assigneefilter'] = 'Choose group and assignee';
 $string['worstresult'] = 'Worst result';
 $string['group'] = 'Group';
 $string['assignee'] = 'Student';
+$string['finaldecision'] = 'Final decision';
