@@ -399,3 +399,5 @@ $string['testresults'] = 'Test results';
 $string['testresults_help'] = 'On this page you can see results of your program\'s testing';
 $string['wogroup'] = 'Without groups';
 $string['group'] = 'Group';
+$string['raisnotinstalled'] = 'Remote autotester plugin is not installed';
+$string['nothingtoshow'] = 'Nothing to show';

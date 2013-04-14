@@ -2703,4 +2703,27 @@ class poasassignment_model {
             ';
         return $DB->get_record_sql($sql);
     }
+
+    /**
+     * Get used graders
+     *
+     * @return mixed array of used graders
+     */
+    public function get_used_graders() {
+        global $DB;
+        // Get graders list
+        $usedgraders = $DB->get_records('poasassignment_used_graders',
+            array('poasassignmentid' => $this->poasassignment->id));
+        if(count($usedgraders) == 0) {
+            return;
+        }
+        $graderids = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderids[] = $usedgrader->graderid;
+        }
+        $inorequal = $DB->get_in_or_equal($graderids);
+        $sql = "SELECT * FROM {poasassignment_graders} WHERE id" . $inorequal[0]. "";
+        $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
+        return $graderrecords;
+    }
 }

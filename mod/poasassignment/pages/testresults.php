@@ -18,6 +18,30 @@ class testresults_page extends abstract_page {
         $this->id = optional_param('id', 0, PARAM_INT);
     }
 
+    function has_satisfying_parameters() {
+        $poasmodel = poasassignment_model::get_instance();
+        $graders = $poasmodel->get_used_graders();
+        foreach ($graders as $grader) {
+            if ($grader->name == 'remote_autotester') {
+                if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+                    return true;
+                }
+                elseif ($poasmodel->assignee->id) {
+                    if ($poasmodel->get_last_attempt($poasmodel->assignee->id)) {
+                        return true;
+                    }
+                    else {
+                        $this->lasterror = 'nothingtoshow';
+                        return false;
+                    }
+                }
+                break;
+            }
+        }
+        $this->lasterror = 'raisnotinstalled';
+        return false;
+    }
+
     function view() {
         $poasmodel = poasassignment_model::get_instance();
         if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {

@@ -335,3 +335,5 @@ $string['testresults'] = 'Результаты тестирования';
 $string['testresults_help'] = 'На этой странице вы можете увидеть результаты тестирования ваших попыток';
 $string['wogroup'] = 'Вне групп';
 $string['group'] = 'Группа';
+$string['raisnotinstalled'] = 'Удаленный автотестер не подключен';
+$string['nothingtoshow'] = 'Нечего показывать';
