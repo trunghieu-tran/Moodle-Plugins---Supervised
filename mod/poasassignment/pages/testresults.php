@@ -7,90 +7,71 @@ class testresults_page extends abstract_page {
     private $assigneeid;
     private $attemptid;
     private $groupid;
+    private $groupname;
+    private $realassigneeid;
     private $id;
 
     function __construct() {
-        $this->attemptid = optional_param('attemptid', 0, PARAM_INT);
         $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
         $this->groupid = optional_param('groupid', 0, PARAM_INT);
+        $this->groupname = optional_param('groupname', '', PARAM_TEXT);
         $this->id = optional_param('id', 0, PARAM_INT);
     }
 
     function view() {
-        global $DB;
         $poasmodel = poasassignment_model::get_instance();
-        $dataassignees = array(0 => '-');
-        $dataattempts = array(0 => '-');
-        $attemptsresult = array();
+        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+            $dataassignees = array(0 => '-');
+            $datagroups = array(0 => '-');
+            $attemptsresult = array();
 
-        // Always get all groups
-        $assignees = $poasmodel->get_assignees_ext($poasmodel->get_poasassignment()->id);
-        $datagroups = $this->get_groups($assignees);
-
-        if ($this->attemptid) {
-            $attempt = $DB->get_record('poasassignment_attempts', array('id' => $this->attemptid));
-            $this->assigneeid = $attempt->assigneeid;
-        }
-        if ($this->assigneeid) {
-            require_once(dirname(dirname(__FILE__)) . '/grader/remote_autotester/remote_autotester.php');
-            $attemptsresult = remote_autotester::get_attempts_results($this->assigneeid);
-        }
-        // If user group id is set, get all users, then assignees of that group
-        if ($this->groupid) {
-            $users = $poasmodel->get_users_by_groups(array($this->groupid));
-            $usersids = array();
-            foreach ($users as $user) {
-                $usersids[] = $user->userid;
-            }
-            $assignees = $poasmodel->get_assignees_ext($poasmodel->get_poasassignment()->id, $usersids);
+            // Get all assignees
+            $assignees = $this->smart_get_assignees();
             foreach ($assignees as $assignee) {
                 $dataassignees[$assignee->id] = $assignee->lastname . ' ' . $assignee->firstname;
             }
-        }
 
-        $mform = new attempt_choose_ext_form(null,
-            array(
-                'groups' => $datagroups,
-                'assignees' => $dataassignees,
-                'attempts' => $dataattempts,
-                'id' => $this->id),
-            'get');
-        $mform->set_data(array('groupid' => $this->groupid));
-        $mform->display();
-        if ($attemptsresult) {
+            // Get assignees groups
+            $groups = $this->get_all_groups();
+            foreach ($groups as $group) {
+                $datagroups[$group->id] = $group->name;
+            }
+
+            // Get attempts
+            if ($this->assigneeid) {
+                $this->realassigneeid = $this->assigneeid;
+                require_once(dirname(dirname(__FILE__)) . '/grader/remote_autotester/remote_autotester.php');
+                $attemptsresult = remote_autotester::get_attempts_results($this->assigneeid);
+            }
+
+            $mform = new attempt_choose_ext_form(null,
+                array(
+                    'groups' => $datagroups,
+                    'assignees' => $dataassignees,
+                    'id' => $this->id),
+                'get');
+            $mform->set_data(array('groupid' => $this->groupid, 'assigneeid' => $this->assigneeid));
+            $mform->display();
+        }
+        else {
+            // Get current assignee id and show it's results
+            if ($poasmodel->assignee->id) {
+                $this->realassigneeid = $poasmodel->assignee->id;
+                require_once(dirname(dirname(__FILE__)) . '/grader/remote_autotester/remote_autotester.php');
+                $attemptsresult = remote_autotester::get_attempts_results($poasmodel->assignee->id);
+            }
+        }
+        if (isset($attemptsresult)) {
             $this->show_attempts_result($attemptsresult);
         }
     }
 
-    function get_groups($assignees) {
-        $datagroups = array();
-        $poasmodel = poasassignment_model::get_instance();
-        $userids = array();
-        foreach ($assignees as $assignee) {
-            $userids[] = $assignee->userid;
-        }
-
-        // Divide assignees by groups, create array of used groups
-        $groups = $poasmodel->get_users_groups($userids);
-
-        $wogroup = new stdClass();
-        $wogroup->name = get_string('wogroup', 'poasassignment');
-        $wogroup->id = -2;
-
-        $nogroup = new stdClass();
-        $nogroup->name = '-';
-        $nogroup->id = 0;
-
-        array_unshift($groups, $wogroup);
-        array_unshift($groups, $nogroup);
-        foreach ($groups as $group) {
-            $datagroups[$group->id] = $group->name;
-        }
-        return $datagroups;
-    }
-
     private function get_statistics($attemptsresult) {
+        $assignee = poasassignment_model::get_instance()->assignee_get_by_id($this->realassigneeid);
         $statistics = array();
+        if (isset($assignee)) {
+            $statistics['assignee'] = $assignee->firstname . ' ' . $assignee->lastname;
+        }
         $statistics['firstpassedattempt'] = false;
         $statistics['totalpenalty'] = 0;
         $statistics['totaltestattempts'] = count($attemptsresult);
@@ -410,17 +391,61 @@ class testresults_page extends abstract_page {
             array_slice($new, $nmax, $maxlen),
             $this->diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
     }
+
+    private function get_all_groups() {
+        global $DB;
+        $model = poasassignment_model::get_instance();
+
+        $where = array();
+        $where[] = '{poasassignment_assignee}.cancelled = 0';
+        $where[] = '{poasassignment_assignee}.poasassignmentid = ' . $model->poasassignment->id;
+
+        $sql = 'SELECT {groups}.id, {groups}.name
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            JOIN {groups_members} on {poasassignment_assignee}.userid={groups_members}.userid
+            JOIN {groups} on {groups_members}.groupid={groups}.id
+            WHERE ' . implode(' AND ', $where) . '
+            ORDER BY {groups}.name ASC
+            ';
+        $result = $DB->get_records_sql($sql);
+        return $result;
+    }
+    private function smart_get_assignees() {
+        global $DB;
+        $model = poasassignment_model::get_instance();
+
+        $where = array();
+        if ($this->groupid > 0) {
+            $where[] = '{groups}.id=' . $this->groupid;
+        }
+        if (strlen($this->groupname) > 0) {
+            $where[] = '{groups}.name=`' . $this->groupname. '`';
+        }
+        $where[] = '{poasassignment_assignee}.cancelled = 0';
+        $where[] = '{poasassignment_assignee}.poasassignmentid = ' . $model->poasassignment->id;
+        $sql = 'SELECT {poasassignment_assignee}.*, firstname, lastname
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            JOIN {groups_members} on {poasassignment_assignee}.userid={groups_members}.userid
+            JOIN {groups} on {groups_members}.groupid={groups}.id
+            WHERE ' . implode(' AND ', $where) . '
+            ORDER BY lastname ASC, firstname ASC, {user}.id ASC
+            ';
+        $result = $DB->get_records_sql($sql);
+        return $result;
+    }
 }
 class attempt_choose_ext_form extends moodleform {
     function definition() {
         global $DB;
         $mform = $this->_form;
         $instance = $this->_customdata;
-        $mform->addElement('select', 'groupid', get_string('group', 'poasassignment'), $instance['groups']);
 
-        $mform->addElement('select', 'assigneeid', get_string('assignee', 'poasassignment'), $instance['assignees']);
+        $mform->addElement('header', 'assigneefilter', get_string('assigneefilter', 'poasassignment_remote_autotester'));
+        $mform->addElement('select', 'groupid', get_string('group', 'poasassignment_remote_autotester'), $instance['groups']);
 
-        $mform->addElement('select', 'attemptid', get_string('attempt', 'poasassignment'), $instance['attempts']);
+        $mform->addElement('select', 'assigneeid', get_string('assignee', 'poasassignment_remote_autotester'), $instance['assignees']);
 
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);

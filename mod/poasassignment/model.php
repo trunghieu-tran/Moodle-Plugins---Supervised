@@ -2588,7 +2588,8 @@ class poasassignment_model {
             SELECT {poasassignment_assignee}.*, firstname, lastname
             FROM {poasassignment_assignee}
             JOIN {user} on {poasassignment_assignee}.userid={user}.id
-            WHERE {poasassignment_assignee}.poasassignmentid = ' . $poasassignmentid;
+            WHERE {poasassignment_assignee}.poasassignmentid = ' . $poasassignmentid . '
+            AND {poasassignment_assignee}.cancelled = 0';
         $params = array();
         if ($usersids) {
             list($insql, $inparams) = $DB->get_in_or_equal($usersids);
@@ -2690,5 +2691,16 @@ class poasassignment_model {
         $attempt = $DB->get_record('poasassignment_attempts', array('id'=>$attemptid), 'id, disablepenalty');
         $attempt->disablepenalty = 1;
         $DB->update_record('poasassignment_attempts',$attempt);
+    }
+
+    public function assignee_get_by_id($assigneeid) {
+        global $DB;
+        $sql = 'SELECT {poasassignment_assignee}.*, firstname, lastname
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            WHERE {poasassignment_assignee}.id='.$assigneeid.'
+            ORDER BY lastname ASC, firstname ASC, {user}.id ASC
+            ';
+        return $DB->get_record_sql($sql);
     }
 }
