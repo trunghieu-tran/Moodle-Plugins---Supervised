@@ -2726,4 +2726,37 @@ class poasassignment_model {
         $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
         return $graderrecords;
     }
+
+    /**
+     * Get criterions for grader in poasassignment instance
+     *
+     * @param $poasassignmentid
+     * @param $graderid
+     */
+    public function get_criterions($poasassignmentid, $graderid) {
+        global $DB;
+        $sql = 'SELECT cr.*
+        FROM {poasassignment_criterions} cr
+        WHERE cr.graderid=' . $graderid . ' AND cr.poasassignmentid=' . $poasassignmentid;
+        $criterions = $DB->get_records_sql($sql);
+        return $criterions;
+    }
+
+    public function delete_rating_values($criterionids, $attemptid) {
+        global $DB;
+        $inorequal = $DB->get_in_or_equal($criterionids);
+        $sql = 'DELETE FROM {poasassignment_rating_values}
+            WHERE {poasassignment_rating_values}.attemptid=' . $attemptid .'
+            AND {poasassignment_rating_values}.criterionid' . $inorequal[0];
+        $DB->execute($sql, $inorequal[1]);
+    }
+
+    public function get_attempt_assignee($attemptid) {
+        global $DB;
+        $sql = 'SELECT {poasassignment_assignee}.*
+        FROM {poasassignment_attempts}
+        JOIN {poasassignment_assignee} ON {poasassignment_assignee}.id={poasassignment_attempts}.assigneeid
+        WHERE {poasassignment_attempts}.id=' . $attemptid;
+        return $DB->get_record_sql($sql);
+    }
 }

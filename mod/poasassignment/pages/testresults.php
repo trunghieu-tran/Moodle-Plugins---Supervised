@@ -46,6 +46,35 @@ class testresults_page extends abstract_page {
         return false;
     }
 
+    function pre_view() {
+        global $USER;
+        if (has_capability('mod/poasassignment:grade', $this->context)) {
+            if ($USER->sesskey == $_POST['sesskey']) {
+                if ($_POST['attemptaction'] && is_array($_POST['attemptaction'])) {
+                    require_once(dirname(dirname(__FILE__)) . '/grader/remote_autotester/remote_autotester.php');
+                    foreach ($_POST['attemptaction'] as $attemptid => $action) {
+                        if ($action == 'ignor') {
+                            poasassignment_model::disable_attempt_penalty($attemptid);
+                        }
+                        elseif ($action == 'fail') {
+                            remote_autotester::set_result($attemptid, 0);
+                        }
+                        elseif ($action == 'ok') {
+                            remote_autotester::set_result($attemptid, 1);
+                        }
+                    }
+                    remote_autotester::put_rating(poasassignment_model::get_instance()->poasassignment->id, $this->assigneeid);
+                    // Redirect with OK message
+                    $params = $_REQUEST;
+                    unset($params['attemptaction']);
+                    unset($params['save']);
+                    $params['saved'] = 'ok';
+                    redirect(new moodle_url('view.php',$params));
+                }
+            }
+        }
+    }
+
     function view() {
         $poasmodel = poasassignment_model::get_instance();
         if (has_capability('mod/poasassignment:grade', $this->context)) {
@@ -94,61 +123,7 @@ class testresults_page extends abstract_page {
         }
     }
 
-    /**
-     * Get statistics array to display in table in top of the page
-     *
-     * @param $attemptsresult array of results to analyze
-     * @return array statistics
-     */
-    private function get_statistics($attemptsresult) {
-        if (!$this->realassigneeid)
-            return array();
-        $assignee = poasassignment_model::get_instance()->assignee_get_by_id($this->realassigneeid);
-        $statistics = array();
-        if (isset($assignee)) {
-            $statistics['assignee'] = $assignee->firstname . ' ' . $assignee->lastname;
-        }
-        $statistics['firstpassedattempt'] = '-';
-        $statistics['totalpenalty'] = 0;
-        $statistics['totaltestattempts'] = count($attemptsresult);
-        $statistics['ignoredtestattempts'] = 0;
-        $statistics['failedtestattempts'] = 0;
-        $statistics['bestresult'] = false;
-        $statistics['worstresult'] = false;
 
-        $i = count ($attemptsresult);
-        foreach ($attemptsresult as $attemptresult) {
-            if (isset($attemptresult->disablepenalty) && $attemptresult->disablepenalty == 1) {
-                $statistics['ignoredtestattempts']++;
-            }
-            else {
-                if ($attemptresult->result == 1) {
-                    $statistics['firstpassedattempt'] = $i;
-                }
-                elseif ($attemptresult->result == 0) {
-                    $statistics['failedtestattempts']++;
-                }
-                $oktest = 0;
-                foreach ($attemptresult->tests as $test) {
-                    if ($test->testpassed == 1) {
-                        $oktest++;
-                    }
-                }
-                if ($statistics['worstresult'] === false || $oktest < $statistics['worstresult']) {
-                    $statistics['worstresult'] = $oktest;
-                }
-                if ($statistics['bestresult'] === false || $oktest > $statistics['bestresult']) {
-                    $statistics['bestresult'] = $oktest;
-                }
-            }
-            $i--;
-        }
-        $penalty = poasassignment_model::get_instance()->poasassignment->penalty;
-        if ($statistics['failedtestattempts'] > 0 && $penalty > 0) {
-            $statistics['totalpenalty'] = ($statistics['failedtestattempts']  - 1) * $penalty;
-        }
-        return $statistics;
-    }
 
     /**
      * Show all attempts
@@ -157,27 +132,35 @@ class testresults_page extends abstract_page {
      */
     private function show_attempts_result($attemptsresult)
     {
-        global $PAGE;
+        global $PAGE, $USER;
         $PAGE->requires->js('/mod/poasassignment/grader/remote_autotester/jquery-1.9.1.min.js');
         $PAGE->requires->js('/mod/poasassignment/grader/remote_autotester/testresults.js');
+        $poasmodel = poasassignment_model::get_instance();
         ?>
         <div class="testresults">
-            <form action="">
-                <div class="report">
-                    <?
-                        $statistics = $this->get_statistics($attemptsresult);
-                    ?>
-                    <table class="poasassignment-table">
-                        <?foreach ($statistics as $key => $value): ?>
-                            <?if ($value !== false): ?>
-                                <tr>
-                                    <td class="header"><?=get_string($key, 'poasassignment_remote_autotester')?></td>
-                                    <td><?=$value?></td>
-                                </tr>
-                            <? endif?>
-                        <? endforeach?>
-                    </table>
-                </div>
+            <form action="" method="post">
+                <?if ($_GET['saved'] == 'ok' && has_capability('mod/poasassignment:grade', $this->context)): ?>
+                    <div class="saved">
+                        <?=get_string('testresultsweresaved', 'poasassignment_remote_autotester')?>
+                    </div>
+                <? endif?>
+                <?if ($this->realassigneeid): ?>
+                    <div class="report">
+                        <?
+                            $statistics = remote_autotester::get_statistics($attemptsresult, $this->realassigneeid);
+                        ?>
+                        <table class="poasassignment-table">
+                            <?foreach ($statistics as $key => $value): ?>
+                                <?if ($value !== false): ?>
+                                    <tr>
+                                        <td class="header"><?=get_string($key, 'poasassignment_remote_autotester')?></td>
+                                        <td><?=$value?></td>
+                                    </tr>
+                                <? endif?>
+                            <? endforeach?>
+                        </table>
+                    </div>
+                <? endif?>
                 <span><?=get_string('allattemptsactions', 'poasassignment_remote_autotester')?>:</span>
                 <span class="hideall"><a href="javascript:void(0)">[<?=get_string('hideall', 'poasassignment_remote_autotester')?>]</a></span>
                 <span class="showall"><a href="javascript:void(0)">[<?=get_string('showall', 'poasassignment_remote_autotester')?>]</a></span>
@@ -201,15 +184,27 @@ class testresults_page extends abstract_page {
                         ?>
                     </tbody>
                     <tfoot>
-                    <tr>
-                        <td>№</td>
-                        <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
-                        <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
-                        <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
-                        <?$this->get_results_thead_td()?>
-                    </tr>
+                        <tr>
+                            <td>№</td>
+                            <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
+                            <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
+                            <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
+                            <?$this->get_results_thead_td()?>
+                        </tr>
                     </tfoot>
                 </table>
+                <?if (has_capability('mod/poasassignment:grade', $this->context)): ?>
+                    <div class="submit">
+                        <?foreach ($_GET as $k => $v): ?>
+                            <? if ($_GET['saved']): ?>
+                                <?continue;?>
+                            <? endif ?>
+                            <input type="hidden" name="<?=$k?>" value="<?=htmlspecialchars($v)?>"/>
+                        <? endforeach?>
+                        <input type="hidden" name="sesskey" value="<?=$USER->sesskey?>"/>
+                        <input type="submit" name="save" value="<?=get_string('submittestresult', 'poasassignment_remote_autotester')?>"/>
+                    </div>
+                <? endif?>
             </form>
         </div>
         <?
