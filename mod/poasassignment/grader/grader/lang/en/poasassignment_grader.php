@@ -17,4 +17,3 @@ $string['showrating'] = 'Show total rating';
 $string['shownumberofpassedtest'] = 'Show number of passed tests and total number of tests';
 $string['studentshowoptionsgrp'] = 'Show to student';
 $string['teachershowoptionsgrp'] = 'Show to teacher';
-$string['poasassignment_grader:diff'] = 'Ability to see diff';
