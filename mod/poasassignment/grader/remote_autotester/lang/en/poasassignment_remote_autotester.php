@@ -84,3 +84,5 @@ $string['remote_autotester:seetestinput'] = 'See test input';
 $string['remote_autotester:seetestoutput'] = 'See test output';
 $string['remote_autotester:seestudentoutput'] = 'See student output';
 $string['remote_autotester:seetestnames'] = 'See test names';
+$string['submittestresult'] = 'Submit changes with test results';
+$string['testresultsweresaved'] = 'Changes have been saved';

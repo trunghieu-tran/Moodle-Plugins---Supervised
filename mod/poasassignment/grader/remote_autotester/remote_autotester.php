@@ -50,13 +50,7 @@ class remote_autotester extends grader{
         }
     }
 
-    private function special_iconv($param)
-    {
-        return iconv("CP1251", "UTF-8", $param);
-    }
-
-    private function send_xmlrpc($taskid, $attemptid, $files, $testdirs = array(), $testcases = FALSE)
-    {
+    private function send_xmlrpc($taskid, $attemptid, $files, $testdirs = array(), $testcases = FALSE) {
         global $DB;
         $record = new stdClass();
         $record->attemptid = $attemptid;
@@ -254,11 +248,11 @@ class remote_autotester extends grader{
             $oktestscount = $DB->count_records('poasassignment_gr_ra_tests', array('remote_id' => $record->id, 'testpassed' => 1));
             if ($record->testsfound > $oktestscount) {
                 // fail attempt
-                self::set_result($record, 0);
+                self::set_result($attemptid, 0);
             }
             else {
                 // submit attempt
-                self::set_result($record, 1);
+                self::set_result($attemptid, 1);
             }
         }
     }
@@ -270,15 +264,16 @@ class remote_autotester extends grader{
      * @param object $raattempt RA attempt
      * @param $result 0 to fail test, other value will submit it
      */
-    public static function set_result($raattempt, $result) {
+    public static function set_result($attemptid, $result) {
         global $DB;
+        $raattempt = $DB->get_record('poasassignment_gr_ra', array('attemptid' => $attemptid), 'id, result');
         if ($result)
             $result = 1;
         $raattempt->result = $result;
         $DB->update_record('poasassignment_gr_ra', $raattempt);
 
         $attempt = new stdClass();
-        $attempt->id = $raattempt->attemptid;
+        $attempt->id = $attemptid;
         $attempt->disablepenalty = 0;
         $DB->update_record('poasassignment_attempts', $attempt);
     }
@@ -321,4 +316,108 @@ class remote_autotester extends grader{
         return FALSE;
     }
 
+    public static function put_rating($poasassignmentid, $assigneeid) {
+        $model = poasassignment_model::get_instance();
+        // to aviod problems with submission page, grade passed attempt AND last attempt
+        $statistics = self::get_grade_statistics(self::get_attempts_results($assigneeid));
+        if ($statistics['firstpassedattempt'] && $statistics['lastattempt']) {
+            // If has passed attempt - update graderbook
+            $criterions = $model->get_criterions($poasassignmentid, self::get_my_id());
+            $criterionids = array();
+            foreach ($criterions as $criterion) {
+                $criterionids[] = $criterion->id;
+            }
+            $model->delete_rating_values($criterionids, $statistics['firstpassedattempt']);
+            $model->delete_rating_values($criterionids, $statistics['lastattempt']);
+            foreach ($criterions as $criterion) {
+                $model->put_rating($criterion->id, $statistics['firstpassedattempt'], 100, '');
+                $model->put_rating($criterion->id, $statistics['lastattempt'], 100, '');
+            }
+            $model->recalculate_rating($assigneeid);
+        }
+    }
+
+    /**
+     * Get statistics array to display in table in top of the page
+     *
+     * @param $attemptsresult array of results to analyze
+     * @return array statistics
+     */
+    public static function get_statistics($attemptsresult, $assigneeid) {
+        $assignee = poasassignment_model::get_instance()->assignee_get_by_id($assigneeid);
+        $statistics = array();
+        if (isset($assignee)) {
+            $statistics['assignee'] = $assignee->firstname . ' ' . $assignee->lastname;
+        }
+        $statistics['firstpassedattempt'] = '-';
+        $statistics['failedtestattempts'] = 0;
+        $statistics['totalpenalty'] = 0;
+        $statistics['totaltestattempts'] = count($attemptsresult);
+        $statistics['ignoredtestattempts'] = 0;
+        $statistics['bestresult'] = false;
+        $statistics['worstresult'] = false;
+
+        $i = count ($attemptsresult);
+        foreach ($attemptsresult as $attemptresult) {
+            if (isset($attemptresult->disablepenalty) && $attemptresult->disablepenalty == 1) {
+                $statistics['ignoredtestattempts']++;
+            }
+            else {
+                if ($attemptresult->result == 1) {
+                    $statistics['firstpassedattempt'] = $i;
+                }
+                elseif ($attemptresult->result == 0) {
+                    $statistics['failedtestattempts']++;
+                }
+                $oktest = 0;
+                foreach ($attemptresult->tests as $test) {
+                    if ($test->testpassed == 1) {
+                        $oktest++;
+                    }
+                }
+                if ($statistics['worstresult'] === false || $oktest < $statistics['worstresult']) {
+                    $statistics['worstresult'] = $oktest;
+                }
+                if ($statistics['bestresult'] === false || $oktest > $statistics['bestresult']) {
+                    $statistics['bestresult'] = $oktest;
+                }
+            }
+            $i--;
+        }
+        $penalty = poasassignment_model::get_instance()->poasassignment->penalty;
+        if ($statistics['failedtestattempts'] > 0 && $penalty > 0) {
+            $statistics['totalpenalty'] = $statistics['failedtestattempts'] * $penalty;
+        }
+        return $statistics;
+    }
+    /**
+     * Get grade statistics array
+     *
+     * @param $attemptsresult array of results to analyze
+     * @return array statistics
+     */
+    public static function get_grade_statistics($attemptsresult) {
+        $statistics = array();
+        $statistics['firstpassedattempt'] = false;
+        $statistics['penalty'] = 0;
+        $statistics['lastattempt'] = false;
+
+        foreach ($attemptsresult as $attemptresult) {
+            if ($statistics['lastattempt'] === false)
+                $statistics['lastattempt'] = $attemptresult->attemptid;
+            if (!isset($attemptresult->disablepenalty) || $attemptresult->disablepenalty == 0) {
+                if ($attemptresult->result == 1) {
+                    $statistics['firstpassedattempt'] = $attemptresult->attemptid;
+                }
+                elseif ($attemptresult->result == 0) {
+                    $statistics['penalty']++;
+                }
+            }
+        }
+        $penalty = poasassignment_model::get_instance()->poasassignment->penalty;
+        if ($statistics['penalty'] > 0 && $penalty > 0) {
+            $statistics['penalty'] = $statistics['penalty'] * $penalty;
+        }
+        return $statistics;
+    }
 }

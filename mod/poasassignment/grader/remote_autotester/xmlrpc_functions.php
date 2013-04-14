@@ -164,14 +164,16 @@ function notify_thread_finished($loginHash, $passwordHash, $attemptid) {
         }
 
         XMLRPC_response(XMLRPC_prepare("200 OK"));
+        require_once('remote_autotester.php');
         if (isset($record)) {
             if (isset($record->testsfound) && $record->testsfound > 0 && isset($record->id)) {
                 $testscount = $DB->count_records('poasassignment_gr_ra_tests', array('remote_id' => $record->id));
                 if ($testscount == $record->testsfound) {
-                    require_once('remote_autotester.php');
                     remote_autotester::grade_attempt($attemptid);
                 }
             }
+            $assignee = poasassignment_model::get_instance()->get_attempt_poasassignmentid(17);
+            remote_autotester::put_rating($assignee->poasassignmentid, $assignee->id);
         }
     }
 }

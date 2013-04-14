@@ -81,3 +81,5 @@ $string['remote_autotester:seetestinput'] = 'Видеть входные дан�
 $string['remote_autotester:seetestoutput'] = 'Видеть выходные данные теста';
 $string['remote_autotester:seestudentoutput'] = 'Видеть выходные данные программы студента';
 $string['remote_autotester:seetestnames'] = 'Видеть названия тестов';
+$string['submittestresult'] = 'Сохранить изменения';
+$string['testresultsweresaved'] = 'Изменения сохранены';
