@@ -1,0 +1,4 @@
+call phpunit block_formal_langs_c_language_test blocks/formal_langs/tests/test_c_language.php
+call phpunit block_formal_langs_simple_english_language_test blocks/formal_langs/tests/test_simple_english_language.php
+call phpunit block_formal_langs_token_base_is_same blocks/formal_langs/tests/test_is_same.php
+
