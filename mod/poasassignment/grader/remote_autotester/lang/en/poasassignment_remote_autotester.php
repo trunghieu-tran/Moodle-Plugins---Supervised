@@ -74,3 +74,7 @@ $string['ignoredtestattempts'] = 'Ignored attempts';
 $string['failedtestattempts'] = 'Failed attempts';
 $string['bestresult'] = 'Best result';
 $string['worstresult'] = 'Worst result';
+$string['assigneefilter'] = 'Choose group and assignee';
+$string['worstresult'] = 'Worst result';
+$string['group'] = 'Group';
+$string['assignee'] = 'Student';

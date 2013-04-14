@@ -72,3 +72,6 @@ $string['ignoredtestattempts'] = 'Проигнорировано попыток'
 $string['failedtestattempts'] = 'Провалено попыток';
 $string['bestresult'] = 'Лучший результат';
 $string['worstresult'] = 'Худший результат';
+$string['assigneefilter'] = 'Выберите группу и студента';
+$string['group'] = 'Группа';
+$string['assignee'] = 'Студент';
