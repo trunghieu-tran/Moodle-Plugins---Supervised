@@ -51,8 +51,20 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addHelpButton('regex_input_header','regex_edit_header', 'qtype_preg');
         
         $mform->addElement('text', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('size' => 100));
-        $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
-        $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        
+        $agent = getenv('HTTP_USER_AGENT');
+        if(stristr($agent, 'MSIE'))
+        {
+            $mform->addElement('html', '<div style="margin-left: 79px" >');
+            $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
+            $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+            $mform->addElement('html', '</div>');
+        }
+        else
+        {
+            $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
+            $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        }
         
         //Add tree    
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
