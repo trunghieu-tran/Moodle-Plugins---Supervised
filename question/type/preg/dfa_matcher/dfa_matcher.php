@@ -206,30 +206,30 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $extstr = substr($str, 0, $result->offset + $result->index+1);
         if ($result->next===0) {
         } else {
-			if ($result->next=='stringstart') {
-				$extstr = '';
-			} elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
-			} elseif ($result->next=='wordchar') {
-				$tmpflag = new qtype_preg_charset_flag;
-				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
-				$tmp = new qtype_preg_leaf_charset;
-				$tmp->flags = array(array($tmpflag));
-				$length=1;
-				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
-			} elseif ($result->next=='notwordchar') {
-				$tmpflag = new qtype_preg_charset_flag;
-				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
-				$tmpflag->negative = true;
-				$tmp = new qtype_preg_leaf_charset;
-				$tmp->flags = array(array($tmpflag));
-				$length=1;
-				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
-			} else {
-				$extstr .= $result->next;
-			}
+            if ($result->next=='stringstart') {
+                $extstr = '';
+            } elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
+            } elseif ($result->next=='wordchar') {
+                $tmpflag = new qtype_preg_charset_flag;
+                $tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+                $tmp = new qtype_preg_leaf_charset;
+                $tmp->flags = array(array($tmpflag));
+                $length=1;
+                $extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
+            } elseif ($result->next=='notwordchar') {
+                $tmpflag = new qtype_preg_charset_flag;
+                $tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+                $tmpflag->negative = true;
+                $tmp = new qtype_preg_leaf_charset;
+                $tmp->flags = array(array($tmpflag));
+                $length=1;
+                $extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
+            } else {
+                $extstr .= $result->next;
+            }
         }
         if (!is_object($extstr)) {
-        	   $extstr = new qtype_poasquestion_string($extstr);
+               $extstr = new qtype_poasquestion_string($extstr);
         }
         if ($result->full) {
             $extmatch = null;
@@ -486,7 +486,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                     }
                 }
                 if (!isset($front[$i]->nextstep)) {
-					     throw new Exception("wave error on regex: $this->regex\n");
+                         throw new Exception("wave error on regex: $this->regex\n");
                 }
                 $front[$i]->currentstep = $front[$i]->nextstep;
                 $front[$i]->nextstep = array();
@@ -658,7 +658,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
-		$this->zeroquantdeleted = false;
+        $this->zeroquantdeleted = false;
         if (isset($CFG->qtype_preg_dfa_state_limit)) {
             $this->maxstatecount = $CFG->qtype_preg_dfa_state_limit;
         } else {
@@ -1217,14 +1217,14 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
 
         if (!$this->zeroquantdeleted) {
-			$res = self::delete_zero_quant($pregnode);
-			if ($res != true && $res != false) {
-				$pregnode = $res;
-			}
-			$this->zeroquantdeleted = true;
-		}
+            $res = self::delete_zero_quant($pregnode);
+            if ($res != true && $res != false) {
+                $pregnode = $res;
+            }
+            $this->zeroquantdeleted = true;
+        }
 
-		$name = $pregnode->name();
+        $name = $pregnode->name();
         switch ($name) {
             case 'node_subexpr':
                 return $this->from_preg_node($pregnode->operands[0]);
@@ -1246,75 +1246,75 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return parent::from_preg_node($pregnode);
     }
 
-	/**
-	* Function delete zero quants subtree from syntax tree
-	* @param node is the subroot of syntax tree, don't need call this function for other node
-	* return true if subtree full deleted or new subroot if changed, false otherwise
-	*/
-	protected function delete_zero_quant($node) {
-		$name = $node->name();
+    /**
+    * Function delete zero quants subtree from syntax tree
+    * @param node is the subroot of syntax tree, don't need call this function for other node
+    * return true if subtree full deleted or new subroot if changed, false otherwise
+    */
+    protected function delete_zero_quant($node) {
+        $name = $node->name();
         switch ($name) {
             case 'node_finite_quant':
-				$res=self::delete_zero_quant($node->operands[0]);
+                $res=self::delete_zero_quant($node->operands[0]);
                 if ($node->rightborder==0 || $res===true) {
-					return true;
-				} elseif (is_a($res, 'preg_node')) {
-					$node->operands[0] = $res;
-				}
+                    return true;
+                } elseif (is_object($res)) {
+                    $node->operands[0] = $res;
+                }
                 break;
-			case 'node_assert':
-			case 'node_subexpr':
+            case 'node_assert':
+            case 'node_subexpr':
             case 'node_infinite_quant':
                 $res=self::delete_zero_quant($node->operands[0]);
                 if ($res===true) {
-					return true;
-				} elseif (is_a('preg_node', $res)) {
-					$node->operands[0] = $res;
-				}
-				break;
+                    return true;
+                } elseif (is_object($res)) {
+                    $node->operands[0] = $res;
+                }
+                break;
             case 'node_alt':
                 $res = array();
-				$res[0]=self::delete_zero_quant($node->operands[0]);
-				$res[1]=self::delete_zero_quant($node->operands[1]);
-				if (is_a($res, 'preg_node')) {
-					$node->operands[0] = $res[0];
-				}
-				if (is_a($res, 'preg_node')) {
-					$node->operands[1] = $res[1];
-				}
-				if ($res[0]===true && $res[1]===true) {
-					return true;
-				} else if ($res[0]===true) {
-					$newsubroot = new qtype_preg_node_finite_quant;
-					$newsubroot->operands[0] = $node->operands[1];
-					return $newsubroot;
-				} else if ($res[1]===true) {
-					$newsubroot = new qtype_preg_node_finite_quant;
-					$newsubroot->operands[0] = $node->operands[0];
-					return $newsubroot;
-				}
-				break;
-			case 'node_concat':
+                $res[0] = self::delete_zero_quant($node->operands[0]);
+                $res[1] = self::delete_zero_quant($node->operands[1]);
+                if (is_object($res)) {
+                    $node->operands[0] = $res[0];
+                }
+                if (is_object($res)) {
+                    $node->operands[1] = $res[1];
+                }
+                if ($res[0]===true && $res[1]===true) {
+                    return true;
+                } else if ($res[0]===true) {
+                    $newsubroot = new qtype_preg_node_finite_quant;
+                    $newsubroot->operands[0] = $node->operands[1];
+                    return $newsubroot;
+                } else if ($res[1]===true) {
+                    $newsubroot = new qtype_preg_node_finite_quant;
+                    $newsubroot->operands[0] = $node->operands[0];
+                    return $newsubroot;
+                }
+                break;
+            case 'node_concat':
                 $res = array();
-				$res[0]=self::delete_zero_quant($node->operands[0]);
-				$res[1]=self::delete_zero_quant($node->operands[1]);
-				if (is_a($res[0], 'preg_node')) {
-					$node->operands[0] = $res[0];
-				}
-				if (is_a($res[1], 'preg_node')) {
-					$node->operands[1] = $res[1];
-				}
-				if ($res[0]===true && $res[1]===true) {
-					return true;
-				} else if ($res[0]===true) {
-					return $node->operands[1];
-				} else if ($res[1]===true) {
-					return $node->operands[0];
-				}
-				break;
+                $res[0]=self::delete_zero_quant($node->operands[0]);
+                $res[1]=self::delete_zero_quant($node->operands[1]);
+                if (is_object($res[0])) {
+                    $node->operands[0] = $res[0];
+                }
+                if (is_object($res[1])) {
+                    $node->operands[1] = $res[1];
+                }
+                if ($res[0]===true && $res[1]===true) {
+                    return true;
+                } else if ($res[0]===true) {
+                    return $node->operands[1];
+                } else if ($res[1]===true) {
+                    return $node->operands[0];
+                }
+                break;
         }
-		return false;
-	}
+        return false;
+    }
 
     /**
     * Function converts operand{} quantificator to operand and operand? combination
@@ -1322,9 +1322,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return node subtree with ?
     */
     protected function convert_finite_quant($node) {
-		if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
-			return $node;    //TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
-		}
+        if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
+            return $node;    //TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
+        }
 
         if ($node->leftborder <= 1 && $node->rightborder <= 1) {
             return $node;
