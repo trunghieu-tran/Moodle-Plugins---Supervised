@@ -103,12 +103,4 @@ class qtype_preg extends qtype_shortanswer {
         parent::save_question_options($question);
     }
 
-    /*function test_response(&$question, $state, $answer) {
-        // Trim the response before it is saved in the database. See MDL-10709
-        $state->responses[''] = trim($state->responses['']);
-        $hintneeded = ($question->usecharhint || $question->uselexemhint) && $answer->fraction >= $question->hintgradeborder;
-        $matcher = $question->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id, $question->notation);
-        return $matcher->match($state->responses['']);
-    }*/
-
 }

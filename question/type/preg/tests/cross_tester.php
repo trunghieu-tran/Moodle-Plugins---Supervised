@@ -148,7 +148,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Create a matcher in POSIX mode for categorization tests.
         $options = new qtype_preg_matching_options();
         $options->mode = qtype_preg_handling_options::MODE_POSIX;
-        $matcher = $this->question->get_matcher($enginename, $regex, false, false, null, self::NOTATION_NATIVE);
+        $matcher = $this->question->get_matcher($enginename, $regex, false, 'i', null, self::NOTATION_NATIVE);
         $matcher->set_options($options);
 
         // Match the first test.
@@ -286,7 +286,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $result = true;
         foreach ($this->extracheckobjects as $obj) {
             $enginename = 'qtype_preg_' . $obj->engine_name();
-            $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
+            $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
             if ($obtained->extendedmatch->full || $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
                 $matcher->match($str);
                 $newresults = $matcher->get_match_results();
@@ -485,7 +485,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 try {
                     $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
                     $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
-                    $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
+                    $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
                     $matcher->set_options($options);
                 } catch (Exception $e) {
                     echo 'EXCEPTION CATCHED DURING BUILDING MATCHER, test name is ' . $methodname .  "\n" . $e->getMessage() . "\n";

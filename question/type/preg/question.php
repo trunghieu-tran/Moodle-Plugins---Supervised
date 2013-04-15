@@ -158,7 +158,7 @@ class qtype_preg_question extends question_graded_automatically
                 if ($answer->fraction >= $hintgradeborder) {
                     $bestfitanswer = $answer;
                     $hintneeded = ($this->usecharhint || $this->uselexemhint);//We already know that $answer->fraction >= $hintgradeborder.
-                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
+                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->get_modifiers($this->usecase), $answer->id, $this->notation, $hintneeded);
                     $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
                         $maxfitness = (-1)*$bestmatchresult->left;
@@ -169,7 +169,7 @@ class qtype_preg_question extends question_graded_automatically
                 }
             }
         } else {//Just use first answer and not bother with maxfitness. But we still should fill $bestmatchresults from matcher to correctly fill matching results arrays.
-            $matcher = $this->get_matcher($this->engine, $bestfitanswer->answer, $this->exactmatch, $this->usecase, $bestfitanswer->id, $this->notation);
+            $matcher = $this->get_matcher($this->engine, $bestfitanswer->answer, $this->exactmatch, $this->get_modifiers($this->usecase), $bestfitanswer->id, $this->notation);
             $bestmatchresult = $matcher->match($response['answer']);
         }
 
@@ -177,7 +177,7 @@ class qtype_preg_question extends question_graded_automatically
         $full = false;
         foreach ($this->answers as $answer) {
             $hintneeded = ($this->usecharhint || $this->uselexemhint) && $answer->fraction >= $hintgradeborder;
-            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
+            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->get_modifiers($this->usecase), $answer->id, $this->notation, $hintneeded);
             $matchresults = $matcher->match($response['answer']);
 
             //Check full match.
@@ -242,28 +242,38 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /**
+     * Return regular expression modifiers string using given arguments and question settings.
+     * @param $usecase bool case sensitive mode
+     */
+    public function get_modifiers($usecase = true) {
+        $modifiers = '';
+
+        //Case (in)sensitivity modifier - used from question options.
+        if (!$usecase) {
+            $modifiers .= 'i';
+        }
+
+        return $modifiers;
+    }
+
+    /**
      * Create or get suitable matcher object for given engine, regex and options.
      * @param engine string engine name
      * @param regex string regular expression to match
-     * @param $exact bool exact macthing mode
-     * @param $usecase bool case sensitive mode
+     * @param $exact bool exact matching mode
+     * @param $modifiers string modifiers for regular expression, use @link get_modifiers to get it
      * @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
      * @param $notation string notation, in which regex is written
      * @param $hintpossible boolean whether hint possible for specified answer
      * @return matcher object
      */
-    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native', $hintpossible = true) {
+    public function &get_matcher($engine, $regex, $exact = false, $modifiers = '', $answerid = null, $notation = 'native', $hintpossible = true) {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
             $matcher = $this->matchers_cache[$answerid];
         } else {//create and store matcher object
-
-            $modifiers = null;
-            if (!$usecase) {
-                $modifiers = 'i';
-            }
 
             //Convert to actually used notation if necessary
             $engineclass = 'qtype_preg_'.$engine;

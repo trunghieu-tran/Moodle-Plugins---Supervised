@@ -184,7 +184,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             if ($trimmedanswer !== '') {
                 $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
                 //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
-                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation'], $hintused);
+                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if($matcher->errors_exist()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';
