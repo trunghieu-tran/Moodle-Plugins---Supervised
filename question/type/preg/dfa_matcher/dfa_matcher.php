@@ -1235,36 +1235,17 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $pregnode = $this->convert_infinite_quant($pregnode);
                 break;
             case 'node_alt':
-                $newoperands = array();
-                $nullable = false;
-                foreach ($pregnode->operands as $operand) {
-                    if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        $nullable = true;
-                    } else {
-                        $newoperands[] = $operand;
-                    }
-                }
-                $pregnode->operands = $newoperands;
-                if ($nullable) {
-                    // Convert alternation to {0,1} quantifier.
-                    $quant = new qtype_preg_node_finite_quant(0, 1);
-                    if (count($newoperands) > 1) {
-                        $quant->operands[0] = $pregnode;
-                    } else {
-                        $quant->operands[0] = $newoperands[0];
-                        $pregnode = $quant;
-                    }
-                }
+                $pregnode = $this->convert_alternation($pregnode);
                 break;
         }
         return parent::from_preg_node($pregnode);
     }
 
     /**
-    * Function delete zero quants subtree from syntax tree
-    * @param node is the subroot of syntax tree, don't need call this function for other node
-    * return true if subtree full deleted or new subroot if changed, false otherwise
-    */
+     * Function delete zero quants subtree from syntax tree
+     * @param node is the subroot of syntax tree, don't need call this function for other node
+     * return true if subtree full deleted or new subroot if changed, false otherwise
+     */
     protected function delete_zero_quant($node) {
         $name = $node->name();
         switch ($name) {
@@ -1331,10 +1312,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-    * Function converts operand{} quantificator to operand and operand? combination
-    * @param node node with {}
-    * @return node subtree with ?
-    */
+     * Converts finite quantifier to operand and operand? combination
+     * @param node node with {}
+     * @return node subtree with ?
+     */
     protected function convert_finite_quant($node) {
         if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
             return $node;    //TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
@@ -1359,88 +1340,49 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-    * Function convert operand{} quantificater to operand, operand? and operand* combination
-    * @param node node with {}
-    * @return node subtree with ? *
-    */
+     * Converts infinite quantifier to operand, operand? and operand* combination
+     * @param node node with {}
+     * @return node subtree with ? *
+     */
     protected function convert_infinite_quant($node) {
         if ($node->leftborder == 0) {
             return $node;
-        } else {
-            $res = new qtype_preg_node_concat;
-            for ($i=0; $i<$node->leftborder; ++$i) {
-                $res->operands[$i] = clone $node->operands[0];
-            }
-            $res->operands[$node->leftborder] = clone $node;
-            $res->operands[$node->leftborder]->leftborder = 0;
-            return $res;
         }
+
+        $res = new qtype_preg_node_concat;
+        for ($i = 0; $i < $node->leftborder; ++$i) {
+            $res->operands[$i] = clone $node->operands[0];
+        }
+        $res->operands[$node->leftborder] = clone $node;
+        $res->operands[$node->leftborder]->leftborder = 0;
+        return $res;
     }
 
-    /**
-    *function get string and compare it with regex
-    *@param response - string which will be compared with regex
-    *@return result of compring, see compare function for format of result
-    */
-/*    function match_inner($response) {
-        if ($response === '' && $this->roots[0]->pregnode->operands[0]->nullable) {
-            $matchresult = new qtype_preg_matching_results(true, true, array(0), array(0), '', 0);
-        } else {
-            $result = new stdClass;
-            $result->full = false;
-            $result->index = -1;
-            $result->left = 999999;
-            for ($i=0; $i<=strlen($response) && !$result->full; $i++) {
-                $tmpres = $this->compare($response, 0, $i, $this->anchor->end);
-                if ($tmpres !== false) {
-                    if ($tmpres->full || $tmpres->left < $result->left || !isset($result->next)&&false) {
-                        $result = $tmpres;
-                    }
-                } else {
-                //TODO: error message about zero length loop
-                }
-            }
-
-            if ($result->next === 0) {
-                $next = '';
+    protected function convert_alternation($node) {
+        $newoperands = array();
+        $nullable = false;
+        foreach ($node->operands as $operand) {
+            if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                $nullable = true;
             } else {
-                $next = $result->next;
+                $newoperands[] = $operand;
             }
-            $matchresult = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->next, $result->left);
         }
-        return $matchresult;
-    }
-    */
 
-    protected function match_preprocess($str) {
-        if ($str === '' && $this->roots[0]->operands[0]->nullable) {//TODO - why operands[0] instead of root itself?
-            return new qtype_preg_matching_results(true, array(0), array(0), 0);
+        if (!$nullable) {
+            return $node;
         }
-        return false;
+
+        // Convert alternation to {0,1} quantifier.
+        $quant = new qtype_preg_node_finite_quant(0, 1);
+        if (count($newoperands) > 1) {
+            $quant->operands[0] = $node;
+        } else {
+            $quant->operands[0] = $newoperands[0];
+        }
+        return $quant;
     }
 
-    /**
-    *@return list of supported operation as array of string
-    */
-    static function list_of_supported_operations_and_operands() {
-        $result = array(
-                        'character                                  - a',
-                        'character class                            - [abc][a-c] and other formats of CC',
-                        'negative character class                   - [^abc] ...',
-                        'character class in \w\W\d\D\s\S\t format',
-                        'empty                                      - something|',
-                        'metasymbol dot                             - .',
-                        'concatenation',
-                        'alternative                                - ab|cd',
-                        'greed iteration                            - a*',
-                        'greed quantificator plus                   - a+',
-                        'greed quantificator in curly               - a{15,137}',
-                        'greed question quantificator               - a?',
-                        'true forward assert                        - (?=...)',
-                        'grouping                                   - (?:...)'
-                       );
-        return $result;
-    }
     public function print_connection($index) {
         echo "\n\n\n\n\n\n\n";
         foreach ($this->connection[$index] as $num=>$leaf) {
