@@ -114,7 +114,7 @@ class qtype_preg_regex_handler {
         for ($i = 0; $i < $modifiers->length(); $i++) {
             $mod = $modifiers[$i];
             if ($supportedmodifiers->contains($mod) === false) {
-                $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod->string());
+                $this->errors[] = new qtype_preg_modifier_error($this->name(), $mod);
             }
         }
 
