@@ -83,10 +83,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-    *returns true for supported capabilities
-    @param capability the capability in question
-    @return bool is capanility supported
-    */
+     *returns true for supported capabilities
+     *@param capability the capability in question
+     *@return bool is capanility supported
+     */
     public function is_supporting($capability) {
         switch($capability) {
         case qtype_preg_matcher::PARTIAL_MATCHING :
@@ -204,14 +204,14 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 			} elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
 			} elseif ($result->next=='wordchar') {
 				$tmpflag = new qtype_preg_charset_flag;
-				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
 				$tmp = new qtype_preg_leaf_charset;
 				$tmp->flags = array(array($tmpflag));
 				$length=1;
 				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
 			} elseif ($result->next=='notwordchar') {
 				$tmpflag = new qtype_preg_charset_flag;
-				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
 				$tmpflag->negative = true;
 				$tmp = new qtype_preg_leaf_charset;
 				$tmp->flags = array(array($tmpflag));
@@ -396,11 +396,11 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-    *Function search for shortest way from current state to end state
-    @param current - number of current state dfa
-    @param assertnum - number of dfa for which do search
-    @return number of state, which is first step on shortest way to end state and count of left character, as class
-    */
+     *Function search for shortest way from current state to end state
+     *@param current - number of current state dfa
+     *@param assertnum - number of dfa for which do search
+     *@return number of state, which is first step on shortest way to end state and count of left character, as class
+     */
     function wave($current, $assertnum) {
         //form start state of waves: start chars, current states of dfa and states of next step
         $i = 0;
@@ -1203,7 +1203,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @param pregnode qtype_preg_node child class instance
     * @return corresponding dfa_preg_node child class instance
     */
-    public function &from_preg_node($pregnode) {
+    public function from_preg_node($pregnode) {
         if (!$this->zeroquantdeleted) {
 			$res = self::delete_zero_quant($pregnode);
 			if ($res!==true && $res!==false) {
