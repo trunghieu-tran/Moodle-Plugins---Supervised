@@ -434,6 +434,7 @@ State 11:
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
+                           ALT shift  10
                       PARSLEAF shift  21
                          QUANT shift  26
                      OPENBRACK shift  8
@@ -470,6 +471,7 @@ State 12:
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
+                           ALT shift  11
                       PARSLEAF shift  21
                          QUANT shift  23
                      OPENBRACK shift  8
@@ -507,9 +509,6 @@ State 13:
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                             $ reduce 4   ** Parsing conflict **
-                    CLOSEBRACK reduce 4   ** Parsing conflict **
-                           ALT reduce 4   ** Parsing conflict **
                       PARSLEAF shift  21
                          QUANT shift  23
                      OPENBRACK shift  8
