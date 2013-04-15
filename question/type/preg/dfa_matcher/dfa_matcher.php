@@ -1235,12 +1235,26 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $pregnode = $this->convert_infinite_quant($pregnode);
                 break;
             case 'node_alt':
-                foreach ($pregnode->operands as $key => $operand) {
+                $newoperands = array();
+                $nullable = false;
+                foreach ($pregnode->operands as $operand) {
                     if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        unset($pregnode->operands[$key]);
+                        $nullable = true;
+                    } else {
+                        $newoperands[] = $operand;
                     }
                 }
-                $pregnode->operands = array_values($pregnode->operands);
+                $pregnode->operands = $newoperands;
+                if ($nullable) {
+                    // Convert alternation to {0,1} quantifier.
+                    $quant = new qtype_preg_node_finite_quant(0, 1);
+                    if (count($newoperands) > 1) {
+                        $quant->operands[0] = $pregnode;
+                    } else {
+                        $quant->operands[0] = $newoperands[0];
+                        $pregnode = $quant;
+                    }
+                }
                 break;
         }
         return parent::from_preg_node($pregnode);
