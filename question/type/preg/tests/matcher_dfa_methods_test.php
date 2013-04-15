@@ -103,8 +103,19 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $maxnum = 0;
         $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
         $this->qtype->roots[0]->operands[0]->nullable();
-        $result=$this->qtype->roots[0]->operands[0]->firstpos();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
+    }
+    function test_firstpos_nullable_alternative() {
+        $this->qtype = new qtype_preg_dfa_matcher('(?:a|)b');
+        $connection = array();
+        $maxnum = 0;
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($result) == 2);
+        $this->assertTrue($result[0] == 1);
+        $this->assertTrue($result[1] == 2);
     }
     function test_firstpos_three_leaf_alternative() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b|c');
@@ -294,7 +305,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->operands[0]->nullable();
         $this->qtype->roots[0]->operands[0]->firstpos();
         $this->qtype->roots[0]->operands[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $res1 = (count($result[1]) == 3 && $result[1][0] == 1 && $result[1][1] == 2 && $result[1][2] == 3);
         $res2 = (count($result[2]) == 3 && $result[2][0] == 1 && $result[2][1] == 2 && $result[2][2] == 3);
@@ -307,7 +318,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
         $this->assertTrue(count($result[3]) == 1 && $result[3][0] == 4);
@@ -319,7 +330,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
@@ -329,7 +340,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
@@ -401,7 +412,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
         $this->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
         $this->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
-        $result=$this->qtype->compare(new qtype_poasquestion_string('b'),0);
+        $result = $this->qtype->compare(new qtype_poasquestion_string('b'),0);
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next == 'a');
     }
