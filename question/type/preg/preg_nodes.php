@@ -1306,7 +1306,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 }
 
 /**
- * Defines concatenation, binary operator.
+ * Defines concatenation, n-ary operator.
  */
 class qtype_preg_node_concat extends qtype_preg_operator {
 
@@ -1320,7 +1320,7 @@ class qtype_preg_node_concat extends qtype_preg_operator {
 }
 
 /**
- * Defines alternative, binary operator.
+ * Defines alternative, n-ary operator.
  */
 class qtype_preg_node_alt extends qtype_preg_operator {
 
