@@ -106,7 +106,7 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     public function get_expected_data() {
-        //Note: not using PARAM_RAW_TRIMMED cause it'll interfere with next character hinting is most ungraceful way: disabling it just when you try to get a first letter of the next word
+        //Note: not using PARAM_RAW_TRIMMED because it'll interfere with next character hinting in most ungraceful way: disabling it by eating trailing spaces just when you try to get a first letter of the next word.
         return array('answer' => PARAM_RAW);
     }
 
@@ -119,11 +119,7 @@ class qtype_preg_question extends question_graded_automatically
         return $this->is_complete_response($response);
     }
 
-    /**
-    * Hint button should work right after Submit without changing response
-    * This may not be needed if the best fit answer would be saved in DB in reponses - TODO
-    */
-    public function is_same_response(array $prevresponse, array $newresponse) {//TODO - check if that now necessary, or there are new ways to deal with hint button
+    public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_have_same_keys_and_values($prevresponse, $newresponse);
     }
 
