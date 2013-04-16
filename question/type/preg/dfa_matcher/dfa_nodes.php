@@ -397,6 +397,8 @@ class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
 }
 abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
 
+    public $operands = array();    // Array of operands.
+
     public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
         foreach ($this->pregnode->operands as $operand) {
