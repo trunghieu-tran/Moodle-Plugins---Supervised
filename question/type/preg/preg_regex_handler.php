@@ -268,25 +268,25 @@ class qtype_preg_regex_handler {
      * @return corresponding xxx_preg_node child class instance
      */
     public function from_preg_node($pregnode) {
-        if (is_a($pregnode,'qtype_preg_node')) {//checking that the node isn't already converted
-            $enginenodename = $this->get_engine_node_name($pregnode->name());
-            if (class_exists($enginenodename)) {
-                $enginenode = new $enginenodename($pregnode, $this);
-                $acceptresult = $enginenode->accept();
-                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                }
-            } else {
-                $enginenode = $pregnode;
-                $acceptresult = $this->is_preg_node_acceptable($pregnode);
-                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                }
-            }
-            return $enginenode;
-        } else {
-            return $pregnode;
+        if (!is_a($pregnode,'qtype_preg_node')) {
+            return $pregnode;   // The node is already converted.
         }
+
+        $enginenodename = $this->get_engine_node_name($pregnode->name());
+        if (class_exists($enginenodename)) {
+            $enginenode = new $enginenodename($pregnode, $this);
+            $acceptresult = $enginenode->accept();
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+            }
+        } else {
+            $enginenode = $pregnode;
+            $acceptresult = $this->is_preg_node_acceptable($pregnode);
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+            }
+        }
+        return $enginenode;
     }
 
     /**
