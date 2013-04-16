@@ -363,32 +363,40 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
 
         if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_CONCAT) {
+
             $left = $this->operands[0]->create_graph($id);
-            $right = $this->operands[1]->create_graph($id);
-
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
-            qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
-
-            $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[0], $right->entries[0]);
-
             $graph->entries[] = end($left->entries);
-            $graph->exits[] = end($right->exits);
+
+            $n = count($this->operands);
+            for($i = 1; $i < $n; ++$i) {
+                $right = $this->operands[$i]->create_graph($id);
+                qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[0], $right->entries[0]);
+
+                if ($i != $n-1) {
+                    $left = $right;
+                } else {
+                    $graph->exits[] = end($right->exits);
+                }
+            }
+                  
         } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ALT) {
-            $left = $this->operands[0]->create_graph($id);
-            $right = $this->operands[1]->create_graph($id);
+            $left = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
+            $right = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
 
-            qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
-            qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
+            foreach($this->operands as $operand) {
+                $new_operand = $operand->create_graph($id);
+                qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $new_operand);
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-            $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $right->entries[count($right->entries) - 1]);
-            $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $left->entries[count($left->entries) - 1]);
-            $graph->entries[] = end($graph->nodes);
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left, $new_operand->entries[count($new_operand->entries)-1]);
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $new_operand->exits[count($new_operand->exits)-1], $right);
+            }
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-            $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
-            $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
-            $graph->exits[] = end($graph->nodes);
+            $graph->nodes[] = $left;
+            $graph->entries[] = $left;
+            $graph->nodes[] = $right;
+            $graph->exits[] = $right;
         } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $this->pregnode->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
             $operand = $this->operands[0]->create_graph($id);
 
