@@ -113,18 +113,18 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
-        $root = new qtype_preg_node_concat;
-        $root = $this->from_preg_node($root);
-        $root->pregnode->operands[0] = $this->roots[0];
-        $root->pregnode->operands[1] = new qtype_preg_leaf_meta;
-        $root->pregnode->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
-        $root->pregnode->operands[1] = $this->from_preg_node($root->pregnode->operands[1]);
+        $endreg = new qtype_preg_leaf_meta;
+        $endreg->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
+
+        $root = $this->from_preg_node(new qtype_preg_node_concat);
+        $root->operands[0] = $this->roots[0];
+        $root->operands[1] = $this->from_preg_node($endreg);
         $this->roots[0] = $root;
         /*
         $lastindex = count($this->roots[0]);
-        $this->roots[0]->pregnode->operands[$lastindex] = new qtype_preg_leaf_meta;
-        $this->roots[0]->pregnode->operands[$lastindex]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
-        $this->roots[0]->pregnode->operands[$lastindex] = $this->from_preg_node($this->roots[0]->pregnode->operands[$lastindex]);
+        $this->roots[0]->operands[$lastindex] = new qtype_preg_leaf_meta;
+        $this->roots[0]->operands[$lastindex]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
+        $this->roots[0]->operands[$lastindex] = $this->from_preg_node($this->roots[0]->operands[$lastindex]);
         */
     }
 
@@ -136,7 +136,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if ($index==0) {
             $root = $this->roots[0];
         } else {
-            $root = $this->roots[$index]->pregnode->operands[0];
+            $root = $this->roots[$index]->operands[0];
         }
         $statecount = 0;
         $passcount = 0;
@@ -691,7 +691,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         foreach ($this->roots as $key => $value) {
             if ($key!=0) {
                 //TODO: use subtype of assert, when few subtype will be supported.
-                $this->roots[$key] = $this->roots[$key]->pregnode->operands[0];
+                $this->roots[$key] = $this->roots[$key]->operands[0];
                 $this->append_end($key);
                 $this->roots[$key]->number($this->connection[$key], $this->maxnum);
                 $this->roots[$key]->nullable();
@@ -1212,37 +1212,36 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return corresponding dfa_preg_node child class instance
     */
     public function from_preg_node($pregnode) {
+        if (!is_a($pregnode,'qtype_preg_node')) {
+            return $pregnode;   // The node is already converted.
+        }
+
         if (!$this->zeroquantdeleted) {
 			$res = self::delete_zero_quant($pregnode);
-			if ($res!==true && $res!==false) {
+			if ($res != true && $res != false) {
 				$pregnode = $res;
 			}
-			$this->zeroquantdeleted=true;
+			$this->zeroquantdeleted = true;
 		}
+
 		$name = $pregnode->name();
         switch ($name) {
+            case 'node_subexpr':
+                return $this->from_preg_node($pregnode->operands[0]);
             case 'node_finite_quant':
                 $pregnode = $this->convert_finite_quant($pregnode);
                 break;
             case 'node_infinite_quant':
                 $pregnode = $this->convert_infinite_quant($pregnode);
                 break;
-            //TODO write dfa_preg_node_subexpr to process situations like subexpression inside of subexpression
-            case 'node_subexpr':
-                $pregnode = $pregnode->operands[0];
-                return $this->from_preg_node($pregnode);
-                break;
             case 'node_alt':
-                $flag = false;
-                foreach ($pregnode->operands as $key=>$operand) {
+                foreach ($pregnode->operands as $key => $operand) {
                     if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         unset($pregnode->operands[$key]);
-                        $flag = true;
                     }
                 }
-                if ($flag) {
-                    $pregnode->operands = array_values($pregnode->operands);
-                }
+                $pregnode->operands = array_values($pregnode->operands);
+                break;
         }
         return parent::from_preg_node($pregnode);
     }
@@ -1324,23 +1323,25 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     */
     protected function convert_finite_quant($node) {
 		if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
-			return $node;//TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
+			return $node;    //TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
 		}
-        if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
-            $res = new qtype_preg_node_concat;
-            for ($i=0; $i<$node->rightborder; ++$i) {
-                if ($i>=$node->leftborder) {
-                    $res->operands[$i] = new qtype_preg_node_finite_quant;
-                    $res->operands[$i]->leftborder = 0;
-                    $res->operands[$i]->rightborder = 1;
-                    $res->operands[$i]->operands[0] = $node->operands[0];
-                } else {
-                    $res->operands[$i] = clone $node->operands[0];
-                }
-            }
-            return $res;
+
+        if ($node->leftborder <= 1 && $node->rightborder <= 1) {
+            return $node;
         }
-        return $node;
+
+        $res = new qtype_preg_node_concat;
+        for ($i = 0; $i < $node->rightborder; $i++) {
+            if ($i >= $node->leftborder) {
+                $tmp = new qtype_preg_node_finite_quant(0, 1);
+                $tmp->operands[0] = $node->operands[0];
+
+                $res->operands[$i] = $tmp;
+            } else {
+                $res->operands[$i] = clone $node->operands[0];
+            }
+        }
+        return $res;
     }
 
     /**
@@ -1398,7 +1399,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     */
 
     protected function match_preprocess($str) {
-        if ($str === '' && $this->roots[0]->pregnode->operands[0]->nullable) {//TODO - why operands[0] instead of root itself?
+        if ($str === '' && $this->roots[0]->operands[0]->nullable) {//TODO - why operands[0] instead of root itself?
             return new qtype_preg_matching_results(true, array(0), array(0), 0);
         }
         return false;
