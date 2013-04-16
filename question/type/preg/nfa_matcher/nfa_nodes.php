@@ -275,7 +275,7 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
     public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
         foreach ($this->pregnode->operands as $operand) {
-            array_push($this->operands, $matcher->from_preg_node($operand));
+            $this->operands[] = $matcher->from_preg_node($operand);
         }
     }
 
@@ -341,12 +341,11 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 
     public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operands create their automatons.
-        foreach ($this->operands as $operand) {
+        foreach (array_reverse($this->operands) as $operand) {
             $operand->create_automaton($matcher, $automaton, $stack);
         }
 
         $count = count($this->operands);
-        self::reverse_stack_items($stack, $count);  // TODO: remove it later.
 
         // Take automatons and alternate them.
         $second = array_pop($stack);
