@@ -72,7 +72,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     protected $map;//map of symbol's following
     protected $maxstatecount;
     protected $maxpasscount;
-	protected $zeroquantdeleted;
+    protected $zeroquantdeleted;
 
     public function name() {
         return 'dfa_matcher';
@@ -114,11 +114,18 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     */
     function append_end($index) {
         $root = new qtype_preg_node_concat;
-        $root->operands[1] = new qtype_preg_leaf_meta;
-        $root->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
         $root = $this->from_preg_node($root);
         $root->pregnode->operands[0] = $this->roots[0];
+        $root->pregnode->operands[1] = new qtype_preg_leaf_meta;
+        $root->pregnode->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
+        $root->pregnode->operands[1] = $this->from_preg_node($root->pregnode->operands[1]);
         $this->roots[0] = $root;
+        /*
+        $lastindex = count($this->roots[0]);
+        $this->roots[0]->pregnode->operands[$lastindex] = new qtype_preg_leaf_meta;
+        $this->roots[0]->pregnode->operands[$lastindex]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
+        $this->roots[0]->pregnode->operands[$lastindex] = $this->from_preg_node($this->roots[0]->pregnode->operands[$lastindex]);
+        */
     }
 
     /**
@@ -250,6 +257,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
  *   If matching is impossible, return bool(false)
     */
     function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
+
         $index = 0;//char index in string, comparing begin of first char in string
         $length = 0;//count of character matched with current leaf
         $end = false;//current state is end state, not yet
@@ -1225,18 +1233,15 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 return $this->from_preg_node($pregnode);
                 break;
             case 'node_alt':
-                if ($pregnode->operands[1]->type == qtype_preg_node::TYPE_LEAF_META && $pregnode->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                    $tmp = $pregnode->operands[0];
-                    $pregnode = new qtype_preg_node_finite_quant;
-                    $pregnode->leftborder = 0;
-                    $pregnode->rightborder = 1;
-                    $pregnode->operands[0] = $tmp;
-                } else if ($pregnode->operands[0]->type == qtype_preg_node::TYPE_LEAF_META && $pregnode->operands[0]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                    $tmp = $pregnode->operands[1];
-                    $pregnode = new qtype_preg_node_finite_quant;
-                    $pregnode->leftborder = 0;
-                    $pregnode->rightborder = 1;
-                    $pregnode->operands[0] = $tmp;
+                $flag = false;
+                foreach ($pregnode->operands as $key=>$operand) {
+                    if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                        unset($pregnode->operands[$key]);
+                        $flag = true;
+                    }
+                }
+                if ($flag) {
+                    $pregnode->operands = array_values($pregnode->operands);
                 }
         }
         return parent::from_preg_node($pregnode);
@@ -1317,44 +1322,23 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @param node node with {}
     * @return node subtree with ?
     */
-    protected function &convert_finite_quant($node) {
+    protected function convert_finite_quant($node) {
 		if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
 			return $node;//TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
 		}
         if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
-            $tmp = $node->operands[0];
-            $subroot = new qtype_preg_node_concat;
-            $subroot->operands[0] = clone $tmp;
-            $subroot->operands[1] = clone $tmp;
-            $count = $node->leftborder;
-            for ($i=2; $i<$count; $i++) {
-                $newsubroot = new qtype_preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] = clone $tmp;
-                $subroot = $newsubroot;
+            $res = new qtype_preg_node_concat;
+            for ($i=0; $i<$node->rightborder; ++$i) {
+                if ($i>=$node->leftborder) {
+                    $res->operands[$i] = new qtype_preg_node_finite_quant;
+                    $res->operands[$i]->leftborder = 0;
+                    $res->operands[$i]->rightborder = 1;
+                    $res->operands[$i]->operands[0] = $node->operands[0];
+                } else {
+                    $res->operands[$i] = clone $node->operands[0];
+                }
             }
-            $tmp = new qtype_preg_node_finite_quant;
-            $tmp->leftborder = 0;
-            $tmp->rightborder = 1;
-            $tmp->greed = $node->greed;
-            $tmp->operands[0] = $node->operands[0];
-            if ($node->leftborder == 0) {
-                $subroot->operands[0] = clone $tmp;
-                $subroot->operands[1] = clone $tmp;
-                $count = $node->rightborder - 2;
-            } else if ($node->leftborder == 1) {
-                $subroot->operands[1] = clone $tmp;
-                $count = $node->rightborder - 2;
-            } else {
-                $count = $node->rightborder - $node->leftborder;
-            }
-            for ($i=0; $i<$count; $i++) {
-                $newsubroot = new qtype_preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] = clone $tmp;
-                $subroot = $newsubroot;
-            }
-            return $subroot;
+            return $res;
         }
         return $node;
     }
@@ -1364,34 +1348,18 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @param node node with {}
     * @return node subtree with ? *
     */
-    protected function &convert_infinite_quant($node) {
+    protected function convert_infinite_quant($node) {
         if ($node->leftborder == 0) {
             return $node;
-        } else if ($node->leftborder == 1) {
-            $tmp = $node->operands[0];
-            $subroot = new qtype_preg_node_concat;
-            $subroot->operands[0] = clone $tmp;
-            $subroot->operands[1] = clone $node;
-            $subroot->operands[1]->leftborder = 0;
         } else {
-            $tmp = $node->operands[0];
-            $subroot = new qtype_preg_node_concat;
-            $subroot->operands[0] = clone $tmp;;
-            $subroot->operands[1] = clone $tmp;
-            $count = $node->leftborder;
-            for ($i=2; $i<$count; $i++) {
-                $newsubroot = new qtype_preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] = clone $tmp;
-                $subroot = $newsubroot;
+            $res = new qtype_preg_node_concat;
+            for ($i=0; $i<$node->leftborder; ++$i) {
+                $res->operands[$i] = clone $node->operands[0];
             }
-            $newsubroot = new qtype_preg_node_concat;
-            $newsubroot->operands[0] = clone $subroot;
-            $newsubroot->operands[1] = clone $node;
-            $newsubroot->operands[1]->leftborder = 0;
-            $subroot = $newsubroot;
+            $res->operands[$node->leftborder] = clone $node;
+            $res->operands[$node->leftborder]->leftborder = 0;
+            return $res;
         }
-        return $subroot;
     }
 
     /**
@@ -1459,11 +1427,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return $result;
     }
     public function print_connection($index) {
+        echo "\n\n\n\n\n\n\n";
         foreach ($this->connection[$index] as $num=>$leaf) {
-            echo 'number: ', $num, '</br>';
+            echo 'number: ', $num, "\n";
             $leaf->print_self(0);
-            echo '</br>';
+            echo "\n";
         }
+        echo "\n\n\n\n\n\n\n";
     }
     /**
     * Debug function draw finite automate with number number in human readable form

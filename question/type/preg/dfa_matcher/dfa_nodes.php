@@ -214,12 +214,12 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
     }
     public function print_self($indent) {
         $this->print_indent($indent);
-        echo 'number: ', $this->number, '<br/>';
+        echo 'number: ', $this->number, "\n";
         $this->print_indent($indent);
         if ($this->nullable) {
-            echo 'nullable: true<br>';
+            echo "nullable: true\n";
         } else {
-            echo 'nullable: false<br>';
+            echo "nullable: false\n";
         }
         $this->print_indent($indent);
         if (is_array($this->firstpos)) {
@@ -228,7 +228,7 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
             foreach ($this->firstpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
         if (is_array($this->lastpos)) {
             $this->print_indent($indent);
@@ -236,7 +236,7 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
             foreach ($this->lastpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
     }
     public function generate_dot_code(&$dotcode, &$maxnum) {
@@ -256,7 +256,7 @@ class qtype_preg_dfa_leaf_charset extends qtype_preg_dfa_leaf {
         }
         echo '<br/>';
         $this->print_indent($indent);
-        echo 'charset: ', $this->pregnode->charset, '<br/>';
+        echo 'charset: '.$this->pregnode->tohr()."\n";
         parent::print_self($indent);
     }
     public function write_self_to_dotcode() {
@@ -292,15 +292,15 @@ class qtype_preg_dfa_leaf_meta extends qtype_preg_dfa_leaf {
         }
         echo '<br/>';
         switch ($this->pregnode->subtype) {
-            case qtype_preg_leaf_meta::SUBTYPE_DOT:
+            /*case qtype_preg_leaf_meta::SUBTYPE_DOT:
                 $subtype = 'dot';
-                break;
-            case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
+                break;*/
+            /*case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
                 $subtype = 'unicode property';
                 break;
             case qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR:
                 $subtype = 'word char';
-                break;
+                break;*/
             case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
                 $subtype = 'empty';
                 break;
@@ -426,18 +426,18 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
     public function print_tree($indent) {
         parent::print_tree($indent);
         foreach ($this->pregnode->operands as $operand) {
-            echo '<br/>';
+            echo "\n";
             $this->print_indent($indent+1);
-            echo 'OPERAND:<br/>';
+            echo "OPERAND:\n";
             $operand->print_tree($indent+1);
         }
     }
     public function print_self($indent) {
         $this->print_indent($indent);
         if ($this->nullable) {
-            echo 'nullable: true<br>';
+            echo "nullable: true\n";
         } else {
-            echo 'nullable: false<br>';
+            echo "nullable: false\n";
         }
         if (is_array($this->firstpos)) {
             $this->print_indent($indent);
@@ -445,7 +445,7 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
             foreach ($this->firstpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
         if (is_array($this->lastpos)) {
             $this->print_indent($indent);
@@ -453,7 +453,7 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
             foreach ($this->lastpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
     }
     public function generate_dot_code(&$dotcode, &$maxnum) {
@@ -470,35 +470,56 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
 class qtype_preg_dfa_node_concat extends qtype_preg_dfa_operator {
 
     public function nullable() {
-        $secnull = $this->pregnode->operands[1]->nullable();
-        $this->nullable = $this->pregnode->operands[0]->nullable() && $secnull;
+        $this->nullable = true;
+        foreach ($this->pregnode->operands as $operand) {
+            if (!$operand->nullable()) {
+                $this->nullable = false;
+            }
+        }
         return $this->nullable;
     }
     public function firstpos() {
-        if ($this->pregnode->operands[0]->nullable) {
-            $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
-        } else {
-            $this->firstpos = $this->pregnode->operands[0]->firstpos();
-            $this->pregnode->operands[1]->firstpos();
+        $this->firstpos = array();
+        $flag = true;
+        foreach ($this->pregnode->operands as $operand) {
+            if ($flag) {
+                $this->firstpos = array_merge($this->firstpos, $operand->firstpos());
+                if (!$operand->nullable()) {
+                    $flag = false;
+                }
+            } else {
+                $operand->firstpos();
+            }
         }
         return $this->firstpos;
     }
     public function lastpos() {
-        if ($this->pregnode->operands[1]->nullable) {
-            $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
-        } else {
-            $this->lastpos = $this->pregnode->operands[1]->lastpos();
-            $this->pregnode->operands[0]->lastpos();
+        $this->lastpos = array();
+        $flag = true;
+        foreach (array_reverse($this->pregnode->operands) as $operand) {
+            if ($flag) {
+                $this->lastpos = array_merge($this->lastpos, $operand->lastpos());
+                if (!$operand->nullable()) {
+                    $flag = false;
+                }
+            } else {
+                $operand->lastpos();
+            }
         }
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         parent::followpos($fpmap);
-        foreach ($this->pregnode->operands[0]->lastpos as $key) {
-            qtype_preg_dfa_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
+        for ($i = 0; $i<count($this->pregnode->operands)-1/*No exist next for last*/; ++$i) {
+            $j=$i+1;
+            do {
+                foreach ($this->pregnode->operands[$i]->lastpos as $key) {
+                    qtype_preg_dfa_node::push_unique($fpmap[$key], $this->pregnode->operands[$j]->firstpos);
+                }
+                ++$j;
+            } while ($j<count($this->pregnode->operands) && $this->pregnode->operands[$j]->nullable());
         }
     }
-
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node concatenation<br/>';
@@ -513,19 +534,28 @@ class qtype_preg_dfa_node_concat extends qtype_preg_dfa_operator {
 class qtype_preg_dfa_node_alt extends qtype_preg_dfa_operator {
 
     public function nullable() {
-        $firnull = $this->pregnode->operands[0]->nullable();
-        $this->nullable = $firnull || $this->pregnode->operands[1]->nullable();
+        $this->nullable = false;
+        foreach ($this->pregnode->operands as $operand) {
+            if ($operand->nullable()) {
+                $this->nullable = true;
+            }
+        }
         return $this->nullable;
     }
     public function firstpos() {
-        $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
+        $this->firstpos = array();
+        foreach ($this->pregnode->operands as $operand) {
+            $this->firstpos = array_merge($this->firstpos, $operand->firstpos());
+        }
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
+        $this->lastpos = array();
+        foreach ($this->pregnode->operands as $operand) {
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos());
+        }
         return $this->lastpos;
     }
-
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node alternative<br/>';
