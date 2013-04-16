@@ -351,8 +351,13 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
     public function __construct($node, &$handler) {
         parent::__construct($node, $handler);
+
         foreach ($this->pregnode->operands as $operand) {
             array_push($this->operands, $handler->from_preg_node($operand));
+        }
+
+        if (isset($this->pregnode->condbranch)) {
+            array_push($this->operands, $handler->from_preg_node($this->pregnode->condbranch));
         }
     }
 
@@ -455,7 +460,8 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 $isAssert = TRUE; $index = 1;
                 if (count($this->operands) == 3) {$index = 2;}
                 $tmp = $this->operands[$index]->create_graph($id);
-                qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[0], $tmp);
+                //print_r($tmp);
+                qtype_preg_author_tool_explain_graph::assume_subgraph($cond_subexpr->subgraphs[0], $tmp->subgraphs[0]);
             }
 
             $cond_subexpr->subgraphs[0]->entries[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
