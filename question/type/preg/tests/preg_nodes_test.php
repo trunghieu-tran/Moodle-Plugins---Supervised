@@ -171,10 +171,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($handler->is_regex_anchored());
         $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|');        // (|c) breaks anchoring
-        $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) breaks anchoring
-        $this->assertFalse($handler->is_regex_anchored());
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)||||');     // Emptiness makes anchoring
+        $this->assertTrue($handler->is_regex_anchored());
+        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) makes anchoring
+        $this->assertTrue($handler->is_regex_anchored());
     }
 
     function test_syntax_errors() {
