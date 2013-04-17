@@ -18,7 +18,7 @@ class qtype_preg_author_tool_tree extends qtype_preg_author_tool {
 
     /**
      * Generate image and map for interative tree
-     * 
+     *
      * @param array $json_array contains link on image and text map of interactive tree
      */
     public function generate_json(&$json_array, $regextext, $id) {
@@ -42,7 +42,7 @@ class qtype_preg_author_tool_tree extends qtype_preg_author_tool {
 
             $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
             $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
-                
+
         } else {
             $dotscript = 'digraph {
                         "Ooops! I can\'t build interactive tree!" [color=white];

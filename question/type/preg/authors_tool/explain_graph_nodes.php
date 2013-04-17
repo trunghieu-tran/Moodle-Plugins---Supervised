@@ -385,7 +385,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                     $graph->exits[] = end($right->exits);
                 }
             }
-                  
+
         } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $left = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
             $right = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
