@@ -105,7 +105,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         case qtype_preg_node::TYPE_NODE_ERROR:
             return true;
         }
-        return get_string($pregnode->name(), 'qtype_preg');
+        return get_string($pregnode->type, 'qtype_preg');
     }
 
     /**
@@ -1224,7 +1224,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             $this->zeroquantdeleted = true;
         }
 
-        $name = $pregnode->name();
+        $name = $pregnode->type;
         switch ($name) {
             case 'node_subexpr':
                 return $this->from_preg_node($pregnode->operands[0]);
@@ -1247,7 +1247,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
      * return true if subtree full deleted or new subroot if changed, false otherwise
      */
     protected function delete_zero_quant($node) {
-        $name = $node->name();
+        $name = $node->type;
         switch ($name) {
             case 'node_finite_quant':
                 $res=self::delete_zero_quant($node->operands[0]);

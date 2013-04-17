@@ -188,18 +188,10 @@ abstract class qtype_preg_node {
     }
 
     /**
-     * Return class name without 'qtype_preg_' prefix. Interface string for the node name should be exactly
-     * the same (and start from an upper-case character) if class not overloading ui_nodename method.
-     */
-    public function name() {
-        return $this->type;
-    }
-
-    /**
      * May be overloaded by childs to change name using data from $this->pregnode.
      */
     public function ui_nodename() {
-        return get_string($this->name(), 'qtype_preg');
+        return get_string($this->type, 'qtype_preg');
     }
 }
 

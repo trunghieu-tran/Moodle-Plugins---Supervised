@@ -20,13 +20,13 @@ class qtype_preg_author_tool_explain_graph_node {
     public $id      = -1;         // id of node
     public $fill    = '';         // filling of node on image
     public $invert  = FALSE;      // flag of inversion of node
-    
+
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
      * @param type - boolean parameter; true - node is destination, false - node is source.
      */
     public function links_count($type) {
-    
+
         $cx = 0; // links counter
         foreach ($this->owner->links as $link) {
             if ($type) {
@@ -40,12 +40,12 @@ class qtype_preg_author_tool_explain_graph_node {
 
         return $cx;
     }
-    
+
     /**
      * Returns array of links in which node is as any instance.
      */
     public function links() {
-    
+
         $result = array();
         foreach ($this->owner->links as $link) {
             if ($link->destination == $this || $link->source == $this)
@@ -54,7 +54,7 @@ class qtype_preg_author_tool_explain_graph_node {
 
         return $result;
     }
-    
+
     public function __construct($lbl, $shp, $clr, &$ownr, $id, $fll = '') {
         $this->label = $lbl;
         $this->shape = $shp;
@@ -63,7 +63,7 @@ class qtype_preg_author_tool_explain_graph_node {
         $this->owner = $ownr;
         $this->id = $id;
     }
-    
+
 }
 
 /**
@@ -75,14 +75,14 @@ class qtype_preg_author_tool_explain_graph_link {
     public $destination = null; // destination of link
     public $label = '';         // label of link on image
     public $style = '';       // visual style of link (for image)
-    
+
     public function __construct($lbl, &$src, &$dst, $stl = 'normal') {
         $this->label = $lbl;
         $this->source = $src;
         $this->destination = $dst;
         $this->style = $stl;
     }
-    
+
 }
 
 /**
@@ -98,13 +98,13 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public $entries     = array();      // array if nodes "entries"
     public $exits       = array();      // array of nodes "exits"
     public $id          = -1;
-    
+
     public function __construct($lbl, $stl, $id = -1) {
         $this->label   = $lbl;
         $this->style   = $stl;
         $this->id      = $id;
     }
-    
+
     /**
      * Creates text with dot instructions.
      */
@@ -131,10 +131,10 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         }
 
         $instr .= '}';
-        
+
         return $instr;
     }
-    
+
     /**
      * Creates html of character class for dot instructions
      * @param lbl - label of node in graph
@@ -169,7 +169,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
                 else
                     $result .= '<TD>' . str_replace('"', '&#34;', $elements[$i]) . '</TD>';
             }
-            
+
             $result .= '</TR></TABLE>>';
         }
 
@@ -181,7 +181,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
 
         return $result;
     }
-    
+
     /**
      * Creates dot instructions for subgraph
      * @param gr - subgraph
@@ -200,7 +200,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             }
         }
 
-        foreach ($gr->subgraphs as $iter) 
+        foreach ($gr->subgraphs as $iter)
             qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr);
 
         foreach ($gr->links as $iter) {
