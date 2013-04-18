@@ -168,10 +168,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
-    public function to_matching_results($max_subpattern, $subexpr_map) {
+    public function to_matching_results($max_subexpr, $subexpr_map) {
         $index = array();
         $length = array();
-        for ($subexpr = 0; $subexpr <= $this->automaton->max_subexpr(); $subexpr++) {
+        for ($subexpr = 0; $subexpr <= $max_subexpr; $subexpr++) {
             if (!array_key_exists($subexpr, $this->subexpr_to_subpatt)) {
                 // Can get here when {0} occurs in the regex.
                 $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
@@ -191,7 +191,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         $index[0] = $this->startpos;
         $length[0] = $this->length;
         $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
-        $result->set_source_info($this->str, $max_subpattern, $subexpr_map);
+        $result->set_source_info($this->str, $max_subexpr, $subexpr_map);
         return $result;
     }
 
