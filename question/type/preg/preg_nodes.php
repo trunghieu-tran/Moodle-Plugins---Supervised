@@ -1236,9 +1236,15 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         foreach ($this->operands as $operand) {
             $operand->calculate_nflf($followpos);
         }
-        $this->nullable = false;
-        $this->firstpos = array();
-        $this->lastpos = array();
+        if (count($this->operands) > 0) {
+            $this->nullable = $this->operands[0]->nullable;
+            $this->firstpos = $this->operands[0]->firstpos;
+            $this->lastpos = $this->operands[0]->lastpos;
+        } else {
+            $this->nullable =  false;
+            $this->firstpos = array();
+            $this->lastpos = array();
+        }
     }
 
     public function dot_script($styleprovider, $isroot = true) {
@@ -1301,9 +1307,7 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
 
     public function calculate_nflf(&$followpos) {
         parent::calculate_nflf($followpos);
-        $this->nullable = $this->leftborder == 0 || $this->operands[0]->nullable;
-        $this->firstpos = $this->operands[0]->firstpos;
-        $this->lastpos = $this->operands[0]->lastpos;
+        $this->nullable = $this->nullable || $this->leftborder == 0;
         // TODO - followpos for situations like {2,10}
     }
 
@@ -1338,9 +1342,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 
     public function calculate_nflf(&$followpos) {
         parent::calculate_nflf($followpos);
-        $this->nullable = $this->leftborder == 0 || $this->operands[0]->nullable;
-        $this->firstpos = $this->operands[0]->firstpos;
-        $this->lastpos = $this->operands[0]->lastpos;
+        $this->nullable = $this->nullable || $this->leftborder == 0;
         foreach ($this->lastpos as $lastpos) {
             if (!array_key_exists($lastpos, $followpos)) {
                 $followpos[$lastpos] = array();
@@ -1475,6 +1477,7 @@ class qtype_preg_node_assert extends qtype_preg_operator {
     }
 
     public function calculate_nflf(&$followpos) {
+        //parent::calculate_nflf($followpos);
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
@@ -1507,13 +1510,6 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
 
     public function is_subpattern() {
         return true;    // Subexpression is a subpattern.
-    }
-
-    public function calculate_nflf(&$followpos) {
-        parent::calculate_nflf($followpos);
-        $this->nullable = $this->operands[0]->nullable;
-        $this->firstpos = $this->operands[0]->firstpos;
-        $this->lastpos = $this->operands[0]->lastpos;
     }
 
     //TODO - ui_nodename()
