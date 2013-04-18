@@ -178,19 +178,75 @@
         return $result;
     }
 
-    protected function assign_ids_and_subpatts($node) {
-        $node->id = ++$this->id_counter;
+    protected function assign_subpatts($node) {
         if ($node->is_subpattern() || $node === $this->root) {
             $node->subpattern = $this->subpatt_counter++;
         }
         if (is_a($node, 'qtype_preg_operator')) {
             if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
-                $this->assign_ids_and_subpatts($node->condbranch);
+                $this->assign_subpatts($node->condbranch);
             }
             foreach ($node->operands as $operand) {
-                $this->assign_ids_and_subpatts($operand);
+                $this->assign_subpatts($operand);
             }
         }
+    }
+
+    protected function assign_ids($node) {
+        $node->id = ++$this->id_counter;
+        if (is_a($node, 'qtype_preg_operator')) {
+            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
+                $this->assign_ids($node->condbranch);
+            }
+            foreach ($node->operands as $operand) {
+                $this->assign_ids($operand);
+            }
+        }
+    }
+
+    protected static function expand_quantifiers($node) {
+        if (is_a($node, 'qtype_preg_operator')) {
+            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
+                $node->condbranch = self::expand_quantifiers($node->condbranch);
+            }
+            foreach ($node->operands as $key => $operand) {
+                $node->operands[$key] = self::expand_quantifiers($operand);
+            }
+        }
+        if ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
+            if ($node->leftborder == 0 && $node->rightborder == 0) {
+                // Convert x{0} to emptiness.
+                $node = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            } else if ($node->rightborder > 1) {
+                // Expand finite quantifier to a sequence like xxxxx?x?x?x?
+                $concat = new qtype_preg_node_concat();
+                for ($i = 0; $i < $node->rightborder; $i++) {
+                    $operand = clone $node->operands[0];
+                    if ($i >= $node->leftborder) {
+                        $qu = new qtype_preg_node_finite_quant(0, 1);
+                        $qu->operands[] = $operand;
+                        $operand = $qu;
+                    }
+                    $concat->operands[] = $operand;
+                }
+                $node = $concat;
+            }
+        }
+        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder > 1) {
+            // Expand finite quantifier to a sequence like xxxx+
+            $concat = new qtype_preg_node_concat();
+            for ($i = 0; $i < $node->leftborder; $i++) {
+                $operand = clone $node->operands[0];
+                if ($i == $node->leftborder - 1) {
+                    $plus = new qtype_preg_node_infinite_quant(1);
+                    $plus->operands[] = $operand;
+                    $operand = $plus;
+                }
+                $concat->operands[] = $operand;
+            }
+            $node = $concat;
+        }
+        return $node;
     }
 
     protected static function is_alt_nullable($altnode) {
@@ -222,8 +278,16 @@ start ::= lastexpr(B). {
     // Set the root node.
     $this->root = B;
 
-    // Numerate all nodes.
-    $this->assign_ids_and_subpatts($this->root);
+    // Assign subpattern numbers.
+    $this->assign_subpatts($this->root);
+
+    // Expand quantifiers if needed.
+    if ($this->handlingoptions->expandquantifiers) {
+        $this->root = self::expand_quantifiers($this->root);
+    }
+
+    // Assign identifiers.
+    $this->assign_ids($this->root);
 
     // Calculate nullable, firstpos, lastpos and followpos for all nodes.
     $this->root->calculate_nflf($this->followpos);

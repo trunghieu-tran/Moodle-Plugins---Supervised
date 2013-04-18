@@ -46,6 +46,8 @@ class qtype_preg_handling_options {
     public $pcrestrict = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
+    /** @var boolean Should parser expand nodes x{m,n} to sequences like xxxx?x?x?x?. */
+    public $expandquantifiers = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
 }
