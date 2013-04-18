@@ -142,7 +142,7 @@ M.preg_authors_tool_script = {
         var oldhighlighted = this.Y.one('.'+highlightedclass);
 
         if(oldhighlighted!=null){
-           oldhighlighted.removeClass(highlightedclass).setStyle('background-color','transparent');
+           oldhighlighted.removeClass(highlightedclass).setStyle('background','transparent');
         }
         var targetspan = this.Y.one('.description_node_'+id);
         targetspan.addClass(highlightedclass);

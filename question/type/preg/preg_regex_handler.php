@@ -268,25 +268,25 @@ class qtype_preg_regex_handler {
      * @return corresponding xxx_preg_node child class instance
      */
     public function from_preg_node($pregnode) {
-        if (is_a($pregnode,'qtype_preg_node')) {//checking that the node isn't already converted
-            $enginenodename = $this->get_engine_node_name($pregnode->name());
-            if (class_exists($enginenodename)) {
-                $enginenode = new $enginenodename($pregnode, $this);
-                $acceptresult = $enginenode->accept();
-                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                }
-            } else {
-                $enginenode = $pregnode;
-                $acceptresult = $this->is_preg_node_acceptable($pregnode);
-                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                }
-            }
-            return $enginenode;
-        } else {
-            return $pregnode;
+        if (!is_a($pregnode,'qtype_preg_node')) {
+            return $pregnode;   // The node is already converted.
         }
+
+        $enginenodename = $this->get_engine_node_name($pregnode->type);
+        if (class_exists($enginenodename)) {
+            $enginenode = new $enginenodename($pregnode, $this);
+            $acceptresult = $enginenode->accept();
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+            }
+        } else {
+            $enginenode = $pregnode;
+            $acceptresult = $this->is_preg_node_acceptable($pregnode);
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+            }
+        }
+        return $enginenode;
     }
 
     /**
@@ -347,8 +347,8 @@ class qtype_preg_regex_handler {
      * Returns the engine-specific node name for the given preg_node name.
      * Overload in case of sophisticated node name schemes.
      */
-    protected function get_engine_node_name($pregname) {
-        return 'qtype_preg_' . $this->node_infix() . '_' . $pregname;
+    protected function get_engine_node_name($nodetype) {
+        return 'qtype_preg_' . $this->node_infix() . '_' . $nodetype;
     }
 
     protected function accept_regex() {
@@ -380,20 +380,26 @@ class qtype_preg_regex_handler {
         if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
             // Expression starts from .*
             $operand = $node->operands[0];
-            return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
+            return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
             // Check the first operand for concatenation and subexpressions.
-            return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
-            // Every branch of alternative is anchored.
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
+            // Every branch of alternation is anchored.
             $cf = true;
             $empty = false;
             foreach ($node->operands as $operand) {
-                $empty = $empty || isset($operand->subtype) && $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
                 $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
             }
             $empty = $empty && !$wasconcat;

@@ -31,246 +31,281 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     //Unit test for nullable function
     function test_nullable_leaf() {
         $this->qtype = new qtype_preg_dfa_matcher('a');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_leaf_iteration_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a*');
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertTrue($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_leaf_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('ab');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_leaf_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_node_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a*bc');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_node_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a*|bc');
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertTrue($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_third_level_node() {
         $this->qtype = new qtype_preg_dfa_matcher('(?:(?:a|b)|c*)|d*');
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertTrue($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_question_quantificator() {
         $this->qtype = new qtype_preg_dfa_matcher('a?');
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertTrue($this->qtype->roots[0]->operands[0]->nullable());
     }
     function test_nullable_negative_character_class() {
         $this->qtype = new qtype_preg_dfa_matcher('[^a]');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->nullable());
     }
     /*function test_nullable_assert() {
         $this->qtype = new qtype_preg_dfa_matcher('a(?=.*b)[xcvbnm]*');
-        $this->assertFalse($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->nullable());
+        $this->assertFalse($this->qtype->roots[0]->operands[0]->operands[0]->operands[1]->nullable());
     }*/
     //Unit test for firstpos function
     function test_firstpos_leaf() {
         $this->qtype = new qtype_preg_dfa_matcher('a');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_leaf_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('ab');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable;
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable;
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($result) == 1 && $result[0] == 1);
+    }
+    function test_firstpos_leaf_concatenation_node_with_end() {
+        $this->qtype = new qtype_preg_dfa_matcher('ab');
+        $connection = array();
+        $maxnum = 0;
+        $this->qtype->roots[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->nullable;
+        $result = $this->qtype->roots[0]->firstpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_leaf_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result=$this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
-    function test_firstpos_three_leaf_alternative() {//TODO:fix it!!!
+    function test_firstpos_nullable_alternative() {
+        $this->qtype = new qtype_preg_dfa_matcher('(?:a|)b');
+        $connection = array();
+        $maxnum = 0;
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($result) == 2);
+        $this->assertTrue($result[0] == 1);
+        $this->assertTrue($result[1] == 2);
+    }
+    function test_firstpos_three_leaf_alternative() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b|c');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_firstpos_leaf_iteration_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_node_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('c*(?:a|b)');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
-        $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($result) == 3);
+        $this->assertTrue($result[0] == 1);
+        $this->assertTrue($result[1] == 2);
+        $this->assertTrue($result[2] == 3);
     }
     function test_firstpos_node_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b|c*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_firstpos_node_iteration_node() {
         $this->qtype = new qtype_preg_dfa_matcher('(?:a*)*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_question_quantificator() {
         $this->qtype = new qtype_preg_dfa_matcher('a?');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->firstpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_negative_character_class() {
         $this->qtype = new qtype_preg_dfa_matcher('[^a]b');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->pregnode->operands[0]->firstpos[0] == 1);
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->firstpos[0] == 1);
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($this->qtype->roots[0]->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->operands[0]->firstpos[0] == 1);
+        $this->assertTrue(count($this->qtype->roots[0]->operands[0]->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->operands[0]->operands[0]->firstpos[0] == 1);
     }
     /*function test_firstpos_assert() {
         $this->qtype = new qtype_preg_dfa_matcher('a(?=.*b)[xcvbnm]*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos) == 1 &&
-                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->assertTrue(count($this->qtype->roots[0]->operands[0]->operands[0]->operands[1]->firstpos) == 1 &&
+                            $this->qtype->roots[0]->operands[0]->operands[0]->operands[1]->firstpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }*/
     //Unit test for lastpos function
     function test_lastpos_leaf() {
         $this->qtype = new qtype_preg_dfa_matcher('a');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_leaf_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('ab');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 2);
+    }
+    function test_lastpos_leaf_concatenation_node_with_end() {
+        $this->qtype = new qtype_preg_dfa_matcher('ab');
+        $connection = array();
+        $maxnum = 0;
+        $this->qtype->roots[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->nullable();
+        $result = $this->qtype->roots[0]->lastpos();
+        $this->assertTrue(count($result) == 1 && $result[0] == 186759556);
     }
     function test_lastpos_leaf_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
     function test_lastpos_leaf_iteration_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_node_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('(?:a|b)c*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
-        $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
+        $this->assertTrue(count($result) == 3);
+        $this->assertTrue($result[0] == 3);
+        $this->assertTrue($result[1] == 1);
+        $this->assertTrue($result[2] == 2);
     }
     function test_lastpos_node_alternative_node() {
         $this->qtype = new qtype_preg_dfa_matcher('a|b|c*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_lastpos_node_iteration_node() {
         $this->qtype = new qtype_preg_dfa_matcher('(?:a*)*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_question_quantificator() {
         $this->qtype = new qtype_preg_dfa_matcher('a?');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_negative_character_class() {
         $this->qtype = new qtype_preg_dfa_matcher('[^a]|b');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $result = $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $result = $this->qtype->roots[0]->operands[0]->lastpos();
         $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
     /*function test_lastpos_assert() {
         $this->qtype = new qtype_preg_dfa_matcher('a(?=.*b)[xcvbnm]*');
         $connection = array();
         $maxnum = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos) &&
-                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $this->qtype->roots[0]->operands[0]->lastpos();
+        $this->assertTrue(count($this->qtype->roots[0]->operands[0]->operands[0]->operands[1]->lastpos) &&
+                            $this->qtype->roots[0]->operands[0]->operands[0]->operands[1]->lastpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }*/
     //Unit tests for followpos function
     function test_followpos_node_concatenation_node() {
         $this->qtype = new qtype_preg_dfa_matcher('(?:a|b)*ab');
-        $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
-        $this->qtype->roots[0]->pregnode->operands[0]->nullable();
-        $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
-        $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
-        $result=null;
+        $this->qtype->roots[0]->operands[0]->number($connection, $maxnum);
+        $this->qtype->roots[0]->operands[0]->nullable();
+        $this->qtype->roots[0]->operands[0]->firstpos();
+        $this->qtype->roots[0]->operands[0]->lastpos();
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $res1 = (count($result[1]) == 3 && $result[1][0] == 1 && $result[1][1] == 2 && $result[1][2] == 3);
         $res2 = (count($result[2]) == 3 && $result[2][0] == 1 && $result[2][1] == 2 && $result[2][2] == 3);
@@ -283,7 +318,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
         $this->assertTrue(count($result[3]) == 1 && $result[3][0] == 4);
@@ -295,7 +330,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
@@ -305,7 +340,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->qtype->roots[0]->lastpos();
-        $result=null;
+        $result = null;
         $this->qtype->roots[0]->followpos($result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
@@ -369,16 +404,15 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     //Unit tests for compare function
     function test_compare_full_incorrect() {//ab
         $this->qtype = new qtype_preg_dfa_matcher('ab');
-        $this->qtype->roots[0]->pregnode->operands[0]->number($this->qtype->connection[0], $maxnum=0);
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[0][2] = new finite_automate_state;
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
-        $result=$this->qtype->compare(new qtype_poasquestion_string('b'),0);
+        $this->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
+        $result = $this->qtype->compare(new qtype_poasquestion_string('b'),0);
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next == 'a');
     }
@@ -390,8 +424,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result = $this->qtype->compare(new qtype_poasquestion_string('cb'),0);
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next == 'a');
@@ -404,8 +438,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result = $this->qtype->compare(new qtype_poasquestion_string('ac'),0);
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == 0 && $result->next == 'b');
@@ -418,8 +452,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result = $this->qtype->compare(new qtype_poasquestion_string('ab'),0);
         $this->assertTrue($result->full);
         $this->assertTrue($result->index == 1 && $result->next == 0);
@@ -433,8 +467,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[2] = 2;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'), 0);
         $result2 = $this->qtype->compare(new qtype_poasquestion_string('b'), 0);
         $result3 = $this->qtype->compare(new qtype_poasquestion_string('Incorrect string'), 0);
@@ -453,8 +487,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'),0);
         $result2 = $this->qtype->compare(new qtype_poasquestion_string('bb'),0);
         $this->assertFalse($result1->full);
@@ -470,8 +504,8 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'), 0);
         $result2 = $this->qtype->compare(new qtype_poasquestion_string('fbf'),0);
         $result3 = $this->qtype->compare(new qtype_poasquestion_string('fff'),0);
@@ -505,11 +539,11 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[1];
         $result = $this->qtype->compare(new qtype_poasquestion_string('OabO'), 0, 0, false);
         $this->assertFalse($result->full);
-        $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 0);
+        $this->assertTrue($result->index == -1 && $result->next == 'a' && $result->offset == 0);
         $result = $this->qtype->compare(new qtype_poasquestion_string('OabO'), 0, 1, false);
         $this->assertTrue($result->full);
         $this->assertTrue($result->index == 1 && $result->next === 0 && $result->offset == 1);
@@ -518,7 +552,7 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result->index == 1 && $result->next === 0 && $result->offset == 1);
         $result = $this->qtype->compare(new qtype_poasquestion_string('OabO'), 0, 2, false);
         $this->assertFalse($result->full);
-        $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 2);
+        $this->assertTrue($result->index == -1 && $result->next == 'a' && $result->offset == 2);
     }
     function test_compare_unanchor_iteration() {//(?:abc)*
         $this->qtype = new qtype_preg_dfa_matcher('(?:abc)*');
@@ -529,9 +563,9 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
         $this->qtype->finiteautomates[0][0]->passages[qtype_preg_dfa_leaf_meta::ENDREG] = -1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[3] = 0;
-        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[0];
-        $this->qtype->connection[0][2] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1];
-        $this->qtype->connection[0][3] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1];
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->operands[0]->operands[0]->operands[0];
+        $this->qtype->connection[0][2] = $this->qtype->roots[0]->operands[0]->operands[0]->operands[1];
+        $this->qtype->connection[0][3] = $this->qtype->roots[0]->operands[0]->operands[0]->operands[2];
         $result = $this->qtype->compare(new qtype_poasquestion_string('abcabcab'), 0, 0, false);
         $this->assertTrue($result->full);
         $this->assertTrue($result->index == 5 && $result->next === 0 && $result->offset == 0);
@@ -606,11 +640,11 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     //Unit tests for convert tree
     function _test_convert_tree_quantificator_l2r4() {
         $this->qtype = new qtype_preg_dfa_matcher('a{2,4}b');
-        $result1 = $this->qtype->compare('ab', 0);
-        $result2 = $this->qtype->compare('aab', 0);
-        $result3 = $this->qtype->compare('aaab', 0);
-        $result4 = $this->qtype->compare('aaaab', 0);
-        $result5 = $this->qtype->compare('aaaaab', 0);
+        $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'), 0);
+        $result2 = $this->qtype->compare(new qtype_poasquestion_string('aab'), 0);
+        $result3 = $this->qtype->compare(new qtype_poasquestion_string('aaab'), 0);
+        $result4 = $this->qtype->compare(new qtype_poasquestion_string('aaaab'), 0);
+        $result5 = $this->qtype->compare(new qtype_poasquestion_string('aaaaab'), 0);
         $this->assertFalse($result1->full);
         $this->assertTrue($result2->full);
         $this->assertTrue($result3->full);
@@ -619,12 +653,12 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     }
     function _test_convert_tree_quantificator_l0r4() {
         $this->qtype = new qtype_preg_dfa_matcher('a{,4}b');
-        $result0 = $this->qtype->compare('b', 0);
-        $result1 = $this->qtype->compare('ab', 0);
-        $result2 = $this->qtype->compare('aab', 0);
-        $result3 = $this->qtype->compare('aaab', 0);
-        $result4 = $this->qtype->compare('aaaab', 0);
-        $result5 = $this->qtype->compare('aaaaab', 0);
+        $result0 = $this->qtype->compare(new qtype_poasquestion_string('b'), 0);
+        $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'), 0);
+        $result2 = $this->qtype->compare(new qtype_poasquestion_string('aab'), 0);
+        $result3 = $this->qtype->compare(new qtype_poasquestion_string('aaab'), 0);
+        $result4 = $this->qtype->compare(new qtype_poasquestion_string('aaaab'), 0);
+        $result5 = $this->qtype->compare(new qtype_poasquestion_string('aaaaab'), 0);
         $this->assertTrue($result0->full);
         $this->assertTrue($result1->full);
         $this->assertTrue($result2->full);
@@ -634,11 +668,11 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     }
     function _test_convert_tree_quantificator_l2rinf() {
         $this->qtype = new qtype_preg_dfa_matcher('a{2,}b');
-        $result1 = $this->qtype->compare('ab', 0);
-        $result2 = $this->qtype->compare('aab', 0);
-        $result3 = $this->qtype->compare('aaab', 0);
-        $result4 = $this->qtype->compare('aaaab', 0);
-        $result5 = $this->qtype->compare('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab', 0);
+        $result1 = $this->qtype->compare(new qtype_poasquestion_string('ab'), 0);
+        $result2 = $this->qtype->compare(new qtype_poasquestion_string('aab'), 0);
+        $result3 = $this->qtype->compare(new qtype_poasquestion_string('aaab'), 0);
+        $result4 = $this->qtype->compare(new qtype_poasquestion_string('aaaab'), 0);
+        $result5 = $this->qtype->compare(new qtype_poasquestion_string('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'), 0);
         $this->assertFalse($result1->full);
         $this->assertTrue($result2->full);
         $this->assertTrue($result3->full);
@@ -647,9 +681,9 @@ class qtype_preg_dfa_matcher_test extends PHPUnit_Framework_TestCase {
     }
     function test_convert_tree_subexpression() {
         $this->qtype = new qtype_preg_dfa_matcher('(a|b)');
-        $result1 = $this->qtype->compare('b', 0);
-        $result2 = $this->qtype->compare('a', 0);
-        $result3 = $this->qtype->compare('Incorrect', 0);
+        $result1 = $this->qtype->compare(new qtype_poasquestion_string('b'), 0);
+        $result2 = $this->qtype->compare(new qtype_poasquestion_string('a'), 0);
+        $result3 = $this->qtype->compare(new qtype_poasquestion_string('Incorrect'), 0);
         $this->assertTrue($result1->full);
         $this->assertTrue($result2->full);
         $this->assertFalse($result3->full);

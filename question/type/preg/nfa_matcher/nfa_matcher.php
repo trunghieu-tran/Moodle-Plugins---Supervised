@@ -347,24 +347,22 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return 'nfa_matcher';
     }
 
-    protected function get_engine_node_name($pregname) {
-        switch($pregname) {
-            case 'node_finite_quant':
-            case 'node_infinite_quant':
-            case 'node_concat':
-            case 'node_alt':
-            case 'node_subexpr':
-                return 'qtype_preg_nfa_' . $pregname;
-                break;
-            case 'leaf_charset':
-            case 'leaf_meta':
-            case 'leaf_assert':
-            case 'leaf_backref':
-                return 'qtype_preg_nfa_leaf';
-                break;
+    protected function get_engine_node_name($nodetype) {
+        switch($nodetype) {
+        case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
+        case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
+        case qtype_preg_node::TYPE_NODE_CONCAT:
+        case qtype_preg_node::TYPE_NODE_ALT:
+        case qtype_preg_node::TYPE_NODE_SUBEXPR:
+            return 'qtype_preg_nfa_' . $nodetype;
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+        case qtype_preg_node::TYPE_LEAF_META:
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+            return 'qtype_preg_nfa_leaf';
         }
 
-        return parent::get_engine_node_name($pregname);
+        return parent::get_engine_node_name($nodetype);
     }
 
     /**
@@ -374,27 +372,27 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      */
     public function is_supporting($capability) {
         switch($capability) {
-            case qtype_preg_matcher::PARTIAL_MATCHING:
-            case qtype_preg_matcher::CORRECT_ENDING:
-            case qtype_preg_matcher::CHARACTERS_LEFT:
-            case qtype_preg_matcher::SUBEXPRESSION_CAPTURING:
-            case qtype_preg_matcher::CORRECT_ENDING_ALWAYS_FULL:
-                return true;
-            default:
-                return false;
+        case qtype_preg_matcher::PARTIAL_MATCHING:
+        case qtype_preg_matcher::CORRECT_ENDING:
+        case qtype_preg_matcher::CHARACTERS_LEFT:
+        case qtype_preg_matcher::SUBEXPRESSION_CAPTURING:
+        case qtype_preg_matcher::CORRECT_ENDING_ALWAYS_FULL:
+            return true;
+        default:
+            return false;
         }
     }
 
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
-            case qtype_preg_node::TYPE_LEAF_CHARSET:
-            case qtype_preg_node::TYPE_LEAF_META:
-            case qtype_preg_node::TYPE_LEAF_ASSERT:
-            case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_NODE_ERROR:
-                return true;
-            default:
-                return get_string($pregnode->name(), 'qtype_preg');
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+        case qtype_preg_node::TYPE_LEAF_META:
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+        case qtype_preg_node::TYPE_NODE_ERROR:
+            return true;
+        default:
+            return get_string($pregnode->type, 'qtype_preg');
         }
     }
 

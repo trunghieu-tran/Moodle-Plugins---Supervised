@@ -130,6 +130,10 @@ class qtype_preg_matching_results {
         return $this->length[$subexpression];
     }
 
+    public function is_subexpr_captured($subexpression) {
+        return $this->length($subexpression) !== self::NO_MATCH_FOUND;
+    }
+
     /**
      * Any match found?
      * The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)

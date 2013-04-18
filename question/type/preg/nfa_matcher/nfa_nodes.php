@@ -275,7 +275,7 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
     public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
         foreach ($this->pregnode->operands as $operand) {
-            array_push($this->operands, $matcher->from_preg_node($operand));
+            $this->operands[] = $matcher->from_preg_node($operand);
         }
     }
 
@@ -308,21 +308,29 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
 
     public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operands create their automatons.
-        $this->operands[0]->create_automaton($matcher, $automaton, $stack);
-        $this->operands[1]->create_automaton($matcher, $automaton, $stack);
+        foreach ($this->operands as $operand) {
+            $operand->create_automaton($matcher, $automaton, $stack);
+        }
+
+        $count = count($this->operands);
 
         // Take automatons and concatenate them.
         $second = array_pop($stack);
-        $first = array_pop($stack);
 
-        $automaton->update_state_references($second['start'], $first['end']);
-        self::move_transitions($second['start'], $first['end']);
-        $automaton->remove_state($second['start']);
+        for ($i = 0; $i < $count - 1; $i++) {
+            $first = array_pop($stack);
+
+            $automaton->update_state_references($second['start'], $first['end']);
+            self::move_transitions($second['start'], $first['end']);
+            $automaton->remove_state($second['start']);
+
+            $second = array('start' => $first['start'], 'end' => $second['end']);
+        }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($first['start']);
+        $automaton->set_start_state($second['start']);
         $automaton->set_end_state($second['end']);
-        $stack[] = array('start' => $first['start'], 'end' => $second['end']);
+        $stack[] = $second;
     }
 }
 
@@ -333,28 +341,32 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 
     public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Operands create their automatons.
-        $this->operands[0]->create_automaton($matcher, $automaton, $stack);
-        $this->operands[1]->create_automaton($matcher, $automaton, $stack);
+        foreach (array_reverse($this->operands) as $operand) {
+            $operand->create_automaton($matcher, $automaton, $stack);
+        }
+
+        $count = count($this->operands);
 
         // Take automatons and alternate them.
         $second = array_pop($stack);
-        $first = array_pop($stack);
+        self::add_ending_eps_transition_if_needed($automaton, $second); // Necessary if there's a quantifier in the end.
 
-        // It is necessary to add eps-transitions to the end of each automaton if they represent quantifiers.
-        self::add_ending_eps_transition_if_needed($automaton, $first);
-        self::add_ending_eps_transition_if_needed($automaton, $second);
+        for ($i = 0; $i < $count - 1; $i++) {
+            $first = array_pop($stack);
+            self::add_ending_eps_transition_if_needed($automaton, $first);  // Necessary if there's a quantifier in the end.
 
-        // Merge start and end states.
-        $automaton->update_state_references($second['start'], $first['start']);
-        $automaton->update_state_references($second['end'], $first['end']);
-        self::move_transitions($second['start'], $first['start']);
-        $automaton->remove_state($second['start']);
-        $automaton->remove_state($second['end']);
+            // Merge start and end states.
+            $automaton->update_state_references($first['start'], $second['start']);
+            $automaton->update_state_references($first['end'], $second['end']);
+            self::move_transitions($first['start'], $second['start']);
+            $automaton->remove_state($first['start']);
+            $automaton->remove_state($first['end']);
+        }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($first['start']);
-        $automaton->set_end_state($first['end']);
-        $stack[] = array('start' => $first['start'], 'end' => $first['end']);
+        $automaton->set_start_state($second['start']);
+        $automaton->set_end_state($second['end']);
+        $stack[] = $second;
     }
 }
 
