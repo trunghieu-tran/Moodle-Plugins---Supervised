@@ -1,7 +1,7 @@
 <?php
 /**
  * Creates authors tool form.
- * 
+ *
  * @copyright &copy; 2012  Terechov Grigory
  * @author Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -46,7 +46,7 @@ if ($cmid = optional_param('cmid', 0, PARAM_INT)) {
     // Note that in the other cases, require_login will set the correct page context.
 }*/
 
-//Instantiate simplehtml_form 
+//Instantiate simplehtml_form
 $mform = new qtype_preg_authors_tool_form();
 $mform->display();
 

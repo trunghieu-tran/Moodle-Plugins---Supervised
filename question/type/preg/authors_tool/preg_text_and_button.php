@@ -18,14 +18,14 @@ MoodleQuickForm::registerElementType('preg_text_and_button',
     $CFG->dirroot.'/question/type/preg/authors_tool/preg_text_and_button.php',
     'MoodleQuickForm_preg_text_and_button');
 
-class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_button { 
-    
+class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_button {
+
     //private $parentjsobjname = 'M.poasquestion_text_and_button';
-    
+
     function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
         parent::MoodleQuickForm_text_and_button($elementName, $elementButtonName, $elementLabel, $elementLinks, $attributes);
     }
-    
+
     function toHtml() {
         global $CFG;
         global $PAGE;
@@ -39,8 +39,8 @@ class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_butt
             'todo',
         );
         $PAGE->requires->js_init_call('M.preg_authors_tool_script.init', $jsargs, true, $jsmodule);
-        
+
         return $parenthtml;
     }
-    
+
 }

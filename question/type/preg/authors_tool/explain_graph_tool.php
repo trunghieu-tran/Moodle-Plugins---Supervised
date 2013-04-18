@@ -62,8 +62,8 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         return 'author_tool_explain_graph';
     }
 
-    protected function get_engine_node_name($pregname) {
-        switch($pregname) {
+    protected function get_engine_node_name($nodetype) {
+        switch($nodetype) {
         case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
         case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
         case qtype_preg_node::TYPE_NODE_CONCAT:
@@ -72,7 +72,6 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
         case qtype_preg_node::TYPE_NODE_ASSERT:
             return 'qtype_preg_author_tool_operator';
-
         case qtype_preg_node::TYPE_LEAF_CHARSET:
         case qtype_preg_node::TYPE_LEAF_META:
         case qtype_preg_node::TYPE_LEAF_ASSERT:
@@ -81,19 +80,18 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             return 'qtype_preg_author_tool_leaf';
         }
 
-        return parent::get_engine_node_name($pregname);
+        return parent::get_engine_node_name($nodetype);
     }
 
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT:
-            case qtype_preg_node::TYPE_LEAF_CONTROL:
-            case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            case qtype_preg_node::TYPE_NODE_ERROR:
-                return false;
-
-            default:
-                return true;
+        case qtype_preg_node::TYPE_ABSTRACT:
+        case qtype_preg_node::TYPE_LEAF_CONTROL:
+        case qtype_preg_node::TYPE_LEAF_OPTIONS:
+        case qtype_preg_node::TYPE_NODE_ERROR:
+            return false;
+        default:
+            return true;
         }
     }
 
@@ -119,96 +117,26 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         foreach ($donor->subgraphs as $subgraph)
             $acceptor->subgraphs[] = $subgraph;
     }
-    
+
     private static $gmain = null; // the main subgraph for building graph from tree
-    
+
     /**
      * Optimizes explaining graph.
      */
     private static function optimize_graph(&$graph, &$parent) {
-        
-        qtype_preg_author_tool_explain_graph::process_alters($graph);
+
+        //qtype_preg_author_tool_explain_graph::process_alters($graph);
 
         qtype_preg_author_tool_explain_graph::process_simple($graph);
-        
+
         qtype_preg_author_tool_explain_graph::process_asserts($graph, $parent);
-        
+
         qtype_preg_author_tool_explain_graph::process_voids($graph);
 
         foreach ($graph->subgraphs as $subgraph)
             qtype_preg_author_tool_explain_graph::optimize_graph($subgraph, $graph);
     }
-    
-    /**
-     * First part of optimization - processing alternatives in graph.
-     */
-    private static function process_alters(&$graph) {
 
-        // Loops over all nodes in graph
-        foreach ($graph->nodes as $iter) {
-            $neighbor = NULL; // neighbor of current node
-
-            if ($iter->shape == 'point') {  // if current node is point...
-                $tmplinks = array();    // here will be links where some node is
-                // get left neighbor of node
-                $neighbor = qtype_preg_author_tool_explain_graph::find_neighbor_src($iter, qtype_preg_author_tool_explain_graph::$gmain);
-                
-                // if left neighbor is point too and both nodes is owned by same subgraph...
-                if ($neighbor->shape == 'point' && $neighbor->owner === $iter->owner) {
-                    if ($neighbor->links_count(FALSE) == 2) { // if neighbor is source in link twice...
-                        $tmplinks = $iter->links(); // get links of current node
-                        foreach ($tmplinks as $iter2) { // loops over all links
-                            if ($iter2->source === $iter) {
-                                //creates new link 
-                                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor, $iter2->destination);
-                                
-                                $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($iter2->source, $iter2->destination, qtype_preg_author_tool_explain_graph::$gmain);
-                                // destroy old link
-                                unset($graph->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
-                                qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
-                            }
-                        }
-                        
-                        $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($neighbor, $iter, qtype_preg_author_tool_explain_graph::$gmain);
-                        unset($graph->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
-                        qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
-                        unset($graph->nodes[array_search($iter, $graph->nodes)]);
-                        $graph->nodes = array_values($graph->nodes);
-                        
-                        reset($graph->nodes);
-                        continue;
-                    }
-                }
-        
-                $neighbor = qtype_preg_author_tool_explain_graph::find_neighbor_dst($iter, qtype_preg_author_tool_explain_graph::$gmain);
- 
-                if ($neighbor->shape == 'point' && $neighbor->owner === $iter->owner) {
-                    if ($neighbor->links_count(TRUE) == 2) {
-                        $tmplinks = $iter->links();
-                        foreach ($tmplinks as $iter2) {
-                            if ($iter2->destination === $iter) {
-                                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $iter2->source, $neighbor);
-                                
-                                $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($iter2->source, $iter2->destination, qtype_preg_author_tool_explain_graph::$gmain);
-                                unset($graph->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
-                                qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
-                            }
-                        }
-
-                        $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($iter, $neighbor, qtype_preg_author_tool_explain_graph::$gmain);
-                        unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
-                        qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
-                        
-                        unset($graph->nodes[array_search($iter, $graph->nodes)]);
-                        $graph->nodes = array_values($graph->nodes);
-
-                        reset($graph->nodes);
-                    }
-                }
-            }
-        }
-    }
-    
     /**
      * Returns node which is right neighbor for $dn.
      * Searches recursively in subgraph $gr
@@ -226,9 +154,9 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 return $result;
             }
         }
-        
+
         $result = new qtype_preg_author_tool_explain_graph_node(array('error'),'','', qtype_preg_author_tool_explain_graph::$gmain, -2);
-        
+
         return $result;
     }
 
@@ -249,14 +177,14 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 return $result;
             }
         }
-        
+
         $result = new qtype_preg_author_tool_explain_graph_node(array('error'),'','', qtype_preg_author_tool_explain_graph::$gmain, -2);
-        
+
         return $result;
     }
-    
-    private static $linkowner = null; // temporary link which is filled by function find_link and uses by various checkings  
-    
+
+    private static $linkowner = null; // temporary link which is filled by function find_link and uses by various checkings
+
     /**
      * Returns link with source = $src and destination = dst.
      * Searches recursively in subgraph $gr
@@ -279,7 +207,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         return $result;
     }
-    
+
     /**
      * Second part of optimization - processing sequences of simple characters in graph.
      */
@@ -299,7 +227,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_src($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($tmpneighbor, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
                     $tmpneighbor->destination = $tmp;
-                    
+
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_dst($neighbor, qtype_preg_author_tool_explain_graph::$gmain);
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($neighbor, $tmpneighbor, qtype_preg_author_tool_explain_graph::$gmain);
                     $tmpneighbor->source = $tmp;
@@ -310,7 +238,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
                     unset($graph->nodes[array_search($neighbor, $graph->nodes)]);
                     $graph->nodes = array_values($graph->nodes);
-                    
+
                     $graph->nodes[array_search($tmpdnode, $graph->nodes)] = $tmp;
 
                     $i = -1;
@@ -318,7 +246,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             }
         }
     }
-    
+
     /**
      * Third part of optimization - processing sequences of asserts in graph and something more.
      */
@@ -338,7 +266,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 if ($neighbor_r->owner === $neighbor_l->owner && $neighbor_l->owner === $graph) {
                     $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label;
                     $tmplabel2 = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain)->label;
-                    
+
                     $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label[0]), $tmplabel2), $neighbor_l, $neighbor_r);
                 } else if ($neighbor_r->owner !== $neighbor_l->owner && $neighbor_l->owner !== $graph && $neighbor_r->owner === $graph) {
                     $tmplabel2 = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain)->label;
@@ -355,29 +283,29 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                         }
                     } else {
                         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                        
+
                         $parent->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_l, $graph->nodes[count($graph->nodes) - 1]);
-                        
+
                         $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmpdnode->label[0], $tmplabel2), $graph->nodes[count($graph->nodes) - 1], $neighbor_r);
                     }
                 } else if ($neighbor_r->owner != $neighbor_l->owner && $neighbor_l->owner == $graph && $neighbor_r->owner != $graph) {
-                    $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label; 
+                    $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label;
 
                     if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
                         if ($neighbor_r->shape != 'point') {
                             $neighbor_r->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $neighbor_r->owner, -1);
-                            
+
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_r->owner->nodes[count($neighbor_r->owner->nodes) - 1], $neighbor_r);
-                            
+
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label[0]), $neighbor_l, $neighbor_r->owner->nodes[count($neighbor_r->owner->nodes) - 1]);
                         } else {
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label[0]), $neighbor_l, $neighbor_r);
                         }
                     } else {
                         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                        
+
                         $parent->links[] = new qtype_preg_author_tool_explain_graph_link('', end($graph->nodes), $neighbor_r);
-                        
+
                         $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label[0]), $neighbor_l, end($graph->nodes));
                     }
                 } else {
@@ -385,18 +313,18 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     $rightborder = $neighbor_r;
 
                     $tmplabel2 = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain)->label;
-                    $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label; 
+                    $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label;
 
                     if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_l->owner) && qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
                         if ($neighbor_r->shape != 'point') {
                             $neighbor_r->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $neighbor_r->owner, -1);
-                            
+
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', end($neighbor_r->owner->nodes), $neighbor_r);
                             $rightborder = end($neighbor_r->owner->nodes);
                         }
                         if ($neighbor_l->shape != 'point') {
                             $neighbor_l->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $neighbor_l->owner, -1);
-                            
+
                             $neighbor_l->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_l, end($neighbor_l->owner->nodes));
                             $leftborder = end($neighbor_l->owner->nodes);
                         }
@@ -405,41 +333,41 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     } else {
                         if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_l->owner)) {
                             $neighbor_l->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $neighbor_l->owner, -1);
-                            
+
                             $neighbor_l->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_l, end($neighbor_l->owner->nodes));
                             $leftborder = end($neighbor_l->owner->nodes);
 
                             $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                            
+
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', end($graph->nodes), $neighbor_r);
-                            
+
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label[0]), $leftborder, end($graph->nodes));
                         } else if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
                             $neighbor_r->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $neighbor_r->owner, -1);
-                            
+
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', end($neighbor_r->owner->nodes), $neighbor_r);
                             $rightborder = end($neighbor_r->owner->nodes);
 
                             $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                            
+
                             $neighbor_l->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_l, end($graph->nodes));
-                            
+
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmpdnode->label[0], $tmplabel2), end($graph->nodes), $rightborder);
                         } else {
                             $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                            
+
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $neighbor_r);
                             $rightborder = end($graph->nodes);
 
                             $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
-                            
+
                             $neighbor_l->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', $neighbor_l, $graph->nodes[count($graph->nodes) - 1]);
-                            
+
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, qtype_preg_author_tool_explain_graph::compute_label($tmpdnode->label[0], $tmplabel2)), $graph->nodes[count($graph->nodes) - 1], $rightborder);
                         }
                     }
                 }
-                
+
                 unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search(qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain), qtype_preg_author_tool_explain_graph::$linkowner->links)]);
                 qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
                 unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search(qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain), qtype_preg_author_tool_explain_graph::$linkowner->links)]);
@@ -452,7 +380,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             }
         }
     }
-    
+
     /**
      * Returns true if child is subgraph of parent
      */
@@ -464,7 +392,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         return false;
     }
-    
+
     /**
      * Integrate two labels of nodes or links
      */
@@ -479,7 +407,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         else
             return $lbl1 . '\n' . $lbl2;
     }
-    
+
     /**
      * Fourth part of optimization - processing sequences of voids in graph.
      */
@@ -488,7 +416,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             if ($iter->color == 'orange') {
                 $neighbor_l = qtype_preg_author_tool_explain_graph::find_neighbor_src($iter, qtype_preg_author_tool_explain_graph::$gmain);
                 $neighbor_r = qtype_preg_author_tool_explain_graph::find_neighbor_dst($iter, qtype_preg_author_tool_explain_graph::$gmain);
-                
+
                 $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $iter, qtype_preg_author_tool_explain_graph::$gmain);
                 $tmpneighbor->destination = $neighbor_r;
 
@@ -503,7 +431,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             }
         }
     }
-    
+
     /**
      * Returns true if two nodes of graph are equal
      */
@@ -527,7 +455,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         return true;
     }
-    
+
     /**
      * Returns true if two subgraphs of graph are equal
      */
@@ -549,7 +477,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 if (!qtype_preg_author_tool_explain_graph::cmp_nodes($g1->nodes[$i], $g2->nodes[$i]))
                     return false;
             }
-        } else {		
+        } else {
 			return false;
 		}
 
@@ -596,16 +524,16 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         return true;
     }
-    
+
     /**
      * Generate image for explain graph
-     * 
+     *
      * @param array $json_array contains link on image of explain graph
      */
     public function generate_json(&$json_array, $regextext, $id) {
-        
+
         global $CFG;
-        
+
         if(!empty($regextext)) {
 
             //Checking parser errors
@@ -618,12 +546,12 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             }
 
             if($pars_error === false && $this->get_ast_root() !== NULL && $this->get_dst_root() !== NULL) {
-                
+
                 $graph = $this->create_graph($id);
                 $dot_instructions_graph = $graph->create_dot();
-                
+
                 $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
-                
+
             } else {
                 $json_array['graph_src'] = $CFG->wwwroot . '/question/type/preg/tmp_img/graph_err.png';
             }

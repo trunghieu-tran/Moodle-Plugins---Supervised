@@ -12,6 +12,8 @@
  * The error field is usually filled if the node contains semantic errors but the syntax is correct:
  * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc.
  *
+ * All nodes returned from the lexer should have valid userinscription and indexes.
+ *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
  * @author     Valeriy Streltsov <vostreltsov@gmail.com>, Dmitriy Kolesov <xapuyc7@gmail.com>
@@ -86,7 +88,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 %eof{
     // End of the expression inside a character class.
     if ($this->charset !== null) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET/*, $this->charset_userinscription*/);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
         $error->set_user_info($this->charset->indfirst, $this->yychar - 1, new qtype_preg_userinscription());
         $this->errors[] = $error;
     }

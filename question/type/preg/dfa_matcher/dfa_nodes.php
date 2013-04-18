@@ -45,16 +45,8 @@ abstract class qtype_preg_dfa_node {
     public $dotnumber;
     public $color;
 
-    public function __construct($node, &$matcher) {
+    public function __construct($node, $matcher) {
         $this->pregnode = $node;
-        //Convert operands to dfa nodes
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $key=>$operand) {
-                if (is_a($node->operands[$key], 'qtype_preg_node')) {//Just to be sure this is not plain-data operand
-                    $node->operands[$key] = $matcher->from_preg_node($operand);
-                }
-            }
-        }
     }
 
     /**
@@ -186,7 +178,7 @@ abstract class qtype_preg_dfa_node {
 }
 
 abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
-    public function __construct($node, &$matcher) {
+    public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
         $this->color = 'greenyellow';
     }
@@ -214,12 +206,12 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
     }
     public function print_self($indent) {
         $this->print_indent($indent);
-        echo 'number: ', $this->number, '<br/>';
+        echo 'number: ', $this->number, "\n";
         $this->print_indent($indent);
         if ($this->nullable) {
-            echo 'nullable: true<br>';
+            echo "nullable: true\n";
         } else {
-            echo 'nullable: false<br>';
+            echo "nullable: false\n";
         }
         $this->print_indent($indent);
         if (is_array($this->firstpos)) {
@@ -228,7 +220,7 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
             foreach ($this->firstpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
         if (is_array($this->lastpos)) {
             $this->print_indent($indent);
@@ -236,7 +228,7 @@ abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
             foreach ($this->lastpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
     }
     public function generate_dot_code(&$dotcode, &$maxnum) {
@@ -256,7 +248,7 @@ class qtype_preg_dfa_leaf_charset extends qtype_preg_dfa_leaf {
         }
         echo '<br/>';
         $this->print_indent($indent);
-        echo 'charset: ', $this->pregnode->charset, '<br/>';
+        echo 'charset: '.$this->pregnode->tohr()."\n";
         parent::print_self($indent);
     }
     public function write_self_to_dotcode() {
@@ -292,15 +284,15 @@ class qtype_preg_dfa_leaf_meta extends qtype_preg_dfa_leaf {
         }
         echo '<br/>';
         switch ($this->pregnode->subtype) {
-            case qtype_preg_leaf_meta::SUBTYPE_DOT:
+            /*case qtype_preg_leaf_meta::SUBTYPE_DOT:
                 $subtype = 'dot';
-                break;
-            case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
+                break;*/
+            /*case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
                 $subtype = 'unicode property';
                 break;
             case qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR:
                 $subtype = 'word char';
-                break;
+                break;*/
             case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
                 $subtype = 'empty';
                 break;
@@ -404,40 +396,47 @@ class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
     }
 }
 abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
-    public function __construct($node, &$matcher) {
+
+    public $operands = array();    // Array of operands.
+
+    public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
+        foreach ($this->pregnode->operands as $operand) {
+            $this->operands[] = $matcher->from_preg_node($operand);
+        }
         $this->color = 'saddlebrown';
     }
+
     public function number(&$connection, &$maxnum) {
-        foreach ($this->pregnode->operands as $key => $operand) {
-            $this->pregnode->operands[$key]->number($connection, $maxnum);
+        foreach ($this->operands as $key => $operand) {
+            $this->operands[$key]->number($connection, $maxnum);
         }
     }
     public function followpos(&$fpmap) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->followpos($fpmap);
+        foreach ($this->operands as $key=>$operand) {
+            $this->operands[$key]->followpos($fpmap);
         }
     }
     public function find_asserts(&$roots) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->find_asserts($roots);
+        foreach ($this->operands as $key=>$operand) {
+            $this->operands[$key]->find_asserts($roots);
         }
     }
     public function print_tree($indent) {
         parent::print_tree($indent);
-        foreach ($this->pregnode->operands as $operand) {
-            echo '<br/>';
+        foreach ($this->operands as $operand) {
+            echo "\n";
             $this->print_indent($indent+1);
-            echo 'OPERAND:<br/>';
+            echo "OPERAND:\n";
             $operand->print_tree($indent+1);
         }
     }
     public function print_self($indent) {
         $this->print_indent($indent);
         if ($this->nullable) {
-            echo 'nullable: true<br>';
+            echo "nullable: true\n";
         } else {
-            echo 'nullable: false<br>';
+            echo "nullable: false\n";
         }
         if (is_array($this->firstpos)) {
             $this->print_indent($indent);
@@ -445,7 +444,7 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
             foreach ($this->firstpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
         if (is_array($this->lastpos)) {
             $this->print_indent($indent);
@@ -453,52 +452,73 @@ abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
             foreach ($this->lastpos as $val) {
                 echo $val, ' ';
             }
-            echo '<br>';
+            echo "\n";
         }
     }
     public function generate_dot_code(&$dotcode, &$maxnum) {
         $this->dotnumber = ++$maxnum;
-        foreach ($this->pregnode->operands as $key=>$value) {
-            $this->pregnode->operands[$key]->generate_dot_code($dotcode, $maxnum);
+        foreach ($this->operands as $key=>$value) {
+            $this->operands[$key]->generate_dot_code($dotcode, $maxnum);
         }
         $dotcode[] = $this->write_self_to_dotcode();
-        foreach ($this->pregnode->operands as $key=>$value) {
-            $dotcode[] = $this->dotnumber.'->'.$this->pregnode->operands[$key]->dotnumber.'[label="'.$key.'"];';
+        foreach ($this->operands as $key=>$value) {
+            $dotcode[] = $this->dotnumber.'->'.$this->operands[$key]->dotnumber.'[label="'.$key.'"];';
         }
     }
 }
 class qtype_preg_dfa_node_concat extends qtype_preg_dfa_operator {
 
     public function nullable() {
-        $secnull = $this->pregnode->operands[1]->nullable();
-        $this->nullable = $this->pregnode->operands[0]->nullable() && $secnull;
+        $this->nullable = true;
+        foreach ($this->operands as $operand) {
+            if (!$operand->nullable()) {
+                $this->nullable = false;
+            }
+        }
         return $this->nullable;
     }
     public function firstpos() {
-        if ($this->pregnode->operands[0]->nullable) {
-            $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
-        } else {
-            $this->firstpos = $this->pregnode->operands[0]->firstpos();
-            $this->pregnode->operands[1]->firstpos();
+        $this->firstpos = array();
+        $flag = true;
+        foreach ($this->operands as $operand) {
+            if ($flag) {
+                $this->firstpos = array_merge($this->firstpos, $operand->firstpos());
+                if (!$operand->nullable()) {
+                    $flag = false;
+                }
+            } else {
+                $operand->firstpos();
+            }
         }
         return $this->firstpos;
     }
     public function lastpos() {
-        if ($this->pregnode->operands[1]->nullable) {
-            $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
-        } else {
-            $this->lastpos = $this->pregnode->operands[1]->lastpos();
-            $this->pregnode->operands[0]->lastpos();
+        $this->lastpos = array();
+        $flag = true;
+        foreach (array_reverse($this->operands) as $operand) {
+            if ($flag) {
+                $this->lastpos = array_merge($this->lastpos, $operand->lastpos());
+                if (!$operand->nullable()) {
+                    $flag = false;
+                }
+            } else {
+                $operand->lastpos();
+            }
         }
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         parent::followpos($fpmap);
-        foreach ($this->pregnode->operands[0]->lastpos as $key) {
-            qtype_preg_dfa_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
+        for ($i = 0; $i<count($this->operands)-1/*No exist next for last*/; ++$i) {
+            $j=$i+1;
+            do {
+                foreach ($this->operands[$i]->lastpos as $key) {
+                    qtype_preg_dfa_node::push_unique($fpmap[$key], $this->operands[$j]->firstpos);
+                }
+                ++$j;
+            } while ($j<count($this->operands) && $this->operands[$j]->nullable());
         }
     }
-
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node concatenation<br/>';
@@ -513,19 +533,28 @@ class qtype_preg_dfa_node_concat extends qtype_preg_dfa_operator {
 class qtype_preg_dfa_node_alt extends qtype_preg_dfa_operator {
 
     public function nullable() {
-        $firnull = $this->pregnode->operands[0]->nullable();
-        $this->nullable = $firnull || $this->pregnode->operands[1]->nullable();
+        $this->nullable = false;
+        foreach ($this->operands as $operand) {
+            if ($operand->nullable()) {
+                $this->nullable = true;
+            }
+        }
         return $this->nullable;
     }
     public function firstpos() {
-        $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
+        $this->firstpos = array();
+        foreach ($this->operands as $operand) {
+            $this->firstpos = array_merge($this->firstpos, $operand->firstpos());
+        }
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
+        $this->lastpos = array();
+        foreach ($this->operands as $operand) {
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos());
+        }
         return $this->lastpos;
     }
-
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node alternative<br/>';
@@ -635,26 +664,26 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
         //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
             $result = true;
-            $this->pregnode->operands[0]->nullable();
+            $this->operands[0]->nullable();
         } else {//+
-            $result = $this->pregnode->operands[0]->nullable();
+            $result = $this->operands[0]->nullable();
         }
         $this->nullable = $result;
         return $result;
     }
     public function firstpos() {
-        $this->firstpos = $this->pregnode->operands[0]->firstpos();
+        $this->firstpos = $this->operands[0]->firstpos();
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = $this->pregnode->operands[0]->lastpos();
+        $this->lastpos = $this->operands[0]->lastpos();
         return $this->lastpos;
     }
 
     public function followpos(&$fpmap) {
         parent::followpos($fpmap);
-        foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
-            qtype_preg_dfa_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
+        foreach ($this->operands[0]->lastpos as $lpkey) {
+            qtype_preg_dfa_node::push_unique($fpmap[$lpkey], $this->operands[0]->firstpos);
         }
     }
     public function print_self($indent) {
@@ -690,7 +719,7 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
 }
 class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quant {
 
-	const MAX_SIZE=50;
+    const MAX_SIZE=50;
 
     public function followpos(&$fpmap) {
         qtype_preg_dfa_operator::followpos($fpmap);
@@ -701,13 +730,13 @@ class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quan
         echo 'type: node finite quant<br/>';
         parent::print_self($indent);
     }
-	public function accept() {
+    public function accept() {
         if (!$this->pregnode->greed) {
             return get_string('ungreedyquant', 'qtype_preg');
         }
-		if ($this->pregnode->rightborder-$this->pregnode->leftborder > self::MAX_SIZE) {
-			return get_string('toolargequant', 'qtype_preg');
-		}
+        if ($this->pregnode->rightborder-$this->pregnode->leftborder > self::MAX_SIZE) {
+            return get_string('toolargequant', 'qtype_preg');
+        }
         return true;
     }
 }

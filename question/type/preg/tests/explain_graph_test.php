@@ -60,10 +60,10 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon, -1);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[1]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[3]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[3]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[1]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[3]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[4], $etalon->nodes[2]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[5]);
 
@@ -314,20 +314,20 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
 
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[0]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[1]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[2]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[3]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[4]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[4], $etalon->nodes[7]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[5]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[5], $etalon->nodes[7]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[8], $etalon->nodes[6]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[7], $etalon->nodes[9]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[4]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[3]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[2]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[1]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[4], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[7]);
 
        $result = $tree->create_graph();
 
