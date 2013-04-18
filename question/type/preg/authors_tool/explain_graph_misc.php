@@ -13,20 +13,19 @@
  */
 class qtype_preg_author_tool_explain_graph_node {
 
-    public $shape   = 'ellipse';  // shape of node on image
-    public $color   = 'black';    // color of node on image
-    public $owner   = NULL;       // owner of node
-    public $label   = '';         // data of node on image
-    public $id      = -1;         // id of node
-    public $fill    = '';         // filling of node on image
-    public $invert  = FALSE;      // flag of inversion of node
+    public $shape  = 'ellipse';  // shape of node on image
+    public $color  = 'black';    // color of node on image
+    public $owner  = NULL;       // owner of node
+    public $label  = '';         // data of node on image
+    public $id     = -1;         // id of node
+    public $fill   = '';         // filling of node on image
+    public $invert = FALSE;      // flag of inversion of node
 
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
      * @param type - boolean parameter; true - node is destination, false - node is source.
      */
     public function links_count($type) {
-
         $cx = 0; // links counter
         foreach ($this->owner->links as $link) {
             if ($type) {
@@ -37,7 +36,6 @@ class qtype_preg_author_tool_explain_graph_node {
                     ++$cx;
             }
         }
-
         return $cx;
     }
 
@@ -45,13 +43,12 @@ class qtype_preg_author_tool_explain_graph_node {
      * Returns array of links in which node is as any instance.
      */
     public function links() {
-
         $result = array();
         foreach ($this->owner->links as $link) {
-            if ($link->destination == $this || $link->source == $this)
+            if ($link->destination == $this || $link->source == $this) {
                 $result[] = $link;
+            }
         }
-
         return $result;
     }
 
@@ -63,7 +60,6 @@ class qtype_preg_author_tool_explain_graph_node {
         $this->owner = $ownr;
         $this->id = $id;
     }
-
 }
 
 /**
@@ -82,7 +78,6 @@ class qtype_preg_author_tool_explain_graph_link {
         $this->destination = $dst;
         $this->style = $stl;
     }
-
 }
 
 /**
@@ -100,9 +95,9 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public $id          = -1;
 
     public function __construct($lbl, $stl, $id = -1) {
-        $this->label   = $lbl;
-        $this->style   = $stl;
-        $this->id      = $id;
+        $this->label = $lbl;
+        $this->style = $stl;
+        $this->id = $id;
     }
 
     /**
@@ -144,8 +139,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $elements = array();
         $result = '';
         if (count($lbl)) {
-            if (count($lbl) == 1)
-            {
+            if (count($lbl) == 1) {
                 if ($invert || strlen($lbl[0]) != 1)
                     $elements[] = $lbl[0];
                 else
@@ -215,16 +209,12 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     private function find_max_id() {
         $maxid = -1;
         foreach ($this->nodes as $node) {
-            if ($node->id > $maxid) {
-                $maxid = $node->id;
-            }
+            $maxid = max($maxid, $node->id);
         }
 
         foreach ($this->subgraphs as $subgraph) {
             $tmpid = $subgraph->find_max_id();
-            if ($tmpid > $maxid) {
-                $maxid = $tmpid;
-            }
+            $maxid = max($maxid, $tmpid);
         }
 
         return $maxid;
@@ -245,7 +235,6 @@ class qtype_preg_author_tool_explain_graph_subgraph {
 
         return $maxid;
     }
-
 }
 
 ?>

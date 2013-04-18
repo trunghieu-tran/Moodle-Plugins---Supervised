@@ -459,8 +459,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     /**
      * Returns true if two subgraphs of graph are equal
      */
-    public static function cmp_graphs(&$g1, &$g2)
-    {
+    public static function cmp_graphs(&$g1, &$g2) {
         if ($g1->label != $g2->label) {
             print(chr(10));
             print('Labels of subgraphs failed!');
@@ -567,8 +566,6 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         }
         return $res;
     }
-
-
 }
 
 ?>

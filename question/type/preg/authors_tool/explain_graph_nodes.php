@@ -35,17 +35,15 @@ abstract class qtype_preg_author_tool_node {
 
     public function accept() {
         switch ($this->pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT:
-            case qtype_preg_node::TYPE_LEAF_CONTROL:
-            case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            case qtype_preg_node::TYPE_NODE_ERROR:
-                return false;
-
-            default:
-                return true;
+        case qtype_preg_node::TYPE_ABSTRACT:
+        case qtype_preg_node::TYPE_LEAF_CONTROL:
+        case qtype_preg_node::TYPE_LEAF_OPTIONS:
+        case qtype_preg_node::TYPE_NODE_ERROR:
+            return false;
+        default:
+            return true;
         }
     }
-
 }
 
 /**
@@ -69,44 +67,44 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
      */
     public function get_value() {
         switch ($this->pregnode->type) {
-            case qtype_preg_node::TYPE_LEAF_CHARSET:
-                return self::process_charset($this->pregnode->userinscription);
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+            return self::process_charset($this->pregnode->userinscription);
 
-            case qtype_preg_node::TYPE_LEAF_META:
-                if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
-                    return array('Void');
-                else
-                    return array(get_string('explain_unknow_meta', 'qtype_preg'));
+        case qtype_preg_node::TYPE_LEAF_META:
+            if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
+                return array('Void');
+            else
+                return array(get_string('explain_unknow_meta', 'qtype_preg'));
 
-            case qtype_preg_node::TYPE_LEAF_ASSERT:
-                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
-                    return array(get_string('description_circumflex', 'qtype_preg'));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
-                    return array(get_string('description_dollar', 'qtype_preg'));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
-                    return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
-                    return array(get_string('description_esc_a', 'qtype_preg'));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
-                    return array(get_string('description_esc_z', 'qtype_preg'));
-                else
-                    return array(get_string('explain_unknow_assert', 'qtype_preg'));
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+            if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
+                return array(get_string('description_circumflex', 'qtype_preg'));
+            else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
+                return array(get_string('description_dollar', 'qtype_preg'));
+            else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
+                return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
+            else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+                return array(get_string('description_esc_a', 'qtype_preg'));
+            else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
+                return array(get_string('description_esc_z', 'qtype_preg'));
+            else
+                return array(get_string('explain_unknow_assert', 'qtype_preg'));
 
-            case qtype_preg_node::TYPE_LEAF_BACKREF:
-                if (is_integer($this->pregnode->number))
-                    return array(str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')));
-                else
-                    return array(str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg')));
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+            if (is_integer($this->pregnode->number))
+                return array(str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')));
+            else
+                return array(str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg')));
 
-            case qtype_preg_node::TYPE_LEAF_RECURSION:
-                if ($this->pregnode->number == 0)
-                    return array(get_string('description_recursion_all', 'qtype_preg'));
-                else if (is_integer($this->pregnode->number))
-                    return array(str_replace('%number', $this->pregnode->number, get_string('description_recursion', 'qtype_preg')));
-                else
-                    return array(str_replace('%name', $this->pregnode->number, get_string('description_recursion_name', 'qtype_preg')));
-            default:
-                return array(get_string('explain_unknow_node', 'qtype_preg'));
+        case qtype_preg_node::TYPE_LEAF_RECURSION:
+            if ($this->pregnode->number == 0)
+                return array(get_string('description_recursion_all', 'qtype_preg'));
+            else if (is_integer($this->pregnode->number))
+                return array(str_replace('%number', $this->pregnode->number, get_string('description_recursion', 'qtype_preg')));
+            else
+                return array(str_replace('%name', $this->pregnode->number, get_string('description_recursion_name', 'qtype_preg')));
+        default:
+            return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
     }
 
@@ -115,29 +113,29 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
      */
     public function get_color() {
         switch ($this->pregnode->type) {
-            case qtype_preg_node::TYPE_LEAF_CHARSET:
-                $tmp = $this->get_value();
-                if (count($tmp) == 1) {
-                    if ($tmp[0][0] == chr(10))
-                        return 'green';
-                    else
-                        return 'black';
-                } else {
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+            $tmp = $this->get_value();
+            if (count($tmp) == 1) {
+                if ($tmp[0][0] == chr(10))
+                    return 'green';
+                else
                     return 'black';
-                }
+            } else {
+                return 'black';
+            }
 
-            case qtype_preg_node::TYPE_LEAF_META:
-                return 'orange';
+        case qtype_preg_node::TYPE_LEAF_META:
+            return 'orange';
 
-            case qtype_preg_node::TYPE_LEAF_ASSERT:
-                return 'red';
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+            return 'red';
 
-            case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_LEAF_RECURSION:
-                return 'blue';
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+        case qtype_preg_node::TYPE_LEAF_RECURSION:
+            return 'blue';
 
-            default:
-                return 'pink';
+        default:
+            return 'pink';
         }
     }
 
@@ -236,16 +234,15 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                         }
                     } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') {
                         $i++;
-                        if (self::is_hex($iter->data[$i]))
-                        {
+                        if (ctype_xdigit($iter->data[$i])) {
                             $tmp = $iter->data[$i];
-
                             $i++;
-                            if (self::is_hex($iter->data[$i]))
+                            if (ctype_xdigit($iter->data[$i])) {
                                 $tmp .= $iter->data[$i];
+                            }
                         } else if ($iter->data[$i] == '{') {
                             $i++;
-                            while ($iter->data[$i] != '}'){
+                            while ($iter->data[$i] != '}') {
                                 $tmp .= $iter->data[$i];
                                 $i++;
                             }
@@ -309,37 +306,6 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         }
 
         return $result;
-    }
-
-    private static function is_hex($letter) {
-        switch ($letter) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-                return true;
-
-            default:
-                return false;
-        }
     }
 }
 
@@ -442,19 +408,21 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
 
                 switch ($this->pregnode->subtype) {
-                    case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
-                        $cond_subexpr->subgraphs[0]->nodes[] =
-                            new qtype_preg_author_tool_explain_graph_node(
-                                array(is_integer($this->pregnode->number) ? str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) : str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
+                case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
+                    $cond_subexpr->subgraphs[0]->nodes[] =
+                        new qtype_preg_author_tool_explain_graph_node(
+                                array(is_integer($this->pregnode->number) ?
+                                      str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) :
+                                      str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
                                 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
                                 );
-                        break;
-                    case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
-                        $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                        break;
-                    case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
-                        $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                        break;
+                    break;
+                case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
+                    $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+                    break;
+                case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
+                    $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+                    break;
                 }
             } else {
                 $isAssert = TRUE; $index = 1;
@@ -499,7 +467,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 $graph->exits[] = $cond_subexpr->subgraphs[1]->exits[0];
                 $cond_subexpr->links[] = new qtype_preg_author_tool_explain_graph_link('true', $cond_subexpr->subgraphs[0]->nodes[0], $cond_subexpr->subgraphs[1]->entries[0]);
             }
-        } else if ($this->pregnode->type == 'node_assert') {
+        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ASSERT) {
             $operand = $this->operands[0]->create_graph($id);
 
             $subexpr = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid; color=grey', $this->pregnode->id);
@@ -507,24 +475,22 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
             $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
 
-            switch ($this->pregnode->subtype)
-            {
-                case qtype_preg_node_assert::SUBTYPE_PLA:
-                    $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color=green, lhead="cluster_' . $this->pregnode->id . '"');
-                    break;
-                case qtype_preg_node_assert::SUBTYPE_NLA:
-                    $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color=red, lhead="cluster_' . $this->pregnode->id . '"');
-                    break;
-                case qtype_preg_node_assert::SUBTYPE_PLB:
-                    $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color=green, lhead="cluster_' . $this->pregnode->id . '"');
-                    break;
-                case qtype_preg_node_assert::SUBTYPE_NLB:
-                    $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color=red, lhead="cluster_' . $this->pregnode->id . '"');
-                    break;
-                default:
-                    $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
+            switch ($this->pregnode->subtype) {
+            case qtype_preg_node_assert::SUBTYPE_PLA:
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color=green, lhead="cluster_' . $this->pregnode->id . '"');
+                break;
+            case qtype_preg_node_assert::SUBTYPE_NLA:
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color=red, lhead="cluster_' . $this->pregnode->id . '"');
+                break;
+            case qtype_preg_node_assert::SUBTYPE_PLB:
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color=green, lhead="cluster_' . $this->pregnode->id . '"');
+                break;
+            case qtype_preg_node_assert::SUBTYPE_NLB:
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color=red, lhead="cluster_' . $this->pregnode->id . '"');
+                break;
+            default:
+                $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
             }
-
 
             $graph->subgraphs[] = $subexpr;
             $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
@@ -542,7 +508,6 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
         return $graph;
     }
-
 }
 
 ?>
