@@ -13,9 +13,11 @@
     // Handling options.
     private $handlingoptions;
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
-    private $id_counter = 0;
+    private $id_counter;
     // Counter of subpatterns.
-    private $subpatt_counter = 0;
+    private $subpatt_counter;
+    // Followpos map.
+    private $followpos;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -24,6 +26,9 @@
             $handlingoptions = new qtype_preg_handling_options();
         }
         $this->handlingoptions = $handlingoptions;
+        $this->id_counter = 0;
+        $this->subpatt_counter = 0;
+        $this->followpos = array();
     }
 
     public function get_root() {
@@ -40,6 +45,10 @@
 
     public function get_max_subpatt() {
         return $this->subpatt_counter;
+    }
+
+    public function get_followpos() {
+        return $this->followpos;
     }
 
     /**
@@ -175,6 +184,9 @@
             $node->subpattern = $this->subpatt_counter++;
         }
         if (is_a($node, 'qtype_preg_operator')) {
+            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
+                $this->assign_ids_and_subpatts($node->condbranch);
+            }
             foreach ($node->operands as $operand) {
                 $this->assign_ids_and_subpatts($operand);
             }
@@ -212,6 +224,9 @@ start ::= lastexpr(B). {
 
     // Numerate all nodes.
     $this->assign_ids_and_subpatts($this->root);
+
+    // Calculate nullable, firstpos, lastpos and followpos for all nodes.
+    $this->root->calculate_nflf($this->followpos);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
