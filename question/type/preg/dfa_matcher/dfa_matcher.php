@@ -190,9 +190,6 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         /*
         foreach ($this->finiteautomates[$index] as $key=>$state) {
             $this->del_double($this->finiteautomates[$index][$key]->passages, $index);
-        }
-        foreach ($this->finiteautomates[$index] as $key=>$state) {
-            $this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
         }*/
     }
 
@@ -535,26 +532,6 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             }
         }
     }
-   /**
-    *function unite parallel passages in dfa state
-    *@param $array array of passages of state of dfa
-    *@param $index index of dfa for which do verify sybol unique
-    */
-    protected function unite_parallel(&$array, $index) {
-        foreach ($array as $key1=>$passage1) {
-            foreach ($array as $key2=>$passage2) {
-               if($passage1==$passage2 && $key1!=$key2) {
-                    $newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
-                    $newleaf = $this->from_preg_node($newleaf);
-                    $this->connection[$index][++$this->maxnum] = $newleaf;
-                    $array[$this->maxnum] = $passage1;
-                    unset($array[$key1]);
-                    unset($array[$key2]);
-                    break;
-               }
-            }
-        }
-    }
     /**
     *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
     *@param index - number of automate
@@ -679,6 +656,11 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         $options->expandquantifiers = true;
         parent::__construct($regex, $modifiers, $options);
+
+        $bigquant = $this->parser->get_max_finite_quant_borders_difference();
+        if ($bigquant > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
+            $this->errors[] = get_string('too_large_fa', 'qtype_preg');
+        }
 
         $this->roots[0] = $this->dst_root;//place dst root in engine specific place
         // Build finite automata
@@ -1235,12 +1217,6 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         switch ($name) {
             case 'node_subexpr':
                 return $this->from_preg_node($pregnode->operands[0]);
-            case 'node_finite_quant':
-                $pregnode = $this->convert_finite_quant($pregnode);
-                break;
-            case 'node_infinite_quant':
-                $pregnode = $this->convert_infinite_quant($pregnode);
-                break;
             case 'node_alt':
                 $pregnode = $this->convert_alternation($pregnode);
                 break;
@@ -1316,53 +1292,6 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 break;
         }
         return false;
-    }
-
-    /**
-     * Converts finite quantifier to operand and operand? combination
-     * @param node node with {}
-     * @return node subtree with ?
-     */
-    protected function convert_finite_quant($node) {
-        if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
-            return $node;    //TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
-        }
-
-        if ($node->leftborder <= 1 && $node->rightborder <= 1) {
-            return $node;
-        }
-
-        $res = new qtype_preg_node_concat;
-        for ($i = 0; $i < $node->rightborder; $i++) {
-            if ($i >= $node->leftborder) {
-                $tmp = new qtype_preg_node_finite_quant(0, 1);
-                $tmp->operands[0] = $node->operands[0];
-
-                $res->operands[$i] = $tmp;
-            } else {
-                $res->operands[$i] = clone $node->operands[0];
-            }
-        }
-        return $res;
-    }
-
-    /**
-     * Converts infinite quantifier to operand, operand? and operand* combination
-     * @param node node with {}
-     * @return node subtree with ? *
-     */
-    protected function convert_infinite_quant($node) {
-        if ($node->leftborder == 0) {
-            return $node;
-        }
-
-        $res = new qtype_preg_node_concat;
-        for ($i = 0; $i < $node->leftborder; ++$i) {
-            $res->operands[$i] = clone $node->operands[0];
-        }
-        $res->operands[$node->leftborder] = clone $node;
-        $res->operands[$node->leftborder]->leftborder = 0;
-        return $res;
     }
 
     protected function convert_alternation($node) {
