@@ -34,8 +34,16 @@ abstract class author_json {
 
         $json_array = array();
 
-        $regextext = optional_param('regex', '', PARAM_TEXT);
+        //$regextext = optional_param('regex', '', PARAM_TEXT);
 
+        if (isset($_POST['regex'])) {       // POST has precedence
+            $regextext = $_POST['regex'];
+        } else if (isset($_GET['regex'])) {
+            $regextext = $_GET['regex'];
+        } else {
+            $regextext = "";
+        }
+    
         //if(!empty($regextext)) {//regex not empty (owervise can't build tree)
             $id = optional_param('id', '', PARAM_INT);
 
