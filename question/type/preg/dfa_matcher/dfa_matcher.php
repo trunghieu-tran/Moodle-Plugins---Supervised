@@ -70,8 +70,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     var $result;
     var $picnum;//number of last picture
     protected $map;//map of symbol's following
-    protected $maxstatecount;
-    protected $maxpasscount;
+    protected $statelimit;
+    protected $transitionlimit;
     protected $zeroquantdeleted;
 
     public function name() {
@@ -181,7 +181,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 }
-                if (($passcount > $this->maxpasscount || $statecount > $this->maxstatecount) && $this->maxstatecount != 0 && $this->maxpasscount != 0) {
+                if (($passcount > $this->transitionlimit || $statecount > $this->statelimit) && $this->statelimit != 0 && $this->transitionlimit != 0) {
                     $this->errors[] = get_string('too_large_fa', 'qtype_preg');
                     return;
                 }
@@ -657,29 +657,36 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
      */
     public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
-        $this->picnum=0;
-        $this->zeroquantdeleted = false;
-        if (isset($CFG->qtype_preg_dfa_state_limit)) {
-            $this->maxstatecount = $CFG->qtype_preg_dfa_state_limit;
-        } else {
-            $this->maxstatecount = 0;
-        }
-        if (isset($CFG->qtype_preg_dfa_transition_limit)) {
-            $this->maxpasscount = $CFG->qtype_preg_dfa_transition_limit;
-        } else {
-            $this->maxpasscount = 0;
-        }
-        if (!isset($regex)) {//not build tree and dfa, if regex not given
+
+        if (!isset($regex)) {
             return;
         }
+
+        $this->picnum = 0;
+        $this->zeroquantdeleted = false;
+        $this->statelimit = 250;
+        $this->transitionlimit = 250;
+        if (isset($CFG->qtype_preg_dfa_state_limit)) {
+            $this->statelimit = $CFG->qtype_preg_dfa_state_limit;
+        }
+        if (isset($CFG->qtype_preg_dfa_transition_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_dfa_transition_limit;
+        }
+
+        // Call the parent constructor.
+        if ($options === null) {
+            $options = new qtype_preg_matching_options();
+        }
+        $options->expandquantifiers = true;
         parent::__construct($regex, $modifiers, $options);
+
         $this->roots[0] = $this->dst_root;//place dst root in engine specific place
-        //building finite automates
+        // Build finite automata
         if ($this->errors_exist()) {
             return;
         }
         $this->append_end(0);
-        //form the map of following
+        //form the followpos map
         $this->roots[0]->number($this->connection[0], $this->maxnum);
         $this->roots[0]->nullable();
         $this->roots[0]->firstpos();
