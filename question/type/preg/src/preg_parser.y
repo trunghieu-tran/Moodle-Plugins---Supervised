@@ -18,6 +18,8 @@
     private $subpatt_counter;
     // Followpos map.
     private $followpos;
+    // Max difference (right - left).
+    private $max_finite_quant_borders_difference;   // В принципе это костыль; когда ДКА будет получаться из НКА - удалить это.
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -29,6 +31,7 @@
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
         $this->followpos = array();
+        $this->max_finite_quant_borders_difference = 0;
     }
 
     public function get_root() {
@@ -49,6 +52,10 @@
 
     public function get_followpos() {
         return $this->followpos;
+    }
+
+    public function get_max_finite_quant_borders_difference() {
+        return $this->max_finite_quant_borders_difference;
     }
 
     /**
@@ -204,16 +211,17 @@
         }
     }
 
-    protected static function expand_quantifiers($node) {
+    protected function expand_quantifiers($node) {
         if (is_a($node, 'qtype_preg_operator')) {
             if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
-                $node->condbranch = self::expand_quantifiers($node->condbranch);
+                $node->condbranch = $this->expand_quantifiers($node->condbranch);
             }
             foreach ($node->operands as $key => $operand) {
-                $node->operands[$key] = self::expand_quantifiers($operand);
+                $node->operands[$key] = $this->expand_quantifiers($operand);
             }
         }
         if ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
+            $this->max_finite_quant_borders_difference = max($this->max_finite_quant_borders_difference, $node->rightborder - $node->leftborder);
             if ($node->leftborder == 0 && $node->rightborder == 0) {
                 // Convert x{0} to emptiness.
                 $node = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
@@ -283,7 +291,7 @@ start ::= lastexpr(B). {
 
     // Expand quantifiers if needed.
     if ($this->handlingoptions->expandquantifiers) {
-        $this->root = self::expand_quantifiers($this->root);
+        $this->root = $this->expand_quantifiers($this->root);
     }
 
     // Assign identifiers.
