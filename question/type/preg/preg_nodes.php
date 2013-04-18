@@ -159,6 +159,10 @@ abstract class qtype_preg_node {
     public $id = -1;
     /** Subpattern number. */
     public $subpattern = -1;
+    /** Some calculable values needed for nfa/dfa construction. */
+    public $nullable = null;
+    public $firstpos = null;
+    public $lastpos = null;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
@@ -169,6 +173,12 @@ abstract class qtype_preg_node {
      * is a leaf, or a subexpression, or a quantifier.
      */
     abstract public function is_subpattern();
+
+    /**
+     * Calculates nullable, firstpos, lastpos and followpos for this node.
+     * @param followpos array to store the followpos map.
+     */
+    abstract public function calculate_nflf(&$followpos);
 
     /**
      * Returns the dot script corresponding to this node.
@@ -216,6 +226,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
     public function is_subpattern() {
         return true;    // Any leaf is a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        // The following is true for almost all leafs, except emptiness.
+        $this->nullable = false;
+        $this->firstpos = array($this->id);
+        $this->lastpos = array($this->id);
     }
 
     public function dot_script($styleprovider, $isroot = true) {
@@ -875,6 +892,15 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         $this->subtype = $subtype;
     }
 
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        if ($this->subtype == self::SUBTYPE_EMPTY) {
+            $this->nullable = true;
+            $this->firstpos = array();
+            $this->lastpos = array();
+        }
+    }
+
     //TODO - ui_nodename()
 
     public function consumes($matcherstateobj = null) {
@@ -1190,7 +1216,6 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     }
 }
 
-
 /**
  * Defines operator nodes.
  */
@@ -1204,6 +1229,16 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         foreach ($this->operands as $i => $operand) {
             $this->operands[$i] = clone $operand;
         }
+    }
+
+    public function calculate_nflf(&$followpos) {
+        // Calculate nflf for all operands.
+        foreach ($this->operands as $operand) {
+            $operand->calculate_nflf($followpos);
+        }
+        $this->nullable = false;
+        $this->firstpos = array();
+        $this->lastpos = array();
     }
 
     public function dot_script($styleprovider, $isroot = true) {
@@ -1233,7 +1268,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         return $result;
     }
 }
-
 
 /**
  * Defines finite quantifiers with left and right borders, unary operator.
@@ -1265,6 +1299,14 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         return true;    // Finite quantifier is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = $this->leftborder == 0 || $this->operands[0]->nullable;
+        $this->firstpos = $this->operands[0]->firstpos;
+        $this->lastpos = $this->operands[0]->lastpos;
+        // TODO - followpos for situations like {2,10}
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1294,6 +1336,23 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         return true;    // Infinite quantifier is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = $this->leftborder == 0 || $this->operands[0]->nullable;
+        $this->firstpos = $this->operands[0]->firstpos;
+        $this->lastpos = $this->operands[0]->lastpos;
+        foreach ($this->lastpos as $lastpos) {
+            if (!array_key_exists($lastpos, $followpos)) {
+                $followpos[$lastpos] = array();
+            }
+            foreach ($this->operands[0]->firstpos as $firstpos) {
+                if (!in_array($firstpos, $followpos[$lastpos])) {
+                    $followpos[$lastpos][] = $firstpos;
+                }
+            }
+        }
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1309,6 +1368,54 @@ class qtype_preg_node_concat extends qtype_preg_operator {
     public function is_subpattern() {
         return false;    // Concatenation is not a subpattern.
     }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = true;
+        $this->firstpos = array();
+        $this->lastpos = array();
+        $count = count($this->operands);
+        // Nullable and firstpos are calculated as always.
+        for ($i = 0; $i < $count; $i++) {
+            $operand = $this->operands[$i];
+            if ($i == 0 || $this->nullable) {
+                $this->firstpos = array_merge($this->firstpos, $operand->firstpos);
+            }
+            if (!$operand->nullable) {
+                $this->nullable = false;
+            }
+        }
+        // Lastpos is calculated backwards.
+        for ($i = $count - 1; $i >= 0; $i--) {
+            $operand = $this->operands[$i];
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos);
+            if (!$operand->nullable) {
+                break;
+            }
+        }
+
+        // Followpos is calculated for each operand except the last one.
+        for ($i = 0; $i < $count - 1; $i++) {
+            $left = $this->operands[$i];
+            foreach ($left->lastpos as $lastpos) {
+                if (!array_key_exists($lastpos, $followpos)) {
+                    $followpos[$lastpos] = array();
+                }
+
+                for ($j = $i + 1; $j < $count; $j++) {
+                    $right = $this->operands[$j];
+                    foreach ($right->firstpos as $firstpos) {
+                        if (!in_array($firstpos, $followpos[$lastpos])) {
+                            $followpos[$lastpos][] = $firstpos;
+                        }
+                    }
+                    if (!$right->nullable) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -1322,6 +1429,21 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function is_subpattern() {
         return false;    // Alternation is not a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = false;
+        $this->firstpos = array();
+        $this->lastpos = array();
+        for ($i = 0; $i < count($this->operands); $i++) {
+            $operand = $this->operands[$i];
+            if ($operand->nullable) {
+                $this->nullable = true;
+            }
+            $this->firstpos = array_merge($this->firstpos, $operand->firstpos);
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos);
+        }
     }
 }
 
@@ -1352,6 +1474,12 @@ class qtype_preg_node_assert extends qtype_preg_operator {
         return true;    // Lookaround assertion is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        $this->nullable = false;
+        $this->firstpos = array($this->id);
+        $this->lastpos = array($this->id);
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1379,6 +1507,13 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
 
     public function is_subpattern() {
         return true;    // Subexpression is a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = $this->operands[0]->nullable;
+        $this->firstpos = $this->operands[0]->firstpos;
+        $this->lastpos = $this->operands[0]->lastpos;
     }
 
     //TODO - ui_nodename()
@@ -1420,6 +1555,11 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
     public function is_subpattern() {
         return true;    // Conditional subexpression is a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        // TODO what should be here?
     }
 
     //TODO - ui_nodename()
