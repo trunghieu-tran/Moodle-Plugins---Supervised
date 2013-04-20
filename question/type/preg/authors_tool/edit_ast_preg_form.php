@@ -53,15 +53,12 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('text', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('size' => 100));
 
         $agent = getenv('HTTP_USER_AGENT');
-        if(stristr($agent, 'MSIE'))
-        {
+        if (stristr($agent, 'MSIE')) {
             $mform->addElement('html', '<div style="margin-left: 79px" >');
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
             $mform->addElement('html', '</div>');
-        }
-        else
-        {
+        } else {
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
@@ -70,12 +67,12 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
+        $mform->addElement('html', '<div style="width:100%;max-height:400px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
 
         //Add graph
         $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
         $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></br>');
+        $mform->addElement('html', '<div style="width:100%;max-height:400px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></br>');
 
         //Add description
         $mform->addElement('header', 'regex_description_header', get_string('regex_description_header', 'qtype_preg'));
