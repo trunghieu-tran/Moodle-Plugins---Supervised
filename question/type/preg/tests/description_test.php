@@ -75,7 +75,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('\B','not at a word boundary','рус - TODO'),
           array('\A','at the start of the subject','рус - TODO'),
           array('\Z','at the end of the subject','рус - TODO'),
-          array('\G','at the first matching position in the subject','рус - TODO')
+          //array('\G','at the first matching position in the subject','рус - TODO')
         );
     }
 

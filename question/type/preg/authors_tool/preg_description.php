@@ -183,6 +183,7 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
         $this->options->rangelengthmax          = (int)$rangelengthmax;
         // make description
         if(isset($this->dst_root)){
+            //var_dump(123);
             $string = $this->dst_root->description($numbering_pattern,null,null);
             $string = self::postprocessing($string);
         }
@@ -325,7 +326,7 @@ abstract class qtype_preg_description_node{
      * @param string $s same as in get_string
      * @param string $form Required form.
      */
-    public static function get_form_string($s,$form=null){
+    protected static function get_form_string($s,$form=null){
 
         if(isset($form) && $form !== ''){
             $s.='_'.$form;
@@ -882,24 +883,60 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
     public function description($numbering_pattern,$node_parent=null,$form=null){
-
+        //var_dump(123);
         $description = '';
         $child_description = '';
-        $matches = array();
-        $i = 0;
+        //$matches = array();
+        //$i = 0;
 
         $this->pattern = $this->pattern($node_parent,$form);
         $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
 
-        $find = '/%(\w+)?(\d)/';
+        /*$find = '/%(\w+)?(\d)/';
         while(preg_match($find,$description,$matches) !== 0){
             $form = $matches[1];
             $i = (int)$matches[2];
             $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
             $description = str_replace($matches[0],$child_description,$description);
+        }*/
+        $replaces = $this->what_to_replace($description);
+        foreach ($replaces as $num => $data) {
+            //var_dump($num);
+            $child_description = $this->operands[$num-1]->description($numbering_pattern,$this,$data['form']);
+            $description = str_replace($data['toreplace'],$child_description,$description);
         }
-        qtype_preg_description_leaf_options::check_options($this,$resultpattern,$form);
+        qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
+    }
+
+    protected function what_to_replace($str) {
+        $pos = null;
+        $form = null;
+        $numstr = null;
+        $num = null;
+        $full = null;
+        $result = array();
+        $pos = strpos($str, '%');
+        $len = strlen($str);
+        while($pos!==false) {
+            //echo($pos);
+            $pos++;
+            $form = '';
+            while($len>$pos && ctype_alpha($str[$pos])) {
+                $form += $str[$pos];
+                $pos++;
+            }
+            $numstr = '';
+            while($len>$pos && ctype_digit($str[$pos])) {
+                $numstr += $str[$pos];
+                $pos++;
+            }
+            $num = (int)$numstr;
+            $full = '%'.$form.$numstr;
+            $result[$num] = array('toreplace'=>$full, 'form'=>$form);
+            $pos = strpos($str, '%', $pos);
+        }
+        return $result;
     }
 }
 
@@ -959,6 +996,8 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         return $resultpattern;
     }
 
+
+
 }
 
 /**
@@ -1008,7 +1047,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
-    public function pattern($node_parent=null,$form=null){
+    /*public function pattern($node_parent=null,$form=null){
         $resultpattern = '';
         $type1 = $this->operands[0]->pregnode->type;
         $type2 = $this->operands[1]->pregnode->type;
@@ -1045,6 +1084,95 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             $resultpattern = self::get_form_string('description_concat',$form);
         }
         return $resultpattern;
+    }*/
+
+        /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$node_parent=null,$form=null){
+
+        /*$description = '';
+        $child_description = '';
+        $matches = array();
+        $i = 0;
+
+        $this->pattern = $this->pattern($node_parent,$form);
+        $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
+
+        $find = '/%(\w+)?(\d)/';
+        while(preg_match($find,$description,$matches) !== 0){
+            $form = $matches[1];
+            $i = (int)$matches[2];
+            $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
+            $description = str_replace($matches[0],$child_description,$description);
+        }
+        qtype_preg_description_leaf_options::check_options($this,$resultpattern,$form);
+        return $description;*/
+
+        $description = '';
+        $childs_count = count($this->operands);
+        $type1 = null;
+        $type2 = null;
+        $subtype1 = null;
+        $subtype2 = null;
+        $left = null;
+        $right = null;
+        $prevdescription = null;
+        $resultpattern = '';
+
+        for($i=$childs_count-2; $i>=0; $i--) {
+            //echo($i);
+            $left = $this->operands[$i];
+            $right = $this->operands[$i+1];
+
+            // getting pattern
+            $type1 = $left->pregnode->type;
+            $type2 = $right->pregnode->type;
+            $subtype1 = $left->pregnode->subtype;
+            $subtype2 = $right->pregnode->subtype;
+
+            $needshortpattern = $type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    $left->is_one_char() &&
+                    $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    $right->is_one_char();
+            $needcontiuneshortpattern = $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    $right->is_one_char() &&
+                    $type1===qtype_preg_node::TYPE_NODE_CONCAT &&
+                    $left->operands[1]->pregnode->type===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    $left->operands[1]->is_one_char();
+            $firstaheadassert = $subtype1===qtype_preg_node_assert::SUBTYPE_PLA || $subtype1===qtype_preg_node_assert::SUBTYPE_NLA;
+            $secondbehindassert = $subtype2===qtype_preg_node_assert::SUBTYPE_PLB || $subtype2===qtype_preg_node_assert::SUBTYPE_NLB;
+            $aheadassertinprevconcat = $type1===qtype_preg_node::TYPE_NODE_CONCAT &&
+                    ($left->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_PLA ||
+                    $left->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_NLA);
+            $neddspacepattern = $type1===qtype_preg_node::TYPE_LEAF_OPTIONS ||
+                    ($type1===qtype_preg_node::TYPE_NODE_CONCAT &&
+                    $left->operands[1]->pregnode->type===qtype_preg_node::TYPE_LEAF_OPTIONS);
+            if($neddspacepattern) {
+                $description = self::get_form_string('description_concat_space',$form);
+            } else if($needshortpattern || $needcontiuneshortpattern) {
+                $description = self::get_form_string('description_concat_short',$form);
+            } else if($firstaheadassert || $secondbehindassert || $aheadassertinprevconcat){
+                $description = self::get_form_string('description_concat_and',$form);
+            } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT) {
+                $description = self::get_form_string('description_concat_wcomma',$form);
+            } else {
+                $description = self::get_form_string('description_concat',$form);
+            }
+
+            //setuping description
+            $replace = $this->what_to_replace($description);
+            if($prevdescription===null) {
+                $prevdescription = $right->description($numbering_pattern,$this,$replace[2]['form']);
+            }
+            $description = str_replace($replace[2]['toreplace'],$prevdescription,$description);
+            $child_description = $left->description($numbering_pattern,$this,$replace[1]['form']);
+            $description = str_replace($replace[1]['toreplace'],$child_description,$description);
+            $prevdescription = $description;
+        }
+        $description = $this->numbering_pattern($numbering_pattern,$description);
+        qtype_preg_description_leaf_options::check_options($this,$description,$form);
+        return $description;
     }
 
 }
@@ -1057,7 +1185,7 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
-    public function pattern($node_parent=null,$form=null){
+    /*public function pattern($node_parent=null,$form=null){
 
         $resultpattern = '';
         $type1 = $this->operands[0]->pregnode->type;
@@ -1069,6 +1197,60 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
             $resultpattern = self::get_form_string('description_alt',$form);
         }
         return $resultpattern;
+    }*/
+
+    public function description($numbering_pattern,$node_parent=null,$form=null){
+
+        /*$description = '';
+        $child_description = '';
+        $matches = array();
+        $i = 0;
+
+        $this->pattern = $this->pattern($node_parent,$form);
+        $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
+
+        $find = '/%(\w+)?(\d)/';
+        while(preg_match($find,$description,$matches) !== 0){
+            $form = $matches[1];
+            $i = (int)$matches[2];
+            $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
+            $description = str_replace($matches[0],$child_description,$description);
+        }
+        qtype_preg_description_leaf_options::check_options($this,$resultpattern,$form);
+        return $description;*/
+        //var_dump(123);
+        $description = '';
+        $childs_count = count($this->operands);
+        $left = null;
+        $right = null;
+        $prevdescription = null;
+
+        for($i=$childs_count-2; $i>=0; $i--) {
+            //var_dump($i);
+            $left = $this->operands[$i];
+            $right = $this->operands[$i+1];
+
+            // getting pattern
+
+            if($childs_count>2 && $i!==$childs_count-2){
+                $description = self::get_form_string('description_alt_wcomma',$form);
+            } else {
+                $description = self::get_form_string('description_alt',$form);
+            }
+
+            //setuping description
+            $replace = $this->what_to_replace($description);
+            if($prevdescription===null) {
+                $prevdescription = $right->description($numbering_pattern,$this,$replace[2]['form']);
+            }
+            $description = str_replace($replace[2]['toreplace'],$prevdescription,$description);
+            $child_description = $left->description($numbering_pattern,$this,$replace[1]['form']);
+            $description = str_replace($replace[1]['toreplace'],$child_description,$description);
+            $prevdescription = $description;
+        }
+        $description = $this->numbering_pattern($numbering_pattern,$description);
+        qtype_preg_description_leaf_options::check_options($this,$description,$form);
+        return $description;
     }
 
 }
