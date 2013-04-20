@@ -211,7 +211,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         return array(
           array('(?i)b','caseless: <span style="color:blue">b</span>','рус - TODO'),
           array('(?i:b)','grouping: [caseless: <span style="color:blue">b</span>]','рус - TODO'),
-          array('(a(?i)b)c','subexpression #1: [<span style="color:blue">a</span> then caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
+          array('(a(?i)b)c','case sensitive: subexpression #1: [<span style="color:blue">a</span> then caseless: <span style="color:blue">b</span>] then <span style="color:blue">c</span>','рус - TODO'),
           //array('(?i)a(?u)b(?-i)c(?-u)d','subexpression #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
         );
     }
@@ -224,7 +224,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         //var_dump($handler);
         $result = $handler->default_description();
         //$expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
-        $expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
+        $expected = '<span class="description_node_1"><span class="description_node_2">subexpression #1: [<span class="description_node_3"><span class="description_node_4">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_5">nothing</span></span>]</span> then <span class="description_node_6"><span class="description_node_7">not word character</span> is repeated any number of times</span></span>';
         $this->assertEquals($expected, $result);
     }
 

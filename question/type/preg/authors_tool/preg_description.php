@@ -529,6 +529,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         return $result;
     }
 
+    protected function fix_pattern_name_suffix($suffix) {
+
+    }
+
     /**
      * Convertes charset flag to array of descriptions(strings)
      *
