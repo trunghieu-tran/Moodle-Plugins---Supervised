@@ -79,13 +79,14 @@ M.poasquestion_text_and_button = {
     btn_pressed : function(e, pagewidth, targetinput) {
 
         e.preventDefault();
+        pagewidth = pagewidth || 1000;// width of dialog
         var is_first_press = this.dialog === null;
 
         this.currentlinput = targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
         this.data = this.currentlinput.get('value');
         if (is_first_press) {
             // if the 'Test regex' button is first pressed, we should generate a dialog window
-            this.setup_dialog();
+            this.setup_dialog(pagewidth);
         }
 
         if(is_first_press && typeof(this.onfirstpresscallback) === "function") {
@@ -102,13 +103,12 @@ M.poasquestion_text_and_button = {
      * Сreates new dialog object
      * @param {int} pagewidth width of dialog
      */
-    setup_dialog : function() {
+    setup_dialog : function(pagewidth) {
         var self = M.poasquestion_text_and_button;
         this.dialog = new this.Y.Panel({
             contentBox: Y.Node.create('<div id="dialog" />'),
             bodyContent: '<div class="message icon-warn">Loading...</div>',
-            width: '90%',
-            height: 'auto',
+            width: pagewidth,
             zIndex: 120,
             centered: true,
             modal: true, // modal behavior

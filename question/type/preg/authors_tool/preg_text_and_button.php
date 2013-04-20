@@ -23,7 +23,11 @@ class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_butt
     //private $parentjsobjname = 'M.poasquestion_text_and_button';
 
     function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
-        parent::MoodleQuickForm_text_and_button($elementName, $elementButtonName, $elementLabel, $elementLinks, $attributes);
+        if ($attributes === null) {
+            $attributes = array();
+        }
+        $attributes['width'] = '90%';
+        parent::__construct($elementName, $elementButtonName, $elementLabel, $elementLinks, $attributes);
     }
 
     function toHtml() {
