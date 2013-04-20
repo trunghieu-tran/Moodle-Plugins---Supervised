@@ -46,13 +46,13 @@ M.preg_authors_tool_script = {
      * Sets the divs' width to max possible values. This is done via javascript
      * because of some browser incompatibilites.
      */
-    fit_images : function() {
+    /*fit_images : function() {
         var tree_handler = this.Y.one('#tree_handler');
         tree_handler._node.style.width = tree_handler._node.clientWidth + 'px';
 
         var graph_handler = this.Y.one('#graph_handler');
         graph_handler._node.style.width = graph_handler._node.clientWidth + 'px';
-    },
+    },*/
 
     /**
      * Sets up options of parent object
@@ -72,7 +72,7 @@ M.preg_authors_tool_script = {
                     self.back_btn = self.Y.one('#id_regex_back');
                     self.back_btn.on("click", self.back_regex);
                     self.main_input.set('value',M.poasquestion_text_and_button.data);
-                    self.fit_images();
+                    //self.fit_images();
                     self.load_content();
                 })
             },
