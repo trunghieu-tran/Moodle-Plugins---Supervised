@@ -161,7 +161,7 @@ class qtype_preg_dot_style_provider {
      * @param string $rankdirlr if true, also adds "rankdir = LR".
      * @return string the heading of a dot script.
      */
-    public function get_dot_head($rankdirlr = true) {
+    public function get_dot_head($rankdirlr = false) {
         $result = 'digraph {';
         if ($rankdirlr) {
             $result .= 'rankdir = LR;';

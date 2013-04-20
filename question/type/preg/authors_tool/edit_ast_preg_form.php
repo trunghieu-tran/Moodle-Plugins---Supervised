@@ -31,53 +31,41 @@ class qtype_preg_authors_tool_form extends moodleform {
         global $CFG;
         global $PAGE;
 
-        $mform =& $this->_form;//Create form
+        // Create the form.
+        $mform =& $this->_form;
 
-        //$PAGE->requires->js('/question/type/preg/authors_tool/author_tool.js');
-        //$mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
-        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
+        // Add header.
+        $mform->addElement('html', '<div align="center"><h2>' . get_string('author_tool_page_header', 'qtype_preg') . '</h2></div>');
 
-        /* ATTENTION! SHOULD USE 'NORMAL' SCRIPT INCLUDE */
-        //$mform->addElement('html', '<script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js"></script>');
-
-        //$PAGE->requires->js('/question/type/preg/authors_tool/preg_authors_tool_script.js');
-        //$mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
-
-        //Add header
-        $mform->addElement('html', '<div align="center"><h2>' . get_string('author_tool_page_header', 'qtype_preg')  . '</h2></div>');
-
-        //Add widget on form
+        // Add widget on form.
         $mform->addElement('header', 'regex_input_header', get_string('regex_edit_header_text', 'qtype_preg'));
         $mform->addHelpButton('regex_input_header','regex_edit_header', 'qtype_preg');
 
         $mform->addElement('text', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('size' => 100));
 
         $agent = getenv('HTTP_USER_AGENT');
-        if(stristr($agent, 'MSIE'))
-        {
+        if (stristr($agent, 'MSIE')) {
             $mform->addElement('html', '<div style="margin-left: 79px" >');
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
             $mform->addElement('html', '</div>');
-        }
-        else
-        {
+        } else {
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
 
-        //Add tree
+        // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
+        $mform->addElement('html', '<div style="max-height:400px;overflow:auto;position:relative" id="tree_handler"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></br>');
 
-        //Add graph
+        // Add graph.
         $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
         $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
-        $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></br>');
+        $mform->addElement('html', '<div style="max-height:400px;overflow:auto;position:relative" id="graph_handler"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></br>');
 
-        //Add description
+        // Add description.
         $mform->addElement('header', 'regex_description_header', get_string('regex_description_header', 'qtype_preg'));
         $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
