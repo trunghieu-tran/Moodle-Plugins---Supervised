@@ -326,6 +326,11 @@ $string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_16value'] = 'character with code 0x%code';
 //$string['description_charset_one'] = '%characters';
 // non-printing characters
+$string['description_charflag_slashd'] = 'decimal digit';
+$string['description_charflag_slashh'] = 'horizontal white space character';
+$string['description_charflag_slashs'] = 'white space';
+$string['description_charflag_slashv'] = 'vertical white space character';//TODO - third string for description \v is it good?
+$string['description_charflag_slashw'] = 'word character';
 $string['description_char0'] = 'null character(NUL)';
 $string['description_char1'] = 'start of header character (SOH)';
 $string['description_char2'] = 'start of text character(STX)';
