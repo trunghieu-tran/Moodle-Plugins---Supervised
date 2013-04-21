@@ -235,10 +235,18 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
     /**
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
      * Returns true if node is supported or user interface string describing
-     *   what properties of node isn't supported.
+     * what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
         return true;
+    }
+
+    protected function generate_json_for_empty_regex(&$json_array, $id) {
+        $json_array['description'] = '';
+    }
+
+    protected function generate_json_for_incorrect_regex(&$json_array, $id) {
+        $json_array['description'] = 'Ooops! Your regex contains errors, so I can\'t build the description!';
     }
 
     /**
@@ -246,31 +254,8 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
      *
      * @param array $json_array contains text of description
      */
-    public function generate_json(&$json_array, $regextext, $id){
-
-        global $CFG;
-
-        if(!empty($regextext)) {
-            if($id == -1){
-
-                //Checking parser errors
-                $pars_error = false;
-                foreach($this->get_errors() as $error) {
-                    if (is_a($error, 'qtype_preg_parsing_error')) {
-                        $pars_error = true;
-                        break;
-                    }
-                }
-
-                if($pars_error === false && $this->get_ast_root() !== NULL) {
-                    $json_array['description'] = $this->default_description();//Add tree
-                } else {
-                    $json_array['description'] = 'Ooops! I can\'t build description!';
-                }
-            }
-        } else {
-            $json_array['description'] = 'Ooops! I can\'t build description!';
-        }
+    protected function generate_json_for_correct_regex(&$json_array, $id){
+        $json_array['description'] = $this->default_description();
     }
 }
 
@@ -745,38 +730,38 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
 
         if($node->pregnode->type === qtype_preg_node::TYPE_NODE_SUBEXPR) {
 
-			$node->handler->state->forceunsetmodifiers = true;
+            $node->handler->state->forceunsetmodifiers = true;
 
-		} else if($node->handler->state->forceunsetmodifiers === true) { // any other leaf
+        } else if($node->handler->state->forceunsetmodifiers === true) { // any other leaf
 
-			// TODO - generate 'caseless, singleline:' instead of 'caseless: singleline:'
-			if($mcaseless === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_i',$form) . ' ';
-				$mcaseless = false;
-			}
-			if($msingleline === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_s',$form) . ' ';
-				$msingleline = false;
-			}
-			if($mmultilineline === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_m',$form) . ' ';
-				$mmultilineline = false;
-			}
-			if($mextended === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_x',$form) . ' ';
-				$mextended = false;
-			}
-			if($mungreedy === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_U',$form) . ' ';
-				$mungreedy = false;
-			}
-			if($mduplicate === true) {
-				$resultpattern .= self::get_form_string('description_unsetoption_J',$form) . ' ';
-				$mduplicate = false;
-			}
-			$node->handler->state->forceunsetmodifiers = false;
-			$node_pattern = $resultpattern . $node_pattern;
-		}
+            // TODO - generate 'caseless, singleline:' instead of 'caseless: singleline:'
+            if($mcaseless === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_i',$form) . ' ';
+                $mcaseless = false;
+            }
+            if($msingleline === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_s',$form) . ' ';
+                $msingleline = false;
+            }
+            if($mmultilineline === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_m',$form) . ' ';
+                $mmultilineline = false;
+            }
+            if($mextended === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_x',$form) . ' ';
+                $mextended = false;
+            }
+            if($mungreedy === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_U',$form) . ' ';
+                $mungreedy = false;
+            }
+            if($mduplicate === true) {
+                $resultpattern .= self::get_form_string('description_unsetoption_J',$form) . ' ';
+                $mduplicate = false;
+            }
+            $node->handler->state->forceunsetmodifiers = false;
+            $node_pattern = $resultpattern . $node_pattern;
+        }
     }
 
 }

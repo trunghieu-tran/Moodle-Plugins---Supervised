@@ -477,8 +477,8 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     return false;
             }
         } else {
-			return false;
-		}
+            return false;
+        }
 
         if (count($g1->entries) == count($g2->entries)) {
             for ($i = 0; $i < count($g1->entries); ++$i) {
@@ -524,47 +524,25 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         return true;
     }
 
+    protected function generate_json_for_empty_regex(&$json_array, $id) {
+        $dotscript = 'digraph { }';
+        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+    }
+
+    protected function generate_json_for_incorrect_regex(&$json_array, $id) {
+        $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the explaining graph!" [color=white]; }';
+        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+    }
+
     /**
      * Generate image for explain graph
      *
      * @param array $json_array contains link on image of explain graph
      */
-    public function generate_json(&$json_array, $regextext, $id) {
-
-        global $CFG;
-
-        if(!empty($regextext)) {
-
-            //Checking parser errors
-            $pars_error = false;
-            foreach($this->get_errors() as $error) {
-                if (is_a($error, 'qtype_preg_parsing_error') || is_a($error, 'qtype_preg_accepting_error')) {
-                    $pars_error = true;
-                    break;
-                }
-            }
-
-            if($pars_error === false && $this->get_ast_root() !== NULL && $this->get_dst_root() !== NULL) {
-
-                $graph = $this->create_graph($id);
-                $dot_instructions_graph = $graph->create_dot();
-
-                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
-
-            } else {
-                $json_array['graph_src'] = $CFG->wwwroot . '/question/type/preg/tmp_img/graph_err.png';
-            }
-        } else {
-            $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_def.png'; //Add graph
-        }
-    }
-
-    public function get_errors() {
-        $res = array();
-        foreach($this->errors as $error) {
-            $res[] = $error;
-        }
-        return $res;
+    protected function generate_json_for_correct_regex(&$json_array, $id) {
+        $graph = $this->create_graph($id);
+        $dot_instructions_graph = $graph->create_dot();
+        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
     }
 }
 
