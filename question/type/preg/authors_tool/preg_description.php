@@ -1141,7 +1141,7 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
 
             // getting pattern
 
-            if($childs_count>2 && $i!==$childs_count-2){
+            if($i!==0){
                 $description = self::get_form_string('description_alt_wcomma',$form);
             } else {
                 $description = self::get_form_string('description_alt',$form);
