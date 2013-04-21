@@ -33,9 +33,9 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
 
     var $idbutton = '';
 
-    private $btn_id_postfix = '_btn';
+    private $_btn_id_postfix = '_btn';
 
-    private $jsmodule = null;
+    private $_jsmodule = null;
 
     /**
      * constructor
@@ -55,14 +55,14 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
             $attributes['width'] = '1000px';
         }
         parent::MoodleQuickForm_text($elementName, $elementLabel, $attributes);
-        $this->idbutton .= $elementButtonName;
-        $this->linkonpage .= $elementLinks['link_on_page'];
-        $this->linkonbuttonimage .= $elementLinks['link_on_button_image'];
+        $this->idbutton = $elementButtonName;
+        $this->linkonpage = $elementLinks['link_on_page'];
+        $this->linkonbuttonimage = $elementLinks['link_on_button_image'];
 
-        $this->jsmodule = array('name'     => 'poasquestion_text_and_button',
+        $this->_jsmodule = array('name'     => 'poasquestion_text_and_button',
                                 'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js',
                                 'requires' => array('node', 'panel', 'node-load', 'get', 'io-xdr', 'substitute'));
-        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', null, true, $this->jsmodule);
+        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', null, true, $this->_jsmodule);
 
     }
 
@@ -71,7 +71,7 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
     }
 
     function getButtonId() {
-        return $this->getAttribute('id') . $this->btn_id_postfix;
+        return $this->getAttribute('id') . $this->_btn_id_postfix;
     }
 
     function getWidth() {
@@ -103,9 +103,9 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
             $this->getWidth()
         );
         //var_dump($jsargs);
-        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->jsmodule);
+        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->_jsmodule);
 
-        return $parenthtml . '<input type="image" src="' . $this->linkonbuttonimage . '" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() .'">';
+        return $parenthtml . '<input type="image" src="' . $this->linkonbuttonimage . '" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() .'" />';
         //return parent::toHtml() . '<input type="image" src="' . $this->linkonbuttonimage . '" name="button_'. $this->idbutton . '" id="id_button_' . $this->idbutton . '">';
     }
 
