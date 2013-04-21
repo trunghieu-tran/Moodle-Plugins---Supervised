@@ -655,7 +655,109 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
         $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
     }
-    function test_syntax_errors() {
+    function test_preserve_all_nodes() {
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser('(?:a)', $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+    }
+    function test_pcre_strict() {
+        // Empty parentheses should be empty subexpression.
+        $parser = $this->run_parser('()', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Nested empty parentheses.
+        $parser = $this->run_parser('((?=))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Empty parentheses with concatenation.
+        $parser = $this->run_parser('a()b', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        // Empty assertion.
+        $parser = $this->run_parser('(?=)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->subtype === qtype_preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Empty conditional subexpression.
+        $parser = $this->run_parser('(?(<name>))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($root->number === 'name');
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Empty conditional subexpression with empty assertion but not empty branches.
+        $parser = $this->run_parser('(?(?<=)a)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_PLB);
+        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->condbranch->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Conditional subexpression with assertion and empty body.
+        $parser = $this->run_parser('(?(?!a))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_NLA);
+        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        // Conditional subexpression with empty assertion and empty body.
+        $parser = $this->run_parser('(?(?<!))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_NLB);
+        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->condbranch->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Conditional subexpression with some condition and empty body.
+        $parser = $this->run_parser('(?(+1))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($root->number === 1);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        // Conditional subexpression with some condition and empty body (same as the previous one but named).
+        $parser = $this->run_parser('(?(<name>))', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($root->number === 'name');
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    }
+    function test_errors() {
         // Unclosed square brackets.
         $parser = $this->run_parser('ab(c|d)[fg\\]', $errornodes);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
@@ -762,6 +864,37 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[0]->indfirst === 2);
         $this->assertTrue($errornodes[0]->indlast === 6);
         $this->assertTrue(empty($errornodes[1]->operands));
+        // Conditional subexpression with empty condition is error.
+        $parser = $this->run_parser('(?()a)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(count($errornodes) === 1);
+        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
+        $this->assertTrue($errornodes[0]->indfirst === 0);
+        $this->assertTrue($errornodes[0]->indlast === 3);
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $parser = $this->run_parser('(?()yes|no)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(count($errornodes) === 1);
+        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
+        $this->assertTrue($errornodes[0]->indfirst === 0);
+        $this->assertTrue($errornodes[0]->indlast === 3);
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        // Conditional subexpression with empty condition is error (same as the previous one but with empty body).
+        $parser = $this->run_parser('(?())', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue(count($errornodes) === 1);
+        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
+        $this->assertTrue($errornodes[0]->indfirst === 0);
+        $this->assertTrue($errornodes[0]->indlast === 3);
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         // Everything possible.
         $parser = $this->run_parser('(*UTF9))((?(?=x)a|b|c)({5,4})(?i-i)[[:hamster:]]\p{Squirrel}', $errornodes);
         $this->assertTrue(count($errornodes) === 9);
@@ -814,132 +947,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[8]->indfirst === 8);
         $this->assertTrue($errornodes[8]->indlast === 8);
         $this->assertTrue(is_a($errornodes[8]->operands[0], 'qtype_preg_node_concat'));
-    }
-    function test_preserve_all_nodes() {
-        $options = new qtype_preg_handling_options;
-        $options->preserveallnodes = true;
-        $parser = $this->run_parser('(?:a)', $errornodes, $options);
-        $root = $parser->get_root();
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-    }
-    function test_pcre_strict() {
-        //$options = new qtype_preg_handling_options();
-        //$options->pcrestrict = true;
-        // Empty parentheses should be empty subexpression.
-        $parser = $this->run_parser('()', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Nested empty parentheses.
-        $parser = $this->run_parser('((?=))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_node_assert::SUBTYPE_PLA);
-        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Empty parentheses with concatenation.
-        $parser = $this->run_parser('a()b', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        // Empty assertion.
-        $parser = $this->run_parser('(?=)', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->subtype === qtype_preg_node_assert::SUBTYPE_PLA);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Empty conditional subexpression.
-        $parser = $this->run_parser('(?(<name>))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->number === 'name');
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Empty conditional subexpression with empty assertion but not empty branches.
-        $parser = $this->run_parser('(?(?<=)a)', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_PLB);
-        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->condbranch->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Conditional subexpression with assertion and empty body.
-        $parser = $this->run_parser('(?(?!a))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_NLA);
-        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        // Conditional subexpression with empty assertion and empty body.
-        $parser = $this->run_parser('(?(?<!))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $this->assertTrue($root->condbranch->type === qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->condbranch->subtype === qtype_preg_node_assert::SUBTYPE_NLB);
-        $this->assertTrue($root->condbranch->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->condbranch->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Conditional subexpression with some condition and empty body.
-        $parser = $this->run_parser('(?(+1))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->number === 1);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        // Conditional subexpression with some condition and empty body (same as the previous one but named).
-        $parser = $this->run_parser('(?(<name>))', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->number === 'name');
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-
-        // Conditional subexpression with empty condition is error.
-        $parser = $this->run_parser('(?()a)', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(count($errornodes) === 1);
-        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
-        $this->assertTrue($errornodes[0]->indfirst === 0);
-        $this->assertTrue($errornodes[0]->indlast === 3);
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        // Conditional subexpression with empty condition is error (same as the previous one but with empty body).
-        $parser = $this->run_parser('(?())', $errornodes/*, $options*/);
-        $root = $parser->get_root();
-        $this->assertTrue(count($errornodes) === 1);
-        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
-        $this->assertTrue($errornodes[0]->indfirst === 0);
-        $this->assertTrue($errornodes[0]->indlast === 3);
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     }
     function test_parser_followpos_infinite_quant() {
         $parser = $this->run_parser('a*', $errornodes);
