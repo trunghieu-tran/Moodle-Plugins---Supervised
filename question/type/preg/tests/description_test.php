@@ -236,7 +236,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_condmask($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        //if($regex == '(?(?=a)b)' )var_dump($handler);
+        //if($regex == '(?(?=a)b)' )var_dump($handler->dst_root);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
     }

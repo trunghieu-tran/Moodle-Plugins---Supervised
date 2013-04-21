@@ -922,6 +922,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $result = array();
         $pos = strpos($str, '%');
         $len = strlen($str);
+        $wasnum = false;
         while($pos!==false) {
             //echo($pos);
             $pos++;
@@ -934,10 +935,13 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
             while($len>$pos && ctype_digit($str[$pos])) {
                 $numstr += $str[$pos];
                 $pos++;
+                $wasnum = true;
             }
-            $num = (int)$numstr;
-            $full = '%'.$form.$numstr;
-            $result[$num] = array('toreplace'=>$full, 'form'=>$form);
+            if($wasnum) {
+                $num = (int)$numstr;
+                $full = '%'.$form.$numstr;
+                $result[$num] = array('toreplace'=>$full, 'form'=>$form);
+            }
             $pos = strpos($str, '%', $pos);
         }
         return $result;
@@ -1125,7 +1129,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
  */
 class qtype_preg_description_node_alt extends qtype_preg_description_operator{
 
-    public function description($numbering_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null) {
 
         $description = '';
         $childs_count = count($this->operands);
@@ -1228,9 +1232,22 @@ class qtype_preg_description_node_subexpr extends qtype_preg_description_operato
  */
 class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_operator {
 
-    private function description_of_condition($form){
+    protected $condbranch;
+
+    /**
+     * Construct array of operands, using method qtype_regex_handler::from_preg_node()
+     *
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct(&$node, &$matcher) {
+        parent::__construct($node, $matcher);
+        $this->condbranch = $matcher->from_preg_node($node->condbranch);
+    }
+
+    /*private function description_of_condition($form){
         $resultpattern = '';
-        switch ($this->pregnode->operands[2]->subtype) {
+        switch ($this->pregnode->condbranch->operands[0]->subtype) {
             case qtype_preg_node_assert::SUBTYPE_PLA:
                 $resultpattern = self::get_form_string('description_pla_node_assert',$form);
                 break;
@@ -1248,7 +1265,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
                 break;
         }
         return $resultpattern;
-    }
+    }*/
 
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
@@ -1284,7 +1301,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
 
         } else {
             $resultpattern = self::get_form_string('description_node_cond_subexpr',$form);
-            $resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands),$resultpattern);
+            //$resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands),$resultpattern);
         }
 
         $elsereplase = isset($this->pregnode->operands[1])?self::get_form_string('description_node_cond_subexpr_else',$form):'';
@@ -1292,7 +1309,14 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         return $resultpattern;
     }
 
-
+    public function description($numbering_pattern,$node_parent=null,$form=null) {
+        $resultpattern = parent::description($numbering_pattern,$this,$form);
+        if(strpos($resultpattern, '%cond')!==false) {
+            $conddescription = $this->condbranch->description($numbering_pattern,$this,$form);
+            $resultpattern = str_replace('%cond',$conddescription ,$resultpattern);
+        }
+        return $resultpattern;
+    }
 
 }
 
@@ -1301,18 +1325,18 @@ class qtype_preg_description_node_error extends qtype_preg_description_operator 
     public function pattern($node_parent=null,$form=null){
 
         $resultpattern = self::get_form_string('description_errorbefore',null)
-                .$this->pregnode->error_string()
-                .self::get_form_string('description_errorafter',null);
+            .$this->pregnode->error_string()
+            .self::get_form_string('description_errorafter',null);
 
-                $operandplaces = array();
-		foreach($this->pregnode->operands as $i => $operand){
-			if(isset($operand)){
+        $operandplaces = array();
+        foreach($this->pregnode->operands as $i => $operand){
+            if(isset($operand)){
                 $operandplaces[] = '%'.($i+1);
-			}
-		}
+            }
+        }
         if(count($operandplaces)!=0){
             $resultpattern .= ' Operands: '.implode(', ',$operandplaces);
-		}
+        }
 
         return $resultpattern;
     }
