@@ -388,7 +388,14 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
         } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
-            $operand = $this->operands[0]->create_graph($id);
+            if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
+                $operand = $this->operands[0]->create_graph($id);
+            } else {
+                $operand = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+                $operand->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $operand, -1);
+                $operand->entries[] = end($operand->nodes);
+                $operand->exits[] = end($operand->nodes);
+            }
 
             $label = get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number;
 
