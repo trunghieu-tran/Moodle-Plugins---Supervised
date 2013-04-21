@@ -69,14 +69,15 @@ M.preg_authors_tool_script = (function(){
                     self.main_input.on('change',self.regex_change)
                     self.back_btn = self.Y.one('#id_regex_back');
                     self.back_btn.on("click", self.back_regex);
-                    self.main_input.set('value',M.poasquestion_text_and_button.data);
+                    self.main_input.set('value',self.textbutton_widget.data);
                     self.load_content();
                 })
             },
 
             // Function called on non-first form openings.
             oneachpresscallback : function() {
-                M.preg_authors_tool_script.load_content();
+                self.main_input.set('value',self.textbutton_widget.data);
+                self.load_content();
             }
         };
 
