@@ -9,6 +9,10 @@
 
 // requaries: 'node', 'io-base'
 
+/**
+ * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
+ * function and oneachpresscallback()
+ */
 M.preg_authors_tool_script = (function(){
 
     var self = {
@@ -19,9 +23,16 @@ M.preg_authors_tool_script = (function(){
     /** @var {string} name of qtype_preg_textbutton parent object */
     textbutton_widget : null,
 
+    /** @var {Object} reference for 'Check' button */
     check_btn : null,
+
+    /** @var {Object} reference for 'input' on top of dialog */
     main_input : null,
+
+    /** @var {Object} reference for 'Back' button */
     back_btn : null,
+
+    /** @var {Object} reference for YUI object, extended with requarued modules */
     Y : null,
 
     /**
@@ -40,7 +51,10 @@ M.preg_authors_tool_script = (function(){
     },
 
     /**
-     * Sets up options of parent object
+     * Sets up options of M.poasquestion_text_and_button object
+     * This method defines onfirstpresscallback method, that calls on very first
+     * press on button, right afted dialog generation
+     * oneachpresscallback calls on second and following pressings on button
      */
     setup_parent_object : function() {
         var options = {
