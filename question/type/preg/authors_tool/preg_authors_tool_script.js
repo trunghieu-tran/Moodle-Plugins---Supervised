@@ -9,7 +9,9 @@
 
 // requaries: 'node', 'io-base'
 
-M.preg_authors_tool_script = {
+M.preg_authors_tool_script = (function(){
+
+    var self = {
 
     /** @var string with www host of moodle (smth like 'http://moodle.site.ru/') */
     preg_www_root : null,
@@ -34,11 +36,6 @@ M.preg_authors_tool_script = {
         this.Y = Y;
         this.preg_www_root = _preg_www_root;
         this.textbutton_widget = M.poasquestion_text_and_button;
-        /*this.check_btn = this.Y.one('#id_regex_check');
-        this.main_input = this.Y.one('#id_regex_text');
-        this.back_btn = this.Y.one('#id_regex_back');
-        this.main_input.set('value',this.textbutton_widget.currentlinput.get('value'));*/
-        //alert(1);
         this.setup_parent_object();
     },
 
@@ -46,7 +43,6 @@ M.preg_authors_tool_script = {
      * Sets up options of parent object
      */
     setup_parent_object : function() {
-        var self = this;
         var options = {
 
             // Function called on the very first form opening.
@@ -76,7 +72,6 @@ M.preg_authors_tool_script = {
     /** Calls if request for information about new regex is successful */
     upd_dialog_Success : function(id, o, a) {
 
-        var obj = M.preg_authors_tool_script;
         // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         var indexofbracket = o.responseText.indexOf("{");
         if (indexofbracket != 0) {
@@ -89,21 +84,18 @@ M.preg_authors_tool_script = {
 
         //TODO: add errors message
         if(typeof jsonarray['tree_src'] != 'undefined') {
-            obj.Y.one('#id_tree').setAttribute("src", '').setAttribute("src", jsonarray['tree_src']);
+            self.Y.one('#id_tree').setAttribute("src", '').setAttribute("src", jsonarray['tree_src']);
         }
         if(typeof jsonarray['map'] != 'undefined') {
-            obj.Y.one('#tree_map').setHTML(jsonarray['map']);
-            obj.Y.all("#_anonymous_0 > area").on('click', obj.check_tree);
+            self.Y.one('#tree_map').setHTML(jsonarray['map']);
+            self.Y.all("#_anonymous_0 > area").on('click', self.check_tree);
         }
         if(typeof jsonarray['graph_src'] != 'undefined') {
-            obj.Y.one('#id_graph').setAttribute("src", '').setAttribute("src", jsonarray['graph_src']);
+            self.Y.one('#id_graph').setAttribute("src", '').setAttribute("src", jsonarray['graph_src']);
         }
         if(typeof jsonarray['description'] != 'undefined') {
-            obj.Y.one('#description_handler').setHTML(jsonarray['description']);
+            self.Y.one('#description_handler').setHTML(jsonarray['description']);
         }
-
-        //obj.back_btn.on("click", obj.back_regex, obj);
-        //obj.check_btn.on("click", obj.check_regex, obj);
     },
 
     /** Calls if request for information about new regex fails */
@@ -113,7 +105,6 @@ M.preg_authors_tool_script = {
 
     load_content_by_id : function(id) {
 
-        //var obj = M.preg_authors_tool_script;
         id += '';
         var regex = this.main_input.get('value');
         this.textbutton_widget.data = regex;
@@ -133,7 +124,7 @@ M.preg_authors_tool_script = {
     },
 
     load_content : function() {
-        M.preg_authors_tool_script.load_content_by_id(-1);
+        self.load_content_by_id(-1);
     },
 
     /**
@@ -156,38 +147,38 @@ M.preg_authors_tool_script = {
     /** Handler of pressing on 'Back' button of dialog */
     back_regex : function( e) {
         e.preventDefault();
-        var obj = M.preg_authors_tool_script;
-        var new_regex = obj.main_input.get('value');
-        obj.textbutton_widget.data = new_regex;
-        obj.textbutton_widget.close_and_set_new_data();
+        var new_regex = self.main_input.get('value');
+        self.textbutton_widget.data = new_regex;
+        self.textbutton_widget.close_and_set_new_data();
     },
 
     /** Handler of pressing on 'Check' button of dialog */
     check_regex : function( e ) {
 
         e.preventDefault();
-        var obj = M.preg_authors_tool_script;
-        obj.load_content();
+        self.load_content();
     },
 
     /**
      * Handler of pressing on area of a map on regex tree image
      */
     check_tree : function( e ) {
-       var obj = M.preg_authors_tool_script;
        var id = e.currentTarget.getAttribute ( 'id' );
-       obj.highlight_description(id);
-       obj.load_content_by_id(id);
+       self.highlight_description(id);
+       self.load_content_by_id(id);
     },
 
      /**
      * Handler of pressing on area of a map on regex tree image
      */
     regex_change : function( e ) {
-       M.preg_authors_tool_script.textbutton_widget.data = M.preg_authors_tool_script.main_input.get('value');
+       self.textbutton_widget.data = self.main_input.get('value');
     }
-}
+};
 
+return self;
+
+})();
 /*YUI().use('node', 'io-base', function (Y) {
     M.preg_authors_tool_script.init(Y,'http://localhost/moodle','M.poasquestion_text_and_button');
 });*/

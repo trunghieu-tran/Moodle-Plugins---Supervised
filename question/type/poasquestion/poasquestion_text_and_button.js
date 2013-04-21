@@ -9,7 +9,9 @@
 
 // requaries: 'node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-parse"
 
-M.poasquestion_text_and_button = {
+M.poasquestion_text_and_button = (function(){
+
+    var self = {
 
     /** @var intupt, from witch we read data */
     currentlinput : null,
@@ -104,7 +106,6 @@ M.poasquestion_text_and_button = {
      * @param {int} pagewidth width of dialog
      */
     setup_dialog : function(pagewidth) {
-        var self = M.poasquestion_text_and_button;
         this.dialog = new this.Y.Panel({
             contentBox: Y.Node.create('<div id="dialog" />'),
             bodyContent: '<div class="message icon-warn">Loading...</div>',
@@ -179,3 +180,8 @@ M.poasquestion_text_and_button = {
         this.dialog.callback = false;
     }
 };
+
+
+return self;
+
+})();
