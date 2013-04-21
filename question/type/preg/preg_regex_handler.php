@@ -452,12 +452,15 @@ class qtype_preg_regex_handler {
                 $this->errors[] = new qtype_preg_parsing_error($regex, $node);
             }
         }
-        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
-            $this->ast_root = $this->parser->get_root();
+
+        $this->ast_root = $this->parser->get_root();
+
+        if (!$this->errors_exist()) {
+            // Fill trees even if there are no errors
+            $this->dst_root = $this->from_preg_node(clone $this->ast_root);
             $this->look_for_anchors();
-            $this->dst_root = clone $this->ast_root;
-            $this->dst_root = $this->from_preg_node($this->dst_root);
-        //}
+        }
+
         fclose($pseudofile);
     }
 }
