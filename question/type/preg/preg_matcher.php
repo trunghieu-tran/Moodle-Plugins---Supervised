@@ -466,7 +466,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     public function match($str) {
 
         //Are there any errors?
-        if (!empty($this->errors)) {
+        if ($this->errors_exist()) {
             throw new qtype_preg_exception('Error: trying to do matching on regex with errors!');
         }
 
