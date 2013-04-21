@@ -1065,7 +1065,6 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
         $resultpattern = '';
 
         for($i=$childs_count-2; $i>=0; $i--) {
-            //echo($i);
             $left = $this->operands[$i];
             $right = $this->operands[$i+1];
 
@@ -1135,12 +1134,10 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
         $prevdescription = null;
 
         for($i=$childs_count-2; $i>=0; $i--) {
-            //var_dump($i);
             $left = $this->operands[$i];
             $right = $this->operands[$i+1];
 
             // getting pattern
-
             if($i!==0){
                 $description = self::get_form_string('description_alt_wcomma',$form);
             } else {
@@ -1250,7 +1247,6 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
                 $resultpattern = self::get_form_string('description_nlb_node_assert',$form);
                 break;
         }
-        //var_dump($resultpattern);
         return $resultpattern;
     }
 
@@ -1288,13 +1284,11 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
 
         } else {
             $resultpattern = self::get_form_string('description_node_cond_subexpr',$form);
-            // replacing %cond with %2 or %3 whichever how many alternatives has this node
             $resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands),$resultpattern);
         }
 
         $elsereplase = isset($this->pregnode->operands[1])?self::get_form_string('description_node_cond_subexpr_else',$form):'';
         $resultpattern = str_replace('%else', $elsereplase,$resultpattern);
-        //var_dump($resultpattern);
         return $resultpattern;
     }
 
@@ -1321,80 +1315,5 @@ class qtype_preg_description_node_error extends qtype_preg_description_operator 
 		}
 
         return $resultpattern;
-		/*$pseudonym='';
-		switch($this->pregnode->subtype){
-			case qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN :
-			break;
-			case qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN :
-			break;
-			case qtype_preg_node_error::SUBTYPE_EMPTY_PARENS :
-			break;
-			case qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET :
-			break;
-			case qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE :
-			break;
-			case qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE :
-			break;
-			case qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE :
-			break;
-			case qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN :
-			break;
-			case qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN :
-			break;
-			case qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE :
-			break;
-			case qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR :
-			break;
-			case qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING :
-			break;
-			case qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER :
-			break;
-			case qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES :
-			break;
-			case qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO :
-			break;
-			case qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES :
-			break;
-			case qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED :
-			break;
-			case qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII :
-			break;
-			case qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED :
-			break;
-		}*/
     }
 }
