@@ -52,23 +52,6 @@ class qtype_preg_handling_options {
     public $debugmode = false;
 }
 
-/**
- * Class with information about regular expression anchoring.
- */
-class qtype_preg_regex_anchoring {
-
-    //TODO - comment accurately before every field which asserts under which modifiers will lead to it!
-    /** @var boolean Regex anchored from start. */
-    public $start = false;
-    /** @var boolean Regex anchored from start and after each line break.*/
-    public $startlinebreak = false;
-    /** @var boolean Regex anchored from end.*/
-    public $end = false;
-    /** @var boolean Regex anchored from end and before each line break.*/
-    public $endlinebreak = false;
-
-}
-
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
@@ -88,8 +71,6 @@ class qtype_preg_regex_handler {
     protected $dst_root;
     /** The error objects array. */
     protected $errors;
-    /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
-    protected $anchor;
 
     /**
      * Parses the regex and does all necessary preprocessing.
@@ -237,33 +218,6 @@ class qtype_preg_regex_handler {
         }
     }
 
-    public function is_regex_anchored($start = true, $linebreak = true) {
-        if ($start) {
-            if ($linebreak) {
-                return $this->anchor->start && $this->anchor->startlinebreak;
-            } else {
-                return $this->anchor->start;
-            }
-        } else {
-            if ($linebreak) {
-                return $this->anchor->end && $this->anchor->endlinebreak;
-            } else {
-                return $this->anchor->end;
-            }
-        }
-    }
-
-    /**
-     * Fill anchor field to show if regex is anchored using ast_root
-     * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
-     * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
-     */
-    public function look_for_anchors() {
-        $this->anchor = new qtype_preg_regex_anchoring;
-        $this->anchor->start = $this->look_for_circumflex($this->ast_root);//TODO - make $this->look_for_circumflex change $this->anchor instead of returning result.
-        $this->anchor->startlinebreak = $this->anchor->start;//TODO - temporary for compatibility reasons, remove when change in the string above will be made.
-    }
-
     /**
      * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree
      * @param pregnode qtype_preg_node child class instance
@@ -378,37 +332,7 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-    protected function look_for_circumflex($node, $wasconcat = false) {
-        if (is_a($node, 'qtype_preg_leaf')) {
-            // Expression starts from ^
-            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        }
 
-        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
-            // Expression starts from .*
-            $operand = $node->operands[0];
-            return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
-                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
-        }
-
-        if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
-            // Check the first operand for concatenation and subexpressions.
-            return $this->look_for_circumflex($node->operands[0], $wasconcat || $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        }
-
-        if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
-            // Every branch of alternation is anchored.
-            $cf = true;
-            $empty = false;
-            foreach ($node->operands as $operand) {
-                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
-            }
-            $empty = $empty && !$wasconcat;
-            return $cf || $empty;
-        }
-        return false;
-    }
 
     /**
      * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
@@ -453,12 +377,10 @@ class qtype_preg_regex_handler {
             }
         }
 
+        // Set AST and DST roots.
         $this->ast_root = $this->parser->get_root();
-
-        if (!$this->errors_exist()) {
-            // Fill trees even if there are no errors
+        if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
-            $this->look_for_anchors();
         }
 
         fclose($pseudofile);
