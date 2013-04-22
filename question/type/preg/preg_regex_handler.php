@@ -154,27 +154,27 @@ class qtype_preg_regex_handler {
      * @return bool  errors exists
      */
     public function errors_exist() {
-        return (!empty($this->errors));
-    }
-
-    /**
-     * Returns error messages for regex
-     * @return array of error messages
-     */
-    public function get_errors() {
-        $res = array();
-        foreach($this->errors as $error) {
-            $res[] = $error->errormsg;
-        }
-        return $res;
+        return count($this->get_errors()) > 0;
     }
 
     /**
      * Returns errors as objects
      * @return array of errors
      */
-    public function get_error_objects() {
+    public function get_errors() {
         return $this->errors;
+    }
+
+    /**
+     * Returns error messages for regex
+     * @return array of error messages
+     */
+    public function get_error_messages() {
+        $res = array();
+        foreach($this->get_errors() as $error) {
+            $res[] = $error->errormsg;
+        }
+        return $res;
     }
 
     /**
@@ -232,13 +232,13 @@ class qtype_preg_regex_handler {
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
             $acceptresult = $enginenode->accept();
-            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->get_errors())) {//highlighting first occurence of unaccepted node
                 $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
             }
         } else {
             $enginenode = $pregnode;
             $acceptresult = $this->is_preg_node_acceptable($pregnode);
-            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->errors)) {//highlighting first occurence of unaccepted node
+            if ($acceptresult !== true && !array_key_exists($enginenodename, $this->get_errors())) {//highlighting first occurence of unaccepted node
                 $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
             }
         }

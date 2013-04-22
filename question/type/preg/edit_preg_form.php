@@ -178,7 +178,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if($matcher->errors_exist()) {//there are errors in the matching process
-                    $regexerrors = $matcher->get_errors();
+                    $regexerrors = $matcher->get_error_messages();
                     $errors['answer['.$key.']'] = '';
                     $i=0;
                     $maxerrors = 5;
