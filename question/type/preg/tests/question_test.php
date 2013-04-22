@@ -30,6 +30,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $regular->correctanswer = 'Do cats eat bats?';
         $regular->exactmatch = true;
         $regular->usecharhint = true;
+        $regular->uselexemhint = true;
         $regular->penalty = 0.1;
         $regular->charhintpenalty = 0.2;
         $regular->hintgradeborder = 0.6;
@@ -123,6 +124,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
     function test_get_best_fit_answer() {
     //////Normal question with hinting on and several answers with different grades
     $testquestion = clone $this->testquestion;
+
     ////Full match testing
     //100% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bats eat cats?'));
@@ -212,7 +214,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
     function test_matchresults_parts() {
         $testquestion = clone $this->testquestion;
         $testquestion->exactmatch = false;//Disable exact matching to be able to have wrong head and tail
-        $hintobj = new qtype_preg_hintmatchingpart($testquestion);
+        $hintobj = new qtype_preg_hintmatchingpart($testquestion, 'hintmatchingpart');
 
         //There is wrong head, wrong tail, correct part and next character
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Oh! Do cats eat hats?'));
@@ -272,7 +274,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $testquestion1 = clone $this->testquestion;
         $testquestion1->exactmatch = false;//Disable exact matching to be able to have wrong head and tail
         $testquestion1->engine = 'php_preg_matcher';
-        $hintobj = new qtype_preg_hintmatchingpart($testquestion1);
+        $hintobj = new qtype_preg_hintmatchingpart($testquestion1, 'hintmatchingpart');
 
         //Full match with wrong head a tail - there is colored string
         $bestfit = $testquestion1->get_best_fit_answer(array('answer' => 'Oh! Do cats eat rats? Really?'));
