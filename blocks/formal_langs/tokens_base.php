@@ -442,7 +442,7 @@ class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pai
      * A string with editing operators.
      * @var string
      */
-     public editops='';
+     public $editops='';
 }
 
 /**
