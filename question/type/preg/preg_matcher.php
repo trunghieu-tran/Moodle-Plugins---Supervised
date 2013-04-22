@@ -391,6 +391,22 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
 }
 
 /**
+ * Class with information about regular expression anchoring.
+ */
+class qtype_preg_regex_anchoring {
+
+    //TODO - comment accurately before every field which asserts under which modifiers will lead to it!
+    /** @var boolean Regex anchored from start. */
+    public $start = false;
+    /** @var boolean Regex anchored from start and after each line break.*/
+    public $startlinebreak = false;
+    /** @var boolean Regex anchored from end.*/
+    public $end = false;
+    /** @var boolean Regex anchored from end and before each line break.*/
+    public $endlinebreak = false;
+}
+
+/**
  * Abstract base class for regular expression matcher
  */
 class qtype_preg_matcher extends qtype_preg_regex_handler {
@@ -408,31 +424,33 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     const CORRECT_ENDING_ALWAYS_FULL = 4;
 
     /**
-    * Returns true for supported capabilities
-    * @param capability the capability in question
-    * @return bool is capability supported
-    */
+     * Returns true for supported capabilities
+     * @param capability the capability in question
+     * @return bool is capability supported
+     */
     public function is_supporting($capability) {
         return false;//abstract class supports nothing
     }
 
-    //Matching results as qtype_preg_matching_results object
+    // Matching results as qtype_preg_matching_results object
     protected $matchresults;
-    //Cache of the matching results,  string for matching is the key
+    // Cache of the matching results,  string for matching is the key
     protected $resultcache;
+    // Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored
+    protected $anchor;
 
     public function name() {
         return 'preg_matcher';
     }
 
     /**
-    * Parse regex and do all necessary preprocessing
-    * @param regex - regular expression to handle
-    * @param modifiers - modifiers of regular expression
-    * @param options - options to handle regex, object of qtype_preg_matching_options class
-    */
+     * Parse regex and do all necessary preprocessing
+     * @param regex - regular expression to handle
+     * @param modifiers - modifiers of regular expression
+     * @param options - options to handle regex, object of qtype_preg_matching_options class
+     */
     public function __construct($regex = null, $modifiers = null, $options = null) {
-        //Set matching data empty
+        // Set matching data empty.
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
@@ -441,28 +459,38 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             $options = new qtype_preg_matching_options();
         }
 
-
-        //Do parsing
+        // Do parsing.
         parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
         }
 
-        //If there were backreferences in regex, subexpression capturing should be forced.
+        if (!$this->errors_exist()) {
+            $this->look_for_anchors();
+        }
+
+        // If there were backreferences in regex, subexpression capturing should be forced.
         if ($this->lexer !== null && !$this->options->capturesubexpressions) {
             $this->options->capturesubexpressions = (count($this->lexer->get_backrefs()) > 0);
         }
 
-        //Invalidate match called later to allow parser to count subexpression
+        // Invalidate match called later to allow parser to count subexpression.
         $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
         $this->matchresults->invalidate_match();
     }
 
     /**
-    * Match regular expression with given string, calls match_inner from a child class to do the real matching
-    * @param str a string to match
-    * @return object of qtype_preg_matching_results class
-    */
+     * Returns an object of match results, helper method.
+     */
+    public function get_match_results() {
+        return $this->matchresults;
+    }
+
+    /**
+     * Match regular expression with given string, calls match_inner from a child class to do the real matching
+     * @param str a string to match
+     * @return object of qtype_preg_matching_results class
+     */
     public function match($str) {
 
         //Are there any errors?
@@ -496,6 +524,34 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             $this->resultcache[$str->string()] = $this->matchresults;
         }
         return $this->matchresults;
+    }
+
+    /**
+     * Perform a match of string from specified offset
+     *
+     * Should be implemented by child classes that use custom matching algorithms
+     * @param str a string to match
+     * @param offset position from where to match
+     * @return qtype_preg_matching_results object
+     */
+    public function match_from_pos($str, $offset) {
+        throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
+    }
+
+    public function is_regex_anchored($start = true, $linebreak = true) {
+        if ($start) {
+            if ($linebreak) {
+                return $this->anchor->start && $this->anchor->startlinebreak;
+            } else {
+                return $this->anchor->start;
+            }
+        } else {
+            if ($linebreak) {
+                return $this->anchor->end && $this->anchor->endlinebreak;
+            } else {
+                return $this->anchor->end;
+            }
+        }
     }
 
     /**
@@ -555,32 +611,55 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-    * Do a necessary preprocessing before matching loop.
-    *
-    * If a @see{qtype_preg_matching_results} object is returned, it is treated as if match was decided during preprocessing
-    * and no actual matching needed.
-    */
+     * Do a necessary preprocessing before matching loop.
+     *
+     * If a @see{qtype_preg_matching_results} object is returned, it is treated as if match was decided during preprocessing
+     * and no actual matching needed.
+     */
     protected function match_preprocess($str) {
         return false;
     }
 
     /**
-    * Perform a match of string from specified offset
-    *
-    * Should be implemented by child classes that use custom matching algorithms
-    * @param str a string to match
-    * @param offset position from where to match
-    * @return qtype_preg_matching_results object
-    */
-    public function match_from_pos($str, $offset) {
-        throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
+     * Fill anchor field to show if regex is anchored using ast_root
+     * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
+     * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+     */
+    protected function look_for_anchors() {
+        $this->anchor = new qtype_preg_regex_anchoring;
+        $this->anchor->start = $this->look_for_circumflex($this->ast_root);//TODO - make $this->look_for_circumflex change $this->anchor instead of returning result.
+        $this->anchor->startlinebreak = $this->anchor->start;//TODO - temporary for compatibility reasons, remove when change in the string above will be made.
     }
 
-    /**
-    * Returns an object of match results, helper method.
-    */
-    public function get_match_results() {
-        return $this->matchresults;
-    }
+    protected function look_for_circumflex($node, $wasconcat = false) {
+        if (is_a($node, 'qtype_preg_leaf')) {
+            // Expression starts from ^
+            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        }
 
+        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+            // Expression starts from .*
+            $operand = $node->operands[0];
+            return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
+                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+            // Check the first operand for concatenation and subexpressions.
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
+            // Every branch of alternation is anchored.
+            $cf = true;
+            $empty = false;
+            foreach ($node->operands as $operand) {
+                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
+            }
+            $empty = $empty && !$wasconcat;
+            return $cf || $empty;
+        }
+        return false;
+    }
 }

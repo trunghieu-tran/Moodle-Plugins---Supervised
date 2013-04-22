@@ -149,31 +149,31 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_anchoring() {
-        $handler = new qtype_preg_regex_handler('^');
+        $handler = new qtype_preg_nfa_matcher('^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^|^');
+        $handler = new qtype_preg_nfa_matcher('^|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|^');
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('(?:a.+$)|.*cd|(^a|.*x)|^');        // (?:a.+$) breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('(?:a.+$)|.*cd|(^a|.*x)|^');        // (?:a.+$) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.+cd|(^a|.*x)|^');       // .+cd breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.+cd|(^a|.*x)|^');       // .+cd breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.cd|(^a|.*x)|^');        // .cd breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.cd|(^a|.*x)|^');        // .cd breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(a|.*x)|^');        // (a|.*x) breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(a|.*x)|^');        // (a|.*x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|x)|^');         // (^a|x) breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|x)|^');         // (^a|x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.x)|^');        // (^a|.x) breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.x)|^');        // (^a|.x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.?x)|^');       // (^a|.?x) breaks anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.?x)|^');       // (^a|.?x) breaks anchoring
         $this->assertFalse($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|^');
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)|^');
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)||||');     // Emptiness makes anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)||||');     // Emptiness makes anchoring
         $this->assertTrue($handler->is_regex_anchored());
-        $handler = new qtype_preg_regex_handler('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) makes anchoring
+        $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) makes anchoring
         $this->assertTrue($handler->is_regex_anchored());
     }
 
