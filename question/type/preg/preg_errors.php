@@ -37,6 +37,15 @@ class qtype_preg_error {
     //
     public $index_last;
 
+    /**
+     * Returns a string with first character in upper case and the rest of the string in lower case.
+     */
+    protected function uppercase_first_letter($str) {
+        $head = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($str, 0, 1));
+        $tail = qtype_poasquestion_string::strtolower(qtype_poasquestion_string::substr($str, 1));
+        return $head . $tail;
+    }
+
     protected function highlight_regex($regex, $indfirst, $indlast) {
         if ($indfirst >= 0 && $indlast >= 0) {
             return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $indfirst)) . '<b>' .
@@ -47,14 +56,15 @@ class qtype_preg_error {
         }
     }
 
-     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2, $preservemsg = false) {
+     public function __construct($errormsg, $regex = '', $index_first = -1, $index_last = -1, $preservemsg = false) {
+        $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
         }
         $this->index_first = $index_first;
         $this->index_last = $index_last;
         if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
+            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last) . '<br/>' . $errormsg;
         } else {
             $this->errormsg = $errormsg;
         }
@@ -64,36 +74,25 @@ class qtype_preg_error {
 // A syntax error occured while parsing a regex.
 class qtype_preg_parsing_error extends qtype_preg_error {
 
-    public function __construct($regex, $parsernode) {
-        $this->index_first = $parsernode->indfirst;
-        $this->index_last = $parsernode->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
+    public function __construct($regex, $astnode) {
+        parent::__construct($astnode->error_string(), $regex, $astnode->indfirst, $astnode->indlast);
     }
 }
 
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    /**
-     * Returns a string with first character converted to upper case.
-     */
-    public function uppercase_first_letter($str) {
-        $firstchar = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($str, 0, 1));
-        $rest = qtype_poasquestion_string::substr($str, 1, qtype_poasquestion_string::strlen($str));
-        return $firstchar.$rest;
-    }
-
-    public function __construct($regex, $matchername, $nodename, $indexes) {
+    public function __construct($regex, $matchername, $nodename, $index_first = -1, $index_last = -1) {
         $a = new stdClass;
-        $a->nodename = $this->uppercase_first_letter($nodename);
-        $a->indfirst = $indexes['start'];
-        $a->indlast = $indexes['end'];
+        $a->nodename = $nodename;
+        $a->indfirst = $index_first;
+        $a->indlast = $index_last;
         $a->engine = get_string($matchername, 'qtype_preg');
-        $this->index_first = $a->indfirst;
-        $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported', 'qtype_preg', $a);
-    }
 
+        $errormsg = get_string('unsupported', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, $regex, $a->indfirst, $a->indlast);
+    }
 }
 
 // There's an unsupported modifier in a regex.
@@ -103,27 +102,32 @@ class qtype_preg_modifier_error extends qtype_preg_error {
         $a = new stdClass;
         $a->modifier = $modifier;
         $a->classname = $matchername;
-        $this->errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
+
+        $errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
+
+        parent::__construct($errormsg);
     }
 }
 
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
-    public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
+    public function __construct($regex, $matcher, $index_first = -1, $index_last = -1) {
         global $CFG;
-        $a = new stdClass;
-        if ($indexes['start'] == -1 && $indexes['end'] == -2) {
-            $a->indfirst = 0;
-            $a->indlast = qtype_poasquestion_string::strlen($regex) - 1;
-        } else {
-            $a->indfirst = $indexes['start'];
-            $a->indlast = $indexes['end'];
+
+        if ($index_first == -1 || $index_last == -1) {
+            $index_first = 0;
+            $index_last = qtype_poasquestion_string::strlen($regex) - 1;
         }
+
+        $a = new stdClass;
+        $a->indfirst = $index_first;
+        $a->indlast = $index_last;
         $a->engine = get_string($matcher->name(), 'qtype_preg');
-        $this->index_first = $a->indfirst;
-        $this->index_last = $a->indlast;
-        $a->link = $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettingpreg';
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('too_large_fa', 'qtype_preg', $a);
+        $a->link = $CFG->wwwroot . '/' . $CFG->admin . '/settings.php?section=qtypesettingpreg';
+
+        $errormsg = get_string('too_large_fa', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, $regex, $index_first, $index_last);
     }
 }
