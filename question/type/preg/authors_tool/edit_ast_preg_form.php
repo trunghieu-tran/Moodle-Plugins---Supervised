@@ -109,7 +109,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', 'Check string');*/
 
-        /*$mform->addElement('text_and_button', 'regex_match_text', 'regex_check_string', 'Input string', array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 100));
+        /*$mform->addElement('text_and_button', 'regex_match_text', 'regex_check_string', 'Input string', array('link_to_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 100));
 
         $mform->registerNoSubmitButton('regex_next_character');
         $mform->addElement('button', 'regex_next_character', 'Get next character');

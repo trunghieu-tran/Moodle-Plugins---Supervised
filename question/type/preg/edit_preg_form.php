@@ -47,14 +47,14 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @return array of form fields.
      */
 
-    function get_per_answer_fields($mform, $label, $gradeoptions,
-            &$repeatedoptions, &$answersoption) {
-            $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
+    function get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption) {
+        $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
-            $tmp = & $mform->createElement('preg_text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), null, array('size' => 80));
-            array_splice($repeated, 1, 1, array( '0' => $tmp));
+        $tmp = & $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
+                                       get_string('answer', 'question'), null, array('size' => 80));
+        array_splice($repeated, 1, 1, array( '0' => $tmp));
 
-            return $repeated;
+        return $repeated;
     }
     /**
      * Add question-type specific form fields.
