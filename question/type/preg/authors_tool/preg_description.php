@@ -245,7 +245,7 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
         $json_array['description'] = '';
     }
 
-    protected function generate_json_for_incorrect_regex(&$json_array, $id) {
+    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
         $json_array['description'] = 'Ooops! Your regex contains errors, so I can\'t build the description!';
     }
 
@@ -254,7 +254,7 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
      *
      * @param array $json_array contains text of description
      */
-    protected function generate_json_for_correct_regex(&$json_array, $id){
+    protected function generate_json_for_accepted_regex(&$json_array, $id){
         $json_array['description'] = $this->default_description();
     }
 }

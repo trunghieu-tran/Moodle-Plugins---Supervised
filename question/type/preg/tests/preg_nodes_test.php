@@ -179,7 +179,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_syntax_errors() {
         $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
-        $errors = $handler->get_error_objects();
+        $errors = $handler->get_errors();
         $this->assertTrue(count($errors) == 11);
         /*$this->assertTrue($errors[0]->index_first == 31); // Setting and unsetting modifier.
         $this->assertTrue($errors[0]->index_last == 36);
@@ -204,7 +204,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[10]->index_first == 8); // Wrong opening paren.
         $this->assertTrue($errors[10]->index_last == 8);*/
         $handler = new qtype_preg_regex_handler('(?z)a(b)\1\2');
-        $errors = $handler->get_error_objects();
+        $errors = $handler->get_errors();
         $this->assertTrue(count($errors) == 3);
         /*$this->assertTrue($errors[0]->index_first == 0);  // Wrong modifier.
         $this->assertTrue($errors[0]->index_last == 3);
