@@ -61,16 +61,16 @@ class qtype_preg_regex_handler {
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
     /** Regex lexer. */
-    protected $lexer;
+    protected $lexer = null;
     /** Regex parser. */
-    protected $parser;
+    protected $parser = null;
 
     /** The root of the regex abstract syntax tree, consists of qtype_preg_node childs. */
-    protected $ast_root;
+    protected $ast_root = null;
     /** The root of the regex definite syntax tree, consists of xxx_preg_node childs where xxx is engine name. */
-    protected $dst_root;
+    protected $dst_root = null;
     /** The error objects array. */
-    protected $errors;
+    protected $errors = array();
 
     /**
      * Parses the regex and does all necessary preprocessing.
@@ -79,10 +79,6 @@ class qtype_preg_regex_handler {
      * @param object options - options to handle regex, i.e. any necessary additional parameters.
      */
     public function __construct($regex = null, $modifiers = null, $options = null) {
-        $this->errors = array();
-        $this->lexer = null;
-        $this->parser = null;
-
         if ($regex == '' || $regex === null) {
             return;
         }

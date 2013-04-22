@@ -465,7 +465,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             return;
         }
 
-        if (!$this->errors_exist()) {
+        if ($this->ast_root !== null && !$this->errors_exist()) {
             $this->look_for_anchors();
         }
 
