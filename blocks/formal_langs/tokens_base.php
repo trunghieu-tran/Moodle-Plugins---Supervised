@@ -414,6 +414,35 @@ class block_formal_langs_matched_tokens_pair {
      * @var integer
      */
     public $mistakeweight;
+
+    /**
+     * Type of error - e.g. typo, extra or missing separator, specific mistake types.
+     * TODO - define a way to describe type, so that any token could add it's own ones. Such a way should be tied to message generation.
+     * @var array
+     */
+    public $type;
+
+    /**
+     * Returns a message about mistake give two processed strings.
+     * @param correctstring block_formal_langs_processed_string object for the correct string.
+     * @param comparedstring block_formal_langs_processed_string object for compared string.
+     * @return user language message string, describing a possible mistake this pair represents.
+     */
+    public function message($correctstring, $comparedstring) {
+        if ($this->mistakeweight == 0) {//Full match, no error.
+            return '';
+        }
+        //TODO - other cases, based on type.
+    }
+}
+
+class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pair {
+
+    /**
+     * A string with editing operators.
+     * @var string
+     */
+     public editops='';
 }
 
 /**
