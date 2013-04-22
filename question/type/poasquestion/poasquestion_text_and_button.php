@@ -27,9 +27,9 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
     /** @var bool if true label will be hidden */
     var $_hiddenLabel = false;
 
-    var $linkonpage = '';
+    var $linktopage = '';
 
-    var $linkonbuttonimage = '';
+    var $linktobuttonimage = '';
 
     var $idbutton = '';
 
@@ -38,8 +38,7 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
     private $_jsmodule = null;
 
     /**
-     * constructor
-     * TODO : nojs activity (may be input shold be replace with <a> ?)
+     * Constructor
      * @param string $elementName (optional) name of the text field
      * @param string $elementButtonName (optional) name of the button
      * @param string $elementLabel (optional) text field label
@@ -56,8 +55,8 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
         }
         parent::MoodleQuickForm_text($elementName, $elementLabel, $attributes);
         $this->idbutton = $elementButtonName;
-        $this->linkonpage = $elementLinks['link_on_page'];
-        $this->linkonbuttonimage = $elementLinks['link_on_button_image'];
+        $this->linktopage = $elementLinks['link_to_page'];
+        $this->linktobuttonimage = $elementLinks['link_to_button_image'];
 
         $this->_jsmodule = array('name'     => 'poasquestion_text_and_button',
                                 'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js',
@@ -105,8 +104,9 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
         //var_dump($jsargs);
         $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->_jsmodule);
 
-        return $parenthtml . '<input type="image" src="' . $this->linkonbuttonimage . '" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() .'" />';
-        //return parent::toHtml() . '<input type="image" src="' . $this->linkonbuttonimage . '" name="button_'. $this->idbutton . '" id="id_button_' . $this->idbutton . '">';
+        return $parenthtml . '<a href="#" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() . '" >' .
+                                 '<img src="' . $this->linktobuttonimage . '" />' .
+                             '</a>';
     }
 
     /**
