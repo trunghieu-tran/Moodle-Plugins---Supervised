@@ -229,13 +229,13 @@ class qtype_preg_regex_handler {
             $enginenode = new $enginenodename($pregnode, $this);
             $acceptresult = $enginenode->accept();
             if ($acceptresult !== true && !array_key_exists($enginenodename, $this->get_errors())) {//highlighting first occurence of unaccepted node
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast);
             }
         } else {
             $enginenode = $pregnode;
             $acceptresult = $this->is_preg_node_acceptable($pregnode);
             if ($acceptresult !== true && !array_key_exists($enginenodename, $this->get_errors())) {//highlighting first occurence of unaccepted node
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast);
             }
         }
         return $enginenode;
@@ -367,7 +367,7 @@ class qtype_preg_regex_handler {
             // There can be a specific accepting error.
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED) {
                 $inscription = $node->addinfo;
-                $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, array('start' => $node->indfirst, 'end' => $node->indlast));
+                $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, $node->indfirst, $node->indlast);
             } else {
                 $this->errors[] = new qtype_preg_parsing_error($regex, $node);
             }
