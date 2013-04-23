@@ -198,8 +198,14 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                     if ($j > $maxerrors) {
                         $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $j - $maxerrors).'<br />';
                     }
-                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)->full) {
-                    $correctanswermatch=true;
+                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {//Correct answer (if supplied) should match at least one 100% grade answer.
+                    //We may need another matcher to check correctanswer since first one ignoring "exact match" option.
+                    if ($data['exactmatch']) {
+                        $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, $data['exactmatch'], $questionobj->get_modifiers($data['usecase']), (-1)*($i+count($answers)), $data['notation'], $hintused);
+                    }
+                    if ($matcher->match($trimmedcorrectanswer)->full) {
+                        $correctanswermatch=true;
+                    }
                 }
                 if ($fractions[$key] >= $data['hintgradeborder']) {
                     $passhintgradeborder = true;
