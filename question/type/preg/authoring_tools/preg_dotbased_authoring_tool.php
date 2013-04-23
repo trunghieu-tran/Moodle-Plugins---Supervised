@@ -15,8 +15,14 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
+    protected function add_image_dimensions_to_json(&$json_array, $raw_image_data) {
+    	$dimensions = getimagesizefromstring($raw_image_data);
+    	$json_array[$this->json_key() . '_width'] = $dimensions[0];
+    	$json_array[$this->json_key() . '_height'] = $dimensions[1];
+    }
 
+    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
+    	// TODO
     }
 
 }

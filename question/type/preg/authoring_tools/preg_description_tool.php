@@ -239,6 +239,10 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         return true;
     }
 
+    protected function json_key() {
+        return 'description';
+    }
+
     protected function generate_json_for_empty_regex(&$json_array, $id) {
         $json_array['description'] = '';
     }
@@ -253,7 +257,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param array $json_array contains text of description
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id){
-        $json_array['description'] = $this->default_description();
+        $json_array[$this->json_key()] = $this->default_description();
     }
 }
 

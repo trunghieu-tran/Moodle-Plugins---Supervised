@@ -85,6 +85,37 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
     }
 
+    protected function json_key() {
+        return 'graph_src';
+    }
+
+    protected function generate_json_for_empty_regex(&$json_array, $id) {
+        $dotscript = 'digraph { }';
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
+        $this->add_image_dimensions_to_json($json_array, $rawdata);
+    }
+
+    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
+        $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the explaining graph!" [color=white]; }';
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
+        $this->add_image_dimensions_to_json($json_array, $rawdata);
+    }
+
+    /**
+     * Generate image for explain graph
+     *
+     * @param array $json_array contains link on image of explain graph
+     */
+    protected function generate_json_for_accepted_regex(&$json_array, $id) {
+        $graph = $this->create_graph($id);
+        $dotscript = $graph->create_dot();
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
+        $this->add_image_dimensions_to_json($json_array, $rawdata);
+    }
+
     public function __construct ($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
         if ($regex === null) {
@@ -512,27 +543,6 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
 
         return true;
-    }
-
-    protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $dotscript = 'digraph { }';
-        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
-    }
-
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the explaining graph!" [color=white]; }';
-        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
-    }
-
-    /**
-     * Generate image for explain graph
-     *
-     * @param array $json_array contains link on image of explain graph
-     */
-    protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $graph = $this->create_graph($id);
-        $dot_instructions_graph = $graph->create_dot();
-        $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
     }
 }
 

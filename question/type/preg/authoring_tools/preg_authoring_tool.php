@@ -38,6 +38,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
     }
 
+    protected abstract function json_key();
+
     protected abstract function generate_json_for_empty_regex(&$json_array, $id);
 
     protected abstract function generate_json_for_unaccepted_regex(&$json_array, $id);
