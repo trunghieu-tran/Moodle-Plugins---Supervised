@@ -195,7 +195,7 @@ $string['nfa_state_limit_description'] = 'Allows you to tune time and memory lim
 $string['dfa_transition_limit_description'] = 'Maximum number of transitions in ДКА';
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in НКА';
 
-/********** This is string for authors tool **********************/
+/********** String for authoring tools **********************/
 $string['regexeditheader'] = 'Input regex';
 $string['regexeditheader_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
 $string['regeximgheader'] = 'Interactive tree/explaining graph';
@@ -536,19 +536,19 @@ $string['explain_any_char'] = 'Любой символ из';
 $string['explain_any_char_except'] = 'Любой символ кроме';
 
 // Strings for tooltipe
-$string['authors_tool_tooltip_charset'] = 'character class';
-$string['authors_tool_tooltip_negative_charset'] = 'negative character class';
-$string['authors_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
-$string['authors_tool_tooltip_emptiness'] = 'emptiness';
-$string['authors_tool_tooltip_assertion'] = 'assertion';
-$string['authors_tool_tooltip_backreference'] = 'backreference';
-$string['authors_tool_tooltip_recursion'] = 'recursion';
-$string['authors_tool_tooltip_control_sequence'] = 'control sequence';
-$string['authors_tool_tooltip_option'] = 'option';
-$string['authors_tool_tooltip_finite_quantifier'] = 'finite quantifier';
-$string['authors_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
-$string['authors_tool_tooltip_concatenation'] = 'concatenation';
-$string['authors_tool_tooltip_alternative'] = 'alternative';
-$string['authors_tool_tooltip_assertion'] = 'assertion';
-$string['authors_tool_tooltip_subexpression'] = 'subexpression';
-$string['authors_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';
+$string['authoring_tool_tooltip_charset'] = 'character class';
+$string['authoring_tool_tooltip_negative_charset'] = 'negative character class';
+$string['authoring_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['authoring_tool_tooltip_emptiness'] = 'emptiness';
+$string['authoring_tool_tooltip_assertion'] = 'assertion';
+$string['authoring_tool_tooltip_backreference'] = 'backreference';
+$string['authoring_tool_tooltip_recursion'] = 'recursion';
+$string['authoring_tool_tooltip_control_sequence'] = 'control sequence';
+$string['authoring_tool_tooltip_option'] = 'option';
+$string['authoring_tool_tooltip_finite_quantifier'] = 'finite quantifier';
+$string['authoring_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
+$string['authoring_tool_tooltip_concatenation'] = 'concatenation';
+$string['authoring_tool_tooltip_alternative'] = 'alternative';
+$string['authoring_tool_tooltip_assertion'] = 'assertion';
+$string['authoring_tool_tooltip_subexpression'] = 'subexpression';
+$string['authoring_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';

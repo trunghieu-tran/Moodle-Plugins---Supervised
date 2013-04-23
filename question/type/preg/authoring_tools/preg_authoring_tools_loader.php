@@ -13,9 +13,9 @@
 require_once(dirname(__FILE__) . '/../../../../config.php');
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/explain_graph_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_description.php');
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool_tree.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 /**
@@ -49,9 +49,9 @@ abstract class author_json {
 
             //array with author tools
             $tools = array(
-                "tree" => new qtype_preg_author_tool_tree($regextext),
-                "graph" => new qtype_preg_author_tool_explain_graph($regextext),
-                "description" => new qtype_preg_author_tool_description($regextext),
+                "tree" => new qtype_preg_explaining_tree_tool($regextext),
+                "graph" => new qtype_preg_explaining_graph_tool($regextext),
+                "description" => new qtype_preg_description_tool($regextext),
             );
 
             //fill json array
