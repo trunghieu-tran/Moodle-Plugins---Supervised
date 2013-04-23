@@ -195,7 +195,7 @@ $string['nfa_state_limit_description'] = 'Allows you to tune time and memory lim
 $string['dfa_transition_limit_description'] = 'Maximum number of transitions in DFA';
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
-/********** This is string for authors tool **********************/
+/********** String for authoring tools **********************/
 $string['author_tool_page_header'] = 'Test regex';
 $string['regex_edit_header_text'] = 'Regex';
 $string['regex_edit_header'] = 'Input regex';
@@ -550,19 +550,19 @@ $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
 
 // Strings for tooltipe
-$string['authors_tool_tooltip_charset'] = 'character class';
-$string['authors_tool_tooltip_negative_charset'] = 'negative character class';
-$string['authors_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
-$string['authors_tool_tooltip_emptiness'] = 'emptiness';
-$string['authors_tool_tooltip_assertion'] = 'assertion';
-$string['authors_tool_tooltip_backreference'] = 'backreference';
-$string['authors_tool_tooltip_recursion'] = 'recursion';
-$string['authors_tool_tooltip_control_sequence'] = 'control sequence';
-$string['authors_tool_tooltip_option'] = 'option';
-$string['authors_tool_tooltip_finite_quantifier'] = 'finite quantifier';
-$string['authors_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
-$string['authors_tool_tooltip_concatenation'] = 'concatenation';
-$string['authors_tool_tooltip_alternative'] = 'alternative';
-$string['authors_tool_tooltip_assertion'] = 'assertion';
-$string['authors_tool_tooltip_subexpression'] = 'subexpression';
-$string['authors_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';
+$string['authoring_tool_tooltip_charset'] = 'character class';
+$string['authoring_tool_tooltip_negative_charset'] = 'negative character class';
+$string['authoring_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['authoring_tool_tooltip_emptiness'] = 'emptiness';
+$string['authoring_tool_tooltip_assertion'] = 'assertion';
+$string['authoring_tool_tooltip_backreference'] = 'backreference';
+$string['authoring_tool_tooltip_recursion'] = 'recursion';
+$string['authoring_tool_tooltip_control_sequence'] = 'control sequence';
+$string['authoring_tool_tooltip_option'] = 'option';
+$string['authoring_tool_tooltip_finite_quantifier'] = 'finite quantifier';
+$string['authoring_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
+$string['authoring_tool_tooltip_concatenation'] = 'concatenation';
+$string['authoring_tool_tooltip_alternative'] = 'alternative';
+$string['authoring_tool_tooltip_assertion'] = 'assertion';
+$string['authoring_tool_tooltip_subexpression'] = 'subexpression';
+$string['authoring_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';

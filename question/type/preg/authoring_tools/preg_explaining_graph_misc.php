@@ -11,7 +11,7 @@
 /**
  * A node of explaining graph.
  */
-class qtype_preg_author_tool_explain_graph_node {
+class qtype_preg_explaining_graph_tool_node {
 
     public $shape  = 'ellipse';  // shape of node on image
     public $color  = 'black';    // color of node on image
@@ -65,7 +65,7 @@ class qtype_preg_author_tool_explain_graph_node {
 /**
  * A link of explaining graph.
  */
-class qtype_preg_author_tool_explain_graph_link {
+class qtype_preg_explaining_graph_tool_link {
 
     public $source = null;      // source of link
     public $destination = null; // destination of link
@@ -83,7 +83,7 @@ class qtype_preg_author_tool_explain_graph_link {
 /**
  * A subgraph of explaining graph.
  */
-class qtype_preg_author_tool_explain_graph_subgraph {
+class qtype_preg_explaining_graph_tool_subgraph {
 
     public $label       = '';           // label of subgraph on image
     public $style       = 'solid';      // style of subgraph on image
@@ -109,14 +109,14 @@ class qtype_preg_author_tool_explain_graph_subgraph {
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_explaining_graph_tool_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
                 $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill . '];';
             }
         }
 
         foreach ($this->subgraphs as $iter) {
-            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr);
+            qtype_preg_explaining_graph_tool_subgraph::process_subgraph($iter, $instr);
         }
 
         foreach ($this->links as $iter) {
@@ -188,14 +188,14 @@ class qtype_preg_author_tool_explain_graph_subgraph {
 
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record')
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_explaining_graph_tool_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else {
                 $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill .'];';
             }
         }
 
         foreach ($gr->subgraphs as $iter)
-            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr);
+            qtype_preg_explaining_graph_tool_subgraph::process_subgraph($iter, $instr);
 
         foreach ($gr->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd';

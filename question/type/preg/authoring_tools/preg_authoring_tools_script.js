@@ -13,7 +13,7 @@
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
  */
-M.preg_authors_tool_script = (function(){
+M.preg_authoring_tools_script = (function(){
 
     var self = {
 
@@ -61,7 +61,7 @@ M.preg_authors_tool_script = (function(){
 
             // Function called on the very first form opening.
             onfirstpresscallback : function() {
-                this.dialoghtmlnode.load(self.preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(this.data) + '&id=-1', function() {
+                this.dialoghtmlnode.load(self.preg_www_root + '/question/type/preg/authoring_tools/ast_preg_form.php?regex=' + encodeURIComponent(this.data) + '&id=-1', function() {
                     //TODO: set empty src in all field
                     self.check_btn = self.Y.one('#id_regex_check')
                     self.check_btn.on("click", self.check_regex);
@@ -123,7 +123,7 @@ M.preg_authors_tool_script = (function(){
         id += '';
         var regex = this.main_input.get('value');
         this.textbutton_widget.data = regex;
-        var url = this.preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(regex) + '&id=' + id;
+        var url = this.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php?regex='+encodeURIComponent(regex) + '&id=' + id;
         var cfg = {
             method: "GET",
             xdr: {
@@ -195,5 +195,5 @@ return self;
 
 })();
 /*YUI().use('node', 'io-base', function (Y) {
-    M.preg_authors_tool_script.init(Y,'http://localhost/moodle','M.poasquestion_text_and_button');
+    M.preg_authoring_tools_script.init(Y,'http://localhost/moodle','M.poasquestion_text_and_button');
 });*/

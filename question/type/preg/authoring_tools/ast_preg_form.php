@@ -1,6 +1,6 @@
 <?php
 /**
- * Creates authors tool form.
+ * Creates authoring tools form.
  *
  * @copyright &copy; 2012  Terechov Grigory
  * @author Terechov Grigory, Volgograd State Technical University
@@ -16,7 +16,7 @@ global $CFG;
 global $PAGE;
 global $DB;
 
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/edit_ast_preg_form.php');
 require_once($CFG->libdir . '/questionlib.php');
 
 $PAGE->set_context(context_system::instance());
@@ -47,7 +47,7 @@ if ($cmid = optional_param('cmid', 0, PARAM_INT)) {
 }*/
 
 //Instantiate simplehtml_form
-$mform = new qtype_preg_authors_tool_form();
+$mform = new qtype_preg_authoring_tool_form();
 $mform->display();
 
 ?>

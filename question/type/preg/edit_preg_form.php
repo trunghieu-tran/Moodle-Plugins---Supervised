@@ -29,7 +29,7 @@ global $CFG;
 //global $app;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_text_and_button.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_text_and_button.php');
 
 /**
  * Preg editing form definition.
@@ -69,11 +69,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $qtypeclass = 'qtype_'.$this->qtype();
         $qtype = new $qtypeclass;
 
-        //$PAGE->requires->js('/question/type/preg/preg_authors_tool_script.js');
+        //$PAGE->requires->js('/question/type/preg/preg_authoring_tools_script.js');
 
 
         //$mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
-        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
+        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authoring_tools/regex_test_push.js"></script></div>');
 
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);

@@ -10,11 +10,11 @@
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
-class qtype_preg_author_tool_tree extends qtype_preg_author_tool {
+class qtype_preg_explaining_tree_tool extends qtype_preg_authoring_tool {
 
     // TODO: override another functions from qtype_preg_regex_handler?
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for /question/type/preg/author_tool_description/preg_description.php.
+ * Tests for /question/type/preg/authoring_tools/preg_description_tool.php.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -12,7 +12,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_description.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
 
 class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
 
@@ -21,7 +21,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_charset($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
     }
@@ -48,7 +48,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     //------------------------------------------------------------------
     public function test_meta()
     {
-        $handler = new qtype_preg_author_tool_description('a|b|',null,null);
+        $handler = new qtype_preg_description_tool('a|b|',null,null);
         $result = $handler->description('%s','%s');
         $expected = '<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing';
         $this->assertEquals($expected, $result);
@@ -61,7 +61,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_assert($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -83,7 +83,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
 
     public function test_backref()
     {
-        $handler = new qtype_preg_author_tool_description('(a)\1',null,null);
+        $handler = new qtype_preg_description_tool('(a)\1',null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $expected = 'subexpression #1: [<span style="color:blue">a</span>] then back reference to subexpression #1';
@@ -97,7 +97,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_concat($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -123,7 +123,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_alt($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -145,7 +145,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_nassert($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -172,7 +172,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_quant($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -200,7 +200,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_option($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -220,7 +220,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
 
     public function test_numbering()
     {
-        $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
+        $handler = new qtype_preg_description_tool('([a|b]|)\W+',null,null);
         //var_dump($handler);
         $result = $handler->default_description();
         //$expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
@@ -235,7 +235,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_condmask($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //if($regex == '(?(?=a)b)' )var_dump($handler->dst_root);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -264,7 +264,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_postprocessing($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -285,7 +285,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_subexpression($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -306,7 +306,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
      */
     public function test_err($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
@@ -328,7 +328,7 @@ class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
      */
     public function test_form($regex,$expected_en,$expected_ru)
     {
-        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $handler = new qtype_preg_description_tool($regex,null,null);
         $result = $handler->form_description('g');
         $this->assertEquals($expected_en, $result);
     }
@@ -353,7 +353,7 @@ class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
         $regex = '(?i)[\xff\x00-\x1fA-B\t\n]';
         $expected = '000';
         //var_dump($options);
-        $handler = new qtype_preg_author_tool_description($regex,null,$options);
+        $handler = new qtype_preg_description_tool($regex,null,$options);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);

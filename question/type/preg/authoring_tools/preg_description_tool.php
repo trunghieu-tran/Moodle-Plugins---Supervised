@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . '/../../../../config.php');
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
@@ -132,7 +132,7 @@ class qtype_preg_description_options extends qtype_preg_handling_options {
 /**
  * Handler, generating information for regular expression
  */
-class qtype_preg_author_tool_description extends qtype_preg_author_tool {
+class qtype_preg_description_tool extends qtype_preg_authoring_tool {
 
     /** @var qtype_preg_description_options options for description and state of description */
     public $options;
@@ -844,7 +844,7 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
  * Defines operator nodes.
  */
 abstract class qtype_preg_description_operator extends qtype_preg_description_node{
-    /** @var qtype_preg_author_tool_description[] Array of operands */
+    /** @var qtype_preg_description_tool[] Array of operands */
     public $operands = array();
 
     /**
