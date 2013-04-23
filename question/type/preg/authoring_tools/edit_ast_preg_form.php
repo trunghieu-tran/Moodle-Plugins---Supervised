@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines authors tool form class.
+ * Defines authoring tools form class.
  *
  * @copyright &copy; 2012  Terechov Grigory
  * @author Terechov Grigory, Volgograd State Technical University
@@ -12,15 +12,15 @@
 
 global $CFG;
 global $PAGE;
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
-require_once($CFG->dirroot.'/question/type/preg/question.php');
-require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
-//require_once($CFG->dirroot.'/question/type/preg/renderer.php');
-require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
+//require_once($CFG->dirroot . '/question/type/preg/renderer.php');
 
-class qtype_preg_authors_tool_form extends moodleform {
+class qtype_preg_authoring_tool_form extends moodleform {
 
     /*function __constructor(){
         parent::moodleform();

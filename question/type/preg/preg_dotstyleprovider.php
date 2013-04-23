@@ -90,62 +90,62 @@ class qtype_preg_dot_style_provider {
                     }
                     if ($pregnode->negative) {
                         $label = '&#91;^' . $label . '&#93;';
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authors_tool_tooltip_negative_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_negative_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
                     } else if (qtype_poasquestion_string::strlen($label) > 1 && $bracketflag) {
                         $label = '&#91;' . $label;
                         $label .= '&#93;';
                     }
 
                     if($pregnode->error === NULL){
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authors_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
                     } else {
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authors_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . " \", shape = record, color = red, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . " \", shape = record, color = red, id = $id]";
                     }
             }
             case qtype_preg_node::TYPE_LEAF_META: {
-                return "[label = \"emptiness\", tooltip = " . get_string('authors_tool_tooltip_emptiness', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"emptiness\", tooltip = " . get_string('authoring_tool_tooltip_emptiness', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_ASSERT: {
                 if($label[0] === "\\"){
                     $label = substr($label, 1);
                 }
-                return "[label = \"assertion $label\", tooltip = " . get_string('authors_tool_tooltip_assertion', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"assertion $label\", tooltip = " . get_string('authoring_tool_tooltip_assertion', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to subexpression #$pregnode->number\", tooltip = " . get_string('authors_tool_tooltip_backreference', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"backreference to subexpression #$pregnode->number\", tooltip = " . get_string('authoring_tool_tooltip_backreference', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                return "[label = \"recursion ' . $pregnode->number . '\", tooltip = " . get_string('authors_tool_tooltip_recursion', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"recursion ' . $pregnode->number . '\", tooltip = " . get_string('authoring_tool_tooltip_recursion', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                return "[label = control sequence \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_control_sequence', 'qtype_preg') . "\", shape = rectangle, id = $id]";
+                return "[label = control sequence \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg') . "\", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                return "[label = \"$label\", tooltip = " . get_string('authors_tool_tooltip_option', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_option', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
                 if ($pregnode->error !== null){
                     return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $pregnode->error) . "\", color = red, id = $id]";
                 }
-                return "[label = \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_finite_quantifier', 'qtype_preg') . "\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
-                return "[label = \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_infinite_quantifier', 'qtype_preg') . "\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_CONCAT: {
-                return "[label = \"&#8226;\", tooltip = " . get_string('authors_tool_tooltip_concatenation', 'qtype_preg') . ", id = $id]";
+                return "[label = \"&#8226;\", tooltip = " . get_string('authoring_tool_tooltip_concatenation', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ALT: {
-                return "[label = \"$label\", tooltip = " . get_string('authors_tool_tooltip_alternative', 'qtype_preg') . ", id = $id]";
+                return "[label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_alternative', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = " . get_string('authors_tool_tooltip_assertion', 'qtype_preg') . ", id = $id]";
+                return "[label = \"assertion $label\", tooltip = " . get_string('authoring_tool_tooltip_assertion', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_SUBEXPR: {
-                return "[label = \"$label\", tooltip = " . get_string('authors_tool_tooltip_subexpression', 'qtype_preg') . ", id = $id]";
+                return "[label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_subexpression', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_COND_SUBEXPR: {
-                return "[label = \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_conditional_subexpression', 'qtype_preg') . "\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
                 return "[label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", color = red, id = $id]";
@@ -295,14 +295,14 @@ class qtype_preg_dot_style_provider {
                              ',' => '&#44;',
                              '|' => '&#124;',
                              );
-            $nonprintable = array(qtype_poasquestion_string::code2utf8(127) => 'description_char7F',
-                                  qtype_poasquestion_string::code2utf8(160) => 'description_charA0',
-                                  qtype_poasquestion_string::code2utf8(173) => 'description_charAD',
-                                  qtype_poasquestion_string::code2utf8(8194) => 'description_char2002',
-                                  qtype_poasquestion_string::code2utf8(8195) => 'description_char2003',
-                                  qtype_poasquestion_string::code2utf8(8201) => 'description_char2009',
-                                  qtype_poasquestion_string::code2utf8(8204) => 'description_char200C',
-                                  qtype_poasquestion_string::code2utf8(8205) => 'description_char200D',
+            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
+                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
+                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
+                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
+                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
+                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
+                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
+                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
                                   );
             $colorednonprintable = array('\n' => get_string('description_charA', 'qtype_preg'),
                                          '\t' => get_string('description_char9', 'qtype_preg'),
@@ -360,14 +360,14 @@ class qtype_preg_dot_style_provider {
                              ']' => '&#93;',
                              ',' => '&#44;'
                              );
-            $nonprintable = array(qtype_poasquestion_string::code2utf8(127) => 'description_char7F',
-                                  qtype_poasquestion_string::code2utf8(160) => 'description_charA0',
-                                  qtype_poasquestion_string::code2utf8(173) => 'description_charAD',
-                                  qtype_poasquestion_string::code2utf8(8194) => 'description_char2002',
-                                  qtype_poasquestion_string::code2utf8(8195) => 'description_char2003',
-                                  qtype_poasquestion_string::code2utf8(8201) => 'description_char2009',
-                                  qtype_poasquestion_string::code2utf8(8204) => 'description_char200C',
-                                  qtype_poasquestion_string::code2utf8(8205) => 'description_char200D'
+            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
+                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
+                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
+                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
+                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
+                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
+                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
+                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D'
                                   );
             $flag = true;
             $colors = array(true=>'blue', false=>'green');
