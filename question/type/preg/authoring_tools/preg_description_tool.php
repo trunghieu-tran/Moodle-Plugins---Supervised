@@ -9,8 +9,6 @@
  * @package questions
  */
 
-require_once(dirname(__FILE__) . '/../../../../config.php');
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -384,26 +382,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     }
 
     /**
-     * Gets unicode char from code $code
-     *
-     * @param int $code decimal code of character
-     * @return string utf8 character;
-     */
-    public static function uchr($code) {
-        if ($code < 128) {
-            $utf = chr($code);
-        } else if ($code < 2048) {
-            $utf = chr(192 + (($code - ($code % 64)) / 64));
-            $utf .= chr(128 + ($code % 64));
-        } else {
-            $utf = chr(224 + (($code - ($code % 4096)) / 4096));
-            $utf .= chr(128 + ((($code % 4096) - ($code % 64)) / 64));
-            $utf .= chr(128 + ($code % 64));
-        }
-        return $utf;
-    }
-
-    /**
      * Checks if a character is printable
      *
      * @param $utf8chr character (from qtype_poasquestion_string) for check
@@ -456,7 +434,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             if($escapehtml && ($code==34||$code==38||$code==39||$code==60||$code==62)){
                 $result = '&#'.$code.';';
             } else {
-                $result = $iscode ? self::uchr($utf8chr) : $utf8chr;
+                $result = $iscode ? qtype_preg_unicode::code2utf8($utf8chr) : $utf8chr;
             }
             $result = str_replace('%char',$result,self::get_form_string('description_char' ,$form));
         }
