@@ -8,18 +8,16 @@
  * @package questions
  */
 
-require_once(dirname(__FILE__) . '/../../../../config.php');
-
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_dotbased_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_misc.php');
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 
 /**
  * Class "handler" for regular expression's graph.
  */
-class qtype_preg_explaining_graph_tool extends qtype_preg_authoring_tool {
+class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_tool {
 
     /**
      * Creates graph which explaining regular expression.
