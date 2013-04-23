@@ -30,14 +30,12 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
         $dotscript = 'digraph { }';
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
         $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
-        $this->add_image_dimensions_to_json($json_array, $rawdata);
     }
 
     protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
         $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the interactive tree!" [color=white]; }';
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
         $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
-        $this->add_image_dimensions_to_json($json_array, $rawdata);
     }
 
     /**
@@ -53,7 +51,6 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
         }
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
         $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
-        $this->add_image_dimensions_to_json($json_array, $rawdata);
 
         // Pass the map and its DOM id via json array.
         $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
