@@ -32,6 +32,9 @@ M.preg_authoring_tools_script = (function(){
     /** @var {Object} reference for 'Back' button */
     back_btn : null,
 
+    /** @var {Integer} id of current node */
+    node_id : -1,
+
     /** @var {Object} reference for YUI object, extended with requarued modules */
     Y : null,
 
@@ -108,7 +111,7 @@ M.preg_authoring_tools_script = (function(){
         if(typeof jsonarray['graph_src'] != 'undefined') {
             self.Y.one('#id_graph').setAttribute("src", '').setAttribute("src", jsonarray['graph_src']);
         }
-        if(typeof jsonarray['description'] != 'undefined') {
+        if(typeof jsonarray['description'] != 'undefined' && self.node_id<0) {
             self.Y.one('#description_handler').setHTML(jsonarray['description']);
         }
     },
@@ -120,6 +123,7 @@ M.preg_authoring_tools_script = (function(){
 
     load_content_by_id : function(id) {
 
+        this.node_id = id+0;
         id += '';
         var regex = this.main_input.get('value');
         this.textbutton_widget.data = regex;
