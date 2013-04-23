@@ -128,7 +128,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
     function test_flag_ascii_match() {
         $flag = new qtype_preg_charset_flag;
         $flag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ASCII);
-        $str = new qtype_poasquestion_string(qtype_poasquestion_string::code2utf8(17).qtype_poasquestion_string::code2utf8(78).qtype_poasquestion_string::code2utf8(130).qtype_poasquestion_string::code2utf8(131).qtype_poasquestion_string::code2utf8(200));
+        $str = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8(17).qtype_preg_unicode::code2utf8(78).qtype_preg_unicode::code2utf8(130).qtype_preg_unicode::code2utf8(131).qtype_preg_unicode::code2utf8(200));
         $this->assertTrue($flag->match($str, 0));
         $this->assertTrue($flag->match($str, 1));
         $this->assertFalse($flag->match($str, 2));
