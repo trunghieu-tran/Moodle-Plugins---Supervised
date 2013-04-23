@@ -308,10 +308,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $pos, $matchlen, $options) {
-        if ($options !== null && !$options->capturesubexpressions) {
-            return;
-        }
-
         // Begin a new iteration of a subpattern. In fact, we can call the method for
         // the subpattern with minimal number; all "bigger" subpatterns will be reset recursively.
         if ($transition->min_subpatt_node != null) {
