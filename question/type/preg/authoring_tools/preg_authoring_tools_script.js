@@ -106,7 +106,7 @@ M.preg_authoring_tools_script = (function(){
         }
         if(typeof jsonarray['map'] != 'undefined') {
             self.Y.one('#tree_map').setHTML(jsonarray['map']);
-            self.Y.all("#_anonymous_0 > area").on('click', self.check_tree);
+            self.Y.all("#qtype_preg_graph > area").on('click', self.check_tree);
         }
         if(typeof jsonarray['graph_src'] != 'undefined') {
             self.Y.one('#id_graph').setAttribute("src", '').setAttribute("src", jsonarray['graph_src']);
