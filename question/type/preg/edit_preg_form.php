@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_text_and_
  */
 class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
-     * This is overdrived method.
+     * This is overloaded method.
      * Get the list of form elements to repeat, one for each answer.
      * @param object $mform the form being built.
      * @param $label the label to use for each option.
@@ -171,28 +171,32 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $i = 0;
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
+
+        //Determine maximum number of errors to show.
+        $maxerrors = 5;
+        if (isset($CFG->qtype_preg_maxerrorsshown)) {
+            $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+        }
+
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
                 //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
-                if($matcher->errors_exist()) {//there are errors in the matching process
+                if($matcher->errors_exist()) {//There were errors in the matching process.
                     $regexerrors = $matcher->get_error_messages();
                     $errors['answer['.$key.']'] = '';
-                    $i=0;
-                    $maxerrors = 5;
-                    if (isset($CFG->qtype_preg_maxerrorsshown)) {//show no more than max errors
-                        $maxerrors = $CFG->qtype_preg_maxerrorsshown;
-                    }
+                    $j=0;
+                    //Show no more than max errors.
                     foreach ($regexerrors as $regexerror) {
-                        if ($i < $maxerrors) {
+                        if ($j < $maxerrors) {
                             $errors['answer['.$key.']'] .= $regexerror.'<br />';
                         }
-                        $i++;
+                        $j++;
                     }
-                    if ($i > $maxerrors) {
-                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors).'<br />';
+                    if ($j > $maxerrors) {
+                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $j - $maxerrors).'<br />';
                     }
                 } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)->full) {
                     $correctanswermatch=true;
