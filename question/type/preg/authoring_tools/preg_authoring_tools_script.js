@@ -42,11 +42,15 @@ M.preg_authoring_tools_script = (function(){
 
     TREE_MAP_KEY : 'map',
 
-    TREE_MAP_ID_KEY : 'map_id',
+    TREE_MAP_ID : '#qtype_preg_graph',
 
     GRAPH_KEY: 'graph_src',
 
     DESCRIPTION_KEY : 'description',
+
+    HEIGHT : '_height',
+
+    WIDTH : '_width',
 
     /**
      * setups module
@@ -112,16 +116,24 @@ M.preg_authoring_tools_script = (function(){
 
         //TODO: add errors message
         if (typeof jsonarray[self.TREE_KEY] != 'undefined') {
-            self.Y.one('#id_tree').setAttribute('src', '').setAttribute('src', jsonarray[self.TREE_KEY]);
+            self.Y.one('#id_tree')
+                .setAttribute('src', '')
+                .setAttribute('src', jsonarray[self.TREE_KEY])
+                .setAttribute('width', jsonarray[self.TREE_KEY+self.WIDTH])
+                .setAttribute('height', jsonarray[self.TREE_KEY+self.HEIGHT]);
         }
 
         if (typeof jsonarray[self.TREE_MAP_KEY] != 'undefined') {
             self.Y.one('#tree_map').setHTML(jsonarray[self.TREE_MAP_KEY]);
-            self.Y.all(jsonarray[self.TREE_MAP_ID_KEY] + ' > area').on('click', self.check_tree);
+            self.Y.all(self.TREE_MAP_ID + ' > area').on('click', self.check_tree);
         }
 
         if (typeof jsonarray[self.GRAPH_KEY] != 'undefined') {
-            self.Y.one('#id_graph').setAttribute('src', '').setAttribute('src', jsonarray[self.GRAPH_KEY]);
+            self.Y.one('#id_graph')
+                .setAttribute('src', '')
+                .setAttribute('src', jsonarray[self.GRAPH_KEY])
+                .setAttribute('width', jsonarray[self.GRAPH_KEY+self.WIDTH])
+                .setAttribute('height', jsonarray[self.GRAPH_KEY+self.HEIGHT]);
         }
 
         if (typeof jsonarray[self.DESCRIPTION_KEY] != 'undefined' && self.node_id < 0) {
