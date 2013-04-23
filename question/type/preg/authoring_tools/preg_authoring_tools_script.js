@@ -48,10 +48,6 @@ M.preg_authoring_tools_script = (function(){
 
     DESCRIPTION_KEY : 'description',
 
-    HEIGHT : '_height',
-
-    WIDTH : '_width',
-
     /**
      * setups module
      * @param {object} Y yui object
@@ -116,11 +112,7 @@ M.preg_authoring_tools_script = (function(){
 
         //TODO: add errors message
         if (typeof jsonarray[self.TREE_KEY] != 'undefined') {
-            self.Y.one('#id_tree')
-                .setAttribute('src', '')
-                .setAttribute('src', jsonarray[self.TREE_KEY])
-                .setAttribute('width', jsonarray[self.TREE_KEY+self.WIDTH])
-                .setAttribute('height', jsonarray[self.TREE_KEY+self.HEIGHT]);
+            self.Y.one('#id_tree').setAttribute('src', jsonarray[self.TREE_KEY]);
         }
 
         if (typeof jsonarray[self.TREE_MAP_KEY] != 'undefined') {
@@ -129,11 +121,7 @@ M.preg_authoring_tools_script = (function(){
         }
 
         if (typeof jsonarray[self.GRAPH_KEY] != 'undefined') {
-            self.Y.one('#id_graph')
-                .setAttribute('src', '')
-                .setAttribute('src', jsonarray[self.GRAPH_KEY])
-                .setAttribute('width', jsonarray[self.GRAPH_KEY+self.WIDTH])
-                .setAttribute('height', jsonarray[self.GRAPH_KEY+self.HEIGHT]);
+            self.Y.one('#id_graph').setAttribute('src', jsonarray[self.GRAPH_KEY]);
         }
 
         if (typeof jsonarray[self.DESCRIPTION_KEY] != 'undefined' && self.node_id < 0) {
