@@ -57,6 +57,6 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
 
         // Pass the map and its DOM id via json array.
         $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
-        $json_array['map_id'] = '#' . qtype_preg_dot_style_provider::get_graph_name();
+        /*$json_array['map_id'] = '#' . qtype_preg_dot_style_provider::get_graph_name();*/
     }
 }
