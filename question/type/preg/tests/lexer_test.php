@@ -512,7 +512,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->negative);
-        $this->assertTrue($token->value->flags[0][0]->data->string() === qtype_poasquestion_string::code2utf8(0x61).qtype_poasquestion_string::code2utf8(0x62).qtype_poasquestion_string::code2utf8(0x63));
+        $this->assertTrue($token->value->flags[0][0]->data->string() === qtype_preg_unicode::code2utf8(0x61).qtype_preg_unicode::code2utf8(0x62).qtype_preg_unicode::code2utf8(0x63));
         $this->assertFalse($token->value->flags[0][0]->negative);
         $token = $lexer->nextToken();// [^-\w\D]
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);

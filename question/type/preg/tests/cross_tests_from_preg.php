@@ -2801,8 +2801,8 @@ class qtype_preg_cross_tests_from_preg {
     }
 
     function data_for_test_escape_sequences() {
-        $test1 = array( 'str'=>'8X'.qtype_poasquestion_string::code2utf8(0x2000).qtype_poasquestion_string::code2utf8(0x000D).
-                               ' ё'.qtype_poasquestion_string::code2utf8(0x000D).qtype_poasquestion_string::code2utf8(0x2000).'_ ',
+        $test1 = array( 'str'=>'8X'.qtype_preg_unicode::code2utf8(0x2000).qtype_preg_unicode::code2utf8(0x000D).
+                               ' ё'.qtype_preg_unicode::code2utf8(0x000D).qtype_preg_unicode::code2utf8(0x2000).'_ ',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -2850,9 +2850,9 @@ class qtype_preg_cross_tests_from_preg {
     }
 
     function data_for_test_uprops_and_posix_classes() {
-        $uch    = qtype_poasquestion_string::code2utf8(0xE01F0);
-        $pch    = qtype_poasquestion_string::code2utf8(0x007A);
-        $hspace = qtype_poasquestion_string::code2utf8(0x3000);
+        $uch    = qtype_preg_unicode::code2utf8(0xE01F0);
+        $pch    = qtype_preg_unicode::code2utf8(0x007A);
+        $hspace = qtype_preg_unicode::code2utf8(0x3000);
 
         $str = '';
         $length = 80;

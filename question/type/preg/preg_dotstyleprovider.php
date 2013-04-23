@@ -295,14 +295,14 @@ class qtype_preg_dot_style_provider {
                              ',' => '&#44;',
                              '|' => '&#124;',
                              );
-            $nonprintable = array(qtype_poasquestion_string::code2utf8(127) => 'description_char7F',
-                                  qtype_poasquestion_string::code2utf8(160) => 'description_charA0',
-                                  qtype_poasquestion_string::code2utf8(173) => 'description_charAD',
-                                  qtype_poasquestion_string::code2utf8(8194) => 'description_char2002',
-                                  qtype_poasquestion_string::code2utf8(8195) => 'description_char2003',
-                                  qtype_poasquestion_string::code2utf8(8201) => 'description_char2009',
-                                  qtype_poasquestion_string::code2utf8(8204) => 'description_char200C',
-                                  qtype_poasquestion_string::code2utf8(8205) => 'description_char200D',
+            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
+                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
+                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
+                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
+                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
+                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
+                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
+                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
                                   );
             $colorednonprintable = array('\n' => get_string('description_charA', 'qtype_preg'),
                                          '\t' => get_string('description_char9', 'qtype_preg'),
@@ -360,14 +360,14 @@ class qtype_preg_dot_style_provider {
                              ']' => '&#93;',
                              ',' => '&#44;'
                              );
-            $nonprintable = array(qtype_poasquestion_string::code2utf8(127) => 'description_char7F',
-                                  qtype_poasquestion_string::code2utf8(160) => 'description_charA0',
-                                  qtype_poasquestion_string::code2utf8(173) => 'description_charAD',
-                                  qtype_poasquestion_string::code2utf8(8194) => 'description_char2002',
-                                  qtype_poasquestion_string::code2utf8(8195) => 'description_char2003',
-                                  qtype_poasquestion_string::code2utf8(8201) => 'description_char2009',
-                                  qtype_poasquestion_string::code2utf8(8204) => 'description_char200C',
-                                  qtype_poasquestion_string::code2utf8(8205) => 'description_char200D'
+            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
+                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
+                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
+                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
+                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
+                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
+                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
+                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D'
                                   );
             $flag = true;
             $colors = array(true=>'blue', false=>'green');

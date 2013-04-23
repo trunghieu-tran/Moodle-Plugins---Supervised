@@ -389,7 +389,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             // Check all the returned ranges.
             foreach ($ranges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
-                    $c = new qtype_poasquestion_string(qtype_poasquestion_string::code2utf8($i));
+                    $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
                     //if ($this->match($c, 0, $l)) {
                     return $c;
                     //}
