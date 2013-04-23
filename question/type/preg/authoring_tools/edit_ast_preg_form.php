@@ -16,6 +16,7 @@ require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 //require_once($CFG->dirroot . '/question/type/preg/renderer.php');
@@ -58,7 +59,10 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
-        $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_handler"><div style="width:10px"><img src="" id="id_tree" usemap="#_anonymous_0" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" /></div></div></br>');
+        $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_handler">' .
+                                       '<div style="width:10px">' .
+                                           '<img src="" id="id_tree" usemap="#' . qtype_preg_dot_style_provider::get_graph_name() . '" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" />' .
+                                    '</div></div></br>');
 
         // Add graph.
         $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
