@@ -16,66 +16,37 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 /**
- * Generate array of links on image of interactive tree, explain graph, text map for interactive tree and text of description
- *
- * @param array $json_array contains author tool content
+ * Generates json array which stores authoring tools' content.
  */
-abstract class author_json {
+function qtype_preg_get_json_array() {
+    global $CFG;
+    $json_array = array();
+    $regextext = '';    // optional_param('regex', '', PARAM_TEXT);
 
-    /**
-     * Generate json array, who store author tools content
-     */
-    public static function get_json_array() {
-
-        global $CFG;
-
-        $json_array = array();
-
-        //$regextext = optional_param('regex', '', PARAM_TEXT);
-
-        if (isset($_POST['regex'])) {       // POST has precedence
-            $regextext = $_POST['regex'];
-        } else if (isset($_GET['regex'])) {
-            $regextext = $_GET['regex'];
-        } else {
-            $regextext = "";
-        }
-    
-        //if(!empty($regextext)) {//regex not empty (owervise can't build tree)
-            $id = optional_param('id', '', PARAM_INT);
-
-            //array with author tools
-            $tools = array(
-                "tree" => new qtype_preg_explaining_tree_tool($regextext),
-                "graph" => new qtype_preg_explaining_graph_tool($regextext),
-                "description" => new qtype_preg_description_tool($regextext),
-            );
-
-            //fill json array
-            foreach($tools as $tool){
-                $tool->generate_json($json_array, $regextext, $id);
-            }
-        /*} else {
-            author_json::get_json_error($json_array);
-        }*/
-
-        return $json_array;
+    if (isset($_POST['regex'])) {       // POST has precedence
+        $regextext = $_POST['regex'];
+    } else if (isset($_GET['regex'])) {
+        $regextext = $_GET['regex'];
     }
 
-    /**
-     * Fill json_array information, when regex is empty
-     *
-     * @param array $json_array whith containt for author tool
-     */
-    private static function get_json_error(&$json_array) {
-            $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot('digraph { "This place is for interactive tree" [color=white]; }', 'png'));
-            $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot('digraph { "This place is for explain graph" [color=white]; }', 'png'));
-            $json_array['description'] = 'This place is for description!';
+    $id = optional_param('id', '', PARAM_INT);
+
+    // Array with authoring tools
+    $tools = array(
+        'tree' => new qtype_preg_explaining_tree_tool($regextext),
+        'graph' => new qtype_preg_explaining_graph_tool($regextext),
+        'description' => new qtype_preg_description_tool($regextext)
+    );
+
+    // Fill json array.
+    foreach($tools as $tool) {
+        $tool->generate_json($json_array, $regextext, $id);
     }
+
+    return $json_array;
 }
 
-$json_array = author_json::get_json_array();
+$json_array = qtype_preg_get_json_array();
 echo json_encode($json_array);

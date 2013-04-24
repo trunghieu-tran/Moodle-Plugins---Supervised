@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
     protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-
+    	// TODO
     }
 
 }

@@ -157,12 +157,19 @@ class qtype_preg_dot_style_provider {
     }
 
     /**
+     * Returns the name used for all graphs. The name usually follows the "digraph" keyword.
+     */
+    public static function get_graph_name() {
+        return 'qtype_preg_graph';
+    }
+
+    /**
      * Returns heading of a dot script which is usually looks like "digraph {".
      * @param string $rankdirlr if true, also adds "rankdir = LR".
      * @return string the heading of a dot script.
      */
-    public function get_dot_head($rankdirlr = false) {
-        $result = 'digraph {';
+    public static function get_dot_head($rankdirlr = false) {
+        $result = 'digraph ' . self::get_graph_name() . ' {';
         if ($rankdirlr) {
             $result .= 'rankdir = LR;';
         }
@@ -173,7 +180,7 @@ class qtype_preg_dot_style_provider {
      * Returns tail of a dot script which is usually looks like "}".
      * @return string the tail of a dot script.
      */
-    public function get_dot_tail() {
+    public static function get_dot_tail() {
         return '}';
     }
 
