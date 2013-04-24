@@ -395,9 +395,9 @@ class qtype_preg_yyParser
     const QUANT                          = 10;
     const OPENBRACK                      = 11;
     const CONDSUBEXPR                    = 12;
-    const YY_NO_ACTION = 52;
-    const YY_ACCEPT_ACTION = 51;
-    const YY_ERROR_ACTION = 50;
+    const YY_NO_ACTION = 50;
+    const YY_ACCEPT_ACTION = 49;
+    const YY_ERROR_ACTION = 48;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -446,48 +446,48 @@ class qtype_preg_yyParser
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-    const YY_SZ_ACTTAB = 125;
+    const YY_SZ_ACTTAB = 123;
 static public $yy_action = array(
- /*     0 */    24,   14,   13,   11,    1,   21,   23,    8,    2,   12,
- /*    10 */    18,    6,   42,   10,    5,   21,   26,    8,    2,    7,
- /*    20 */    16,   42,   42,   11,   42,   21,   23,    8,    2,   42,
- /*    30 */    19,   42,   42,   10,   42,   21,   26,    8,    2,   42,
- /*    40 */    15,   42,   42,   11,   42,   21,   23,    8,    2,   42,
- /*    50 */    22,   42,   42,   11,   42,   21,   23,    8,    2,   42,
- /*    60 */    17,   42,   42,   10,   42,   21,   26,    8,    2,   42,
- /*    70 */    20,   42,   42,   10,   42,   21,   26,    8,    2,   42,
- /*    80 */     3,   42,   42,   11,   42,   21,   23,    8,    2,   42,
- /*    90 */     4,   42,   42,   10,   42,   21,   26,    8,    2,   42,
- /*   100 */    42,   10,   42,   21,   26,    8,    2,   42,   42,   11,
- /*   110 */    42,   21,   23,    8,    2,   21,   23,    8,    2,   51,
- /*   120 */    25,    9,   23,    8,    2,
+ /*     0 */    20,   49,    4,   12,   11,   16,   21,    9,    2,   14,
+ /*    10 */    15,   40,   13,   12,    1,   16,   21,    9,    2,    7,
+ /*    20 */    24,   40,    8,   10,    5,   16,   25,    9,    2,   40,
+ /*    30 */    17,   40,   40,   10,   40,   16,   25,    9,    2,   40,
+ /*    40 */    23,   40,   40,   12,   40,   16,   21,    9,    2,   40,
+ /*    50 */    19,   40,   40,   10,   40,   16,   25,    9,    2,   40,
+ /*    60 */    18,   40,   40,   10,   40,   16,   25,    9,    2,   40,
+ /*    70 */     6,   40,   40,   10,   40,   16,   25,    9,    2,   40,
+ /*    80 */    22,   40,   40,   12,   40,   16,   21,    9,    2,   40,
+ /*    90 */     3,   40,   40,   12,   40,   16,   21,    9,    2,   40,
+ /*   100 */    40,   10,   40,   16,   25,    9,    2,   40,   40,   12,
+ /*   110 */    40,   16,   21,    9,    2,   16,   21,    9,    2,   40,
+ /*   120 */    21,    9,    2,
     );
     static public $yy_lookahead = array(
- /*     0 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
- /*    10 */     4,   16,   17,    7,   16,    9,   10,   11,   12,   16,
- /*    20 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    30 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    40 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    50 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    60 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    70 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    80 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*    90 */     4,   17,   17,    7,   17,    9,   10,   11,   12,   17,
- /*   100 */    17,    7,   17,    9,   10,   11,   12,   17,   17,    7,
- /*   110 */    17,    9,   10,   11,   12,    9,   10,   11,   12,   14,
- /*   120 */    15,   16,   10,   11,   12,
+ /*     0 */     4,   14,   15,    7,   15,    9,   10,   11,   12,   15,
+ /*    10 */     4,   16,   15,    7,   15,    9,   10,   11,   12,   15,
+ /*    20 */     4,   16,   15,    7,   15,    9,   10,   11,   12,   16,
+ /*    30 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    40 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    50 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    60 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    70 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    80 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*    90 */     4,   16,   16,    7,   16,    9,   10,   11,   12,   16,
+ /*   100 */    16,    7,   16,    9,   10,   11,   12,   16,   16,    7,
+ /*   110 */    16,    9,   10,   11,   12,    9,   10,   11,   12,   16,
+ /*   120 */    10,   11,   12,
 );
     const YY_SHIFT_USE_DFLT = -5;
     const YY_SHIFT_MAX = 14;
     static public $yy_shift_ofst = array(
- /*     0 */    66,   76,   86,   56,    6,   16,   36,   46,   26,   -4,
- /*    10 */    94,   94,  102,  106,  112,
+ /*     0 */    16,   86,   66,   46,   -4,    6,   26,   36,   76,   56,
+ /*    10 */    94,  102,   94,  106,  110,
 );
-    const YY_REDUCE_USE_DFLT = -16;
+    const YY_REDUCE_USE_DFLT = -14;
     const YY_REDUCE_MAX = 14;
     static public $yy_reduce_ofst = array(
- /*     0 */   105,  -15,  -12,    3,   -2,  -15,  -15,  -15,   -5,  -15,
- /*    10 */    -7,  -14,  -15,  -15,  -15,
+ /*     0 */   -13,   -6,   -1,    7,   -6,   -6,    9,   -6,   -6,    4,
+ /*    10 */   -11,   -6,   -3,   -6,   -6,
 );
     static public $yyExpectedTokens = array(
         /* 0 */ array(4, 7, 9, 10, 11, 12, ),
@@ -516,12 +516,11 @@ static public $yy_action = array(
         /* 23 */ array(),
         /* 24 */ array(),
         /* 25 */ array(),
-        /* 26 */ array(),
 );
     static public $yy_default = array(
- /*     0 */    50,   47,   48,   42,   43,   50,   44,   46,   45,   41,
- /*    10 */    32,   30,   31,   29,   28,   35,   38,   37,   39,   34,
- /*    20 */    43,   40,   36,   33,   42,   27,   49,
+ /*     0 */    48,   45,   46,   40,   26,   48,   41,   42,   44,   43,
+ /*    10 */    32,   31,   30,   29,   28,   38,   27,   39,   34,   37,
+ /*    20 */    40,   33,   36,   35,   41,   47,
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
@@ -553,11 +552,11 @@ static public $yy_action = array(
 **    YYERRORSYMBOL      is the code number of the error symbol.  If not
 **                       defined, then do no error processing.
 */
-    const YYNOCODE = 18;
+    const YYNOCODE = 17;
     const YYSTACKDEPTH = 100;
     const qtype_preg_ARG_DECL = '0';
-    const YYNSTATE = 27;
-    const YYNRULE = 23;
+    const YYNSTATE = 26;
+    const YYNRULE = 22;
     const YYERRORSYMBOL = 13;
     const YYERRSYMDT = 'yy0';
     const YYFALLBACK = 0;
@@ -634,8 +633,7 @@ static public $yy_action = array(
   '$',             'ERROR_PREC_SHORTEST',  'ERROR_PREC_SHORT',  'ERROR_PREC',  
   'CLOSEBRACK',    'ALT_SHORTEST',  'ALT_SHORT',     'ALT',         
   'CONC',          'PARSLEAF',      'QUANT',         'OPENBRACK',   
-  'CONDSUBEXPR',   'error',         'start',         'lastexpr',    
-  'expr',        
+  'CONDSUBEXPR',   'error',         'start',         'expr',        
     );
 
     /**
@@ -643,29 +641,28 @@ static public $yy_action = array(
      * @var array
      */
     static public $yyRuleName = array(
- /*   0 */ "start ::= lastexpr",
- /*   1 */ "expr ::= expr expr",
- /*   2 */ "expr ::= expr ALT expr",
- /*   3 */ "expr ::= expr ALT",
- /*   4 */ "expr ::= ALT expr",
- /*   5 */ "expr ::= ALT",
- /*   6 */ "expr ::= expr QUANT",
- /*   7 */ "expr ::= OPENBRACK CLOSEBRACK",
- /*   8 */ "expr ::= OPENBRACK expr CLOSEBRACK",
- /*   9 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK",
- /*  10 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK",
- /*  11 */ "expr ::= CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK",
- /*  12 */ "expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK",
- /*  13 */ "expr ::= PARSLEAF",
- /*  14 */ "lastexpr ::= expr",
- /*  15 */ "expr ::= expr CLOSEBRACK",
- /*  16 */ "expr ::= CLOSEBRACK",
- /*  17 */ "expr ::= OPENBRACK expr",
- /*  18 */ "expr ::= OPENBRACK",
- /*  19 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr",
- /*  20 */ "expr ::= CONDSUBEXPR expr",
- /*  21 */ "expr ::= CONDSUBEXPR",
- /*  22 */ "expr ::= QUANT",
+ /*   0 */ "start ::= expr",
+ /*   1 */ "expr ::= PARSLEAF",
+ /*   2 */ "expr ::= expr expr",
+ /*   3 */ "expr ::= expr ALT expr",
+ /*   4 */ "expr ::= expr ALT",
+ /*   5 */ "expr ::= ALT expr",
+ /*   6 */ "expr ::= ALT",
+ /*   7 */ "expr ::= expr QUANT",
+ /*   8 */ "expr ::= OPENBRACK CLOSEBRACK",
+ /*   9 */ "expr ::= OPENBRACK expr CLOSEBRACK",
+ /*  10 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK",
+ /*  11 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK",
+ /*  12 */ "expr ::= CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK",
+ /*  13 */ "expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK",
+ /*  14 */ "expr ::= expr CLOSEBRACK",
+ /*  15 */ "expr ::= CLOSEBRACK",
+ /*  16 */ "expr ::= OPENBRACK expr",
+ /*  17 */ "expr ::= OPENBRACK",
+ /*  18 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr",
+ /*  19 */ "expr ::= CONDSUBEXPR expr",
+ /*  20 */ "expr ::= CONDSUBEXPR",
+ /*  21 */ "expr ::= QUANT",
     );
 
     /**
@@ -1003,28 +1000,27 @@ static public $yy_action = array(
      */
     static public $yyRuleInfo = array(
   array( 'lhs' => 14, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 3 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 3 ),
-  array( 'lhs' => 16, 'rhs' => 5 ),
-  array( 'lhs' => 16, 'rhs' => 4 ),
-  array( 'lhs' => 16, 'rhs' => 4 ),
-  array( 'lhs' => 16, 'rhs' => 3 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
   array( 'lhs' => 15, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 4 ),
-  array( 'lhs' => 16, 'rhs' => 2 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
-  array( 'lhs' => 16, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 3 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 3 ),
+  array( 'lhs' => 15, 'rhs' => 5 ),
+  array( 'lhs' => 15, 'rhs' => 4 ),
+  array( 'lhs' => 15, 'rhs' => 4 ),
+  array( 'lhs' => 15, 'rhs' => 3 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 4 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
     );
 
     /**
@@ -1056,7 +1052,6 @@ static public $yy_action = array(
         19 => 19,
         20 => 20,
         21 => 21,
-        22 => 22,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -1083,9 +1078,15 @@ static public $yy_action = array(
     // Calculate nullable, firstpos, lastpos and followpos for all nodes.
     $this->root->calculate_nflf($this->followpos);
     }
-#line 1091 "../preg_parser.php"
+#line 1086 "../preg_parser.php"
 #line 301 "../preg_parser.y"
     function yy_r1(){
+    $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+    $this->create_error_node_from_lexer($this->yystack[$this->yyidx + 0]->minor);
+    }
+#line 1092 "../preg_parser.php"
+#line 306 "../preg_parser.y"
+    function yy_r2(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT) {
         $this->yystack[$this->yyidx + -1]->minor->operands = array_merge($this->yystack[$this->yyidx + -1]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
@@ -1102,9 +1103,9 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, new qtype_preg_userinscription());
     }
-#line 1110 "../preg_parser.php"
-#line 319 "../preg_parser.y"
-    function yy_r2(){
+#line 1111 "../preg_parser.php"
+#line 324 "../preg_parser.y"
+    function yy_r3(){
     if ($this->yystack[$this->yyidx + -2]->minor->type == qtype_preg_node::TYPE_NODE_ALT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
         $this->yystack[$this->yyidx + -2]->minor->operands = array_merge($this->yystack[$this->yyidx + -2]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
         $this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
@@ -1121,9 +1122,9 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -2]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, new qtype_preg_userinscription('|'));
     }
-#line 1129 "../preg_parser.php"
-#line 337 "../preg_parser.y"
-    function yy_r3(){
+#line 1130 "../preg_parser.php"
+#line 342 "../preg_parser.y"
+    function yy_r4(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + -1]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     } else if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
@@ -1142,9 +1143,9 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + -1]->minor->indlast + 1, new qtype_preg_userinscription('|'));
     }
-#line 1150 "../preg_parser.php"
-#line 357 "../preg_parser.y"
-    function yy_r4(){
+#line 1151 "../preg_parser.php"
+#line 362 "../preg_parser.y"
+    function yy_r5(){
     if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + 0]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     } else if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
@@ -1163,37 +1164,37 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + 0]->minor->indfirst - 1, $this->yystack[$this->yyidx + 0]->minor->indlast, new qtype_preg_userinscription('|'));
     }
-#line 1171 "../preg_parser.php"
-#line 377 "../preg_parser.y"
-    function yy_r5(){
+#line 1172 "../preg_parser.php"
+#line 382 "../preg_parser.y"
+    function yy_r6(){
     $this->_retvalue = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + 0]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, new qtype_preg_userinscription('|'));
     }
-#line 1177 "../preg_parser.php"
-#line 382 "../preg_parser.y"
-    function yy_r6(){
+#line 1178 "../preg_parser.php"
+#line 387 "../preg_parser.y"
+    function yy_r7(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1185 "../preg_parser.php"
-#line 389 "../preg_parser.y"
-    function yy_r7(){
+#line 1186 "../preg_parser.php"
+#line 394 "../preg_parser.y"
+    function yy_r8(){
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info($this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + -1]->minor->indlast, new qtype_preg_userinscription($this->yystack[$this->yyidx + -1]->minor->userinscription->data . ')'));
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -1]->minor, $emptynode);
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 1193 "../preg_parser.php"
-#line 396 "../preg_parser.y"
-    function yy_r8(){
+#line 1194 "../preg_parser.php"
+#line 401 "../preg_parser.y"
+    function yy_r9(){
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor);
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + -2]->minor);
     }
-#line 1199 "../preg_parser.php"
-#line 401 "../preg_parser.y"
-    function yy_r9(){
+#line 1200 "../preg_parser.php"
+#line 406 "../preg_parser.y"
+    function yy_r10(){
     if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
         $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
@@ -1201,9 +1202,9 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
     }
-#line 1209 "../preg_parser.php"
-#line 410 "../preg_parser.y"
-    function yy_r10(){
+#line 1210 "../preg_parser.php"
+#line 415 "../preg_parser.y"
+    function yy_r11(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
         $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, null);
@@ -1211,9 +1212,9 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, null);
     }
     }
-#line 1219 "../preg_parser.php"
-#line 419 "../preg_parser.y"
-    function yy_r11(){
+#line 1220 "../preg_parser.php"
+#line 424 "../preg_parser.y"
+    function yy_r12(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
         $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -3]->minor, null, $this->yystack[$this->yyidx + -1]->minor);
@@ -1221,9 +1222,9 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
     }
-#line 1229 "../preg_parser.php"
-#line 428 "../preg_parser.y"
-    function yy_r12(){
+#line 1230 "../preg_parser.php"
+#line 433 "../preg_parser.y"
+    function yy_r13(){
     if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
         $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -2]->minor, null, null);
@@ -1231,61 +1232,50 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -2]->minor, null);
     }
     }
-#line 1239 "../preg_parser.php"
-#line 437 "../preg_parser.y"
-    function yy_r13(){
-    $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
-    $this->create_error_node_from_lexer($this->yystack[$this->yyidx + 0]->minor);
-    }
-#line 1245 "../preg_parser.php"
-#line 442 "../preg_parser.y"
+#line 1240 "../preg_parser.php"
+#line 447 "../preg_parser.y"
     function yy_r14(){
-    $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
-    }
-#line 1250 "../preg_parser.php"
-#line 452 "../preg_parser.y"
-    function yy_r15(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription->data, $this->yystack[$this->yyidx + -1]->minor->indlast + 1, $this->yystack[$this->yyidx + -1]->minor->indlast + 1, $this->yystack[$this->yyidx + 0]->minor->userinscription, array($this->yystack[$this->yyidx + -1]->minor));
     }
-#line 1255 "../preg_parser.php"
-#line 456 "../preg_parser.y"
-    function yy_r16(){
+#line 1245 "../preg_parser.php"
+#line 451 "../preg_parser.y"
+    function yy_r15(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription->data, $this->yystack[$this->yyidx + 0]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1260 "../preg_parser.php"
-#line 460 "../preg_parser.y"
-    function yy_r17(){
+#line 1250 "../preg_parser.php"
+#line 455 "../preg_parser.y"
+    function yy_r16(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription->data, $this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + -1]->minor->indlast, $this->yystack[$this->yyidx + -1]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor));
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 1266 "../preg_parser.php"
-#line 465 "../preg_parser.y"
-    function yy_r18(){
+#line 1256 "../preg_parser.php"
+#line 460 "../preg_parser.y"
+    function yy_r17(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription->data, $this->yystack[$this->yyidx + 0]->minor->indfirst,  $this->yystack[$this->yyidx + 0]->minor->indlast, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1272 "../preg_parser.php"
-#line 470 "../preg_parser.y"
-    function yy_r19(){
+#line 1262 "../preg_parser.php"
+#line 465 "../preg_parser.y"
+    function yy_r18(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, $this->yystack[$this->yyidx + -3]->minor->userinscription->data, $this->yystack[$this->yyidx + -3]->minor->indfirst, $this->yystack[$this->yyidx + -3]->minor->indlast, $this->yystack[$this->yyidx + -3]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -2]->minor));
     }
-#line 1277 "../preg_parser.php"
-#line 474 "../preg_parser.y"
-    function yy_r20(){
+#line 1267 "../preg_parser.php"
+#line 469 "../preg_parser.y"
+    function yy_r19(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription->data, $this->yystack[$this->yyidx + -1]->minor->indfirst, $this->yystack[$this->yyidx + -1]->minor->indlast, $this->yystack[$this->yyidx + -1]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 1282 "../preg_parser.php"
-#line 478 "../preg_parser.y"
-    function yy_r21(){
+#line 1272 "../preg_parser.php"
+#line 473 "../preg_parser.y"
+    function yy_r20(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription->data, $this->yystack[$this->yyidx + 0]->minor->indfirst, $this->yystack[$this->yyidx + 0]->minor->indlast, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1287 "../preg_parser.php"
-#line 482 "../preg_parser.y"
-    function yy_r22(){
+#line 1277 "../preg_parser.php"
+#line 477 "../preg_parser.y"
+    function yy_r21(){
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, $this->yystack[$this->yyidx + 0]->minor->userinscription->data, $this->yystack[$this->yyidx + 0]->minor->indfirst,  $this->yystack[$this->yyidx + 0]->minor->indlast, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->create_error_node_from_lexer($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1293 "../preg_parser.php"
+#line 1283 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1389,7 +1379,7 @@ static public $yy_action = array(
     if (count($this->errornodes) === 0) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, null, -1, -1, new qtype_preg_userinscription());
     }
-#line 1398 "../preg_parser.php"
+#line 1388 "../preg_parser.php"
     }
 
     /**
