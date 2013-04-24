@@ -410,17 +410,17 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         $possible_pairs=array();
         for ($k=0; $k<count($other); $k++)
         {
-            //подготовка неправильных слов к функции            
+            //preparation wrong words to the function         
             if($iscorrect==true)
             {
-                //проверка на возможность пары (опечатка)
+                //check on the possibility of (typo)
                 $dist=$this->possible_pair($other[$k],$max);
                 if($dist!=-1)
                 {
                     $pair=new block_formal_langs_matched_tokens_pair(array($this->tokenindex),array($k),$dist);
                     array_push($possible_pairs,$pair);
                 }
-                //проверка на возможность пары (лишний разделитель - склейка неправильных слов)
+                //check on the possibility of (extra separator - gluing the wrong words)
                 if($k+1!=count($other))
                 {
                     $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
@@ -436,7 +436,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             }
             else
             {
-                //проверка на возможность пары (пропущенный разделитель - склейка правильных слов)
+                //check on the possibility of (missed separator - gluing the right words)
                 if($k+1!=count($other))
                 {
                     $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
