@@ -1145,6 +1145,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indlast === 220);
     }
     function test_lexer_errors() {
+        // TODO: SUBTYPE_INVALID_ESCAPE_SEQUENCE, SUBTYPE_MISSING_CONTROL_ENDING, SUBTYPE_CALLOUT_BIG_NUMBER
         $lexer = $this->create_lexer('\p{C}[a\p{Squirrel}b]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -1265,7 +1266,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->error[0]->indfirst === 35);
         $this->assertTrue($token->value->error[0]->indlast === 39);
         $this->assertTrue($token->value->error[0]->addinfo === '4');
-        $lexer = $this->create_lexer('(?i-i)(?z-z:[bc');
+        $lexer = $this->create_lexer('(?i-i)(?z-z:\9[bc');
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token[0]->value->subtype === qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER);
@@ -1273,12 +1274,20 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[0]->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token[0]->value->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER);
         $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number === 9);
+        $token = $lexer->nextToken();
         $this->assertTrue($token === null);
-        $errors = $lexer->get_errors();
-        $this->assertTrue(count($errors) === 1);
+        $errors = $lexer->get_error_nodes();
+        $this->assertTrue(count($errors) === 2);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
-        $this->assertTrue($errors[0]->indfirst === 12);
-        $this->assertTrue($errors[0]->indlast === 14);
+        $this->assertTrue($errors[0]->indfirst === 14);
+        $this->assertTrue($errors[0]->indlast === 16);
+        $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR);
+        $this->assertTrue($errors[1]->indfirst === 12);
+        $this->assertTrue($errors[1]->indlast === 13);
+        $this->assertTrue($errors[1]->addinfo === '9');
         $lexer = $this->create_lexer('a\\');
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
@@ -1302,7 +1311,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN);
         $this->assertTrue($token->value->indfirst === 14);
         $this->assertTrue($token->value->indlast === 15);
-        $lexer = $this->create_lexer('(?#comment here)\x{FFFFFFFF}(?#comment without closing paren');
+        $lexer = $this->create_lexer('(?#comment here)\x{FFFFFFFF}\x{d800}(?#comment without closing paren');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_ERROR);
@@ -1312,9 +1321,15 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED);
         $this->assertTrue($token->value->indfirst === 28);
-        $this->assertTrue($token->value->indlast === 59);
+        $this->assertTrue($token->value->indlast === 35);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
+        $this->assertTrue($token->value->indfirst === 36);
+        $this->assertTrue($token->value->indlast === 67);
         $lexer = $this->create_lexer('(?(0)(?C255(?Pn(?<name1(?\'name2(?P<name3\g0(?<>(?\'\'(?P<>\g{}\k<>\k\'\'\k{}(?P=)\cй');
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
@@ -1609,7 +1624,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->userinscription[0]->data === '\p{Squirrel}');
-
         $lexer = $this->create_lexer('[\xff\x00-\x1fA-B\t\n]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);

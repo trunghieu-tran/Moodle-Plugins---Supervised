@@ -47,7 +47,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         }
         $parser->doParse(0, 0);
         $errors = array();
-        $lexerrors = $lexer->get_errors();
+        $lexerrors = $lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             $errors[] = $node;
         }
