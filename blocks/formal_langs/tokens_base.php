@@ -801,6 +801,25 @@ class block_formal_langs_token_stream {
      */
     public function compare_matches_groups($group1, $group2) {
         //TODO Birukova
+        if(count($group1->correctcoverage)+count($group1->comparedcoverage) == count($group2->correctcoverage)+count($group2->comparedcoverage))
+        {
+            if($group1->mistakeweight == $group2->mistakeweight)
+                return 0;
+            else
+            {
+                if($group1->mistakeweight < $group2->mistakeweight)
+                    return 1;
+                else
+                    return -1;
+            }
+        }
+        else
+        {
+            if(count($group1->correctcoverage)+count($group1->comparedcoverage) > count($group2->correctcoverage)+count($group2->comparedcoverage))
+                return 1;
+            else
+                return -1;
+        }
     }
 
     /**
