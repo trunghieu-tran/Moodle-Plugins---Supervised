@@ -22,14 +22,20 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
         return true;
     }
 
+    protected function json_key() {
+        return 'tree_src';
+    }
+
     protected function generate_json_for_empty_regex(&$json_array, $id) {
         $dotscript = 'digraph { }';
-        $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
     }
 
     protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
         $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the interactive tree!" [color=white]; }';
-        $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
     }
 
     /**
@@ -43,7 +49,11 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
         if ($id != -1) {
             $dotscript = $styleprovider->select_subtree($dotscript, $id);
         }
-        $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
+        $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
+
+        // Pass the map and its DOM id via json array.
         $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
+        /*$json_array['map_id'] = '#' . qtype_preg_dot_style_provider::get_graph_name();*/
     }
 }
