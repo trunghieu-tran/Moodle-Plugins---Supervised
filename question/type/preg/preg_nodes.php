@@ -147,8 +147,8 @@ abstract class qtype_preg_node {
     public $type;
     /** Subtype, defined by a child class. */
     public $subtype;
-    /** Error data for the subtype. */
-    public $error = null;
+    /** Errors found for this particular node. */
+    public $errors = array();
     /** Index of the first character of this node in the regex. */
     public $indfirst = -1;
     /** Index of the last character of this node in the regex. */
