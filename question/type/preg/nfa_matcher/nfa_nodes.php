@@ -105,14 +105,18 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
  */
 class qtype_preg_nfa extends qtype_preg_finite_automaton {
 
+    // The AST root node.
+    protected $ast_root;
+
     // Number of subpatterns in the regular expression.
     protected $max_subpatt;
 
     // Number of subexpressions in the regular expression.
     protected $max_subexpr;
 
-    public function __construct($max_subpatt, $max_subexpr) {
+    public function __construct($ast_root, $max_subpatt, $max_subexpr) {
         parent::__construct();
+        $this->ast_root = $ast_root;
         $this->max_subpatt = $max_subpatt;
         $this->max_subexpr = $max_subexpr;
     }
@@ -146,6 +150,10 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     }
 
     public function complete_match() {
+    }
+
+    public function ast_root() {
+        return $this->ast_root;
     }
 
     public function max_subpatt() {
