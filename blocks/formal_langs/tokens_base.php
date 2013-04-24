@@ -573,6 +573,11 @@ class block_formal_langs_token_stream {
         //  - look_for_matches function
         //2. Find best groups of pairs - Birukova
         //  - group_matches function, with criteria defined by compare_matches_groups function
+        $all_possible_pairs=array();
+        $best_groups=array();
+        $all_possible_pairs=$this->look_for_matches($comparedstream,$threshold);
+        $best_groups=$this->group_matches($all_possible_pairs);
+        return $best_groups;
     }
 
     /**
@@ -586,6 +591,17 @@ class block_formal_langs_token_stream {
      */
     public function look_for_matches($comparedstream, $threshold) {
         //TODO Birukova
+        $tokens=$this->tokens;
+        $all_possible_pairs=array();
+        for ($i=0; $i<count($this->tokens); $i++)
+        {
+            array_push($all_possible_pairs, $tokens[$i]->look_for_matches($comparedstream,$threshold,true));
+        }
+        for($i=0; $i<count($comparedstream); $i++)
+        {
+            array_push($all_possible_pairs, $comparedstream[$i]->look_for_matches($this->tokens,$threshold,false));
+        }
+        return $all_possible_pairs;
     }
 
     /**
