@@ -324,8 +324,69 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return int Damerau-Levenshtein distance
      */
     static public function damerau_levenshtein($str1, $str2) {
+        if ($str1 == $str2) 
+            return 0;//words identical
+        $str1_len = strlen($str1);
+        $str2_len = strlen($str2);
+        //zero length of words
+        if ($str1_len == 0) {
+            return $str2_len;
+        } 
+        else 
+            if ($str2_len == 0) {
+                return $str1_len;
+            }
+        //matrix [str1_len+1][str2_len+1]
+        for($i=0;$i<$str1_len;$i++)
+            for ($j=0;$j<$str2_len+1;$j++) 
+                    $mas[$i][$j]=0;
+        //fill in the first row and column  
+        for($i=0;$i<=$str1_len;$i++)
+            $mas[$i][0]=$i;
+        for($j=0;$j<=$str2_len;$j++)
+            $mas[0][$j]=$j;
+        //calculation
+        for($i=1;$i<=$str1_len;$i++)
+        {
+            for($j=1;$j<=$str2_len;$j++)
+            {
+                $up=$mas[$i-1][$j]+1;//deletion
+                $left=$mas[$i][$j-1]+1;//insertion
+                if($str1[$i-1]==$str2[$j-1])
+                    $cost=0;
+                else
+                    $cost=1;
+                $diag=$mas[$i-1][$j-1]+$cost;//replacement
+                $mas[$i][$j]=min(min($up,$left),$diag);
+                if($i>1 && $j>1 && $str1[$i-1]==$str2[$j-2] && $str1[$i-2]==$str2[$j-1])
+                    $mas[$i][$j]=min($mas[$i][$j], $mas[$i-2][$j-2]+$cost);//transposition
+            }
+        }
+        return $mas[$str1_len][$str2_len];
     }
 
+    
+    /* Determines the possibility existence of a pair
+    *
+    * @return int Damerau-Levenstein distance or -1 if pair is not possible
+    */
+    public function possible_pair($token, $max)
+    {
+        $str1= $this->value;
+        $str2= $token->value;
+        $length_of_str1=strlen($str1);                 //define the length of str1
+        $length_of_str2=strlen($str2);                 //define the length of str2
+        if(!($length_of_str1-$max<=$length_of_str2 && $length_of_str2<=$length_of_str1+$max))
+            return -1;
+        //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
+        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2);
+        if($distance<=$max)
+            return $distance;
+        else
+            return -1;
+    }
+    
+    
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
@@ -343,7 +404,54 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect) {
-        // TODO: generic mistakes handling
+        $result=strlen($this->value)-strlen($this->value)*$threshold;
+        $max=round($result);
+        $str='';
+        $possible_pairs=array();
+        for ($k=0; $k<count($other); $k++)
+        {
+            //подготовка неправильных слов к функции            
+            if($iscorrect==true)
+            {
+                //проверка на возможность пары (опечатка)
+                $dist=$this->possible_pair($other[$k],$max);
+                if($dist!=-1)
+                {
+                    $pair=new block_formal_langs_matched_tokens_pair(array($this->tokenindex),array($k),$dist);
+                    array_push($possible_pairs,$pair);
+                }
+                //проверка на возможность пары (лишний разделитель - склейка неправильных слов)
+                if($k+1!=count($other))
+                {
+                    $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                    $lexem=new block_formal_langs_token_base(null,'type',$str,null,0);
+                    $dist=$this->possible_pair($lexem, $max);
+                    if($dist!=-1)
+                    {
+                        $pair=new block_formal_langs_matched_tokens_pair(array($this->tokenindex),array($k, $k+1),$dist);
+                        array_push($possible_pairs, $pair);
+                    }
+                    $str='';
+                }
+            }
+            else
+            {
+                //проверка на возможность пары (пропущенный разделитель - склейка правильных слов)
+                if($k+1!=count($other))
+                {
+                    $str=$str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                    $lexem=new block_formal_langs_token_base(null,'type',$str,null,0);
+                    $dist=$this->possible_pair($lexem, $max);
+                    if($dist!=-1)
+                    {
+                        $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist);
+                        array_push($possible_pairs,$pair);
+                    }
+                    $str='';
+                }
+             }
+        }
+        return $possible_pairs;
     }
 
     /**
