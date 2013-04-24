@@ -75,26 +75,6 @@
     }
 
     /**
-     * Creates error node(s) if there is an error in the given node.
-     * @param node the node to be checked.
-     */
-    protected function create_error_node_from_lexer($node) {
-        if (isset($node->type) && $node->type === qtype_preg_node::TYPE_NODE_ERROR) {
-            $this->create_error_node($node->subtype, $node->addinfo, $node->indfirst, $node->indlast, $node->userinscription);
-        }
-        if (!isset($node->error)) {
-            return;
-        }
-        if (is_array($node->error)) {
-            foreach ($node->error as $error) {
-                $this->create_error_node($error->subtype, $error->addinfo, $error->indfirst, $error->indlast, $error->userinscription);
-            }
-        } else if ($node->error !== null) {
-            $this->create_error_node($node->error->subtype, $node->error->addinfo, $node->error->indfirst, $node->error->indlast, $node->error->userinscription);
-        }
-    }
-
-    /**
       * Creates and return correct parenthesis node (subexpression, groping or assertion).
       *
       * Used to avoid code duplication between empty and non-empty parenthesis.
@@ -303,7 +283,6 @@ start ::= expr(B). {
 
 expr(A) ::= PARSLEAF(B). {
     A = B;
-    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
@@ -391,19 +370,16 @@ expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->set_user_info(B->indfirst, C->indlast, C->userinscription);
     A->operands[0] = B;
-    $this->create_error_node_from_lexer(C);
 }
 
 expr(A) ::= OPENBRACK(B) CLOSEBRACK. {
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info(B->indfirst, B->indlast, new qtype_preg_userinscription(B->userinscription->data . ')'));
     A = $this->create_parens_node(B, $emptynode);
-    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     A = $this->create_parens_node(B, C);
-    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= CONDSUBEXPR(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
@@ -457,12 +433,10 @@ expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
 
 expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
     A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C));
-    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
     A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst,  B->indlast, B->userinscription);
-    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(E) CLOSEBRACK(D) expr(C). [ERROR_PREC] {
@@ -479,5 +453,4 @@ expr(A) ::= CONDSUBEXPR(B). [ERROR_PREC_SHORTEST] {
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
     A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->userinscription->data, B->indfirst,  B->indlast, B->userinscription);
-    $this->create_error_node_from_lexer(B);
 }

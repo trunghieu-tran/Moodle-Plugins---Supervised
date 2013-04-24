@@ -96,7 +96,7 @@ class qtype_preg_dot_style_provider {
                         $label .= '&#93;';
                     }
 
-                    if($pregnode->error === NULL){
+                    if (count($pregnode->errors) == 0) {
                         return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
                     } else {
                         return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . " \", shape = record, color = red, id = $id]";
@@ -124,8 +124,8 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_option', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
-                if ($pregnode->error !== null){
-                    return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $pregnode->error) . "\", color = red, id = $id]";
+                if (count($pregnode->errors) > 0) {
+                    return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $pregnode->errors[0]) . "\", color = red, id = $id]";
                 }
                 return "[label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg') . "\", id = $id]";
             }

@@ -530,13 +530,13 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
-    public function pattern($node_parent=null,$form=null){
+    public function pattern($node_parent = null, $form = null) {
 
         $result_pattern = '';
         $characters = array();
         // check errors
-        if($this->pregnode->error !== NULL){
-            return $this->pregnode->error[0]->error_string();
+        if (count($this->pregnode->errors) > 0) {
+            return $this->pregnode->errors[0]->error_string();
         }
 
         // 'not not' fix
