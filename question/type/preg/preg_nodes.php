@@ -1645,7 +1645,8 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_GLNU_UNSUPPORTED             => 'error_glnuunsupported',
                                    self::SUBTYPE_UNRECOGNIZED_LBA             => 'error_unrecognizedlba'
                                    );
-    /** Additional info. */
+
+    /** Additional info, should be a string. */
     public $addinfo;
 
     public function __construct($subtype = null, $addinfo = null) {
@@ -1679,6 +1680,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $a->indfirst = $this->indfirst;
         $a->indlast = $this->indlast;
         $a->addinfo = $this->addinfo;
-        return get_string(qtype_preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
+        return get_string(self::$errstrs[$this->subtype], 'qtype_preg', $a);
     }
 }

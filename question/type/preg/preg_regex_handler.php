@@ -356,7 +356,7 @@ class qtype_preg_regex_handler {
         $this->parser->doParse(0, 0);
 
         // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
-        $lexerrors = $this->lexer->get_errors();
+        $lexerrors = $this->lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
