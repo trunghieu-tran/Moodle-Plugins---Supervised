@@ -55,58 +55,30 @@ class qtype_preg_description_state {
     }
 
     /**
-     * set flag that means modifier $modifier is set
+     * Set or unsets the flag meaning that $modifier is (un)set
      *
-     * @param string $modifier modifier to set
+     * @param string $modifier modifier to (un)set
      */
-    public function set_modifier($modifier) {
-        switch ($modifier){
-            case 'i':
-                $this->caseless = true;
-                break;
-            case 's':
-                $this->singleline = true;
-                break;
-            case 'm':
-                $this->multilineline = true;
-                break;
-            case 'x':
-                $this->extended = true;
-                break;
-            case 'U':
-                $this->ungreedy = true;
-                break;
-            case 'J':
-                $this->duplicate = true;
-                break;
-        }
-    }
-
-    /**
-     * set flag that means modifier $modifier is unset
-     *
-     * @param string $modifier modifier to unset
-     */
-    public function unset_modifier($modifier) {
-        switch ($modifier){
-            case 'i':
-                $this->caseless = false;
-                break;
-            case 's':
-                $this->singleline = false;
-                break;
-            case 'm':
-                $this->multilineline = false;
-                break;
-            case 'x':
-                $this->extended = false;
-                break;
-            case 'U':
-                $this->ungreedy = false;
-                break;
-            case 'J':
-                $this->duplicate = false;
-                break;
+    public function set_modifier($modifier, $value) {
+        switch ($modifier) {
+        case 'i':
+            $this->caseless = $value;
+            break;
+        case 's':
+            $this->singleline = $value;
+            break;
+        case 'm':
+            $this->multilineline = $value;
+            break;
+        case 'x':
+            $this->extended = $value;
+            break;
+        case 'U':
+            $this->ungreedy = $value;
+            break;
+        case 'J':
+            $this->duplicate = $value;
+            break;
         }
     }
 }
@@ -603,7 +575,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         }
         return $result_pattern;
     }
-
 }
 
 
@@ -619,7 +590,6 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
 
         return self::get_form_string('description_empty',$form);
     }
-
 }
 
 /**
@@ -654,7 +624,6 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
         }
         return $resultpattern;
     }
-
 }
 
 /**
@@ -682,12 +651,12 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
         $resultpattern = '';
         $posopt =& $this->pregnode->posopt;
         $negopt =& $this->pregnode->negopt;
-        if($posopt->length() > 0) {
-            $this->handler->state->set_modifier($posopt[0]);
-            $resultpattern = self::get_form_string('description_option_'.$posopt[0],$form);
-        } else if($negopt->length() > 0) {
-            $this->handler->state->unset_modifier($negopt[0]);
-            $resultpattern = self::get_form_string('description_unsetoption_'.$negopt[0],$form);
+        if ($posopt->length() > 0) {
+            $this->handler->state->set_modifier($posopt[0], true);
+            $resultpattern = self::get_form_string('description_option_'.$posopt[0], $form);
+        } else if ($negopt->length() > 0) {
+            $this->handler->state->set_modifier($negopt[0], false);
+            $resultpattern = self::get_form_string('description_unsetoption_'.$negopt[0], $form);
         }
         return $resultpattern;
     }
@@ -745,7 +714,6 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
             $node_pattern = $resultpattern . $node_pattern;
         }
     }
-
 }
 
 class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
@@ -765,7 +733,6 @@ class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
         }
         return $resultpattern;
     }
-
 }
 
 /**
@@ -819,7 +786,6 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
         }
         return $resultpattern;
     }
-
 }
 
 /**
@@ -970,9 +936,6 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         }
         return $resultpattern;
     }
-
-
-
 }
 
 /**
@@ -1011,7 +974,6 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
         $resultpattern = str_replace('%greed',$greedpattern,$resultpattern);
         return $resultpattern;
     }
-
 }
 
 /**
@@ -1088,7 +1050,6 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
         qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
     }
-
 }
 
 /**
@@ -1129,7 +1090,6 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
         qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
     }
-
 }
 
 /**
@@ -1145,7 +1105,6 @@ class qtype_preg_description_node_assert extends qtype_preg_description_operator
         $suff = ($node_parent !== null && $node_parent->pregnode->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR) ? '_cond' : '';
         return self::get_form_string('description_' . $this->pregnode->subtype . $suff,$form);
     }
-
 }
 
 /**
@@ -1189,7 +1148,6 @@ class qtype_preg_description_node_subexpr extends qtype_preg_description_operato
         }
         return $resultpattern;
     }
-
 }
 
 /**
@@ -1284,7 +1242,6 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         }
         return $resultpattern;
     }
-
 }
 
 class qtype_preg_description_node_error extends qtype_preg_description_operator {
