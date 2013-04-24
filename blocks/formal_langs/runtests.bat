@@ -5,5 +5,8 @@ call phpunit block_formal_langs_token_base_is_same blocks/formal_langs/tests/tes
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_damerau_levenshtein.php
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_possible_pair.php
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_look_for_matches.php
+
+call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_group_matches.php
+call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_compare_groups.php
 pause
 
