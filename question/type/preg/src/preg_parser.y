@@ -282,7 +282,7 @@
 %nonassoc QUANT.
 %nonassoc OPENBRACK CONDSUBEXPR.
 
-start ::= lastexpr(B). {
+start ::= expr(B). {
     // Set the root node.
     $this->root = B;
 
@@ -299,6 +299,11 @@ start ::= lastexpr(B). {
 
     // Calculate nullable, firstpos, lastpos and followpos for all nodes.
     $this->root->calculate_nflf($this->followpos);
+}
+
+expr(A) ::= PARSLEAF(B). {
+    A = B;
+    $this->create_error_node_from_lexer(B);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
@@ -436,16 +441,6 @@ expr(A) ::= CONDSUBEXPR(D) CLOSEBRACK CLOSEBRACK. {
         A = $this->create_cond_subexpr_other_node(D, null);
     }
 }
-
-expr(A) ::= PARSLEAF(B). {
-    A = B;
-    $this->create_error_node_from_lexer(B);
-}
-
-lastexpr(A) ::= expr(B). {
-    A = B;
-}
-
 
 /**************************************************
  * Below are the rules for errors reporting.     *
