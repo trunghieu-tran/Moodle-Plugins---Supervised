@@ -522,6 +522,21 @@ class block_formal_langs_matched_tokens_pair {
      * @var integer
      */
     public $mistakeweight;
+    
+    
+    /**
+     * Tokens pair constructor.
+     *
+     * @param array $correcttokens - Indexes of the correct text tokens.
+     * @param array $comparedtokens - Indexes of the compared text tokens.
+     * @param integer $mistakeweight -  Mistake weight
+     * @return tokens pair
+     */
+    public function __construct($correcttokens, $comparedtokens, $mistakeweight) {
+        $this->correcttokens = $correcttokens;
+        $this->comparedtokens = $comparedtokens;
+        $this->mistakeweight = $mistakeweight;
+    }
 }
 
 /**
