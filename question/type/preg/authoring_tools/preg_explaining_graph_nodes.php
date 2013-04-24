@@ -278,14 +278,14 @@ class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg')  . get_string('description_charflag_vspace', 'qtype_preg');
                     } else if ($iter->data[$i] == ' ') {
                         $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                    } else if ($iter->data[$i] == '	') {
+                    } else if ($iter->data[$i] == "\t") {
                         $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                     } else {
                         $result[0] .= $iter->data[$i];
                     }
                 } else if ($iter->data[$i] == ' ') {
                     $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                } else if ($iter->data[$i] == '	') {
+                } else if ($iter->data[$i] == "\t") {
                     $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                 } else if ($iter->data[$i] == '.') {
                     if ($iter->type == qtype_preg_userinscription::TYPE_GENERAL)
