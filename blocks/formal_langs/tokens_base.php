@@ -708,7 +708,88 @@ class block_formal_langs_token_stream {
         }
     }
     
-    
+        public function bloking(&$place, &$matches, &$status){
+        $count_pairs=count($matches);
+        for($i=$place+1; $i<$count_pairs; $i++)
+        {
+            if($status[$i]!=-1)
+            {
+                if($matches[$place]->correcttokens[0]==$matches[$i]->correcttokens[0]||$matches[$place]->comparedtokens[0]==$matches[$i]->comparedtokens[0])
+                    $status[$i]=-1;
+                if(count($matches[$place]->correcttokens)==2)
+                {
+                    if($matches[$place]->correcttokens[1]==$matches[$i]->correcttokens[0])
+                        $status[$i]=-1;
+                    if(count($matches[$i]->correcttokens)==2)
+                    {
+                        if($matches[$place]->correcttokens[1]==$matches[$i]->correcttokens[1])
+                            $status[$i]=-1;
+                    }
+                }
+                if(count($matches[$i]->correcttokens)==2)
+                {
+                    if($matches[$place]->correcttokens[0]==$matches[$i]->correcttokens[1])
+                        $status[$i]=-1;
+                }
+                if(count($matches[$place]->comparedtokens)==2)
+                {
+                    if($matches[$place]->comparedtokens[1]==$matches[$i]->comparedtokens[0])
+                        $status[$i]=-1;
+                    if(count($matches[$i]->comparedtokens)==2)
+                    {
+                        if($matches[$place]->comparedtokens[1]==$matches[$i]->comparedtokens[1])
+                            $status[$i]=-1;
+                    }
+                }
+                if(count($matches[$i]->comparedtokens)==2)
+                {
+                    if($matches[$place]->comparedtokens[0]==$matches[$i]->comparedtokens[1])
+                        $status[$i]=-1;
+                }
+            }
+        }
+    }
+    public function unlock(&$place, &$matches, &$status){
+        $count_status=count($status)-1;
+        for($i=$count_status; $i>$place; $i--)
+        {
+            if($status[$i]!=0)
+            {
+                if($matches[$place]->correcttokens[0]==$matches[$i]->correcttokens[0]||$matches[$place]->comparedtokens[0]==$matches[$i]->comparedtokens[0])
+                    $status[$i]=0;
+                if(count($matches[$place]->correcttokens)==2)
+                {
+                    if($matches[$place]->correcttokens[1]==$matches[$i]->correcttokens[0])
+                        $status[$i]=0;
+                    if(count($matches[$i]->correcttokens)==2)
+                    {
+                        if($matches[$place]->correcttokens[1]==$matches[$i]->correcttokens[1])
+                            $status[$i]=0;
+                    }
+                }
+                if(count($matches[$i]->correcttokens)==2)
+                {
+                    if($matches[$place]->correcttokens[0]==$matches[$i]->correcttokens[1])
+                        $status[$i]=0;
+                }
+                if(count($matches[$place]->comparedtokens)==2)
+                {
+                    if($matches[$place]->comparedtokens[1]==$matches[i]->comparedtokens[0])
+                        $status[$i]=0;
+                    if(count($matches[$i].comparedtokens)==2)
+                    {
+                        if($matches[$place]->comparedtokens[1]==$matches[$i]->comparedtokens[1])
+                            $status[$i]=0;
+                    }
+                }
+                if(count($matches[$i]->comparedtokens)==2)
+                {
+                    if($matches[$place]->comparedtokens[0]==$matches[$i]->comparedtokens[1])
+                        $status[$i]=0;
+                }
+            }
+        }
+    }
     
     /**
      * Compares two matches groups.
