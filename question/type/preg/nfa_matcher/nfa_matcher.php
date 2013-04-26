@@ -316,7 +316,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $partialmatches = array();    // Possible partial matches.
 
 //$styleprovider = new qtype_preg_dot_style_provider();
-//$dotscript = $this->ast_root->dot_script($styleprovider);
+//$dotscript = $this->ast_root->dot_script(new qtype_preg_dot_node_context(true));
 //$this->automaton->draw('png', '/home/user/automaton.png');
 //self::execute_dot($dotscript, 'png', '/home/user/ast.png');
 
