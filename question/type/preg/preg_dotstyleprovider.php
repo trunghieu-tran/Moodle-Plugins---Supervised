@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 require_once($CFG->libdir . '/moodlelib.php');
 
 /**
@@ -59,136 +59,108 @@ class qtype_preg_dot_style_provider {
      * @return string which can be used as a dot instruction to set style, label etc, for example '[style - dotted, label = \"some label here\"]'.
      */
     public static function get_style($pregnode, $context) {
-        // Form a label from the user inscription which can be an array of strings.
-        $tmptooltip = '';
         $label = '';
         $tooltip = '';
-        $bracketflag = true;//true if need [...]
-        if (is_array($pregnode->userinscription)) {
-            //$flag = true;
-            //$colors = array(true=>'blue', false=>'green');
-            $countiters = 0;
-            foreach ($pregnode->userinscription as $tmp) {
-                $countiters++;
-                if ((strlen($tmp->data) === 1 || $tmp->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG || $tmp->data === '\\\\') && $countiters < 2) {
-                    $bracketflag = false;
-                } else {
-                    $bracketflag = true;
-                }
+        $shape = is_a($pregnode, 'qtype_preg_operator') ? 'ellipse' : 'rectangle';
+        $color = 'black';
+        if (count($pregnode->errors) > 0 || $pregnode->type == qtype_preg_node::TYPE_NODE_ERROR) {
+          $color = 'red';
+        }
 
-                $label .= qtype_preg_dot_style_provider::get_spec_symbol($tmp, $tmptooltip, 7);
-                //$flag = !$flag;
-                //$color = $colors[$flag];
-                //var_dump($colors[$flag]);
-                //$label .= qtype_preg_dot_style_provider::get_spec_symbol_with_color($tmp, $tmptooltip, 7, $colors[$flag]);
-                $tooltip .= $tmptooltip;// . '&#10;';
+        // Form a label from the user inscription which can be an array of strings.
+        if (is_array($pregnode->userinscription)) {
+            foreach ($pregnode->userinscription as $tmp) {
                 $tmptooltip = '';
+                $label .= qtype_preg_dot_style_provider::get_spec_symbol($tmp, $tmptooltip, 7);
+                $tooltip .= $tmptooltip;
             }
         } else {
-            /*if (strlen($tmp->data) === 2) {
-                    $bracketflag = false;
-            }*/
-            $label = qtype_preg_dot_style_provider::get_spec_symbol($pregnode->userinscription, $tmptooltip, 7);
-            //$label = qtype_preg_dot_style_provider::get_spec_symbol_with_color($pregnode->userinscription, $tmptooltip, 7);
-            $tooltip = $tmptooltip;
+            $label = qtype_preg_dot_style_provider::get_spec_symbol($pregnode->userinscription, $tooltip, 7);
         }
-        $id = $pregnode->id;
 
         // Now the label is ready, just return the appropriate style for node type and subtype.
         switch ($pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT: {
-                $result = 'label = "abstract node", style = dotted, color = "blue"';
-                break;
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+            if ($pregnode->negative) {
+                $label = '^' . $label;
             }
-            case qtype_preg_node::TYPE_LEAF_CHARSET: {
-                $tooltip = qtype_poasquestion_string::substr($tooltip, 0, qtype_poasquestion_string::strlen($tooltip) - 5);
+            $label = '<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4"><TR><TD>&#91;' . $label . '&#93;</TD></TR></TABLE>>';
 
-                if (qtype_poasquestion_string::strrpos($label, ',') === (qtype_poasquestion_string::strlen($label) - 1) && qtype_poasquestion_string::strlen($label) > 0) {
-                    $label = qtype_poasquestion_string::substr($label, 0, -1);
-                }
-                if ($pregnode->negative) {
-                    $label = '&#91;^' . $label . '&#93;';
-                    $result = "label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_negative_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id";
-                } else if (qtype_poasquestion_string::strlen($label) > 1 && $bracketflag) {
-                    $label = '&#91;' . $label;
-                    $label .= '&#93;';
-                }
+            if (count($pregnode->errors) > 0) {
+                $tooltip = get_string('authoring_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip;
+            } else {
+                $tooltip = $pregnode->negative ?
+                           get_string('authoring_tool_tooltip_negative_charset', 'qtype_preg') . ": " . $tooltip :
+                           get_string('authoring_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip;
+            }
+            break;
+        case qtype_preg_node::TYPE_LEAF_META:
+            $label = '"emptiness"';
+            $tooltip = get_string('authoring_tool_tooltip_emptiness', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+            if ($label[0] === "\\") {
+                $label = qtype_preg_unicode::substr($label, 1);
+            }
+            $label = '"assertion ' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+            $label = '"backreference to subexpression #' . $pregnode->number . '"';
+            $tooltip = get_string('authoring_tool_tooltip_backreference', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_LEAF_RECURSION:
+            $label = '"recursion ' . $pregnode->number . '"';
+            $tooltip = get_string('authoring_tool_tooltip_recursion', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_LEAF_CONTROL:
+            $label = '"control sequence ' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_LEAF_OPTIONS:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_option', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_CONCAT:
+            $label = '"&#8226;"';
+            $tooltip = get_string('authoring_tool_tooltip_concatenation', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_ALT:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_alternative', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_ASSERT:
+            $label = '"assertion ' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_SUBEXPR:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_subexpression', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
+            $label = '"' . $label . '"';
+            $tooltip = get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg');
+            break;
+        case qtype_preg_node::TYPE_NODE_ERROR:
+            $label = '"ERROR"';
+            $tooltip = $pregnode->error_string();
+            break;
+        default:
+            $label = '"Unknown node subtype"';
+            $color = 'red';
+            break;
+        }
 
-                if (count($pregnode->errors) == 0) {
-                    $result = "label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id";
-                } else {
-                    $result = "label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('authoring_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . " \", shape = record, color = red, id = $id";
-                }
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_META: {
-                $result = "label = \"emptiness\", tooltip = " . get_string('authoring_tool_tooltip_emptiness', 'qtype_preg') . ", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_ASSERT: {
-                if ($label[0] === "\\") {
-                    $label = qtype_poasquestion_string::substr($label, 1);
-                }
-                $result = "label = \"assertion $label\", tooltip = " . get_string('authoring_tool_tooltip_assertion', 'qtype_preg') . ", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                $result = "label = \"backreference to subexpression #$pregnode->number\", tooltip = " . get_string('authoring_tool_tooltip_backreference', 'qtype_preg') . ", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                $result = "[label = \"recursion ' . $pregnode->number . '\", tooltip = " . get_string('authoring_tool_tooltip_recursion', 'qtype_preg') . ", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                $result = "[label = control sequence \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg') . "\", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                $result = "[label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_option', 'qtype_preg') . ", shape = rectangle, id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
-                $result = "label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg') . "\", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
-                $result = "label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg') . "\", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_CONCAT: {
-                $result = "label = \"&#8226;\", tooltip = " . get_string('authoring_tool_tooltip_concatenation', 'qtype_preg') . ", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_ALT: {
-                $result = "label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_alternative', 'qtype_preg') . ", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_ASSERT: {
-                $result = "label = \"assertion $label\", tooltip = " . get_string('authoring_tool_tooltip_assertion', 'qtype_preg') . ", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_SUBEXPR: {
-                $result = "label = \"$label\", tooltip = " . get_string('authoring_tool_tooltip_subexpression', 'qtype_preg') . ", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_COND_SUBEXPR: {
-                $result = "label = \"$label\", tooltip = \"" . get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg') . "\", id = $id";
-                break;
-            }
-            case qtype_preg_node::TYPE_NODE_ERROR: {
-                $result = "label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", color = red, id = $id";
-                break;
-            }
-            default: {
-                $result = "label = \"Unknown node subtype\", style = dotted";
-                break;
-            }
-        }
-        if (count($pregnode->errors) > 0) {
-            $result .= ', color = red';
-        }
-        if ($context->selectid == $id) {
+        $result = "id = {$pregnode->id}, label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
+        if ($context->selectid == $pregnode->id) {
             $result .= ', style = dotted';
         }
         return '[' . $result . ']';
@@ -265,26 +237,26 @@ class qtype_preg_dot_style_provider {
             $result = $userinscription->data;
 
             foreach ($service as $key => $value) {
-                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $result = str_replace($key, $value, $result);
                 }
             }
             $tooltip = $result . '&#10;';
 
             for ($i = 1; $i < 33; $i++) {
-                if (qtype_poasquestion_string::strpos($result, chr($i)) !== false) {
+                if (qtype_preg_unicode::strpos($result, chr($i)) !== false) {
                     $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
                     $result = str_replace(chr($i), '<font color="blue">' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
                 }
             }
             foreach($colorednonprintable as $key => $value) {
-                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $tooltip = str_replace($key, $value, $tooltip);
                     $result = str_replace($key, '<font color="blue">' . shorten_text($value, $length) . '</font>,', $result);
                 }
             }
             foreach ($nonprintable as $key => $value) {
-                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $tooltip .= get_string($value, 'qtype_preg') . '&#10;';
                     $result = str_replace($key, '<font color="blue">' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font>,', $result);
                 }
@@ -328,20 +300,20 @@ class qtype_preg_dot_style_provider {
 
             $result = $userinscription->data;
             foreach ($service as $key => $value) {
-                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $result = str_replace($key, $value, $result);
                 }
             }
             $tooltip = $result . '&#10;';
             for ($i = 1; $i < 33; $i++) {
-                if (qtype_poasquestion_string::strpos($result, chr($i)) !== false) {
+                if (qtype_preg_unicode::strpos($result, chr($i)) !== false) {
                     $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
                     $result = str_replace(chr($i), '<font color="' . $colors[$flag]. '">' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font> ', $result);
                     $flag = !$flag;
                 }
             }
             foreach ($nonprintable as $key => $value) {
-                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $tooltip .= get_string($value, 'qtype_preg') . '&#10;';
                     $result = str_replace($key, '<font color="' . $colors[$flag] . '">' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
                     $flag = !$flag;
