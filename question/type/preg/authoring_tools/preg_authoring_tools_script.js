@@ -13,7 +13,7 @@
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
  */
-M.preg_authoring_tools_script = (function(){
+M.preg_authoring_tools_script = (function() {
 
     var self = {
 
@@ -79,18 +79,19 @@ M.preg_authoring_tools_script = (function(){
                     self.check_btn = self.Y.one('#id_regex_check')
                     self.check_btn.on('click', self.check_regex);
                     self.main_input = self.Y.one('#id_regex_text');
-                    self.main_input.on('change',self.regex_change)
+                    self.main_input.on('change', self.regex_change)
                     self.back_btn = self.Y.one('#id_regex_back');
                     self.back_btn.on('click', self.back_regex);
-                    self.main_input.set('value',self.textbutton_widget.data);
-                    self.load_content();
+                    self.main_input.set('value', self.textbutton_widget.data);
+                    self.Y.one('#id_tree').on('click', self.tree_node_misclicked);
+                    self.load_content_by_id(-1);
                 })
             },
 
             // Function called on non-first form openings.
             oneachpresscallback : function() {
-                self.main_input.set('value',self.textbutton_widget.data);
-                self.load_content();
+                self.main_input.set('value', self.textbutton_widget.data);
+                self.load_content_by_id(-1);
             }
         };
 
@@ -98,12 +99,12 @@ M.preg_authoring_tools_script = (function(){
     },
 
     /** Calls if request for information about new regex is successful */
-    upd_dialog_Success : function(id, o, a) {
+    upd_dialog_success : function(id, o, a) {
 
         // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         var indexofbracket = o.responseText.indexOf('{');
         if (indexofbracket != 0) {
-            alert(o.responseText.substr(0,indexofbracket));
+            alert(o.responseText.substr(0, indexofbracket));
         }
         // allerting json array:
         // alert(o.responseText.substr(indexofbracket));
@@ -117,7 +118,7 @@ M.preg_authoring_tools_script = (function(){
 
         if (typeof jsonarray[self.TREE_MAP_KEY] != 'undefined') {
             self.Y.one('#tree_map').setHTML(jsonarray[self.TREE_MAP_KEY]);
-            self.Y.all(self.TREE_MAP_ID + ' > area').on('click', self.check_tree);
+            self.Y.all(self.TREE_MAP_ID + ' > area').on('click', self.tree_node_clicked);
         }
 
         if (typeof jsonarray[self.GRAPH_KEY] != 'undefined') {
@@ -135,8 +136,7 @@ M.preg_authoring_tools_script = (function(){
     },
 
     load_content_by_id : function(id) {
-
-        this.node_id = id+0;
+        this.node_id = id + 0;
         id += '';
         var regex = this.main_input.get('value');
         this.textbutton_widget.data = regex;
@@ -147,7 +147,7 @@ M.preg_authoring_tools_script = (function(){
                 use: 'native'
             },
             on: {
-                success: this.upd_dialog_Success,    // upd_dialog_Succes(...) will call if request is successful
+                success: this.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
                 failure: this.upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
             }
         };
@@ -155,29 +155,27 @@ M.preg_authoring_tools_script = (function(){
         var response = this.Y.io(url, cfg);
     },
 
-    load_content : function() {
-        self.load_content_by_id(-1);
-    },
-
     /**
-     * Highlights part of text description of regex corresponding to giving id
-     * @param {int} id id of node for which we should highlight part of description
+     * Highlights part of text description of regex corresponding to given id.
+     * Highlights nothing if -1 is passed.
      */
-    highlight_description : function(id){
+    highlight_description : function(id) {
 
         var highlightedclass = 'description_highlighted';
-        var oldhighlighted = this.Y.one('.'+highlightedclass);
+        var oldhighlighted = this.Y.one('.' + highlightedclass);
 
-        if(oldhighlighted!=null){
-           oldhighlighted.removeClass(highlightedclass).setStyle('background','transparent');
+        if(oldhighlighted != null) {
+           oldhighlighted.removeClass(highlightedclass).setStyle('background', 'transparent');
         }
-        var targetspan = this.Y.one('.description_node_'+id);
-        targetspan.addClass(highlightedclass);
-        targetspan.setStyle('background','#FFFF00');
+        var targetspan = this.Y.one('.description_node_' + id);
+        if (targetspan != null) {
+            targetspan.addClass(highlightedclass);
+            targetspan.setStyle('background', '#FFFF00');
+        }
     },
 
     /** Handler of pressing on 'Back' button of dialog */
-    back_regex : function( e) {
+    back_regex : function(e) {
         e.preventDefault();
         var new_regex = self.main_input.get('value');
         self.textbutton_widget.data = new_regex;
@@ -185,25 +183,32 @@ M.preg_authoring_tools_script = (function(){
     },
 
     /** Handler of pressing on 'Check' button of dialog */
-    check_regex : function( e ) {
-
+    check_regex : function(e) {
         e.preventDefault();
-        self.load_content();
+        self.load_content_by_id(-1);
     },
 
     /**
-     * Handler of pressing on area of a map on regex tree image
+     * Handler of clicking on a node (map area, in fact)
      */
-    check_tree : function( e ) {
-       var id = e.currentTarget.getAttribute ( 'id' );
-       self.highlight_description(id);
+    tree_node_clicked : function(e) {
+       var id = e.currentTarget.getAttribute('id');
        self.load_content_by_id(id);
+       self.highlight_description(id);
+    },
+
+    /**
+     * Handler of clicking on area outside all nodes
+     */
+    tree_node_misclicked : function(e) {
+       self.load_content_by_id(-1);
+       self.highlight_description(-1);
     },
 
      /**
      * Handler of pressing on area of a map on regex tree image
      */
-    regex_change : function( e ) {
+    regex_change : function(e) {
        self.textbutton_widget.data = self.main_input.get('value');
     }
 };
