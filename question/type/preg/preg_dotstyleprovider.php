@@ -84,7 +84,12 @@ class qtype_preg_dot_style_provider {
             if ($pregnode->negative) {
                 $label = '^' . $label;
             }
-            $label = '<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4"><TR><TD>&#91;' . $label . '&#93;</TD></TR></TABLE>>';
+
+            if(qtype_poasquestion_string::strlen($label) > 1){
+                $label = '&#91;' . $label . '&#93;';
+            }
+            
+            $label = '<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4"><TR><TD>' . $label . '</TD></TR></TABLE>>';
 
             if (count($pregnode->errors) > 0) {
                 $tooltip = get_string('authoring_tool_tooltip_charset_error', 'qtype_preg') . ": " . $tooltip;
