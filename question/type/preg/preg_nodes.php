@@ -1271,7 +1271,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         } else {
             return array($dotscript, $style);
         }
-        return $result;
     }
 }
 
@@ -1558,6 +1557,18 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
         // TODO what should be here?
     }
 
+    public function dot_script($styleprovider, $isroot = true) {
+        $operands = $this->operands;
+        if ($this->condbranch !== null) {
+            $this->operands = array_merge(array($this->condbranch), $operands);
+            $result = parent::dot_script($styleprovider, $isroot);
+            $this->operands = $operands;
+        } else {
+            $result = parent::dot_script($styleprovider, $isroot);
+        }
+        return $result;
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1660,7 +1671,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     }
 
     public function dot_script($styleprovider, $isroot = true) {
-        // Calculate the node name, style and the result.
+        // Calculate the node name, style and the result.   // TODO: remove this function and use the code inherited from operator?
         $nodename = $this->id;
         $style = $nodename . $styleprovider->get_style($this) . ';';
         $dotscript = $nodename . ';';
