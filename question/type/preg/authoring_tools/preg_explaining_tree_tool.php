@@ -45,10 +45,8 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
         $styleprovider = new qtype_preg_dot_style_provider();
-        $dotscript = $this->get_ast_root()->dot_script($styleprovider);
-        if ($id != -1) {
-            $dotscript = $styleprovider->select_subtree($dotscript, $id);
-        }
+        $context = new qtype_preg_dot_node_context(true, $id);
+        $dotscript = $this->get_ast_root()->dot_script($context);
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'png');
         $json_array[$this->json_key()] = 'data:image/png;base64,' . base64_encode($rawdata);
 
