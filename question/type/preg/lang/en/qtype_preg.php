@@ -86,7 +86,7 @@ $string['leaf_options']                = 'modifier';   // TODO: remove?
 $string['node_finite_quant']           = 'finite quantifier';
 $string['node_infinite_quant']         = 'infinite quantifier';
 $string['node_concat']                 = 'concatenation';
-$string['node_alt']                    = 'alternative';
+$string['node_alt']                    = 'alternation';
 $string['node_assert']                 = 'lookaround assertion';
 $string['node_subexpr']                = 'subexpression';
 $string['node_cond_subexpr']           = 'conditional subexpression';
@@ -131,7 +131,7 @@ $string['nla_node_cond_subexpr']       = 'negative lookahead conditional subexpr
 $string['plb_node_cond_subexpr']       = 'positive lookbehind conditional subexpression';
 $string['nlb_node_cond_subexpr']       = 'negative lookbehind conditional subexpression';
 $string['unknown_error_node_error']                                = 'unknown error';
-$string['condsubexpr_too_much_alter_node_error']                    = 'too much top-level alternatives in a conditional subexpression';
+$string['condsubexpr_too_much_alter_node_error']                   = 'too much top-level alternations in a conditional subexpression';
 $string['wrong_close_paren_node_error']                            = 'closing paren without opening';
 $string['wrong_open_paren_node_error']                             = 'opening paren without closing';
 $string['empty_parens_node_error']                                 = 'empty parens';
@@ -145,7 +145,7 @@ $string['incorrect_range_node_error']                              = 'incorrect 
 
 /******* Error messages *******/
 $string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
-$string['error_threealtincondsubexpr']          = 'Regex syntax error: three or more top-level alternatives in the conditional subexpression in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
+$string['error_threealtincondsubexpr']          = 'Regex syntax error: three or more top-level alternations in the conditional subexpression in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternations in yes-expr on no-expr.';
 $string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
 $string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
 $string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
@@ -284,7 +284,7 @@ $string['description_subexpression_once'] = 'once checked subexpression #%number
 $string['description_subexpression_name'] = 'subexpression "%name": [%1]';
 $string['description_subexpression_once_name'] = 'once checked subexpression "%name": [%1]';
 $string['description_grouping'] = 'grouping: [%1]';
-$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternative): [%1]';
+$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternation): [%1]';
 // TYPE_NODE_COND_SUBEXPR (%1 - first option; %2 - second option; %cond - condition )
 $string['description_node_cond_subexpr'] = 'if %cond then check: [%1]%else';
 $string['description_node_cond_subexpr_else'] = ' else check: [%2]';
@@ -562,7 +562,7 @@ $string['authoring_tool_tooltip_option'] = 'option';
 $string['authoring_tool_tooltip_finite_quantifier'] = 'finite quantifier';
 $string['authoring_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
 $string['authoring_tool_tooltip_concatenation'] = 'concatenation';
-$string['authoring_tool_tooltip_alternative'] = 'alternative';
+$string['authoring_tool_tooltip_alternative'] = 'alternation';
 $string['authoring_tool_tooltip_assertion'] = 'assertion';
 $string['authoring_tool_tooltip_subexpression'] = 'subexpression';
 $string['authoring_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';
