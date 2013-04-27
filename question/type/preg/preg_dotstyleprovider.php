@@ -208,11 +208,13 @@ class qtype_preg_dot_style_provider {
      * @param int $length string length.
      * @return modified label.
      */
-    protected static function get_spec_symbol($userinscription, &$tooltip, $length = 30) {
+    protected static function get_spec_symbol($userinscription, &$tooltip, $length, $usecolor = false) {
         if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
             $tooltip = $userinscription->data . '&#10;';
             $result = '<font color="blue">' . $tooltip . '</font>';
         } else {
+            $result = $userinscription->data;
+
             // Replacement of service and non-printable characters.
             $service = array('&' => '&#38;',
                              '"' => '&#34;',
@@ -235,98 +237,58 @@ class qtype_preg_dot_style_provider {
                                   qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
                                   qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
                                   );
+
             $colorednonprintable = array('\n' => get_string('description_charA', 'qtype_preg'),
                                          '\t' => get_string('description_char9', 'qtype_preg'),
                                          '\r' => get_string('description_charD', 'qtype_preg')
                                          );
-            $result = $userinscription->data;
+
+            $colors = array(true => '"blue"', false => '"green"');
 
             foreach ($service as $key => $value) {
                 if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $result = str_replace($key, $value, $result);
                 }
             }
+
             $tooltip = $result . '&#10;';
 
+            $flag = true;
             for ($i = 1; $i < 33; $i++) {
-                if (qtype_preg_unicode::strpos($result, chr($i)) !== false) {
+                if (qtype_preg_unicode::strpos($result, qtype_preg_unicode::code2utf8($i)) !== false) {
                     $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
-                    $result = str_replace(chr($i), '<font color="blue">' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
+                    $color = '"blue"';
+                    if ($usecolor) {
+                        $color = $colors[$flag];
+                    }
+                    $result = str_replace(qtype_preg_unicode::code2utf8($i), '<font color=' . $color . '>' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
+                    $flag = !$flag;
                 }
             }
+
             foreach($colorednonprintable as $key => $value) {
                 if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $tooltip = str_replace($key, $value, $tooltip);
                     $result = str_replace($key, '<font color="blue">' . shorten_text($value, $length) . '</font>,', $result);
                 }
             }
+
+            $flag = true;
             foreach ($nonprintable as $key => $value) {
                 if (qtype_preg_unicode::strpos($result, $key) !== false) {
                     $tooltip .= get_string($value, 'qtype_preg') . '&#10;';
-                    $result = str_replace($key, '<font color="blue">' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font>,', $result);
+                    $color = '"blue"';
+                    if ($usecolor) {
+                        $color = $colors[$flag];
+                    }
+                    $result = str_replace($key, '<font color=' . $color . '>' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
+                    $flag = !$flag;
                 }
             }
             //$tooltip = str_replace('\\\\', '\\', $tooltip);
             $tooltip = str_replace('\\', '', $tooltip);
             $result = str_replace('\\', '', $result);
         }
-        return $result;
-    }
-
-    protected static function get_spec_symbol_with_color($userinscription, &$tooltip, $length = 30, $color = 'blue') {
-        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
-            $tooltip = $userinscription->data . '&#10;';
-            $result = '<font color="blue">' . $tooltip . '</font>';
-            //$result = '<font color="' . $color . '">' . $tooltip . '</font>';
-        } else {
-            // Replacement of service and non-printable characters.
-            $service = array('"' => '&#34;',
-                             //'\\' '&#92;',
-                             '&' => '&#38;',
-                             '{' => '\\{',
-                             '}' => '\\}',
-                             '>' => '&#62;',
-                             '<' => '&#60;',
-                             '[' => '&#91;',
-                             ']' => '&#93;',
-                             ',' => '&#44;'
-                             );
-            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
-                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
-                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
-                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
-                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
-                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
-                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
-                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D'
-                                  );
-            $flag = true;
-            $colors = array(true=>'blue', false=>'green');
-
-            $result = $userinscription->data;
-            foreach ($service as $key => $value) {
-                if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                    $result = str_replace($key, $value, $result);
-                }
-            }
-            $tooltip = $result . '&#10;';
-            for ($i = 1; $i < 33; $i++) {
-                if (qtype_preg_unicode::strpos($result, chr($i)) !== false) {
-                    $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
-                    $result = str_replace(chr($i), '<font color="' . $colors[$flag]. '">' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font> ', $result);
-                    $flag = !$flag;
-                }
-            }
-            foreach ($nonprintable as $key => $value) {
-                if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                    $tooltip .= get_string($value, 'qtype_preg') . '&#10;';
-                    $result = str_replace($key, '<font color="' . $colors[$flag] . '">' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
-                    $flag = !$flag;
-                }
-            }
-        }
-        //var_dump($color);
-        //var_dump($result);
         return $result;
     }
 }
