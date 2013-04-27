@@ -10,8 +10,7 @@
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_dotbased_authoring_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
-//require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
 
 class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
@@ -52,7 +51,6 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
      * @param array $json_array contains link on image and text map of interactive tree
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $styleprovider = new qtype_preg_dot_style_provider();
         $context = new qtype_preg_dot_node_context(true, $id);
         $dotscript = $this->get_ast_root()->dot_script($context);
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
@@ -60,6 +58,6 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
 
         // Pass the map and its DOM id via json array.
         $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
-        /*$json_array['map_id'] = '#' . qtype_preg_dot_style_provider::get_graph_name();*/
+        /*$json_array['map_id'] = '#' . qtype_preg_explaining_tree_node::get_graph_name();*/
     }
 }
