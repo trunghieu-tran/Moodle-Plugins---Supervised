@@ -229,7 +229,7 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
             $newcontext = clone $context;
             $newcontext->isroot = false;
             if ($newcontext->selectid == $this->pregnode->id) {
-                $newcontext->selectid = $this->pregnode->id;
+                $newcontext->selectid = $operand->pregnode->id;
             }
             // Recursive call to subtree.
             $tmp = $operand->dot_script($newcontext);
@@ -272,7 +272,7 @@ class qtype_preg_explaining_tree_leaf_charset extends qtype_preg_explaining_tree
 class qtype_preg_explaining_tree_leaf_meta extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"emptiness"';
+        return '"Emptiness"';
     }
 
     protected function tooltip() {
@@ -287,7 +287,7 @@ class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_
         if ($label[0] === "\\") {
             $label = qtype_preg_unicode::substr($label, 1);
         }
-        return '"assertion ' . $label . '"';
+        return '"Assertion ' . $label . '"';
     }
 
     protected function tooltip() {
@@ -298,7 +298,7 @@ class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_
 class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"backreference to subexpression #' . $this->pregnode->number . '"';
+        return '"Backreference to subexpression #' . $this->pregnode->number . '"';
     }
 
     protected function tooltip() {
@@ -320,7 +320,7 @@ class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_
 class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"recursion ' . $this->pregnode->number . '"';
+        return '"Recursion ' . $this->pregnode->number . '"';
     }
 
     protected function tooltip() {
@@ -331,7 +331,7 @@ class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tr
 class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"control sequence ' . parent::label() . '"';
+        return '"Control sequence ' . parent::label() . '"';
     }
 
     protected function tooltip() {
@@ -339,7 +339,7 @@ class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree
     }
 }
 
-class qtype_preg_explaining_tree_node_node_finite_quant extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_finite_quant extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
         return '"' . parent::label() . '"';
@@ -350,7 +350,7 @@ class qtype_preg_explaining_tree_node_node_finite_quant extends qtype_preg_expla
     }
 }
 
-class qtype_preg_explaining_tree_node_node_infinite_quant extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_infinite_quant extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
         return '"' . parent::label() . '"';
@@ -372,7 +372,7 @@ class qtype_preg_explaining_tree_node_concat extends qtype_preg_explaining_tree_
     }
 }
 
-class qtype_preg_explaining_tree_node_node_alt extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_alt extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
         return '"' . parent::label() . '"';
@@ -383,10 +383,10 @@ class qtype_preg_explaining_tree_node_node_alt extends qtype_preg_explaining_tre
     }
 }
 
-class qtype_preg_explaining_tree_node_node_assert extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_assert extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-        return '"assertion ' . parent::label() . '"';
+        return '"Assertion ' . parent::label() . '"';
     }
 
     protected function tooltip() {
@@ -394,7 +394,7 @@ class qtype_preg_explaining_tree_node_node_assert extends qtype_preg_explaining_
     }
 }
 
-class qtype_preg_explaining_tree_node_node_subexpr extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_subexpr extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
         return '"' . parent::label() . '"';
@@ -405,7 +405,7 @@ class qtype_preg_explaining_tree_node_node_subexpr extends qtype_preg_explaining
     }
 }
 
-class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_cond_subexpr extends qtype_preg_explaining_tree_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -426,14 +426,14 @@ class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_expla
     }
 }
 
-class qtype_preg_explaining_tree_node_node_error extends qtype_preg_explaining_tree_operator {
+class qtype_preg_explaining_tree_node_error extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-        return '"ERROR"';
+        return '"Error"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return $this->pregnode->error_string();
     }
 
     protected function color() {
