@@ -181,13 +181,6 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
-     * Returns the dot script corresponding to this node.
-     * @param context an instance of qtype_preg_dot_node_context.
-     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
-     */
-    abstract public function dot_script($context);
-
-    /**
      * Sets indexes and userinscription for the node.
      */
     public function set_user_info($indfirst, $indlast, $userinscription = null) {
@@ -232,19 +225,6 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
-    }
-
-    public function dot_script($context) {
-        // Calculate the node name, style and the result.
-        $nodename = $this->id;
-        $style = $nodename . qtype_preg_dot_style_provider::get_style($this, $context) . ';';
-        $dotscript = $nodename . ';';
-        if ($context->isroot) {
-            $dotscript = qtype_preg_dot_style_provider::get_dot_head() . $style . $dotscript . qtype_preg_dot_style_provider::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
-        }
     }
 
     /**
@@ -330,40 +310,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $this->nullable =  false;
             $this->firstpos = array();
             $this->lastpos = array();
-        }
-    }
-
-    public function dot_script($context) {
-        // Calculate the node name and style.
-        $nodename = $this->id;
-        $style = $nodename . qtype_preg_dot_style_provider::get_style($this, $context) . ';';
-
-        // Get child dot scripts and styles.
-        $childscripts = array();
-
-        foreach ($this->operands as $operand) {
-            // Change the context to select the subtree.
-            $newcontext = clone $context;
-            $newcontext->isroot = false;
-            if ($newcontext->selectid == $this->id) {
-                $newcontext->selectid = $operand->id;
-            }
-            // Recursive call to subtree.
-            $tmp = $operand->dot_script($newcontext);
-            $childscripts[] = $tmp[0];
-            $style .= $tmp[1];
-        }
-
-        // Form the result.
-        $dotscript = '';
-        foreach ($childscripts as $childscript) {
-            $dotscript .= $nodename . '->' . $childscript;
-        }
-        if ($context->isroot) {
-            $dotscript = qtype_preg_dot_style_provider::get_dot_head() . $style . $dotscript . qtype_preg_dot_style_provider::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
         }
     }
 }
@@ -1564,18 +1510,6 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
         // TODO what should be here?
     }
 
-    public function dot_script($context) {
-        $operands = $this->operands;
-        if ($this->condbranch !== null) {
-            $this->operands = array_merge(array($this->condbranch), $operands);
-            $result = parent::dot_script($context);
-            $this->operands = $operands;
-        } else {
-            $result = parent::dot_script($context);
-        }
-        return $result;
-    }
-
     //TODO - ui_nodename()
 }
 
@@ -1675,19 +1609,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
 
     public function is_subpattern() {
         return false;    // Of course it's not.
-    }
-
-    public function dot_script($context) {
-        // Calculate the node name, style and the result.   // TODO: remove this function and use the code inherited from operator?
-        $nodename = $this->id;
-        $style = $nodename . qtype_preg_dot_style_provider::get_style($this, $context) . ';';
-        $dotscript = $nodename . ';';
-        if ($context->isroot) {
-            $dotscript = qtype_preg_dot_style_provider::get_dot_head() . $style . $dotscript . qtype_preg_dot_style_provider::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
-        }
     }
 
     /**
