@@ -139,8 +139,10 @@ class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_expla
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
-        $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
-        $this->operands = array_merge(array($condbranch), $this->operands);
+        if ($this->pregnode->condbranch !== null) {
+            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
+            $this->operands = array_merge(array($condbranch), $this->operands);
+        }
     }
 }
 
