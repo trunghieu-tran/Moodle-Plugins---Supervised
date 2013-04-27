@@ -63,95 +63,73 @@ abstract class qtype_preg_explaining_tree_node {
     }
 
     /**
-     * Replaces non-printable and service characters and shortens their description
-     * and additional info (for example, is it a charset flag (\ w, \ d) - true or false, etc)
-     * to the appropriate equivalents for the dot.
-     * @param object $tmp string for label.
-     * @param string $tooltip string for tooltip.
-     * @param int $length string length.
-     * @return modified label.
+     * Replaces non-printable and special characters in the given string.
+     * Highlights them if needed.
      */
-    protected static function get_spec_symbol($userinscription, &$tooltip, $length, $usecolor = false) {
-        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
-            $tooltip = $userinscription->data . '&#10;';
-            $result = '<font color="blue">' . $tooltip . '</font>';
-        } else {
-            $result = $userinscription->data;
+    protected static function replace_special_characters($string, $usecolor = false) {
+        $special = array('&' => '&#38;',
+                         '"' => '&#34;',
+                         '\\\\'=> '&#92;',
+                         '{' => '&#123;',
+                         '}' => '&#125;',
+                         '>' => '&#62;',
+                         '<' => '&#60;',
+                         '[' => '&#91;',
+                         ']' => '&#93;',
+                         ',' => '&#44;',
+                         '|' => '&#124;',
+                         );
+        $nonprintable = array('\n' => 'description_charA',
+                              '\t' => 'description_char9',
+                              '\r' => 'description_charD',
+                              qtype_preg_unicode::code2utf8(127) => 'description_char7F',
+                              qtype_preg_unicode::code2utf8(160) => 'description_charA0',
+                              qtype_preg_unicode::code2utf8(173) => 'description_charAD',
+                              qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
+                              qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
+                              qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
+                              qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
+                              qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
+                              );
 
-            // Replacement of service and non-printable characters.
-            $service = array('&' => '&#38;',
-                             '"' => '&#34;',
-                             '\\\\'=> '&#92;',
-                             '{' => '&#123;',
-                             '}' => '&#125;',
-                             '>' => '&#62;',
-                             '<' => '&#60;',
-                             '[' => '&#91;',
-                             ']' => '&#93;',
-                             ',' => '&#44;',
-                             '|' => '&#124;',
-                             );
-            $nonprintable = array(qtype_preg_unicode::code2utf8(127) => 'description_char7F',
-                                  qtype_preg_unicode::code2utf8(160) => 'description_charA0',
-                                  qtype_preg_unicode::code2utf8(173) => 'description_charAD',
-                                  qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
-                                  qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
-                                  qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
-                                  qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
-                                  qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
-                                  );
+        $colors = array(true => '"blue"', false => '"green"');
 
-            $colorednonprintable = array('\n' => get_string('description_charA', 'qtype_preg'),
-                                         '\t' => get_string('description_char9', 'qtype_preg'),
-                                         '\r' => get_string('description_charD', 'qtype_preg')
-                                         );
+        $result = $string;
 
-            $colors = array(true => '"blue"', false => '"green"');
-
-            foreach ($service as $key => $value) {
-                if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                    $result = str_replace($key, $value, $result);
-                }
+        // Replace special characters without using color.
+        foreach ($special as $key => $value) {
+            if (qtype_preg_unicode::strpos($result, $key) !== false) {
+                $result = str_replace($key, $value, $result);
             }
-
-            $tooltip = $result . '&#10;';
-
-            $flag = true;
-            for ($i = 1; $i < 33; $i++) {
-                if (qtype_preg_unicode::strpos($result, qtype_preg_unicode::code2utf8($i)) !== false) {
-                    $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
-                    $color = '"blue"';
-                    if ($usecolor) {
-                        $color = $colors[$flag];
-                    }
-                    $result = str_replace(qtype_preg_unicode::code2utf8($i), '<font color=' . $color . '>' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
-                    $flag = !$flag;
-                }
-            }
-
-            foreach($colorednonprintable as $key => $value) {
-                if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                    $tooltip = str_replace($key, $value, $tooltip);
-                    $result = str_replace($key, '<font color="blue">' . shorten_text($value, $length) . '</font>,', $result);
-                }
-            }
-
-            $flag = true;
-            foreach ($nonprintable as $key => $value) {
-                if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                    $tooltip .= get_string($value, 'qtype_preg') . '&#10;';
-                    $color = '"blue"';
-                    if ($usecolor) {
-                        $color = $colors[$flag];
-                    }
-                    $result = str_replace($key, '<font color=' . $color . '>' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
-                    $flag = !$flag;
-                }
-            }
-            //$tooltip = str_replace('\\\\', '\\', $tooltip);
-            $tooltip = str_replace('\\', '', $tooltip);
-            $result = str_replace('\\', '', $result);
         }
+
+        // TODO non-printable.
+
+        /*$flag = true;
+        for ($i = 1; $i < 33; $i++) { // until space character
+            if (qtype_preg_unicode::strpos($result, qtype_preg_unicode::code2utf8($i)) !== false) {
+                $color = '"blue"';
+                if ($usecolor) {
+                    $color = $colors[$flag];
+                }
+                $result = str_replace(qtype_preg_unicode::code2utf8($i), '<font color=' . $color . '>' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
+                $flag = !$flag;
+            }
+        }
+
+        $flag = true;
+        foreach ($nonprintable as $key => $value) {
+            if (qtype_preg_unicode::strpos($result, $key) !== false) {
+                $color = '"blue"';
+                if ($usecolor) {
+                    $color = $colors[$flag];
+                }
+                $result = str_replace($key, '<font color=' . $color . '>' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
+                $flag = !$flag;
+            }
+        }
+        $result = str_replace('\\', '', $result);*/
+
         return $result;
     }
 
@@ -162,24 +140,60 @@ abstract class qtype_preg_explaining_tree_node {
      */
     public abstract function dot_script($context);  // TODO: move from preg_nodes.php
 
-    protected abstract function label();
+    protected function get_style($context) {
+        $label = $this->label();
+        $tooltip = $this->tooltip();
+        $shape = $this->shape();
+        $color = $this->color();
+        $result = "id = {$this->pregnode->id}, label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
+        if ($context->selectid == $this->pregnode->id) {
+            $result .= ', style = dotted';
+        }
+        return '[' . $result . ']';
+    }
 
-    protected abstract function tooltip();
+    protected function label() {
+        // Is userinscription an object?
+        if (is_object($this->pregnode->userinscription)) {
+            return shorten_text(self::replace_special_characters($this->pregnode->userinscription->data));
+        }
+        // Userinscription is an array, iterate over all objects.
+        $label = '';
+        foreach ($this->pregnode->userinscription as $tmp) {
+            $label .= shorten_text(self::replace_special_characters($tmp->data));
+        }
+        return $label;
+    }
 
-    protected abstract function shape();
+    protected function tooltip() {
+        return $this->label(); // TODO: this is placeholder, write real code
+    }
+
+    protected function shape() {
+      return 'ellipse';
+    }
 
     protected function color() {
-        return 'black';
+        return count($this->pregnode->errors) > 0 ? 'red' : 'black';
     }
 }
 
 /**
  * Class for leafs.
  */
-abstract class qtype_preg_explaining_tree_leaf extends qtype_preg_explaining_tree_node {
+class qtype_preg_explaining_tree_leaf extends qtype_preg_explaining_tree_node {
 
     public function dot_script($context) {
-
+        // Calculate the node name, style and the result.
+        $nodename = $this->pregnode->id;
+        $style = $nodename . self::get_style($context) . ';';
+        $dotscript = $nodename . ';';
+        if ($context->isroot) {
+            $dotscript = self::get_dot_head() . $style . $dotscript . self::get_dot_tail();
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
     }
 
     protected function shape() {
@@ -191,7 +205,7 @@ abstract class qtype_preg_explaining_tree_leaf extends qtype_preg_explaining_tre
 /**
  * Class for operators.
  */
-abstract class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_node {
+class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_node {
 
     public $operands = array(); // an array of operands
 
@@ -203,88 +217,121 @@ abstract class qtype_preg_explaining_tree_operator extends qtype_preg_explaining
     }
 
     public function dot_script($context) {
+        // Calculate the node name and style.
+        $nodename = $this->pregnode->id;
+        $style = $nodename . self::get_style($context) . ';';
 
-    }
+        // Get child dot scripts and styles.
+        $childscripts = array();
 
-    protected function shape() {
-        return 'ellipse';
+        foreach ($this->operands as $operand) {
+            // Change the context to select the subtree.
+            $newcontext = clone $context;
+            $newcontext->isroot = false;
+            if ($newcontext->selectid == $this->pregnode->id) {
+                $newcontext->selectid = $this->pregnode->id;
+            }
+            // Recursive call to subtree.
+            $tmp = $operand->dot_script($newcontext);
+            $childscripts[] = $tmp[0];
+            $style .= $tmp[1];
+        }
+
+        // Form the result.
+        $dotscript = '';
+        foreach ($childscripts as $childscript) {
+            $dotscript .= $nodename . '->' . $childscript;
+        }
+        if ($context->isroot) {
+            $dotscript = self::get_dot_head() . $style . $dotscript . self::get_dot_tail();
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
     }
 }
 
-class qtype_preg_explaining_tree_node_leaf_charset extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_charset extends qtype_preg_explaining_tree_leaf {
+
+    protected function label() {
+        $result = parent::label();
+        if ($this->pregnode->negative) {
+            $result = '^' . $result;
+        }
+        if (is_array($this->pregnode->userinscription)) {
+            $result = '&#91;' . $result . '&#93;';
+        }
+        return '<' . $result . '>';
+    }
+
+    protected function tooltip() {
+        return parent::tooltip();
+    }
+}
+
+class qtype_preg_explaining_tree_leaf_meta extends qtype_preg_explaining_tree_leaf {
+
+    protected function label() {
+        return '"emptiness"';
+    }
+
+    protected function tooltip() {
+        return parent::tooltip();
+    }
+}
+
+class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
 
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
-class qtype_preg_explaining_tree_node_leaf_meta extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
 
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
-class qtype_preg_explaining_tree_node_leaf_assert extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
 
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
-class qtype_preg_explaining_tree_node_leaf_backref extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
 
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
-class qtype_preg_explaining_tree_node_leaf_option extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
 
     }
 
     protected function tooltip() {
-
-    }
-}
-
-class qtype_preg_explaining_tree_node_leaf_recursion extends qtype_preg_explaining_tree_leaf {
-
-    protected function label() {
-
-    }
-
-    protected function tooltip() {
-
-    }
-}
-
-class qtype_preg_explaining_tree_node_leaf_control extends qtype_preg_explaining_tree_leaf {
-
-    protected function label() {
-
-    }
-
-    protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -295,7 +342,7 @@ class qtype_preg_explaining_tree_node_node_finite_quant extends qtype_preg_expla
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -306,18 +353,18 @@ class qtype_preg_explaining_tree_node_node_infinite_quant extends qtype_preg_exp
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
 class qtype_preg_explaining_tree_node_concat extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"&#8226;"';
     }
 
     protected function tooltip() {
-
+        return get_string('authoring_tool_tooltip_concatenation', 'qtype_preg');
     }
 }
 
@@ -328,7 +375,7 @@ class qtype_preg_explaining_tree_node_node_alt extends qtype_preg_explaining_tre
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -339,7 +386,7 @@ class qtype_preg_explaining_tree_node_node_assert extends qtype_preg_explaining_
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -350,7 +397,7 @@ class qtype_preg_explaining_tree_node_node_subexpr extends qtype_preg_explaining
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -358,6 +405,8 @@ class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_expla
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
+        // Add the condbranch as the first operand.
+        // It simplifies the drawing process.
         if ($this->pregnode->condbranch !== null) {
             $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
             $this->operands = array_merge(array($condbranch), $this->operands);
@@ -369,7 +418,7 @@ class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_expla
     }
 
     protected function tooltip() {
-
+        return parent::tooltip();
     }
 }
 
@@ -380,7 +429,11 @@ class qtype_preg_explaining_tree_node_node_error extends qtype_preg_explaining_t
     }
 
     protected function tooltip() {
+        return parent::tooltip();
+    }
 
+    protected function color() {
+        return 'red';
     }
 }
 

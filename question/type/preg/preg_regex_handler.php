@@ -174,11 +174,18 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Access function to AST root.
+     * Access function to the AST root.
      * Used mainly for unit-testing and avoiding re-parsing
      */
     public function get_ast_root() {
         return $this->ast_root;
+    }
+
+    /**
+     * Access function to the DST root.
+     */
+    public function get_dst_root() {
+        return $this->dst_root;
     }
 
     /**

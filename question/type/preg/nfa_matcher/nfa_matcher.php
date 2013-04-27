@@ -315,11 +315,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
 
-//$styleprovider = new qtype_preg_dot_style_provider();
-//$dotscript = $this->ast_root->dot_script(new qtype_preg_dot_node_context(true));
 //$this->automaton->draw('svg', '/home/user/automaton.svg');
-//self::execute_dot($dotscript, 'svg', '/home/user/ast.svg');
-
 
         $curstates = array($this->create_initial_state($this->automaton->start_state(), $str, $startpos));    // States which the automaton is in at the current wave front.
         $lazystates = array();       // States reached lazily.

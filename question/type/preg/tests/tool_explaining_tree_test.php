@@ -13,12 +13,24 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
+
 
 class qtype_preg_tool_explaining_tree_test extends PHPUnit_Framework_TestCase {
-   function test_something() {
-       $tree = new qtype_preg_explaining_tree_tool('(kind(?:a| of) regex)');
 
-   }
+    function test_dummy() {
+       $tree = new qtype_preg_explaining_tree_tool('a');
+       var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
+    }
+
+    function test_concat() {
+       $tree = new qtype_preg_explaining_tree_tool('ab');
+       var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
+    }
+
+    function test_something() {
+        $tree = new qtype_preg_explaining_tree_tool('(kind(?:a| of) regex)');
+    }
  }
 
 ?>
