@@ -14,7 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
 
-class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider charset_provider

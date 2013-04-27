@@ -13,9 +13,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
-class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
+class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
 {
    function test_create_graph_subexpression()
    {
