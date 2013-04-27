@@ -21,93 +21,93 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
     function draw($regex, $filename) {
         $matcher = new qtype_preg_nfa_matcher($regex);
         if (!$matcher->errors_exist()) {
-            $matcher->automaton->draw('png', $this->dir . $filename);
+            $matcher->automaton->draw('svg', $this->dir . $filename);
         } else {
             $this->assertTrue(false, "nfa building failed\n");
         }
     }
 
     function test_build_concat() {
-        $this->draw('^abc$', 'test_build_concat.png');
+        $this->draw('^abc$', 'test_build_concat.svg');
     }
 
     function test_build_alt() {
-        $this->draw('^ab|cd$', 'test_build_alt.png');
+        $this->draw('^ab|cd$', 'test_build_alt.svg');
     }
 
     function test_build_aster() {
-        $this->draw('a*', 'test_build_aster.png');
+        $this->draw('a*', 'test_build_aster.svg');
     }
 
     function test_build_brace_infinite_1() {
-        $this->draw('(?:ab){1,}', 'test_build_brace_infinite_1.png');
+        $this->draw('(?:ab){1,}', 'test_build_brace_infinite_1.svg');
     }
 
     function test_build_brace_infinite_3() {
-        $this->draw('(?:ab){3,}', 'test_build_brace_infinite_3.png');
+        $this->draw('(?:ab){3,}', 'test_build_brace_infinite_3.svg');
     }
 
     function test_build_plus() {
-        $this->draw('a+', 'test_build_plus.png');
+        $this->draw('a+', 'test_build_plus.svg');
     }
 
     function test_build_qu() {
-        $this->draw('(?:ab)?', 'test_build_qu.png');
+        $this->draw('(?:ab)?', 'test_build_qu.svg');
     }
 
     function test_build_brace_finite_0() {
-        $this->draw('(?:ab){0,3}', 'test_build_brace_finite_0.png');
+        $this->draw('(?:ab){0,3}', 'test_build_brace_finite_0.svg');
     }
 
     function test_build_brace_finite_2() {
-        $this->draw('(?:ab){2,3}', 'test_build_brace_finite_2.png');
+        $this->draw('(?:ab){2,3}', 'test_build_brace_finite_2.svg');
     }
 
     function test_build_brace_finite_4() {
-        $this->draw('(?:ab){4}', 'test_build_brace_finite_4.png');
+        $this->draw('(?:ab){4}', 'test_build_brace_finite_4.svg');
     }
 
     function test_build_subexpr() {
-        $this->draw('(a|b|cd|)', 'test_build_subexpr.png');
+        $this->draw('(a|b|cd|)', 'test_build_subexpr.svg');
     }
 
     function test_build_complex_1() {
-        $this->draw('^[-.\w]+@(?:[a-z\d](a|b|cd|)[-a-z\d]+\.)+[a-z]{2,6}$', 'test_build_complex_1.png');
+        $this->draw('^[-.\w]+@(?:[a-z\d](a|b|cd|)[-a-z\d]+\.)+[a-z]{2,6}$', 'test_build_complex_1.svg');
     }
 
     function test_build_complex_2() {
-        $this->draw('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|', 'test_build_complex_2.png');
+        $this->draw('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|', 'test_build_complex_2.svg');
     }
 
     function test_build_subexpr_concat() {
-        $this->draw('ab(cd)(ef)g', 'test_build_subexpr_concat.png');
+        $this->draw('ab(cd)(ef)g', 'test_build_subexpr_concat.svg');
     }
 
     function test_build_subexpr_alt() {
-        $this->draw('a|(bc)|(de)|f', 'test_build_subexpr_alt.png');
+        $this->draw('a|(bc)|(de)|f', 'test_build_subexpr_alt.svg');
     }
 
     function test_build_subexpr_brace_finite() {
-        $this->draw('(a){3,6}', 'test_build_subexpr_brace_finite.png');
+        $this->draw('(a){3,6}', 'test_build_subexpr_brace_finite.svg');
     }
 
     function test_build_subexpr_brace_finite_with_alt() {
-        $this->draw('(a|b|){3,6}', 'test_build_subexpr_brace_finite_with_alt.png');
+        $this->draw('(a|b|){3,6}', 'test_build_subexpr_brace_finite_with_alt.svg');
     }
 
     function test_build_subexpr_brace_infinite() {
-        $this->draw('(a){3,}', 'test_build_subexpr_brace_infinite.png');
+        $this->draw('(a){3,}', 'test_build_subexpr_brace_infinite.svg');
     }
 
     function test_build_subexpr_brace_infinite_with_alt() {
-        $this->draw('(a|b|){3,}', 'test_build_subexpr_brace_infinite_with_alt.png');
+        $this->draw('(a|b|){3,}', 'test_build_subexpr_brace_infinite_with_alt.svg');
     }
 
     function test_build_subexpr_aster() {
-        $this->draw('(a*)*', 'test_build_subexpr_aster.png');
+        $this->draw('(a*)*', 'test_build_subexpr_aster.svg');
     }
 
     function test_build_subexpr_uncounted() {
-        $this->draw('(?:ab)+', 'test_build_subexpr_uncounted.png');
+        $this->draw('(?:ab)+', 'test_build_subexpr_uncounted.svg');
     }
 }

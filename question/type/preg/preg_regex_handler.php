@@ -258,7 +258,7 @@ class qtype_preg_regex_handler {
     /**
      * Runs dot of graphviz on the given dot script.
      * @param dotscript a string containing the dot script.
-     * @param type type of the resulting image, should be 'png' or something.
+     * @param type type of the resulting image, should be 'svg', png' or something.
      * @param filename the absolute path to the resulting image file.
      * @return binary representation of the image if filename is null.
      */

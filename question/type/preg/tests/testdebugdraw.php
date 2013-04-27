@@ -46,9 +46,9 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $dotscript = $root->dot_script(new qtype_preg_dot_node_context(true, 8));
 
-        qtype_preg_regex_handler::execute_dot($dotscript, 'png', $dir . 'ast_test.png');
+        qtype_preg_regex_handler::execute_dot($dotscript, 'svg', $dir . 'ast_test.svg');
 
-        $str = '<img src="data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png')) . '"/>';
+        $str = '<img src="data:image/svg+xml;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'svg')) . '"/>';
         $file = fopen($dir . 'testdrawhtml.html', 'w');
         fwrite($file, $str);
         fclose($file);
@@ -322,7 +322,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
         /*
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nodes');
-        qtype_preg_regex_handler::execute_dot($root66->dot_script(new qtype_preg_dot_node_context(true)), $dir . 'ast_test.png');
+        qtype_preg_regex_handler::execute_dot($root66->dot_script(new qtype_preg_dot_node_context(true)), 'svg', $dir . 'ast_test.svg');
         var_dump($root66->dot_script(new qtype_preg_dot_node_context(true)));
         */
         $context = new qtype_preg_dot_node_context(true);
