@@ -276,84 +276,88 @@ class qtype_preg_explaining_tree_leaf_meta extends qtype_preg_explaining_tree_le
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_emptiness', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-
+        $label = parent::label();
+        if ($label[0] === "\\") {
+            $label = qtype_preg_unicode::substr($label, 1);
+        }
+        return '"assertion ' . $label . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-
+        return '"backreference to subexpression #' . $this->pregnode->number . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_backreference', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_option', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-
+        return '"recursion ' . $this->pregnode->number . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_recursion', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-
+        return '"control sequence ' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_node_node_finite_quant extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_node_node_infinite_quant extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg');
     }
 }
 
@@ -371,33 +375,33 @@ class qtype_preg_explaining_tree_node_concat extends qtype_preg_explaining_tree_
 class qtype_preg_explaining_tree_node_node_alt extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_alternative', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_node_node_assert extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"assertion ' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_node_node_subexpr extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_subexpression', 'qtype_preg');
     }
 }
 
@@ -414,18 +418,18 @@ class qtype_preg_explaining_tree_node_node_cond_subexpr extends qtype_preg_expla
     }
 
     protected function label() {
-
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        return get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_node_node_error extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-
+        return '"ERROR"';
     }
 
     protected function tooltip() {
