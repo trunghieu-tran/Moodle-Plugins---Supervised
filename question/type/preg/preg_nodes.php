@@ -303,6 +303,72 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 }
 
 /**
+ * Defines operator nodes.
+ */
+abstract class qtype_preg_operator extends qtype_preg_node {
+
+    /** An array of operands. */
+    public $operands = array();
+
+    public function __clone() {
+        // When clonning an operator we also want its subtree to be cloned.
+        foreach ($this->operands as $i => $operand) {
+            $this->operands[$i] = clone $operand;
+        }
+    }
+
+    public function calculate_nflf(&$followpos) {
+        // Calculate nflf for all operands.
+        foreach ($this->operands as $operand) {
+            $operand->calculate_nflf($followpos);
+        }
+        if (count($this->operands) > 0) {
+            $this->nullable = $this->operands[0]->nullable;
+            $this->firstpos = $this->operands[0]->firstpos;
+            $this->lastpos = $this->operands[0]->lastpos;
+        } else {
+            $this->nullable =  false;
+            $this->firstpos = array();
+            $this->lastpos = array();
+        }
+    }
+
+    public function dot_script($context) {
+        // Calculate the node name and style.
+        $nodename = $this->id;
+        $style = $nodename . qtype_preg_dot_style_provider::get_style($this, $context) . ';';
+
+        // Get child dot scripts and styles.
+        $childscripts = array();
+
+        foreach ($this->operands as $operand) {
+            // Change the context to select the subtree.
+            $newcontext = clone $context;
+            $newcontext->isroot = false;
+            if ($newcontext->selectid == $this->id) {
+                $newcontext->selectid = $operand->id;
+            }
+            // Recursive call to subtree.
+            $tmp = $operand->dot_script($newcontext);
+            $childscripts[] = $tmp[0];
+            $style .= $tmp[1];
+        }
+
+        // Form the result.
+        $dotscript = '';
+        foreach ($childscripts as $childscript) {
+            $dotscript .= $nodename . '->' . $childscript;
+        }
+        if ($context->isroot) {
+            $dotscript = qtype_preg_dot_style_provider::get_dot_head() . $style . $dotscript . qtype_preg_dot_style_provider::get_dot_tail();
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
+    }
+}
+
+/**
  * Represents a character or a charcter set.
  */
 class qtype_preg_leaf_charset extends qtype_preg_leaf {
@@ -1212,72 +1278,6 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     }
     public function tohr() {
         return 'control';
-    }
-}
-
-/**
- * Defines operator nodes.
- */
-abstract class qtype_preg_operator extends qtype_preg_node {
-
-    /** An array of operands. */
-    public $operands = array();
-
-    public function __clone() {
-        // When clonning an operator we also want its subtree to be cloned.
-        foreach ($this->operands as $i => $operand) {
-            $this->operands[$i] = clone $operand;
-        }
-    }
-
-    public function calculate_nflf(&$followpos) {
-        // Calculate nflf for all operands.
-        foreach ($this->operands as $operand) {
-            $operand->calculate_nflf($followpos);
-        }
-        if (count($this->operands) > 0) {
-            $this->nullable = $this->operands[0]->nullable;
-            $this->firstpos = $this->operands[0]->firstpos;
-            $this->lastpos = $this->operands[0]->lastpos;
-        } else {
-            $this->nullable =  false;
-            $this->firstpos = array();
-            $this->lastpos = array();
-        }
-    }
-
-    public function dot_script($context) {
-        // Calculate the node name and style.
-        $nodename = $this->id;
-        $style = $nodename . qtype_preg_dot_style_provider::get_style($this, $context) . ';';
-
-        // Get child dot scripts and styles.
-        $childscripts = array();
-
-        foreach ($this->operands as $operand) {
-            // Change the context to select the subtree.
-            $newcontext = clone $context;
-            $newcontext->isroot = false;
-            if ($newcontext->selectid == $this->id) {
-                $newcontext->selectid = $operand->id;
-            }
-            // Recursive call to subtree.
-            $tmp = $operand->dot_script($newcontext);
-            $childscripts[] = $tmp[0];
-            $style .= $tmp[1];
-        }
-
-        // Form the result.
-        $dotscript = '';
-        foreach ($childscripts as $childscript) {
-            $dotscript .= $nodename . '->' . $childscript;
-        }
-        if ($context->isroot) {
-            $dotscript = qtype_preg_dot_style_provider::get_dot_head() . $style . $dotscript . qtype_preg_dot_style_provider::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
-        }
     }
 }
 

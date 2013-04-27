@@ -85,10 +85,10 @@ class qtype_preg_dot_style_provider {
                 $label = '^' . $label;
             }
 
-            if(qtype_poasquestion_string::strlen($label) > 1){
+            if (is_array($pregnode->userinscription) && count($pregnode->userinscription) > 1) {
                 $label = '&#91;' . $label . '&#93;';
             }
-            
+
             $label = '<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4"><TR><TD>' . $label . '</TD></TR></TABLE>>';
 
             if (count($pregnode->errors) > 0) {

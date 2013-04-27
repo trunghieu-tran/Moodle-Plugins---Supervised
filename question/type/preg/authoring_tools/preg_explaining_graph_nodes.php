@@ -22,7 +22,7 @@ abstract class qtype_preg_authoring_tool_node {
 
     public $pregnode; // a reference to the corresponding preg_node
 
-    public function __construct(&$node, &$handler) {
+    public function __construct($node, $handler) {
         $this->pregnode = $node;
     }
 
@@ -313,15 +313,16 @@ class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node
 class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node {
     public $operands = array(); // an array of operands
 
-    public function __construct($node, &$handler) {
+    public function __construct($node, $handler) {
         parent::__construct($node, $handler);
-
         foreach ($this->pregnode->operands as $operand) {
-            array_push($this->operands, $handler->from_preg_node($operand));
+            $this->operands[] = $handler->from_preg_node($operand);
         }
 
-        if (isset($this->pregnode->condbranch)) {
-            array_push($this->operands, $handler->from_preg_node($this->pregnode->condbranch));
+        // TODO: create cond subexpr class and move this code to its constructor.
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $this->pregnode->condbranch !== null) {
+            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
+            $this->operands = array_merge(array($condbranch), $this->operands);
         }
     }
 

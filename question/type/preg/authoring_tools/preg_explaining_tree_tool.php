@@ -3,23 +3,31 @@
  * Defines class which is builder of graphical syntax tree.
  *
  * @copyright &copy; 2012  Vladimir Ivanov
- * @author Vladimir Ivanov, Volgograd State Technical University
+ * @author Terechov Grigory <grvlter@gmail.com>, Valeriy Streltsov <vostreltsov@gmail.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package qtype_preg
  */
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_dotbased_authoring_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
+//require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
 
 class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
-    // TODO: override another functions from qtype_preg_regex_handler?
+    public function name() {
+        return 'explaining_tree_tool';
+    }
 
     protected function is_preg_node_acceptable($pregnode) {
         // Well, everything that was parsed can be displayed to user.
         return true;
+    }
+
+    protected function node_infix() {
+        // Nodes should be named like qtype_preg_explaining_tree_node_concat.
+        // This allows us to use the inherited get_engine_node_name() method.
+        return 'explaining_tree';
     }
 
     protected function json_key() {
