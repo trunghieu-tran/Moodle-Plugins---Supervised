@@ -10,7 +10,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     protected $matcher;

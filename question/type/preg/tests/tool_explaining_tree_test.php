@@ -13,8 +13,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
-
 
 class qtype_preg_tool_explaining_tree_test extends PHPUnit_Framework_TestCase {
 

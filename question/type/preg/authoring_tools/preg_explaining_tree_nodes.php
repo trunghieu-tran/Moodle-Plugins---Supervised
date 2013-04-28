@@ -14,6 +14,23 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
+ * Context for nodes drawing.
+ */
+class qtype_preg_dot_node_context {
+
+    // Whether the node is the root or not.
+    public $isroot;
+
+    // Id of the ast node to be selected.
+    public $selectid;
+
+    public function __construct($isroot, $selectid = -1) {
+        $this->isroot = $isroot;
+        $this->selectid = $selectid;
+    }
+}
+
+/**
  * Abstract class for both operators and leafs.
  */
 abstract class qtype_preg_explaining_tree_node {
@@ -26,7 +43,7 @@ abstract class qtype_preg_explaining_tree_node {
     }
 
     /**
-     * Returns true if this node is supported by the engine, rejection string otherwise.
+     * Returns true if this node is supported, rejection string otherwise.
      */
     public function accept() {
         return true; // Accepting anything by default.
@@ -66,7 +83,14 @@ abstract class qtype_preg_explaining_tree_node {
      * Replaces non-printable and special characters in the given string.
      * Highlights them if needed.
      */
-    protected static function replace_special_characters($string, $usecolor = false) {
+    protected static function userinscription_to_string($userinscription, $usecolor) {
+        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
+            return $usecolor ? '<font color="blue">' . $userinscription->data . '</font>' : $userinscription->data;
+        }
+
+        $result = $userinscription->data;
+
+        // Replace special characters, not using color.
         $special = array('&' => '&#38;',
                          '"' => '&#34;',
                          '\\\\'=> '&#92;',
@@ -79,57 +103,28 @@ abstract class qtype_preg_explaining_tree_node {
                          ',' => '&#44;',
                          '|' => '&#124;',
                          );
-        $nonprintable = array('\n' => 'description_charA',
-                              '\t' => 'description_char9',
-                              '\r' => 'description_charD',
-                              qtype_preg_unicode::code2utf8(127) => 'description_char7F',
-                              qtype_preg_unicode::code2utf8(160) => 'description_charA0',
-                              qtype_preg_unicode::code2utf8(173) => 'description_charAD',
-                              qtype_preg_unicode::code2utf8(8194) => 'description_char2002',
-                              qtype_preg_unicode::code2utf8(8195) => 'description_char2003',
-                              qtype_preg_unicode::code2utf8(8201) => 'description_char2009',
-                              qtype_preg_unicode::code2utf8(8204) => 'description_char200C',
-                              qtype_preg_unicode::code2utf8(8205) => 'description_char200D',
-                              );
-
-        $colors = array(true => '"blue"', false => '"green"');
-
-        $result = $string;
-
-        // Replace special characters without using color.
         foreach ($special as $key => $value) {
-            if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                $result = str_replace($key, $value, $result);
-            }
+            $result = str_replace($key, $value, $result);
         }
 
-        // TODO non-printable.
-
-        /*$flag = true;
-        for ($i = 1; $i < 33; $i++) { // until space character
-            if (qtype_preg_unicode::strpos($result, qtype_preg_unicode::code2utf8($i)) !== false) {
-                $color = '"blue"';
-                if ($usecolor) {
-                    $color = $colors[$flag];
-                }
-                $result = str_replace(qtype_preg_unicode::code2utf8($i), '<font color=' . $color . '>' . shorten_text(get_string('description_char' . dechex($i), 'qtype_preg'), $length) . '</font>,', $result);
-                $flag = !$flag;
-            }
+        // Replace non-printable characters, using color.
+        $nonprintable = array();
+        for ($code = 1; $code <= 0x20; $code++) {
+            $nonprintable[qtype_preg_unicode::code2utf8($code)] = 'description_char' . dechex($code);
+        }
+        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
+            $nonprintable[qtype_preg_unicode::code2utf8($code)] = 'description_char' . dechex($code);
         }
 
-        $flag = true;
-        foreach ($nonprintable as $key => $value) {
-            if (qtype_preg_unicode::strpos($result, $key) !== false) {
-                $color = '"blue"';
-                if ($usecolor) {
-                    $color = $colors[$flag];
-                }
-                $result = str_replace($key, '<font color=' . $color . '>' . shorten_text(get_string($value, 'qtype_preg'), $length) . '</font> ', $result);
-                $flag = !$flag;
+        foreach ($nonprintable as $code => $replacement) {
+            $char = qtype_preg_unicode::code2utf8($code);
+            if (qtype_preg_unicode::strpos($result, $char) !== false) {
+                $replacement = get_string($replacement, 'qtype_preg');
+                $result = $usecolor ? str_replace($char, '<font color="blue">' . $replacement . '</font>,', $result)
+                                    : str_replace($char, $replacement, $result);
             }
         }
-        $result = str_replace('\\', '', $result);*/
-
+        $result = str_replace('\\', '', $result);
         return $result;
     }
 
@@ -155,12 +150,12 @@ abstract class qtype_preg_explaining_tree_node {
     protected function label() {
         // Is userinscription an object?
         if (is_object($this->pregnode->userinscription)) {
-            return shorten_text(self::replace_special_characters($this->pregnode->userinscription->data));
+            return shorten_text(self::userinscription_to_string($this->pregnode->userinscription, true));
         }
         // Userinscription is an array, iterate over all objects.
         $label = '';
-        foreach ($this->pregnode->userinscription as $tmp) {
-            $label .= shorten_text(self::replace_special_characters($tmp->data));
+        foreach ($this->pregnode->userinscription as $userinscription) {
+            $label .= shorten_text(self::userinscription_to_string($userinscription, true)) . '&#10;';
         }
         return $label;
     }
@@ -267,12 +262,20 @@ class qtype_preg_explaining_tree_leaf_charset extends qtype_preg_explaining_tree
 
     protected function tooltip() {
         if (count($this->pregnode->errors) > 0) {
-            return get_string($this->pregnode->type . '_error', 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg');
         } else if ($this->pregnode->negative) {
-            return get_string($this->pregnode->type . '_negative', 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg');
         } else {
-            return get_string($this->pregnode->type, 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type, 'qtype_preg');
         }
+
+        if (is_object($this->pregnode->userinscription)) {
+            return $tooltip . '&#10;' . self::userinscription_to_string($this->pregnode->userinscription, false);
+        }
+        foreach ($this->pregnode->userinscription as $userinscription) {
+            $tooltip .= '&#10;' . self::userinscription_to_string($userinscription, false);
+        }
+        return $tooltip;
     }
 }
 
