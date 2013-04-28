@@ -622,8 +622,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
      * Fill anchor field to show if regex is anchored using ast_root
-     * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
-     * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+     * If all top-level alternations starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
+     * If all top-level alternations ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
      */
     protected function look_for_anchors() {
         $this->anchor = new qtype_preg_regex_anchoring;

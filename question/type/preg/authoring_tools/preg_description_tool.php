@@ -1053,7 +1053,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
 }
 
 /**
- * Defines alternative, binary operator.
+ * Defines alternation, binary operator.
  */
 class qtype_preg_description_node_alt extends qtype_preg_description_operator{
 

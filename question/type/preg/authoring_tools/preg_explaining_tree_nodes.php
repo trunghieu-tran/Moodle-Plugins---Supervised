@@ -379,7 +379,7 @@ class qtype_preg_explaining_tree_node_alt extends qtype_preg_explaining_tree_ope
     }
 
     protected function tooltip() {
-        return get_string('authoring_tool_tooltip_alternative', 'qtype_preg');
+        return get_string('authoring_tool_tooltip_alternation', 'qtype_preg');
     }
 }
 

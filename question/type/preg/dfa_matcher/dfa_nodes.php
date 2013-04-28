@@ -557,12 +557,12 @@ class qtype_preg_dfa_node_alt extends qtype_preg_dfa_operator {
     }
     public function print_self($indent) {
         $this->print_indent($indent);
-        echo 'type: node alternative<br/>';
+        echo 'type: node alternation<br/>';
         parent::print_self($indent);
     }
     public function write_self_to_dotcode() {
         $str = dfa_preg_node::write_self_to_dotcode();
-        $str .= '|ALTERNATIVE}"];';
+        $str .= '|ALTERNATION}"];';
         return $str;
     }
 }
