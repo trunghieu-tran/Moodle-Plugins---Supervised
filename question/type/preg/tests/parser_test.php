@@ -825,16 +825,16 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(empty($errornodes[3]->operands));
         $this->assertTrue(empty($errornodes[4]->operands));
         // Test error reporting for conditional subexpressions, which are particulary tricky.
-        // Three or more alternatives in conditional subexpression.
+        // Three or more alternations in conditional subexpression.
         $parser = $this->run_parser('(?(?=bc)dd|e*f|hhh)', $errornodes);
         $this->assertTrue(count($errornodes) === 1);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER);
         $this->assertTrue($errornodes[0]->indfirst === 0);
         $this->assertTrue($errornodes[0]->indlast === 18);
-        $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternative and expression inside assertion
+        $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternation and expression inside assertion
         $this->assertTrue(is_a($errornodes[0]->operands[1], 'qtype_preg_node_concat'));
-        // Correct situation: alternatives are nested within two alternatives for conditional subexpression.
+        // Correct situation: alternations are nested within two alternations for conditional subexpression.
         $parser = $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))', $errornodes);
         $this->assertFalse($parser->get_error());
         // Unclosed second parenthesis.
@@ -844,7 +844,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
         $this->assertTrue($errornodes[0]->indfirst === 1);
         $this->assertTrue($errornodes[0]->indlast === 5);
-        $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternative and expression inside assertion
+        $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternation and expression inside assertion
         $this->assertTrue(is_a($errornodes[0]->operands[1], 'qtype_preg_node_concat'));
         // Two parenthesis unclosed.
         $parser = $this->run_parser('(?(?=bce*f|hhh', $errornodes);

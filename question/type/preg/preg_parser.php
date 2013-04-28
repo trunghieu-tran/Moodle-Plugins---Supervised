@@ -220,7 +220,7 @@ class qtype_preg_yyParser
             $result = new qtype_preg_node_cond_subexpr($paren->subtype);
             $result->operands[0] = $exprnode;
         } else {
-            // Error: only one or two top-level alternative allowed in a conditional subexpression.
+            // Error: only one or two top-level alternations allowed in a conditional subexpression.
             if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT && count($exprnode->operands) > 2) {
                 $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode, $assertnode));
                 return $result;
@@ -254,7 +254,7 @@ class qtype_preg_yyParser
             $result = new qtype_preg_node_cond_subexpr($paren->subtype);
             $result->operands[0] = $exprnode;
         } else {
-             // Error: only one or two top-level alternative allowed in a conditional subexpression.
+             // Error: only one or two top-level alternations allowed in a conditional subexpression.
             if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT && count($exprnode->operands) > 2) {
                 $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode));
                 return $result;

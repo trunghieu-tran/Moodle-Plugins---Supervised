@@ -68,7 +68,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with alternative!');
+       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with alternation!');
    }
 
    function test_create_graph_charclass()

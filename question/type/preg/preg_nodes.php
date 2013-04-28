@@ -132,7 +132,7 @@ abstract class qtype_preg_node {
     const TYPE_NODE_INFINITE_QUANT = 'node_infinite_quant';
     /** Concatenation. */
     const TYPE_NODE_CONCAT = 'node_concat';
-    /** Alternative. */
+    /** Alternation. */
     const TYPE_NODE_ALT = 'node_alt';
     /** Assert with expression within. */
     const TYPE_NODE_ASSERT = 'node_assert';
@@ -893,9 +893,9 @@ class qtype_preg_charset_flag {
  */
 class qtype_preg_leaf_meta extends qtype_preg_leaf {
 
-    //Leaf with empty in alternative (something|)
+    // Leaf with empty in alternation (something|)
     const SUBTYPE_EMPTY = 'empty_leaf_meta';
-    //Service subtype - end of regex, but not end of string
+    // Service subtype - end of regex, but not end of string
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
 
     public function __construct($subtype = null) {
@@ -1373,7 +1373,7 @@ class qtype_preg_node_concat extends qtype_preg_operator {
 }
 
 /**
- * Defines alternative, n-ary operator.
+ * Defines alternation, n-ary operator.
  */
 class qtype_preg_node_alt extends qtype_preg_operator {
 
@@ -1519,7 +1519,7 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 class qtype_preg_node_error extends qtype_preg_operator {
 
     const SUBTYPE_UNKNOWN_ERROR                = 'unknown_error_node_error';                    // Unknown parse error.
-    const SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   = 'consubexpr_too_much_alter_node_error';        // Too much top-level alternatives in a conditional subexpression.
+    const SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   = 'consubexpr_too_much_alter_node_error';        // Too much top-level alternations in a conditional subexpression.
     const SUBTYPE_WRONG_CLOSE_PAREN            = 'wrong_close_paren_node_error';                // Closing paren without opening  xxx).
     const SUBTYPE_WRONG_OPEN_PAREN             = 'wrong_open_paren_node_error';                 // Opening paren without closing  (xxx.
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';     // Quantifier at the start of the expression  - NOTE - currently incompatible with PCRE which treat it as a character.

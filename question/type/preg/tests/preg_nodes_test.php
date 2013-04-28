@@ -189,7 +189,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[2]->index_last == 6);
         $this->assertTrue($errors[3]->index_first == 7);  // Wrong closing paren.
         $this->assertTrue($errors[3]->index_last == 7);
-        $this->assertTrue($errors[4]->index_first == 9);  // Three alternatives in the conditional subexpression.
+        $this->assertTrue($errors[4]->index_first == 9);  // Three alternations in the conditional subexpression.
         $this->assertTrue($errors[4]->index_last == 21);
         $this->assertTrue($errors[5]->index_first == 25); // Quantifier without operand.
         $this->assertTrue($errors[5]->index_last == 29);

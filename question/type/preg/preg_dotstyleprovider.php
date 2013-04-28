@@ -99,69 +99,6 @@ class qtype_preg_dot_style_provider {
                            get_string('authoring_tool_tooltip_charset', 'qtype_preg') . ": " . $tooltip;
             }
             break;
-        case qtype_preg_node::TYPE_LEAF_META:
-            $label = '"emptiness"';
-            $tooltip = get_string('authoring_tool_tooltip_emptiness', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_LEAF_ASSERT:
-            if ($label[0] === "\\") {
-                $label = qtype_preg_unicode::substr($label, 1);
-            }
-            $label = '"assertion ' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_LEAF_BACKREF:
-            $label = '"backreference to subexpression #' . $pregnode->number . '"';
-            $tooltip = get_string('authoring_tool_tooltip_backreference', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_LEAF_RECURSION:
-            $label = '"recursion ' . $pregnode->number . '"';
-            $tooltip = get_string('authoring_tool_tooltip_recursion', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_LEAF_CONTROL:
-            $label = '"control sequence ' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_option', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_CONCAT:
-            $label = '"&#8226;"';
-            $tooltip = get_string('authoring_tool_tooltip_concatenation', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_ALT:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_alternative', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_ASSERT:
-            $label = '"assertion ' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_SUBEXPR:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_subexpression', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
-            $label = '"' . $label . '"';
-            $tooltip = get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg');
-            break;
-        case qtype_preg_node::TYPE_NODE_ERROR:
-            $label = '"ERROR"';
-            $tooltip = $pregnode->error_string();
-            break;
-        default:
-            $label = '"Unknown node subtype"';
-            $color = 'red';
-            break;
         }
 
         $result = "id = {$pregnode->id}, label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";

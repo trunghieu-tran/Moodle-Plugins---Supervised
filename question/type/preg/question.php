@@ -287,7 +287,7 @@ class qtype_preg_question extends question_graded_automatically
             //Modify regex according with question properties
             $for_regexp=$regex;
             if ($exact) {
-                //Grouping is needed in case regexp contains top-level alternatives.
+                //Grouping is needed in case regexp contains top-level alternations.
                 //Use non-capturing grouping to not mess-up with user subexpression capturing.
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
