@@ -57,103 +57,6 @@ class block_formal_langs_predefined_printf_language_lexer_raw extends JLexBase  
         $this->counter++;
         return $res;
     }
-    function octal_to_decimal_char($matches) {
-        $code = $matches[0];
-        $code = octdec($code);
-        return chr(intval($code));
-    }
-    function hex_to_decimal_char($matches) {
-        $code = $matches[0];
-        $code = hexdec($code);
-        $string = '';
-        if (strlen($matches[0]) == 2) {
-            $string = chr(intval($code));
-        } else {
-            //  mb_convert_encoding left intentionally, because
-            // textlib uses iconv to convert, and iconv fails
-            // to conver from entities
-            $string = mb_convert_encoding('&#' . intval($code) . ';', 'UTF-8', 'HTML-ENTITIES');
-        }
-        return $string;
-    }
-    function to_text($text) {
-        $state = 0;
-        $length = textlib::strlen($text);
-        $result = "";
-        $statetext = '';
-        $esc = array('\'' => '\'', '"' => '"' , 'a' => "\a", 'b' => "\b", 'f' => "\f",
-                     'n'  => "\n", 'r' => "\r", 't' => "\t", 'v' => "\v", '\\' => '\\',
-                     '?'  => '?');
-        $numbers = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
-        for($i = 0; $i < $length; $i++) {
-            $c = $text[$i];
-            $handled = false;
-            if ($state == 0 && !$handled) {
-                if ($c == '\\') {
-                    $state = 1;
-                } else {
-                    $result .= $c;
-                }
-                $handled = true;
-            }
-            if ($state == 1 && !$handled) {
-                $handled = true;
-                if (array_key_exists($c, $esc)) {
-                    $result .= $esc[$c];
-                }  else {
-                    if ($c == '0') {
-                        $state = 2;  $
-                        $statetext = '';
-                    }  else {
-                        if ($c == 'x' || $c == 'X') {
-                            $state = 3;
-                            $statetext = '';
-                        } else {
-                            $result .= '\\' . $c;
-                        }
-                    }
-                }
-            }
-            if ($state == 2 && !$handled) {
-                 $handled = true;
-                 $ia = array($c, $numbers, $result, $state, $statetext, 'octal_to_decimal_char', '\\0', $i);
-                 $a =  $this->handle_cstate_transition($ia);
-                 list($state, $statetext, $result, $i) = $a;
-            }
-            if ($state == 3 && !$handled) {
-                 $handled = true;
-                 $ia = array($c, $numbers, $result, $state, $statetext, 'hex_to_decimal_char', '\\x', $i);
-                 $a =  $this->handle_cstate_transition($ia);
-                 list($state, $statetext, $result, $i) = $a;
-            }
-        }
-        $handled = false;
-        if ($state == 2 && !$handled) {
-            $handled = true;
-            $result .= $this->octal_to_decimal_char(array($statetext));
-        }
-        if ($state == 3 && !$handled) {
-            $handled = true;
-            $result .= $this->hex_to_decimal_char(array($statetext));
-        }
-        return $result;
-    }
-    private function handle_cstate_transition($input_array)
-    {
-         list($c, $numbers, $result, $state, $statetext, $fun, $d, $i) = $input_array;
-         if (in_array($c, $numbers)) {
-            $statetext .= $c;
-         } else {
-            if (textlib::strlen($statetext) != 0) {
-                $result .= $this->$fun(array($statetext));
-            } else {
-                $result .= $d;
-            }
-            $state = 0;
-            --$i;
-         }
-         return array($state, $statetext, $result, $i);
-    }
     private function return_pos() {
         $begin_line = $this->yyline;
         $begin_col = $this->yycol;
@@ -3602,7 +3505,7 @@ array(
 						case -6:
 							break;
 						case 6:
-							{ return $this->create_token('text',$this->to_text($this->yytext())); }
+							{ return $this->create_token('text',($this->yytext())); }
 						case -7:
 							break;
 						case 7:
