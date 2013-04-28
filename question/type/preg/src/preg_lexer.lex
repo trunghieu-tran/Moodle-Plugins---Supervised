@@ -84,8 +84,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->charset                     = null;
     $this->charset_count               = 0;
     $this->charset_set                 = '';
-    $this->charset_userinscription     = null;
-    $this->charset_userinscription_raw = null;
     $this->handlingoptions             = new qtype_preg_handling_options();
 %init}
 %eof{
@@ -113,8 +111,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
     protected $charset_count;               // Number of characters in the charset excluding flags.
     protected $charset_set;                 // Characters of the charset.
-    protected $charset_userinscription;     // User inscriptions for flags and ranges.
-    protected $charset_userinscription_raw; // User inscriptions char by char (can also be \x... or anything representing one character).
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -717,17 +713,17 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      */
     protected function reduce_charset_range() {
         // Check if there are enough characters in before.
-        if ($this->charset_count < 3 || qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 2, 1) !== '-') {
+        if ($this->charset_count < 3 || qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 2, 1) != '-') {
             return;
         }
         $startchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 3, 1);
         $endchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 1, 1);
 
         // Modify userinscription;
-        $userinscriptionend = array_pop($this->charset_userinscription_raw);
-        array_pop($this->charset_userinscription_raw);
-        $userinscriptionstart = array_pop($this->charset_userinscription_raw);
-        $this->charset_userinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
+        $userinscriptionend = array_pop($this->charset->userinscription);
+        array_pop($this->charset->userinscription);
+        $userinscriptionstart = array_pop($this->charset->userinscription);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
 
         if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
             // Replace last 3 characters by all the characters between them.
@@ -823,7 +819,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     protected function add_flag_to_charset($text, $type, $data, $negative = false, $appendtoend = true) {
         switch ($type) {
         case qtype_preg_charset_flag::SET:
-            $this->charset_userinscription_raw[] = new qtype_preg_userinscription($text);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text);
             $this->charset_count++;
             if ($appendtoend) {
                 $this->charset_set .= $data;
@@ -834,7 +830,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
-            $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
@@ -949,8 +945,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->charset->userinscription = array();
     $this->charset_count = 0;
     $this->charset_set = '';
-    $this->charset_userinscription = array();
-    $this->charset_userinscription_raw = array();
     if ($text === '[^]' || $text === '[]') {
         $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
     }
@@ -1502,7 +1496,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    $this->charset_userinscription[] = new qtype_preg_userinscription($text);
+    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
@@ -1511,7 +1505,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -1531,7 +1525,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-            $this->charset_userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -1550,7 +1544,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $code = hexdec(qtype_poasquestion_string::substr($text, 2));
         if ($code > qtype_preg_unicode::max_possible_code()) {
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-            $this->charset_userinscription[] = new qtype_preg_userinscription($text);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
         } else {
@@ -1564,7 +1558,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        $this->charset_userinscription[] = new qtype_preg_userinscription($text);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
     } else if (0xd800 <= $code && $code <= 0xdfff) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     } else {
@@ -1579,7 +1573,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $char = $this->calculate_cx($text);
     if ($char === null) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        $this->charset_userinscription[] = new qtype_preg_userinscription($text);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
@@ -1606,7 +1600,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
     $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    $this->charset_userinscription[] = new qtype_preg_userinscription($text);
+    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> "\Q".*"\E" {
     $text = $this->yytext();
@@ -1635,16 +1629,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charset_set));
         $this->charset->flags[] = array($flag);
     }
-    $tmp = '';
-    foreach ($this->charset_userinscription_raw as $userinscription) {
-        $tmp .= $userinscription->data;
-    }
-    if ($tmp !== '') {
-        $this->charset->userinscription[] = new qtype_preg_userinscription($tmp);
-    }
-    foreach ($this->charset_userinscription as $userinscription) {
-        $this->charset->userinscription[] = $userinscription;
-    }
     if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
         $this->charset->caseinsensitive = true;
     }
@@ -1652,8 +1636,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->charset = null;
     $this->charset_count = 0;
     $this->charset_set = '';
-    $this->charset_userinscription = array();
-    $this->charset_userinscription_raw = array();
     $this->yybegin(self::YYINITIAL);
     return $res;
 }

@@ -196,12 +196,13 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->indlast === 16);
         $this->assertTrue($root->possessive);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->userinscription[0]->data === 'az');
-        $this->assertTrue($root->operands[0]->userinscription[1]->data === '\w');
-        $this->assertTrue($root->operands[0]->userinscription[1]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->userinscription[0]->data === '\w');
+        $this->assertTrue($root->operands[0]->userinscription[0]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->userinscription[1]->data === 'a');
         $this->assertTrue($root->operands[0]->userinscription[2]->data === 'b-y');
-        $this->assertTrue($root->operands[0]->userinscription[3]->data === '\d');
-        $this->assertTrue($root->operands[0]->userinscription[3]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->userinscription[3]->data === 'z');
+        $this->assertTrue($root->operands[0]->userinscription[4]->data === '\d');
+        $this->assertTrue($root->operands[0]->userinscription[4]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         $this->assertTrue($root->operands[0]->indfirst === 0);
         $this->assertTrue($root->operands[0]->indlast === 14);
         $this->assertTrue($root->nullable === false);

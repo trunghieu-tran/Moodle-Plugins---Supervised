@@ -16,23 +16,9 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 
 class qtype_preg_tool_explaining_tree_test extends PHPUnit_Framework_TestCase {
 
-    function test_dummy() {
-       $tree = new qtype_preg_explaining_tree_tool('a');
-       var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
-    }
-
-    function test_concat() {
-       $tree = new qtype_preg_explaining_tree_tool('ab');
-       var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
-    }
-
-    function test_fnite_quant() {
-       $tree = new qtype_preg_explaining_tree_tool('a+');
-       var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
-    }
-
     function test_something() {
-        $tree = new qtype_preg_explaining_tree_tool('(kind(?:a| of) regex)');
+        $tree = new qtype_preg_explaining_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
+        var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
     }
  }
 
