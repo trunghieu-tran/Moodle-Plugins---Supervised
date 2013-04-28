@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_exec_state.php');
-//require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
