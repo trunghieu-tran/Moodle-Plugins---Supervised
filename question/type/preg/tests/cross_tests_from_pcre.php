@@ -4887,9 +4887,9 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(abc)\123',
                      'tests'=>array($test1));
     }
-/* на следующих 2 тестовых функциях выбрасывается исключение: Uninitialized string offset: 1
+
     function data_for_test_subexpression_and_oct_code_of_character_2() {
-        $test1 = array( 'str'=>"abc\x93",
+        $test1 = array( 'str'=>'abc' . qtype_preg_unicode::code2utf8(0x93),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
@@ -4901,7 +4901,7 @@ class qtype_preg_cross_tests_from_pcre {
     }
 
     function data_for_test_subexpression_and_oct_code_of_character_3() {
-        $test1 = array( 'str'=>"abc\xd3",
+        $test1 = array( 'str'=>'abc' . qtype_preg_unicode::code2utf8(0xd3),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
@@ -4911,7 +4911,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(abc)\323',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_subexpression_and_oct_code_of_character_4() {
         $test1 = array( 'str'=>"abc\x40",
                         'is_match'=>true,
@@ -18501,16 +18501,16 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'a[\C-X]b',
                      'tests'=>array($test1));
     }
-/* на следующих 2 тестовых функциях выбрасывается исключение: Uninitialized string offset: 1
+
     function data_for_test_horizontal_and_vertical_space_characters() {
-        $test1 = array( 'str'=>"X X\x0a",
+        $test1 = array( 'str'=>'X X' . qtype_preg_unicode::code2utf8(0x0a),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test2 = array( 'str'=>"X\x09X\x0b",
+        $test2 = array( 'str'=>'X' . qtype_preg_unicode::code2utf8(0x09) . 'X' . qtype_preg_unicode::code2utf8(0x0b),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -18526,13 +18526,13 @@ class qtype_preg_cross_tests_from_pcre {
                         'next'=>'\v',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test4 = array( 'str'=>"\xa0 X\x0a",
-                        'is_match'=>false,
+        $test4 = array( 'str'=>qtype_preg_unicode::code2utf8(0xa0) . ' X' . qtype_preg_unicode::code2utf8(0x0a),
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(4),
-                        'next'=>'\H',
+                        'index_first'=>array(0=>2),
+                        'length'=>array(0=>1),
+                        'left'=>array(3),
+                        'next'=>'\h',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\H\h\V\v',
@@ -18540,21 +18540,21 @@ class qtype_preg_cross_tests_from_pcre {
     }
 
     function data_for_test_horizontal_and_vertical_space_characters_in_quantifiers() {
-        $test1 = array( 'str'=>"\x09\x20\xa0X\x0a\x0b\x0c\x0d\x0a",
+        $test1 = array( 'str'=>qtype_preg_unicode::code2utf8(0x09) . qtype_preg_unicode::code2utf8(0x20) . qtype_preg_unicode::code2utf8(0xa0) . 'X' . qtype_preg_unicode::code2utf8(0x0a) . qtype_preg_unicode::code2utf8(0x0b) . qtype_preg_unicode::code2utf8(0x0c) . qtype_preg_unicode::code2utf8(0x0d) . qtype_preg_unicode::code2utf8(0x0a),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>8),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test2 = array( 'str'=>"\x09\x20\xa0\x0a\x0b\x0c\x0d\x0a",
+        $test2 = array( 'str'=>qtype_preg_unicode::code2utf8(0x09) . qtype_preg_unicode::code2utf8(0x20) . qtype_preg_unicode::code2utf8(0xa0) . qtype_preg_unicode::code2utf8(0x0a) . qtype_preg_unicode::code2utf8(0x0b) . qtype_preg_unicode::code2utf8(0x0c) . qtype_preg_unicode::code2utf8(0x0d) . qtype_preg_unicode::code2utf8(0x0a),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>7),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test3 = array( 'str'=>"\x09\x20\xa0\x0a\x0b\x0c",
+        $test3 = array( 'str'=>qtype_preg_unicode::code2utf8(0x09) . qtype_preg_unicode::code2utf8(0x20) . qtype_preg_unicode::code2utf8(0xa0) . qtype_preg_unicode::code2utf8(0x0a) . qtype_preg_unicode::code2utf8(0x0b) . qtype_preg_unicode::code2utf8(0x0c),
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -18570,7 +18570,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'next'=>'\v',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test5 = array( 'str'=>"\x09\x20\xa0\x0a\x0b",
+        $test5 = array( 'str'=>qtype_preg_unicode::code2utf8(0x09) . qtype_preg_unicode::code2utf8(0x20) . qtype_preg_unicode::code2utf8(0xa0) . qtype_preg_unicode::code2utf8(0x0a) . qtype_preg_unicode::code2utf8(0x0b),
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -18582,7 +18582,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'\H*\h+\V?\v{3,4}',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
-*/
+
     function data_for_test_not_horizontal_space_character_in_quantifier() {
         $test1 = array( 'str'=>'XY  ABCDE',
                         'is_match'=>true,
