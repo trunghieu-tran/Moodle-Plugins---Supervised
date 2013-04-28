@@ -75,7 +75,6 @@ $string['uselexemhint_help'] = '<p>In behaviours which allow multiple tries (e.g
 
 /******* Abstract syntax tree nodes descriptions *******/
 // Types.
-$string['node_abstract']               = 'abstract node';
 $string['leaf_charset']                = 'character set';
 $string['leaf_meta']                   = 'meta-character or escape-sequence';
 $string['leaf_assert']                 = 'simple assertion';
@@ -142,6 +141,10 @@ $string['unknown_unicode_property_node_error']                     = 'unknown un
 $string['unknown_posix_class_node_error']                          = 'unknown posix class';
 $string['unknown_control_sequence_node_error']                     = 'unknown control sequence (*...)';
 $string['incorrect_range_node_error']                              = 'incorrect ranges in a quantifier or a character set: {5,3} or [z-a]';
+
+// Types and subtypes needed for authoring tools
+$string['leaf_charset_negative'] = 'negative character set';
+$string['leaf_charset_error']    = 'incorrect character set';
 
 /******* Error messages *******/
 $string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
@@ -548,21 +551,3 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
-
-// Strings for tooltipe
-$string['authoring_tool_tooltip_charset'] = 'character class';
-$string['authoring_tool_tooltip_negative_charset'] = 'negative character class';
-$string['authoring_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
-$string['authoring_tool_tooltip_emptiness'] = 'emptiness';
-$string['authoring_tool_tooltip_assertion'] = 'assertion';
-$string['authoring_tool_tooltip_backreference'] = 'backreference';
-$string['authoring_tool_tooltip_recursion'] = 'recursion';
-$string['authoring_tool_tooltip_control_sequence'] = 'control sequence';
-$string['authoring_tool_tooltip_option'] = 'option';
-$string['authoring_tool_tooltip_finite_quantifier'] = 'finite quantifier';
-$string['authoring_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
-$string['authoring_tool_tooltip_concatenation'] = 'concatenation';
-$string['authoring_tool_tooltip_alternation'] = 'alternation';
-$string['authoring_tool_tooltip_assertion'] = 'assertion';
-$string['authoring_tool_tooltip_subexpression'] = 'subexpression';
-$string['authoring_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';

@@ -166,7 +166,8 @@ abstract class qtype_preg_explaining_tree_node {
     }
 
     protected function tooltip() {
-        return $this->label(); // TODO: this is placeholder, write real code
+        // Almost all nodes use its type as string key.
+        return get_string($this->pregnode->type, 'qtype_preg');
     }
 
     protected function shape() {
@@ -265,33 +266,35 @@ class qtype_preg_explaining_tree_leaf_charset extends qtype_preg_explaining_tree
     }
 
     protected function tooltip() {
-        return parent::tooltip();
+        if (count($this->pregnode->errors) > 0) {
+            return get_string($this->pregnode->type . '_error', 'qtype_preg');
+        } else if ($this->pregnode->negative) {
+            return get_string($this->pregnode->type . '_negative', 'qtype_preg');
+        } else {
+            return get_string($this->pregnode->type, 'qtype_preg');
+        }
     }
 }
 
 class qtype_preg_explaining_tree_leaf_meta extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"Emptiness"';
+        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
     }
 
     protected function tooltip() {
-        return get_string('authoring_tool_tooltip_emptiness', 'qtype_preg');
+        return get_string($this->pregnode->subtype, 'qtype_preg');
     }
 }
 
 class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        $label = parent::label();
-        if ($label[0] === "\\") {
-            $label = qtype_preg_unicode::substr($label, 1);
-        }
-        return '"Assertion ' . $label . '"';
+        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
     }
 
     protected function tooltip() {
-        return get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
+        return get_string($this->pregnode->subtype, 'qtype_preg');
     }
 }
 
@@ -300,20 +303,12 @@ class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree
     protected function label() {
         return '"Backreference to subexpression #' . $this->pregnode->number . '"';
     }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_backreference', 'qtype_preg');
-    }
 }
 
 class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
         return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_option', 'qtype_preg');
     }
 }
 
@@ -322,20 +317,12 @@ class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tr
     protected function label() {
         return '"Recursion ' . $this->pregnode->number . '"';
     }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_recursion', 'qtype_preg');
-    }
 }
 
 class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
         return '"Control sequence ' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_control_sequence', 'qtype_preg');
     }
 }
 
@@ -344,20 +331,12 @@ class qtype_preg_explaining_tree_node_finite_quant extends qtype_preg_explaining
     protected function label() {
         return '"' . parent::label() . '"';
     }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_finite_quantifier', 'qtype_preg');
-    }
 }
 
 class qtype_preg_explaining_tree_node_infinite_quant extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
         return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_infinite_quantifier', 'qtype_preg');
     }
 }
 
@@ -366,10 +345,6 @@ class qtype_preg_explaining_tree_node_concat extends qtype_preg_explaining_tree_
     protected function label() {
         return '"&#8226;"';
     }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_concatenation', 'qtype_preg');
-    }
 }
 
 class qtype_preg_explaining_tree_node_alt extends qtype_preg_explaining_tree_operator {
@@ -377,20 +352,12 @@ class qtype_preg_explaining_tree_node_alt extends qtype_preg_explaining_tree_ope
     protected function label() {
         return '"' . parent::label() . '"';
     }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_alternation', 'qtype_preg');
-    }
 }
 
 class qtype_preg_explaining_tree_node_assert extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-        return '"Assertion ' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_assertion', 'qtype_preg');
+        return '"' . get_string($this->pregnode->type, 'qtype_preg') . ' ' . parent::label() . '"';
     }
 }
 
@@ -398,10 +365,6 @@ class qtype_preg_explaining_tree_node_subexpr extends qtype_preg_explaining_tree
 
     protected function label() {
         return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_subexpression', 'qtype_preg');
     }
 }
 
@@ -419,10 +382,6 @@ class qtype_preg_explaining_tree_node_cond_subexpr extends qtype_preg_explaining
 
     protected function label() {
         return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string('authoring_tool_tooltip_conditional_subexpression', 'qtype_preg');
     }
 }
 
