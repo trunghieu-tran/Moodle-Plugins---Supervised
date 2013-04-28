@@ -799,7 +799,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      * @return character corresponding to the given sequence.
      */
     protected function calculate_cx($cx) {
-        $x = qtype_poasquestion_string::substr($cx, 2);
+        $x = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($cx, 2));
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
             return null;
@@ -974,9 +974,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> "(?>" {
     $this->push_opt_lvl();
-    $this->last_subexpr++;
-    $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
-    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), $this->last_subexpr));
+    return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), -1));
 }
 <YYINITIAL> "(?<"{ALNUM}*">"? {                 // Named subexpression (?<name>...)
     return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
@@ -1567,6 +1565,9 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <CHARSET> "\a" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+}
+<CHARSET> "\b" {
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x08));
 }
 <CHARSET> "\c". {
     $text = $this->yytext();
