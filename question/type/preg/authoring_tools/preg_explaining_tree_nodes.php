@@ -88,43 +88,41 @@ abstract class qtype_preg_explaining_tree_node {
             return $usecolor ? '<font color="blue">' . $userinscription->data . '</font>' : $userinscription->data;
         }
 
-        $result = $userinscription->data;
-
-        // Replace special characters, not using color.
-        $special = array('&' => '&#38;',
-                         '"' => '&#34;',
-                         '\\\\'=> '&#92;',
-                         '{' => '&#123;',
-                         '}' => '&#125;',
-                         '>' => '&#62;',
+        $special = array('"' => '&#34;',
+                         '&' => '&#38;',
+                         ',' => '&#44;',
                          '<' => '&#60;',
+                         '>' => '&#62;',
                          '[' => '&#91;',
                          ']' => '&#93;',
-                         ',' => '&#44;',
+                         '{' => '&#123;',
                          '|' => '&#124;',
+                         '}' => '&#125;',
+                         '\\\\'=> '&#92;'
                          );
+
+        for ($code = 1; $code <= 0x20; $code++) {
+            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
+            if ($usecolor) {
+                $replacement = '<font color="blue">' . $replacement . '</font>';
+            }
+            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
+        }
+        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
+            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
+            if ($usecolor) {
+                $replacement = '<font color="blue">' . $replacement . '</font>';
+            }
+            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
+        }
+
+        $result = $userinscription->data;
+
         foreach ($special as $key => $value) {
             $result = str_replace($key, $value, $result);
         }
 
-        // Replace non-printable characters, using color.
-        $nonprintable = array();
-        for ($code = 1; $code <= 0x20; $code++) {
-            $nonprintable[qtype_preg_unicode::code2utf8($code)] = 'description_char' . dechex($code);
-        }
-        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
-            $nonprintable[qtype_preg_unicode::code2utf8($code)] = 'description_char' . dechex($code);
-        }
-
-        foreach ($nonprintable as $code => $replacement) {
-            $char = qtype_preg_unicode::code2utf8($code);
-            if (qtype_preg_unicode::strpos($result, $char) !== false) {
-                $replacement = get_string($replacement, 'qtype_preg');
-                $result = $usecolor ? str_replace($char, '<font color="blue">' . $replacement . '</font>,', $result)
-                                    : str_replace($char, $replacement, $result);
-            }
-        }
-        $result = str_replace('\\', '', $result);
+        $result = str_replace('\\', '\\\\', $result);
         return $result;
     }
 
