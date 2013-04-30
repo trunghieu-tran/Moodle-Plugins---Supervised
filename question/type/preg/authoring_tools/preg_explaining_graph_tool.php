@@ -49,7 +49,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     public function name() {
-        return 'author_tool_explain_graph';
+        return 'authoring_tool_explain_graph';
     }
 
     protected function get_engine_node_name($nodetype) {

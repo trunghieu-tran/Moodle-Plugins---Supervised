@@ -90,6 +90,7 @@ $string['node_assert']                 = 'lookaround assertion';
 $string['node_subexpr']                = 'subexpression';
 $string['node_cond_subexpr']           = 'conditional subexpression';
 $string['node_error']                  = 'syntax error';
+
 // Subtypes.
 $string['empty_leaf_meta']             = 'emptiness';
 $string['circumflex_leaf_assert']      = 'start of the subject assertion';
@@ -198,8 +199,8 @@ $string['nfa_state_limit_description'] = 'Allows you to tune time and memory lim
 $string['dfa_transition_limit_description'] = 'Maximum number of transitions in DFA';
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
-/********** String for authoring tools **********************/
-$string['author_tool_page_header'] = 'Test regex';
+/********** Strings for authoring tools **********************/
+$string['authoring_tool_page_header'] = 'Test regex';
 $string['regex_edit_header_text'] = 'Regex';
 $string['regex_edit_header'] = 'Input regex';
 $string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
@@ -329,6 +330,7 @@ $string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_16value'] = 'character with code 0x%code';
 //$string['description_charset_one'] = '%characters';
 // non-printing characters
+$string['description_charflag_dot'] = 'any character';
 $string['description_charflag_slashd'] = 'decimal digit';
 $string['description_charflag_slashh'] = 'horizontal white space character';
 $string['description_charflag_slashs'] = 'white space';
@@ -539,7 +541,7 @@ $string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
 
-$string['author_tool_explain_graph'] = 'explain graph';
+$string['authoring_tool_explain_graph'] = 'explain graph';
 
 $string['explain_subexpression'] = 'subexpression #';
 $string['explain_backref'] = 'the result of subexpression #';
