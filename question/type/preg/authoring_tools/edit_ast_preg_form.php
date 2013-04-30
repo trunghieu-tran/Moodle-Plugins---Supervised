@@ -33,7 +33,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform =& $this->_form;
 
         // Add header.
-        $mform->addElement('html', '<div align="center"><h2>' . get_string('author_tool_page_header', 'qtype_preg') . '</h2></div>');
+        $mform->addElement('html', '<div align="center"><h2>' . get_string('authoring_tool_page_header', 'qtype_preg') . '</h2></div>');
 
         // Add widget on form.
         $mform->addElement('header', 'regex_input_header', get_string('regex_edit_header_text', 'qtype_preg'));

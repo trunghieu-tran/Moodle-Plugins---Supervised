@@ -187,27 +187,36 @@ $string['error_cxshouldbeascii']                = '\c should be followed by an a
 $string['error_glnuunsupported']                = 'Последовательности \G, \L, \l, \N{name}, \U, и \u не поддерживаются.';
 $string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
 
-/******* ДКА and НКА limitations *******/
+/******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
 $string['fa_state_limit'] = 'Automata size limit: states';
 $string['fa_transition_limit'] = 'Automata size limit: transitions';
 $string['dfa_settings_heading'] = 'Deterministic finite state automata engine settings';
 $string['nfa_settings_heading'] = 'Nondeterministic finite state automata engine settings';
-$string['dfa_state_limit_description'] = 'Allows you to tune time and memory limits for the ДКА engine when matching complex regexes';
-$string['nfa_state_limit_description'] = 'Allows you to tune time and memory limits for the НКА engine when matching complex regexes';
-$string['dfa_transition_limit_description'] = 'Maximum number of transitions in ДКА';
-$string['nfa_transition_limit_description'] = 'Maximum number of transitions in НКА';
+$string['dfa_state_limit_description'] = 'Allows you to tune time and memory limits for the DFA engine when matching complex regexes';
+$string['nfa_state_limit_description'] = 'Allows you to tune time and memory limits for the NFA engine when matching complex regexes';
+$string['dfa_transition_limit_description'] = 'Maximum number of transitions in DFA';
+$string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
-/********** String for authoring tools **********************/
-$string['regexeditheader'] = 'Input regex';
-$string['regexeditheader_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
-$string['regeximgheader'] = 'Interactive tree/explaining graph';
-$string['regeximgheader_help'] = 'Here you can see interactive tree and explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
-$string['regexdescriptionheader'] = 'Description';
-$string['regexdescriptionheader_help'] = 'Here you can see description of regular expression.';
-$string['regexmatchheader'] = 'Input string for check';
-$string['regexmatchheader_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+/********** Strings for authoring tools **********************/
+$string['authoring_tool_page_header'] = 'Test regex';
+$string['regex_edit_header_text'] = 'Regex';
+$string['regex_edit_header'] = 'Input regex';
+$string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_text_text'] = 'Input regex';
+$string['regex_check_text'] = 'Check';
+$string['regex_back_text'] = 'Back (and save regex in this field)';
+$string['regex_tree_build'] = 'Build tree...';
+$string['regex_tree_header'] = 'Interactive tree';
+$string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_build'] = 'Build graph...';
+$string['regex_graph_header'] = 'Explaining graph';
+$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_description_header'] = 'Description';
+$string['regex_description_header_help'] = 'Here you can see description of regular expression.';
+$string['regex_match_header'] = 'Input string for check';
+$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
 
 // Strings for node description
 
@@ -321,6 +330,12 @@ $string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_16value'] = 'символ с кодом 0x%code';
 //$string['description_charset_one'] = '%characters';
 // non-printing characters
+$string['description_charflag_dot'] = 'any character';
+$string['description_charflag_slashd'] = 'decimal digit';
+$string['description_charflag_slashh'] = 'horizontal white space character';
+$string['description_charflag_slashs'] = 'white space';
+$string['description_charflag_slashv'] = 'vertical white space character';//TODO - third string for description \v is it good?
+$string['description_charflag_slashw'] = 'word character';
 $string['description_char0'] = 'ноль-символ(NUL)';
 $string['description_char1'] = 'символ начала заголовка(SOH)';
 $string['description_char2'] = 'символ начала такста(STX)';
@@ -526,7 +541,7 @@ $string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
 
-$string['author_tool_explain_graph'] = 'explain graph';
+$string['authoring_tool_explain_graph'] = 'explain graph';
 
 $string['explain_subexpression'] = 'подвыражение №';
 $string['explain_backref'] = 'результат подвыражения №';
