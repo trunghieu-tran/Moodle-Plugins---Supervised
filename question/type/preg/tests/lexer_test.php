@@ -1016,6 +1016,20 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($token->value->subtype === qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        $lexer = $this->create_lexer('[а-ймъ-ьяё]');    // 'ё' is not between 'е' and 'ж'.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'абвгдежзиймъыьяё');
+        $lexer = $this->create_lexer('\x{430}[\x{431}-е]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'а');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'бвгде');
     }
     function test_lexer_qe() {
         $lexer = $this->create_lexer('\\Q');
