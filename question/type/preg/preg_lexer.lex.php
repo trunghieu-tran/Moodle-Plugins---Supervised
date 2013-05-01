@@ -74,9 +74,9 @@ class qtype_preg_lexer extends JLexBase  {
     protected $comment = '';
     // Comment length.
     protected $comment_length = 0;
-    // Comment string.
+    // \Q...\E sequence.
     protected $qe_sequence = '';
-    // Comment length.
+    // \Q...\E sequence length.
     protected $qe_sequence_length = 0;
     // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
     protected $charset = null;
