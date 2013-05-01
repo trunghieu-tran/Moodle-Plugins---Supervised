@@ -7,7 +7,7 @@
  * @package questions
  */
 
-// requaries: 'node', 'io-base'
+// requires: 'node', 'io-base'
 
 /**
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
@@ -33,10 +33,17 @@ M.preg_authoring_tools_script = (function() {
     back_btn : null,
 
     /** @var {Integer} id of current node */
-    node_id : -1,
+    node_id : '-1',
+
+    /** @var {Object} cache of content; first dimension is regex, second is node id */
+    cache : {},
 
     /** @var {Object} reference for YUI object, extended with requarued modules */
     Y : null,
+
+    REGEX_KEY : 'regex',
+
+    ID_KEY : 'id',
 
     TREE_KEY : 'tree_src',
 
@@ -84,83 +91,120 @@ M.preg_authoring_tools_script = (function() {
                     self.back_btn.on('click', self.back_regex);
                     self.main_input.set('value', self.textbutton_widget.data);
                     self.Y.one('#id_tree').on('click', self.tree_node_misclicked);
-                    self.load_content_by_id(-1);
+                    self.load_content_by_id('-1');
                 })
             },
 
             // Function called on non-first form openings.
             oneachpresscallback : function() {
                 self.main_input.set('value', self.textbutton_widget.data);
-                self.load_content_by_id(-1);
+                self.load_content_by_id('-1');
             }
         };
 
         this.textbutton_widget.setup(options);
     },
 
-    /** Calls if request for information about new regex is successful */
+    // Stores images and description for the given regex and node id in the cache
+    cache_data : function(regex, id, t, m, g, d) {
+        if (!self.cache[regex]) {
+            self.cache[regex] = {};
+        }
+        if (!self.cache[regex][id]) {
+            self.cache[regex][id] = {};
+        }
+
+        self.cache[regex][id][self.TREE_KEY] = t;
+        self.cache[regex][id][self.TREE_MAP_KEY] = m;
+        self.cache[regex][id][self.GRAPH_KEY] = g;
+        self.cache[regex][id][self.DESCRIPTION_KEY] = d;
+    },
+
+    // Displays given images and description
+    display_data : function(i, t, m, g, d) {
+        if (t) self.Y.one('#id_tree').setAttribute('src', t);
+        if (m) {
+            self.Y.one('#tree_map').setHTML(m);
+            self.Y.all(self.TREE_MAP_ID + ' > area').on('click', self.tree_node_clicked);
+        }
+        if (g) self.Y.one('#id_graph').setAttribute('src', g);
+        if (d) self.Y.one('#description_handler').setHTML(d);
+
+        self.highlight_description(i);
+    },
+
+    // Calls if request for information about new regex is successful
     upd_dialog_success : function(id, o, a) {
 
-        // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // TODO: delete on release
         var indexofbracket = o.responseText.indexOf('{');
         if (indexofbracket != 0) {
             alert(o.responseText.substr(0, indexofbracket));
         }
-        // allerting json array:
-        // alert(o.responseText.substr(indexofbracket));
-        // end of debug output !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // End of TODO
+
         var jsonarray = Y.JSON.parse(o.responseText);
 
-        //TODO: add errors message
-        if (typeof jsonarray[self.TREE_KEY] != 'undefined') {
-            self.Y.one('#id_tree').setAttribute('src', jsonarray[self.TREE_KEY]);
+        var r = jsonarray[self.REGEX_KEY];
+        var i = jsonarray[self.ID_KEY] + '';
+        var t = jsonarray[self.TREE_KEY];
+        var m = jsonarray[self.TREE_MAP_KEY];
+        var g = jsonarray[self.GRAPH_KEY];
+        var d = jsonarray[self.DESCRIPTION_KEY];
+
+        // Cache the data.
+        if (r && i && t && m && g && d) {
+            self.cache_data(r, i, t, m, g, d);
         }
 
-        if (typeof jsonarray[self.TREE_MAP_KEY] != 'undefined') {
-            self.Y.one('#tree_map').setHTML(jsonarray[self.TREE_MAP_KEY]);
-            self.Y.all(self.TREE_MAP_ID + ' > area').on('click', self.tree_node_clicked);
-        }
-
-        if (typeof jsonarray[self.GRAPH_KEY] != 'undefined') {
-            self.Y.one('#id_graph').setAttribute('src', jsonarray[self.GRAPH_KEY]);
-        }
-
-        if (typeof jsonarray[self.DESCRIPTION_KEY] != 'undefined' && self.node_id < 0) {
-            self.Y.one('#description_handler').setHTML(jsonarray[self.DESCRIPTION_KEY]);
-        }
+        // Display the data.
+        self.display_data(i, t, m, g, d);
     },
 
-    /** Calls if request for information about new regex fails */
+    // Calls if request for information about new regex fails
     upd_dialog_failure : function(id, o, a) {
        alert('ERROR ' + id + ' ' + a);
     },
 
+    // Checks for cached data and if it doesn't exist, sends a request to the server
     load_content_by_id : function(id) {
-        this.node_id = id + 0;
-        id += '';
-        var regex = this.main_input.get('value');
-        this.textbutton_widget.data = regex;
-        var url = this.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php?regex='+encodeURIComponent(regex) + '&id=' + id;
+        if (self.node_id == id) {
+            id = '-1';  // Deselect the node when clicked for the second time.
+        }
+        self.node_id = id;
+        var regex = self.main_input.get('value');
+
+        // Check the cache.
+        var cachedregex = self.cache[regex];
+        var cachedid = null;
+        if (cachedregex) {
+            cachedid = cachedregex[id];
+        }
+        if (cachedid) {
+            self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_ID], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
+            return;
+        }
+
+        var url = self.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php?regex=' + encodeURIComponent(regex) + '&id=' + id;
         var cfg = {
             method: 'GET',
             xdr: {
                 use: 'native'
             },
             on: {
-                success: this.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
-                failure: this.upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
+                success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
+                failure: self.upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
             }
         };
 
-        var response = this.Y.io(url, cfg);
+        var response = self.Y.io(url, cfg);
     },
 
     /**
      * Highlights part of text description of regex corresponding to given id.
-     * Highlights nothing if -1 is passed.
+     * Highlights nothing if '-1' is passed.
      */
     highlight_description : function(id) {
-
         var highlightedclass = 'description_highlighted';
         var oldhighlighted = this.Y.one('.' + highlightedclass);
 
@@ -185,27 +229,25 @@ M.preg_authoring_tools_script = (function() {
     /** Handler of pressing on 'Check' button of dialog */
     check_regex : function(e) {
         e.preventDefault();
-        self.load_content_by_id(-1);
+        self.load_content_by_id('-1');
     },
 
     /**
      * Handler of clicking on a node (map area, in fact)
      */
     tree_node_clicked : function(e) {
-       var id = e.currentTarget.getAttribute('id');
+       var id = e.currentTarget.getAttribute('id') + '';
        self.load_content_by_id(id);
-       self.highlight_description(id);
     },
 
     /**
      * Handler of clicking on area outside all nodes
      */
     tree_node_misclicked : function(e) {
-       self.load_content_by_id(-1);
-       self.highlight_description(-1);
+       self.load_content_by_id('-1');
     },
 
-     /**
+    /**
      * Handler of pressing on area of a map on regex tree image
      */
     regex_change : function(e) {

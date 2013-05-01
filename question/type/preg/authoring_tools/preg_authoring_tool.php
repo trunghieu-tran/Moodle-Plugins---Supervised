@@ -29,6 +29,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
     }
 
     public function generate_json(&$json_array, $regex, $id) {
+        $json_array['regex'] = $regex;
+        $json_array['id'] = $id;
         if ($regex == '') {
             $this->generate_json_for_empty_regex($json_array, $id);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
