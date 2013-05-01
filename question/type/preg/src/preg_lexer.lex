@@ -53,6 +53,8 @@ class qtype_preg_opt_stack_item {
 %char
 %unicode
 %state YYCOMMENT
+%state YYQEOUT
+%state YYQEIN
 %state YYCHARSET
 NOTSPECIALO = [^"\^$.[|()?*+{"]                          // Special characters outside character sets.
 NOTSPECIALI = [^"\^-[]"]                                 // Special characters inside character sets.
@@ -111,6 +113,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 
     // Comment length.
     protected $comment_length = 0;
+
+    // Comment string.
+    protected $qe_sequence = '';
+
+    // Comment length.
+    protected $qe_sequence_length = 0;
 
     // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
     protected $charset = null;
@@ -720,7 +728,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      * Forms an interval from sequences like a-z, 0-9, etc. If a string contains
      * something like "x-z" in the end, it will be converted to "xyz".
      */
-    protected function reduce_charset_range() {
+    protected function expand_charset_range() {
+        // Don't expand anything if inside a \Q...\E sequence.
+        if ($this->qe_sequence_length > 1) {
+            return;
+        }
         // Check if there are enough characters in before.
         if ($this->charset_count < 3 || qtype_preg_unicode::substr($this->charset_set, $this->charset_count - 2, 1) != '-') {
             return;
@@ -835,7 +847,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
             } else {
                 $this->charset_set = $data . $this->charset_set;
             }
-            $this->reduce_charset_range();
+            $this->expand_charset_range();
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
@@ -846,25 +858,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
             $this->charset->flags[] = array($flag);
             break;
         }
-    }
-
-    /**
-     * Returns the string inside a \Q...\E sequence and restores yy_buffer_index because quantifiers are greed.
-     * @param text the \Q...\E sequence.
-     * @return the string between \Q and \E.
-     */
-    protected function recognize_qe_sequence($text) {
-        $str = '';
-        $epos = qtype_preg_unicode::strpos($text, '\E');
-        if ($epos === false) {
-            $str = qtype_preg_unicode::substr($text, 2);
-        } else {
-            $str = qtype_preg_unicode::substr($text, 2, $epos - 2);
-            // Here's a trick. Quantifiers are greed, so a part after '\Q...\E' can be matched by this rule. Reset $this->yy_buffer_index manually.
-            $tail = qtype_preg_unicode::substr($text, $epos + 2);
-            $this->yy_buffer_index -= qtype_preg_unicode::strlen($tail);
-        }
-        return $str;
     }
 
     /**
@@ -892,7 +885,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
-<YYCOMMENT> "\)"|\\\\ {                    // Comment body: \) or \\
+<YYCOMMENT> "\)"|\\\\ {                // Comment body: \) or \\
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
@@ -901,8 +894,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->comment_length += $this->yylength();
 }
 <YYCOMMENT> ")" {                      // Comment ending
-    $this->comment .= $this->yytext();
-    $this->comment_length += $this->yylength();
+    //$this->comment .= $this->yytext();
+    //$this->comment_length += $this->yylength();
     // TODO: make use of it?
     $this->comment = '';
     $this->comment_length = 0;
@@ -942,7 +935,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
 }
-
 <YYINITIAL> "{"[0-9]+",}"("?"|"+")? {           // Quantifier {m,}
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -1308,7 +1300,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     } else {
-        return $this->nextToken();
+        // Do nothing in YYINITIAL state.
     }
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {
@@ -1341,17 +1333,24 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $text = $this->yytext();
     return $this->form_recursion($text, $this->yychar, $this->yylength(), $text);
 }
-<YYINITIAL> "\Q".*"\E"|"\Q".* {
-    $text = $this->yytext();
-    $str = $this->recognize_qe_sequence($text);
-    $res = array();
-    for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
-        $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1));
-    }
-    return $res;
-}
 <YYINITIAL> "\E" {
-    return $this->nextToken();  // Ignored in YYINITIAL state.
+    // Do nothing in YYINITIAL state.
+}
+<YYINITIAL> "\Q" {                    // \Q...\E beginning
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    $this->yybegin(self::YYQEOUT);
+}
+<YYQEOUT> .|[\r\n] {                  // \Q...\E body
+    $text = $this->yytext();
+    $this->qe_sequence .= $text;
+    $this->qe_sequence_length++;
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+}
+<YYQEOUT> "\E" {                      // \Q...\E ending
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    $this->yybegin(self::YYINITIAL);
 }
 <YYINITIAL> "\c" {
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1622,15 +1621,24 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
-<YYCHARSET> "\Q".*"\E" {
-    $text = $this->yytext();
-    $str = $this->recognize_qe_sequence($text);
-    if ($str != '') {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
-    }
-}
 <YYCHARSET> "\E" {
-    return $this->nextToken();
+    // Do nothing in YYCHARSET state.
+}
+<YYCHARSET> "\Q" {                   // \Q...\E beginning
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    $this->yybegin(self::YYQEIN);
+}
+<YYQEIN> .|[\r\n] {                  // \Q...\E body
+    $text = $this->yytext();
+    $this->qe_sequence .= $text;
+    $this->qe_sequence_length++;
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+}
+<YYQEIN> "\E" {                      // \Q...\E ending
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    $this->yybegin(self::YYCHARSET);
 }
 <YYCHARSET> \\. {
     $text = $this->yytext();
