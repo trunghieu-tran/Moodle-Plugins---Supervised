@@ -1064,11 +1064,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data->string() === 'бвгде');
     }
     function test_lexer_qe() {
-        $lexer = $this->create_lexer('\\Q');
-        $token = $lexer->nextToken();// \Q
+        $lexer = $this->create_lexer('\Q');    // Unclosed empty \Q
+        $token = $lexer->nextToken();
         $this->assertTrue(is_array($token));
         $this->assertTrue(count($token) === 0);
-        $lexer = $this->create_lexer('\\Q\\Ex{3,10}');
+        $lexer = $this->create_lexer('\Q\Ex{3,10}');
         $token = $lexer->nextToken();// \Q\E
         $this->assertTrue(is_array($token));
         $this->assertTrue(count($token) === 0);
@@ -1084,7 +1084,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
         $this->assertTrue(!$token->value->possessive);
-        $lexer = $this->create_lexer('\\Qt@$t\\Es+');
+        $lexer = $this->create_lexer('\Qt@$t\Es+');
         $token = $lexer->nextToken();// \Qt@$t\E
         $this->assertTrue(is_array($token));
         $this->assertTrue(count($token) === 4);
@@ -1111,6 +1111,17 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
         $this->assertTrue(!$token->value->possessive);
+        $lexer = $this->create_lexer('\Qa\E[x\Q[y]\Ez]');    // \Q...\E followed by a charset containing the same thing.
+        $token = $lexer->nextToken();
+        $this->assertTrue(is_array($token));
+        $this->assertTrue(count($token) === 1);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token[0]->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token[0]->value->flags[0][0]->data->string() === 'a');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'x[y]z');
     }
     function test_lexer_control_sequences() {
         $lexer = $this->create_lexer('(*ACCEPT)(*FAIL)(*F)(*MARK:NAME0)(*:NAME1)(*COMMIT)(*PRUNE)(*PRUNE:NAME2)(*SKIP)(*SKIP:NAME3)(*THEN)(*THEN:NAME4)(*CR)(*LF)(*CRLF)(*ANYCRLF)(*ANY)(*BSR_ANYCRLF)(*BSR_UNICODE)(*NO_START_OPT)(*UTF8)(*UTF16)(*UCP)(*SQUIRREL)');

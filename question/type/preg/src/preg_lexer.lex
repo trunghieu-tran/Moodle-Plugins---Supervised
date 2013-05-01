@@ -59,26 +59,16 @@ NOTSPECIALI = [^"\^-[]"]                                 // Special characters i
 MODIFIER    = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
 ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
 %init{
-    $this->errors                      = array();
-    $this->last_subexpr                = 0;
-    $this->max_subexpr                 = 0;
-    $this->subexpr_map                 = array();
-    $this->backrefs                    = array();
-    $this->opt_stack                   = array();
-    $this->opt_stack[0]                = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
-    $this->opt_count                   = 1;
-    $this->comment                     = '';
-    $this->comment_length              = 0;
-    $this->charset                     = null;
-    $this->charset_count               = 0;
-    $this->charset_set                 = '';
-    $this->handlingoptions             = new qtype_preg_handling_options();
+    $this->handlingoptions = new qtype_preg_handling_options();
+    $this->opt_stack[0] = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
 %init}
 %eof{
     // End of the expression inside a character class.
     if ($this->yy_lexical_state == self::YYCHARSET) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, '', $this->charset->indfirst, $this->yychar - 1, '');
     }
+
+    // End of the expression inside a comment.
     if ($this->yy_lexical_state == self::YYCOMMENT) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, '', $this->yychar - $this->comment_length, $this->yychar - 1, '');  // TODO indexes
     }
@@ -92,17 +82,44 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     }
 %eof}
 %{
-    public $handlingoptions;                // Regex handling options set from the outside.
-    protected $errors;                      // Array of lexical errors found.
-    protected $last_subexpr;                // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
-    protected $max_subexpr;                 // Max subexpression number.
-    protected $subexpr_map;                 // Map of subexpression names => numbers.
-    protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
-    protected $opt_stack;                   // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
-    protected $opt_count;                   // Number of items in the above stack.
-    protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
-    protected $charset_count;               // Number of characters in the charset excluding flags.
-    protected $charset_set;                 // Characters of the charset.
+    // Regex handling options set from the outside.
+    public $handlingoptions = null;
+
+    // Array of lexical errors found.
+    protected $errors = array();
+
+    // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
+    protected $last_subexpr = 0;
+
+    // Max subexpression number.
+    protected $max_subexpr = 0;
+
+    // Map of subexpression names => numbers.
+    protected $subexpr_map = array();
+
+    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
+    protected $backrefs = array();
+
+    // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
+    protected $opt_stack = array();
+
+    // Number of items in the above stack.
+    protected $opt_count = 1;
+
+    // Comment string.
+    protected $comment = '';
+
+    // Comment length.
+    protected $comment_length = 0;
+
+    // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
+    protected $charset = null;
+
+    // Number of characters in the charset excluding flags.
+    protected $charset_count = 0;
+
+    // Characters of the charset.
+    protected $charset_set = '';
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -290,13 +307,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         if (count($errors) == 0) {
             for ($i = 0; $i < $set->length(); $i++) {
                 $modname = $set[$i];
-                if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+                if (qtype_preg_unicode::strpos($allowed, $modname) !== false) {
                     $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = true;
                 }
             }
             for ($i = 0; $i < $unset->length(); $i++) {
                 $modname = $unset[$i];
-                if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+                if (qtype_preg_unicode::strpos($allowed, $modname) !== false) {
                     $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = false;
                 }
             }
@@ -343,7 +360,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      */
     protected function form_control($text, $pos, $length) {
         // Error: missing ) at end.
-        if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== ')') {
+        if (qtype_preg_unicode::substr($text, $length - 1, 1) !== ')') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
@@ -421,7 +438,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
             $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
         default:
-            $delimpos = qtype_poasquestion_string::strpos($text, ':');
+            $delimpos = qtype_preg_unicode::strpos($text, ':');
 
             // Error: unknown control sequence.
             if ($delimpos === false) {
@@ -430,8 +447,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
             }
 
             // There is a parameter separated by ":"
-            $subtype = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
-            $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $length - $delimpos - 2);
+            $subtype = qtype_preg_unicode::substr($text, 2, $delimpos - 2);
+            $name = qtype_preg_unicode::substr($text, $delimpos + 1, $length - $delimpos - 2);
 
             // Error: empty name.
             if ($name === '') {
@@ -475,12 +492,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $this->push_opt_lvl();
 
         // Error: missing closing characters.
-        if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
+        if (qtype_preg_unicode::substr($text, $length - 1, 1) !== $closetype) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
-        $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
+        $name = qtype_preg_unicode::substr($text, $namestartpos, $length - $namestartpos - 1);
 
         // Error: empty name.
         if ($name === '') {
@@ -529,7 +546,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $endlength = strlen($ending);
 
         // Error: unclosed condition.
-        if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
+        if (qtype_preg_unicode::substr($text, $length - $endlength) !== $ending) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
@@ -539,14 +556,14 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 
         // Recursion.
         if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
-            if (qtype_poasquestion_string::substr($text, 4, 1) === '&') {   // (?(R&
-                $data = qtype_poasquestion_string::substr($text, 5, $length - 6);
+            if (qtype_preg_unicode::substr($text, 4, 1) === '&') {   // (?(R&
+                $data = qtype_preg_unicode::substr($text, 5, $length - 6);
                 // Error: empty name.
                 if ($data === '') {
                     $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
                 }
             } else {                                                        // (?(Rnumber)
-                $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
+                $tmp = qtype_preg_unicode::substr($text, 4, $length - 5);
                 // Error: digits expected.
                 if ($tmp !== '' && !ctype_digit($tmp)) {
                     $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER, $tmp, $pos, $pos + $length - 1, '');
@@ -558,13 +575,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 
         // Subexpression.
         if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR && $numeric) {
-            $str = qtype_poasquestion_string::substr($text, 3, $length - 4);
-            $tmp = qtype_poasquestion_string::substr($str, 0, 1);
+            $str = qtype_preg_unicode::substr($text, 3, $length - 4);
+            $tmp = qtype_preg_unicode::substr($str, 0, 1);
             $sign = 0;
             $tmp === '+' && $sign++;
             $tmp === '-' && $sign--;
             if ($sign !== 0) {
-                $str = qtype_poasquestion_string::substr($str, 1);
+                $str = qtype_preg_unicode::substr($str, 1);
             }
             if ($str !== '' && !ctype_digit($str)) {
                 // Error: digits expected.
@@ -586,7 +603,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         }
 
         if ($subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR && !$numeric) {
-            $data = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - $endlength);
+            $data = qtype_preg_unicode::substr($text, $namestartpos, $length - $namestartpos - $endlength);
             // Error: empty name.
             if ($data === '') {
                 $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
@@ -605,18 +622,18 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      */
     protected function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
         // Error: missing opening characters.
-        if (qtype_poasquestion_string::substr($text, $namestartpos - 1, 1) !== $opentype) {
+        if (qtype_preg_unicode::substr($text, $namestartpos - 1, 1) !== $opentype) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $opentype, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
 
         // Error: missing closing characters.
-        if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
+        if (qtype_preg_unicode::substr($text, $length - 1, 1) !== $closetype) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, $closetype, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
 
-        $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
+        $name = qtype_preg_unicode::substr($text, $namestartpos, $length - $namestartpos - 1);
 
         // Error: empty name.
         if ($name === '') {
@@ -694,7 +711,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         if ($number[2] === 'R') {
             $node->number = 0;
         } else {
-            $node->number = (int)qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
+            $node->number = (int)qtype_preg_unicode::substr($number, 2, qtype_preg_unicode::strlen($number) - 3);
         }
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
@@ -705,11 +722,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      */
     protected function reduce_charset_range() {
         // Check if there are enough characters in before.
-        if ($this->charset_count < 3 || qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 2, 1) != '-') {
+        if ($this->charset_count < 3 || qtype_preg_unicode::substr($this->charset_set, $this->charset_count - 2, 1) != '-') {
             return;
         }
-        $startchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 3, 1);
-        $endchar = qtype_poasquestion_string::substr($this->charset_set, $this->charset_count - 1, 1);
+        $startchar = qtype_preg_unicode::substr($this->charset_set, $this->charset_count - 3, 1);
+        $endchar = qtype_preg_unicode::substr($this->charset_set, $this->charset_count - 1, 1);
 
         // Modify userinscription;
         $userinscriptionend = array_pop($this->charset->userinscription);
@@ -719,7 +736,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 
         if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
             // Replace last 3 characters by all the characters between them.
-            $this->charset_set = qtype_poasquestion_string::substr($this->charset_set, 0, $this->charset_count - 3);
+            $this->charset_set = qtype_preg_unicode::substr($this->charset_set, 0, $this->charset_count - 3);
             $this->charset_count -= 3;
             $curord = qtype_poasquestion_string::ord($startchar);
             $endord = qtype_poasquestion_string::ord($endchar);
@@ -730,7 +747,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         } else {
             // Delete last 3 characters.
             $this->charset_count -= 3;
-            $this->charset_set = qtype_poasquestion_string::substr($this->charset_set, 0, $this->charset_count);
+            $this->charset_set = qtype_preg_unicode::substr($this->charset_set, 0, $this->charset_count);
             // Form the error node.
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $startchar . '-' . $endchar, $this->yychar - 2, $this->yychar + $this->yylength() - 1, '');
         }
@@ -791,7 +808,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      * @return character corresponding to the given sequence.
      */
     protected function calculate_cx($cx) {
-        $x = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($cx, 2));
+        $x = qtype_preg_unicode::strtoupper(qtype_preg_unicode::substr($cx, 2));
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
             return null;
@@ -837,16 +854,15 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
      * @return the string between \Q and \E.
      */
     protected function recognize_qe_sequence($text) {
-        $text = $this->yytext();
         $str = '';
-        $epos = qtype_poasquestion_string::strpos($text, '\E');
+        $epos = qtype_preg_unicode::strpos($text, '\E');
         if ($epos === false) {
-            $str = qtype_poasquestion_string::substr($text, 2);
+            $str = qtype_preg_unicode::substr($text, 2);
         } else {
-            $str = qtype_poasquestion_string::substr($text, 2, $epos - 2);
+            $str = qtype_preg_unicode::substr($text, 2, $epos - 2);
             // Here's a trick. Quantifiers are greed, so a part after '\Q...\E' can be matched by this rule. Reset $this->yy_buffer_index manually.
-            $tail = qtype_poasquestion_string::substr($text, $epos + 2);
-            $this->yy_buffer_index -= qtype_poasquestion_string::strlen($tail);
+            $tail = qtype_preg_unicode::substr($text, $epos + 2);
+            $this->yy_buffer_index -= qtype_preg_unicode::strlen($tail);
         }
         return $str;
     }
@@ -895,63 +911,63 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <YYINITIAL> "?"("?"|"+")? {                     // Quantifier ?
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
+    $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greed, $possessive);
 }
 <YYINITIAL> "*"("?"|"+")? {                     // Quantifier *
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
+    $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
 }
 <YYINITIAL> "+"("?"|"+")? {                     // Quantifier +
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
+    $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
 }
 <YYINITIAL> "{"[0-9]+","[0-9]+"}"("?"|"+")? {   // Quantifier {m,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
     $greed = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greed && !$lazy;
     $greed || $textlen--;
-    $delimpos = qtype_poasquestion_string::strpos($text, ',');
-    $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $delimpos - 1);
-    $rightborder = (int)qtype_poasquestion_string::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
+    $delimpos = qtype_preg_unicode::strpos($text, ',');
+    $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
+    $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
 }
 
 <YYINITIAL> "{"[0-9]+",}"("?"|"+")? {           // Quantifier {m,}
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
     $greed = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greed && !$lazy;
     $greed || $textlen--;
-    $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $textlen - 1);
+    $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greed, $possessive);
 }
 <YYINITIAL> "{,"[0-9]+"}"("?"|"+")? {           // Quantifier {,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
     $greed = ($lastchar === '}');
     $lazy = !$greed && $lastchar === '?';
     $possessive = !$greed && !$lazy;
     $greed || $textlen--;
-    $rightborder = (int)qtype_poasquestion_string::substr($text, 2, $textlen - 3);
+    $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greed, $possessive);
 }
 <YYINITIAL> "{"[0-9]+"}" {                      // Quantifier {m}
     $text = $this->yytext();
-    $count = (int)qtype_poasquestion_string::substr($text, 1, $this->yylength() - 2);
+    $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $count, $count, false, true, false);
 }
 <YYINITIAL> "[^"|"["|"[^]"|"[]" {               // Beginning of a charset: [^ or [ or [^] or []
@@ -1038,11 +1054,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <YYINITIAL> "(?("[^"'<>()?!="]*")"? {           // Conditional subexpression - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
-    qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
-    $data = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 3 - $rightoffset);
-    $sign = qtype_poasquestion_string::substr($data, 0, 1);
+    qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
+    $data = qtype_preg_unicode::substr($text, 3, $this->yylength() - 3 - $rightoffset);
+    $sign = qtype_preg_unicode::substr($data, 0, 1);
     if ($sign === '+' || $sign === '-') {
-        $data = qtype_poasquestion_string::substr($data, 1);    }
+        $data = qtype_preg_unicode::substr($data, 1);    }
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subexpr($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', $numeric, 3);
 }
@@ -1062,20 +1078,24 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->push_opt_lvl();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<!')));
 }
+<YYINITIAL> "(?<". {       // ERROR: Unrecognized character after (?<
+    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, '(?<', $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+}
 <YYINITIAL> "(?C"[0-9]*")"? {
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
-    if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
+    if (qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) !== ')') {
         $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
     }
     throw new Exception('Callouts are not implemented yet');
-    $number = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
         $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
     } else {
-
+        // TODO
     }
 }
 <YYINITIAL> "." {
@@ -1090,11 +1110,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> "\g"[0-9][0-9]? {
     $text = $this->yytext();
-    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_poasquestion_string::substr($text, 2));
+    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_preg_unicode::substr($text, 2));
 }
 <YYINITIAL> ("\g{-"|"\g{")[0-9][0-9]?"}" {
     $text = $this->yytext();
-    $num = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $num = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     // Is it a relative backreference? Is so, convert it to an absolute one.
     if ($num < 0) {
         $num = $this->last_subexpr + $num + 1;
@@ -1140,8 +1160,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> ("\p"|"\P"). {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 2);
-    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
+    $str = qtype_preg_unicode::substr($text, 2);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
         $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1152,12 +1172,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> ("\p"|"\P")("{^"|"{")[^}]*"}" {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
-    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
-    $circumflex = (qtype_poasquestion_string::substr($str, 0, 1) === '^');
+    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
+    $circumflex = (qtype_preg_unicode::substr($str, 0, 1) === '^');
     $negative = ($negative xor $circumflex);
     if ($circumflex) {
-        $str = qtype_poasquestion_string::substr($str, 1);
+        $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str === 'Any') {
         $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
@@ -1181,10 +1201,10 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <YYINITIAL> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
     if ($this->yylength() < 3) {
-        $str = qtype_poasquestion_string::substr($text, 1);
+        $str = qtype_preg_unicode::substr($text, 1);
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
     } else {
-        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        $code = hexdec(qtype_preg_unicode::substr($text, 2));
         if ($code > qtype_preg_unicode::max_possible_code()) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
@@ -1198,7 +1218,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1271,12 +1291,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {
     $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, '-');
+    $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
-        $set = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
-        $unset = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
+        $set = qtype_preg_unicode::substr($text, 2, $delimpos - 2);
+        $unset = qtype_preg_unicode::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
     } else {
-        $set = qtype_poasquestion_string::substr($text, 2, $this->yylength() - 3);
+        $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
     $set = new qtype_poasquestion_string($set);
@@ -1293,12 +1313,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {
     $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, '-');
+    $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
-        $set = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
-        $unset = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
+        $set = qtype_preg_unicode::substr($text, 2, $delimpos - 2);
+        $unset = qtype_preg_unicode::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
     } else {
-        $set = qtype_poasquestion_string::substr($text, 2, $this->yylength() - 3);
+        $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
     $set = new qtype_poasquestion_string($set);
@@ -1325,13 +1345,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $text = $this->yytext();
     $str = $this->recognize_qe_sequence($text);
     $res = array();
-    for ($i = 0; $i < qtype_poasquestion_string::strlen($str); $i++) {
-        $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($str, $i, 1));
+    for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
+        $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1));
     }
     return $res;
 }
 <YYINITIAL> "\E" {
-    return $this->nextToken();
+    return $this->nextToken();  // Ignored in YYINITIAL state.
 }
 <YYINITIAL> "\c" {
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1344,7 +1364,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 1);
+    $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_backref($text, $this->yychar, $this->yylength(), (int)$str);
@@ -1352,28 +1372,28 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         // Return a character.
         $octal = '';
         $failed = false;
-        for ($i = 0; !$failed && $i < qtype_poasquestion_string::strlen($str); $i++) {
-            $tmp = qtype_poasquestion_string::substr($str, $i, 1);
+        for ($i = 0; !$failed && $i < qtype_preg_unicode::strlen($str); $i++) {
+            $tmp = qtype_preg_unicode::substr($str, $i, 1);
             if (intval($tmp) < 8) {
                 $octal = $octal . $tmp;
             } else {
                 $failed = true;
             }
         }
-        if (qtype_poasquestion_string::strlen($octal) === 0) {    // If no octal digits found, it should be 0.
+        if (qtype_preg_unicode::strlen($octal) === 0) {    // If no octal digits found, it should be 0.
             $octal = '0';
             $tail = $str;
         } else {                      // Octal digits found.
-            $tail = qtype_poasquestion_string::substr($str, qtype_poasquestion_string::strlen($octal));
+            $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
-        if (qtype_poasquestion_string::strlen($tail) === 0) {
+        if (qtype_preg_unicode::strlen($tail) === 0) {
             $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
         } else {
             $res = array();
             $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-            for ($i = 0; $i < qtype_poasquestion_string::strlen($tail); $i++) {
-                $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($tail, $i, 1));
+            for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
+                $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1));
             }
         }
     }
@@ -1381,15 +1401,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 <YYINITIAL> \\. {
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
-}
-<YYINITIAL> "(?<". {       // ERROR: Unrecognized character after (?<
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, '(?<', $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($text, 1, 1));
 }
 <YYINITIAL> \\ {           // ERROR: \ at end of pattern.
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\', $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1501,8 +1517,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYCHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 2);
-    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
+    $str = qtype_preg_unicode::substr($text, 2);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1513,12 +1529,12 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYCHARSET> ("\p"|"\P")("{^"|"{")[^}]*"}" {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
-    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
-    $circumflex = (qtype_poasquestion_string::substr($str, 0, 1) === '^');
+    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
+    $circumflex = (qtype_preg_unicode::substr($str, 0, 1) === '^');
     $negative = ($negative xor $circumflex);
     if ($circumflex) {
-        $str = qtype_poasquestion_string::substr($str, 1);
+        $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str === 'Any') {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
@@ -1534,15 +1550,15 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYCHARSET> \\[0-7][0-7]?[0-7]? {
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 <YYCHARSET> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
     if ($this->yylength() < 3) {
-        $str = qtype_poasquestion_string::substr($text, 1);
+        $str = qtype_preg_unicode::substr($text, 1);
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
     } else {
-        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        $code = hexdec(qtype_preg_unicode::substr($text, 2));
         if ($code > qtype_preg_unicode::max_possible_code()) {
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
             $this->charset->userinscription[] = new qtype_preg_userinscription($text);
@@ -1555,7 +1571,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYCHARSET> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -1618,7 +1634,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 }
 <YYCHARSET> \\. {
     $text = $this->yytext();
-    $char = qtype_poasquestion_string::substr($text, 1, 1);
+    $char = qtype_preg_unicode::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
 <YYCHARSET> [^\]] {
