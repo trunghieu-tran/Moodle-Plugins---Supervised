@@ -52,7 +52,8 @@ class qtype_preg_opt_stack_item {
 %function nextToken
 %char
 %unicode
-%state CHARSET
+%state YYCOMMENT
+%state YYCHARSET
 NOTSPECIALO = [^"\^$.[|()?*+{"]                          // Special characters outside character sets.
 NOTSPECIALI = [^"\^-[]"]                                 // Special characters inside character sets.
 MODIFIER    = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
@@ -66,6 +67,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->opt_stack                   = array();
     $this->opt_stack[0]                = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
     $this->opt_count                   = 1;
+    $this->comment                     = '';
+    $this->comment_length              = 0;
     $this->charset                     = null;
     $this->charset_count               = 0;
     $this->charset_set                 = '';
@@ -73,9 +76,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 %init}
 %eof{
     // End of the expression inside a character class.
-    if ($this->charset !== null) {
+    if ($this->yy_lexical_state == self::YYCHARSET) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, '', $this->charset->indfirst, $this->yychar - 1, '');
     }
+    if ($this->yy_lexical_state == self::YYCOMMENT) {
+        $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, '', $this->yychar - $this->comment_length, $this->yychar - 1, '');  // TODO indexes
+    }
+
     // Check for backreferences to unexisting subexpressions.
     foreach ($this->backrefs as $leaf) {
         $number = $leaf->number;
@@ -93,7 +100,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
     protected $opt_stack;                   // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
     protected $opt_count;                   // Number of items in the above stack.
-    protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
+    protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
     protected $charset_count;               // Number of characters in the charset excluding flags.
     protected $charset_set;                 // Characters of the charset.
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
@@ -794,7 +801,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     }
 
     /**
-     * Adds a flag to the lexer's charset when lexer is in the CHARSET state.
+     * Adds a flag to the lexer's charset when lexer is in the YYCHARSET state.
      * @param userinscription a string typed by user and consumed by lexer.
      * @param type type of the flag, should be a constant of qtype_preg_leaf_charset.
      * @param data can contain either subtype of a flag or characters for a charset.
@@ -860,6 +867,31 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 
 %%
 
+<YYINITIAL> "(?#" {                    // Comment beginning
+    $this->comment = $this->yytext();
+    $this->comment_length = $this->yylength();
+    $this->yybegin(self::YYCOMMENT);
+}
+<YYCOMMENT> [^)\\]* {                  // Comment body: all characters until ')' or '\' found
+    $this->comment .= $this->yytext();
+    $this->comment_length += $this->yylength();
+}
+<YYCOMMENT> "\)"|\\\\ {                    // Comment body: \) or \\
+    $this->comment .= $this->yytext();
+    $this->comment_length += $this->yylength();
+}
+<YYCOMMENT> [^)] {                     // Comment body: not ')'
+    $this->comment .= $this->yytext();
+    $this->comment_length += $this->yylength();
+}
+<YYCOMMENT> ")" {                      // Comment ending
+    $this->comment .= $this->yytext();
+    $this->comment_length += $this->yylength();
+    // TODO: make use of it?
+    $this->comment = '';
+    $this->comment_length = 0;
+    $this->yybegin(self::YYINITIAL);
+}
 <YYINITIAL> "?"("?"|"+")? {                     // Quantifier ?
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
@@ -933,7 +965,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     if ($text === '[^]' || $text === '[]') {
         $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
     }
-    $this->yybegin(self::CHARSET);
+    $this->yybegin(self::YYCHARSET);
 }
 <YYINITIAL> "(" {                               // Beginning of a subexpression
     $this->push_opt_lvl();
@@ -944,15 +976,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
     return new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
-}
-<YYINITIAL> "(?#"[^)]*")"? {                    // Comment
-    $text = $this->yytext();
-    if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
-    } else {
-        return $this->nextToken();
-    }
 }
 <YYINITIAL> "(*"[^)]*")"? {                     // Control sequence
     return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
@@ -1376,107 +1399,107 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
-<CHARSET> "\d"|"\D" {
+<YYCHARSET> "\d"|"\D" {
     $text = $this->yytext();
     $negative = ($text === '\D');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
 }
-<CHARSET> "\h"|"\H" {
+<YYCHARSET> "\h"|"\H" {
     $text = $this->yytext();
     $negative = ($text === '\H');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
 }
-<CHARSET> "\s"|"\S" {
+<YYCHARSET> "\s"|"\S" {
     $text = $this->yytext();
     $negative = ($text === '\S');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
 }
-<CHARSET> "\v"|"\V" {
+<YYCHARSET> "\v"|"\V" {
     $text = $this->yytext();
     $negative = ($text === '\V');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
 }
-<CHARSET> "\w"|"\W" {
+<YYCHARSET> "\w"|"\W" {
     $text = $this->yytext();
     $negative = ($text === '\W');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
 }
-<CHARSET> "[:alnum:]"|"[:^alnum:]" {
+<YYCHARSET> "[:alnum:]"|"[:^alnum:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^alnum:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALNUM, $negative);
 }
-<CHARSET> "[:alpha:]"|"[:^alpha:]" {
+<YYCHARSET> "[:alpha:]"|"[:^alpha:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^alpha:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALPHA, $negative);
 }
-<CHARSET> "[:ascii:]"|"[:^ascii:]" {
+<YYCHARSET> "[:ascii:]"|"[:^ascii:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^ascii:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ASCII, $negative);
 }
-<CHARSET> "[:blank:]"|"[:^blank:]" {
+<YYCHARSET> "[:blank:]"|"[:^blank:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^blank:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_BLANK, $negative);
 }
-<CHARSET> "[:cntrl:]"|"[:^cntrl:]" {
+<YYCHARSET> "[:cntrl:]"|"[:^cntrl:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^cntrl:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_CNTRL, $negative);
 }
-<CHARSET> "[:digit:]"|"[:^digit:]" {
+<YYCHARSET> "[:digit:]"|"[:^digit:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^digit:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_DIGIT, $negative);
 }
-<CHARSET> "[:graph:]"|"[:^graph:]" {
+<YYCHARSET> "[:graph:]"|"[:^graph:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^graph:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_GRAPH, $negative);
 }
-<CHARSET> "[:lower:]"|"[:^lower:]" {
+<YYCHARSET> "[:lower:]"|"[:^lower:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^lower:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_LOWER, $negative);
 }
-<CHARSET> "[:print:]"|"[:^print:]" {
+<YYCHARSET> "[:print:]"|"[:^print:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^print:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PRINT, $negative);
 }
-<CHARSET> "[:punct:]"|"[:^punct:]" {
+<YYCHARSET> "[:punct:]"|"[:^punct:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^punct:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PUNCT, $negative);
 }
-<CHARSET> "[:space:]"|"[:^space:]"  {
+<YYCHARSET> "[:space:]"|"[:^space:]"  {
     $text = $this->yytext();
     $negative = ($text === '[:^space:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_SPACE, $negative);
 }
-<CHARSET> "[:upper:]"|"[:^upper:]" {
+<YYCHARSET> "[:upper:]"|"[:^upper:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^upper:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_UPPER, $negative);
 }
-<CHARSET> "[:word:]"|"[:^word:]" {
+<YYCHARSET> "[:word:]"|"[:^word:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^word:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_WORD, $negative);
 }
-<CHARSET> "[:xdigit:]"|"[:^xdigit:]" {
+<YYCHARSET> "[:xdigit:]"|"[:^xdigit:]" {
     $text = $this->yytext();
     $negative = ($text === '[:^xdigit:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_XDIGIT, $negative);
 }
-<CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
+<YYCHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
-<CHARSET> ("\p"|"\P"). {
+<YYCHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -1488,7 +1511,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-<CHARSET> ("\p"|"\P")("{^"|"{")[^}]*"}" {
+<YYCHARSET> ("\p"|"\P")("{^"|"{")[^}]*"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -1509,11 +1532,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         }
     }
 }
-<CHARSET> \\[0-7][0-7]?[0-7]? {
+<YYCHARSET> \\[0-7][0-7]?[0-7]? {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-<CHARSET> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
+<YYCHARSET> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -1530,7 +1553,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         }
     }
 }
-<CHARSET> "\x{"[0-9a-fA-F]+"}" {
+<YYCHARSET> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
@@ -1543,13 +1566,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
     }
 }
-<CHARSET> "\a" {
+<YYCHARSET> "\a" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
-<CHARSET> "\b" {
+<YYCHARSET> "\b" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x08));
 }
-<CHARSET> "\c". {
+<YYCHARSET> "\c". {
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
     if ($char === null) {
@@ -1559,50 +1582,50 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
 }
-<CHARSET> "\e" {
+<YYCHARSET> "\e" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
-<CHARSET> "\f" {
+<YYCHARSET> "\f" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
-<CHARSET> "\n" {
+<YYCHARSET> "\n" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
-<CHARSET> "\N" {
+<YYCHARSET> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
-<CHARSET> "\r" {
+<YYCHARSET> "\r" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
-<CHARSET> "\t" {
+<YYCHARSET> "\t" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
 }
-<CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
+<YYCHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
     $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
-<CHARSET> "\Q".*"\E" {
+<YYCHARSET> "\Q".*"\E" {
     $text = $this->yytext();
     $str = $this->recognize_qe_sequence($text);
     if ($str != '') {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
     }
 }
-<CHARSET> "\E" {
+<YYCHARSET> "\E" {
     return $this->nextToken();
 }
-<CHARSET> \\. {
+<YYCHARSET> \\. {
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-<CHARSET> [^\]] {
+<YYCHARSET> [^\]] {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
 }
-<CHARSET> "]" {
+<YYCHARSET> "]" {
     // Form the charset.
     $this->charset->indlast = $this->yychar;
     $this->charset->israngecalculated = false;
