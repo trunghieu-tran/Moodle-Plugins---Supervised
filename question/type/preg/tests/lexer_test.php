@@ -472,10 +472,42 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(array_key_exists('qwe', $map) && $map['qwe'] === 1);
         $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);
     }
-    function test_lexer_lexems() {
-        $lexer = $this->create_lexer('(?#this should be skipped)');
-        $token = $lexer->nextToken();    // (?#{{)
-        $this->assertTrue($token === null);
+    function test_lexer_comment() {
+        $lexer = $this->create_lexer('(?# this should be ignored)ё');    // Normal comment.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'ё');
+        $this->assertTrue($token->value->indfirst === 27);
+        $this->assertTrue($token->value->indlast === 27);
+        $lexer = $this->create_lexer('(?# paren should be \) ignored as well as \\\\ the backslash)ё');    // Comment with escaped backslash and closing paren.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'ё');
+        $this->assertTrue($token->value->indfirst === 59);
+        $this->assertTrue($token->value->indlast === 59);
+        $lexer = $this->create_lexer('(?#\\\\)ё');      // Empty of only slashes.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'ё');
+        $this->assertTrue($token->value->indfirst === 6);
+        $this->assertTrue($token->value->indlast === 6);
+        $lexer = $this->create_lexer('(?#)ё');      // Empty comment.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'ё');
+        $this->assertTrue($token->value->indfirst === 4);
+        $this->assertTrue($token->value->indlast === 4);
+        $lexer = $this->create_lexer("(?#some stuff\nanother stuff\ryet another stuff)ё");      // Multiline comment.
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'ё');
+        $this->assertTrue($token->value->indfirst === 46);
+        $this->assertTrue($token->value->indlast === 46);
     }
     function test_lexer_charclass() {
         $lexer = $this->create_lexer('[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d0-9][3-6][^\x61-\x{63}][^-\w\D][\Q][?\E][]a][^]a]');
@@ -1343,11 +1375,12 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indfirst === 28);
         $this->assertTrue($token->value->indlast === 35);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
-        $this->assertTrue($token->value->indfirst === 36);
-        $this->assertTrue($token->value->indlast === 67);
+        $this->assertTrue($token === null);
+        $errors = $lexer->get_error_nodes();
+        $this->assertTrue(count($errors) === 3);
+        $this->assertTrue($errors[2]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
+        $this->assertTrue($errors[2]->indfirst === 36);
+        $this->assertTrue($errors[2]->indlast === 67);
         $lexer = $this->create_lexer('(?(0)(?C255(?Pn(?<name1(?\'name2(?P<name3\g0(?<>(?\'\'(?P<>\g{}\k<>\k\'\'\k{}(?P=)\cй');
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
