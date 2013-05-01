@@ -1387,11 +1387,6 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\', $this->yychar, $this->yychar + $this->yylength() - 1, '');
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-<YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {      // ERROR: POSIX class outside character set.
-    $text = $this->yytext();
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
-}
 <YYINITIAL> . {                 // Just to avoid exceptions.
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
@@ -1623,6 +1618,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
 }
 <CHARSET> "]" {
+    // Form the charset.
     $this->charset->indlast = $this->yychar;
     $this->charset->israngecalculated = false;
     if ($this->charset_set !== '') {
@@ -1633,10 +1629,21 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpressio
     if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
         $this->charset->caseinsensitive = true;
     }
-    $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $this->charset);
+
+    // Look for possible errors.
+    $ui1 = $this->charset->userinscription[0];
+    $ui2 = end($this->charset->userinscription);
+    if (count($this->charset->userinscription) > 1 && $ui1->data == ':' && $ui2->data == ':') {
+        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, '', $this->charset->indfirst, $this->charset->indlast, '');
+        $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
+    } else {
+        $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $this->charset);
+    }
+
     $this->charset = null;
     $this->charset_count = 0;
     $this->charset_set = '';
     $this->yybegin(self::YYINITIAL);
+
     return $res;
 }
