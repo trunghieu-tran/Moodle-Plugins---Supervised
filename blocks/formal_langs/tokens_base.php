@@ -365,7 +365,10 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         return $mas[$str1_len][$str2_len];
     }
 
-    
+    /* Calculates redaction between two strings.  
+     *
+     * @return str redaction distance
+     */
     static public function redaction($str1,$str2){
         $str1_len = strlen($str1);
         $str2_len = strlen($str2);
@@ -425,6 +428,27 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         } while(($i != 0) || ($j != 0));
         $redact= strrev($route);
         return $redact;
+    }
+    
+    
+     /* Calculates possible pair  
+     *
+     * @return distance if possible or -1 if no possible
+     */
+    public function possible_pair($token, $max)
+    {
+        $str1= $this->value;
+        $str2= $token->value;
+        $length_of_str1=strlen($str1);                 //define the length of str1
+        $length_of_str2=strlen($str2);                 //define the length of str2
+        if(!($length_of_str1-$max<=$length_of_str2 && $length_of_str2<=$length_of_str1+$max))
+            return -1;
+        //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
+        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2);
+        if($distance<=$max)
+            return $distance;
+        else
+            return -1;
     }
     
     /**
