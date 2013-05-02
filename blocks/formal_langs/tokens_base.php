@@ -726,6 +726,39 @@ class block_formal_langs_token_stream {
      */
     public function group_matches($matches) {
         //TODO Birukova
+        $status = array();
+        for($i=0; $i<count($matches); $i++)
+        {
+            $status[] = 0;
+        }
+        $sets_of_pairs = array();        
+        $array_of_best_groups_of_matches = array();
+        //recurcive_backtracking
+        $this->recurcive_backtracking($matches, $status, $sets_of_pairs);
+        //first is the best
+        array_push($array_of_best_groups_of_matches, $sets_of_pairs[0]);
+
+        //write the best
+        for($i=1; $i<count($sets_of_pairs); $i++)
+        {
+            //equal
+            if($this->compare_matches_groups($array_of_best_groups_of_matches[0], $sets_of_pairs[$i]) == 0)
+            {
+                array_push($array_of_best_groups_of_matches, $sets_of_pairs[$i]);
+            }
+            else
+            {
+                //new group
+                if($this->compare_matches_groups($array_of_best_groups_of_matches[0],$sets_of_pairs[$i]) < 0)
+                {
+                    //clear    
+                    $array_of_best_groups_of_matches = array();
+                    array_push($array_of_best_groups_of_matches, $sets_of_pairs[$i]);
+                }
+            }
+        }
+        //array of results
+        return $array_of_best_groups_of_matches;
     }
 
     /**
