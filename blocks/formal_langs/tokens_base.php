@@ -959,8 +959,41 @@ class block_formal_langs_token_stream {
      * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
      */
     public function correct_mistakes($correctstream, $matchedpairsgroup) {
-        $newstream = clone $this;
+        //it not work((
+        //$newstream = clone $this;
         //TODO Birukova - change tokens using pairs
+        $newstream = $this;   //incorrect lexems
+        $streamcorrect = new block_formal_langs_token_stream();
+        $streamcorrect->tokens=array();
+        //TODO Birukova - change tokens using pairs
+        for($i=0; $i<count($newstream->tokens); $i++){
+            $flag=0;
+            for ($j=0; $j<count($matchedpairsgroup); $j++)
+            {
+                //not second
+                if(count($matchedpairsgroup[$j]->comparedtokens)==2)
+                {
+                    if($matchedpairsgroup[$j]->comparedtokens[1]==$i)
+                        $flag=1;
+                }
+                //write correcttokens
+                if($matchedpairsgroup[$j]->comparedtokens[0]==$i)
+                {
+                    for($k=0; $k<count($matchedpairsgroup[$j]->correcttokens); $k++)
+                    {
+                        array_push($streamcorrect->tokens,$correctstream->tokens[$matchedpairsgroup[$j]->correcttokens[$k]]);
+                    }
+                    $flag=1;
+                }
+            }
+            //write comparedtoken
+            if($flag==0)
+            {
+                array_push($streamcorrect->tokens,$newstream->tokens[$i]);
+            }
+        }
+        return $streamcorrect;
+        
     }
 }
 
