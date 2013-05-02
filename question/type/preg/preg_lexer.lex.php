@@ -234,7 +234,7 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns array of error nodes.
      */
     public function mod_top_opt($set, $unset) {
-        $allowed = new qtype_poasquestion_string('i');  // TODO: actual modifiers
+        $allowed = new qtype_poasquestion_string('imsxJU');
         $setunset = new qtype_poasquestion_string($set . $unset);
         $wrongfound = '';
         $errors = array();
@@ -4484,17 +4484,17 @@ class qtype_preg_lexer extends JLexBase  {
  32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 0, 0,);
 
 		static $yy_rmap = array(
- 0, 1, 2, 3, 1, 4, 1, 5, 6, 7, 1, 1, 1, 1, 8, 1, 9, 1, 1, 1,
- 10, 1, 11, 12, 1, 13, 1, 1, 1, 1, 1, 14, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 15, 16, 1, 1, 1, 17, 18, 19, 1, 1, 1, 1, 20, 1, 21, 1, 22,
- 1, 1, 1, 23, 24, 25, 26, 1, 1, 1, 1, 1, 27, 1, 28, 29, 1, 1, 1, 1,
- 30, 1, 1, 31, 32, 33, 1, 1, 1, 1, 1, 1, 1, 1, 1, 34, 1, 1, 35, 1,
- 1, 1, 1, 1, 1, 36, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+ 0, 1, 2, 3, 1, 1, 4, 1, 5, 6, 7, 1, 1, 1, 1, 8, 1, 9, 1, 1,
+ 1, 10, 1, 11, 12, 1, 13, 1, 1, 1, 1, 1, 14, 1, 1, 1, 1, 1, 1, 1,
+ 1, 1, 1, 1, 15, 16, 1, 1, 1, 17, 18, 19, 1, 1, 1, 1, 20, 1, 21, 1,
+ 22, 1, 1, 1, 23, 24, 25, 26, 1, 1, 1, 1, 27, 1, 28, 29, 1, 1, 1, 1,
+ 30, 1, 1, 31, 32, 33, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 34, 1, 1, 35,
+ 1, 1, 1, 1, 1, 1, 36, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 37, 1, 38, 1, 1, 39, 1, 40,
  1, 41, 42, 43, 1, 44, 45, 1, 1, 1, 46, 47, 48, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 49, 50, 51, 52, 53, 1, 54, 55, 56, 1, 1, 57, 1, 1, 1, 58, 59,
+ 1, 1, 1, 49, 50, 51, 52, 53, 54, 1, 55, 56, 1, 1, 57, 1, 1, 1, 58, 59,
  60, 1, 61, 47, 1, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 46, 73, 74, 75,
- 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 55, 92, 93, 94,
+ 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 53, 92, 93, 94,
  95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
  115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 88, 131, 132, 133,
  134, 135, 90, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152,
@@ -4507,10 +4507,10 @@ class qtype_preg_lexer extends JLexBase  {
 
 		static $yy_nxt = array(
 array(
- 1, 2, 3, 4, -1, 5, 6, 7, 8, 134, 4, 4, 4, 9, 10, 4, 4, 4, -1, 4,
- 4, 4, 11, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 12, 4, 4, 4, 4,
+ 1, 2, 3, 4, 5, 6, 7, 8, 9, 134, 4, 4, 4, 10, 11, 4, 4, 4, 5, 4,
+ 4, 4, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 13, 4, 4, 4, 4,
  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 13, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+ 4, 14, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4519,7 +4519,7 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, 132, -1, -1, -1, -1, -1, 14, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, 132, -1, -1, -1, -1, -1, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4531,10 +4531,10 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 15, 15, 15, -1, 15, 15, 15, 15, 15, 16, 15, 15, 15, 15, 15, 15, 15, -1, 15,
- 139, 15, 15, 15, 15, 17, 18, 19, 15, 15, 20, 15, 15, 15, 21, 15, 22, 23, 24, 25,
- 26, 27, 28, 139, 29, 30, 31, 32, 18, 33, 33, 34, 34, 35, 36, 36, 37, 38, 39, 39,
- 40, 15, 41, 42, 42, 42, 42, 43, 43, 15, 15, 15,
+ -1, 16, 16, 16, -1, 16, 16, 16, 16, 16, 17, 16, 16, 16, 16, 16, 16, 16, -1, 16,
+ 139, 16, 16, 16, 16, 18, 19, 20, 16, 16, 21, 16, 16, 16, 22, 16, 23, 24, 25, 26,
+ 27, 28, 29, 139, 30, 31, 32, 33, 19, 34, 34, 35, 35, 36, 37, 37, 38, 39, 40, 40,
+ 41, 16, 42, 43, 43, 43, 43, 44, 44, 16, 16, 16,
 ),
 array(
  -1, -1, 135, -1, -1, -1, -1, 135, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4555,10 +4555,10 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 14, 14, 14, 14, 14, 138, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
- 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
- 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
- 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ -1, 15, 15, 15, 15, 15, 138, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+ 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+ 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+ 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 252, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4573,22 +4573,22 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 141, 57, -1, 173, -1, -1, -1, -1, -1, 183, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 141, 58, -1, 173, -1, -1, -1, -1, -1, 183, -1,
  183, -1, -1, -1, -1, 183, 183, 183, 183, 183, 183, -1, 183, -1, 183, -1, 183, 183, 183, 183,
  183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183,
- 183, -1, 183, 183, 183, 183, 183, 57, 57, 183, 183, 183,
+ 183, -1, 183, 183, 183, 183, 183, 58, 58, 183, 183, 183,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 142, 174, -1, 184, -1, -1, -1, 58, 152, 174, 59,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 142, 174, -1, 184, -1, -1, -1, 59, 152, 174, 60,
  174, -1, -1, -1, -1, 174, 174, 174, 174, 174, 174, -1, 174, -1, 174, -1, 174, 174, 174, 174,
  174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174,
  174, -1, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174,
 ),
 array(
- -1, 60, 60, 60, -1, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, -1, 60,
- 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
- 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
- 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+ -1, 61, 61, 61, -1, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, -1, 61,
+ 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61,
+ 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61,
+ 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, 192, 143, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4603,22 +4603,22 @@ array(
  -1, -1, -1, -1, -1, -1, -1, 253, 253, -1, -1, -1,
 ),
 array(
- -1, -1, 195, 145, 145, 145, 62, 63, 145, 145, 63, 145, 145, 145, 145, 145, -1, 64, 145, 65,
- 145, 145, 145, -1, -1, 66, 379, 145, 145, 145, 145, 63, 145, 145, 145, 145, 145, 145, 145, 145,
+ -1, -1, 195, 145, 145, 145, 63, 64, 145, 145, 64, 145, 145, 145, 145, 145, -1, 65, 145, 66,
+ 145, 145, 145, -1, -1, 67, 379, 145, 145, 145, 145, 64, 145, 145, 145, 145, 145, 145, 145, 145,
  145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145,
- 145, 145, 145, 145, 145, 145, 145, 63, 63, 145, 145, 145,
+ 145, 145, 145, 145, 145, 145, 145, 64, 64, 145, 145, 145,
 ),
 array(
- -1, 69, 69, 69, -1, 69, 69, 69, 69, 69, 146, 69, 69, 69, 69, 69, 177, 69, 146, 69,
- 146, 69, 69, 70, 71, 146, 146, 146, 146, 146, 146, 69, 146, 69, 146, 69, 146, 146, 146, 146,
+ -1, 5, 5, 5, -1, 5, 5, 5, 5, 5, 146, 5, 5, 5, 5, 5, 177, 5, 146, 5,
+ 146, 5, 5, 70, 71, 146, 146, 146, 146, 146, 146, 5, 146, 5, 146, 5, 146, 146, 146, 146,
  146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146,
- 146, 69, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146,
+ 146, 5, 146, 146, 146, 146, 146, 146, 146, 146, 146, 146,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 49, -1, -1, -1, -1, -1, -1, -1, 49, 147,
- 49, -1, -1, -1, -1, 49, 49, 49, 49, 49, 49, -1, 49, -1, 49, -1, 49, 49, 49, 49,
- 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
- 49, -1, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1, -1, -1, -1, -1, -1, 50, 147,
+ 50, -1, -1, -1, -1, 50, 50, 50, 50, 50, 50, -1, 50, -1, 50, -1, 50, 50, 50, 50,
+ 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+ 50, -1, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
 ),
 array(
  -1, -1, -1, -1, -1, -1, 148, -1, -1, -1, 178, -1, -1, -1, -1, -1, -1, 72, 178, -1,
@@ -4627,10 +4627,10 @@ array(
  178, -1, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
 ),
 array(
- -1, -1, -1, -1, -1, -1, 149, -1, -1, -1, 55, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, 149, -1, -1, -1, 56, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, 55, 55, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, 56, 56, -1, -1, -1,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 151, -1, 173, -1, -1, -1, -1, -1, 183, -1,
@@ -4639,34 +4639,34 @@ array(
  183, -1, 183, 183, 183, 183, 183, 151, 151, 183, 183, 183,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 59, -1, -1, -1, -1, -1, -1, -1, 59, 153,
- 59, -1, -1, -1, -1, 59, 59, 59, 59, 59, 59, -1, 59, -1, 59, -1, 59, 59, 59, 59,
- 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59,
- 59, -1, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 60, -1, -1, -1, -1, -1, -1, -1, 60, 153,
+ 60, -1, -1, -1, -1, 60, 60, 60, 60, 60, 60, -1, 60, -1, 60, -1, 60, 60, 60, 60,
+ 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+ 60, -1, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
 ),
 array(
- -1, -1, -1, 145, 145, 145, 154, 63, 145, 145, 63, 145, 145, 145, 145, 145, -1, -1, 145, -1,
- 145, 145, 145, -1, -1, 145, 145, 145, 145, 145, 145, 63, 145, 145, 145, 145, 145, 145, 145, 145,
+ -1, -1, -1, 145, 145, 145, 154, 64, 145, 145, 64, 145, 145, 145, 145, 145, -1, -1, 145, -1,
+ 145, 145, 145, -1, -1, 145, 145, 145, 145, 145, 145, 64, 145, 145, 145, 145, 145, 145, 145, 145,
  145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145,
- 145, 145, 145, 145, 145, 145, 145, 63, 63, 145, 145, 145,
+ 145, 145, 145, 145, 145, 145, 145, 64, 64, 145, 145, 145,
 ),
 array(
- -1, -1, -1, 64, 64, 64, -1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 201, -1, 64, -1,
- 64, 64, 64, -1, -1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
- 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
- 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-),
-array(
- -1, -1, -1, 65, 65, 65, -1, 65, 65, 65, 65, 65, 65, 65, 65, 65, -1, -1, 65, 202,
+ -1, -1, -1, 65, 65, 65, -1, 65, 65, 65, 65, 65, 65, 65, 65, 65, 201, -1, 65, -1,
  65, 65, 65, -1, -1, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
  65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
  65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
 ),
 array(
- -1, -1, 66, 66, 66, 66, 157, 66, 66, 66, 66, 66, 66, 66, 66, 66, -1, -1, 66, -1,
- 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66,
+ -1, -1, -1, 66, 66, 66, -1, 66, 66, 66, 66, 66, 66, 66, 66, 66, -1, -1, 66, 202,
+ 66, 66, 66, -1, -1, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66,
  66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66,
  66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66,
+),
+array(
+ -1, -1, 67, 67, 67, 67, 157, 67, 67, 67, 67, 67, 67, 67, 67, 67, -1, -1, 67, -1,
+ 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+ 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+ 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 72, -1, -1, -1, -1, -1, 158, -1, 72, -1,
@@ -4723,14 +4723,14 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 210, 169, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, 169, 169, 169, -1, -1, -1, -1, -1, 169, -1, -1, -1, 169, 169,
- 169, 169, -1, -1, -1, -1, -1, 169, 169, -1, -1, -1, -1, -1, -1, -1, -1, -1, 169, 169,
- -1, -1, -1, -1, -1, -1, -1, 169, 169, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 210, 170, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, 170, 170, 170, -1, -1, -1, -1, -1, 170, -1, -1, -1, 170, 170,
+ 170, 170, -1, -1, -1, -1, -1, 170, 170, -1, -1, -1, -1, -1, -1, -1, -1, -1, 170, 170,
+ -1, -1, -1, -1, -1, -1, -1, 170, 170, -1, -1, -1,
 ),
 array(
- -1, 44, 186, 45, 186, 186, 46, 186, 186, 186, 188, 186, 186, 186, 186, 186, 47, 48, 186, 49,
- 50, 51, 52, 53, 54, 190, 186, 186, 186, 186, 186, 186, 186, 186, 55, 186, 186, 186, 186, 186,
+ -1, 45, 186, 46, 186, 186, 47, 186, 186, 186, 188, 186, 186, 186, 186, 186, 48, 49, 186, 50,
+ 51, 52, 53, 54, 55, 190, 186, 186, 186, 186, 186, 186, 186, 186, 56, 186, 186, 186, 186, 186,
  186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186,
  186, 186, 186, 186, 186, 186, 186, 188, 188, 186, 186, 186,
 ),
@@ -4747,10 +4747,10 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 56, 56, 56, -1, 56, 56, 56, 56, 150, 56, 56, 56, 56, 56, 56, 56, 56, -1, 56,
- 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
- 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
- 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
+ -1, 57, 57, 57, -1, 57, 57, 57, 57, 150, 57, 57, 57, 57, 57, 57, 57, 57, -1, 57,
+ 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
+ 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
+ 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 187, -1, 173, -1, -1, -1, -1, -1, 183, -1,
@@ -4795,7 +4795,7 @@ array(
  183, -1, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 152, -1, -1, -1, -1, -1, 58, -1, 152, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 152, -1, -1, -1, -1, -1, 59, -1, 152, -1,
  152, -1, -1, -1, -1, 152, 152, 152, 152, 152, 152, -1, 152, -1, 152, -1, 152, 152, 152, 152,
  152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152,
  152, -1, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152,
@@ -4819,22 +4819,10 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 94, 94, 94, -1, 94, 94, 94, 94, 94, 95, 94, 94, 94, 94, 94, 94, 94, -1, 94,
- 167, 94, 94, 94, 94, 94, 96, 97, 94, 94, 98, 94, 94, 94, 94, 94, 94, 94, 99, 180,
- 100, 101, 102, 167, 103, 104, 105, 94, 96, 106, 106, 107, 107, 108, 109, 109, 94, 94, 110, 94,
- 94, 94, 111, 94, 112, 112, 112, 94, 95, 94, 94, 94,
-),
-array(
- -1, 113, 113, 113, -1, 113, 113, 113, 113, 170, 113, 113, 113, 113, 113, 113, 113, 113, -1, 113,
- 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113,
- 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113,
- 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113, 113,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 181, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, 181, 181, 181, -1, -1, -1, -1, -1, 181, -1, -1, -1, 181, 181,
- 181, 181, -1, -1, -1, -1, -1, 181, 181, -1, -1, -1, -1, -1, -1, -1, -1, -1, 181, 181,
- -1, -1, -1, -1, -1, -1, -1, 181, 181, -1, -1, -1,
+ -1, 95, 95, 95, -1, 95, 95, 95, 95, 95, 96, 95, 95, 95, 95, 95, 95, 95, -1, 95,
+ 168, 95, 95, 95, 95, 95, 97, 98, 95, 95, 99, 95, 95, 95, 95, 95, 95, 95, 100, 180,
+ 101, 102, 103, 168, 104, 105, 106, 95, 97, 107, 107, 108, 108, 109, 110, 110, 95, 95, 111, 95,
+ 95, 95, 112, 95, 113, 113, 113, 95, 96, 95, 95, 95,
 ),
 array(
  -1, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 115, 216, 216, 216, 216, 216, 216, 216,
@@ -4843,13 +4831,25 @@ array(
  216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 171, 193, 61, -1, -1, -1, -1, -1, -1, -1,
+ -1, 93, 93, 93, -1, 93, 93, 93, 93, 167, 93, 93, 93, 93, 93, 93, 93, 93, -1, 93,
+ 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93,
+ 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93,
+ 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 181, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, 181, 181, 181, -1, -1, -1, -1, -1, 181, -1, -1, -1, 181, 181,
+ 181, 181, -1, -1, -1, -1, -1, 181, 181, -1, -1, -1, -1, -1, -1, -1, -1, -1, 181, 181,
+ -1, -1, -1, -1, -1, -1, -1, 181, 181, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 171, 193, 62, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, 171, 171, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 174, -1, 184, -1, -1, -1, 58, -1, 174, 153,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 174, -1, 184, -1, -1, -1, 59, -1, 174, 153,
  174, -1, -1, -1, -1, 174, 174, 174, 174, 174, 174, -1, 174, -1, 174, -1, 174, 174, 174, 174,
  174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174,
  174, -1, 174, 174, 174, 174, 174, 174, 174, 174, 174, 174,
@@ -4885,8 +4885,8 @@ array(
  145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145, 145,
 ),
 array(
- -1, -1, 186, -1, 186, 186, 46, 186, 186, 186, -1, 186, 186, 186, 186, 186, -1, -1, 186, -1,
- -1, 67, -1, -1, -1, -1, 186, 186, 186, 186, 186, 186, 186, 186, -1, 186, 186, 186, 186, 186,
+ -1, -1, 186, -1, 186, 186, 47, 186, 186, 186, -1, 186, 186, 186, 186, 186, -1, -1, 186, -1,
+ -1, 68, -1, -1, -1, -1, 186, 186, 186, 186, 186, 186, 186, 186, -1, 186, 186, 186, 186, 186,
  186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186,
  186, 186, 186, 186, 186, 186, 186, -1, -1, 186, 186, 186,
 ),
@@ -4897,7 +4897,7 @@ array(
  183, -1, 183, 183, 183, 183, 183, 189, 189, 183, 183, 183,
 ),
 array(
- -1, -1, -1, -1, -1, -1, 68, -1, -1, -1, 188, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, 69, -1, -1, -1, 188, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, 188, 188, -1, -1, -1,
@@ -4909,13 +4909,13 @@ array(
  183, -1, 183, 183, 183, 183, 183, 183, 183, 183, 183, 183,
 ),
 array(
- -1, -1, -1, -1, -1, -1, 68, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 191, -1, 42, -1, -1, -1, -1, -1, 191, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 191, -1, 43, -1, -1, -1, -1, -1, 191, -1,
  191, -1, -1, -1, -1, 191, 191, 191, 191, 191, 191, -1, 191, -1, 191, -1, 191, 191, 191, 191,
  191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191,
  191, -1, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191,
@@ -5005,7 +5005,7 @@ array(
  90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
 ),
 array(
- 1, 92, 92, 92, 92, 166, 92, 92, 92, 92, 92, 92, 92, 179, 92, 93, 92, 92, 92, 92,
+ 1, 92, 92, 92, 93, 166, 92, 92, 92, 92, 92, 92, 92, 179, 92, 94, 92, 92, 93, 92,
  92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92,
  92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92,
  92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92, 92,
@@ -5017,7 +5017,7 @@ array(
  337, 337, 337, 337, 340, 337, 341, 337, 337, 337, 337, 337,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 209, -1, 112, -1, -1, -1, -1, -1, 209, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 209, -1, 113, -1, -1, -1, -1, -1, 209, -1,
  209, -1, -1, -1, -1, 209, 209, 209, 209, 209, 209, -1, 209, -1, 209, -1, 209, 209, 209, 209,
  209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209,
  209, -1, 209, 209, 209, 209, 209, 209, 209, 209, 209, 209,
@@ -5281,10 +5281,10 @@ array(
  -1, -1, -1, -1, -1, -1, -1, 144, 144, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 168, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 169, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, 168, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, 169, -1, -1, -1,
 ),
 array(
  -1, -1, -1, 145, 145, 145, 176, 145, 145, 145, 145, 145, 145, 145, 145, 145, -1, -1, 145, -1,
@@ -6165,20 +6165,27 @@ array(
 						case -5:
 							break;
 						case 5:
-							{           // ERROR: \ at end of pattern.
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\', $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
+							{       // ERROR: Unrecognized character after (?<
+    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, '(?<', $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
 }
 						case -6:
 							break;
 						case 6:
-							{
-    $this->pop_opt_lvl();
-    return new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
+							{           // ERROR: \ at end of pattern.
+    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\', $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
 }
 						case -7:
 							break;
 						case 7:
+							{
+    $this->pop_opt_lvl();
+    return new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
+}
+						case -8:
+							break;
+						case 8:
 							{                     // Quantifier +
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
@@ -6186,9 +6193,9 @@ array(
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
 }
-						case -8:
+						case -9:
 							break;
-						case 8:
+						case 9:
 							{                     // Quantifier *
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
@@ -6196,9 +6203,9 @@ array(
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
 }
-						case -9:
+						case -10:
 							break;
-						case 9:
+						case 10:
 							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
@@ -6212,15 +6219,15 @@ array(
     }
     $this->yybegin(self::YYCHARSET);
 }
-						case -10:
-							break;
-						case 10:
-							{
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-}
 						case -11:
 							break;
 						case 11:
+							{
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+}
+						case -12:
+							break;
+						case 12:
 							{
     // Reset subexpressions numeration inside a (?|...) group.
     if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num != -1) {
@@ -6228,78 +6235,72 @@ array(
     }
     return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
-						case -12:
-							break;
-						case 12:
-							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
-}
 						case -13:
 							break;
 						case 13:
 							{
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 						case -14:
 							break;
 						case 14:
-							{                     // Control sequence
-    return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
+							{
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
 }
 						case -15:
 							break;
 						case 15:
-							{
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($text, 1, 1));
+							{                     // Control sequence
+    return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
 }
 						case -16:
 							break;
 						case 16:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($text, 1, 1));
 }
 						case -17:
 							break;
 						case 17:
 							{
-    // TODO: matches new line unicode sequences.
-    // \B, \R, and \X are not special inside a character class.
-    throw new Exception('\R is not implemented yet');
+    $text = $this->yytext();
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 						case -18:
 							break;
 						case 18:
 							{
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $text === '\D');
+    // TODO: matches new line unicode sequences.
+    // \B, \R, and \X are not special inside a character class.
+    throw new Exception('\R is not implemented yet');
 }
 						case -19:
 							break;
 						case 19:
 							{
-    // Do nothing in YYINITIAL state.
+    $text = $this->yytext();
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $text === '\D');
 }
 						case -20:
 							break;
 						case 20:
 							{
-    // TODO: matches any character except new line characters. For now, the same as dot.
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    // Do nothing in YYINITIAL state.
 }
 						case -21:
 							break;
 						case 21:
 							{
-    // TODO: matches any one data unit. For now implemented the same way as dot.
+    // TODO: matches any character except new line characters. For now, the same as dot.
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 						case -22:
 							break;
 						case 22:
-							{              // Named backreference.
-    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
+							{
+    // TODO: matches any one data unit. For now implemented the same way as dot.
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 						case -23:
 							break;
@@ -6310,49 +6311,55 @@ array(
 						case -24:
 							break;
 						case 24:
-							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+							{              // Named backreference.
+    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
 						case -25:
 							break;
 						case 25:
 							{
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
 						case -26:
 							break;
 						case 26:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
 }
 						case -27:
 							break;
 						case 27:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
 						case -28:
 							break;
 						case 28:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
 						case -29:
 							break;
 						case 29:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
 						case -30:
 							break;
 						case 30:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
 						case -31:
 							break;
 						case 31:
+							{
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+}
+						case -32:
+							break;
+						case 32:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
@@ -6371,88 +6378,88 @@ array(
         }
     }
 }
-						case -32:
-							break;
-						case 32:
-							{
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
-}
 						case -33:
 							break;
 						case 33:
 							{
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $text === '\H');
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
 }
 						case -34:
 							break;
 						case 34:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $text === '\S');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $text === '\H');
 }
 						case -35:
 							break;
 						case 35:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $text === '\V');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $text === '\S');
 }
 						case -36:
 							break;
 						case 36:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $text === '\W');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $text === '\V');
 }
 						case -37:
 							break;
 						case 37:
 							{
-    // TODO: reset start of match.
-    throw new Exception('\K is not implemented yet');
+    $text = $this->yytext();
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $text === '\W');
 }
 						case -38:
 							break;
 						case 38:
 							{
-    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
-    // \B, \R, and \X are not special inside a character class.
-    throw new Exception('\R is not implemented yet');
+    // TODO: reset start of match.
+    throw new Exception('\K is not implemented yet');
 }
 						case -39:
 							break;
 						case 39:
 							{
-    $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_B, $text === '\B');
+    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
+    // \B, \R, and \X are not special inside a character class.
+    throw new Exception('\R is not implemented yet');
 }
 						case -40:
 							break;
 						case 40:
 							{
     $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z/*, $text === '\Z'*/);
+    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_B, $text === '\B');
 }
 						case -41:
 							break;
 						case 41:
+							{
+    $text = $this->yytext();
+    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z/*, $text === '\Z'*/);
+}
+						case -42:
+							break;
+						case 42:
 							{                    // \Q...\E beginning
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
     $this->yybegin(self::YYQEOUT);
 }
-						case -42:
+						case -43:
 							break;
-						case 42:
+						case 43:
 							{
     $text = $this->yytext();
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
 }
-						case -43:
+						case -44:
 							break;
-						case 43:
+						case 44:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
@@ -6490,9 +6497,9 @@ array(
     }
     return $res;
 }
-						case -44:
+						case -45:
 							break;
-						case 44:
+						case 45:
 							{           // Conditional subexpression - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
@@ -6504,17 +6511,17 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subexpr($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', $numeric, 3);
 }
-						case -45:
+						case -46:
 							break;
-						case 45:
+						case 46:
 							{                    // Comment beginning
     $this->comment = $this->yytext();
     $this->comment_length = $this->yylength();
     $this->yybegin(self::YYCOMMENT);
 }
-						case -46:
+						case -47:
 							break;
-						case 46:
+						case 47:
 							{
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
@@ -6537,62 +6544,62 @@ array(
         // Do nothing in YYINITIAL state.
     }
 }
-						case -47:
+						case -48:
 							break;
-						case 47:
+						case 48:
 							{
     $this->push_opt_lvl();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), -1));
 }
-						case -48:
-							break;
-						case 48:
-							{                 // Named subexpression (?<name>...)
-    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
-}
 						case -49:
 							break;
 						case 49:
-							{                 // Named subexpression (?'name'...)
-    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
+							{                 // Named subexpression (?<name>...)
+    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
 }
 						case -50:
 							break;
 						case 50:
-							{             // Named backreference.
-    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
+							{                 // Named subexpression (?'name'...)
+    return $this->form_named_subexpr($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
 }
 						case -51:
 							break;
 						case 51:
-							{
-    $this->push_opt_lvl();
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
+							{             // Named backreference.
+    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
 }
 						case -52:
 							break;
 						case 52:
-							{                             // Duplicate subexpression numbers group
-    $this->push_opt_lvl($this->last_subexpr);    // Save the top-level subexpression number.
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
+							{
+    $this->push_opt_lvl();
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
 }
 						case -53:
 							break;
 						case 53:
-							{
-    $this->push_opt_lvl();
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?=')));
+							{                             // Duplicate subexpression numbers group
+    $this->push_opt_lvl($this->last_subexpr);    // Save the top-level subexpression number.
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
 }
 						case -54:
 							break;
 						case 54:
 							{
     $this->push_opt_lvl();
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?!')));
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?=')));
 }
 						case -55:
 							break;
 						case 55:
+							{
+    $this->push_opt_lvl();
+    return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?!')));
+}
+						case -56:
+							break;
+						case 56:
 							{
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
@@ -6609,9 +6616,9 @@ array(
         // TODO
     }
 }
-						case -56:
+						case -57:
 							break;
-						case 56:
+						case 57:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 2);
@@ -6624,28 +6631,28 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-						case -57:
-							break;
-						case 57:
-							{
-    $text = $this->yytext();
-    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_preg_unicode::substr($text, 2));
-}
 						case -58:
 							break;
 						case 58:
-							{              // Named backreference.
-    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '<', '>');
+							{
+    $text = $this->yytext();
+    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_preg_unicode::substr($text, 2));
 }
 						case -59:
 							break;
 						case 59:
 							{              // Named backreference.
-    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '\'', '\'');
+    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '<', '>');
 }
 						case -60:
 							break;
 						case 60:
+							{              // Named backreference.
+    return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '\'', '\'');
+}
+						case -61:
+							break;
+						case 61:
 							{
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
@@ -6656,17 +6663,17 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $char);
     }
 }
-						case -61:
+						case -62:
 							break;
-						case 61:
+						case 62:
 							{                      // Quantifier {m}
     $text = $this->yytext();
     $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $count, $count, false, true, false);
 }
-						case -62:
+						case -63:
 							break;
-						case 62:
+						case 63:
 							{                            // Error - empty condition
     $text = $this->yytext();
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
@@ -6674,33 +6681,33 @@ array(
                  new JLexToken(qtype_preg_yyParser::PARSLEAF, $error),
                  new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
 }
-						case -63:
-							break;
-						case 63:
-							{                 // Conditional subexpression - numeric
-    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', true);
-}
 						case -64:
 							break;
 						case 64:
-							{       // Conditional subexpression - named
-    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '>)', false, 4);
+							{                 // Conditional subexpression - numeric
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, ')', true);
 }
 						case -65:
 							break;
 						case 65:
 							{       // Conditional subexpression - named
-    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '\')', false, 4);
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '>)', false, 4);
 }
 						case -66:
 							break;
 						case 66:
-							{             // Conditional subexpression - recursion
-    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, ')');
+							{       // Conditional subexpression - named
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, '\')', false, 4);
 }
 						case -67:
 							break;
 						case 67:
+							{             // Conditional subexpression - recursion
+    return $this->form_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, ')');
+}
+						case -68:
+							break;
+						case 68:
 							{
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
@@ -6727,19 +6734,12 @@ array(
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
     }
 }
-						case -68:
-							break;
-						case 68:
-							{
-    $text = $this->yytext();
-    return $this->form_recursion($text, $this->yychar, $this->yylength(), $text);
-}
 						case -69:
 							break;
 						case 69:
-							{       // ERROR: Unrecognized character after (?<
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, '(?<', $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+							{
+    $text = $this->yytext();
+    return $this->form_recursion($text, $this->yychar, $this->yylength(), $text);
 }
 						case -70:
 							break;
@@ -6924,7 +6924,7 @@ array(
 						case -88:
 							break;
 						case 88:
-							{                  // \Q...\E body
+							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
@@ -6941,7 +6941,7 @@ array(
 						case -90:
 							break;
 						case 90:
-							{                  // \Q...\E body
+							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
@@ -6965,6 +6965,21 @@ array(
 						case -93:
 							break;
 						case 93:
+							{
+    $text = $this->yytext();
+    $str = qtype_preg_unicode::substr($text, 2);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
+    $subtype = $this->get_uprop_flag($str);
+    if ($subtype === null) {
+        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+    } else {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
+    }
+}
+						case -94:
+							break;
+						case 94:
 							{
     // Form the charset.
     $this->charset->indlast = $this->yychar;
@@ -6992,81 +7007,81 @@ array(
     $this->yybegin(self::YYINITIAL);
     return $res;
 }
-						case -94:
-							break;
-						case 94:
-							{
-    $text = $this->yytext();
-    $char = qtype_preg_unicode::substr($text, 1, 1);
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
-}
 						case -95:
 							break;
 						case 95:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    $char = qtype_preg_unicode::substr($text, 1, 1);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
 						case -96:
 							break;
 						case 96:
 							{
     $text = $this->yytext();
-    $negative = ($text === '\D');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 						case -97:
 							break;
 						case 97:
 							{
-    // Do nothing in YYCHARSET state.
+    $text = $this->yytext();
+    $negative = ($text === '\D');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
 }
 						case -98:
 							break;
 						case 98:
 							{
-    // TODO: matches any character except new line characters. For now, the same as dot.
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    // Do nothing in YYCHARSET state.
 }
 						case -99:
 							break;
 						case 99:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+    // TODO: matches any character except new line characters. For now, the same as dot.
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
 }
 						case -100:
 							break;
 						case 100:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
 						case -101:
 							break;
 						case 101:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
 						case -102:
 							break;
 						case 102:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
 						case -103:
 							break;
 						case 103:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
 						case -104:
 							break;
 						case 104:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
 						case -105:
 							break;
 						case 105:
+							{
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+}
+						case -106:
+							break;
+						case 106:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
@@ -7084,74 +7099,59 @@ array(
         }
     }
 }
-						case -106:
-							break;
-						case 106:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '\H');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
-}
 						case -107:
 							break;
 						case 107:
 							{
     $text = $this->yytext();
-    $negative = ($text === '\S');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
+    $negative = ($text === '\H');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
 }
 						case -108:
 							break;
 						case 108:
 							{
     $text = $this->yytext();
-    $negative = ($text === '\V');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
+    $negative = ($text === '\S');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
 }
 						case -109:
 							break;
 						case 109:
 							{
     $text = $this->yytext();
-    $negative = ($text === '\W');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
+    $negative = ($text === '\V');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
 }
 						case -110:
 							break;
 						case 110:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x08));
+    $text = $this->yytext();
+    $negative = ($text === '\W');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
 }
 						case -111:
 							break;
 						case 111:
-							{                   // \Q...\E beginning
-    $this->qe_sequence = '';
-    $this->qe_sequence_length = 0;
-    $this->yybegin(self::YYQEIN);
+							{
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x08));
 }
 						case -112:
 							break;
 						case 112:
-							{
-    $text = $this->yytext();
-    $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+							{                   // \Q...\E beginning
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    $this->yybegin(self::YYQEIN);
 }
 						case -113:
 							break;
 						case 113:
 							{
     $text = $this->yytext();
-    $str = qtype_preg_unicode::substr($text, 2);
-    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
-    $subtype = $this->get_uprop_flag($str);
-    if ($subtype === null) {
-        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
-    } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
-    }
+    $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
 						case -114:
 							break;
@@ -7647,7 +7647,7 @@ array(
 						case -163:
 							break;
 						case 164:
-							{                  // \Q...\E body
+							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
@@ -7656,7 +7656,7 @@ array(
 						case -164:
 							break;
 						case 165:
-							{                  // \Q...\E body
+							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
@@ -7674,19 +7674,34 @@ array(
 						case 167:
 							{
     $text = $this->yytext();
-    $char = qtype_preg_unicode::substr($text, 1, 1);
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
+    $str = qtype_preg_unicode::substr($text, 2);
+    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
+    $subtype = $this->get_uprop_flag($str);
+    if ($subtype === null) {
+        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+    } else {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
+    }
 }
 						case -167:
 							break;
 						case 168:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    $char = qtype_preg_unicode::substr($text, 1, 1);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
 						case -168:
 							break;
 						case 169:
+							{
+    $text = $this->yytext();
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+}
+						case -169:
+							break;
+						case 170:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
@@ -7702,21 +7717,6 @@ array(
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
         }
-    }
-}
-						case -169:
-							break;
-						case 170:
-							{
-    $text = $this->yytext();
-    $str = qtype_preg_unicode::substr($text, 2);
-    $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
-    $subtype = $this->get_uprop_flag($str);
-    if ($subtype === null) {
-        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
-    } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
 						case -170:
