@@ -701,6 +701,17 @@ class block_formal_langs_token_stream {
      */
     public function look_for_matches($comparedstream, $threshold) {
         //TODO Birukova
+        $tokens=$this->tokens;
+        $all_possible_pairs=array();
+        for ($i=0; $i<count($this->tokens); $i++)
+        {
+            array_push($all_possible_pairs, $tokens[$i]->look_for_matches($comparedstream,$threshold,true));
+        }
+        for($i=0; $i<count($comparedstream); $i++)
+        {
+            array_push($all_possible_pairs, $comparedstream[$i]->look_for_matches($this->tokens,$threshold,false));
+        }
+        return $all_possible_pairs;
     }
 
     /**
@@ -725,8 +736,27 @@ class block_formal_langs_token_stream {
      *
      * @return number <0 if $group1 worse than $group2; 0 if $group1==$group2; >0 if $group1 better than $group2
      */
-    public function compare_matches_groups($group1, $group2) {
+    public function compare_matches_groups($group1, $group2) {   
         //TODO Birukova
+                if(count($group1->correctcoverage)+count($group1->comparedcoverage) == count($group2->correctcoverage)+count($group2->comparedcoverage))
+        {
+            if($group1->mistakeweight == $group2->mistakeweight)
+                return 0;
+            else
+            {
+                if($group1->mistakeweight < $group2->mistakeweight)
+                    return 1;
+                else
+                    return -1;
+            }
+        }
+        else
+        {
+            if(count($group1->correctcoverage)+count($group1->comparedcoverage) > count($group2->correctcoverage)+count($group2->comparedcoverage))
+                return 1;
+            else
+                return -1;
+        }
     }
 
     /**
