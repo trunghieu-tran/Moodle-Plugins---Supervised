@@ -365,6 +365,68 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         return $mas[$str1_len][$str2_len];
     }
 
+    
+    static public function redaction($str1,$str2){
+        $str1_len = strlen($str1);
+        $str2_len = strlen($str2);
+        
+        for($i=0;$i<$str1_len+1;$i++)
+            for ($j=0;$j<$str2_len+1;$j++) 
+                    $D[$i][$j]=0;
+        for($i=0;$i<$str1_len+1;$i++)
+            for ($j=0;$j<$str2_len+1;$j++) 
+                    $M[$i][$j]='I';
+        for ($i = 0; $i <= $str1_len; $i++) {
+                $D[$i][0] = $i;
+                $P[$i][0] = 'D';
+        }
+        for ($i = 0; $i <= $str2_len; $i++) {
+                $D[0][$i] = $i;
+                $P[0][$i] = 'I';
+        }
+ 
+        for ($i = 1; $i <= $str1_len; $i++){
+                for ($j = 1; $j <= $str2_len; $j++) {
+                        $cost = ($str1[$i - 1] != $str2[$j - 1]) ? 1 : 0;
+                        if($D[$i][$j - 1] < $D[$i - 1][$j] && $D[$i][$j - 1] < $D[$i - 1][$j - 1] + $cost) {
+                                //insertion
+                                $D[$i][$j] = $D[$i][$j - 1] + 1;
+                                $P[$i][$j] = 'I';
+                        }
+                        else if($D[$i - 1][$j] < $D[$i - 1][$j - 1] + $cost) {
+                                //deletion
+                                $D[$i][$j] = $D[$i - 1][$j] + 1;
+                                $P[$i][$j] = 'D';
+                        }
+                        else {
+                                //replacement or not operation
+                                $D[$i][$j] = $D[$i - 1][$j - 1] + $cost;
+                                $P[$i][$j] = ($cost == 1) ? 'R' : 'M';
+                        }
+                }
+        }
+        //recovery orders
+        $route = "";
+        $i = $str1_len;
+        $j = $str2_len;
+        do {
+                $c = $P[$i][$j];
+                $route=$route.($c);
+                if($c == 'R' || $c == 'M') {
+                        $i --;
+                        $j --;
+                }
+                else if($c == 'D') {
+                        $i --;
+                }
+                else if ($c== 'I'){
+                        $j --;
+                }
+        } while(($i != 0) || ($j != 0));
+        $redact= strrev($route);
+        return $redact;
+    }
+    
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
