@@ -1099,14 +1099,19 @@ ANY      = .|[\r\n]
     }
     return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
-<YYINITIAL> "\g"[0-9][0-9]? {
+<YYINITIAL> "\g"-?[0-9][0-9]? {
     $text = $this->yytext();
-    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_preg_unicode::substr($text, 2));
+    $num = (int)qtype_preg_unicode::substr($text, 2);
+    // Convert relative backreferences to absolute.
+    if ($num < 0) {
+        $num = $this->last_subexpr + $num + 1;
+    }
+    return $this->form_backref($text, $this->yychar, $this->yylength(), $num);
 }
-<YYINITIAL> ("\g{-"|"\g{")[0-9][0-9]?"}" {
+<YYINITIAL> "\g{"-?[0-9][0-9]?"}" {
     $text = $this->yytext();
     $num = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    // Is it a relative backreference? Is so, convert it to an absolute one.
+    // Convert relative backreferences to absolute.
     if ($num < 0) {
         $num = $this->last_subexpr + $num + 1;
     }
