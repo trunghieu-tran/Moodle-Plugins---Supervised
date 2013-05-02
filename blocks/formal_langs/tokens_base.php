@@ -760,7 +760,67 @@ class block_formal_langs_token_stream {
         //array of results
         return $array_of_best_groups_of_matches;
     }
-
+    
+    
+    
+    public function recurcive_backtracking(&$matches,&$status, &$sets_of_pairs){
+        $place=-1;
+        for($i=0; $i<count($status); $i++){
+            if($status[$i]==1)
+                $place=$i;
+        }
+        $place=$place+1;
+        $count_status=count($status);
+        for($i=$place; $i<$count_status; $i++)
+        {
+            if($status[$i]==0)
+            {
+                $status[$i]=1;
+                $this->bloking($i, $matches, $status);
+                $flag=-1;
+                for($j=$i;$j<count($status);$j++){
+                    if($status[$j]==0)
+                        $flag=1;
+                }
+                if($flag!=-1)
+                    $this->recurcive_backtracking($matches, $status, $sets_of_pairs);
+                else
+                {              
+                    $set_of_pairs=new block_formal_langs_matches_group();
+                    $set_of_pairs->matchedpairs=array();
+                    $set_of_pairs->mistakeweight=0;
+                    $set_of_pairs->correctcoverage=array();
+                    $set_of_pairs->comparedcoverage=array();
+                    for($k=0; $k<count($status);$k++)
+                    {
+                        if($status[$k]==1){
+                            array_push($set_of_pairs->matchedpairs, $matches[$k]);
+                            $set_of_pairs->mistakeweight+=$matches[$k]->mistakeweight;
+                            for($g=0; $g<count($matches[$k]->correcttokens); $g++)
+                            array_push($set_of_pairs->correctcoverage,$matches[$k]->correcttokens[$g]);
+                            for($g=0; $g<count($matches[$k]->comparedtokens); $g++)
+                            array_push($set_of_pairs->comparedcoverage,$matches[$k]->comparedtokens[$g]);
+                        }
+                    }
+                    sort($set_of_pairs->correctcoverage);
+                    sort($set_of_pairs->comparedcoverage);
+                    array_push($sets_of_pairs,$set_of_pairs);
+                }
+                $this->unlock($i, $matches, $status);
+                $status[$i]=0;
+                //bloking
+                for($j=0; $j<count($status); $j++)
+                {
+                    if($status[$j]==1)
+                        $this->bloking($j, $matches, $status);
+                }
+            }
+        }
+    }
+    
+    
+    
+    
     /**
      * Compares two matches groups.
      *
