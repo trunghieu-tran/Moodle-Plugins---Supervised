@@ -609,6 +609,20 @@ class block_formal_langs_matched_tokens_pair {
         }
         //TODO - other cases, based on type.
     }
+    
+    /**
+     * Tokens pair constructor.
+     *
+     * @param array $correcttokens - Indexes of the correct text tokens.
+     * @param array $comparedtokens - Indexes of the compared text tokens.
+     * @param integer $mistakeweight -  Mistake weight
+     * @return tokens pair
+     */
+    public function __construct($correcttokens, $comparedtokens, $mistakeweight) {
+        $this->correcttokens = $correcttokens;
+        $this->comparedtokens = $comparedtokens;
+        $this->mistakeweight = $mistakeweight;
+    }
 }
 
 class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pair {
@@ -669,6 +683,11 @@ class block_formal_langs_token_stream {
         //  - look_for_matches function
         //2. Find best groups of pairs - Birukova
         //  - group_matches function, with criteria defined by compare_matches_groups function
+        $all_possible_pairs=array();
+        $best_groups=array();
+        $all_possible_pairs=$this->look_for_matches($comparedstream,$threshold);
+        $best_groups=$this->group_matches($all_possible_pairs);
+        return $best_groups;
     }
 
     /**
