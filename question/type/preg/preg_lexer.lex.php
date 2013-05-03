@@ -230,9 +230,6 @@ class qtype_preg_lexer extends JLexBase  {
     public function get_backrefs() {
         return $this->backrefs;
     }
-    /**
-     * Returns array of error nodes.
-     */
     public function mod_top_opt($set, $unset) {
         $allowed = new qtype_poasquestion_string('imsxJU');
         $setunset = new qtype_poasquestion_string($set . $unset);
@@ -457,6 +454,9 @@ class qtype_preg_lexer extends JLexBase  {
         }
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number));
     }
+    /**
+     * Returns a conditional subexpression (number of name condition) token.
+     */
     protected function form_cond_subexpr_reference($text, $pos, $length, $number, $ending = '') {
         $this->push_opt_lvl();
         // Error: unclosed condition.
@@ -476,6 +476,9 @@ class qtype_preg_lexer extends JLexBase  {
                      new JLexToken(qtype_preg_yyParser::PARSLEAF, $secondnode),
                      new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
+    /**
+     * Returns a conditional subexpression (recursion condition) token.
+     */
     protected function form_cond_subexpr_recursion($text, $pos, $length, $number, $ending = '') {
         $this->push_opt_lvl();
         // Error: unclosed condition.
@@ -495,11 +498,17 @@ class qtype_preg_lexer extends JLexBase  {
                      new JLexToken(qtype_preg_yyParser::PARSLEAF, $secondnode),
                      new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
+    /**
+     * Returns a conditional subexpression (assertion condition) token.
+     */
     protected function form_cond_subexpr_assert($text, $pos, $length, $subtype, $ending = '') {
         $this->push_opt_lvl();
         $this->push_opt_lvl();
         return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
     }
+    /**
+     * Returns a conditional subexpression (define condition) token.
+     */
     protected function form_cond_subexpr_define($text, $pos, $length, $ending = '') {
         $this->push_opt_lvl();
         // Error: unclosed condition.
@@ -580,7 +589,7 @@ class qtype_preg_lexer extends JLexBase  {
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
     /**
-     * Returns a named backreference token.
+     * Returns a named recursion token.
      */
     protected function form_named_recursion($text, $pos, $length, $name) {
         // Error: empty name.
