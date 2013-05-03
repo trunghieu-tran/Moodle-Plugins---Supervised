@@ -56,11 +56,11 @@ class qtype_preg_opt_stack_item {
 %state YYQEOUT
 %state YYQEIN
 %state YYCHARSET
-QUANTTYPE = ("?"|"+")?                                // Greedy, lazy or possessive quantifiers,
-MODIFIER = [^"(|)<>#&':=!PCR"0-9]                     // Excluding reserved (?... sequences, returning error if there is something weird.
-ALNUM    = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
-ANY      = (.|[\r\n])
-SIGN     = ("+"|"-")
+QUANTTYPE = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
+MODIFIER = [^"(|)<>#&':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
+ALNUM     = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
+ANY       = (.|[\r\n])                                 // Any character.
+SIGN      = ("+"|"-")                                  // Sign of an integer.
 %init{
     $this->handlingoptions = new qtype_preg_handling_options();
     $this->opt_stack[0] = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
@@ -264,7 +264,6 @@ SIGN     = ("+"|"-")
                                          'Yi'                     => qtype_preg_charset_flag::YI
                                   );
 
-
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -281,9 +280,6 @@ SIGN     = ("+"|"-")
         return $this->backrefs;
     }
 
-    /**
-     * Returns array of error nodes.
-     */
     public function mod_top_opt($set, $unset) {
         $allowed = new qtype_poasquestion_string('imsxJU');
         $setunset = new qtype_poasquestion_string($set . $unset);
@@ -531,6 +527,9 @@ SIGN     = ("+"|"-")
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number));
     }
 
+    /**
+     * Returns a conditional subexpression (number of name condition) token.
+     */
     protected function form_cond_subexpr_reference($text, $pos, $length, $number, $ending = '') {
         $this->push_opt_lvl();
 
@@ -554,6 +553,9 @@ SIGN     = ("+"|"-")
                      new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
 
+    /**
+     * Returns a conditional subexpression (recursion condition) token.
+     */
     protected function form_cond_subexpr_recursion($text, $pos, $length, $number, $ending = '') {
         $this->push_opt_lvl();
 
@@ -577,12 +579,18 @@ SIGN     = ("+"|"-")
                      new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
 
+    /**
+     * Returns a conditional subexpression (assertion condition) token.
+     */
     protected function form_cond_subexpr_assert($text, $pos, $length, $subtype, $ending = '') {
         $this->push_opt_lvl();
         $this->push_opt_lvl();
         return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
     }
 
+    /**
+     * Returns a conditional subexpression (define condition) token.
+     */
     protected function form_cond_subexpr_define($text, $pos, $length, $ending = '') {
         $this->push_opt_lvl();
 
@@ -674,7 +682,7 @@ SIGN     = ("+"|"-")
     }
 
     /**
-     * Returns a named backreference token.
+     * Returns a named recursion token.
      */
     protected function form_named_recursion($text, $pos, $length, $name) {
         // Error: empty name.
