@@ -1519,10 +1519,10 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 class qtype_preg_node_error extends qtype_preg_operator {
 
     const SUBTYPE_UNKNOWN_ERROR                = 'unknown_error_node_error';                    // Unknown parse error.
-    const SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   = 'consubexpr_too_much_alter_node_error';        // Too much top-level alternations in a conditional subexpression.
+    const SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   = 'condsubexpr_too_much_alter_node_error';       // Too much top-level alternations in a conditional subexpression.
     const SUBTYPE_WRONG_CLOSE_PAREN            = 'wrong_close_paren_node_error';                // Closing paren without opening  xxx).
     const SUBTYPE_WRONG_OPEN_PAREN             = 'wrong_open_paren_node_error';                 // Opening paren without closing  (xxx.
-    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';     // Quantifier at the start of the expression  - NOTE - currently incompatible with PCRE which treat it as a character.
+    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';     // Quantifier at the start of the expression. NOTE: currently incompatible with PCRE which treats it as a character.
     const SUBTYPE_UNCLOSED_CHARSET             = 'unclosed_charset_node_error';                 // Unclosed brackets in a character set.
     const SUBTYPE_SET_UNSET_MODIFIER           = 'set_and_unset_same_modifier_node_error';      // Set and unset same modifier at ther same time.
     const SUBTYPE_UNKNOWN_UNICODE_PROPERTY     = 'unknown_unicode_property_node_error';         // Unknown unicode property.
@@ -1537,12 +1537,12 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_UNEXISTING_SUBEXPR           = 'unexisting_subexpr_node_error';               // Reference to unexisting subexpression.
     const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 // Unknown, wrong or unsupported modifier.
     const SUBTYPE_MISSING_COMMENT_ENDING       = 'missing_comment_ending_node_error';           // Missing ) after comment.
-    const SUBTYPE_MISSING_CONDSUBEXPR_ENDING   = 'missing_condsubexpr_ending_node_error';       // Missing conditional subexprern name ending.
+    const SUBTYPE_MISSING_CONDSUBEXPR_ENDING   = 'missing_condsubexpr_ending_node_error';       // Missing conditional subexpression name ending.
     const SUBTYPE_MISSING_CALLOUT_ENDING       = 'missing_callout_ending_node_error';           // Missing ) after (?C.
-    const SUBTYPE_MISSING_SUBEXPR_ENDING       = 'missing_subexpr_name_ending_node_error';      // Missing subexpression name ending.
-    const SUBTYPE_MISSING_BACKREF_ENDING       = 'missing_backref_name_ending_node_error';      // Missing backreference name ending.
-    const SUBTYPE_MISSING_BACKREF_BEGINNING    = 'missing_backref_name_beginning_node_error';   // Missing backreference name beginning.
     const SUBTYPE_MISSING_CONTROL_ENDING       = 'missing_control_ending_node_error';           // Missing ) after control sequence.
+    const SUBTYPE_MISSING_SUBEXPR_NAME_ENDING  = 'missing_subexpr_name_ending_node_error';      // Missing subexpression name ending.
+    const SUBTYPE_MISSING_BRACKETS_FOR_G       = 'missing_brackets_for_g_node_error';           // \g is not followed by {}, <>, or ''.
+    const SUBTYPE_MISSING_BRACKETS_FOR_K       = 'missing_brackets_for_k_node_error';           // \k is not followed by {}, <>, or ''.
     const SUBTYPE_WRONG_CONDSUBEXPR_NUMBER     = 'wrong_condsubexpr_number_node_error';         // Wrong conditional subexpression number, digits expected.
     const SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED  = 'condsubexpr_assert_expected_node_error';      // Assertion or condition expected.
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
@@ -1550,53 +1550,13 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_CONSUBEXPR_ZERO_CONDITION    = 'condsubexpr_zero_condition_node_error';       // Invalid condition (?(0).
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';               // Too big number in (?C...).
     const SUBTYPE_DUPLICATE_SUBEXPR_NAMES      = 'duplicate_subexpr_names_node_error';          // Two named subexpressions have the same name.
-    const SUBTYPE_BACKREF_TO_ZERO              = 'backref_to_zero_error';                       // Backreference to the whole expression.
     const SUBTYPE_DIFFERENT_SUBEXPR_NAMES      = 'different_subexpr_names_node_error';          // Different subexpression names for subexpressions of the same number.
     const SUBTYPE_SUBEXPR_NAME_EXPECTED        = 'subexpr_name_expected_node_error';            // Subexpression name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
-    const SUBTYPE_GLNU_UNSUPPORTED             = 'glnu_unsupported_node_error';                  // \G, \L, \l, \N{name}, \U, and \u are unsupported.
-    const SUBTYPE_UNRECOGNIZED_LBA             = 'unrecognized_lab_node_error';                 // Unrecognized character after (?<.
-
-    /** Error strings names in qtype_preg.php lang file. */
-    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
-                                   self::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER   => 'error_threealtincondsubexpr',
-                                   self::SUBTYPE_WRONG_CLOSE_PAREN            => 'error_unopenedparen',
-                                   self::SUBTYPE_WRONG_OPEN_PAREN             => 'error_unclosedparen',
-                                   self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'error_quantifieratstart',
-                                   self::SUBTYPE_UNCLOSED_CHARSET             => 'error_unclosedsqbrackets',
-                                   self::SUBTYPE_SET_UNSET_MODIFIER           => 'error_setunsetmod',
-                                   self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'error_unknownunicodeproperty',
-                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'error_unknownposixclass',
-                                   self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'error_unknowncontrolsequence',
-                                   self::SUBTYPE_INCORRECT_CHARSET_RANGE      => 'error_incorrectcharsetrange',
-                                   self::SUBTYPE_INCORRECT_QUANT_RANGE        => 'error_incorrectquantrange',
-                                   self::SUBTYPE_SLASH_AT_END_OF_PATTERN      => 'error_slashatendofpattern',
-                                   self::SUBTYPE_C_AT_END_OF_PATTERN          => 'error_catendofpattern',
-                                   self::SUBTYPE_INVALID_ESCAPE_SEQUENCE      => 'error_invalidescapesequence',
-                                   self::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  => 'error_posixclassoutsidecharset',
-                                   self::SUBTYPE_UNEXISTING_SUBEXPR           => 'error_unexistingsubexpr',
-                                   self::SUBTYPE_UNKNOWN_MODIFIER             => 'error_unknownmodifier',
-                                   self::SUBTYPE_MISSING_COMMENT_ENDING       => 'error_missingcommentending',
-                                   self::SUBTYPE_MISSING_CONDSUBEXPR_ENDING   => 'error_missingcondsubexprending',
-                                   self::SUBTYPE_MISSING_CALLOUT_ENDING       => 'error_missingcalloutending',
-                                   self::SUBTYPE_MISSING_SUBEXPR_ENDING       => 'error_missingsubexprending',
-                                   self::SUBTYPE_MISSING_BACKREF_ENDING       => 'error_missingbackrefending',
-                                   self::SUBTYPE_MISSING_BACKREF_BEGINNING    => 'error_missingbackrefbeginning',
-                                   self::SUBTYPE_MISSING_CONTROL_ENDING       => 'error_missingcontrolending',
-                                   self::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER     => 'error_wrongcondsubexprnumber',
-                                   self::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED  => 'error_condsubexprassertexpected',
-                                   self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
-                                   self::SUBTYPE_CHAR_CODE_DISALLOWED         => 'error_charcodedisallowed',
-                                   self::SUBTYPE_CONSUBEXPR_ZERO_CONDITION    => 'error_condsubexprzerocondition',
-                                   self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
-                                   self::SUBTYPE_DUPLICATE_SUBEXPR_NAMES      => 'error_duplicatesubexprnames',
-                                   self::SUBTYPE_BACKREF_TO_ZERO              => 'error_backreftozero',
-                                   self::SUBTYPE_DIFFERENT_SUBEXPR_NAMES      => 'error_differentsubexprnames',
-                                   self::SUBTYPE_SUBEXPR_NAME_EXPECTED        => 'error_subexprnameexpected',
-                                   self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii',
-                                   self::SUBTYPE_GLNU_UNSUPPORTED             => 'error_glnuunsupported',
-                                   self::SUBTYPE_UNRECOGNIZED_LBA             => 'error_unrecognizedlba'
-                                   );
+    const SUBTYPE_GLNU_UNSUPPORTED             = 'glnu_unsupported_node_error';                 // \G, \L, \l, \N{name}, \U, and \u are unsupported.
+    const SUBTYPE_UNRECOGNIZED_PQH             = 'unrecognized_pqh_node_error';                 // Unrecognized character after (? or (?-.
+    const SUBTYPE_UNRECOGNIZED_PQLT            = 'unrecognized_pqlt_node_error';                // Unrecognized character after (?<.
+    const SUBTYPE_UNRECOGNIZED_PQP             = 'unrecognized_pqp_node_error';                 // Unrecognized character after (?P.
 
     /** Additional info, should be a string. */
     public $addinfo;
@@ -1619,6 +1579,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $a->indfirst = $this->indfirst;
         $a->indlast = $this->indlast;
         $a->addinfo = $this->addinfo;
-        return get_string(self::$errstrs[$this->subtype], 'qtype_preg', $a);
+        return get_string($this->subtype, 'qtype_preg', $a);
     }
 }

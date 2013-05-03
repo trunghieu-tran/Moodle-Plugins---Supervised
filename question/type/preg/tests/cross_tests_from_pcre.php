@@ -17581,7 +17581,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'[^a]+?X',
-                     'modifiers'=>'i   ',
+                     'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3));
     }
 
