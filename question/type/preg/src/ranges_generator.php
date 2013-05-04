@@ -194,7 +194,7 @@ $props = array( 'dot'    => '.',
 
 $out = fopen($FILE_NAME_OUT, 'w');
 foreach ($props as $funcname => $regex) {
-    $pattern = '/(*UTF8)' . $regex . '/';
+    $pattern = "/$regex/su";
     $exists = false;
     $tmp = fopen($FILE_NAME_TMP, 'w');
     for ($i = 0; $i <= 0x10FFFD; $i++) {

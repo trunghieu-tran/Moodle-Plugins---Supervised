@@ -319,8 +319,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
  */
 class qtype_preg_leaf_charset extends qtype_preg_leaf {
 
-    /** Does the metacharacter "." match everything including new line? */
-    public $dotall = false;
     /** Simple flags in the disjunctive normal form. */
     public $flags = null;   // array(array());
     /** A range is a pair of integers, ranges are 3-dimensional array of integers or 2-dimensional array of pairs. */
@@ -365,7 +363,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             // Get intersection of all current flags.
             $result = !empty($flags);
             foreach ($flags as $flag) {
-                $result = $result && $flag->match($str, $pos, $this->caseless, $this->dotall);
+                $result = $result && $flag->match($str, $pos, $this->caseless);
                 if (!$result) {
                     break;
                 }
@@ -384,7 +382,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
-            $ranges = qtype_preg_unicode::all_ranges();
+            $ranges = qtype_preg_unicode::dot_ranges();
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
@@ -830,7 +828,7 @@ class qtype_preg_charset_flag {
         return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
     }
 
-    public function match($str, $pos, $caseless, $dotall) {
+    public function match($str, $pos, $caseless) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
         }
@@ -851,11 +849,7 @@ class qtype_preg_charset_flag {
                 break;
             case self::FLAG:
             case self::UPROP:
-                if ($this->data == self::META_DOT && $dotall) {
-                    $ranges = qtype_preg_unicode::all_ranges();
-                } else {
-                    $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
-                }
+                $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
                 break;
         }
 

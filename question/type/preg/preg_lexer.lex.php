@@ -314,9 +314,6 @@ class qtype_preg_lexer extends JLexBase  {
         if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
             $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
-        if ($node->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-            $node->dotall = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
-        }
     }
     /**
      * Returns a quantifier token.
@@ -6343,7 +6340,18 @@ array(
 							break;
 						case 13:
 							{
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    $extended = false;
+    if ($this->opt_count > 0) {
+        $stackitem = $this->opt_stack[$this->opt_count - 1];
+        $extended = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
+    }
+    if ($extended) {
+        // The true dot matches everything.
+        return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    } else {
+        // Convert . to [^\n]
+        return $this->form_charset('.', $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, "\n", true);
+    }
 }
 						case -14:
 							break;
@@ -6455,8 +6463,7 @@ array(
 							break;
 						case 24:
 							{
-    // TODO: matches any character except new line characters. For now, the same as dot.
-    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, "\n", true);
 }
 						case -25:
 							break;
