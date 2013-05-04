@@ -238,15 +238,15 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /**
-     * Return regular expression modifiers string using given arguments and question settings.
+     * Return regular expression modifiers using given arguments and question settings.
      * @param $usecase bool case sensitive mode
      */
     public function get_modifiers($usecase = true) {
-        $modifiers = '';
+        $modifiers = 0;
 
         //Case (in)sensitivity modifier - used from question options.
         if (!$usecase) {
-            $modifiers .= 'i';
+            $modifiers = $modifiers | qtype_preg_handling_options::MODIFIER_CASELESS;
         }
 
         return $modifiers;
@@ -263,7 +263,7 @@ class qtype_preg_question extends question_graded_automatically
      * @param $hintpossible boolean whether hint possible for specified answer
      * @return matcher object
      */
-    public function &get_matcher($engine, $regex, $exact = false, $modifiers = '', $answerid = null, $notation = 'native', $hintpossible = true) {
+    public function &get_matcher($engine, $regex, $exact = false, $modifiers = 0, $answerid = null, $notation = 'native', $hintpossible = true) {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
@@ -281,7 +281,6 @@ class qtype_preg_question extends question_graded_automatically
                 $notationclass = 'qtype_preg_notation_'.$notation;
                 $notationobj = new $notationclass($regex, $modifiers);
                 $regex = $notationobj->convert_regex($usednotation);
-                $modifiers = $notationobj->convert_modifiers($usednotation);
             }
 
             //Modify regex according with question properties
@@ -293,7 +292,9 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             //Create and fill options object
-            $matchingoptions = new qtype_preg_matching_options;
+            $matchingoptions = new qtype_preg_matching_options();
+            $matchingoptions->modifiers = $modifiers;
+
             //We need extension to hint next character or to generate correct answer if none is supplied
             $matchingoptions->extensionneeded = $this->usecharhint || $this->uselexemhint || trim($this->correctanswer) == '';
             if($answerid !== null && $answerid > 0) {
@@ -309,14 +310,14 @@ class qtype_preg_question extends question_graded_automatically
                 $matchingoptions = $notationobj->convert_options($usednotation);
             }
 
-            $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
+            $matcher = new $engineclass($for_regexp, $matchingoptions);
 
             if ($matcher->errors_exist() && !$hintpossible && $engine != 'php_preg_matcher') {
                 //Custom engine can't handle regex and hints not needed, let's try preg_match instead.
                 $engine = 'php_preg_matcher';
                 require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
                 $engineclass = 'qtype_preg_'.$engine;
-                $newmatcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
+                $newmatcher = new $engineclass($for_regexp, $matchingoptions);
                 if (!$newmatcher->errors_exist()) {//We still prefer to show error messages from custom engine, since they are much more detailed.
                     $matcher = $newmatcher;
                 }

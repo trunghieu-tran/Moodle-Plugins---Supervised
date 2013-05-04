@@ -446,10 +446,9 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
      * Parse regex and do all necessary preprocessing
      * @param regex - regular expression to handle
-     * @param modifiers - modifiers of regular expression
      * @param options - options to handle regex, object of qtype_preg_matching_options class
      */
-    public function __construct($regex = null, $modifiers = null, $options = null) {
+    public function __construct($regex = null, $options = null) {
         // Set matching data empty.
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
@@ -460,7 +459,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         // Do parsing.
-        parent::__construct($regex, $modifiers, $options);
+        parent::__construct($regex, $options);
         if ($regex === null) {
             return;
         }
@@ -637,12 +636,12 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         }
 
-        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+        /*if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
             // Expression starts from .*
             $operand = $node->operands[0];
             return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
-        }
+        }*/
 
         if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
             // Check the first operand for concatenation and subexpressions.

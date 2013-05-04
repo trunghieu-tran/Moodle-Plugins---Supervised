@@ -319,6 +319,8 @@ abstract class qtype_preg_operator extends qtype_preg_node {
  */
 class qtype_preg_leaf_charset extends qtype_preg_leaf {
 
+    /** Does the metacharacter "." match everything including new line? */
+    public $dotall = false;
     /** Simple flags in the disjunctive normal form. */
     public $flags = null;   // array(array());
     /** A range is a pair of integers, ranges are 3-dimensional array of integers or 2-dimensional array of pairs. */
@@ -806,6 +808,7 @@ class qtype_preg_charset_flag {
     public $type;
     /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG or TYPE_UPROP correspondingly. */
     public $data;
+
 
     public function __clone() {
         if (is_object($this->data)) {
