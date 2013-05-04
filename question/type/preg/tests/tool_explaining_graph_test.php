@@ -37,7 +37,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_explaining_graph_tool('(?:\d)');
 
        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'decimal digit'), 'ellipse', 'green', $etalon, 0);
+       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'decimal digit'), 'ellipse', 'hotpink', $etalon, 0);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
@@ -53,8 +53,8 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_explaining_graph_tool('.|\D');
 
        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'green', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not decimal digit'), 'ellipse', 'green', $etalon, 1);
+       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'hotpink', $etalon, 0);
+       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not decimal digit'), 'ellipse', 'hotpink', $etalon, 1);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
@@ -92,7 +92,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_explaining_graph_tool('\W');
 
        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not word character'), 'ellipse', 'green', $etalon, 0);
+       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not word character'), 'ellipse', 'hotpink', $etalon, 0);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
@@ -339,7 +339,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('"'), 'ellipse', 'black', $etalon, 0);
-        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'green', $etalon, 1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'hotpink', $etalon, 1);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('"'), 'ellipse', 'black', $etalon, 2);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
