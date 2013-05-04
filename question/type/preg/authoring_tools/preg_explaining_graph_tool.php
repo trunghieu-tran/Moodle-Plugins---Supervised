@@ -56,12 +56,17 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         switch($nodetype) {
         case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
         case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
+            return 'qtype_preg_authoring_tool_operator_quant';
         case qtype_preg_node::TYPE_NODE_CONCAT:
+            return 'qtype_preg_authoring_tool_operator_concat';
         case qtype_preg_node::TYPE_NODE_ALT:
+            return 'qtype_preg_authoring_tool_operator_alt';
         case qtype_preg_node::TYPE_NODE_SUBEXPR:
+            return 'qtype_preg_authoring_tool_operator_subexpr';
         case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
+            return 'qtype_preg_authoring_tool_operator_condsubexpr';
         case qtype_preg_node::TYPE_NODE_ASSERT:
-            return 'qtype_preg_authoring_tool_operator';
+            return 'qtype_preg_authoring_tool_operator_assert';
         case qtype_preg_node::TYPE_LEAF_CHARSET:
         case qtype_preg_node::TYPE_LEAF_META:
         case qtype_preg_node::TYPE_LEAF_ASSERT:

@@ -310,21 +310,18 @@ class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node
 /**
  * Class for tree's operator.
  */
-class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node {
+abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node {
     public $operands = array(); // an array of operands
+    private $cond_id = -1;
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
         foreach ($this->pregnode->operands as $operand) {
             $this->operands[] = $handler->from_preg_node($operand);
         }
-
-        // TODO: create cond subexpr class and move this code to its constructor.
-        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $this->pregnode->condbranch !== null) {
-            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
-            $this->operands = array_merge(array($condbranch), $this->operands);
-        }
     }
+
+    abstract protected function process_operator($graph, $id);
 
     /**
      * Implementation of abstract create_graph for concatenation.
@@ -332,179 +329,9 @@ class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node 
     public function &create_graph($id = -1) {
         $graph = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
 
-        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_CONCAT) {
+        $this->process_operator($graph, $id);
 
-            $left = $this->operands[0]->create_graph($id);
-            qtype_preg_explaining_graph_tool::assume_subgraph($graph, $left);
-            $graph->entries[] = end($left->entries);
-
-            $n = count($this->operands);
-            for($i = 1; $i < $n; ++$i) {
-                $right = $this->operands[$i]->create_graph($id);
-                qtype_preg_explaining_graph_tool::assume_subgraph($graph, $right);
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0]);
-
-                if ($i != $n-1) {
-                    $left = $right;
-                } else {
-                    $graph->exits[] = end($right->exits);
-                }
-            }
-
-        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ALT) {
-            $left = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
-            $right = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
-
-            foreach($this->operands as $operand) {
-                $new_operand = $operand->create_graph($id);
-                qtype_preg_explaining_graph_tool::assume_subgraph($graph, $new_operand);
-
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left, $new_operand->entries[count($new_operand->entries)-1]);
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $new_operand->exits[count($new_operand->exits)-1], $right);
-            }
-
-            $graph->nodes[] = $left;
-            $graph->entries[] = $left;
-            $graph->nodes[] = $right;
-            $graph->exits[] = $right;
-        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $this->pregnode->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
-            $operand = $this->operands[0]->create_graph($id);
-
-            if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
-                $label = 'from ' . $this->pregnode->leftborder . ' to ';
-                if ($this->pregnode->rightborder == 1)
-                    $label .= $this->pregnode->rightborder . ' time';
-                else
-                    $label .= $this->pregnode->rightborder .' times';
-            } else {
-                $label = 'from ' . $this->pregnode->leftborder . ' to infinity times';
-            }
-
-            $quant = new qtype_preg_explaining_graph_tool_subgraph($label, 'dotted; color=black', $this->pregnode->id);
-            qtype_preg_explaining_graph_tool::assume_subgraph($quant, $operand);
-
-            $graph->subgraphs[] = $quant;
-            $graph->entries[] = end($operand->entries);
-            $graph->exits[] = end($operand->exits);
-        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
-            if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
-                $operand = $this->operands[0]->create_graph($id);
-            } else {
-                $operand = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
-                $operand->entries[] = end($operand->nodes);
-                $operand->exits[] = end($operand->nodes);
-            }
-
-            $label = get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number;
-
-            $subexpr = new qtype_preg_explaining_graph_tool_subgraph($label, 'solid; color=black', $this->pregnode->id);
-            qtype_preg_explaining_graph_tool::assume_subgraph($subexpr, $operand);
-
-            $graph->subgraphs[] = $subexpr;
-            $graph->entries[] = end($operand->entries);
-            $graph->exits[] = end($operand->exits);
-        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR) {
-
-            $cond_subexpr = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black', $this->pregnode->id);
-            $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=purple', 0.1 + $this->pregnode->id);
-            $isAssert = FALSE;
-
-            if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
-                $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-
-                switch ($this->pregnode->subtype) {
-                case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
-                    $cond_subexpr->subgraphs[0]->nodes[] =
-                        new qtype_preg_explaining_graph_tool_node(
-                                array(is_integer($this->pregnode->number) ?
-                                      str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) :
-                                      str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
-                                'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
-                                );
-                    break;
-                case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
-                    $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                    break;
-                case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
-                    $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                    break;
-                }
-            } else {
-                $isAssert = TRUE; $index = 1;
-                if (count($this->operands) == 3) {$index = 2;}
-                $tmp = $this->operands[$index]->create_graph($id);
-                qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[0], $tmp->subgraphs[0]);
-            }
-
-            $cond_subexpr->subgraphs[0]->entries[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
-            $cond_subexpr->subgraphs[0]->exits[] = end($cond_subexpr->subgraphs[0]->nodes[0]);
-
-            $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? ''/*'true'*/ : '', 'dashed; color=purple', 0.2 + $this->pregnode->id);
-            $tmp = $this->operands[0]->create_graph($id);
-            qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[1], $tmp);
-            $cond_subexpr->subgraphs[1]->entries[] = end($tmp->entries);
-            $cond_subexpr->subgraphs[1]->exits[] = end($tmp->exits);
-
-            if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-                $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(''/*'false'*/, 'dashed; color=purple', 0.3 + $this->pregnode->id);
-                $tmp = $this->operands[1]->create_graph($id);
-                qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[2], $tmp);
-                $cond_subexpr->subgraphs[2]->entries[] = end($tmp->entries);
-                $cond_subexpr->subgraphs[2]->exits[] = end($tmp->exits);
-            }
-
-            $graph->subgraphs[] = $cond_subexpr;
-            $graph->entries[] = $cond_subexpr->subgraphs[0]->nodes[0];
-
-            if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-                $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
-                $graph->exits[] = $graph->subgraphs[0]->nodes[0];
-                $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
-
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $cond_subexpr->subgraphs[0]->nodes[0], $graph->subgraphs[0]->nodes[1]);
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[1]->entries[0]);
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $cond_subexpr->subgraphs[1]->exits[0], $graph->subgraphs[0]->nodes[0]);
-
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('false', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[2]->entries[0]);
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $cond_subexpr->subgraphs[2]->exits[0], $graph->subgraphs[0]->nodes[0]);
-            } else {
-                $graph->exits[] = $cond_subexpr->subgraphs[1]->exits[0];
-                $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $cond_subexpr->subgraphs[0]->nodes[0], $cond_subexpr->subgraphs[1]->entries[0]);
-            }
-        } else if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_ASSERT) {
-            $operand = $this->operands[0]->create_graph($id);
-
-            $color = (($this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLA || $this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLB) ? 'green' : 'red');
-
-            $sub = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; edge[style=dotted, color=' . $color . ']; node[style=dashed, color=' . $color . ']; color=grey', $this->pregnode->id);
-            qtype_preg_explaining_graph_tool::assume_subgraph($sub, $operand);
-
-            $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
-
-            switch ($this->pregnode->subtype) {
-            case qtype_preg_node_assert::SUBTYPE_PLA:
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="green' . $this->pregnode->id . '"');
-                break;
-            case qtype_preg_node_assert::SUBTYPE_NLA:
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="red' . $this->pregnode->id . '"');
-                break;
-            case qtype_preg_node_assert::SUBTYPE_PLB:
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="green' . $this->pregnode->id . '"');
-                break;
-            case qtype_preg_node_assert::SUBTYPE_NLB:
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="red' . $this->pregnode->id . '"');
-                break;
-            default:
-                $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
-            }
-
-            $graph->subgraphs[] = $sub;
-            $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
-            $graph->exits[] = $graph->nodes[count($graph->nodes) - 1];
-        }
-
-        if ($id == $this->pregnode->id) {
+        if ($id == $this->pregnode->id || ($id == $this->cond_id && $id != -1) ) {
             $marking = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=darkgreen', 0.5 + $this->pregnode->id);
             qtype_preg_explaining_graph_tool::assume_subgraph($marking, $graph);
             $graph->nodes = array();
@@ -514,6 +341,231 @@ class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node 
         }
 
         return $graph;
+    }
+}
+
+class qtype_preg_authoring_tool_operator_concat extends qtype_preg_authoring_tool_operator {
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+    }
+
+    protected function process_operator($graph, $id) {
+        $left = $this->operands[0]->create_graph($id);
+        qtype_preg_explaining_graph_tool::assume_subgraph($graph, $left);
+        $graph->entries[] = end($left->entries);
+
+        $n = count($this->operands);
+        for($i = 1; $i < $n; ++$i) {
+            $right = $this->operands[$i]->create_graph($id);
+            qtype_preg_explaining_graph_tool::assume_subgraph($graph, $right);
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0]);
+
+            if ($i != $n-1) {
+                $left = $right;
+            } else {
+                $graph->exits[] = end($right->exits);
+            }
+        }
+    }
+}
+
+class qtype_preg_authoring_tool_operator_alt extends qtype_preg_authoring_tool_operator {
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+    }
+
+    protected function process_operator($graph, $id) {
+        $left = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
+        $right = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
+
+        foreach($this->operands as $operand) {
+            $new_operand = $operand->create_graph($id);
+            qtype_preg_explaining_graph_tool::assume_subgraph($graph, $new_operand);
+
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left, $new_operand->entries[count($new_operand->entries)-1]);
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $new_operand->exits[count($new_operand->exits)-1], $right);
+        }
+
+        $graph->nodes[] = $left;
+        $graph->entries[] = $left;
+        $graph->nodes[] = $right;
+        $graph->exits[] = $right;
+    }
+}
+
+class qtype_preg_authoring_tool_operator_quant extends qtype_preg_authoring_tool_operator {
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+    }
+
+    protected function process_operator($graph, $id) {
+        $operand = $this->operands[0]->create_graph($id);
+
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
+            $label = 'from ' . $this->pregnode->leftborder . ' to ';
+            if ($this->pregnode->rightborder == 1)
+                $label .= $this->pregnode->rightborder . ' time';
+            else
+                $label .= $this->pregnode->rightborder .' times';
+        } else {
+            $label = 'from ' . $this->pregnode->leftborder . ' to infinity times';
+        }
+
+        $quant = new qtype_preg_explaining_graph_tool_subgraph($label, 'dotted; color=black', $this->pregnode->id);
+        qtype_preg_explaining_graph_tool::assume_subgraph($quant, $operand);
+
+        $graph->subgraphs[] = $quant;
+        $graph->entries[] = end($operand->entries);
+        $graph->exits[] = end($operand->exits);  
+    }
+}
+
+class qtype_preg_authoring_tool_operator_subexpr extends qtype_preg_authoring_tool_operator {
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+    }
+
+    protected function process_operator($graph, $id) {
+        if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
+            $operand = $this->operands[0]->create_graph($id);
+        } else {
+            $operand = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+            $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+            $operand->entries[] = end($operand->nodes);
+            $operand->exits[] = end($operand->nodes);
+        }
+
+        $label = get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number;
+
+        $subexpr = new qtype_preg_explaining_graph_tool_subgraph($label, 'solid; color=black', $this->pregnode->id);
+        qtype_preg_explaining_graph_tool::assume_subgraph($subexpr, $operand);
+
+        $graph->subgraphs[] = $subexpr;
+        $graph->entries[] = end($operand->entries);
+        $graph->exits[] = end($operand->exits); 
+    }
+}
+
+class qtype_preg_authoring_tool_operator_condsubexpr extends qtype_preg_authoring_tool_operator {
+
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $this->pregnode->condbranch !== null) {
+            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
+            $this->operands = array_merge($this->operands, array($condbranch));
+            $cond_id = $condbranch->pregnode->id;
+        }
+    }
+
+    protected function process_operator($graph, $id) {
+        $cond_subexpr = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black', $this->pregnode->id);
+        $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=purple', 0.1 + $this->pregnode->id);
+        $isAssert = FALSE;
+        $tmp = NULL;
+
+        if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
+            $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+
+            switch ($this->pregnode->subtype) {
+            case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
+                $cond_subexpr->subgraphs[0]->nodes[] =
+                    new qtype_preg_explaining_graph_tool_node(
+                            array(is_integer($this->pregnode->number) ?
+                                    str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) :
+                                    str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
+                            'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
+                            );
+                break;
+            case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
+                $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+                break;
+            case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
+                $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+                break;
+            }
+        } else {
+            $isAssert = TRUE; $index = 1;
+            if (count($this->operands) == 3) {$index = 2;}
+            $tmp = $this->operands[$index]->create_graph($id);
+
+            qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[0], $tmp);
+        }
+
+        $point = count($cond_subexpr->subgraphs[0]->nodes) ? $cond_subexpr->subgraphs[0]->nodes[0] : $cond_subexpr->subgraphs[0]->subgraphs[0]->nodes[0];
+        $cond_subexpr->subgraphs[0]->entries[] = $point;
+        $cond_subexpr->subgraphs[0]->exits[] = $point;
+
+        $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? ''/*'true'*/ : '', 'dashed; color=purple', 0.2 + $this->pregnode->id);
+        $tmp = $this->operands[0]->create_graph($id);
+        qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[1], $tmp);
+        $cond_subexpr->subgraphs[1]->entries[] = end($tmp->entries);
+        $cond_subexpr->subgraphs[1]->exits[] = end($tmp->exits);
+
+        if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+            $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(''/*'false'*/, 'dashed; color=purple', 0.3 + $this->pregnode->id);
+            $tmp = $this->operands[1]->create_graph($id);
+            qtype_preg_explaining_graph_tool::assume_subgraph($cond_subexpr->subgraphs[2], $tmp);
+            $cond_subexpr->subgraphs[2]->entries[] = end($tmp->entries);
+            $cond_subexpr->subgraphs[2]->exits[] = end($tmp->exits);
+        }
+
+        $graph->subgraphs[] = $cond_subexpr;
+        $graph->entries[] = $point;
+
+        if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+            $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
+            $graph->exits[] = $graph->subgraphs[0]->nodes[0];
+            $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
+
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $point, $graph->subgraphs[0]->nodes[1]);
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[1]->entries[0]);
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $cond_subexpr->subgraphs[1]->exits[0], $point);
+
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('false', $graph->subgraphs[0]->nodes[1], $cond_subexpr->subgraphs[2]->entries[0]);
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $cond_subexpr->subgraphs[2]->exits[0], $point);
+        } else {
+            $graph->exits[] = $cond_subexpr->subgraphs[1]->exits[0];
+            $cond_subexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $point, $cond_subexpr->subgraphs[1]->entries[0]);
+        }
+    }
+}
+
+class qtype_preg_authoring_tool_operator_assert extends qtype_preg_authoring_tool_operator {
+    public function __construct($node, $handler) {
+        parent::__construct($node, $handler);
+    }
+
+    protected function process_operator($graph, $id) {
+        $operand = $this->operands[0]->create_graph($id);
+
+        $color = (($this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLA || $this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLB) ? 'green' : 'red');
+
+        $sub = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; edge[style=dotted, color=' . $color . ']; node[style=dashed, color=' . $color . ']; color=grey', $this->pregnode->id);
+        qtype_preg_explaining_graph_tool::assume_subgraph($sub, $operand);
+
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
+
+        switch ($this->pregnode->subtype) {
+        case qtype_preg_node_assert::SUBTYPE_PLA:
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="green"');
+            break;
+        case qtype_preg_node_assert::SUBTYPE_NLA:
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="red"');
+            break;
+        case qtype_preg_node_assert::SUBTYPE_PLB:
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="green"');
+            break;
+        case qtype_preg_node_assert::SUBTYPE_NLB:
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="red"');
+            break;
+        default:
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
+        }
+
+        $graph->subgraphs[] = $sub;
+        $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
+        $graph->exits[] = $graph->nodes[count($graph->nodes) - 1];
     }
 }
 
