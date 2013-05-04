@@ -266,7 +266,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
-        $leaf = $lexer->nextToken()->value;
+        $token = $lexer->nextToken();
+        $leaf = is_array($token) ? $token[0]->value : $token->value;
         $res = $leaf->match(new qtype_poasquestion_string($char), 0, $length, false);
         fclose($pseudofile);
         return $res;

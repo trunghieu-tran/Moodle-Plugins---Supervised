@@ -69,11 +69,14 @@ class qtype_preg_opt_stack_item {
 %state YYQEOUT
 %state YYQEIN
 %state YYCHARSET
-QUANTTYPE = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
-MODIFIER  = [imsxeADSUXJu]                             // Excluding reserved (?... sequences, returning error if there is something weird.
-ALNUM     = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
-ANY       = (.|[\r\n])                                 // Any character.
-SIGN      = ("+"|"-")                                  // Sign of an integer.
+
+QUANTTYPE  = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
+MODIFIER   = [imsxeADSUXJu]                             // Excluding reserved (?... sequences, returning error if there is something weird.
+ALNUM      = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
+ANY        = (.|[\r\n])                                 // Any character.
+SIGN       = ("+"|"-")                                  // Sign of an integer.
+WHITESPACE = [\ \n\r\t\f]                               // All possible white spaces.
+
 %init{
     $this->options = new qtype_preg_handling_options();
     $this->opt_stack[0] = new qtype_preg_opt_stack_item(0, -1, null, -1);
@@ -299,9 +302,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
     }
 
     protected function mod_top_opt($set, $unset) {
-        $allowed =
         $errors = array();
-        $text = $this->yytext();
 
         // Setting and unsetting modifier at the same time is error.
         $setunset = $set & $unset;
@@ -326,16 +327,33 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         return null;
     }
 
-    protected function set_node_modifiers(&$node) {
-        if ($this->opt_count < 1) {
-            return;
-        }
-        $stackitem = $this->opt_stack[$this->opt_count - 1];
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
-            $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
-        }
-        if ($node->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-            $node->dotall = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
+    protected function push_opt_lvl($subexpr_num = -1) {
+        if ($this->opt_count > 0) {
+            $this->opt_stack[$this->opt_count] = clone $this->opt_stack[$this->opt_count - 1];
+            if ($subexpr_num !== -1) {
+                $this->opt_stack[$this->opt_count]->subexpr_num = $subexpr_num;
+                $this->opt_stack[$this->opt_count]->parennum = $this->opt_count;
+            }
+            $this->opt_stack[$this->opt_count]->subexpr_name = null;   // Reset it anyway.
+            $this->opt_count++;
+        } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
+    }
+
+    protected function pop_opt_lvl() {
+        if ($this->opt_count > 0) {
+            $item = $this->opt_stack[$this->opt_count - 1];
+            $this->opt_count--;
+            // Is it a pair for some opening paren?
+            if ($item->parennum === $this->opt_count) {
+                // Are we out of a (?|...) block?
+                if ($this->opt_stack[$this->opt_count - 1]->subexpr_num !== -1) {
+                    // Inside.
+                    $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;    // Reset subexpression numeration.
+                } else {
+                    // Outside.
+                    $this->last_subexpr = $this->max_subexpr;
+                }
+            }
         }
     }
 
@@ -351,6 +369,19 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
             $this->charset->errors[] = $error;
         }
         return $error;
+    }
+
+    protected function set_node_modifiers(&$node) {
+        if ($this->opt_count < 1) {
+            return;
+        }
+        $stackitem = $this->opt_stack[$this->opt_count - 1];
+        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
+            $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+        }
+        if ($node->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            $node->dotall = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
+        }
     }
 
     /**
@@ -756,36 +787,6 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         }
     }
 
-    protected function push_opt_lvl($subexpr_num = -1) {
-        if ($this->opt_count > 0) {
-            $this->opt_stack[$this->opt_count] = clone $this->opt_stack[$this->opt_count - 1];
-            if ($subexpr_num !== -1) {
-                $this->opt_stack[$this->opt_count]->subexpr_num = $subexpr_num;
-                $this->opt_stack[$this->opt_count]->parennum = $this->opt_count;
-            }
-            $this->opt_stack[$this->opt_count]->subexpr_name = null;   // Reset it anyway.
-            $this->opt_count++;
-        } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
-    }
-
-    protected function pop_opt_lvl() {
-        if ($this->opt_count > 0) {
-            $item = $this->opt_stack[$this->opt_count - 1];
-            $this->opt_count--;
-            // Is it a pair for some opening paren?
-            if ($item->parennum === $this->opt_count) {
-                // Are we out of a (?|...) block?
-                if ($this->opt_stack[$this->opt_count - 1]->subexpr_num !== -1) {
-                    // Inside.
-                    $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;    // Reset subexpression numeration.
-                } else {
-                    // Outside.
-                    $this->last_subexpr = $this->max_subexpr;
-                }
-            }
-        }
-    }
-
     /**
      * Adds a named subexpression to the map.
      */
@@ -851,6 +852,15 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         }
     }
 
+    protected function string_to_tokens($str) {
+        $res = array();
+        for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
+            $char = qtype_preg_unicode::substr($str, $i, 1);
+            $res[] = $this->form_charset($char, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $char);
+        }
+        return $res;
+    }
+
     /**
      * Returns a unicode property flag type corresponding to the consumed string.
      * @param str string consumed by the lexer, defines the property itself.
@@ -867,6 +877,26 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
 
 %%
 
+<YYINITIAL> {WHITESPACE}+ {                      /* More than one whitespace */
+    $extended = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
+    if ($this->opt_count > 0) {
+        $extended = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
+    }
+    if (!$extended) {
+        // If the "x" modifier is not set, return all the whitespaces.
+        return $this->string_to_tokens($this->yytext());
+    }
+}
+<YYINITIAL> "#"[^\n]*\n {
+    $extended = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
+    if ($this->opt_count > 0) {
+        $extended = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
+    }
+    if (!$extended) {
+        // If the "x" modifier is not set, return all the whitespaces.
+        return $this->string_to_tokens($this->yytext());
+    }
+}
 <YYINITIAL> "?"{QUANTTYPE} {                     // ?     Quantifier 0 or 1
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
@@ -962,11 +992,8 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
     if (qtype_preg_unicode::strlen($tail) === 0) {
         $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
     } else {
-        $res = array();
-        $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-        for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-            $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1));
-        }
+        $res = array($this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+        $res = array_merge($res, $this->string_to_tokens($tail));
     }
     return $res;
 }
