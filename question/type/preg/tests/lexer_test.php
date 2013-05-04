@@ -857,7 +857,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->data->string() === 'e');
         $this->assertTrue($token->value->caseless);
-        $lexer = $this->create_lexer('(?imsxeADSUXJu:a(?-i:b)c)');
+        $lexer = $this->create_lexer('(?imsxuADSUXJ:a(?-i:b)c)');
         $token = $lexer->nextToken();// (?i:
         $token = $lexer->nextToken();// a
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);

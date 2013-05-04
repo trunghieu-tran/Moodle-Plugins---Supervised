@@ -40,10 +40,30 @@ class qtype_preg_handling_options {
     const MODE_PCRE = 0;
     const MODE_POSIX = 1;
 
-    const MODIFIER_CASELESS  = 1;   // i, case insensitive match
-    const MODIFIER_MULTILINE = 2;   // m, multiple lines match
-    const MODIFIER_DOTALL    = 4;   // s, dot matches newlines
-    const MODIFIER_EXTENDED  = 8;   // x, ignore white spaces
+    const MODIFIER_ANCHORED            = 1;         // A // the pattern is forced to be anchored
+    //const MODIFIER_AUTO_CALLOUT      = 2;
+    const MODIFIER_BSR_ANYCRLF         = 4;         //   // \R matches CR, LF, or CRLF
+    const MODIFIER_BSR_UNICODE         = 8;         //   // \R matches any Unicode newline sequence
+    const MODIFIER_CASELESS            = 16;        // i // case insensitive match
+    const MODIFIER_DOLLAR_ENDONLY      = 32;        // D // dollar metacharacter matches only at the end of the subject string
+    const MODIFIER_DOTALL              = 64;        // s // dot matches newlines
+    const MODIFIER_DUPNAMES            = 128;       // J // names used to identify capturing subpatterns need not be unique
+    const MODIFIER_EXTENDED            = 256;       // x // ignore white spaces
+    //const MODIFIER_EXTRA             = 512;       // X //
+    //const MODIFIER_FIRSTLINE         = 1024;
+    //const MODIFIER_JAVASCRIPT_COMPAT = 2048;
+    const MODIFIER_MULTILINE           = 4096;      // m // multiple lines match
+    const MODIFIER_NEWLINE_CR          = 8192;      //   // newline is indicated by CR
+    const MODIFIER_NEWLINE_LF          = 16384;     //   // newline is indicated by LF
+    const MODIFIER_NEWLINE_CRLF        = 32768;     //   // newline is indicated by CRLF
+    const MODIFIER_NEWLINE_ANYCRLF     = 65536;     //   // newline is indicated by CR, LF or CRLF
+    const MODIFIER_NEWLINE_ANY         = 131072;    //   // newline is indicated by any Unicode newline sequence
+    //const MODIFIER_NO_AUTO_CAPTURE   = 262144;
+    //const MODIFIER_NO_START_OPTIMIZE = 524288;
+    //const MODIFIER_UCP               = 1048576;
+    const MODIFIER_UNGREEDY            = 2097152;   // U // inverts the greediness of the quantifiers
+    const MODIFIER_UTF8                = 4194304;   // u // regard both the pattern and the subject as UTF-8 strings
+    //const MODIFIER_NO_UTF8_CHECK     = 8388608;
 
     /** @var boolean Regex compatibility mode. */
     public $mode = self::MODE_PCRE;
@@ -59,22 +79,99 @@ class qtype_preg_handling_options {
     public $debugmode = false;
 
     public static function get_all_modifiers() {
-        return array(qtype_preg_handling_options::MODIFIER_CASELESS, qtype_preg_handling_options::MODIFIER_MULTILINE,
-                     qtype_preg_handling_options::MODIFIER_DOTALL, qtype_preg_handling_options::MODIFIER_EXTENDED);
+        return array(self::MODIFIER_ANCHORED,
+                     //self::MODIFIER_AUTO_CALLOUT,
+                     self::MODIFIER_BSR_ANYCRLF,
+                     self::MODIFIER_BSR_UNICODE,
+                     self::MODIFIER_CASELESS,
+                     self::MODIFIER_DOLLAR_ENDONLY,
+                     self::MODIFIER_DOTALL,
+                     self::MODIFIER_DUPNAMES,
+                     self::MODIFIER_EXTENDED,
+                     //self::MODIFIER_EXTRA,
+                     //self::MODIFIER_FIRSTLINE,
+                     //self::MODIFIER_JAVASCRIPT_COMPAT,
+                     self::MODIFIER_MULTILINE,
+                     self::MODIFIER_NEWLINE_CR,
+                     self::MODIFIER_NEWLINE_LF,
+                     self::MODIFIER_NEWLINE_CRLF,
+                     self::MODIFIER_NEWLINE_ANYCRLF,
+                     self::MODIFIER_NEWLINE_ANY,
+                     //self::MODIFIER_NO_AUTO_CAPTURE,
+                     //self::MODIFIER_NO_START_OPTIMIZE,
+                     //self::MODIFIER_UCP,
+                     self::MODIFIER_UNGREEDY,
+                     self::MODIFIER_UTF8,
+                     //self::MODIFIER_NO_UTF8_CHECK
+                     );
     }
 
     public static function char_to_modifier($char) {
         switch ($char) {
+        case 'A':
+            return self::MODIFIER_ANCHORED;
         case 'i':
             return self::MODIFIER_CASELESS;
-        case 'm':
-            return self::MODIFIER_MULTILINE;
+        case 'D':
+            return self::MODIFIER_DOLLAR_ENDONLY;
         case 's':
             return self::MODIFIER_DOTALL;
+        case 'J':
+            return self::MODIFIER_DUPNAMES;
         case 'x':
             return self::MODIFIER_EXTENDED;
+        //case 'X':
+        //    return self::MODIFIER_EXTRA;
+        case 'm':
+            return self::MODIFIER_MULTILINE;
+        case 'U':
+            return self::MODIFIER_UNGREEDY;
+        case 'u':
+            return self::MODIFIER_UTF8;
         default:
             return 0;
+        }
+    }
+
+    public static function modifier_to_char($mod) {
+        switch ($mod) {
+        case self::MODIFIER_ANCHORED:
+            return 'A';
+        //case self::MODIFIER_AUTO_CALLOUT:
+        case self::MODIFIER_BSR_ANYCRLF:
+        case self::MODIFIER_BSR_UNICODE:
+            return '';
+        case self::MODIFIER_CASELESS:
+            return 'i';
+        case self::MODIFIER_DOLLAR_ENDONLY:
+            return 'D';
+        case self::MODIFIER_DOTALL:
+            return 's';
+        case self::MODIFIER_DUPNAMES:
+            return 'J';
+        case self::MODIFIER_EXTENDED:
+            return 'x';
+        //case self::MODIFIER_EXTRA:
+        //    return 'X';
+        //case self::MODIFIER_FIRSTLINE:
+        //case self::MODIFIER_JAVASCRIPT_COMPAT:
+        case self::MODIFIER_MULTILINE:
+            return 'm';
+        case self::MODIFIER_NEWLINE_CR:
+        case self::MODIFIER_NEWLINE_LF:
+        case self::MODIFIER_NEWLINE_CRLF:
+        case self::MODIFIER_NEWLINE_ANYCRLF:
+        case self::MODIFIER_NEWLINE_ANY:
+        //case self::MODIFIER_NO_AUTO_CAPTURE:
+        //case self::MODIFIER_NO_START_OPTIMIZE:
+        //case self::MODIFIER_UCP:
+        case self::MODIFIER_UNGREEDY:
+            return 'U';
+        case self::MODIFIER_UTF8:
+            return 'u';
+        //case self::MODIFIER_NO_UTF8_CHECK:
+        default:
+            return '';
         }
     }
 
@@ -84,21 +181,6 @@ class qtype_preg_handling_options {
             $result = $result | self::char_to_modifier($str[$i]);
         }
         return $result;
-    }
-
-    public static function modifier_to_char($mod) {
-        switch ($mod) {
-        case self::MODIFIER_CASELESS;
-            return 'i';
-        case self::MODIFIER_MULTILINE;
-            return 'm';
-        case self::MODIFIER_DOTALL;
-            return 's';
-        case self::MODIFIER_EXTENDED;
-            return 'x';
-        default:
-            return '';
-        }
     }
 
     public static function modifiers_to_string($mods) {

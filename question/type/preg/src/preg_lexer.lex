@@ -71,7 +71,7 @@ class qtype_preg_opt_stack_item {
 %state YYCHARSET
 
 QUANTTYPE  = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
-MODIFIER   = [imsxeADSUXJu]                             // Excluding reserved (?... sequences, returning error if there is something weird.
+MODIFIER   = [imsxuADSUXJ]                              // Recognizable modifiers letters.
 ALNUM      = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
 ANY        = (.|[\r\n])                                 // Any character.
 SIGN       = ("+"|"-")                                  // Sign of an integer.
@@ -1120,7 +1120,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 
 
 
-<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {              /* (?imsxeADSUXJu-imsxeADSUXJu) Option setting */
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {              /* (?imsxuADSUXJ-imsxuADSUXJ) Option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
@@ -1142,7 +1142,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         // Do nothing in YYINITIAL state.
     }
 }
-<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {              /* (?imsxeADSUXJu-imsxeADSUXJu: Subexpression with option setting */
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {              /* (?imsxuADSUXJ-imsxuADSUXJ: Subexpression with option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
