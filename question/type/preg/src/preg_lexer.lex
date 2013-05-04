@@ -45,6 +45,19 @@ class qtype_preg_opt_stack_item {
         $this->subexpr_name = $subexpr_name;
         $this->parennum = $parennum;
     }
+
+    public function set_modifier($modifier) {
+        $this->modifiers = ($this->modifiers | $modifier);
+    }
+
+    public function unset_modifier($modifier) {
+        $modifier = ~$modifier;
+        $this->modifiers = ($this->modifiers & $modifier);
+    }
+
+    public function is_modifier_set($modifier) {
+        return ($this->modifiers & $modifier) == 0 ? false : true;
+    }
 }
 
 %%
@@ -57,13 +70,13 @@ class qtype_preg_opt_stack_item {
 %state YYQEIN
 %state YYCHARSET
 QUANTTYPE = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
-MODIFIER = [^"(|)<>#&':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
+MODIFIER  = [imsxeADSUXJu]                             // Excluding reserved (?... sequences, returning error if there is something weird.
 ALNUM     = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
 ANY       = (.|[\r\n])                                 // Any character.
 SIGN      = ("+"|"-")                                  // Sign of an integer.
 %init{
-    $this->handlingoptions = new qtype_preg_handling_options();
-    $this->opt_stack[0] = new qtype_preg_opt_stack_item(array('i' => false), -1, null, -1);
+    $this->options = new qtype_preg_handling_options();
+    $this->opt_stack[0] = new qtype_preg_opt_stack_item(0, -1, null, -1);
 %init}
 %eof{
     // End of the expression inside a character class.
@@ -86,7 +99,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
 %eof}
 %{
     // Regex handling options set from the outside.
-    public $handlingoptions = null;
+    protected $options = null;
 
     // Array of lexical errors found.
     protected $errors = array();
@@ -280,51 +293,43 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         return $this->backrefs;
     }
 
-    public function mod_top_opt($set, $unset) {
-        $allowed = new qtype_poasquestion_string('imsxJU');
-        $setunset = new qtype_poasquestion_string($set . $unset);
-        $wrongfound = '';
+    public function set_options($options) {
+        $this->options = $options;
+        $this->mod_top_opt($options->modifiers, 0);
+    }
+
+    protected function mod_top_opt($set, $unset) {
+        $allowed =
         $errors = array();
         $text = $this->yytext();
 
-        // Are there unknown/unsupported modifiers?
-        for ($i = 0; $i < $setunset->length(); $i++) {
-            $modname = $setunset[$i];
-            if ($allowed->contains($modname) === false) {
-                $wrongfound .= $modname;
-            }
-        }
-        if ($wrongfound != '') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, $wrongfound, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-            $errors[] = $error;
-        }
-
-        for ($i = 0; $i < $set->length(); $i++) {
-            $modname = $set[$i];
-            if ($unset->contains($modname) !== false && $allowed->contains($modname) !== false) {
-                // Setting and unsetting modifier at the same time is error.
-                $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $modname, $this->yychar, $this->yychar + $this->yylength() - 1, '');
-                $errors[] = $error;
-            }
-        }
-
-        // If errors don't exist, set and unset local modifiers.
-        if (count($errors) == 0) {
-            for ($i = 0; $i < $set->length(); $i++) {
-                $modname = $set[$i];
-                if (qtype_preg_unicode::strpos($allowed, $modname) !== false) {
-                    $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = true;
-                }
-            }
-            for ($i = 0; $i < $unset->length(); $i++) {
-                $modname = $unset[$i];
-                if (qtype_preg_unicode::strpos($allowed, $modname) !== false) {
-                    $this->opt_stack[$this->opt_count - 1]->modifiers[$modname] = false;
+        // Setting and unsetting modifier at the same time is error.
+        $setunset = $set & $unset;
+        if ($setunset) {
+            foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
+                if ($mod & $setunset) {
+                    $modname = qtype_preg_handling_options::modifier_to_char($mod);
+                    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $modname, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+                    $errors[] = $error;
                 }
             }
         }
 
-        return $errors;
+        if (count($errors) > 0) {
+            return $errors;
+        }
+
+        // Unset and set local modifiers.
+        $stackitem = $this->opt_stack[$this->opt_count - 1];
+        $stackitem->unset_modifier($unset);
+        $stackitem->set_modifier($set);
+        return null;
+    }
+
+    protected function set_node_case_sensitivity(&$node) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
+            $node->caseinsensitive = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+        }
     }
 
     protected function create_error_node($subtype, $addinfo, $indfirst, $indlast, $rawuserinscription) {
@@ -639,9 +644,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
     protected function form_backref($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
-            $node->caseinsensitive = true;
-        }
+        $this->set_node_case_sensitivity($node);
         $this->backrefs[] = $node;
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
@@ -664,16 +667,19 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $node = new qtype_preg_leaf_charset();
         $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
         $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
-            $node->caseinsensitive = true;
-        }
         $node->subtype = $subtype;
         $node->israngecalculated = false;
+
+        $this->set_node_case_sensitivity($node);
+
         if ($data !== null) {
             $flag = new qtype_preg_charset_flag;
             $flag->negative = $negative;
-            if ($subtype === qtype_preg_charset_flag::SET) {
+            if ($subtype == qtype_preg_charset_flag::SET) {
                 $data = new qtype_poasquestion_string($data);
+            }
+            if ($subtype == qtype_preg_charset_flag::META_DOT) {
+                $node->dotall = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
             }
             $flag->set_data($subtype, $data);
             $node->flags = array(array($flag));
@@ -700,10 +706,8 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
     protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
-            $node->caseinsensitive = true;
-        }
         $node->number = $number;
+        $this->set_node_case_sensitivity($node);
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
 
@@ -1085,7 +1089,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
 
 
 
-<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {              /* (?imsxUJ-imsxUJ) Option setting */
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {              /* (?imsxeADSUXJu-imsxeADSUXJu) Option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
@@ -1095,10 +1099,10 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
-    $set = new qtype_poasquestion_string($set);
-    $unset = new qtype_poasquestion_string($unset);
+    $set = qtype_preg_handling_options::string_to_modifiers($set);
+    $unset = qtype_preg_handling_options::string_to_modifiers($unset);
     $errors = $this->mod_top_opt($set, $unset);
-    if ($this->handlingoptions->preserveallnodes) {
+    if ($this->options->preserveallnodes) {
         $node = new qtype_preg_leaf_option($set, $unset);
         $node->errors = $errors;
         $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
@@ -1107,7 +1111,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         // Do nothing in YYINITIAL state.
     }
 }
-<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {              /* (?imsxUJ-imsxUJ: Subexpression with option setting */
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {              /* (?imsxeADSUXJu-imsxeADSUXJu: Subexpression with option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
     if ($delimpos !== false) {
@@ -1117,11 +1121,11 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
-    $set = new qtype_poasquestion_string($set);
-    $unset = new qtype_poasquestion_string($unset);
+    $set = qtype_preg_handling_options::string_to_modifiers($set);
+    $unset = qtype_preg_handling_options::string_to_modifiers($unset);
     $this->push_opt_lvl();
     $errors = $this->mod_top_opt($set, $unset);
-    if ($this->handlingoptions->preserveallnodes) {
+    if ($this->options->preserveallnodes) {
         $node = new qtype_preg_leaf_option($set, $unset);
         $node->errors = $errors;
         $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
@@ -1791,9 +1795,8 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charset_set));
         $this->charset->flags[] = array($flag);
     }
-    if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->modifiers['i']) {
-        $this->charset->caseinsensitive = true;
-    }
+
+    $this->set_node_case_sensitivity($this->charset);
 
     // Look for possible errors.
     $ui1 = $this->charset->userinscription[0];

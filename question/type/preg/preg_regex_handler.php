@@ -40,8 +40,15 @@ class qtype_preg_handling_options {
     const MODE_PCRE = 0;
     const MODE_POSIX = 1;
 
+    const MODIFIER_CASELESS  = 1;   // i, case insensitive match
+    const MODIFIER_MULTILINE = 2;   // m, multiple lines match
+    const MODIFIER_DOTALL    = 4;   // s, dot matches newlines
+    const MODIFIER_EXTENDED  = 8;   // x, ignore white spaces
+
     /** @var boolean Regex compatibility mode. */
     public $mode = self::MODE_PCRE;
+    /** @var integer bitwise union of constants MODIFIER_XXX. */
+    public $modifiers = 0;
     /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
@@ -50,14 +57,78 @@ class qtype_preg_handling_options {
     public $expandquantifiers = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
+
+    public static function get_all_modifiers() {
+        return array(qtype_preg_handling_options::MODIFIER_CASELESS, qtype_preg_handling_options::MODIFIER_MULTILINE,
+                     qtype_preg_handling_options::MODIFIER_DOTALL, qtype_preg_handling_options::MODIFIER_EXTENDED);
+    }
+
+    public static function char_to_modifier($char) {
+        switch ($char) {
+        case 'i':
+            return self::MODIFIER_CASELESS;
+        case 'm':
+            return self::MODIFIER_MULTILINE;
+        case 's':
+            return self::MODIFIER_DOTALL;
+        case 'x':
+            return self::MODIFIER_EXTENDED;
+        default:
+            return 0;
+        }
+    }
+
+    public static function string_to_modifiers($str) {
+        $result = 0;
+        for ($i = 0; $i < strlen($str); $i++) {
+            $result = $result | self::char_to_modifier($str[$i]);
+        }
+        return $result;
+    }
+
+    public static function modifier_to_char($mod) {
+        switch ($mod) {
+        case self::MODIFIER_CASELESS;
+            return 'i';
+        case self::MODIFIER_MULTILINE;
+            return 'm';
+        case self::MODIFIER_DOTALL;
+            return 's';
+        case self::MODIFIER_EXTENDED;
+            return 'x';
+        default:
+            return '';
+        }
+    }
+
+    public static function modifiers_to_string($mods) {
+        $result = '';
+        foreach (self::get_all_modifiers() as $mod) {
+            if ($mod & $mods) {
+                $result .= self::modifier_to_char($mod);
+            }
+        }
+        return $result;
+    }
+
+    public function set_modifier($modifier) {
+        $this->modifiers = ($this->modifiers | $modifier);
+    }
+
+    public function unset_modifier($modifier) {
+        $modifier = ~$modifier;
+        $this->modifiers = ($this->modifiers & $modifier);
+    }
+
+    public function is_modifier_set($modifier) {
+        return ($this->modifiers & $modifier) == 0 ? false : true;
+    }
 }
 
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
     protected $regex;
-    /** Modifiers for regular expression as an object of qtype_poasquestion_string. */
-    protected $modifiers;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
     /** Regex lexer. */
@@ -75,26 +146,11 @@ class qtype_preg_regex_handler {
     /**
      * Parses the regex and does all necessary preprocessing.
      * @param string regex - regular expression to handle.
-     * @param string modifiers - modifiers of the regular expression.
      * @param object options - options to handle regex, i.e. any necessary additional parameters.
      */
-    public function __construct($regex = null, $modifiers = null, $options = null) {
+    public function __construct($regex = null, $options = null) {
         if ($regex == '' || $regex === null) {
             return;
-        }
-
-        // Are the passed modifiers supported?
-        if (is_string($modifiers)) {
-            $modifiers = new qtype_poasquestion_string($modifiers);
-        } else if (!is_a($modifiers, 'qtype_poasquestion_string')) {
-            $modifiers = new qtype_poasquestion_string('');
-        }
-        $supportedmodifiers = $this->get_supported_modifiers();
-        for ($i = 0; $i < $modifiers->length(); $i++) {
-            $mod = $modifiers[$i];
-            if ($supportedmodifiers->contains($mod) === false) {
-                $this->errors[] = new qtype_preg_modifier_error($this->name(), $mod);
-            }
         }
 
         // Options should exist at least as a default object.
@@ -102,18 +158,27 @@ class qtype_preg_regex_handler {
             $options = new qtype_preg_handling_options();
         }
 
+        // Look for unsupported modifiers.
+        $allmodifiers = qtype_preg_handling_options::get_all_modifiers();
+        $supportedmodifiers = $this->get_supported_modifiers();
+        foreach ($allmodifiers as $mod) {
+            $passed = $options->is_modifier_set($mod);
+            $supported = $supportedmodifiers & $mod;
+            if ($passed && !$supported) {
+                $this->errors[] = new qtype_preg_modifier_error($this->name(), $mod);
+            }
+        }
+
         $this->regex = new qtype_poasquestion_string($regex);
-        $this->modifiers = $modifiers;
         $this->options = $options;
-        //do parsing
+
+        // Do parsing.
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subexpressions
-        } else {
-            $this->ast_root = null;
-            //In case with no parsing we should stick to accepting whole regex, not nodes
-            $this->accept_regex();
         }
+        // Sometimes engine that use accept_regex still need parsing to count subexpressions.
+        // In case with no parsing we should stick to accepting whole regex, not nodes.
+        $this->accept_regex();
     }
 
     /**
@@ -131,10 +196,13 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns string of regular expression modifiers supported by this engine
+     * Returns supported modifiers as bitwise union of constants MODIFIER_XXX.
      */
     public function get_supported_modifiers() {
-        return new qtype_poasquestion_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
+        return qtype_preg_handling_options::MODIFIER_CASELESS |     // Any qtype_preg_matcher should support case insensitivity.
+               qtype_preg_handling_options::MODIFIER_MULTILINE |    // Supported by lexer.
+               qtype_preg_handling_options::MODIFIER_DOTALL |       // Supported by lexer.
+               qtype_preg_handling_options::MODIFIER_EXTENDED;      // Supported by lexer.
     }
 
     /**
@@ -335,8 +403,6 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-
-
     /**
      * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
      * @param string regex - regular expression for building tree.
@@ -346,8 +412,7 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
-        $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
-        $this->lexer->handlingoptions = $this->options;
+        $this->lexer->set_options($this->options);
 
         $this->parser = new qtype_preg_yyParser($this->options);
 
@@ -362,7 +427,7 @@ class qtype_preg_regex_handler {
         }
         $this->parser->doParse(0, 0);
 
-        // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
+        // Lexer returns errors for an unclosed character set or wrong modifiers.
         $lexerrors = $this->lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);

@@ -66,14 +66,6 @@ abstract class qtype_preg_notation {
     }
 
     /**
-    * Returns regular expression modifiers in desired notation, should suit most notations
-    * When overloading this, you probably would want to add some modifers based on regular expression
-    */
-    public function convert_modifiers($targetnotation) {
-        return $this->modifiers;
-    }
-
-    /**
     * Returns regular expression options in desired notation, should suit most notations
     * When overloading this, you probably would want to set some options based on notation
     */

@@ -32,7 +32,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->handlingoptions = $options;
+        $lexer->set_options($options);
 
         $parser = new qtype_preg_yyParser($options);
 

@@ -268,11 +268,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $acceptedcharcount = -1;
         $ismatch = false;
         $laststates = array();//array of states without changing index
-        if (strpos($this->modifiers, 'i') === false) {
-            $casesens=true;
-        } else {
-            $casesens=false;
-        }
+
+        $casesens = !$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+
         do {
         /*check current character while: 1)checked substring match with regex
                                          2)current character isn't end of string
@@ -630,9 +628,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     /**
      *get regex and build finite automates
      * @param regex - regular expirience for which will be build finite automate
-     * @param modifiers - modifiers of regular expression
+     * @param options - options of regular expression
      */
-    public function __construct($regex = null, $modifiers = null, $options = null) {
+    public function __construct($regex = null, $options = null) {
         global $CFG;
 
         if (!isset($regex)) {
@@ -655,7 +653,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             $options = new qtype_preg_matching_options();
         }
         $options->expandquantifiers = true;
-        parent::__construct($regex, $modifiers, $options);
+        parent::__construct($regex, $options);
 
         $bigquant = $this->parser->get_max_finite_quant_borders_difference();
         if ($bigquant > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {

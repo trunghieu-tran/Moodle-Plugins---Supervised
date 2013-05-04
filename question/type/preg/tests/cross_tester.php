@@ -463,11 +463,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 // Get current test data.
                 $data = $testdataobj->$methodname();
                 $regex = $data['regex'];
-                $modifiers = null;
+                $modifiers = 0;
                 $regextags = array();
                 $notation = self::NOTATION_NATIVE;
                 if (array_key_exists('modifiers', $data)) {
-                    $modifiers = $data['modifiers'];
+                    $modifiers = qtype_preg_handling_options::string_to_modifiers($data['modifiers']);
                 }
                 if (array_key_exists('tags', $data)) {
                     $regextags = $data['tags'];

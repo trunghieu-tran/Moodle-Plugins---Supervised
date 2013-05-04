@@ -32,13 +32,13 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
-    public function __construct($regex = null, $modifiers = null, $options = null) {
+    public function __construct($regex = null, $options = null) {
         //This matcher sometimes use common lexer/parser to count subexpressions, since preg_match don't always return them all.
         //We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
         if (is_object($options)) {
             $options->pcrestrict = true;
         }
-        parent::__construct($regex, $modifiers, $options);
+        parent::__construct($regex, $options);
     }
 
     public function is_supporting($capability) {
@@ -55,10 +55,10 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Returns string of regular expression modifiers supported by this engine
+     * Returns supported modifiers as bitwise union of constants MODIFIER_XXX.
      */
     public function get_supported_modifiers() {
-        return new qtype_poasquestion_string('imsxeADSUX');
+        return parent::get_supported_modifiers(); // TODO: imsxeADSUX
     }
 
     /**
@@ -114,7 +114,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $for_regexp = implode('\/',explode('/',$for_regexp));
         }
         $for_regexp = '/'.$for_regexp.'/u';
-        $for_regexp .= $this->modifiers;
+        $for_regexp .= qtype_preg_handling_options::modifiers_to_string($this->options->modifiers);
 
         //Do matching
         $matches = array();
