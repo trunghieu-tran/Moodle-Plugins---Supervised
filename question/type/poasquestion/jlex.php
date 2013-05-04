@@ -25,34 +25,32 @@
   **************************************************************
 */
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once('poasquestion_string.php');
 
 class JLexToken {
+    public $type;
+    public $value;
     public $line;
     public $col;
-    public $value;
-    public $type;
-
     function __construct($type, $value = null, $line = null, $col = null) {
+        $this->type = $type;
+        $this->value = $value;
         $this->line = $line;
         $this->col = $col;
-        $this->value = $value;
-        $this->type = $type;
     }
 }
 
 class JLexBase {
     protected $yy_reader;
     protected $yy_buffer;
-    protected $yy_buffer_read;
-    protected $yy_buffer_index;
-    protected $yy_buffer_start;
-    protected $yy_buffer_end;
+    protected $yy_buffer_read = 0;
+    protected $yy_buffer_index = 0;
+    protected $yy_buffer_start = 0;
+    protected $yy_buffer_end = 0;
     protected $yychar = 0;
     protected $yycol = 0;
     protected $yyline = 0;
-    protected $yy_at_bol;
+    protected $yy_at_bol = true;
     protected $yy_lexical_state;
     protected $yy_last_was_cr = false;
     protected $yy_count_lines = false;
@@ -62,20 +60,14 @@ class JLexBase {
 
     function __construct($stream) {
         $this->yy_reader = $stream;
+        $this->yy_buffer = new qtype_poasquestion_string();
+
         $meta = stream_get_meta_data($stream);
         if (!isset($meta['uri'])) {
             $this->yyfilename = '<<input>>';
         } else {
             $this->yyfilename = $meta['uri'];
         }
-        $this->yy_buffer = "";
-        $this->yy_buffer_read = 0;
-        $this->yy_buffer_index = 0;
-        $this->yy_buffer_start = 0;
-        $this->yy_buffer_end = 0;
-        $this->yychar = 0;
-        $this->yyline = 0;
-        $this->yy_at_bol = true;
     }
 
     protected function yybegin($state) {
@@ -84,13 +76,13 @@ class JLexBase {
 
     protected function yy_advance() {
         if ($this->yy_buffer_index < $this->yy_buffer_read) {
-            $char = qtype_poasquestion_string::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+            $char = $this->yy_buffer[$this->yy_buffer_index++];
             return qtype_poasquestion_string::ord($char);
         }
         if ($this->yy_buffer_start != 0) {
             // Shunt.
             $j = $this->yy_buffer_read - $this->yy_buffer_start;
-            $this->yy_buffer = qtype_poasquestion_string::substr($this->yy_buffer, $this->yy_buffer_start, $j);
+            $this->yy_buffer = $this->yy_buffer->substring($this->yy_buffer_start, $j);
             $this->yy_buffer_end -= $this->yy_buffer_start;
             $this->yy_buffer_start = 0;
             $this->yy_buffer_read = $j;
@@ -100,7 +92,7 @@ class JLexBase {
             if ($data === false || !qtype_poasquestion_string::strlen($data)) {
                 return $this->YY_EOF;
             }
-            $this->yy_buffer .= $data;
+            $this->yy_buffer->concatenate($data);
             $this->yy_buffer_read .= qtype_poasquestion_string::strlen($data);
         }
         while ($this->yy_buffer_index >= $this->yy_buffer_read) {
@@ -108,10 +100,10 @@ class JLexBase {
             if ($data === false || !qtype_poasquestion_string::strlen($data)) {
                 return $this->YY_EOF;
             }
-            $this->yy_buffer .= $data;
+            $this->yy_buffer->concatenate($data);
             $this->yy_buffer_read .= qtype_poasquestion_string::strlen($data);
         }
-        $char = qtype_poasquestion_string::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+        $char = $this->yy_buffer[$this->yy_buffer_index++];
         return qtype_poasquestion_string::ord($char);
     }
 
@@ -164,7 +156,7 @@ class JLexBase {
     }
 
     protected function yytext() {
-        return qtype_poasquestion_string::substr($this->yy_buffer, $this->yy_buffer_start, $this->yy_buffer_end - $this->yy_buffer_start);
+        return $this->yy_buffer->substring($this->yy_buffer_start, $this->yy_buffer_end - $this->yy_buffer_start)->string();
     }
 
     protected function yylength() {
@@ -179,27 +171,5 @@ class JLexBase {
         if ($fatal) {
             throw new Exception("JLex fatal error " . self::$yy_error_string[$code]);
         }
-    }
-
-    /**
-     * Creates an annotated token.
-     */
-    function createToken($type = null) {
-        if ($type === null) {
-            $type = $this->yytext();
-        }
-        $tok = new JLexToken($type);
-        $this->annotateToken($tok);
-        return $tok;
-    }
-
-    /**
-     * Annotates a token with a value and source positioning.
-     */
-    function annotateToken(JLexToken $tok) {
-        $tok->value = $this->yytext();
-        $tok->col = $this->yycol;
-        $tok->line = $this->yyline;
-        $tok->filename = $this->yyfilename;
     }
 }
