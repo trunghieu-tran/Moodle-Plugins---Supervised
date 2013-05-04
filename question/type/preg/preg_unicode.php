@@ -38,6 +38,10 @@ class qtype_preg_unicode extends textlib {
         return 0x10FFFD;
     }
 
+    public static function all_ranges() {
+        return array(array(self::min_possible_code(), self::max_possible_code()));
+    }
+
     public static function dot_ranges() {
         return array(array(0=>0x0000, 1=>0x0009),
                      array(0=>0x000B, 1=>0xD7FF),
@@ -7727,7 +7731,7 @@ class qtype_preg_unicode extends textlib {
         $size = count($ranges);
         $maxcode = self::max_possible_code();
         if ($size === 0) {
-            return array(array(0, $maxcode));
+            return self::all_ranges();
         }
         $result = array();
         if ($ranges[0][0] > 0) {

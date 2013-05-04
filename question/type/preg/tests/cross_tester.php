@@ -148,7 +148,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Create a matcher in POSIX mode for categorization tests.
         $options = new qtype_preg_matching_options();
         $options->mode = qtype_preg_handling_options::MODE_POSIX;
-        $matcher = $this->question->get_matcher($enginename, $regex, false, '', null, self::NOTATION_NATIVE);
+        $matcher = $this->question->get_matcher($enginename, $regex);
         $matcher->set_options($options);
 
         // Match the first test.

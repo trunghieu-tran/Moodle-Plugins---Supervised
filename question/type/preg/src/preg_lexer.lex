@@ -326,9 +326,16 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         return null;
     }
 
-    protected function set_node_case_sensitivity(&$node) {
+    protected function set_node_modifiers(&$node) {
+        if ($this->opt_count < 1) {
+            return;
+        }
+        $stackitem = $this->opt_stack[$this->opt_count - 1];
         if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
-            $node->caseinsensitive = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+            $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+        }
+        if ($node->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            $node->dotall = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
         }
     }
 
@@ -644,7 +651,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
     protected function form_backref($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        $this->set_node_case_sensitivity($node);
+        $this->set_node_modifiers($node);
         $this->backrefs[] = $node;
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
@@ -670,16 +677,13 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $node->subtype = $subtype;
         $node->israngecalculated = false;
 
-        $this->set_node_case_sensitivity($node);
+        $this->set_node_modifiers($node);
 
         if ($data !== null) {
             $flag = new qtype_preg_charset_flag;
             $flag->negative = $negative;
             if ($subtype == qtype_preg_charset_flag::SET) {
                 $data = new qtype_poasquestion_string($data);
-            }
-            if ($subtype == qtype_preg_charset_flag::META_DOT) {
-                $node->dotall = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
             }
             $flag->set_data($subtype, $data);
             $node->flags = array(array($flag));
@@ -707,7 +711,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $node = new qtype_preg_leaf_recursion();
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $node->number = $number;
-        $this->set_node_case_sensitivity($node);
+        $this->set_node_modifiers($node);
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
 
@@ -1796,7 +1800,7 @@ SIGN      = ("+"|"-")                                  // Sign of an integer.
         $this->charset->flags[] = array($flag);
     }
 
-    $this->set_node_case_sensitivity($this->charset);
+    $this->set_node_modifiers($this->charset);
 
     // Look for possible errors.
     $ui1 = $this->charset->userinscription[0];
