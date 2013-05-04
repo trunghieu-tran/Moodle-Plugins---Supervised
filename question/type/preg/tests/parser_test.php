@@ -451,7 +451,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('.', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
+        $this->assertTrue($root->flags[0][0]->data->string() === "\n");
+        $this->assertTrue($root->flags[0][0]->negative);
     }
     function test_parser_word_break() {
         $parser = $this->run_parser('a\b', $errornodes);
