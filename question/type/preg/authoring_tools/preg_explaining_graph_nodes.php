@@ -53,7 +53,7 @@ class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node
      * Returns filling settings of node which will be in graph.
      */
     public function get_filled() {
-        if ($this->pregnode->caseinsensitive) {
+        if ($this->pregnode->caseless) {
             return ', style=filled, fillcolor=grey';
         } else {
             return '';
@@ -416,7 +416,7 @@ class qtype_preg_authoring_tool_operator_quant extends qtype_preg_authoring_tool
 
         $graph->subgraphs[] = $quant;
         $graph->entries[] = end($operand->entries);
-        $graph->exits[] = end($operand->exits);  
+        $graph->exits[] = end($operand->exits);
     }
 }
 
@@ -442,7 +442,7 @@ class qtype_preg_authoring_tool_operator_subexpr extends qtype_preg_authoring_to
 
         $graph->subgraphs[] = $subexpr;
         $graph->entries[] = end($operand->entries);
-        $graph->exits[] = end($operand->exits); 
+        $graph->exits[] = end($operand->exits);
     }
 }
 

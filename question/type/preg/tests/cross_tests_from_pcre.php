@@ -2508,7 +2508,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-/*  function data_for_test_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_modifier_s() {
         $test1 = array( 'str'=>"12\n34",
                         'is_match'=>true,
                         'full'=>true,
@@ -2527,7 +2527,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_positive_lookahead_assertion_and_metacharacters() {
         $test1 = array( 'str'=>"the quick brown\t fox",
                         'is_match'=>true,
@@ -4505,7 +4505,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_begin_and_end_of_string_and_any_character_in_quantifier_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_begin_and_end_of_string_and_any_character_in_quantifier_modifier_s() {
         $test1 = array( 'str'=>"abc\ndef",
                         'is_match'=>true,
                         'full'=>true,
@@ -4517,7 +4517,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_begin_and_end_of_string_and_any_character_in_quantifier_modifier_m() { //модификатор m не поддерживается
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>true,
@@ -5112,7 +5112,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_modifier_s_2() { //модификатор s не поддерживается
+    function data_for_test_modifier_s_2() {
         $test1 = array( 'str'=>"a\nb",
                         'is_match'=>true,
                         'full'=>true,
@@ -5123,7 +5123,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?s)a.b',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_negative_character_classes() {
         $test1 = array( 'str'=>'baNOTccccd',
                         'is_match'=>true,
@@ -6313,7 +6313,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_and_dot_gif_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_and_dot_gif_modifier_s() {
         $test1 = array( 'str'=>"borfle\nbib.gif\nno",
                         'is_match'=>true,
                         'full'=>true,
@@ -6325,7 +6325,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_and_dot_gif_modifiers_ms() { //модификаторы m и s не поддерживаются
         $test1 = array( 'str'=>"borfle\nbib.gif\nno",
                         'is_match'=>true,
@@ -6364,7 +6364,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_before_end_of_line_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_before_end_of_line_modifier_s() {
         $test1 = array( 'str'=>"borfle\nbib.gif\nno",
                         'is_match'=>true,
                         'full'=>true,
@@ -6376,7 +6376,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_before_end_of_line_modifiers_ms() { //модификаторы m и s не поддерживаются
         $test1 = array( 'str'=>"borfle\nbib.gif\nno",
                         'is_match'=>true,
@@ -6415,7 +6415,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_before_end_of_line_modifier_s_2() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_before_end_of_line_modifier_s_2() {
         $test1 = array( 'str'=>"borfle\nbib.gif\nno\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -6427,7 +6427,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_before_end_of_line_modifiers_ms_2() { //модификаторы m и s не поддерживаются
         $test1 = array( 'str'=>"borfle\nbib.gif\nno\n",
                         'is_match'=>true,
@@ -6505,7 +6505,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s() {
         $test1 = array( 'str'=>"abcde\n1234Xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -6542,7 +6542,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifiers_ms() { //модификаторы m и s не поддерживаются
         $test1 = array( 'str'=>"abcde\n1234Xyz",
                         'is_match'=>true,
@@ -6570,7 +6570,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s_in_regexp() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s_in_regexp() {
         $test1 = array( 'str'=>"abcde\n1234Xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -6606,8 +6606,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?s)(.*X|^B)',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-*/
-/*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s_in_unnumbered_subexpression() { //модификатор s не поддерживается
+
+    function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternation_modifier_s_in_unnumbered_subexpression() {
         $test1 = array( 'str'=>"abcde\n1234Xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -6643,7 +6643,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?s:.*X|^B)',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-*/
+
     function data_for_test_any_character_in_quantifier_after_begin_of_line() {
         $test1 = array( 'str'=>'**** Failers',
                         'is_match'=>true,
@@ -6667,7 +6667,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_any_character_in_quantifier_after_begin_of_line_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_after_begin_of_line_modifier_s() {
         $test1 = array( 'str'=>"abc\nB",
                         'is_match'=>true,
                         'full'=>true,
@@ -6678,7 +6678,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?s)^.*B',
                      'tests'=>array($test1));
     }
-*/
+
 /*  function data_for_test_any_character_in_quantifier_after_begin_of_line_modifier_m() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"abc\nB",
                         'is_match'=>true,
@@ -6715,7 +6715,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_end_of_line_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_end_of_line_modifier_s() {
         $test1 = array( 'str'=>"B\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -6726,7 +6726,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'(?s)B$',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_many_digits() {
         $test1 = array( 'str'=>'123456654321',
                         'is_match'=>true,
@@ -7072,7 +7072,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_negative_character_class_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_negative_character_class_modifier_s() {
         $test1 = array( 'str'=>'acb',
                         'is_match'=>true,
                         'full'=>true,
@@ -7091,8 +7091,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1, $test2));
     }
-*/
-/*  function data_for_test_any_character_modifier_s() { //модификатор s не поддерживается
+
+    function data_for_test_any_character_modifier_s() {
         $test1 = array( 'str'=>'acb',
                         'is_match'=>true,
                         'full'=>true,
@@ -7111,7 +7111,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'s',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_subexpression_and_alternation_and_lazy_quantifiers_2() {
         $test1 = array( 'str'=>'bac',
                         'is_match'=>true,
@@ -8079,7 +8079,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_modifiers_s_not_i() { //модификатор s не поддерживается
+    function data_for_test_modifiers_s_not_i() {
         $test1 = array( 'str'=>'more than million',
                         'is_match'=>true,
                         'full'=>true,
@@ -8132,8 +8132,8 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
-*/
-/*  function data_for_test_modifiers_s_not_i_2() { //модификатор s не поддерживается
+
+    function data_for_test_modifiers_s_not_i_2() {
         $test1 = array( 'str'=>'more than million',
                         'is_match'=>true,
                         'full'=>true,
@@ -8186,7 +8186,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
-*/
+
     function data_for_test_modifier_i_in_atomic_group() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -14107,7 +14107,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_any_character_in_unnumbered_subexpression_modifier_s_not_i_in_subexpression_modifier_i() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_unnumbered_subexpression_modifier_s_not_i_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>"a\nB",
                         'is_match'=>true,
                         'full'=>true,
@@ -14119,7 +14119,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'modifiers'=>'i',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_many_unnumbered_subexpressions_and_empty_unnumbered_subexpressions() {
         $test1 = array( 'str'=>'cabbbb',
                         'is_match'=>true,
@@ -14422,7 +14422,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion() { //модификатор s не поддерживается
+    function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion() {
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14433,8 +14433,8 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'((?s).)c(?!.)',
                      'tests'=>array($test1));
     }
-*/
-/*  function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion_2() { //модификатор s не поддерживается
+
+    function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion_2() {
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14445,7 +14445,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'((?s)b.)c(?!.)',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_begin_of_line_after_empty_subexpression() {
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
@@ -17095,7 +17095,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_end_of_line_character_in_negative_lookbehind_assertion_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_any_character_in_quantifier_in_atomic_group_and_end_of_line_character_in_negative_lookbehind_assertion_modifier_s() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17115,7 +17115,7 @@ class qtype_preg_cross_tests_from_pcre {
         return array('regex'=>'^(?s)(?>.*)(?<!\n)',
                      'tests'=>array($test1, $test2));
     }
-*/
+
     function data_for_test_end_of_line_character_in_negative_character_class_in_quantifier_and_end_of_line_character_and_end_of_string_in_negative_lookahead_assertion() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -23092,7 +23092,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_modifier_s() { //модификатор s и ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+    function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_modifier_s() { //модификатор s и ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
                         'full'=>true,
@@ -23104,7 +23104,7 @@ name were given. */
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_1() {
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
@@ -23117,7 +23117,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_begin_of_line_in_atomic_group_modifier_s() { //модификатор s не поддерживается
+    function data_for_test_begin_of_line_in_atomic_group_modifier_s() {
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
                         'full'=>false,
@@ -23131,7 +23131,7 @@ name were given. */
                      'modifiers'=>'s',
                      'tests'=>array($test1));
     }
-*/
+
     function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_subexpressions_in_alternation_in_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,

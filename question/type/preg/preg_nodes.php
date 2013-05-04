@@ -203,7 +203,7 @@ abstract class qtype_preg_node {
 abstract class qtype_preg_leaf extends qtype_preg_node {
 
     /** Is matching case insensitive? */
-    public $caseinsensitive = false;
+    public $caseless = false;
     /** Is this leaf negative? */
     public $negative = false;
     /** Assertions merged into this node (qtype_preg_leaf_assert objects). */
@@ -365,7 +365,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             // Get intersection of all current flags.
             $result = !empty($flags);
             foreach ($flags as $flag) {
-                $result = $result && $flag->match($str, $pos, !$this->caseinsensitive);
+                $result = $result && $flag->match($str, $pos, $this->caseless, $this->dotall);
                 if (!$result) {
                     break;
                 }
@@ -384,7 +384,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
-            $ranges = array(array(0, qtype_preg_unicode::max_possible_code()));
+            $ranges = qtype_preg_unicode::all_ranges();
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
@@ -830,13 +830,13 @@ class qtype_preg_charset_flag {
         return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
     }
 
-    public function match($str, $pos, $cs) {
+    public function match($str, $pos, $caseless, $dotall) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
         }
 
         $char = $str[$pos];
-        if (!$cs) {
+        if ($caseless) {
             $charlower = qtype_poasquestion_string::strtolower($char);
             $charupper = qtype_poasquestion_string::strtoupper($char);
         }
@@ -851,14 +851,18 @@ class qtype_preg_charset_flag {
                 break;
             case self::FLAG:
             case self::UPROP:
-                $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
+                if ($this->data == self::META_DOT && $dotall) {
+                    $ranges = qtype_preg_unicode::all_ranges();
+                } else {
+                    $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
+                }
                 break;
         }
 
-        if ($cs) {
-            $result = qtype_preg_unicode::is_in_range($char, $ranges);
-        } else {
+        if ($caseless) {
             $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
+        } else {
+            $result = qtype_preg_unicode::is_in_range($char, $ranges);
         }
         return ($result xor $this->negative);
     }
@@ -1080,7 +1084,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         }
 
         $strcopy = clone $str;
-        if ($this->caseinsensitive) {
+        if ($this->caseless) {
             $strcopy->tolower();
         }
         $matchlen = 0;
