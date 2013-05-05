@@ -281,10 +281,14 @@ class qtype_preg_regex_handler {
      * Returns supported modifiers as bitwise union of constants MODIFIER_XXX.
      */
     public function get_supported_modifiers() {
-        return qtype_preg_handling_options::MODIFIER_CASELESS |     // Any qtype_preg_matcher should support case insensitivity.
-               qtype_preg_handling_options::MODIFIER_MULTILINE |    // Supported by lexer.
-               qtype_preg_handling_options::MODIFIER_DOTALL |       // Supported by lexer.
-               qtype_preg_handling_options::MODIFIER_EXTENDED;      // Supported by lexer.
+        return qtype_preg_handling_options::MODIFIER_ANCHORED |
+               qtype_preg_handling_options::MODIFIER_CASELESS |         // Any qtype_preg_matcher should support case insensitivity.
+               qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY |
+               qtype_preg_handling_options::MODIFIER_DOTALL |
+               qtype_preg_handling_options::MODIFIER_DUPNAMES |
+               qtype_preg_handling_options::MODIFIER_EXTENDED |
+               qtype_preg_handling_options::MODIFIER_MULTILINE |
+               qtype_preg_handling_options::MODIFIER_UTF8;
     }
 
     /**

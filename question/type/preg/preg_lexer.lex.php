@@ -47,9 +47,6 @@ class qtype_preg_opt_stack_item {
         $modifier = ~$modifier;
         $this->modifiers = ($this->modifiers & $modifier);
     }
-    public function is_modifier_set($modifier) {
-        return ($this->modifiers & $modifier) == 0 ? false : true;
-    }
 }
 
 
@@ -244,6 +241,16 @@ class qtype_preg_lexer extends JLexBase  {
         $this->options = $options;
         $this->mod_top_opt($options->modifiers, 0);
     }
+    /**
+     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
+     */
+    protected function is_modifier_set($modifier) {
+        $modifiers = $this->options->modifiers;
+        if ($this->opt_count > 0) {
+            $modifiers = $this->opt_stack[$this->opt_count - 1]->modifiers;
+        }
+        return ($modifiers & $modifier) == 0 ? false : true;
+    }
     protected function mod_top_opt($set, $unset) {
         $errors = array();
         // Setting and unsetting modifier at the same time is error.
@@ -307,16 +314,12 @@ class qtype_preg_lexer extends JLexBase  {
         return $error;
     }
     protected function set_node_modifiers(&$node) {
-        if ($this->opt_count < 1) {
-            return;
-        }
-        $stackitem = $this->opt_stack[$this->opt_count - 1];
         if (is_a($node, 'qtype_preg_leaf')) {
-            $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+            $node->caseless = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
         if (is_a($node, 'qtype_preg_leaf_assert')) {
-            $node->dollarendonly = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
-            $node->multiline = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
+            $node->dollarendonly = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
+            $node->multiline = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
         }
     }
     /**
@@ -470,7 +473,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
-        $number = $this->map_subexpr($name);
+        $number = $this->map_subexpression($name);
         // Error: subexpressions with same names should have different numbers.
         if ($number === null) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
@@ -683,19 +686,25 @@ class qtype_preg_lexer extends JLexBase  {
     /**
      * Adds a named subexpression to the map.
      */
-    protected function map_subexpr($name) {
-        if (!isset($this->subexpr_map[$name])) {   // This subexpression does not exists.
+    protected function map_subexpression($name) {
+        $exists = isset($this->subexpr_map[$name]);
+        if (!$exists) {
+            // This subexpression does not exists, all is OK.
             $number = ++$this->last_subexpr;
             $this->subexpr_map[$name] = $number;
-        } else {                                                // Subexpressions with same names should have same numbers.
-            if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num === -1) {
+        } else if ($exists && $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES)) {
+            // This subexpression does exist, but there's the J modifier.
+            $number = $this->subexpr_map[$name];
+        } else {
+            // Subexpressions with same names should have same numbers.
+            if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num == -1) {
                 return null;
             }
             $number = $this->subexpr_map[$name];
             $this->last_subexpr++;
         }
         $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
-        return (int)$number;
+        return $number;
     }
     /**
      * Calculates the character for a \cx sequence.
@@ -6246,11 +6255,7 @@ array(
 							break;
 						case 2:
 							{                      /* More than one whitespace */
-    $extended = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
-    if ($this->opt_count > 0) {
-        $extended = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
-    }
-    if (!$extended) {
+    if (!$this->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
         return $this->string_to_tokens($this->yytext());
     }
@@ -6259,11 +6264,7 @@ array(
 							break;
 						case 3:
 							{                                /* Comment beginning when modifier x is set */
-    $extended = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
-    if ($this->opt_count > 0) {
-        $extended = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
-    }
-    if ($extended) {
+    if ($this->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         $this->yybegin(self::YYCOMMENTEXT);
     } else {
         return $this->form_charset('#', $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, '#');
@@ -6365,12 +6366,7 @@ array(
 							break;
 						case 14:
 							{
-    $extended = false;
-    if ($this->opt_count > 0) {
-        $stackitem = $this->opt_stack[$this->opt_count - 1];
-        $extended = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL);
-    }
-    if ($extended) {
+    if ($this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
         // The true dot matches everything.
         return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
     } else {
