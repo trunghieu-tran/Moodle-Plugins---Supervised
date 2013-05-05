@@ -613,10 +613,8 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
-        // Error: reference to the whole expression.
-        if (is_integer($number) && $number == 0) {
-            $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $pos, $pos + $length - 1, '');
-        } else if ($number === '') {
+        // Error: assertion expected.
+        if ($number === '') {
             $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $pos, $pos + $length - 1, '');
         } else {
             $secondnode = new qtype_preg_lexem(null, -1, -1, null);
