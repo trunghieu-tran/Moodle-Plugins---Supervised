@@ -15757,7 +15757,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>27),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>"abc#comment\n\Q#not comment\nliteral\E",
+        return array('regex'=>"abc#comment\n    \Q#not comment\n    literal\E",
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
@@ -15770,7 +15770,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>27),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>"abc#comment\n\Q#not comment\nliteral",
+        return array('regex'=>"abc#comment\n    \Q#not comment\n    literal",
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
@@ -15783,7 +15783,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>27),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>"abc#comment\n\Q#not comment\nliteral\E #more comment\n    ",
+        return array('regex'=>"abc#comment\n    \Q#not comment\n    literal\E #more comment\n    ",
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
@@ -15796,7 +15796,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>27),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>"abc#comment\n\Q#not comment\nliteral\E #more comment",
+        return array('regex'=>"abc#comment\n    \Q#not comment\n    literal\E #more comment",
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
