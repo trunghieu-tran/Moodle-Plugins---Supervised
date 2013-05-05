@@ -11008,11 +11008,11 @@ class qtype_preg_cross_tests_from_pcre {
     }
 
     function data_for_test_backslash() {
-        $test1 = array( 'str'=>'a\\b',
+        $test1 = array( 'str'=>'a' . chr(0x08), // Originally contained \b for chr(0x08) (backspace).
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
+                        'length'=>array(0=>1),
                         'left'=>array(2),
                         'next'=>'\\\\',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -12543,7 +12543,7 @@ class qtype_preg_cross_tests_from_pcre {
     }
 
     function data_for_test_backslash_modifier_i() {
-        $test1 = array( 'str'=>'A\\B',
+        $test1 = array( 'str'=>'A',  // Originally was 'A\B', but pcretest converts \B to an option, so ignore it.
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
