@@ -114,7 +114,7 @@ class qtype_preg_matching_results {
      * otherwise (numbered subexpression) just return $subexpression.
      */
     public function subexpression_number($subexpression) {
-        if (array_key_exists($subexpression, $this->subexpr_map)) {//named subexpression
+        if (isset($this->subexpr_map[$subexpression])) {//named subexpression
             return $this->subexpr_map[$subexpression];
         }
         return $subexpression;
@@ -139,7 +139,7 @@ class qtype_preg_matching_results {
      * The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
      */
     public function is_match() {
-        if (array_key_exists(0, $this->length)) {
+        if (isset($this->length[0])) {
             return $this->full || ($this->length[0] > 0);
         } else {//no matching resutls at all
             return false;
@@ -498,7 +498,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //Are results cached already?
-        if (array_key_exists($str, $this->resultcache)) {
+        if (isset($this->resultcache[$str])) {
             $this->matchresults = $this->resultcache[$str];
         } else {
             $str = new qtype_poasquestion_string($str);

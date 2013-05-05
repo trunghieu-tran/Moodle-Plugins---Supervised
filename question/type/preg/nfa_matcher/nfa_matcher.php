@@ -155,7 +155,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state->number;
-                if (!array_key_exists($number, $result) || $newstate->leftmost_longest($result[$number])) {
+                if (!isset($result[$number]) || $newstate->leftmost_longest($result[$number])) {
                     $result[$number] = $newstate;
                     $curstates[] = $newstate;
                 }
@@ -287,7 +287,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $closure = $this->epsilon_closure(array($newstate->state->number => $newstate), $str);
                     foreach ($closure as $curclosure) {
                         $number = $curclosure->state->number;
-                        if (!array_key_exists($number, $reached) || $reached[$number]->length > $newstate->length) {
+                        if (!isset($reached[$number]) || $reached[$number]->length > $newstate->length) {
                             $reached[$number] = $curclosure;
                         }
                     }
@@ -457,7 +457,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $lazystates[] = $newstate;
                         } else {
                             $number = $newstate->state->number;
-                            if (!array_key_exists($number, $reached) || $newstate->leftmost_longest($reached[$number])) {
+                            if (!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) {
                                 $reached[$number] = $newstate;
                             }
                         }

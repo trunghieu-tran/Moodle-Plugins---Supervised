@@ -571,7 +571,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
-        $number = array_key_exists($name, $this->subexpr_map) ? $this->subexpr_map[$name] : null;
+        $number = isset($this->subexpr_map[$name]) ? $this->subexpr_map[$name] : null;
         return $this->form_backref($text, $pos, $length, $number);
     }
     /**
@@ -624,7 +624,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
-        $number = array_key_exists($name, $this->subexpr_map) ? $this->subexpr_map[$name] : null;
+        $number = isset($this->subexpr_map[$name]) ? $this->subexpr_map[$name] : null;
         return $this->form_recursion($text, $pos, $length, $number);
     }
     /**
@@ -679,7 +679,7 @@ class qtype_preg_lexer extends JLexBase  {
      * Adds a named subexpression to the map.
      */
     protected function map_subexpr($name) {
-        if (!array_key_exists($name, $this->subexpr_map)) {   // This subexpression does not exists.
+        if (!isset($this->subexpr_map[$name])) {   // This subexpression does not exists.
             $number = ++$this->last_subexpr;
             $this->subexpr_map[$name] = $number;
         } else {                                                // Subexpressions with same names should have same numbers.
@@ -750,11 +750,7 @@ class qtype_preg_lexer extends JLexBase  {
      * @return a constant of qtype_preg_leaf_charset if this property is known, null otherwise.
      */
     protected function get_uprop_flag($str) {
-        if (array_key_exists($str, self::$upropflags)) {
-            $error = null;
-            return self::$upropflags[$str];
-        }
-        return null;
+        return isset(self::$upropflags[$str]) ? self::$upropflags[$str] : null;
     }
 	protected $yy_count_chars = true;
 
