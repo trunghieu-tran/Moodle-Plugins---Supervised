@@ -4529,8 +4529,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test2 = array( 'str'=>"abc\ndef",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>2),
+                        'length'=>array(0=>3,1=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
