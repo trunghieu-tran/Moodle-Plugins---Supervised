@@ -235,9 +235,9 @@ class qtype_preg_lexer extends JLexBase  {
     }
     public function set_options($options) {
         $this->options = $options;
-        $this->mod_top_opt($options->modifiers, 0);
+        $this->modify_top_options_stack_item($options->modifiers, 0);
     }
-    protected function mod_top_opt($set, $unset) {
+    protected function modify_top_options_stack_item($set, $unset) {
         $errors = array();
         // Setting and unsetting modifier at the same time is error.
         $setunset = $set & $unset;
@@ -259,31 +259,33 @@ class qtype_preg_lexer extends JLexBase  {
         $stackitem->options->set_modifier($set);
         return null;
     }
-    protected function push_opt_lvl($subexpr_num = -1) {
-        if ($this->opt_count > 0) {
-            $this->opt_stack[$this->opt_count] = clone $this->opt_stack[$this->opt_count - 1];
-            if ($subexpr_num !== -1) {
-                $this->opt_stack[$this->opt_count]->subexpr_num = $subexpr_num;
-                $this->opt_stack[$this->opt_count]->parennum = $this->opt_count;
-            }
-            $this->opt_stack[$this->opt_count]->subexpr_name = null;   // Reset it anyway.
-            $this->opt_count++;
-        } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
+    protected function push_options_stack_item($subexpr_num = -1) {
+        $newitem = clone $this->opt_stack[$this->opt_count - 1];
+        if ($subexpr_num !== -1) {
+            $newitem->subexpr_num = $subexpr_num;
+            $newitem->parennum = $this->opt_count;
+        }
+        $newitem->subexpr_name = null;   // Reset it anyway.
+        $this->opt_stack[$this->opt_count] = $newitem;
+        $this->opt_count++;
     }
-    protected function pop_opt_lvl() {
-        if ($this->opt_count > 0) {
-            $item = $this->opt_stack[$this->opt_count - 1];
-            $this->opt_count--;
-            // Is it a pair for some opening paren?
-            if ($item->parennum === $this->opt_count) {
-                // Are we out of a (?|...) block?
-                if ($this->opt_stack[$this->opt_count - 1]->subexpr_num !== -1) {
-                    // Inside.
-                    $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;    // Reset subexpression numeration.
-                } else {
-                    // Outside.
-                    $this->last_subexpr = $this->max_subexpr;
-                }
+    protected function pop_options_stack_item() {
+        if ($this->opt_count < 2) {
+            // Stack should always contain at least 1 item.
+            return;
+        }
+        $item = array_pop($this->opt_stack);
+        $this->opt_count--;
+        // Is it a pair for some opening paren?
+        if ($item->parennum === $this->opt_count) {
+            // Are we outside of a (?|...) block?
+            $previtem = $this->opt_stack[$this->opt_count - 1];
+            if ($previtem->subexpr_num !== -1) {
+                // Inside.
+                $this->last_subexpr = $previtem->subexpr_num;    // Reset subexpression numeration.
+            } else {
+                // Outside.
+                $this->last_subexpr = $this->max_subexpr;
             }
         }
     }
@@ -300,25 +302,16 @@ class qtype_preg_lexer extends JLexBase  {
         return $error;
     }
     /**
-     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
-     */
-    protected function is_modifier_set($modifier) {
-        $modifiers = $this->options->modifiers;
-        if ($this->opt_count > 0) {
-            $modifiers = $this->opt_stack[$this->opt_count - 1]->options->modifiers;
-        }
-        return ($modifiers & $modifier) == 0 ? false : true;
-    }
-    /**
      * Sets modifiers for the given node using the top stack item.
      */
     protected function set_node_modifiers(&$node) {
+        $topitem = $this->opt_stack[$this->opt_count - 1];
         if (is_a($node, 'qtype_preg_leaf')) {
-            $node->caseless = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+            $node->caseless = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
         if (is_a($node, 'qtype_preg_leaf_assert')) {
-            $node->dollarendonly = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
-            $node->multiline = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
+            $node->dollarendonly = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
+            $node->multiline = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
         }
     }
     /**
@@ -466,7 +459,7 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a named subexpression token.
      */
     protected function form_named_subexpr($text, $pos, $length, $name) {
-        $this->push_opt_lvl();
+        $this->push_options_stack_item();
         // Error: empty name.
         if ($name === '') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
@@ -495,7 +488,7 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a conditional subexpression (number of name condition) token.
      */
     protected function form_cond_subexpr_reference($text, $pos, $length, $number, $ending = '') {
-        $this->push_opt_lvl();
+        $this->push_options_stack_item();
         // Error: unclosed condition.
         if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
@@ -517,7 +510,7 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a conditional subexpression (recursion condition) token.
      */
     protected function form_cond_subexpr_recursion($text, $pos, $length, $number, $ending = '') {
-        $this->push_opt_lvl();
+        $this->push_options_stack_item();
         // Error: unclosed condition.
         if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
@@ -537,15 +530,15 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a conditional subexpression (assertion condition) token.
      */
     protected function form_cond_subexpr_assert($text, $pos, $length, $subtype, $ending = '') {
-        $this->push_opt_lvl();
-        $this->push_opt_lvl();
+        $this->push_options_stack_item();
+        $this->push_options_stack_item();
         return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
     }
     /**
      * Returns a conditional subexpression (define condition) token.
      */
     protected function form_cond_subexpr_define($text, $pos, $length, $ending = '') {
-        $this->push_opt_lvl();
+        $this->push_options_stack_item();
         // Error: unclosed condition.
         if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
@@ -685,16 +678,17 @@ class qtype_preg_lexer extends JLexBase  {
      */
     protected function map_subexpression($name) {
         $exists = isset($this->subexpr_map[$name]);
+        $topitem = $this->opt_stack[$this->opt_count - 1];
         if (!$exists) {
             // This subexpression does not exists, all is OK.
             $number = ++$this->last_subexpr;
             $this->subexpr_map[$name] = $number;
-        } else if ($exists && $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES)) {
+        } else if ($exists && $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES)) {
             // This subexpression does exist, but there's the J modifier.
             $number = $this->subexpr_map[$name];
         } else {
             // Subexpressions with same names should have same numbers.
-            if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num == -1) {
+            if ($topitem->subexpr_num == -1) {
                 return null;
             }
             $number = $this->subexpr_map[$name];
@@ -6252,7 +6246,8 @@ array(
 							break;
 						case 2:
 							{                      /* More than one whitespace */
-    if (!$this->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
         return $this->string_to_tokens($this->yytext());
     }
@@ -6261,7 +6256,8 @@ array(
 							break;
 						case 3:
 							{                                /* Comment beginning when modifier x is set */
-    if ($this->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         $this->yybegin(self::YYCOMMENTEXT);
     } else {
         return $this->form_charset('#', $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, '#');
@@ -6315,7 +6311,7 @@ array(
 							break;
 						case 9:
 							{                      /* (...)           Subexpression */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     $this->last_subexpr++;
     $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->yychar, $this->yychar, new qtype_preg_userinscription('('), $this->last_subexpr));
@@ -6324,7 +6320,7 @@ array(
 							break;
 						case 10:
 							{
-    $this->pop_opt_lvl();
+    $this->pop_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
 }
 						case -11:
@@ -6332,8 +6328,9 @@ array(
 						case 11:
 							{
     // Reset subexpressions numeration inside a (?|...) group.
-    if ($this->opt_count > 0 && $this->opt_stack[$this->opt_count - 1]->subexpr_num != -1) {
-        $this->last_subexpr = $this->opt_stack[$this->opt_count - 1]->subexpr_num;
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if ($topitem->subexpr_num != -1) {
+        $this->last_subexpr = $topitem->subexpr_num;
     }
     return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
@@ -6363,7 +6360,8 @@ array(
 							break;
 						case 14:
 							{
-    if ($this->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
         // The true dot matches everything.
         return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
     } else {
@@ -6712,7 +6710,7 @@ array(
 							break;
 						case 54:
 							{                    /* (?>...)         Atomic, non-capturing group */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), -1));
 }
 						case -55:
@@ -6747,7 +6745,7 @@ array(
 							break;
 						case 58:
 							{                    /* (?=...)         Positive look ahead assertion */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?=')));
 }
 						case -59:
@@ -6765,7 +6763,7 @@ array(
     }
     $set = qtype_preg_handling_options::string_to_modifiers($set);
     $unset = qtype_preg_handling_options::string_to_modifiers($unset);
-    $errors = $this->mod_top_opt($set, $unset);
+    $errors = $this->modify_top_options_stack_item($set, $unset);
     if ($this->options->preserveallnodes) {
         $node = new qtype_preg_leaf_option($set, $unset);
         $node->errors = $errors;
@@ -6779,7 +6777,7 @@ array(
 							break;
 						case 60:
 							{                    /* (?:...)         Non-capturing group */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
 }
 						case -61:
@@ -6787,14 +6785,14 @@ array(
 						case 61:
 							{                    /* (?|...)         Non-capturing group, duplicate subexpression numbers */
     // Save the top-level subexpression number.
-    $this->push_opt_lvl($this->last_subexpr);
+    $this->push_options_stack_item($this->last_subexpr);
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subexpr::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
 }
 						case -62:
 							break;
 						case 62:
 							{                    /* (?!...)         Negative look ahead assertion */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?!')));
 }
 						case -63:
@@ -6938,8 +6936,8 @@ array(
     }
     $set = qtype_preg_handling_options::string_to_modifiers($set);
     $unset = qtype_preg_handling_options::string_to_modifiers($unset);
-    $this->push_opt_lvl();
-    $errors = $this->mod_top_opt($set, $unset);
+    $this->push_options_stack_item();
+    $errors = $this->modify_top_options_stack_item($set, $unset);
     if ($this->options->preserveallnodes) {
         $node = new qtype_preg_leaf_option($set, $unset);
         $node->errors = $errors;
@@ -6956,14 +6954,14 @@ array(
 							break;
 						case 75:
 							{                   /* (?<=...)        Positive look behind assertion */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<=')));
 }
 						case -76:
 							break;
 						case 76:
 							{                   /* (?<!...)        Negative look behind assertion */
-    $this->push_opt_lvl();
+    $this->push_options_stack_item();
     return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<!')));
 }
 						case -77:
