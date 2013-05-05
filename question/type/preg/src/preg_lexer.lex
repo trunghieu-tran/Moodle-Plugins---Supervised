@@ -34,25 +34,20 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_opt_stack_item {
-    public $modifiers;
+    public $options;
     public $subexpr_num;
     public $subexpr_name;
     public $parennum;
 
-    public function __construct($modifiers, $subexpr_num, $subexpr_name, $parennum) {
-        $this->modifiers = $modifiers;
+    public function __construct($options, $subexpr_num, $subexpr_name, $parennum) {
+        $this->options = $options;
         $this->subexpr_num = $subexpr_num;
         $this->subexpr_name = $subexpr_name;
         $this->parennum = $parennum;
     }
 
-    public function set_modifier($modifier) {
-        $this->modifiers = ($this->modifiers | $modifier);
-    }
-
-    public function unset_modifier($modifier) {
-        $modifier = ~$modifier;
-        $this->modifiers = ($this->modifiers & $modifier);
+    public function __clone() {
+        $this->options = clone $this->options;
     }
 }
 
@@ -76,7 +71,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 
 %init{
     $this->options = new qtype_preg_handling_options();
-    $this->opt_stack[0] = new qtype_preg_opt_stack_item(0, -1, null, -1);
+    $this->opt_stack[0] = new qtype_preg_opt_stack_item(clone $this->options, -1, null, -1);
 %init}
 %eof{
     // End of the expression inside a character class.
@@ -116,7 +111,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
     protected $backrefs = array();
 
-    // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
+    // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
 
     // Number of items in the above stack.
@@ -298,17 +293,6 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         $this->mod_top_opt($options->modifiers, 0);
     }
 
-    /**
-     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
-     */
-    protected function is_modifier_set($modifier) {
-        $modifiers = $this->options->modifiers;
-        if ($this->opt_count > 0) {
-            $modifiers = $this->opt_stack[$this->opt_count - 1]->modifiers;
-        }
-        return ($modifiers & $modifier) == 0 ? false : true;
-    }
-
     protected function mod_top_opt($set, $unset) {
         $errors = array();
 
@@ -330,8 +314,8 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 
         // Unset and set local modifiers.
         $stackitem = $this->opt_stack[$this->opt_count - 1];
-        $stackitem->unset_modifier($unset);
-        $stackitem->set_modifier($set);
+        $stackitem->options->unset_modifier($unset);
+        $stackitem->options->set_modifier($set);
         return null;
     }
 
@@ -379,6 +363,20 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         return $error;
     }
 
+    /**
+     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
+     */
+    protected function is_modifier_set($modifier) {
+        $modifiers = $this->options->modifiers;
+        if ($this->opt_count > 0) {
+            $modifiers = $this->opt_stack[$this->opt_count - 1]->options->modifiers;
+        }
+        return ($modifiers & $modifier) == 0 ? false : true;
+    }
+
+    /**
+     * Sets modifiers for the given node using the top stack item.
+     */
     protected function set_node_modifiers(&$node) {
         if (is_a($node, 'qtype_preg_leaf')) {
             $node->caseless = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
