@@ -91,7 +91,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
     // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
     public function current_match($subpatt) {
-        if (!array_key_exists($subpatt, $this->matches)) {
+        if (!isset($this->matches[$subpatt])) {
             return null;
         }
         return end($this->matches[$subpatt]);
@@ -110,7 +110,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return $this->current_match($subpatt);
         }
 
-        if (!array_key_exists($subpatt, $this->matches)) {
+        if (!isset($this->matches[$subpatt])) {
             return null;
         }
 
@@ -147,7 +147,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     /**********************************************************************/
 
     public function find_dup_subexpr_match($subexpr) {
-        if (!array_key_exists($subexpr, $this->subexpr_to_subpatt)) {
+        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
             // Can get here when {0} occurs in the regex.
             return self::empty_subpatt_match();
         }
@@ -178,7 +178,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         $index = array();
         $length = array();
         for ($subexpr = 0; $subexpr <= $this->automaton->max_subexpr(); $subexpr++) {
-            if (!array_key_exists($subexpr, $this->subexpr_to_subpatt)) {
+            if (!isset($this->subexpr_to_subpatt[$subexpr])) {
                 // Can get here when {0} occurs in the regex.
                 $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
                 $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
@@ -275,8 +275,8 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
         // Iterate over all subpatterns skipping the first which is the whole expression.
         for ($i = $this->root_subpatt_number() + 1; $i <= $this->automaton->max_subpatt(); $i++) {
-            $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : array(self::empty_subpatt_match());
-            $other_match = array_key_exists($i, $other->matches) ? $other->matches[$i] : array(self::empty_subpatt_match());
+            $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
+            $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
             // Less number of iterations means that there is a longer match without epsilons.
             $this_count = count($this_match);

@@ -321,7 +321,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $foundkey = $key;
                 $ismatch = true;
             }
-            if (array_key_exists(qtype_preg_dfa_leaf_meta::ENDREG, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
+            if (isset($this->finiteautomates[$assertnumber][$currentstate]->passages[qtype_preg_dfa_leaf_meta::ENDREG])) {
             //if current character is end of string and fa can go to end state.
                 if ($offset + $index == strlen($string)) { //must be end
                     $found = true;
@@ -565,7 +565,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
 
                     //$this->connection[$index][$number]->pregnode->push_negative();
-                    if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
+                    if (isset($passages[$num]) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
                         array_push($equnum, $num);
                     }
                 }
@@ -573,15 +573,15 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         } elseif ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
             echo '<BR>'.'LEAF_META used:'.$this->connection[$index][$number]->pregnode->type.'<BR>';
             foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
+                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && isset($passages[$num])) {
                     array_push($equnum, $num);
-                } /*else if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
+                } /*else if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_DOT && isset($passages[$num])) {
                     array_push($equnum, $num);
                 }*/
             }
         } elseif ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {//if this leaf is assert
             foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
+                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && isset($passages[$num])) {
                     array_push($equnum, $num);
                 }
             }
@@ -1186,12 +1186,11 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         foreach ($this->map[0] as $key=>$val) {
             foreach ($val as $key2=>$val2) {
-                if (!array_key_exists($val2, $this->connection[0])) {
-                    unset ($this->map[0][$key][$key2]);
+                if (!isset($this->connection[0][$val2])) {
+                    unset($this->map[0][$key][$key2]);
                 }
             }
         }
-
     }
     /**
     * DFA node factory
