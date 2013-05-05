@@ -65,6 +65,7 @@ class qtype_preg_opt_stack_item {
 %function nextToken
 %char
 %unicode
+%state YYCOMMENTEXT
 %state YYCOMMENT
 %state YYQEOUT
 %state YYQEIN
@@ -885,16 +886,27 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         return $this->string_to_tokens($this->yytext());
     }
 }
-<YYINITIAL> "#"[^\n]*\n {
+<YYINITIAL> "#" {                                /* Comment beginning when modifier x is set */
     $extended = $this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
     if ($this->opt_count > 0) {
         $extended = $this->opt_stack[$this->opt_count - 1]->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED);
     }
-    if (!$extended) {
-        // If the "x" modifier is not set, return all the whitespaces.
-        return $this->string_to_tokens($this->yytext());
+    if ($extended) {
+        $this->yybegin(self::YYCOMMENTEXT);
+    } else {
+        return $this->form_charset('#', $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, '#');
     }
 }
+<YYCOMMENTEXT> [^\n]* {
+    // Do nothing.
+}
+<YYCOMMENTEXT> \n {
+    $this->yybegin(self::YYINITIAL);
+}
+
+
+
+
 <YYINITIAL> "?"{QUANTTYPE} {                     // ?     Quantifier 0 or 1
     $text = $this->yytext();
     $greed = $this->yylength() === 1;

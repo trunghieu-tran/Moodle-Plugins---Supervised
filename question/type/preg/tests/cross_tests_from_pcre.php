@@ -15396,7 +15396,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>22,1=>1,2=>12),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>'<a[\s]+href[\s]*=[\s]*          # find <a href=\n([\"\'])?                       # find single or double quote\n(?(1) (.*?)\1 | ([^\s]+))       # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n',
+        return array('regex'=>"<a[\s]+href[\s]*=[\s]*          # find <a href=\n([\\\"\'])?                       # find single or double quote\n(?(1) (.*?)\\1 | ([^\s]+))       # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n",
                      'modifiers'=>'isx',
                      'tests'=>array($test1, $test2, $test3));
     }
@@ -15423,7 +15423,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>36,1=>1,2=>12),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>'<a\s+href\s*=\s*                # find <a href=\n (["\'])?                         # find single or double quote\n (?(1) (.*?)\1 | (\S+))          # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n',
+        return array('regex'=>"<a\s+href\s*=\s*                # find <a href=\n ([\"'])?                         # find single or double quote\n (?(1) (.*?)\\1 | (\S+))          # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n",
                      'modifiers'=>'isx',
                      'tests'=>array($test1, $test2, $test3));
     }
