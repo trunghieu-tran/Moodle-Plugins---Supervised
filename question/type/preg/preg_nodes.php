@@ -1297,7 +1297,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         parent::calculate_nflf($followpos);
         $this->nullable = $this->nullable || $this->leftborder == 0;
         foreach ($this->lastpos as $lastpos) {
-            if (!array_key_exists($lastpos, $followpos)) {
+            if (!isset($followpos[$lastpos])) {
                 $followpos[$lastpos] = array();
             }
             foreach ($this->operands[0]->firstpos as $firstpos) {
@@ -1350,25 +1350,46 @@ class qtype_preg_node_concat extends qtype_preg_operator {
         }
 
         // Followpos is calculated for each operand except the last one.
-        for ($i = 0; $i < $count - 1; $i++) {
+        $followpos_prev = array(); // followpos calculated on the previous step.
+        for ($i = $count - 2; $i >= 0; $i--) {
             $left = $this->operands[$i];
+            $right = $this->operands[$i + 1];
+            $followpos_new = array(); // followpos calculated on this step.
+
             foreach ($left->lastpos as $lastpos) {
-                if (!array_key_exists($lastpos, $followpos)) {
+                if (!isset($followpos[$lastpos])) {
                     $followpos[$lastpos] = array();
                 }
+                if (!isset($followpos_new[$lastpos])) {
+                    $followpos_new[$lastpos] = array();
+                }
 
-                for ($j = $i + 1; $j < $count; $j++) {
-                    $right = $this->operands[$j];
-                    foreach ($right->firstpos as $firstpos) {
-                        if (!in_array($firstpos, $followpos[$lastpos])) {
-                            $followpos[$lastpos][] = $firstpos;
-                        }
+                foreach ($right->firstpos as $firstpos) {
+                    if (!in_array($firstpos, $followpos[$lastpos])) {
+                        $followpos[$lastpos][] = $firstpos;
+                        $followpos_new[$lastpos][] = $firstpos;
                     }
-                    if (!$right->nullable) {
-                        break;
+                }
+
+                // Right operand is not nullable; continue.
+                if (!$right->nullable || $i == $count - 2) {
+                    continue;
+                }
+
+                // Right operand is nullable. Copy its follopos to current node.
+                foreach ($followpos_prev as $from => $to) {
+                    if (!isset($followpos[$from])) {
+                        $followpos[$from] = array();
+                    }
+                    foreach ($to as $tmp) {
+                        if (!in_array($tmp, $followpos[$lastpos])) {
+                            $followpos[$lastpos][] = $tmp;
+                            $followpos_new[$lastpos][] = $tmp;
+                        }
                     }
                 }
             }
+            $followpos_prev = $followpos_new;
         }
     }
 }
