@@ -945,16 +945,21 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
  */
 class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
+    /** \b and \B */
+    const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
+    /** \A */
+    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
+    /** \z and \Z */
+    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
+    /** \G */
+    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
     /** ^ */
     const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
     /** $ */
     const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
-    /** \b */
-    const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
-    /** \A */
-    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
-    /** \z */
-    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
+
+    public $dollarendonly = false;
+    public $multiline = false;
 
     public function __construct($subtype = null, $negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
@@ -969,53 +974,90 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
+        $result = false;
         switch ($this->subtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                $result = ($pos === 0);
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                $result = ($pos === $str->length());
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
-                $alnumrange = qtype_preg_unicode::alnum_ranges();
-                $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_in_range($str[0], $alnumrange));
-                $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange));
-                $wW = $Ww = false;
-                if ($pos > 0 && $pos < $str->length()) {
-                    $wW = ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange)) && !($str[$pos] === '_' || qtype_preg_unicode::is_in_range($str[$pos], $alnumrange));
-                    $Ww = !($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange)) && ($str[$pos] === '_' || qtype_preg_unicode::is_in_range($str[$pos], $alnumrange));
-                }
-                $result = ($start || $end || $wW || $Ww);
-                break;
-            default:
-                $result = false;
-        }
-        if ($this->negative) {
-            $result = !$result;
+        case self::SUBTYPE_ESC_B:
+            // \b (\B) matches at (not) a word boundary.
+            $alnumrange = qtype_preg_unicode::alnum_ranges();
+            $ch0 = $str[0];
+            $ch1 = $str[$pos - 1];
+
+            $flag0 = $ch0 == '_' || qtype_preg_unicode::is_in_range($ch0, $alnumrange);
+            $flag1 = $ch1 == '_' || qtype_preg_unicode::is_in_range($ch1, $alnumrange);
+
+            $start = $flag0 && $pos == 0;
+            $end = $flag1 && $pos == $str->length();
+            $wW = false;
+            $Ww = false;
+
+            if ($pos > 0 && $pos < $str->length()) {
+                $ch2 = $str[$pos];
+                $flag2 = $ch2 == '_' || qtype_preg_unicode::is_in_range($ch2, $alnumrange);
+                $wW = $flag1 && !$flag2;
+                $Ww = !$flag1 && $flag2;
+            }
+            $result = ($start || $end || $wW || $Ww);
+            $result = ($result xor $this->negative);
+            break;
+        case self::SUBTYPE_ESC_A:
+            // \A matches at the very start of the string.
+            $result = ($pos == 0);
+            break;
+        case self::SUBTYPE_ESC_Z:
+            if ($this->negative) {
+                // \Z matches at the end of the string, also matches before the very last newline.
+                $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
+            } else {
+                // \z matches only at the end of the string.
+                $result = ($pos == $str->length());
+            }
+            break;
+        case self::SUBTYPE_ESC_G:
+            // TODO matches at the first matching position in the string.
+            break;
+        case self::SUBTYPE_CIRCUMFLEX:
+            if ($this->multiline) {
+                // Matches at the very start of the string or after \n.
+                $result = ($pos == 0) || ($str[$pos - 1] == "\n");
+            } else {
+                // Default case, the same as \A.
+                $result = ($pos == 0);
+            }
+            break;
+        case self::SUBTYPE_DOLLAR:
+            if ($this->dollarendonly && !$this->multiline) {
+                // Matches only at the end of the string.
+                $result = ($pos == $str->length());
+            } else if ($this->multiline) {
+                // Matches at the end of the string and before any \n.
+                $result = ($pos == $str->length()) || ($str[$pos] == "\n");
+            } else {
+                // Default case, the same as \Z.
+                $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
+            }
+            break;
         }
         return $result;
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case self::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case self::SUBTYPE_CIRCUMFLEX:
                 if ($this->negative) {
                     return 'notstringstart';
                 } else {
                     return 'stringstart';
                 }
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
+            case self::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case self::SUBTYPE_DOLLAR:
                 if ($this->negative) {
                     return ' notstringend';
                 } else {
                     return '';
                 }
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
+            case self::SUBTYPE_ESC_B:
                 if ($this->negative) {
                     return 'notwordchar';
                 } else {
@@ -1026,15 +1068,15 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     }
     public function tohr() {
         switch ($this->subtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case self::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case self::SUBTYPE_CIRCUMFLEX:
                 $type = '^';
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
+            case self::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case self::SUBTYPE_DOLLAR:
                 $type = '$';
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
+            case self::SUBTYPE_ESC_B:
                 $type = '\\b';
                 break;
         }
@@ -1073,7 +1115,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
         if (!$matcherstateobj->is_subexpr_captured($this->number) || ($subexprlen > 0 && $pos >= $str->length())) {
             return false;
-        } else if ($subexprlen === 0) {
+        } else if ($subexprlen == 0) {
             return true;
         }
 
@@ -1085,7 +1127,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         $result = true;
         // Check char by char.
         for ($i = $start; $result && $i <= $end && $matchlen + $pos < $str->length(); $i++) {
-            $result = $result && ($strcopy[$i] === $strcopy[$pos + $matchlen]);
+            $result = $result && ($strcopy[$i] == $strcopy[$pos + $matchlen]);
             if ($result) {
                 $matchlen++;
             }
@@ -1575,7 +1617,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_DIFFERENT_SUBEXPR_NAMES      = 'different_subexpr_names_node_error';          // Different subexpression names for subexpressions of the same number.
     const SUBTYPE_SUBEXPR_NAME_EXPECTED        = 'subexpr_name_expected_node_error';            // Subexpression name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
-    const SUBTYPE_GLNU_UNSUPPORTED             = 'glnu_unsupported_node_error';                 // \G, \L, \l, \N{name}, \U, and \u are unsupported.
+    const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
     const SUBTYPE_UNRECOGNIZED_PQH             = 'unrecognized_pqh_node_error';                 // Unrecognized character after (? or (?-.
     const SUBTYPE_UNRECOGNIZED_PQLT            = 'unrecognized_pqlt_node_error';                // Unrecognized character after (?<.
     const SUBTYPE_UNRECOGNIZED_PQP             = 'unrecognized_pqp_node_error';                 // Unrecognized character after (?P.

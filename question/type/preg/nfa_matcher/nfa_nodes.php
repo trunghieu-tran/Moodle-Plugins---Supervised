@@ -256,6 +256,13 @@ abstract class qtype_preg_nfa_node {
  */
 class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 
+    public function accept() {
+        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
+            return get_string($this->pregnode->subtype, 'qtype_preg');
+        }
+        return true;
+    }
+
     public function create_automaton_inner($matcher, &$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
         $start = new qtype_preg_fa_state($automaton);
@@ -595,7 +602,7 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
 
     public function accept() {
         if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
-            return get_string('onceonly_node_subexpr', 'qtype_preg');
+            return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
     }

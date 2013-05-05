@@ -154,12 +154,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Match the first test.
         $matcher->match($test1['str']);
         $obtained1 = $matcher->get_match_results();
-        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', false, false);
+        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], 0, '', $matcher, $test1, $obtained1, 'categorize', 'associativity', false, false);
 
         // Match the second test.
         $matcher->match($test2['str']);
         $obtained2 = $matcher->get_match_results();
-        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', false, false);
+        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], 0, '', $matcher, $test2, $obtained2, 'categorize', 'associativity', false, false);
 
         if ($left && !$right) {
             return self::TAG_ASSOC_LEFT;
@@ -317,7 +317,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, $dumpfails) {
+    function compare_results($regex, $notation, $str, $mods, $modstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, $dumpfails) {
         // Do some initialization.
         $fullpassed = ($expected['full'] === $obtained->full);
         $ismatchpassed = true;
@@ -373,7 +373,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             $leftpassed = in_array($obtained->left, $expected['left']);
         }
         if (!$skippartialcheck && $this->doextrachecks && $obtained->extendedmatch !== null) {
-            $this->do_extra_check($regex, $notation, $modifiers, $obtained);
+            $this->do_extra_check($regex, $notation, $mods, $obtained);
         }
 
         $passed = $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $nextpassed && $leftpassed;
@@ -383,7 +383,9 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         }
 
         $enginename = $matcher->name();
-        $failedstr = "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname)\n";
+        $failedstr = $mods == ''
+                     ? "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname)\n"
+                     : "$enginename failed on regex '$regex' string '$str' and modifiers '$modstr' ($classname, $methodname)\n";
         $expectedstr = "expected:\n";
 
         // is_match
@@ -464,11 +466,13 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 // Get current test data.
                 $data = $testdataobj->$methodname();
                 $regex = $data['regex'];
+                $modifiersstr = '';
                 $modifiers = 0;
                 $regextags = array();
                 $notation = self::NOTATION_NATIVE;
                 if (array_key_exists('modifiers', $data)) {
-                    $modifiers = qtype_preg_handling_options::string_to_modifiers($data['modifiers']);
+                    $modifiersstr = $data['modifiers'];
+                    $modifiers = qtype_preg_handling_options::string_to_modifiers($modifiersstr);
                 }
                 if (array_key_exists('tags', $data)) {
                     $regextags = $data['tags'];
@@ -527,7 +531,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                     // Results obtained, check them.
                     $skippartialcheck = in_array(self::TAG_DONT_CHECK_PARTIAL, $tags);
-                    if ($this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
+                    if ($this->compare_results($regex, $notation, $str, $modifiers, $modifiersstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
                         $this->passcount++;
                     } else {
                         $this->failcount++;
