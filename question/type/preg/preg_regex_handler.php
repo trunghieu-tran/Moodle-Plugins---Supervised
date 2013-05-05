@@ -183,10 +183,10 @@ class qtype_preg_handling_options {
         return $result;
     }
 
-    public static function modifiers_to_string($mods) {
+    public function modifiers_to_string() {
         $result = '';
         foreach (self::get_all_modifiers() as $mod) {
-            if ($mod & $mods) {
+            if ($this->modifiers & $mod) {
                 $result .= self::modifier_to_char($mod);
             }
         }

@@ -114,7 +114,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $for_regexp = implode('\/',explode('/',$for_regexp));
         }
         $for_regexp = '/'.$for_regexp.'/u';
-        $for_regexp .= qtype_preg_handling_options::modifiers_to_string($this->options->modifiers);
+        $for_regexp .= $this->options->modifiers_to_string();
 
         //Do matching
         $matches = array();

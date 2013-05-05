@@ -30,22 +30,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 class qtype_preg_opt_stack_item {
-    public $modifiers;
+    public $options;
     public $subexpr_num;
     public $subexpr_name;
     public $parennum;
-    public function __construct($modifiers, $subexpr_num, $subexpr_name, $parennum) {
-        $this->modifiers = $modifiers;
+    public function __construct($options, $subexpr_num, $subexpr_name, $parennum) {
+        $this->options = $options;
         $this->subexpr_num = $subexpr_num;
         $this->subexpr_name = $subexpr_name;
         $this->parennum = $parennum;
     }
-    public function set_modifier($modifier) {
-        $this->modifiers = ($this->modifiers | $modifier);
-    }
-    public function unset_modifier($modifier) {
-        $modifier = ~$modifier;
-        $this->modifiers = ($this->modifiers & $modifier);
+    public function __clone() {
+        $this->options = clone $this->options;
     }
 }
 
@@ -73,7 +69,7 @@ class qtype_preg_lexer extends JLexBase  {
     protected $subexpr_map = array();
     // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
     protected $backrefs = array();
-    // Stack containing additional information about subexpressions (modifiers, current subexpression name, etc).
+    // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
     // Number of items in the above stack.
     protected $opt_count = 1;
@@ -241,16 +237,6 @@ class qtype_preg_lexer extends JLexBase  {
         $this->options = $options;
         $this->mod_top_opt($options->modifiers, 0);
     }
-    /**
-     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
-     */
-    protected function is_modifier_set($modifier) {
-        $modifiers = $this->options->modifiers;
-        if ($this->opt_count > 0) {
-            $modifiers = $this->opt_stack[$this->opt_count - 1]->modifiers;
-        }
-        return ($modifiers & $modifier) == 0 ? false : true;
-    }
     protected function mod_top_opt($set, $unset) {
         $errors = array();
         // Setting and unsetting modifier at the same time is error.
@@ -269,8 +255,8 @@ class qtype_preg_lexer extends JLexBase  {
         }
         // Unset and set local modifiers.
         $stackitem = $this->opt_stack[$this->opt_count - 1];
-        $stackitem->unset_modifier($unset);
-        $stackitem->set_modifier($set);
+        $stackitem->options->unset_modifier($unset);
+        $stackitem->options->set_modifier($set);
         return null;
     }
     protected function push_opt_lvl($subexpr_num = -1) {
@@ -313,6 +299,19 @@ class qtype_preg_lexer extends JLexBase  {
         }
         return $error;
     }
+    /**
+     * Is modifier set? First checks the top stack item; if stack is empty falls back to lexer's options.
+     */
+    protected function is_modifier_set($modifier) {
+        $modifiers = $this->options->modifiers;
+        if ($this->opt_count > 0) {
+            $modifiers = $this->opt_stack[$this->opt_count - 1]->options->modifiers;
+        }
+        return ($modifiers & $modifier) == 0 ? false : true;
+    }
+    /**
+     * Sets modifiers for the given node using the top stack item.
+     */
     protected function set_node_modifiers(&$node) {
         if (is_a($node, 'qtype_preg_leaf')) {
             $node->caseless = $this->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
@@ -771,7 +770,7 @@ class qtype_preg_lexer extends JLexBase  {
 		$this->yy_lexical_state = self::YYINITIAL;
 
     $this->options = new qtype_preg_handling_options();
-    $this->opt_stack[0] = new qtype_preg_opt_stack_item(0, -1, null, -1);
+    $this->opt_stack[0] = new qtype_preg_opt_stack_item(clone $this->options, -1, null, -1);
 	}
 
 	private function yy_do_eof () {
