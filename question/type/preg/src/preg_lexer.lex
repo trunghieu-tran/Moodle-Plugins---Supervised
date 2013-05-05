@@ -376,8 +376,12 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
             return;
         }
         $stackitem = $this->opt_stack[$this->opt_count - 1];
-        if (is_a($node, 'qtype_preg_leaf') && $this->opt_count > 0) {
+        if (is_a($node, 'qtype_preg_leaf')) {
             $node->caseless = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+        }
+        if (is_a($node, 'qtype_preg_leaf_assert')) {
+            $node->dollarendonly = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
+            $node->multiline = $stackitem->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
         }
     }
 
@@ -692,6 +696,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $node->subtype = $subtype;
         $node->negative = $negative;
+        $this->set_node_modifiers($node);
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
 
@@ -1552,7 +1557,10 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 }
 <YYINITIAL> "\z"|"\Z" {
     $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z/*, $text === '\Z'*/);
+    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, $text === '\Z');
+}
+<YYINITIAL> "\G" {
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
 }
 <YYINITIAL> "^" {
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
@@ -1564,9 +1572,9 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');
     return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
 }
-<YYINITIAL> "\G"|"\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
+<YYINITIAL> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
@@ -1789,7 +1797,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 }
 <YYCHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $this->create_error_node(qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+    $this->create_error_node(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text, $this->yychar, $this->yychar + $this->yylength() - 1, '');
     $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
 <YYCHARSET> "\E" {

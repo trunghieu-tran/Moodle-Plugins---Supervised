@@ -519,7 +519,7 @@ class qtype_preg_regex_handler {
         $parseerrors = $this->parser->get_error_nodes();
         foreach($parseerrors as $node) {
             // There can be a specific accepting error.
-            if ($node->subtype == qtype_preg_node_error::SUBTYPE_GLNU_UNSUPPORTED) {
+            if ($node->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED) {
                 $inscription = $node->addinfo;
                 $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, $node->indfirst, $node->indlast);
             } else {

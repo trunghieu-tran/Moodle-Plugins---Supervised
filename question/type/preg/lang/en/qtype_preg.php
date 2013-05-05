@@ -93,11 +93,12 @@ $string['node_error']                  = 'syntax error';
 
 // Subtypes.
 $string['empty_leaf_meta']             = 'emptiness';
-$string['circumflex_leaf_assert']      = 'start of the subject assertion';
-$string['dollar_leaf_assert']          = 'end of the subject assertion';
 $string['esc_b_leaf_assert']           = 'word boundary assertion';
 $string['esc_a_leaf_assert']           = 'start of the subject assertion';
 $string['esc_z_leaf_assert']           = 'end of the subject assertion';
+$string['esc_g_leaf_assert']           = '';
+$string['circumflex_leaf_assert']      = 'start of the subject assertion';
+$string['dollar_leaf_assert']          = 'end of the subject assertion';
 $string['accept_leaf_control']         = '';   // TODO
 $string['fail_leaf_control']           = '';
 $string['mark_name_leaf_control']      = '';
@@ -166,7 +167,7 @@ $string['duplicate_subexpr_names_node_error']      = 'Two named subexpressions h
 $string['different_subexpr_names_node_error']      = 'Different subexpression names for subexpressions of the same number.';
 $string['subexpr_name_expected_node_error']        = 'subexpression name expected.';
 $string['cx_should_be_ascii_node_error']           = '\c should be followed by an ascii character.';
-$string['glnu_unsupported_node_error']             = 'Sequences \G, \L, \l, \N{name}, \U, and \u are not supported.';
+$string['lnu_unsupported_node_error']              = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
 $string['unrecognized_pqh_node_error']             = 'Unrecognized character after (? or (?-';
 $string['unrecognized_pqlt_node_error']            = 'Unrecognized character after (?<';
 $string['unrecognized_pqp_node_error']             = 'Unrecognized character after (?P';
