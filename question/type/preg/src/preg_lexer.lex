@@ -35,14 +35,14 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_opt_stack_item {
     public $options;
-    public $subexpr_num;
-    public $subexpr_name;
+    public $last_dup_subexpr_number;
+    public $last_dup_subexpr_name;
     public $parennum;
 
-    public function __construct($options, $subexpr_num, $subexpr_name, $parennum) {
+    public function __construct($options, $last_dup_subexpr_number, $last_dup_subexpr_name, $parennum) {
         $this->options = $options;
-        $this->subexpr_num = $subexpr_num;
-        $this->subexpr_name = $subexpr_name;
+        $this->last_dup_subexpr_number = $last_dup_subexpr_number;
+        $this->last_dup_subexpr_name = $last_dup_subexpr_name;
         $this->parennum = $parennum;
     }
 
@@ -339,13 +339,11 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         return null;
     }
 
-    protected function push_options_stack_item($subexpr_num = -1) {
+    protected function push_options_stack_item($last_dup_subexpr_number = -1) {
         $newitem = clone $this->opt_stack[$this->opt_count - 1];
-        if ($subexpr_num !== -1) {
-            $newitem->subexpr_num = $subexpr_num;
-            $newitem->parennum = $this->opt_count;
-        }
-        $newitem->subexpr_name = null;   // Reset it anyway.
+        $newitem->last_dup_subexpr_name = null;   // Reset it anyway.
+        $newitem->parennum = $this->opt_count;
+        $newitem->last_dup_subexpr_number = $last_dup_subexpr_number;
         $this->opt_stack[$this->opt_count] = $newitem;
         $this->opt_count++;
     }
@@ -359,13 +357,10 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         $this->opt_count--;
         // Is it a pair for some opening paren?
         if ($item->parennum === $this->opt_count) {
-            // Are we outside of a (?|...) block?
+            // Are we eventually outside of a (?|...) block?
             $previtem = $this->opt_stack[$this->opt_count - 1];
-            if ($previtem->subexpr_num !== -1) {
-                // Inside.
-                $this->last_subexpr = $previtem->subexpr_num;    // Reset subexpression numeration.
-            } else {
-                // Outside.
+            if ($previtem->last_dup_subexpr_number == -1) {
+                // Yes we are outside; set subpattern numeration to max occurred number.
                 $this->last_subexpr = $this->max_subexpr;
             }
         }
@@ -552,8 +547,6 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
      * Returns a named subexpression token.
      */
     protected function form_named_subexpr($text, $pos, $length, $name) {
-        $this->push_options_stack_item();
-
         // Error: empty name.
         if ($name === '') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
@@ -562,6 +555,8 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 
         $number = $this->map_subexpression($name);
 
+        $this->push_options_stack_item();
+
         // Error: subexpressions with same names should have different numbers.
         if ($number === null) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
@@ -569,17 +564,20 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         }
 
         // Are we inside a (?| group?
-        $insidedup = ($this->opt_count > 1 && $this->opt_stack[$this->opt_count - 2]->subexpr_num !== -1);
+        $penult = $this->opt_stack[$this->opt_count - 2];
+        $insidedup = ($penult->last_dup_subexpr_number !== -1);
 
-        // First occurence of a named subexpression inside a (?| group.
-        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name === null) {
-            $this->opt_stack[$this->opt_count - 2]->subexpr_name = $name;
-        }
-
-        // Error: different names for subexpressions of the same number.
-        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name !== $name) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $text, $pos, $pos + $length - 1, '');
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        if ($insidedup) {
+            if ($penult->last_dup_subexpr_name === null) {
+                // First occurence of a named subexpression inside a (?| group.
+                $penult->last_dup_subexpr_name = $name;
+            } else {
+                // Error: different names for subexpressions of the same number.
+                if ($penult->last_dup_subexpr_name !== $name) {
+                    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $text, $pos, $pos + $length - 1, '');
+                    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+                }
+            }
         }
 
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number));
@@ -817,20 +815,18 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     protected function map_subexpression($name) {
         $exists = isset($this->subexpr_map[$name]);
         $topitem = $this->opt_stack[$this->opt_count - 1];
+        $duplicate = $topitem->last_dup_subexpr_number != -1 || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
         if (!$exists) {
             // This subexpression does not exists, all is OK.
             $number = ++$this->last_subexpr;
             $this->subexpr_map[$name] = $number;
-        } else if ($exists && $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES)) {
+        } else if ($duplicate) {
             // This subexpression does exist, but there's the J modifier.
             $number = $this->subexpr_map[$name];
+            $this->last_subexpr = max($this->last_subexpr, $number);
         } else {
             // Subexpressions with same names should have same numbers.
-            if ($topitem->subexpr_num == -1) {
-                return null;
-            }
-            $number = $this->subexpr_map[$name];
-            $this->last_subexpr++;
+            return null;
         }
         $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
         return $number;
@@ -1431,8 +1427,8 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 <YYINITIAL> "|" {
     // Reset subexpressions numeration inside a (?|...) group.
     $topitem = $this->opt_stack[$this->opt_count - 1];
-    if ($topitem->subexpr_num != -1) {
-        $this->last_subexpr = $topitem->subexpr_num;
+    if ($topitem->last_dup_subexpr_number != -1) {
+        $this->last_subexpr = $topitem->last_dup_subexpr_number;
     }
     return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
