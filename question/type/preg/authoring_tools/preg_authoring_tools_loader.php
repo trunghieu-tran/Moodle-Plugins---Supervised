@@ -23,7 +23,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 function qtype_preg_get_json_array() {
     global $CFG;
     $json_array = array();
-    $regextext = optional_param('regex', '', RAW);
+    $regextext = optional_param('regex', '', PARAM_RAW);
 
     /*if (isset($_POST['regex'])) {       // POST has precedence
         $regextext = $_POST['regex'];
