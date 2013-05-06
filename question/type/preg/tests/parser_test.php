@@ -348,7 +348,10 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($followpos == array(3 => array(4), 6 => array(7)));
     }
     function test_parser_conditional_subexpression() {
-        $parser = $this->run_parser('(?(name)a|b)', $errornodes);
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser('(?(name)a|b|c)', $errornodes, $options);
+        $this->assertTrue(count($errornodes) == 2);
         $root = $parser->get_root();
         $followpos = $parser->get_followpos();
         $this->assertTrue($root->number === 'name');
@@ -696,9 +699,11 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
         $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         // Empty conditional subexpression.
-        $parser = $this->run_parser('(?(<name>))', $errornodes);
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser('(?(<name>))', $errornodes, $options);
         $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
+        $this->assertTrue(count($errornodes) == 1);
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($root->number === 'name');
@@ -741,16 +746,26 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         // Conditional subexpression with some condition and empty body.
         $parser = $this->run_parser('(?(+1))', $errornodes);
         $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR);
+        $this->assertTrue($errornodes[0]->indfirst === 0);
+        $this->assertTrue($errornodes[0]->indlast === 5);
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($root->number === 1);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
         $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         // Conditional subexpression with some condition and empty body (same as the previous one but named).
-        $parser = $this->run_parser('(?(<name>))', $errornodes);
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser('(?(<name>))', $errornodes, $options);
         $root = $parser->get_root();
-        $this->assertTrue(empty($errornodes));
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR);
+        $this->assertTrue($errornodes[0]->indfirst === 0);
+        $this->assertTrue($errornodes[0]->indlast === 9);
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($root->number === 'name');
@@ -829,13 +844,13 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         // Test error reporting for conditional subexpressions, which are particulary tricky.
         // Three or more alternations in conditional subexpression.
         $parser = $this->run_parser('(?(?=bc)dd|e*f|hhh)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue(count($errornodes) === 1);
-        $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER);
-        $this->assertTrue($errornodes[0]->indfirst === 0);
-        $this->assertTrue($errornodes[0]->indlast === 18);
-        $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternation and expression inside assertion
-        $this->assertTrue(is_a($errornodes[0]->operands[1], 'qtype_preg_node_concat'));
+        $this->assertTrue($root->errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($root->errors[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER);
+        $this->assertTrue($root->errors[0]->indfirst === 0);
+        $this->assertTrue($root->errors[0]->indlast === 18);
         // Correct situation: alternations are nested within two alternations for conditional subexpression.
         $parser = $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))', $errornodes);
         $this->assertFalse($parser->get_error());
@@ -933,12 +948,9 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[5]->indlast === 7);
         $this->assertTrue($errornodes[5]->operands[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[5]->operands[0]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE);
-        $this->assertTrue(count($errornodes[6]->operands) === 2);
         $this->assertTrue($errornodes[6]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER);
         $this->assertTrue($errornodes[6]->indfirst === 9);
         $this->assertTrue($errornodes[6]->indlast === 21);
-        $this->assertTrue(is_a($errornodes[6]->operands[0], 'qtype_preg_node_alt'));
-        $this->assertTrue(is_a($errornodes[6]->operands[1], 'qtype_preg_leaf_charset'));
         $this->assertTrue(count($errornodes[7]->operands) === 0);
         $this->assertTrue($errornodes[7]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[7]->subtype === qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
