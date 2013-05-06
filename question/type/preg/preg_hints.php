@@ -77,7 +77,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
      */
-    public function render_stringextension_hint($renderer, $response) {
+    public function render_stringextension_hint($renderer, question_attempt $qa, question_display_options $options, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
@@ -95,7 +95,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
             } else {//No hint, due to full match
-                return qtype_preg_hintmatchingpart::render_hint($renderer, $response);
+                return qtype_preg_hintmatchingpart::render_hint($renderer, $qa, $options, $response);
             }
         }
         return '';
@@ -177,7 +177,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
     ////qtype_preg_matching_hint functions implementation
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
-        return $this->render_stringextension_hint($renderer, $response);
+        return $this->render_stringextension_hint($renderer, $qa, $options, $response);
     }
 
     public function hinted_string($matchresults) {
@@ -238,8 +238,8 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, question_attempt $qa, question_display_options $options,$response = null) {
-        return $this->render_stringextension_hint($renderer, $response);
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+        return $this->render_stringextension_hint($renderer, $qa, $options, $response);
     }
 
     public function hinted_string($matchresults) {
