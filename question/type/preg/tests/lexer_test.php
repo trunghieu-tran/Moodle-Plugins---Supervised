@@ -463,7 +463,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $token = $lexer->nextToken();    // (
+        $token = $lexer->nextToken();    // (?<qwe>
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
@@ -471,7 +471,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
         $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
-        $token = $lexer->nextToken();    // (
+        $token = $lexer->nextToken();    // (?'qwe'
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
@@ -479,7 +479,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
-        $token = $lexer->nextToken();    // (
+        $token = $lexer->nextToken();    // (?P<rty>
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
@@ -532,7 +532,206 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
     }
-    function test_duplicate_subexpression_numbers_from_pcre() {
+    function test_duplicate_subexpression_numbers_simple() {
+        $lexer = $this->create_lexer('(?||()|()())()');
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+    }
+    function test_duplicate_subexpression_numbers_simple_with_empty_alt() {
+        $lexer = $this->create_lexer('(?|()||())()');
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+    }
+    function test_duplicate_subexpression_numbers_nested() {
+        $lexer = $this->create_lexer('()(?|()|()(?|()|(()))|((?|()|()())))()');
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 4);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 4);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 5);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+    }
+    /*function test_duplicate_subexpression_numbers_simple_with_names() {
+        $lexer = $this->create_lexer('(?|()|()(?<qwe>)()(?<rty>))()');
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (?<qwe>
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        var_dump("_______________________!!!");
+        $token = $lexer->nextToken();    // (?<rty>
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);var_dump($token->value->subtype);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 4);
+        $token = $lexer->nextToken();    // )
+
+    }*/
+
+    function test_duplicate_subexpression_numbers_from_pcre_1() {
         $lexer = $this->create_lexer('(a)(?|x(y)z|(p(q)r)|(t)u(v))(z)');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
@@ -630,8 +829,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
     }
-    function test_duplicate_subexpression_numbers_nested() {
-        $lexer = $this->create_lexer('()(?|()|()(?|()|(()))|())()');
+    function test_duplicate_subexpression_numbers_from_pcre_2() {
+        $lexer = $this->create_lexer('()(?|(|()())|())()()()');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
@@ -645,37 +844,18 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
-        $token = $lexer->nextToken();    // )
-        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
-        $token = $lexer->nextToken();    // |
-        $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
-        $token = $lexer->nextToken();    // (
-        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($token->value->number === 2);
-        $token = $lexer->nextToken();    // )
-        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
-        $token = $lexer->nextToken();    // (?|
-        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $token = $lexer->nextToken();    // (
-        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($token->value->number === 3);
-        $token = $lexer->nextToken();    // )
-        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
         $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
-        $token = $lexer->nextToken();    // )
-        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -696,6 +876,19 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->number === 5);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 6);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token->value->number === 7);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
+
     }
     function test_subexpressions_errors() {
         $lexer = $this->create_lexer('(?<name_1(?\'name_1(?P<name_1');
@@ -738,22 +931,22 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES);
         $lexer = $this->create_lexer("(?|(?<qwe>)|(?'qwe'(?'rty'(?'abc')))|(?'uio')");  // incorrect name: 'uio'
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // (?|
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // (?<qwe>
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // )
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // |
         $this->assertTrue($token->type === qtype_preg_yyParser::ALT);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // (?'qwe'
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // (?'rty'
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
@@ -761,7 +954,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
-        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();   // (?'abc'
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::CLOSEBRACK);
