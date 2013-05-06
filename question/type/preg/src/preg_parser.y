@@ -101,68 +101,60 @@
         return $result;
     }
 
-    protected function create_cond_subexpr_assertion_node($paren, $assertnode, $exprnode) {
+    protected function create_cond_subexpr_assertion_node($node, $assertnode, $exprnode) {
         if ($assertnode === null) {
             $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $assertnode->set_user_info($paren->indlast, $paren->indlast, new qtype_preg_userinscription());
+            $assertnode->set_user_info($node->indlast, $node->indlast, new qtype_preg_userinscription());
         }
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $exprnode->set_user_info($assertnode->indlast + 1, $assertnode->indlast + 1, new qtype_preg_userinscription());
         }
-        if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
-            $result = new qtype_preg_node_cond_subexpr($paren->subtype);
-            $result->operands[0] = $exprnode;
-        } else {
-            // Error: only one or two top-level alternations allowed in a conditional subexpression.
-            if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT && count($exprnode->operands) > 2) {
-                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode, $assertnode));
-                return $result;
-            } else {
-                $result = new qtype_preg_node_cond_subexpr($paren->subtype);
-                $result->operands = $exprnode->operands;
+
+        if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
+            $node->operands = $exprnode->operands;
+            if (count($exprnode->operands) > 2) {
+                // Error: only one or two top-level alternations allowed in a conditional subexpression.
+                $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $node->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode));
             }
+        } else {
+            $node->operands[0] = $exprnode;
         }
-        if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
+
+        if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
-        } else if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB) {
+        } else if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLB;
-        } else if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA) {
+        } else if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_NLA;
         } else {
             $subtype = qtype_preg_node_assert::SUBTYPE_NLB;
         }
-        $result->condbranch = new qtype_preg_node_assert($subtype);
-        $result->condbranch->operands[0] = $assertnode;
-        $result->condbranch->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($paren->userinscription->data, 2) . '...)');
-        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...)...|...)'));
-        return $result;
+        $node->condbranch = new qtype_preg_node_assert($subtype);
+        $node->condbranch->operands[0] = $assertnode;
+        $node->condbranch->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($node->userinscription->data, 2) . '...)');
+        $node->set_user_info($node->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($node->userinscription->data . '...)...|...)'));
+        return $node;
     }
 
-    protected function create_cond_subexpr_other_node($paren, $exprnode) {
+    protected function create_cond_subexpr_other_node($node, $exprnode) {
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $exprnode->set_user_info($paren->indlast + 2, $paren->indlast + 2, new qtype_preg_userinscription());
+            $exprnode->set_user_info($node->indlast + 2, $node->indlast + 2, new qtype_preg_userinscription());
         }
-        if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
-            $result = new qtype_preg_node_cond_subexpr($paren->subtype);
-            $result->operands[0] = $exprnode;
-        } else {
-             // Error: only one or two top-level alternations allowed in a conditional subexpression.
-            if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT && count($exprnode->operands) > 2) {
-                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode));
-                return $result;
-            } else {
-                $result = new qtype_preg_node_cond_subexpr($paren->subtype);
-                $result->operands[0] = $exprnode->operands[0];
-                $result->operands[1] = $exprnode->operands[1];
+
+        if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
+            $node->operands = $exprnode->operands;
+            if (count($exprnode->operands) > 2) {
+                // Error: only one or two top-level alternations allowed in a conditional subexpression.
+                $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $node->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription(), array($exprnode));
             }
+        } else {
+            $node->operands[0] = $exprnode;
         }
-        if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
-            $result->number = $paren->number;
-        }
-        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...|...)'));
-        return $result;
+
+        $node->set_user_info($node->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($node->userinscription->data . '...|...)'));
+        return $node;
     }
 
     protected function assign_subpatts($node) {
