@@ -400,16 +400,16 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     /**
      * Returns a quantifier token.
      */
-    protected function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greed, $possessive) {
+    protected function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greedy, $possessive) {
         if ($infinite) {
-            $node = new qtype_preg_node_infinite_quant($leftborder, $lazy, $greed, $possessive);
+            $node = new qtype_preg_node_infinite_quant($leftborder, $lazy, $greedy, $possessive);
         } else {
-            $node = new qtype_preg_node_finite_quant($leftborder, $rightborder, $lazy, $greed, $possessive);
+            $node = new qtype_preg_node_finite_quant($leftborder, $rightborder, $lazy, $greedy, $possessive);
         }
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         if (!$infinite && $leftborder > $rightborder) {
             $rightoffset = 0;
-            $greed || $rightoffset++;
+            $greedy || $rightoffset++;
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $leftborder . ',' . $rightborder, $pos + 1, $pos + $length - 2 - $rightoffset, '');
             $node->errors[] = $error;
         }
@@ -946,59 +946,59 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 
 <YYINITIAL> "?"{QUANTTYPE} {                     // ?     Quantifier 0 or 1
     $text = $this->yytext();
-    $greed = $this->yylength() === 1;
+    $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
-    $possessive = !$greed && !$lazy;
-    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greed, $possessive);
+    $possessive = !$greedy && !$lazy;
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "*"{QUANTTYPE} {                     // *     Quantifier 0 or more
     $text = $this->yytext();
-    $greed = $this->yylength() === 1;
+    $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
-    $possessive = !$greed && !$lazy;
-    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
+    $possessive = !$greedy && !$lazy;
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "+"{QUANTTYPE} {                     // +     Quantifier 1 or more
     $text = $this->yytext();
-    $greed = $this->yylength() === 1;
+    $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
-    $possessive = !$greed && !$lazy;
-    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
+    $possessive = !$greedy && !$lazy;
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "{"[0-9]+","[0-9]+"}"{QUANTTYPE} {   // {n,m} Quantifier at least n, no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greed = $lastchar === '}';
+    $greedy = $lastchar === '}';
     $lazy = $lastchar === '?';
-    $possessive = !$greed && !$lazy;
-    $greed || $textlen--;
+    $possessive = !$greedy && !$lazy;
+    $greedy|| $textlen--;
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "{"[0-9]+",}"{QUANTTYPE} {           // {n,}  Quantifier n or more
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greed = $lastchar === '}';
+    $greedy= $lastchar === '}';
     $lazy = $lastchar === '?';
-    $possessive = !$greed && !$lazy;
-    $greed || $textlen--;
+    $possessive = !$greedy&& !$lazy;
+    $greedy|| $textlen--;
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greed, $possessive);
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "{,"[0-9]+"}"{QUANTTYPE} {           // {,m}  Quantifier no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greed = ($lastchar === '}');
-    $lazy = !$greed && $lastchar === '?';
-    $possessive = !$greed && !$lazy;
-    $greed || $textlen--;
+    $greedy= ($lastchar === '}');
+    $lazy = !$greedy&& $lastchar === '?';
+    $possessive = !$greedy&& !$lazy;
+    $greedy|| $textlen--;
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greed, $possessive);
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greedy, $possessive);
 }
 <YYINITIAL> "{"[0-9]+"}" {                       // {n}    Quantifier exactly n
     $text = $this->yytext();

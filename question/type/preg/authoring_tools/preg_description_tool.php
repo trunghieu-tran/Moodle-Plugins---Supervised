@@ -892,7 +892,7 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
     public function pattern($node_parent=null,$form=null){
 
         $resultpattern ='';
-        $greedpattern='';
+        $greedypattern='';
         $wrong_borders =$this->pregnode->leftborder > $this->pregnode->rightborder;
 
         if($this->pregnode->leftborder===0 ){
@@ -917,15 +917,15 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         }
 
         if($this->pregnode->lazy==true){
-            $greedpattern = self::get_form_string('description_quant_lazy',$form);
+            $greedypattern = self::get_form_string('description_quant_lazy',$form);
         }
-        else if ($this->pregnode->greed==true) {
-            $greedpattern = self::get_form_string('description_quant_greed',$form);
+        else if ($this->pregnode->greedy==true) {
+            $greedypattern = self::get_form_string('description_quant_greedy',$form);
         }
         else if ($this->pregnode->possessive==true) {
-            $greedpattern = self::get_form_string('description_quant_possessive',$form);
+            $greedypattern = self::get_form_string('description_quant_possessive',$form);
         }
-        $resultpattern = str_replace('%greed',$greedpattern,$resultpattern);
+        $resultpattern = str_replace('%greedy',$greedypattern,$resultpattern);
 
         if($wrong_borders){
             $resultpattern = preg_replace('/%(\w+)?1/',('%${1}1'.self::get_form_string('description_errorbefore',$form)),$resultpattern);
@@ -948,7 +948,7 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
     public function pattern($node_parent=null,$form=null){
 
         $resultpattern ='';
-        $greedpattern='';
+        $greedypattern='';
         if($this->pregnode->leftborder===0){
             $resultpattern = self::get_form_string('description_infinite_quant_0',$form);
         }
@@ -961,16 +961,16 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
         }
 
         if($this->pregnode->lazy==true){
-            $greedpattern = self::get_form_string('description_quant_lazy',$form);
+            $greedypattern = self::get_form_string('description_quant_lazy',$form);
         }
-        else if ($this->pregnode->greed==true) {
-            $greedpattern = self::get_form_string('description_quant_greed',$form);
+        else if ($this->pregnode->greedy==true) {
+            $greedypattern = self::get_form_string('description_quant_greedy',$form);
         }
         else if ($this->pregnode->possessive==true) {
-            $greedpattern = self::get_form_string('description_quant_possessive',$form);
+            $greedypattern = self::get_form_string('description_quant_possessive',$form);
         }
 
-        $resultpattern = str_replace('%greed',$greedpattern,$resultpattern);
+        $resultpattern = str_replace('%greedy',$greedypattern,$resultpattern);
         return $resultpattern;
     }
 }
