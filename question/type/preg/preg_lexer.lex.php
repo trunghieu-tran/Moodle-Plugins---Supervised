@@ -706,6 +706,9 @@ class qtype_preg_lexer extends JLexBase  {
             // Two subexpressions with same number in a row is error.
             return $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
         }
+        if ($modJ && $number == $this->last_subexpr) {
+            $number++;
+        }
         $this->last_subexpr++;
         $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
         return $number;

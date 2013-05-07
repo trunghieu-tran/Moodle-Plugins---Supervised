@@ -1168,6 +1168,27 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_subexpr_duplicate_with_modifier_J() {
+        $test1 = array( 'str'=>'aba',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>2,1=>1,2=>1),
+                        'left'=>array(1),
+                        'next'=>'b');
+
+        $test2 = array( 'str'=>'abb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>3,1=>1,2=>1));
+
+        return array('regex'=>'(?|(?<name>a)(?<name>b))\2',
+                     'tests'=>array($test1, $test2),
+                     'modifiers'=>'J',
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     function data_for_test_subexpr_named() {
         $test1 = array( 'str'=>'abcabcabc',
                         'is_match'=>true,
