@@ -31,13 +31,13 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 class qtype_preg_opt_stack_item {
     public $options;
-    public $subexpr_num;
-    public $subexpr_name;
+    public $last_dup_subexpr_number;
+    public $last_dup_subexpr_name;
     public $parennum;
-    public function __construct($options, $subexpr_num, $subexpr_name, $parennum) {
+    public function __construct($options, $last_dup_subexpr_number, $last_dup_subexpr_name, $parennum) {
         $this->options = $options;
-        $this->subexpr_num = $subexpr_num;
-        $this->subexpr_name = $subexpr_name;
+        $this->last_dup_subexpr_number = $last_dup_subexpr_number;
+        $this->last_dup_subexpr_name = $last_dup_subexpr_name;
         $this->parennum = $parennum;
     }
     public function __clone() {
@@ -66,7 +66,11 @@ class qtype_preg_lexer extends JLexBase  {
     // Max subexpression number.
     protected $max_subexpr = 0;
     // Map of subexpression names => numbers.
-    protected $subexpr_map = array();
+    protected $subexpr_name_to_number_map = array();
+    // Map of subexpression numbers => names.
+    protected $subexpr_number_to_name_map = array();
+    // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, recursion.
+    protected $nodes_with_subexpr_refs = array();
     // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
     protected $backrefs = array();
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
@@ -228,7 +232,7 @@ class qtype_preg_lexer extends JLexBase  {
         return $this->max_subexpr;
     }
     public function get_subexpr_map() {
-        return $this->subexpr_map;
+        return $this->subexpr_name_to_number_map;
     }
     public function get_backrefs() {
         return $this->backrefs;
@@ -259,13 +263,11 @@ class qtype_preg_lexer extends JLexBase  {
         $stackitem->options->set_modifier($set);
         return null;
     }
-    protected function push_options_stack_item($subexpr_num = -1) {
+    protected function push_options_stack_item($last_dup_subexpr_number = -1) {
         $newitem = clone $this->opt_stack[$this->opt_count - 1];
-        if ($subexpr_num !== -1) {
-            $newitem->subexpr_num = $subexpr_num;
-            $newitem->parennum = $this->opt_count;
-        }
-        $newitem->subexpr_name = null;   // Reset it anyway.
+        $newitem->last_dup_subexpr_name = null;   // Reset it anyway.
+        $newitem->parennum = $this->opt_count;
+        $newitem->last_dup_subexpr_number = $last_dup_subexpr_number;
         $this->opt_stack[$this->opt_count] = $newitem;
         $this->opt_count++;
     }
@@ -278,13 +280,10 @@ class qtype_preg_lexer extends JLexBase  {
         $this->opt_count--;
         // Is it a pair for some opening paren?
         if ($item->parennum === $this->opt_count) {
-            // Are we outside of a (?|...) block?
+            // Are we eventually outside of a (?|...) block?
             $previtem = $this->opt_stack[$this->opt_count - 1];
-            if ($previtem->subexpr_num !== -1) {
-                // Inside.
-                $this->last_subexpr = $previtem->subexpr_num;    // Reset subexpression numeration.
-            } else {
-                // Outside.
+            if ($previtem->last_dup_subexpr_number == -1) {
+                // Yes we are outside; set subpattern numeration to max occurred number.
                 $this->last_subexpr = $this->max_subexpr;
             }
         }
@@ -459,94 +458,97 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a named subexpression token.
      */
     protected function form_named_subexpr($text, $pos, $length, $name) {
-        $this->push_options_stack_item();
         // Error: empty name.
         if ($name === '') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
-        $number = $this->map_subexpression($name);
-        // Error: subexpressions with same names should have different numbers.
-        if ($number === null) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $number = $this->map_subexpression($name, $pos, $length);
+        $this->push_options_stack_item();
+        // Error: subexpressions with same names should have same numbers.
+        if (is_object($number)) {
+            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $number);  // An error is actually returned.
         }
         // Are we inside a (?| group?
-        $insidedup = ($this->opt_count > 1 && $this->opt_stack[$this->opt_count - 2]->subexpr_num !== -1);
-        // First occurence of a named subexpression inside a (?| group.
-        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name === null) {
-            $this->opt_stack[$this->opt_count - 2]->subexpr_name = $name;
+        $penult = $this->opt_stack[$this->opt_count - 2];
+        $insidedup = ($penult->last_dup_subexpr_number !== -1);
+        if ($insidedup && $penult->last_dup_subexpr_name === null) {
+            // First occurence of a named subexpression inside a (?| group.
+            $penult->last_dup_subexpr_name = $name;
         }
-        // Error: different names for subexpressions of the same number.
-        if ($insidedup && $this->opt_stack[$this->opt_count - 2]->subexpr_name !== $name) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $text, $pos, $pos + $length - 1, '');
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
-        }
+        // If all is fine, fill the another, inverse, map.
+        $this->subexpr_number_to_name_map[$number] = $name;
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number));
     }
     /**
      * Returns a conditional subexpression (number of name condition) token.
      */
-    protected function form_cond_subexpr_reference($text, $pos, $length, $number, $ending = '') {
+    protected function form_numeric_or_named_cond_subexpr($text, $pos, $length, $number, $ending = '') {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
+        if (qtype_preg_unicode::substr($text, $length - strlen($ending)) != $ending) {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
-        // Error: reference to the whole expression.
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         if (is_integer($number) && $number == 0) {
-            $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $pos, $pos + $length - 1, '');
+            // Error: reference to the whole expression.
+            $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $pos, $pos + $length - 1, '');
         } else if ($number === '') {
-            $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $pos, $pos + $length - 1, '');
-        } else {
-            $secondnode = new qtype_preg_lexem(null, -1, -1, null);
+            // Error: assertion expected.
+            $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $pos, $pos + $length - 1, '');
         }
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number)),
-                     new JLexToken(qtype_preg_yyParser::PARSLEAF, $secondnode),
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
+        $this->nodes_with_subexpr_refs[] = $node;
+        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_yyParser::PARSLEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, null));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a conditional subexpression (recursion condition) token.
      */
-    protected function form_cond_subexpr_recursion($text, $pos, $length, $number, $ending = '') {
+    protected function form_recursive_cond_subexpr($text, $pos, $length, $number) {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
+        if (qtype_preg_unicode::substr($text, $length - 1) != ')') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
-        // Error: assertion expected.
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         if ($number === '') {
-            $secondnode = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $pos, $pos + $length - 1, '');
-        } else {
-            $secondnode = new qtype_preg_lexem(null, -1, -1, null);
+            // Error: assertion expected.
+            $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $pos, $pos + $length - 1, '');
         }
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number)),
-                     new JLexToken(qtype_preg_yyParser::PARSLEAF, $secondnode),
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
+        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_yyParser::PARSLEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, null));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a conditional subexpression (assertion condition) token.
      */
-    protected function form_cond_subexpr_assert($text, $pos, $length, $subtype, $ending = '') {
+    protected function form_assert_cond_subexpr($text, $pos, $length, $subtype) {
         $this->push_options_stack_item();
         $this->push_options_stack_item();
-        return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
+        $node = new qtype_preg_node_cond_subexpr($subtype);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node);
     }
     /**
      * Returns a conditional subexpression (define condition) token.
      */
-    protected function form_cond_subexpr_define($text, $pos, $length, $ending = '') {
+    protected function form_define_cond_subexpr($text, $pos, $length) {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - strlen($ending)) !== $ending) {
+        if (qtype_preg_unicode::substr($text, $length - 1) != ')') {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, new qtype_preg_lexem_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), -1)),
-                     new JLexToken(qtype_preg_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, null)),
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_yyParser::PARSLEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, null));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a named backreference token.
@@ -568,8 +570,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
-        $number = isset($this->subexpr_map[$name]) ? $this->subexpr_map[$name] : null;
-        return $this->form_backref($text, $pos, $length, $number);
+        return $this->form_backref($text, $pos, $length, $name);
     }
     /**
      * Returns a backreference token.
@@ -579,6 +580,7 @@ class qtype_preg_lexer extends JLexBase  {
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $this->set_node_modifiers($node);
         $this->backrefs[] = $node;
+        $this->nodes_with_subexpr_refs[] = $node;
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
     /**
@@ -622,8 +624,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text, $pos, $pos + $length - 1, '');
             return new JLexToken(qtype_preg_yyParser::PARSLEAF, $error);
         }
-        $number = isset($this->subexpr_map[$name]) ? $this->subexpr_map[$name] : null;
-        return $this->form_recursion($text, $pos, $length, $number);
+        return $this->form_recursion($text, $pos, $length, $name);
     }
     /**
      * Returns a recursion token.
@@ -633,6 +634,7 @@ class qtype_preg_lexer extends JLexBase  {
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $node->number = $number;
         $this->set_node_modifiers($node);
+        $this->nodes_with_subexpr_refs[] = $node;
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
     }
     /**
@@ -676,24 +678,38 @@ class qtype_preg_lexer extends JLexBase  {
     /**
      * Adds a named subexpression to the map.
      */
-    protected function map_subexpression($name) {
-        $exists = isset($this->subexpr_map[$name]);
-        $topitem = $this->opt_stack[$this->opt_count - 1];
+    protected function map_subexpression($name, $pos, $length) {
+        // Does the given name exist?
+        $exists = isset($this->subexpr_name_to_number_map[$name]);
         if (!$exists) {
-            // This subexpression does not exists, all is OK.
-            $number = ++$this->last_subexpr;
-            $this->subexpr_map[$name] = $number;
-        } else if ($exists && $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES)) {
-            // This subexpression does exist, but there's the J modifier.
-            $number = $this->subexpr_map[$name];
-        } else {
-            // Subexpressions with same names should have same numbers.
-            if ($topitem->subexpr_num == -1) {
-                return null;
+            // This subexpression does not exists, all is OK. Almost.
+            $number = $this->last_subexpr + 1;
+            if (isset($this->subexpr_number_to_name_map[$number])) {
+                // There can be situations like (?|(?<name1>)|(?<name2>)). By this moment name2 doesn't exist, but this is an error.
+                $assumed_name = $this->subexpr_number_to_name_map[$number];
+                if ($name != $assumed_name) {
+                    // Subexpression has wrong name.
+                    return $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
+                }
             }
-            $number = $this->subexpr_map[$name];
+            $this->subexpr_name_to_number_map[$name] = $number;
             $this->last_subexpr++;
+            $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+            return $number;
         }
+        // This subexpression does exist.
+        $number = $this->subexpr_name_to_number_map[$name];
+        $topitem = $this->opt_stack[$this->opt_count - 1];
+        $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
+        $assumed_name = $this->subexpr_number_to_name_map[$number];
+        if ($number == $this->last_subexpr && !$modJ) {
+            // Two subexpressions with same number in a row is error.
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
+        }
+        if ($modJ && $number == $this->last_subexpr) {
+            $number++;
+        }
+        $this->last_subexpr++;
         $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
         return $number;
     }
@@ -778,11 +794,25 @@ class qtype_preg_lexer extends JLexBase  {
     if ($this->yy_lexical_state == self::YYCOMMENT) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, '', $this->yychar - $this->comment_length, $this->yychar - 1, '');  // TODO indexes
     }
-    // Check for backreferences to unexisting subexpressions.
-    foreach ($this->backrefs as $leaf) {
-        $number = $leaf->number;
-        if (!is_int($number) || $number > $this->max_subexpr) {
-            $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $leaf->indfirst, $leaf->indlast, '');
+    // Check for references to unexisting subexpressions.
+    foreach ($this->nodes_with_subexpr_refs as $node) {
+        $number = $node->number;
+        if (is_int($number)) {
+            if ($number > $this->max_subexpr) {
+                // Error: unexisting subexpression.
+                $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node->indfirst, $node->indlast, '');
+            }
+            continue;   // No need for further checks if it's an integer number.
+        }
+        // Convert name to number.
+        $number = isset($this->subexpr_name_to_number_map[$number]) ? $this->subexpr_name_to_number_map[$number] : null;
+        if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
+            // Error: unexisting subexpression.
+            $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node->indfirst, $node->indlast, '');
+        }
+        // For matchers: replace name with number for simple usage.
+        if (!$this->options->preserveallnodes) {
+            $node->number = $number;
         }
     }
 		}
@@ -6329,8 +6359,8 @@ array(
 							{
     // Reset subexpressions numeration inside a (?|...) group.
     $topitem = $this->opt_stack[$this->opt_count - 1];
-    if ($topitem->subexpr_num != -1) {
-        $this->last_subexpr = $topitem->subexpr_num;
+    if ($topitem->last_dup_subexpr_number != -1) {
+        $this->last_subexpr = $topitem->last_dup_subexpr_number;
     }
     return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
@@ -6732,7 +6762,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -57:
 							break;
@@ -6970,7 +7000,7 @@ array(
 							{          /* (?(n)...                  Conditional subexpression - absolute reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $number, ')');
 }
 						case -78:
 							break;
@@ -6978,7 +7008,7 @@ array(
 							{    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, '>)');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, '>)');
 }
 						case -79:
 							break;
@@ -6986,7 +7016,7 @@ array(
 							{    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, "')");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, "')");
 }
 						case -80:
 							break;
@@ -6994,7 +7024,7 @@ array(
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_cond_subexpr_recursion($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_recursive_cond_subexpr($text, $this->yychar, $this->yylength(), $number);
 }
 						case -81:
 							break;
@@ -7093,13 +7123,13 @@ array(
 							break;
 						case 89:
 							{                  /* (?(assert)...             Conditional subexpression - positive look ahead assertion */
-    return $this->form_cond_subexpr_assert($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
+    return $this->form_assert_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
 }
 						case -90:
 							break;
 						case 90:
 							{                  /* (?(assert)...             Conditional subexpression - negative look ahead assertion */
-    return $this->form_cond_subexpr_assert($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
+    return $this->form_assert_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
 }
 						case -91:
 							break;
@@ -7112,7 +7142,7 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $number, ')');
 }
 						case -92:
 							break;
@@ -7120,7 +7150,7 @@ array(
 							{      /* (?(name)...               Conditional subexpression - specific recursion condition */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_cond_subexpr_recursion($text, $this->yychar, $this->yylength(), $name, ')');
+    return $this->form_recursive_cond_subexpr($text, $this->yychar, $this->yylength(), $name);
 }
 						case -93:
 							break;
@@ -7140,19 +7170,19 @@ array(
 							break;
 						case 95:
 							{                 /* (?(assert)...             Conditional subexpression - positive look behind assertion */
-    return $this->form_cond_subexpr_assert($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
+    return $this->form_assert_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
 }
 						case -96:
 							break;
 						case 96:
 							{                 /* (?(assert)...             Conditional subexpression - negative look behind assertion */
-    return $this->form_cond_subexpr_assert($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
+    return $this->form_assert_cond_subexpr($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
 }
 						case -97:
 							break;
 						case 97:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
-    return $this->form_cond_subexpr_define($this->yytext(), $this->yychar, $this->yylength(), ')');
+    return $this->form_define_cond_subexpr($this->yytext(), $this->yychar, $this->yylength());
 }
 						case -98:
 							break;
@@ -7799,7 +7829,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -164:
 							break;
@@ -7853,7 +7883,7 @@ array(
 							{          /* (?(n)...                  Conditional subexpression - absolute reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $number, ')');
 }
 						case -168:
 							break;
@@ -7861,7 +7891,7 @@ array(
 							{    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, '>)');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, '>)');
 }
 						case -169:
 							break;
@@ -7869,7 +7899,7 @@ array(
 							{    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, "')");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, "')");
 }
 						case -170:
 							break;
@@ -7877,7 +7907,7 @@ array(
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_cond_subexpr_recursion($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_recursive_cond_subexpr($text, $this->yychar, $this->yylength(), $number);
 }
 						case -171:
 							break;
@@ -7919,7 +7949,7 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $number, ')');
 }
 						case -174:
 							break;
@@ -7927,13 +7957,13 @@ array(
 							{      /* (?(name)...               Conditional subexpression - specific recursion condition */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_cond_subexpr_recursion($text, $this->yychar, $this->yylength(), $name, ')');
+    return $this->form_recursive_cond_subexpr($text, $this->yychar, $this->yylength(), $name);
 }
 						case -175:
 							break;
 						case 176:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
-    return $this->form_cond_subexpr_define($this->yytext(), $this->yychar, $this->yylength(), ')');
+    return $this->form_define_cond_subexpr($this->yytext(), $this->yychar, $this->yylength());
 }
 						case -176:
 							break;
@@ -8079,7 +8109,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -189:
 							break;
@@ -8087,7 +8117,7 @@ array(
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_cond_subexpr_recursion($text, $this->yychar, $this->yylength(), $number, ')');
+    return $this->form_recursive_cond_subexpr($text, $this->yychar, $this->yylength(), $number);
 }
 						case -190:
 							break;
@@ -8130,7 +8160,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -194:
 							break;
@@ -8190,7 +8220,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -198:
 							break;
@@ -8198,7 +8228,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -199:
 							break;
@@ -8206,7 +8236,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -200:
 							break;
@@ -8214,7 +8244,7 @@ array(
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_cond_subexpr_reference($text, $this->yychar, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $this->yychar, $this->yylength(), $name, ")");
 }
 						case -201:
 							break;
