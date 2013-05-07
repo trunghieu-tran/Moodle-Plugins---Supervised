@@ -357,11 +357,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     // If a backreference matched partially - set corresponding fields.
                     $partialmatch = clone $curstate;
                     $partialmatch->length += $length;
-                    $partialmatch->last_match_len = $length;
                     $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
-                    if ($length > 0) {
-                        $partialmatch->last_transition = $transition;
-                    }
+                    $partialmatch->last_transition = $transition;
+                    $partialmatch->last_match_len = $length;
 
                     // Finally, save the possible partial match.
                     $partialmatches[] = $partialmatch;
@@ -462,11 +460,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         // If a backreference matched partially - set corresponding fields.
                         $partialmatch = clone $curstate;
                         $partialmatch->length += $length;
-                        $partialmatch->last_match_len = $length;
                         $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
-                        if ($length > 0) {
-                            $partialmatch->last_transition = $transition;
-                        }
+                        $partialmatch->last_transition = $transition;
+                        $partialmatch->last_match_len = $length;
 
                         // Finally, save the possible partial match.
                         $partialmatches[] = $partialmatch;

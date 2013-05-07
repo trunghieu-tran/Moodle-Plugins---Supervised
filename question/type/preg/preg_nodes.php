@@ -1109,34 +1109,47 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-        $subexprlen = $matcherstateobj->length($this->number);
-        $start = $matcherstateobj->index_first($this->number);
-        $end = $start + $subexprlen - 1;
 
-        if (!$matcherstateobj->is_subexpr_captured($this->number) || ($subexprlen > 0 && $pos >= $str->length())) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
+            // For no match return the result immediately.
             return false;
-        } else if ($subexprlen == 0) {
+        }
+
+        $subexprlen = $matcherstateobj->length($this->number);
+        if ($subexprlen == 0) {
+            // For empty match return the result immediately.
             return true;
         }
+
+        if ($pos >= $str->length()) {
+            // Out of borders.
+            return false;
+        }
+
+        $start = $matcherstateobj->index_first($this->number);
+        $end = $start + $subexprlen - 1;
 
         $strcopy = clone $str;
         if ($this->caseless) {
             $strcopy->tolower();
         }
-        $matchlen = 0;
-        $result = true;
+
         // Check char by char.
-        for ($i = $start; $result && $i <= $end && $matchlen + $pos < $str->length(); $i++) {
-            $result = $result && ($strcopy[$i] == $strcopy[$pos + $matchlen]);
+        $result = true;
+        for ($i = $start; $result && $i <= $end && $length + $pos < $strcopy->length(); $i++) {
+            $result = $result && ($strcopy[$i] == $strcopy[$pos + $length]);
             if ($result) {
-                $matchlen++;
+                $length++;
+            } else {
+                break;
             }
         }
+
         // If the string has not enough characters.
-        if ($pos + $subexprlen - 1 >= $str->length()) {
+        if ($pos + $subexprlen - 1 >= $strcopy->length()) {
             $result = false;
         }
-        $length = $matchlen;
+
         return $result;
     }
 
