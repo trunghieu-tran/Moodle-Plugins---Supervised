@@ -9545,8 +9545,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test8 = array( 'str'=>'aCD',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>2,1=>2),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(1),
                         'next'=>'d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17036,8 +17036,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>59),
-                        'length'=>array(0=>60,1=>1),
+                        'index_first'=>array(0=>0,1=>60),
+                        'length'=>array(0=>60,1=>0),
                         'left'=>array(1),
                         'next'=>'\d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
