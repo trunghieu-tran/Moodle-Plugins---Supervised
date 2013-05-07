@@ -96,7 +96,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         }
 
         // Convert name to number.
-        $number = isset($this->subexpr_map[$number]) ? $this->subexpr_map[$number] : null;
+        $number = isset($this->subexpr_name_to_number_map[$number]) ? $this->subexpr_name_to_number_map[$number] : null;
 
         if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
             // Error: unexisting subexpression.
@@ -123,7 +123,10 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     protected $max_subexpr = 0;
 
     // Map of subexpression names => numbers.
-    protected $subexpr_map = array();
+    protected $subexpr_name_to_number_map = array();
+
+    // Map of subexpression numbers => names.
+    protected $subexpr_number_to_name_map = array();
 
     // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, recursion.
     protected $nodes_with_subexpr_refs = array();
@@ -301,7 +304,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     }
 
     public function get_subexpr_map() {
-        return $this->subexpr_map;
+        return $this->subexpr_name_to_number_map;
     }
 
     public function get_backrefs() {
@@ -553,32 +556,26 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
             return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
         }
 
-        $number = $this->map_subexpression($name);
+        $number = $this->map_subexpression($name, $pos, $length);
 
         $this->push_options_stack_item();
 
-        // Error: subexpressions with same names should have different numbers.
-        if ($number === null) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        // Error: subexpressions with same names should have same numbers.
+        if (is_object($number)) {
+            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $number);  // An error is actually returned.
         }
 
         // Are we inside a (?| group?
         $penult = $this->opt_stack[$this->opt_count - 2];
         $insidedup = ($penult->last_dup_subexpr_number !== -1);
 
-        if ($insidedup) {
-            if ($penult->last_dup_subexpr_name === null) {
-                // First occurence of a named subexpression inside a (?| group.
-                $penult->last_dup_subexpr_name = $name;
-            } else {
-                // Error: different names for subexpressions of the same number.
-                if ($penult->last_dup_subexpr_name !== $name) {
-                    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $text, $pos, $pos + $length - 1, '');
-                    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
-                }
-            }
+        if ($insidedup && $penult->last_dup_subexpr_name === null) {
+            // First occurence of a named subexpression inside a (?| group.
+            $penult->last_dup_subexpr_name = $name;
         }
+
+        // If all is fine, fill the another, inverse, map.
+        $this->subexpr_number_to_name_map[$number] = $name;
 
         return new JLexToken(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $number));
     }
@@ -812,22 +809,41 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     /**
      * Adds a named subexpression to the map.
      */
-    protected function map_subexpression($name) {
-        $exists = isset($this->subexpr_map[$name]);
-        $topitem = $this->opt_stack[$this->opt_count - 1];
-        $duplicate = $topitem->last_dup_subexpr_number != -1 || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
+    protected function map_subexpression($name, $pos, $length) {
+        // Does the given name exist?
+        $exists = isset($this->subexpr_name_to_number_map[$name]);
         if (!$exists) {
-            // This subexpression does not exists, all is OK.
-            $number = ++$this->last_subexpr;
-            $this->subexpr_map[$name] = $number;
-        } else if ($duplicate) {
-            // This subexpression does exist, but there's the J modifier.
-            $number = $this->subexpr_map[$name];
-            $this->last_subexpr = max($this->last_subexpr, $number);
-        } else {
-            // Subexpressions with same names should have same numbers.
-            return null;
+            // This subexpression does not exists, all is OK. Almost.
+            $number = $this->last_subexpr + 1;
+
+            if (isset($this->subexpr_number_to_name_map[$number])) {
+                // There can be situations like (?|(?<name1>)|(?<name2>)). By this moment name2 doesn't exist, but this is an error.
+                $assumed_name = $this->subexpr_number_to_name_map[$number];
+                if ($name != $assumed_name) {
+                    // Subexpression has wrong name.
+                    return $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
+                }
+            }
+
+            $this->subexpr_name_to_number_map[$name] = $number;
+            $this->last_subexpr++;
+            $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+            return $number;
         }
+
+        // This subexpression does exist.
+        $number = $this->subexpr_name_to_number_map[$name];
+        $topitem = $this->opt_stack[$this->opt_count - 1];
+        $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
+
+        $assumed_name = $this->subexpr_number_to_name_map[$number];
+
+        if ($number == $this->last_subexpr && !$modJ) {
+            // Two subexpressions with same number in a row is error.
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
+        }
+
+        $this->last_subexpr++;
         $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
         return $number;
     }
