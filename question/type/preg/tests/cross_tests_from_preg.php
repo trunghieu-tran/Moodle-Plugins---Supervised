@@ -1168,7 +1168,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subexpr_duplicate_with_modifier_J() {
+    function data_for_test_subexpr_duplicate_with_modifier_J_1() {
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>false,
@@ -1185,6 +1185,33 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'(?|(?<name>a)(?<name>b))\2',
                      'tests'=>array($test1, $test2),
+                     'modifiers'=>'J',
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_subexpr_duplicate_with_modifier_J_2() {
+        $test1 = array( 'str'=>'az',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>1));
+
+        $test2 = array( 'str'=>'abcc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1,2=>2),
+                        'length'=>array(0=>4,1=>1,2=>1));
+
+        $test3 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
+                        'left'=>array(1),
+                        'next'=>'z');
+
+        return array('regex'=>'(?|(?<qwe>a)z|a(b)(?|(?<qwe>c)))\2?',
+                     'tests'=>array($test1, $test2, $test3),
                      'modifiers'=>'J',
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
