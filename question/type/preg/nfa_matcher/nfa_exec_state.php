@@ -281,6 +281,20 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             // Less number of iterations means that there is a longer match without epsilons.
             $this_count = count($this_match);
             $other_count = count($other_match);
+
+            if ($this->options->mode == qtype_preg_handling_options::MODE_PCRE && $this_count == $other_count + 1) {
+                // PCRE mode selection: if states have N and N + 1 subpattern repetitions, respectively,
+                // and the (N + 1)th repetition is empty, then select the second state. And vice versa.
+                $this_last = $this->last_match($i);
+                $other_last = $other->last_match($i);
+                if ($this_last[1] == 0 && $this_last[0] > $other_last[0]) {
+                    return true;
+                } else  if ($other_last[1] == 0 && $other_last[0] > $this_last[0]) {
+                    return false;
+                }
+            }
+
+            // POSIX mode selection goes on here.
             if ($this_count < $other_count) {
                 return true;
             } else if ($other_count < $this_count) {
