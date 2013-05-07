@@ -208,7 +208,7 @@ $string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressin
 $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression.';
 $string['regex_match_header'] = 'Input string for check';
-$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+$string['regex_match_header_help'] = 'Here you can input a string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
 
 // Strings for node description
 
@@ -242,19 +242,19 @@ $string['description_unsetoption_U'] = 'quantifiers greedy by default:';
 $string['description_option_J'] = 'allow duplicate names:';
 $string['description_unsetoption_J'] = 'disallow duplicate names:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
-$string['description_finite_quant_strict'] = '%1 is repeated %count times%greed';
-$string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
-$string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
-$string['description_finite_quant_01'] = '%1 may be missing%greed';
+$string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greedy';
+$string['description_finite_quant_strict'] = '%1 is repeated %count times%greedy';
+$string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greedy';
+$string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greedy';
+$string['description_finite_quant_01'] = '%1 may be missing%greedy';
 $string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
-$string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
-$string['description_infinite_quant_1'] = '%1 is repeated any number of times%greed';
-// %greed
+$string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greedy';
+$string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greedy';
+$string['description_infinite_quant_1'] = '%1 is repeated any number of times%greedy';
+// %greedy
 $string['description_quant_lazy'] = ' (lazy quantifier)';
-$string['description_quant_greed'] = '';
+$string['description_quant_greedy'] = '';
 $string['description_quant_possessive'] = ' (possessive quantifier)';
 // TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';

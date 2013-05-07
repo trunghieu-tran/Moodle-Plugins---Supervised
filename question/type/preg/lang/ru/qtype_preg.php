@@ -242,19 +242,19 @@ $string['description_unsetoption_U'] = 'квантификаторы жадны�
 $string['description_option_J'] = 'повторение имен разрешено:';
 $string['description_unsetoption_J'] = 'повторение имен запрещено:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '%1 повторяется от %leftborder до %rightborder раз(а)%greed';
-$string['description_finite_quant_strict'] = '%1 повторяется %count раз(а)%greed';
-$string['description_finite_quant_0'] = '%1 повторяется не более %rightborder раз или отсутствует%greed';
-$string['description_finite_quant_1'] = '%1 повторяется не более %rightborder раз%greed';
-$string['description_finite_quant_01'] = '%1 может отсутствовать%greed';
+$string['description_finite_quant'] = '%1 повторяется от %leftborder до %rightborder раз(а)%greedy';
+$string['description_finite_quant_strict'] = '%1 повторяется %count раз(а)%greedy';
+$string['description_finite_quant_0'] = '%1 повторяется не более %rightborder раз или отсутствует%greedy';
+$string['description_finite_quant_1'] = '%1 повторяется не более %rightborder раз%greedy';
+$string['description_finite_quant_01'] = '%1 может отсутствовать%greedy';
 $string['description_finite_quant_borders_err'] = ' (некорректные границы у квантификатора)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '%1 повторяется хотябы %leftborder раз(а)%greed';
-$string['description_infinite_quant_0'] = '%1 повторяется любое количество раз или отсутствует%greed';
-$string['description_infinite_quant_1'] = '%1 повторяется любое количество раз%greed';
-// %greed
+$string['description_infinite_quant'] = '%1 повторяется хотябы %leftborder раз(а)%greedy';
+$string['description_infinite_quant_0'] = '%1 повторяется любое количество раз или отсутствует%greedy';
+$string['description_infinite_quant_1'] = '%1 повторяется любое количество раз%greedy';
+// %greedy
 $string['description_quant_lazy'] = ' (ленивый квантификатор)';
-$string['description_quant_greed'] = '';
+$string['description_quant_greedy'] = '';
 $string['description_quant_possessive'] = ' (сверхжадный квантификатор)';
 // TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 затем %2';

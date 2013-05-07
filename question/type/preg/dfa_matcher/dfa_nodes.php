@@ -655,7 +655,7 @@ class qtype_preg_dfa_node_assert extends qtype_preg_dfa_operator {
 class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
 
     public function accept() {
-        if (!$this->pregnode->greed) {
+        if (!$this->pregnode->greedy) {
             return get_string('ungreedyquant', 'qtype_preg');
         }
         return true;
@@ -701,10 +701,10 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
     }
     public function write_self_to_dotcode() {
         $str = dfa_preg_node::write_self_to_dotcode();
-        if ($this->pregnode->greed) {
-            $greedness = 'greed';
+        if ($this->pregnode->greedy) {
+            $greediness = 'greedy';
         } else {
-            $greedness = 'lazy';
+            $greediness = 'lazy';
         }
         if (isset($this->pregnode->rightborder)) {
             $rightbordertext = '|rightborder: '.$this->pregnode->rightborder;
@@ -713,7 +713,7 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
             $rightbordertext = '';
             $name = 'INF QUANT';
         }
-        $str .= '|'.$name.'|'.$greedness.'|leftborder: '.$this->pregnode->leftborder.$rightbordertext.'}"];';
+        $str .= '|'.$name.'|'.$greediness.'|leftborder: '.$this->pregnode->leftborder.$rightbordertext.'}"];';
         return $str;
     }
 }
@@ -731,7 +731,7 @@ class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quan
         parent::print_self($indent);
     }
     public function accept() {
-        if (!$this->pregnode->greed) {
+        if (!$this->pregnode->greedy) {
             return get_string('ungreedyquant', 'qtype_preg');
         }
         if ($this->pregnode->rightborder-$this->pregnode->leftborder > self::MAX_SIZE) {

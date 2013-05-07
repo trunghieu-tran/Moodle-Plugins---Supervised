@@ -172,7 +172,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $followpos = $parser->get_followpos();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription->data === '*');
-        $this->assertTrue($root->greed);
+        $this->assertTrue($root->greedy);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->userinscription->data === '');
         $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -216,7 +216,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $followpos = $parser->get_followpos();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription->data === '{8,}');
-        $this->assertTrue($root->greed);
+        $this->assertTrue($root->greedy);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->userinscription[0]->data === '\p{Egyptian_Hieroglyphs}');
         $this->assertTrue($root->nullable === false);

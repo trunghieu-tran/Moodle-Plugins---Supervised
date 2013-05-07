@@ -1291,8 +1291,8 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
 
     /** Is quantifier lazy? */
     public $lazy;
-    /** Is quantifier greed? */
-    public $greed;
+    /** Is quantifier greedy? */
+    public $greedy;
     /** Is quantifier possessive? */
     public $possessive;
     /** Smallest possible repetition number. */
@@ -1300,12 +1300,12 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
     /** Biggest possible repetition number. */
     public $rightborder;
 
-    public function __construct($leftborder = 0, $rightborder = 0, $lazy = false, $greed = true, $possessive = false) {
+    public function __construct($leftborder = 0, $rightborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
         $this->leftborder = $leftborder;
         $this->rightborder = $rightborder;
         $this->lazy = $lazy;
-        $this->greed = $greed;
+        $this->greedy = $greedy;
         $this->possessive = $possessive;
     }
 
@@ -1329,18 +1329,18 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 
     /** Is quantifier lazy? */
     public $lazy;
-    /** Is quantifier greed? */
-    public $greed;
+    /** Is quantifier greedy? */
+    public $greedy;
     /** Is quantifier possessive? */
     public $possessive;
     /** Smallest possible repetition number. */
     public $leftborder;
 
-    public function __construct($leftborder = 0, $lazy = false, $greed = true, $possessive = false) {
+    public function __construct($leftborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
         $this->leftborder = $leftborder;
         $this->lazy = $lazy;
-        $this->greed = $greed;
+        $this->greedy = $greedy;
         $this->possessive = $possessive;
     }
 
