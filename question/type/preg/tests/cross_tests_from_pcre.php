@@ -8941,14 +8941,14 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>1,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>5),
                         'length'=>array(0=>5,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8960,35 +8960,35 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>1,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>1,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'ababab',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>6),
                         'length'=>array(0=>6,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'aaaabcde',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>5),
                         'length'=>array(0=>5,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'bbbb',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>4),
                         'length'=>array(0=>4,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9000,14 +9000,14 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>1,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'bbbb',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>4),
                         'length'=>array(0=>4,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9026,7 +9026,7 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'cccc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
+                        'index_first'=>array(0=>0,1=>4),
                         'length'=>array(0=>4,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
