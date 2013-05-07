@@ -6791,11 +6791,11 @@ array(
         $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
-    $set = qtype_preg_handling_options::string_to_modifiers($set);
-    $unset = qtype_preg_handling_options::string_to_modifiers($unset);
-    $errors = $this->modify_top_options_stack_item($set, $unset);
+    $setflags = qtype_preg_handling_options::string_to_modifiers($set);
+    $unsetflags = qtype_preg_handling_options::string_to_modifiers($unset);
+    $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
-        $node = new qtype_preg_leaf_option($set, $unset);
+        $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
         return new JLexToken(qtype_preg_yyParser::PARSLEAF, $node);
@@ -6964,12 +6964,12 @@ array(
         $set = qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
         $unset = '';
     }
-    $set = qtype_preg_handling_options::string_to_modifiers($set);
-    $unset = qtype_preg_handling_options::string_to_modifiers($unset);
+    $setflags = qtype_preg_handling_options::string_to_modifiers($set);
+    $unsetflags = qtype_preg_handling_options::string_to_modifiers($unset);
     $this->push_options_stack_item();
-    $errors = $this->modify_top_options_stack_item($set, $unset);
+    $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
-        $node = new qtype_preg_leaf_option($set, $unset);
+        $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
         $res = array();
