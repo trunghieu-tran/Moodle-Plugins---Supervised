@@ -168,13 +168,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Returns the minimal path to complete a partial match.
      * @param qtype_poasquestion_string str string being matched.
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
-     * @param bool fulllastmatch - was the last transition captured fully, not partially?
      * @return object of qtype_preg_nfa_exec_state.
      */
-    public function determine_characters_left($str, $laststate, $fulllastmatch) {
+    public function determine_characters_left($str, $laststate) {
         $states = array();       // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();    // States which the automaton is in.
         $endstate = $this->automaton->end_state();
+
+        $fulllastmatch = ($laststate->last_match_len == 0);  // Was the last transition captured fully, not partially?
 
         // Create an array of processing states for all nfa states (the only state where match was stopped, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
@@ -355,23 +356,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 } else if (count($fullmatches) == 0) {    // Transition not matched, save the partial match.
                     // If a backreference matched partially - set corresponding fields.
                     $partialmatch = clone $curstate;
-                    $fulllastmatch = true;
-                    if ($length > 0) {
-                        $partialmatch->length += $length;
-                        $partialmatch->last_transition = $transition;
-                        $partialmatch->last_match_len = $length;
-                        $fulllastmatch = false;
-                    }
-
+                    $partialmatch->length += $length;
+                    $partialmatch->last_match_len = $length;
                     $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
-
-                    $path = null;
-                    // TODO: if ($this->options === null || $this->options->extensionneeded).
-                    $path = $this->determine_characters_left($str, $partialmatch, $fulllastmatch);
-                    if ($path !== null) {
-                        $partialmatch->left = $path->length - $partialmatch->length;
-                        $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                    if ($length > 0) {
+                        $partialmatch->last_transition = $transition;
                     }
+
                     // Finally, save the possible partial match.
                     $partialmatches[] = $partialmatch;
                 }
@@ -388,8 +379,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result[] = $match->to_matching_results($this->get_subexpr_map());
         }
         if (count($fullmatches) == 0) {
-            foreach ($partialmatches as $match) {
-                $result[] = $match->to_matching_results($this->get_subexpr_map());
+            foreach ($partialmatches as $partialmatch) {
+                // TODO: if ($this->options === null || $this->options->extensionneeded).
+                $path = $this->determine_characters_left($str, $partialmatch);
+                if ($path !== null) {
+                    $partialmatch->left = $path->length - $partialmatch->length;
+                    $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                }
+                $result[] = $partialmatch->to_matching_results($this->get_subexpr_map());
             }
         }
         return $result;
@@ -464,23 +461,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     } else if ($states[$endstate->number] == null) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
                         $partialmatch = clone $curstate;
-                        $fulllastmatch = true;
-                        if ($length > 0) {
-                            $partialmatch->length += $length;
-                            $partialmatch->last_transition = $transition;
-                            $partialmatch->last_match_len = $length;
-                            $fulllastmatch = false;
-                        }
-
+                        $partialmatch->length += $length;
+                        $partialmatch->last_match_len = $length;
                         $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
-
-                        $path = null;
-                        // TODO: if ($this->options === null || $this->options->extensionneeded).
-                        $path = $this->determine_characters_left($str, $partialmatch, $fulllastmatch);
-                        if ($path !== null) {
-                            $partialmatch->left = $path->length - $partialmatch->length;
-                            $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                        if ($length > 0) {
+                            $partialmatch->last_transition = $transition;
                         }
+
                         // Finally, save the possible partial match.
                         $partialmatches[] = $partialmatch;
                     }
@@ -511,8 +498,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         if ($endstatematch !== null) {
             $result[] = $endstatematch->to_matching_results($this->get_subexpr_map());
         } else {
-            foreach ($partialmatches as $match) {
-                $result[] = $match->to_matching_results($this->get_subexpr_map());
+            foreach ($partialmatches as $partialmatch) {
+                // TODO: if ($this->options === null || $this->options->extensionneeded).
+                $path = $this->determine_characters_left($str, $partialmatch);
+                if ($path !== null) {
+                    $partialmatch->left = $path->length - $partialmatch->length;
+                    $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                }
+                $result[] = $partialmatch->to_matching_results($this->get_subexpr_map());
             }
         }
         return $result;
