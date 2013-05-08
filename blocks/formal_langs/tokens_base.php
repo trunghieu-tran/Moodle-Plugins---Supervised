@@ -325,7 +325,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return int Damerau-Levenshtein distance
      */
     static public function damerau_levenshtein($str1, $str2) {
-            if ($str1 == $str2) 
+        if ($str1 == $str2) 
             return 0;//words identical
         $str1_len = textlib::strlen($str1);
         $str2_len = textlib::strlen($str2);
