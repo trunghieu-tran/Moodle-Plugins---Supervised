@@ -4457,7 +4457,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>3),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test2 = array( 'str'=>"abc\n ", //- странный тест, совпадения быть не должно, но в исходном списке тестов у этого теста есть совпадение
+        $test2 = array( 'str'=>"abc\n",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
