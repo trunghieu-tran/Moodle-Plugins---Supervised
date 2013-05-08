@@ -211,6 +211,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         if ($qo == false) {
             return $qo;
         }
+        $format->import_hints($qo, $data, false, false);//TODO - change last one to "true" when interactivehints will be implemented
         $question_type = $data['@']['type'];
         if ($question_type != $this->name()) {
             return false;
