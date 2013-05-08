@@ -127,7 +127,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
                 if ($match[1] !== -1) {
-                    $matchresults->length[$i] = strlen($match[0]);
+                    $matchresults->length[$i] = qtype_preg_unicode::strlen($match[0]);
                 } else {
                     $matchresults->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
                 }
