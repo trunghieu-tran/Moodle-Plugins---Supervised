@@ -134,9 +134,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             foreach ($curstate->state->outgoing_transitions() as $transition) {
                 $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
-                if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY ||
-                    $transition->pregleaf->consumes($curstate) ||
-                    !$transition->pregleaf->match($str, $curpos, $length, $curstate)) {
+                if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY ||
+                    $transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
                     continue;
                 }
 
@@ -175,8 +174,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $curstates = array();    // States which the automaton is in.
         $endstate = $this->automaton->end_state();
 
-        $fulllastmatch = ($laststate->last_match_len == 0);  // Was the last transition captured fully, not partially?
-
         // Create an array of processing states for all nfa states (the only state where match was stopped, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate->number] = null;
@@ -184,7 +181,26 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $resumestate = null;
 
-        if ($laststate->last_transition === null || $fulllastmatch) {
+        if ($laststate->last_match_len > 0) {
+            // The last transition was a partially matched backreference; we can only continue from this transition.
+            $backref_length = $laststate->length($laststate->last_transition->pregleaf->number);
+            $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
+
+            $resumestate = clone $laststate;
+            $resumestate->state = $laststate->last_transition->to;
+            $resumestate->full = ($resumestate->state === $endstate);
+            $resumestate->left = $resumestate->full ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
+            $resumestate->extendedmatch = null;
+            $resumestate->last_transition = $laststate->last_transition;
+            $resumestate->last_match_len = $backref_length;
+
+            $resumestate->length += $backref_length - $laststate->last_match_len;
+            $resumestate->write_subpatt_info($laststate->last_transition, $prevpos, $backref_length);
+
+            // Re-write the string with correct characters.
+            $newchr = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
+            $resumestate->str->concatenate($newchr);
+        } else {
             // There was no match at all, or the last transition was fully-matched.
             $curpos = $laststate->startpos + $laststate->length;
 
@@ -212,25 +228,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
             // Well, there were no $ fails at the end. Try the other paths to complete match.
             $resumestate = $laststate;
-        } else {
-            // The last transition was a partially matched backreference; we can only continue from this transition.
-            $backref_length = $laststate->length($laststate->last_transition->pregleaf->number);
-            $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
-
-            $resumestate = clone $laststate;
-            $resumestate->state = $laststate->last_transition->to;
-            $resumestate->full = ($resumestate->state === $endstate);
-            $resumestate->left = $resumestate->full ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-            $resumestate->extendedmatch = null;
-            $resumestate->last_transition = $laststate->last_transition;
-            $resumestate->last_match_len = $backref_length;
-
-            $resumestate->length += $backref_length - $laststate->last_match_len;
-            $resumestate->write_subpatt_info($laststate->last_transition, $prevpos, $backref_length);
-
-            // Re-write the string with correct characters.
-            $newchr = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
-            $resumestate->str->concatenate($newchr);
         }
 
         $closure = $this->epsilon_closure(array($resumestate->state->number => $resumestate), $str);
@@ -244,6 +241,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             while (count($curstates) != 0) {
                 $curstate = $states[array_pop($curstates)];
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
+                    if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                        continue;
+                    }
                     // Check for anchors.
                     // \A and ^ are only valid on start position and thus can only be matched, but can't generate strings.
                     // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
@@ -354,15 +354,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $fullmatches[] = $newstate;
                         }
                     }
-                } else if (count($fullmatches) == 0) {    // Transition not matched, save the partial match.
-                    // If a backreference matched partially - set corresponding fields.
+                } else if (count($fullmatches) == 0) {
+                    // Transition not matched, save the partial match.
                     $partialmatch = clone $curstate;
                     $partialmatch->length += $length;
                     $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
                     $partialmatch->last_transition = $transition;
                     $partialmatch->last_match_len = $length;
-
-                    // Finally, save the possible partial match.
                     $partialmatches[] = $partialmatch;
                 }
             }
@@ -428,7 +426,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
-                    if (/*!$transition->pregleaf->consumes($curstate)*/$transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
                     $curpos = $startpos + $curstate->length;
@@ -457,15 +455,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                 $reached[$number] = $newstate;
                             }
                         }
-                    } else if ($states[$endstate->number] == null) {    // Transition not matched, save the partial match.
-                        // If a backreference matched partially - set corresponding fields.
+                    } else if ($states[$endstate->number] == null) {
+                        // Transition not matched, save the partial match.
                         $partialmatch = clone $curstate;
                         $partialmatch->length += $length;
                         $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
                         $partialmatch->last_transition = $transition;
                         $partialmatch->last_match_len = $length;
-
-                        // Finally, save the possible partial match.
                         $partialmatches[] = $partialmatch;
                     }
                 }
@@ -509,11 +505,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     public function match_from_pos($str, $startpos) {
-        $backrefs = count($this->get_backrefs()) > 0;
         $possiblematches = array();
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
-        if ($backrefs) {
+        if (count($this->get_backrefs()) > 0) {
             $possiblematches = $this->match_brute_force($str, $startpos);
         } else {
             $possiblematches = $this->match_fast($str, $startpos);
