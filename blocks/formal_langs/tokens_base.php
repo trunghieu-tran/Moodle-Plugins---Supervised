@@ -9,6 +9,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstream.php');
 
 class block_formal_langs_ast {
 
@@ -326,8 +327,8 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     static public function damerau_levenshtein($str1, $str2) {
             if ($str1 == $str2) 
             return 0;//words identical
-        $str1_len = strlen($str1);
-        $str2_len = strlen($str2);
+        $str1_len = textlib::strlen($str1);
+        $str2_len = textlib::strlen($str2);
         //zero length of words
         if ($str1_len == 0) {
             return $str2_len;
@@ -370,8 +371,8 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return str redaction distance
      */
     static public function redaction($str1,$str2){
-        $str1_len = strlen($str1);
-        $str2_len = strlen($str2);
+        $str1_len = textlib::strlen($str1);
+        $str2_len = textlib::strlen($str2);
         
         for($i=0;$i<$str1_len+1;$i++)
             for ($j=0;$j<$str2_len+1;$j++) 
@@ -426,7 +427,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                         $j --;
                 }
         } while(($i != 0) || ($j != 0));
-        $redact= strrev($route);
+        $redact= textlib::strrev($route);
         return $redact;
     }
     
@@ -439,8 +440,8 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     {
         $str1= $this->value;
         $str2= $token->value;
-        $length_of_str1=strlen($str1);                 //define the length of str1
-        $length_of_str2=strlen($str2);                 //define the length of str2
+        $length_of_str1=textlib::strlen($str1);                 //define the length of str1
+        $length_of_str2=textlib::strlen($str2);                 //define the length of str2
         if(!($length_of_str1-$max<=$length_of_str2 && $length_of_str2<=$length_of_str1+$max))
             return -1;
         //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
@@ -469,7 +470,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     public function look_for_matches($other, $threshold, $iscorrect) {
         // TODO: generic mistakes handling
-        $result=strlen($this->value)-strlen($this->value)*$threshold;
+        $result=textlib::strlen($this->value)-textlib::strlen($this->value)*$threshold;
         $max=round($result);
         $str='';
         $possible_pairs=array();
@@ -608,19 +609,19 @@ class block_formal_langs_matched_tokens_pair {
             return '';
         }
         if($this->mistakeweight>0 && count($this->correcttokens)==1 && count($this->comparedtokens)==1){
-            return "typo";
+            return 'typo';
         }
         if($this->mistakeweight==1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
-            return "extra separator";
+            return 'extra separator';
         }
         if($this->mistakeweight==1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
-            return "missing separator";
+            return 'missing separator';
         }
         if($this->mistakeweight>1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
-            return "extra separator and typo";
+            return 'extra separator and typo';
         }
         if($this->mistakeweight>1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
-            return "missing separator and typo";
+            return 'missing separator and typo';
         }
         //TODO - other cases, based on type.
     }
