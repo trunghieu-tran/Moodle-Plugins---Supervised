@@ -188,9 +188,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             // There was no match at all, or the last transition was fully-matched.
             $curpos = $laststate->startpos + $laststate->length;
 
-            // Check if a $ assertion before the eps-closure of the end state. Then it's possible to remove few characters.
+            // Check for a \Z \z or $ assertion before the eps-closure of the end state. Then it's possible to remove few characters.
             foreach ($laststate->state->outgoing_transitions() as $transition) {
-                if ($transition->is_loop || $transition->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                if ($transition->is_loop || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                     continue;
                 }
                 $closure = $this->epsilon_closure(array($laststate->state->number => $laststate), $str);   // TODO!!!
@@ -245,11 +245,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstate = $states[array_pop($curstates)];
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
                     // Check for anchors.
-                    // ^ is only valid on start position and thus can only be matched, but can't generate strings.
-                    // $ is only valid at the end of regex. TODO: what's with eps-closure?
-                    $circumflex = $transition->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX;
-                    $dollar = $transition->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to !== $endstate;
-                    if ($circumflex || $dollar) {
+                    // \A and ^ are only valid on start position and thus can only be matched, but can't generate strings.
+                    // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
+                    $assert = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
+                    $anchorstart = $assert && $transition->pregleaf->is_start_anchor();
+                    $anchorend = $assert && $transition->pregleaf->is_end_anchor() && $transition->to !== $endstate;
+                    if ($anchorstart || $anchorend) {
                         continue;
                     }
 

@@ -20,8 +20,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
     function create_lexer($regex, $options = null) {
         if ($options === null) {
             $options = new qtype_preg_handling_options();
+            $options->preserveallnodes = true;
         }
-        $options->preserveallnodes = true;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
@@ -1169,9 +1169,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// .
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->data->string() === "\n");
+        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
         $this->assertTrue($token->value->caseless);
-        $this->assertTrue($token->value->flags[0][0]->negative);
         $token = $lexer->nextToken();// (
         $token = $lexer->nextToken();// c
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -1256,6 +1255,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
     }
     function test_global_options() {
         $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_CASELESS);
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_DOTALL);
         $lexer = $this->create_lexer('ab(?-i:.d)(?-s)e', $options);
@@ -1288,6 +1288,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data->string() === 'e');
         $this->assertTrue($token->value->caseless);
         $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
         $lexer = $this->create_lexer("\n   \t\r(?i-x)\n", $options);
         $token = $lexer->nextToken();
@@ -1737,7 +1738,9 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype === qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_meta_dot() {
-        $lexer = $this->create_lexer('.');
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = false;
+        $lexer = $this->create_lexer('.', $options);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
