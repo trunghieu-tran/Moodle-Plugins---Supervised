@@ -391,10 +391,6 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
         if (is_a($node, 'qtype_preg_leaf')) {
             $node->caseless = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
-        if (is_a($node, 'qtype_preg_leaf_assert')) {
-            $node->dollarendonly = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY);
-            $node->multiline = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE);
-        }
     }
 
     /**
@@ -1436,7 +1432,7 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
 }
 <YYINITIAL> "." {
     $topitem = $this->opt_stack[$this->opt_count - 1];
-    if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
+    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
         // The true dot matches everything.
         return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
     } else {
@@ -1602,10 +1598,27 @@ WHITESPACE = [\ \n\r\t\f]                               // All possible white sp
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
 }
 <YYINITIAL> "^" {
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+        // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+        return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+    } else {
+        // Default case: the same as \A.
+        return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+    }
 }
 <YYINITIAL> "$" {
-    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+    $topitem = $this->opt_stack[$this->opt_count - 1];
+    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+        // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+        return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+    } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
+        // Not multiline, but dollar endonly; the same as \z.
+        return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, false);
+    } else {
+        // Default case: the same as \Z.
+        return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, true);
+    }
 }
 <YYINITIAL> "\c" {
     $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c', $this->yychar, $this->yychar + $this->yylength() - 1, '');

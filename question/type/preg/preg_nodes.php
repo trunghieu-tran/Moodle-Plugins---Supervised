@@ -958,13 +958,18 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     /** $ */
     const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
 
-    public $dollarendonly = false;
-    public $multiline = false;
-
     public function __construct($subtype = null, $negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
         $this->subtype = $subtype;
         $this->negative = $negative;
+    }
+
+    public function is_start_anchor() {
+        return $this->subtype == self::SUBTYPE_ESC_A || $this->subtype == self::SUBTYPE_CIRCUMFLEX;
+    }
+
+    public function is_end_anchor() {
+        return $this->subtype == self::SUBTYPE_ESC_Z || $this->subtype == self::SUBTYPE_DOLLAR;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -1016,25 +1021,12 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
             // TODO matches at the first matching position in the string.
             break;
         case self::SUBTYPE_CIRCUMFLEX:
-            if ($this->multiline) {
-                // Matches at the very start of the string or after \n.
-                $result = ($pos == 0) || ($str[$pos - 1] == "\n");
-            } else {
-                // Default case, the same as \A.
-                $result = ($pos == 0);
-            }
+            // Used only in multiline mode. Matches at the very start of the string or after any \n.
+            $result = ($pos == 0) || ($str[$pos - 1] == "\n");
             break;
         case self::SUBTYPE_DOLLAR:
-            if ($this->dollarendonly && !$this->multiline) {
-                // Matches only at the end of the string.
-                $result = ($pos == $str->length());
-            } else if ($this->multiline) {
-                // Matches at the end of the string and before any \n.
-                $result = ($pos == $str->length()) || ($str[$pos] == "\n");
-            } else {
-                // Default case, the same as \Z.
-                $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
-            }
+            // Used only in multiline mode. Matches at the end of the string and before any \n.
+            $result = ($pos == $str->length()) || ($str[$pos] == "\n");
             break;
         }
         return $result;
