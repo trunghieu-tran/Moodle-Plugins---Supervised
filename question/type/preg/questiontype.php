@@ -64,6 +64,10 @@ class qtype_preg extends qtype_shortanswer {
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'qtype_preg');
+        ///TODO - delete with "answers" field
+        $answerskey = array_search('answers', $extraquestionfields);
+        unset($extraquestionfields[$answerskey]);
+        ///
         array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder', 'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
     }
@@ -103,4 +107,16 @@ class qtype_preg extends qtype_shortanswer {
         parent::save_question_options($question);
     }
 
+    /** Overload import from Moodle XML format to import hints */
+    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+        $qo = parent::import_from_xml($data, $question, $format, $extra);
+        $format->import_hints($qo, $data, false, false);//TODO - change last one to "true" when interactivehints will be implemented
+        return $qo;
+    }
+
+    /*public function export_to_xml($question, qformat_xml $format, $extra=null) {
+        $expout = parent::export_to_xml($question, $format, $extra);
+        //$expout .= $format->write_hints($question);
+        return $expout;
+    }*/
 }
