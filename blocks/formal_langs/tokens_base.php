@@ -610,11 +610,17 @@ class block_formal_langs_matched_tokens_pair {
         if($this->mistakeweight>0 && count($this->correcttokens)==1 && count($this->comparedtokens)==1){
             return "typo";
         }
-        if($this->mistakeweight>0 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
+        if($this->mistakeweight==1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
             return "extra separator";
         }
-        if($this->mistakeweight>0 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
+        if($this->mistakeweight==1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
             return "missing separator";
+        }
+        if($this->mistakeweight>1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
+            return "extra separator and typo";
+        }
+        if($this->mistakeweight>1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
+            return "missing separator and typo";
         }
         //TODO - other cases, based on type.
     }
