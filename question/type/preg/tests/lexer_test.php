@@ -1993,7 +1993,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indlast === 220);
     }
     function test_errors() {
-        // TODO: SUBTYPE_INVALID_ESCAPE_SEQUENCE, SUBTYPE_MISSING_CONTROL_ENDING, SUBTYPE_CALLOUT_BIG_NUMBER
+        // TODO: SUBTYPE_MISSING_CONTROL_ENDING, SUBTYPE_CALLOUT_BIG_NUMBER
         $lexer = $this->create_lexer('\p{C}[a\p{Squirrel}b]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
