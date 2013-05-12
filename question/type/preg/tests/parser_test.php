@@ -793,15 +793,15 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $root = $parser->get_root();
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($root->operands[1]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($root->operands[1]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN);
         // Unopened parenthesis.
         $parser = $this->run_parser(')ab(c|d)eg)', $errornodes);
         $this->assertTrue(count($errornodes) === 2);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN);
         $this->assertTrue($errornodes[0]->indfirst === 0);
         $this->assertTrue($errornodes[1]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[1]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[1]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN);
         $this->assertTrue($errornodes[1]->indfirst === 10);
         $root = $parser->get_root();
         $this->assertTrue($errornodes[1]->operands[0] === $root->operands[0]);
@@ -860,7 +860,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('a(?(?=bc)dd|e*f|hhh', $errornodes);
         $this->assertTrue(count($errornodes) === 1);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->indfirst === 1);
         $this->assertTrue($errornodes[0]->indlast === 5);
         $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));//There should be two operands for such error: alternation and expression inside assertion
@@ -869,7 +869,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?(?=bce*f|hhh', $errornodes);
         $this->assertTrue(count($errornodes) === 1);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->indfirst === 0);
         $this->assertTrue($errornodes[0]->indlast === 4);
         $this->assertTrue(is_a($errornodes[0]->operands[0], 'qtype_preg_node_alt'));
@@ -877,7 +877,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('ab(?(?=', $errornodes);
         $this->assertTrue(count($errornodes) === 1);
         $this->assertTrue($errornodes[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->indfirst === 2);
         $this->assertTrue($errornodes[0]->indlast === 6);
         $this->assertTrue(empty($errornodes[1]->operands));
@@ -945,7 +945,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[4]->addinfo === 'Squirrel');
         $this->assertTrue(count($errornodes[5]->operands) === 1);
         $this->assertTrue($errornodes[5]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[5]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[5]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN);
         $this->assertTrue($errornodes[5]->indfirst === 7);
         $this->assertTrue($errornodes[5]->indlast === 7);
         $this->assertTrue($errornodes[5]->operands[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
@@ -960,7 +960,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[7]->indlast === 27);
         $this->assertTrue(count($errornodes[8]->operands) === 1);
         $this->assertTrue($errornodes[8]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[8]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[8]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN);
         $this->assertTrue($errornodes[8]->indfirst === 8);
         $this->assertTrue($errornodes[8]->indlast === 8);
         $this->assertTrue(is_a($errornodes[8]->operands[0], 'qtype_preg_node_concat'));

@@ -416,31 +416,31 @@ expr(A) ::= CONDSUBEXPR(D) CLOSEBRACK CLOSEBRACK. {
 
 
 expr(A) ::= expr(B) CLOSEBRACK(C). [ERROR_PREC] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, C->userinscription->data, B->indlast + 1, B->indlast + 1, C->userinscription, array(B));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, C->userinscription->data, B->indlast + 1, B->indlast + 1, C->userinscription, array(B));
 }
 
 expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription);
 }
 
 expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C));
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst,  B->indlast, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription->data, B->indfirst,  B->indlast, B->userinscription);
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(E) CLOSEBRACK(D) expr(C). [ERROR_PREC] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C, E));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C, E));
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription, array(C));
 }
 
 expr(A) ::= CONDSUBEXPR(B). [ERROR_PREC_SHORTEST] {
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription->data, B->indfirst, B->indlast, B->userinscription);
 }
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
