@@ -15,7 +15,7 @@ require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/lib/textlib.class.php');
 
-class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
+class block_formal_langs_language_cpp_language extends block_formal_langs_predefined_language
 {
     public function __construct() {
         parent::__construct(null,null);
@@ -23,7 +23,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
     
     
     public function name() {
-        return 'c_language';
+        return 'cpp_language';
     }    
 }
 
@@ -54,7 +54,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 %function next_token
 %char
 %line
-%class block_formal_langs_predefined_c_language_lexer_raw
+%class block_formal_langs_predefined_cpp_language_lexer_raw
 %state CHARACTER
 %state STRING
 %state MULTILINE_COMMENT
@@ -198,92 +198,92 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     }
 
     protected function check_and_create_character()
-    {
-        $result = $this->leavebufferedstate('character');
-        $maxcharacterlength = 3;
-        $value = $result->value();
-        if ($value[0] == 'L')
-            $maxcharacterlength = $maxcharacterlength + 1;
-        if ( textlib::strlen($value) > $maxcharacterlength) {
-            $res = new block_formal_langs_lexical_error();
-            $res->tokenindex = $this->counter - 1;
-            $a = new stdClass();
-            $a->line = $result->position()->linestart();
-            $a->col = $result->position()->colstart();
-            $a->symbol = $value;
-            $res->errorkind = 'clanguagemulticharliteral';
-            $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
-            $this->errors[] = $res;
+        {
+            $result = $this->leavebufferedstate('character');
+            $maxcharacterlength = 3;
+            $value = $result->value();
+            if ($value[0] == 'L')
+                $maxcharacterlength = $maxcharacterlength + 1;
+            if ( textlib::strlen($value) > $maxcharacterlength) {
+                $res = new block_formal_langs_lexical_error();
+                $res->tokenindex = $this->counter - 1;
+                $a = new stdClass();
+                $a->line = $result->position()->linestart();
+                $a->col = $result->position()->colstart();
+                $a->symbol = $value;
+                $res->errorkind = 'clanguagemulticharliteral';
+                $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
+                $this->errors[] = $res;
+            }
+            return $result;
         }
-        return $result;
-    }
-  
-    private function return_pos() {
-        $begin_line = $this->yyline;
-        $begin_col = $this->yycol;
 
-        if(strpos($this->yytext(), '\n')) {
-            $lines = explode("\n", $this->yytext());
-            $num_lines = count($lines);
-            
-            $end_line = $begin_line + $num_lines - 1;
-            $end_col = textlib::strlen($lines[$num_lines -1]) - 1;
-        } else {
-            $end_line = $begin_line;
-            $end_col = $begin_col + textlib::strlen($this->yytext()) - 1;
+        private function return_pos() {
+            $begin_line = $this->yyline;
+            $begin_col = $this->yycol;
+
+            if(strpos($this->yytext(), '\n')) {
+                $lines = explode("\n", $this->yytext());
+                $num_lines = count($lines);
+
+                $end_line = $begin_line + $num_lines - 1;
+                $end_col = textlib::strlen($lines[$num_lines -1]) - 1;
+            } else {
+                $end_line = $begin_line;
+                $end_col = $begin_col + textlib::strlen($this->yytext()) - 1;
+            }
+
+            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+
+            return $res;
         }
-        
-        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
-        
-        return $res;
-    }
-    private function return_pos_by_field($blfield, $bcfield, $elfield, $ecfield)  {
-        $begin_line = $this->$blfield;
-        $begin_col = $this->$bcfield;
-        $end_line =  $this->$elfield;
-        $end_col =  $this->$ecfield;
+        private function return_pos_by_field($blfield, $bcfield, $elfield, $ecfield)  {
+            $begin_line = $this->$blfield;
+            $begin_col = $this->$bcfield;
+            $end_line =  $this->$elfield;
+            $end_col =  $this->$ecfield;
 
-        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
 
-        return $res;
-    }
-
-    private function return_buffered_pos() {
-        $this->endyyline = $this->yyline;
-        $this->endyycol = $this->yycol + textlib::strlen($this->yytext()) - 1;
-        return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
-    }
-
-    private function return_error_token_pos() {
-        return $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
-    }
-
-
-
-    private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
-        $pos = $this->return_error_token_pos();
-        $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1);
-        $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1);
-        $this->endstate = true;
-
-        $realstring = $tokenstring;
-        if (is_object($realstring)) {
-            $realstring = $realstring->string();
+            return $res;
         }
-        $token1string = textlib::substr($realstring,0, $splitoffset);
-        $token2string = textlib::substr($realstring, $splitoffset, null);
-        $token1string = new qtype_poasquestion_string($token1string);
-        $token2string = new qtype_poasquestion_string($token2string);
 
-        $token1 =  $this->create_token_with_position('unknown', $token1string, $pos1);
-        $token2 =  $this->create_token_with_position('unknown', $token2string, $pos2);
+        private function return_buffered_pos() {
+            $this->endyyline = $this->yyline;
+            $this->endyycol = $this->yycol + textlib::strlen($this->yytext()) - 1;
+            return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
+        }
 
-        $this->create_buffer_error($errorstring, 2);
-        $this->endstate = true;
-        $this->endtoken = $token2;
-        $this->yybegin(self::YYINITIAL);
-        return $token1;
-    }
+        private function return_error_token_pos() {
+            return $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
+        }
+
+
+
+        private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
+            $pos = $this->return_error_token_pos();
+            $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1);
+            $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1);
+            $this->endstate = true;
+
+            $realstring = $tokenstring;
+            if (is_object($realstring)) {
+                $realstring = $realstring->string();
+            }
+            $token1string = textlib::substr($realstring,0, $splitoffset);
+            $token2string = textlib::substr($realstring, $splitoffset, null);
+            $token1string = new qtype_poasquestion_string($token1string);
+            $token2string = new qtype_poasquestion_string($token2string);
+
+            $token1 =  $this->create_token_with_position('unknown', $token1string, $pos1);
+            $token2 =  $this->create_token_with_position('unknown', $token2string, $pos2);
+
+            $this->create_buffer_error($errorstring, 2);
+            $this->endstate = true;
+            $this->endtoken = $token2;
+            $this->yybegin(self::YYINITIAL);
+            return $token1;
+        }
 %}
 
 %eofval{
@@ -325,7 +325,23 @@ INC = "#include"
 <YYINITIAL> (extern|for|goto|if)         { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (return|sizeof|static)       { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (struct|register)            { return $this->create_token('keyword',$this->yytext()); }
-<YYINITIAL> (switch|typedef)             { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (switch|typedef)                           { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (signals|slots|public|private|protected)   { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (auto|lambda|class|try|catch)              { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (friend|asm|template|typename)             { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (const_cast|dynamic_cast|reinterpret_cast) { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (static_cast|foreach)                      { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("+"|"-"|"*"|"/"|\\|"~=")          { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("&"|"|"|"~"|"->")                 { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("+="|"-="|"*=")               { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("/="|"++"|"--")               { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("%"|"%="|"<<="|">>=")         { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("&="|"|="|"!="|"!")           { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("&&="|"||=")           { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("="|"++"|"--")                { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("<"|">"|"<="|">="|"=="|"!=")  { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("&&"|"||"|">>"|"<<")          { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> operator("^"|"^="|"="|".")             { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (union|volatile|while)       { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (char|double|float|int)      { return $this->create_token('typename',$this->yytext()); }
 <YYINITIAL> (long|signed|unsigned|void)  { return $this->create_token('typename',$this->yytext()); }
@@ -347,6 +363,8 @@ INC = "#include"
 <YYINITIAL> {D}*"."{D}+({E})?{FS}?       { return $this->create_token('numeric',$this->yytext()); }
 <YYINITIAL> {D}+"."{D}*({E})?{FS}?       { return $this->create_token('numeric',$this->yytext()); }
 <YYINITIAL> "..."                        { return $this->create_token('ellipsis',$this->yytext()); }
+<YYINITIAL> ":"                          { return $this->create_token('operators',$this->yytext()); }
+<YYINITIAL> "::"                         { return $this->create_token('operators',$this->yytext()); }
 <YYINITIAL> ">>="                        { return $this->create_token('operators',$this->yytext()); }
 <YYINITIAL> "<<="                        { return $this->create_token('operators',$this->yytext()); }
 <YYINITIAL> "="                          { return $this->create_token('operators',$this->yytext()); }

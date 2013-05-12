@@ -138,16 +138,43 @@ class qtype_correctwriting_lexical_analyzer {
         }
 
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
-        //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-        //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
-        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $responsestring);
+        $best_groups=$answertokens->look_for_token_pairs($responsetokens,$question->lexicalerrorthreshold);
+        
 
+        
+        //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
+        $analyzer_array=array();
+        $correct_response_array=array();
+        for($i=0; $i<count($best_groups); $i++){
+            //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
+            $newcorrectstream=$responsetokens->correct_mistakes($answertokens,$best_groups[0]->matchedpairs);
+            array_push($correct_response_array, $newcorrectstream);
+            $analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
+            array_push($analyzer_array, $analyzer);
+        }
+        
         //7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
+        $max_fit=$analyzer_array[0]->fitness();
+        $number_analyzer=0;
+        for($i=0; $i<count($analyzer_array); $i++){
+            if($analyzer_array[$i]->fitness()>$max_fit){
+                $max_fit=$analyzer_array[$i]->fitness();
+                $number_analyzer=$i;
+            }
+        }
         //8. Set array of mistakes accordingly - Birukova and Mamontov
         //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
-        $this->correctedresponse= $responsestring->stream->tokens;
-        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->fitness = $analyzer->fitness();
+        
+        //???
+        //$this->correctedresponse= $responsestring->stream->tokens;
+        $this->correctedresponse=$correct_response_array[$number_analyzer];
+        
+        //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        $this->mistakes = array_merge($mistakes, $analyzer_array[$number_analyzer]->mistakes());
+        
+        //$this->fitness = $analyzer->fitness();
+        $this->fitness=$analyzer_array[$number_analyzer]->fitness();
+        
         //NOTE: if responsestr is null just check for errors - Mamontov
         //NOTE: if some stage create errors in answer, stop processing right there
         //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
