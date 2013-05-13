@@ -57,8 +57,24 @@ abstract class  qtype_correctwriting_response_mistake {
     protected $answerstring;
 
     /**
+     * Returns a descriptions or token value for specified token
+     * @param block_formal_langs_token_base   $token
+     * @return string
+     */
+    protected function description_or_value_for($token) {
+        $description = $this->token_descriptions();
+        if ($description === null) {
+            $description = $token->value();
+            if (!is_string($description)) {
+                $description = $description->string();
+            }
+        }
+        return $description;
+    }
+    /**
      * Return a comma-separated list of token desciprions of these tokens, null if there is none
-     * @param andvalue bool get strings like "{descr} is {value}"
+     * @param bool $andvalue  get strings like "{descr} is {value}"
+     * @return string
      */
     public function token_descriptions($andvalue = false) {
         $descripts = array();

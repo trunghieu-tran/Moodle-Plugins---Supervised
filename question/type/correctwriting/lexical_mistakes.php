@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // CorrectWriting question type is free software: you can redistribute it and/or modify
@@ -15,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Defines an implementation of mistakes, that are determined by lexical analyzer
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author  Oleg Sychev, Dmitriy Mamontov, Birukova Maria Volgograd State Technical University
+ * @author  Oleg Sychev, Dmitriy Mamontov,Birukova Maria Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
