@@ -147,7 +147,7 @@ class qtype_correctwriting_lexical_analyzer {
         $correct_response_array=array();
         for($i=0; $i<count($best_groups); $i++){
             //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-            $newcorrectstream=$responsetokens->correct_mistakes($answertokens,$best_groups[0]->matchedpairs);
+            $newcorrectstream=$responsetokens->correct_mistakes($answertokens,$best_groups[$i]->matchedpairs);
             array_push($correct_response_array, $newcorrectstream);
             $analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
             array_push($analyzer_array, $analyzer);
@@ -168,12 +168,16 @@ class qtype_correctwriting_lexical_analyzer {
         //???
         //$this->correctedresponse= $responsestring->stream->tokens;
         $this->correctedresponse=$correct_response_array[$number_analyzer];
+        $lexical_mistakes = $matches_to_mistakes($best_groups[$number_analyzer]);
+        $this->mistakes = array_merge($mistakes, $lexical_mistakes);
         
         //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
         $this->mistakes = array_merge($mistakes, $analyzer_array[$number_analyzer]->mistakes());
         
         //$this->fitness = $analyzer->fitness();
         $this->fitness=$analyzer_array[$number_analyzer]->fitness();
+        
+        $this->fitness=$this->fitness-$max_fit;
         
         //NOTE: if responsestr is null just check for errors - Mamontov
         //NOTE: if some stage create errors in answer, stop processing right there
@@ -187,6 +191,13 @@ class qtype_correctwriting_lexical_analyzer {
      * Returns an array of mistakes objects for given matches_group object
      */
     public function matches_to_mistakes($group) {
+        $arrayofmistakes=array();
+        for($i=0; $i<count($group->matchedpairs); $i++){
+            ////////////////////////////////////////////////////////////////////////
+            array_push($arrayofmistakes,$group->matchedpairs[$i]->message(/*???*/));
+            ////////////////////////////////////////////////////////////////////////
+        }
+        return $arrayofmistakes;
     }
 
     /**
