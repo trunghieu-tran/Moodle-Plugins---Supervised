@@ -79,7 +79,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         case qtype_preg_node::TYPE_LEAF_META:
         case qtype_preg_node::TYPE_LEAF_ASSERT:
         case qtype_preg_node::TYPE_LEAF_BACKREF:
-        case qtype_preg_node::TYPE_NODE_ERROR:
             return true;
         default:
             return get_string($pregnode->type, 'qtype_preg');
@@ -91,8 +90,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      */
     public function create_initial_state($state, $str, $startpos) {
         $result = new qtype_preg_nfa_exec_state();
-        $result->options = $this->options;
-        $result->automaton = $this->automaton;
+        $result->matcher = $this;
         $result->state = $state;
 
         $result->matches = array();
@@ -373,7 +371,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $result = array();
         foreach ($fullmatches as $match) {
-            $result[] = $match->to_matching_results($this->get_subexpr_map());
+            $result[] = $match->to_matching_results();
         }
         if (count($fullmatches) == 0) {
             foreach ($partialmatches as $partialmatch) {
@@ -381,9 +379,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $path = $this->determine_characters_left($str, $partialmatch);
                 if ($path !== null) {
                     $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                    $partialmatch->extendedmatch = $path->to_matching_results();
                 }
-                $result[] = $partialmatch->to_matching_results($this->get_subexpr_map());
+                $result[] = $partialmatch->to_matching_results();
             }
         }
         return $result;
@@ -421,7 +419,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // Do search.
         while (count($curstates) != 0) {
             $reached = array();
-            // We'll replace curstates with newstates by the end of this loop.
+            // We'll replace curstates with reached by the end of this loop.
             while (count($curstates) != 0) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
@@ -489,16 +487,16 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result = array();
         $endstatematch = $states[$endstate->number];
         if ($endstatematch !== null) {
-            $result[] = $endstatematch->to_matching_results($this->get_subexpr_map());
+            $result[] = $endstatematch->to_matching_results();
         } else {
             foreach ($partialmatches as $partialmatch) {
                 // TODO: if ($this->options === null || $this->options->extensionneeded).
                 $path = $this->determine_characters_left($str, $partialmatch);
                 if ($path !== null) {
                     $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path->to_matching_results($this->get_subexpr_map());
+                    $partialmatch->extendedmatch = $path->to_matching_results();
                 }
-                $result[] = $partialmatch->to_matching_results($this->get_subexpr_map());
+                $result[] = $partialmatch->to_matching_results();
             }
         }
         return $result;

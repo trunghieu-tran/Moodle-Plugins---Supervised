@@ -299,8 +299,12 @@ class qtype_preg_regex_handler {
         $this->options = $options;
     }
 
+    public function get_options() {
+        return $this->options;
+    }
+
     /**
-     * Was there an errors in regex?
+     * Was there an error in regex?
      * @return bool  errors exists
      */
     public function errors_exist() {
