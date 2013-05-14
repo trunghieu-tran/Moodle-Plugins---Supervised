@@ -26,6 +26,13 @@ class block_formal_langs extends block_base {
         //TODO: Replace it with actual code
         global $DB;
         
+        //BUG: When installing moodle 2.5 settings of correctwriting will eventually call this function
+        // before table created
+        $dbman = $DB->get_manager();
+        if ($dbman->table_exists('block_formal_langs') == false) {
+            return array();
+        }
+        
         //Get all visible records
         $records = $DB->get_records('block_formal_langs', array('visible' => '1'));
         
