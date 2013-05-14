@@ -62,21 +62,6 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
-/**
- * Represents auxiliary class for extra checks. The extra checks are performed by cross-tester
- * on tests with partial matching: cross-tester concatenates correct heading and returned ending, then
- * checks this string for full match and some other equalities. The purpose of this class is only to
- * return the name of the matcher to do this check.
- */
-abstract class qtype_preg_cross_tests_extra_checker {
-
-    /**
-     * Returns name of the engine, implement it in child classes for each engine.
-     */
-    abstract public function engine_name();
-
-}
-
 abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     // Different sources of test data.
@@ -108,7 +93,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     protected $skipcount;              // Number of skipped tests.
     protected $exceptionscount;        // Number of exceptions during testing.
     protected $testdataobjects;        // Objects with test data.
-    protected $extracheckobjects;      // Objects for extra checks.
     protected $doextrachecks;          // Is it needed to do extra checks.
     protected $question;               // Question object for getting matchers.
 
@@ -175,7 +159,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $this->skipcount = 0;
         $this->exceptionscount = 0;
         $this->testdataobjects = array();
-        $this->extracheckobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
         $this->question = new qtype_preg_question();
 
@@ -198,20 +181,10 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             if (strpos($file, 'cross_tests_') !== 0 || pathinfo($file, PATHINFO_EXTENSION) !== 'php') {
                 continue;
             }
+            // Test data file found.
             require_once($testdir . $file);
             $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
-            if (strpos($file, 'cross_tests_extra_checker') === 0) {
-                // Extra checker found.
-                if ($this->doextrachecks) {
-                    $obj = new $classname;
-                    $enginename = $obj->engine_name();
-                    require_once($pregdir . $enginename . '/' . $enginename . '.php');
-                    $this->extracheckobjects[] = new $obj;
-                }
-            } else {
-                // Test data object found.
-                $this->testdataobjects[] = new $classname;
-            }
+            $this->testdataobjects[] = new $classname;
         }
         closedir($dh);
 
@@ -281,36 +254,30 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @return true if everything is correct, false otherwise.
      */
     function do_extra_check($regex, $notation, $modifiers, $obtained) {
+        if ($obtained->extendedmatch === null || !$obtained->extendedmatch->full) {
+            return;
+        }
+
         $str = $obtained->matched_part() . $obtained->string_extension();
-        $thisenginename = $this->engine_name();
         $boolstr = array(false => 'FALSE', true => 'TRUE');
         $result = true;
-        foreach ($this->extracheckobjects as $obj) {
-            $enginename = 'qtype_preg_' . $obj->engine_name();
-            $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
-            if ($obtained->extendedmatch->full || $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
-                $matcher->match($str);
-                $newresults = $matcher->get_match_results();
+        $matcher = $this->question->get_matcher('php_preg_matcher', $regex, false, $modifiers, null, $notation);
 
-                // Length + left should remain the same.
-                $sum1 = $obtained->length() + $obtained->left;
-                $sum2 = $obtained->extendedmatch->length() + $obtained->extendedmatch->left;
-                if ($obtained->length() === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $sum1++;
-                }
+        $matcher->match($str);
+        $newresults = $matcher->get_match_results();
 
-                $full = $newresults->full === $obtained->extendedmatch->full;
-                $sum = $sum1 === $sum2;
-                if (!$full) {
-                    $result = false;
-                    echo "extended match field 'full' has the value of " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)\n";
-                }
-                if (!$sum) {
-                    $result = false;
-                    echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . ' and ' . $obtained->left . ', the new values are ' . $obtained->extendedmatch->length() . ' and ' . $obtained->extendedmatch->left . " (extra-tested by $enginename)\n";
-                }
-            }
+        // Length + left should remain the same.
+        $sum1 = $obtained->length() + $obtained->left;
+        $sum2 = $obtained->extendedmatch->length() + $obtained->extendedmatch->left;
+        if ($obtained->length() === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $sum1++;
         }
+
+        if ($newresults->full != $obtained->extendedmatch->full) {
+            $result = false;
+            echo "extended match field 'full' has the value " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect\n";
+        }
+
         return $result;
     }
 
@@ -372,7 +339,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         if (!$skippartialcheck && !$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
             $leftpassed = in_array($obtained->left, $expected['left']);
         }
-        if (!$skippartialcheck && $this->doextrachecks && $obtained->extendedmatch !== null) {
+        if (!$skippartialcheck && $this->doextrachecks) {
             $this->do_extra_check($regex, $notation, $mods, $obtained);
         }
 
