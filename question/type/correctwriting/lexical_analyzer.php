@@ -138,7 +138,9 @@ class qtype_correctwriting_lexical_analyzer {
         }
 
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
-        $best_groups=$answertokens->look_for_token_pairs($responsetokens,$question->lexicalerrorthreshold);
+        $answerstream=$answerstring->stream;
+        $responsestream=$responsestring->stream;
+        $best_groups=$answerstream->look_for_token_pairs($responsestream,$question->lexicalerrorthreshold);
         
 
         
@@ -147,7 +149,7 @@ class qtype_correctwriting_lexical_analyzer {
         $correct_response_array=array();
         for($i=0; $i<count($best_groups); $i++){
             //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-            $newcorrectstream=$responsetokens->correct_mistakes($answertokens,$best_groups[$i]->matchedpairs);
+            $newcorrectstream=$responsestream->correct_mistakes($answerstream,$best_groups[$i]->matchedpairs);
             array_push($correct_response_array, $newcorrectstream);
             $analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
             array_push($analyzer_array, $analyzer);
@@ -194,7 +196,7 @@ class qtype_correctwriting_lexical_analyzer {
         $arrayofmistakes=array();
         for($i=0; $i<count($group->matchedpairs); $i++){
             ////////////////////////////////////////////////////////////////////////
-            array_push($arrayofmistakes,$group->matchedpairs[$i]->message(/*???*/));
+            array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
             ////////////////////////////////////////////////////////////////////////
         }
         return $arrayofmistakes;
