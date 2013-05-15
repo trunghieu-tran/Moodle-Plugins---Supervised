@@ -783,6 +783,13 @@ class block_formal_langs_processed_string {
     protected function set_descriptions($descriptions)  {
         $this->descriptions = $descriptions;
     }
+
+    /**
+     * Returns true if string doesn't contains line breaks.
+     */
+    public function single_line_string() {
+        return strpos($this->string, "\n") === FALSE;//TODO - unit tests
+    }
     /**
      *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
      *  @param array $descriptions descriptions array
@@ -871,11 +878,37 @@ class block_formal_langs_processed_string {
      * Returns description string for passed node.
      *
      * @param $nodenumber number of node
-     * @return string - description of node
+     * @param $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param $at whether include position if token description is absent
+     * @return string - description of node if present, quoted node value otherwise.
      */
-    public function node_description($nodenumber) {
-        $this->node_descriptions_list();
-        return $this->descriptions[$nodenumber];
+    public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
+        $result = '';
+        if ($this->has_description($nodenumber)) {
+            return $this->descriptions[$nodenumber];
+        } else {
+            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            if (!is_string($value)) {
+                $value = $value->string();
+            }
+            if (!$quotevalue) {
+                return $value;
+            } else if ($at) {//Should return position information.
+                $a = new stdClass();
+                $a->value = $value;
+                $pos = $this->tokenstream->tokens[$nodenumber]->position();
+                $a->column = $pos->colstart();
+                if ($this->single_line_string()) {
+                    return get_string('quoteatsingleline', 'block_formal_langs', $a);
+                } else {
+                    $a->line = $pos->linestart();
+                    return get_string('quoteat', 'block_formal_langs', $a);
+                }
+            } else {//Just quote 
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
     }
 
     /**
@@ -900,7 +933,7 @@ class block_formal_langs_processed_string {
      */
     public function has_description($index) {
        $this->node_descriptions_list();
-       if (array_key_exists($index, $this->descriptions) == true)
+       if (isset($this->descriptions[$index]))
            return strlen(trim($this->descriptions[$index]))!=0;
        return false;
     }
