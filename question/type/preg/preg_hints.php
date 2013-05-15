@@ -214,7 +214,12 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
     }
 
     public function hint_description() {
-        return get_string('hintnextlexem', 'qtype_preg', $this->question->lexemusername);
+        $lexemname = $this->question->lexemusername;
+        if ($lexemname == '') {
+            $langobj = block_formal_langs::lang_object($this->question->langid);
+            $lexemname = $langobj->lexem_name();
+        }
+        return get_string('hintnextlexem', 'qtype_preg', $lexemname);
     }
 
     /**
