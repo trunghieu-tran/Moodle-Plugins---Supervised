@@ -4,7 +4,7 @@
  *
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Dmitriy Mamontov, Sergey Pashaev Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -20,8 +20,13 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
     }
     public function name() {
         return 'c_language';
-    }    
+    }
+
+    public function lexem_name() {
+        return get_string('lexeme', 'block_formal_langs');
+    }
 }
+
 function block_formal_langs_octal_to_decimal_char($matches) {
     $code = $matches[0];
     $code = octdec($code);
