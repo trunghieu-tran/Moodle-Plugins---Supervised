@@ -21,3 +21,5 @@ $string['lang_printf_language_help'] = 'Язык форматированной 
 $string['lang_simple_english'] = 'Английский язык';
 $string['lang_simple_english_help'] = 'Простая реализация английского языка (только лексический разбор).';
 $string['pluginname'] = 'Блок формальных языков';
+$string['quoteat'] = '"{$a->value}" начинающееся с позиции {$a->line}:{$a->column}';
+$string['quoteatsingleline'] = '"{$a->value}" начинающееся с символа {$a->column}';

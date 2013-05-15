@@ -21,3 +21,6 @@ $string['lang_simple_english'] = 'English';
 $string['lang_simple_english_help'] = 'English Language with support for words, numbers and punctuation marks. Scanning only.';
 $string['lexical_error_message'] = 'Cannot match input {$a->symbol} near {$a->line}:{$a->position} ';
 $string['pluginname'] = 'Formal languages block';
+$string['quote'] = '"{$a}"';
+$string['quoteat'] = '"{$a->value}" starting from position {$a->line}:{$a->column}';
+$string['quoteatsingleline'] = '"{$a->value}" starting from character {$a->column}';
