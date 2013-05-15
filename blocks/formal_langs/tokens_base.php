@@ -459,10 +459,13 @@ class block_formal_langs_matched_tokens_pair {
                 $this->messageid = '';
             } else if (count($correcttokens) > 1) {
                 $this->type = self::TYPE_MISSING_SEPARATOR;
-                //TODO - set  $this->messageid
+                $this->messageid = 'missingseparatormsg';
             } else if (count($comparedtokens) > 1) {
                 $this->type = self::TYPE_EXTRA_SEPARATOR;
-                //TODO - set  $this->messageid
+                $this->messageid = 'extraseparatormsg';
+            } else {
+                $this->type = self::TYPE_TYPO;
+                $this->messageid = 'typomsg';
             }
         }
     }
@@ -477,7 +480,19 @@ class block_formal_langs_matched_tokens_pair {
         if ($this->type == self::TYPE_NO_MISTAKE) {//Full match, no mistake.
             return '';
         }
-        //TODO - other cases, based on type.
+
+        $a = new stdClass();
+        $a->mistakeweight = $this->mistakeweight;
+        $a->correct = array();
+        foreach ($this->correcttokens as $index) {
+            $a->correct[] = $correctstring->node_description($index);
+        }
+        $a->compared = array();
+        foreach ($this->comparedtokens as $index) {
+            $a->compared[] = $comparedstring->node_description($index);
+        }
+
+        return get_string($this->messageid, 'block_formal_langs', $a);
     }
 }
 
@@ -833,7 +848,7 @@ class block_formal_langs_processed_string {
      * Returns true if string doesn't contains line breaks.
      */
     public function single_line_string() {
-        return strpos($this->string, "\n") === FALSE;//TODO - unit tests
+        return strpos($this->string, "\n") === FALSE;
     }
     /**
      *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
