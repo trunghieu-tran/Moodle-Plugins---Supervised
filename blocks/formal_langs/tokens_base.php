@@ -394,6 +394,18 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
  */
 class block_formal_langs_matched_tokens_pair {
 
+
+    //No mistake in this pair, all is correct.
+    const TYPE_NO_MISTAKE = 0;
+    //Mistake is a typo, measured by Damerau-Levenshtein distance.
+    const TYPE_TYPO = 1;
+    //Mistake is an extra separator.
+    const TYPE_EXTRA_SEPARATOR = 2;
+    //Mistake is a missing separator.
+    const TYPE_MISSING_SEPARATOR = 3;
+    //This is a token-type specific mistake.
+    const TYPE_SPECIFIC_MISTAKE = 999999;
+
     /**
      * Indexes of the correct text tokens.
      * @var array
@@ -416,20 +428,53 @@ class block_formal_langs_matched_tokens_pair {
     public $mistakeweight;
 
     /**
-     * Type of error - e.g. typo, extra or missing separator, specific mistake types.
-     * TODO - define a way to describe type, so that any token could add it's own ones. Such a way should be tied to message generation.
+     * Type of mistake - e.g. typo, extra or missing separator, specific mistake types.
+     * TODO - does we really need to have subtypes (for specific mistake or no mistake pairs) with messageid which actually acts as one?
      * @var array
      */
     public $type;
 
     /**
+     * Mistake message identifier for the get_string() function.
+     * TODO - describe format for $a object
+     * @var string
+     */
+    public $messageid;
+
+    public function __construct($correcttokens, $comparedtokens, $mistakeweight, $specific = false, $messageid = '') {
+        $this->correcttokens = $correcttokens;
+        $this->comparedtokens = $comparedtokens;
+        $this->mistakeweight = $mistakeweight;
+        if ($specific) {//This mistake is a lexem-type specific mistake.
+            if ($mistakeweight == 0) {
+                $this->type = self::TYPE_NO_MISTAKE;
+                $this->messageid = '';
+            } else {
+                $this->type = self::TYPE_SPECIFIC_MISTAKE;
+                $this->messageid = $messageid;
+            }
+        } else {//This mistake is a general mistake.
+            if ($mistakeweight == 0) {
+                $this->type = self::TYPE_NO_MISTAKE;
+                $this->messageid = '';
+            } else if (count($correcttokens) > 1) {
+                $this->type = self::TYPE_MISSING_SEPARATOR;
+                //TODO - set  $this->messageid
+            } else if (count($comparedtokens) > 1) {
+                $this->type = self::TYPE_EXTRA_SEPARATOR;
+                //TODO - set  $this->messageid
+            }
+        }
+    }
+
+    /**
      * Returns a message about mistake give two processed strings.
-     * @param correctstring block_formal_langs_processed_string object for the correct string.
-     * @param comparedstring block_formal_langs_processed_string object for compared string.
+     * @param correctstring block_formal_langs_processed_string object for the correct string (created from db).
+     * @param comparedstring block_formal_langs_processed_string object for compared string (created from string).
      * @return user language message string, describing a possible mistake this pair represents.
      */
     public function message($correctstring, $comparedstring) {
-        if ($this->mistakeweight == 0) {//Full match, no error.
+        if ($this->type == self::TYPE_NO_MISTAKE) {//Full match, no mistake.
             return '';
         }
         //TODO - other cases, based on type.
