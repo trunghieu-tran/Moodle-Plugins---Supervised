@@ -105,7 +105,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
         $mform->addHelpButton('langid','langselect','qtype_preg');
         $mform->addElement('text', 'lexemusername', get_string('lexemusername','qtype_preg'), array('size' => 54));
-        $mform->setDefault('lexemusername','word');
+        $mform->setDefault('lexemusername','');
         $mform->addHelpButton('lexemusername','lexemusername','qtype_preg');
         $mform->setAdvanced('lexemusername');
 
