@@ -532,7 +532,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
     public function build_nfa($ast_node, $dst_node) {
-        $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr());
+        $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_backrefs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {

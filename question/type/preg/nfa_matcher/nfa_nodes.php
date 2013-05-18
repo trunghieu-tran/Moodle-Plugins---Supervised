@@ -61,6 +61,9 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // A subpattern node with minimal number.
     public $min_subpatt_node;
 
+    // Does this transition start a backreferenced subexpression(s).
+    public $starts_backrefed_subexprs;
+
     public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
         parent::__construct($from, $pregleaf, $to, $consumeschars);
         $this->subpatt_start = array();
@@ -70,6 +73,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         $this->quant = self::QUANT_NONE;
         $this->is_loop = false;
         $this->min_subpatt_node = null;
+        $this->starts_backrefed_subexprs = false;
     }
 
     // Overriden for subpatterns information
@@ -114,11 +118,18 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Number of subexpressions in the regular expression.
     protected $max_subexpr;
 
-    public function __construct($ast_root, $max_subpatt, $max_subexpr) {
+    // Backreference numbers existing in the regex.
+    protected $backref_numbers;
+
+    public function __construct($ast_root, $max_subpatt, $max_subexpr, $backrefs) {
         parent::__construct();
         $this->ast_root = $ast_root;
         $this->max_subpatt = $max_subpatt;
         $this->max_subexpr = $max_subexpr;
+        $this->backref_numbers = array();
+        foreach ($backrefs as $backref) {
+            $this->backref_numbers[] = $backref->number;
+        }
     }
 
     protected function set_limits() {
@@ -172,6 +183,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         // Copy the node to the starting transitions.
         foreach ($this->startstate->outgoing_transitions() as $transition) {
             $transition->subexpr_start[$subexpr_number] = $pregnode;
+            $transition->starts_backrefed_subexprs = $transition->starts_backrefed_subexprs || in_array($pregnode->number, $this->backref_numbers);
         }
 
         // Copy the node to the ending transitions.
