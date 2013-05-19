@@ -38,6 +38,9 @@ M.preg_authoring_tools_script = (function() {
     /** @var {Object} cache of content; first dimension is regex, second is node id */
     cache : {},
 
+    /** @var {string} previously selected tree orientation */
+    tree_orientation : null,
+
     /** @var {Object} reference for YUI object, extended with requarued modules */
     Y : null,
 
@@ -185,7 +188,13 @@ M.preg_authoring_tools_script = (function() {
             return;
         }
 
-        var url = self.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php?regex=' + encodeURIComponent(regex) + '&id=' + id;
+        var url = self.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php'
+                +'?regex='
+                + encodeURIComponent(regex)
+                + '&id='
+                + id
+                + '&tree_orientation='
+                + this.Y.one("#tree_orientation_radioset input:checked").get("value");
         var cfg = {
             method: 'GET',
             xdr: {

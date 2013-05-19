@@ -51,7 +51,13 @@ class qtype_preg_authoring_tool_form extends moodleform {
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
-
+        //add tree orientation radio buttons
+        $mform->addElement('html',
+                '<div id="tree_orientation_radioset">'
+                .'<input type="radio" name="authoring_tools_tree_orientation" value="vertical" checked>&nbsp;vertical<br>'
+                .'<input type="radio" name="authoring_tools_tree_orientation" value="horizontal">&nbsp;horizontal<br>'
+                .'</div>'
+                );//Add generated map
         // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
