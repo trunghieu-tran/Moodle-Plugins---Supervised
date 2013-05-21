@@ -175,7 +175,8 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
                 $hinttext = get_string('wheretxtbetween', 'qtype_correctwriting', $a);
             }
             //Capitalize first letter
-            $hinttext[0] = textlib::strtoupper($hinttext[0]);
+            $hinttext = textlib::strtoupper(textlib::substr($hinttext, 0, 1))
+                      . textlib::substr($hinttext, 1);
         }
         return $hinttext;
     }
