@@ -79,7 +79,7 @@ abstract class  qtype_correctwriting_response_mistake {
     public function token_descriptions($andvalue = false) {
         $descripts = array();
         foreach ($this->answermistaken as $answerindex) {
-            if (is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {
+            if (is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {//TODO should we check "has_description" or just add quoted value instead?
                 $description = $this->answerstring->node_description($answerindex);
                 if ($andvalue) {
                     $a = new stdClass;
@@ -118,22 +118,10 @@ abstract class  qtype_correctwriting_response_mistake {
     }
 
     /**
-      * Returns token description if available, token value in quotes otherwise
+      * Returns token description if available, token value in quotes otherwise.
       */
-    public function token_descr_or_value($answerindex) {
-        $result = '';
-        if (is_object($this->answerstring)) {
-            if ($this->answerstring->has_description($answerindex)) {
-                $result = $this->answerstring->node_description($answerindex);
-            } else {
-                $result = $this->answer[$answerindex]->value();
-                if (!is_string($result)) {
-                        $result = $result->string();
-                }
-                $result = '"' . $result . '"';
-            }
-        }
-        return $result;
+    public function token_description($answerindex, $quotevalue = true, $at = false) {
+        return $this->answerstring->node_description($answerindex, $quotevalue, $at);
     }
 
     /** Returns a message for mistakes. Used for lazy message initiallization.

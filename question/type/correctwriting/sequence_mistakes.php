@@ -85,23 +85,10 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
     /** Performs a mistake message creation if needed
      */
     public function get_mistake_message() {
-        if ($this->mistakemsg == null) {
-            //Create a mistake message
-            $a = new stdClass();
-            $answerindex = $this->answermistaken[0];
-            $a->description = $this->token_descriptions();
-            if ($a->description !== null) {
-                $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
-            } else {
-                $data = $this->answer[$answerindex]->value();
-                if (!is_string($data)) {
-                    $data = $data->string();
-                }
-                $a->value = $data;
-                $a->line = $this->answer[$answerindex]->position()->linestart();
-                $a->position = $this->answer[$answerindex]->position()->colstart();
-                $this->mistakemsg = get_string('movedmistakemessagenodescription','qtype_correctwriting',$a);
-            }
+        if ($this->mistakemsg === null) {
+            //Create a mistake message.
+            $a = $this->token_description($this->answermistaken[0], true, true);
+            $this->mistakemsg = get_string('movedmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
     }
@@ -151,18 +138,14 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         }
 
         //Create a mistake message
-        $a = new stdClass();
         $data = $this->response[$responseindex]->value();
         if (!is_string($data)) {
             $data = $data->string();
         }
-        $a->value = $data;
-        $a->line = $this->position->linestart();
-        $a->position = $this->position->colstart();
         if ($exists) {
-            $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
+            $this->mistakemsg = get_string('addedmistakemessage', 'qtype_correctwriting', $data);
         } else {
-            $this->mistakemsg = get_string('addedmistakemessage_notexist','qtype_correctwriting',$a);
+            $this->mistakemsg = get_string('addedmistakemessage_notexist', 'qtype_correctwriting', $data);
         }
     }
 
@@ -202,20 +185,9 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
      */
     public function get_mistake_message() {
         if ($this->mistakemsg == null) {
-            //Create a mistake message
-            $a = new stdClass();
-            $answerindex = $this->answermistaken[0];
-            $a->description = $this->token_descriptions();
-            if ($a->description !== null) {
-                $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
-            } else {
-                $data = $this->answer[$answerindex]->value();
-                if (!is_string($data)) {
-                    $data = $data->string();
-                }
-                $a->value = $data;
-                $this->mistakemsg = get_string('absentmistakemessagenodescription','qtype_correctwriting',$a);
-            }
+            //Create a mistake message.
+            $a = $this->token_description($this->answermistaken[0]);
+            $this->mistakemsg = get_string('absentmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
     }
