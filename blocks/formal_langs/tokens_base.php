@@ -1064,6 +1064,24 @@ class block_formal_langs_string_pair {
     //TODO - functions for the lexical and sequence analyzers, and mistake classes.
 
     /**
+     *  Returns a corrected string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
+    public function correctedstring() {
+        return $this->correctedstring;
+    }
+
+    /**
+     *  Returns a correct string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
+    public function correctstring() {
+        return $this->correctstring;
+    }
+
+    /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
     public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared) {
@@ -1085,6 +1103,10 @@ class block_formal_langs_string_pair {
         //TODO Birukova - create a new string from $comparedstring and matches
         //This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
         //Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
+
+        // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
+        // corrected string
+        $this->correctedstring = $this->comparedstring;
     }
 
     /**
