@@ -1106,7 +1106,7 @@ class block_formal_langs_string_pair {
 
         // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
         // corrected string
-        $this->correctedstring = $this->comparedstring;
+        return $this->comparedstring;
     }
 
     /**
