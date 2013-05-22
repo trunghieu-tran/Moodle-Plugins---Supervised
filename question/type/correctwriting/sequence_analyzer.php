@@ -48,8 +48,11 @@ class  qtype_correctwriting_sequence_analyzer {
     protected $language;             // Language object - contains scaner, parser etc
     protected $errors;               // Array of error objects - teacher errors when entering answer
 
-    protected $answer;               // Array of answer tokens
-    protected $correctedresponse;    // Array of response tokens where lexical errors are corrected
+    /**
+     * A string pair with best matches, which can be passed to sequence analyzer
+     * @var block_formal_langs_string_pair
+     */
+    protected $bestmatchpair;
     protected $mistakes;             // Array of mistake objects - student errors (structural errors)
 
     private   $fitness;              // Fitness for response
@@ -60,14 +63,13 @@ class  qtype_correctwriting_sequence_analyzer {
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
-    public function __construct($question, $answer, $language, $correctedresponse=null) {
-        $this->answer = $answer;
-        $this->correctedresponse = $correctedresponse;
+    public function __construct($question, $bestmatchpair, $language) {
+        $this->bestmatchpair =  $bestmatchpair;
         // If question is set null we suppose this is a unit-test mode and don't do stuff
         if ($question != null) {
             $this->language = $language;
             $this->question = $question;
-            if ($correctedresponse == null) {
+            if ($this->bestmatchpair->correctedstring() == null) {
                 // Scan errors by syntax_analyzer
                 if ($language->could_parse()) {
                     $analyzer = new qtype_correctwriting_syntax_analyzer($answer, $language, null, null);
@@ -76,7 +78,6 @@ class  qtype_correctwriting_sequence_analyzer {
             } else {
                 //Fill weights of sequence errors
                 $weights = new stdClass;
-                // TODO Extract these  values from question
                 $weights->movedweight = $question->movedmistakeweight;
                 $weights->absentweight = $question->absentmistakeweight;
                 $weights->addedweight = $question->addedmistakeweight;
@@ -102,8 +103,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @param object $weights weights of errors
      */
     private function scan_response_mistakes($weights) {
-        $answertokens = $this->answer->stream;
-        $responsetokens = $this->correctedresponse->stream;
+        $answertokens = $this->bestmatchpair->correctstring()->stream;
+        $responsetokens = $this->bestmatchpair->correctedstring()->stream;
         $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $this->question->usecase);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
@@ -117,8 +118,7 @@ class  qtype_correctwriting_sequence_analyzer {
             $isfirst = true;
             $haserrors = false;
             for ($i = 0;$i < count($alllcs) && $haserrors == false;$i++) {
-                $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
-                                                                     $this->correctedresponse,
+                $analyzer = new qtype_correctwriting_syntax_analyzer($this->bestmatchpair, $this->language,
                                                                      $alllcs[$i]);
                 $fitness = $analyzer->fitness();
 
@@ -327,9 +327,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_moved_mistake($answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer,
+        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->bestmatchpair,
                                                              $answerindex,
-                                                             $this->correctedresponse,
                                                              $responseindex);
     }
     /**
@@ -339,8 +338,7 @@ class  qtype_correctwriting_sequence_analyzer {
      */
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language,
-                                                             $this->answer,
-                                                             $this->correctedresponse,
+                                                             $this->bestmatchpair,
                                                              $responseindex);
     }
     /**
@@ -350,9 +348,9 @@ class  qtype_correctwriting_sequence_analyzer {
      */
     private function create_absent_mistake($answerindex) {
         return new qtype_correctwriting_lexeme_absent_mistake($this->language,
-                                                              $this->answer,
-                                                              $answerindex,
-                                                              $this->correctedresponse);
+                                                              $this->bestmatchpair,
+                                                              $answerindex
+                                                             );
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
@@ -362,8 +360,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of mistake objects
      */
     public function matches_to_mistakes($lcs,$weights) {
-        $answer = &$this->answer->stream->tokens;
-        $response = &$this->correctedresponse->stream->tokens;
+        $answer = &$this->bestmatchpair->correctstring()->stream->tokens;
+        $response = &$this->bestmatchpair->correctedstring()->stream->tokens;
         // Determines, whether answer tokens are used in mistake computation
         $answerused = array();
         $answercount = count($answer);

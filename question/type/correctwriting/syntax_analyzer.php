@@ -41,8 +41,11 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
     protected $language;//language object - contains scaner, parser etc
     protected $errors;//array of objects - teacher errors when entering answer
 
-    protected $answer;//array of tokens
-    protected $correctedresponse;//array of tokens with lexical errors corrected
+    /**
+     * A pair of strings with data
+     * @var block_formal_langs_string_pair
+     */
+    protected $pair;
     protected $lcs;//longest common subsequence - array with indexes in answer as keys and indexes in response as values
     protected $ast;//abstract syntax tree of answer (with labels)
     protected $subtrees;//array - trees created by parsing parts of response don't covered by LCS
@@ -52,8 +55,8 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
-    public function __construct($answer, $language, $correctedresponse=null, $lcs=null) {
-
+    public function __construct($pair, $language, $lcs=null) {
+        $this->pair = $pair;
         $this->errors = array();
         $this->mistakes  = array();
 

@@ -40,10 +40,12 @@ abstract class  qtype_correctwriting_response_mistake {
     public $languagename;
     //Mistake message, can be changed from other parts and handled from some other classes
     public $mistakemsg;
-    //Answer as array of tokens
-    public $answer;
-    //Response as array of tokens
-    public $response;
+
+    /**
+     * A string pair with data of answer and response
+     * @var block_formal_langs_string_pair
+     */
+    public $stringpair;
     //Indexes of answer tokens involved (if applicable)
     public $answermistaken;
     //Indexes of response tokens involved (if applicable)
@@ -51,10 +53,6 @@ abstract class  qtype_correctwriting_response_mistake {
     //Weight of mistake used in mark computation
     public $weight;
 
-    /**
-     * @var block_formal_langs_processed_string processed string of answer
-     */
-    protected $answerstring;
 
 
     /**
@@ -65,12 +63,12 @@ abstract class  qtype_correctwriting_response_mistake {
     public function token_descriptions($andvalue = false) {
         $descripts = array();
         foreach ($this->answermistaken as $answerindex) {
-            if (is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {//TODO should we check "has_description" or just add quoted value instead?
-                $description = $this->answerstring->node_description($answerindex);
+            if (is_object($this->stringpair->correctstring()) && $this->stringpair->correctstring()->has_description($answerindex)) {//TODO should we check "has_description" or just add quoted value instead?
+                $description = $this->stringpair->correctstring()->node_description($answerindex);
                 if ($andvalue) {
                     $a = new stdClass;
                     $a->tokendescr = $description;
-                    $a->tokenvalue = $this->answer[$answerindex]->value();
+                    $a->tokenvalue = $this->stringpair->correctstring()->stream->tokens[$answerindex]->value();
                     if (!is_string($a->tokenvalue)) {
                         $a->tokenvalue = $a->tokenvalue->string();
                     }
@@ -107,7 +105,7 @@ abstract class  qtype_correctwriting_response_mistake {
       * Returns token description if available, token value in quotes otherwise.
       */
     public function token_description($answerindex, $quotevalue = true, $at = false) {
-        return $this->answerstring->node_description($answerindex, $quotevalue, $at);
+        return $this->stringpair->node_description($answerindex, $quotevalue, $at);
     }
 
     /** Returns a message for mistakes. Used for lazy message initiallization.
