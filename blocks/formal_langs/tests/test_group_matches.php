@@ -95,6 +95,22 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
     $this->assertTrue();
     $this->assertTrue();
     }*/
+    
+    function test_group_matches_5() {
+    $mistakeweight=0;
+    $correctcoverage=array();
+    $comparedcoverage=array();
+    //sasha and masha
+    //you name mike
+    $token_stream=new block_formal_langs_token_stream(array(),array());
+    $matches=array();
+    
+    $this->assertTrue(count($token_stream->group_matches($matches))==0);
+    list($result)=$token_stream->group_matches($matches);
+    $this->assertTrue($result->mistakeweight==0);
+    $this->assertTrue($result->correctcoverage==$correctcoverage);
+    $this->assertTrue($result->comparedcoverage==$comparedcoverage);
+    }
 
 }
 ?>

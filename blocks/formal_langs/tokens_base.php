@@ -601,7 +601,7 @@ class block_formal_langs_matched_tokens_pair {
     /**
      * Returns a message about mistake give two processed strings.
      * @param correctstring block_formal_langs_processed_string object for the correct string.
-     * @param comparedstring block_formal_langs_processed_string object for compared string.
+     * @param comparedstring block_formal_langs_token_stream object for compared string.
      * @return user language message string, describing a possible mistake this pair represents.
      */
     public function message($correctstring, $comparedstring) {
