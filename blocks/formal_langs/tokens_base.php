@@ -570,6 +570,18 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
  */
 class block_formal_langs_matched_tokens_pair {
 
+
+    //No mistake in this pair, all is correct.
+    const TYPE_NO_MISTAKE = 0;
+    //Mistake is a typo, measured by Damerau-Levenshtein distance.
+    const TYPE_TYPO = 1;
+    //Mistake is an extra separator.
+    const TYPE_EXTRA_SEPARATOR = 2;
+    //Mistake is a missing separator.
+    const TYPE_MISSING_SEPARATOR = 3;
+    //This is a token-type specific mistake.
+    const TYPE_SPECIFIC_MISTAKE = 999999;
+
     /**
      * Indexes of the correct text tokens.
      * @var array
@@ -592,35 +604,71 @@ class block_formal_langs_matched_tokens_pair {
     public $mistakeweight;
 
     /**
-     * Type of error - e.g. typo, extra or missing separator, specific mistake types.
-     * TODO - define a way to describe type, so that any token could add it's own ones. Such a way should be tied to message generation.
+     * Type of mistake - e.g. typo, extra or missing separator, specific mistake types.
+     * TODO - does we really need to have subtypes (for specific mistake or no mistake pairs) with messageid which actually acts as one?
      * @var array
      */
     public $type;
 
     /**
+     * Mistake message identifier for the get_string() function.
+     * TODO - describe format for $a object
+     * @var string
+     */
+    public $messageid;
+
+    public function __construct($correcttokens, $comparedtokens, $mistakeweight, $specific = false, $messageid = '') {
+        $this->correcttokens = $correcttokens;
+        $this->comparedtokens = $comparedtokens;
+        $this->mistakeweight = $mistakeweight;
+        if ($specific) {//This mistake is a lexem-type specific mistake.
+            if ($mistakeweight == 0) {
+                $this->type = self::TYPE_NO_MISTAKE;
+                $this->messageid = '';
+            } else {
+                $this->type = self::TYPE_SPECIFIC_MISTAKE;
+                $this->messageid = $messageid;
+            }
+        } else {//This mistake is a general mistake.
+            if ($mistakeweight == 0) {
+                $this->type = self::TYPE_NO_MISTAKE;
+                $this->messageid = '';
+            } else if (count($correcttokens) > 1) {
+                $this->type = self::TYPE_MISSING_SEPARATOR;
+                $this->messageid = 'missingseparatormsg';
+            } else if (count($comparedtokens) > 1) {
+                $this->type = self::TYPE_EXTRA_SEPARATOR;
+                $this->messageid = 'extraseparatormsg';
+            } else {
+                $this->type = self::TYPE_TYPO;
+                $this->messageid = 'typomsg';
+            }
+        }
+    }
+
+    /**
      * Returns a message about mistake give two processed strings.
-     * @param correctstring block_formal_langs_processed_string object for the correct string.
-     * @param comparedstring block_formal_langs_token_stream object for compared string.
+     * @param correctstring block_formal_langs_processed_string object for the correct string (created from db).
+     * @param comparedstring block_formal_langs_processed_string object for compared string (created from string).
      * @return user language message string, describing a possible mistake this pair represents.
      */
     public function message($correctstring, $comparedstring) {
-        if ($this->mistakeweight == 0) {//Full match, no error.
+        if ($this->type == self::TYPE_NO_MISTAKE) {//Full match, no mistake.
             return '';
         }
-        if($this->mistakeweight>0 && count($this->correcttokens)==1 && count($this->comparedtokens)==1){
-            return 'typo';
+
+        $a = new stdClass();
+        $a->mistakeweight = $this->mistakeweight;
+        $a->correct = array();
+        foreach ($this->correcttokens as $index) {
+            $a->correct[] = $correctstring->node_description($index);
         }
-        if($this->mistakeweight==1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
-            return 'extra separator';
+        $a->compared = array();
+        foreach ($this->comparedtokens as $index) {
+            $a->compared[] = $comparedstring->node_description($index);
         }
-        if($this->mistakeweight==1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
-            return 'missing separator';
-        }
-        if($this->mistakeweight>1 && count($this->correcttokens)==1 && count($this->comparedtokens)==2){
-            return 'extra separator and typo';
-        }
-        if($this->mistakeweight>1 && count($this->correcttokens)==2 && count($this->comparedtokens)==1){
+
+        return get_string($this->messageid, 'block_formal_langs', $a);
             return 'missing separator and typo';
         }
         //TODO - other cases, based on type.
@@ -1030,6 +1078,14 @@ class  block_formal_langs_matches_group {
 
     //Sorted array of all compared token indexes for tokens, covered by pairs from this group
     public $comparedcoverage;
+
+    /**
+     * Returns an array of token indexes from compared string, which matches tokens from correct string
+     *
+     * @param correcttokens array of token indexes from correct string
+     */
+    public function get_relevant_compared_tokens($correcttokens) {
+    }
 }
 
 /**
@@ -1248,6 +1304,13 @@ class block_formal_langs_processed_string {
     protected function set_descriptions($descriptions)  {
         $this->descriptions = $descriptions;
     }
+
+    /**
+     * Returns true if string doesn't contains line breaks.
+     */
+    public function single_line_string() {
+        return strpos($this->string, "\n") === FALSE;
+    }
     /**
      *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
      *  @param array $descriptions descriptions array
@@ -1336,11 +1399,37 @@ class block_formal_langs_processed_string {
      * Returns description string for passed node.
      *
      * @param $nodenumber number of node
-     * @return string - description of node
+     * @param $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param $at whether include position if token description is absent
+     * @return string - description of node if present, quoted node value otherwise.
      */
-    public function node_description($nodenumber) {
-        $this->node_descriptions_list();
-        return $this->descriptions[$nodenumber];
+    public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
+        $result = '';
+        if ($this->has_description($nodenumber)) {
+            return $this->descriptions[$nodenumber];
+        } else {
+            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            if (!is_string($value)) {
+                $value = $value->string();
+            }
+            if (!$quotevalue) {
+                return $value;
+            } else if ($at) {//Should return position information.
+                $a = new stdClass();
+                $a->value = $value;
+                $pos = $this->tokenstream->tokens[$nodenumber]->position();
+                $a->column = $pos->colstart();
+                if ($this->single_line_string()) {
+                    return get_string('quoteatsingleline', 'block_formal_langs', $a);
+                } else {
+                    $a->line = $pos->linestart();
+                    return get_string('quoteat', 'block_formal_langs', $a);
+                }
+            } else {//Just quote 
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
     }
 
     /**
@@ -1365,7 +1454,7 @@ class block_formal_langs_processed_string {
      */
     public function has_description($index) {
        $this->node_descriptions_list();
-       if (array_key_exists($index, $this->descriptions) == true)
+       if (isset($this->descriptions[$index]))
            return strlen(trim($this->descriptions[$index]))!=0;
        return false;
     }
@@ -1393,6 +1482,112 @@ class block_formal_langs_processed_string {
      */
     protected function get_string() {
         return $this->string;
+    }
+}
+
+/**
+ * Represents a pair of correct and compared strings with group of pairs, matching their tokens.
+ *
+ * Use it when you need mistakes in individual lexemes functionality.
+ * Both strings are block_formal_langs_processed_string objects, but correct one created from DB, while compared one from string.
+ * The class incapsulate block_formal_matches_group describing pairing between both strings and corrected string, created from this pairing.
+ * 
+ */
+class block_formal_langs_string_pair {
+
+    /**
+     * Correct string, entered by a teacher.
+     *
+     * @var block_formal_langs_processed_string, created from DB.
+     */
+    protected $correctstring;
+
+    /**
+     * Compared (possibly incorrect) string, entered by a student.
+     *
+     * @var block_formal_langs_processed_string, created from string.
+     */
+    protected $comparedstring;
+
+    /**
+     * Matches - define a connection between correct and compared strings.
+     *
+     * @var block_formal_langs_matches_group
+     */
+    protected $matches;
+
+    /**
+     * Corrected string - string, created from compared string by applying all matches.
+     *
+     * @var block_formal_langs_processed_string, created from token_array.
+     */
+    protected $correctedstring;
+
+
+    //TODO - anyone -  access functions
+    //TODO - functions for the lexical and sequence analyzers, and mistake classes.
+
+    /**
+     * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
+     */
+    public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared) {
+    }
+
+    public function __construct($correct, $compared, $matches) {
+        $this->correctstring = $correct;
+        $this->comparedstring = $compared;
+        $this->matches = $matches;
+        $this->correctedstring = $this->correct_mistakes();
+    }
+
+    /**
+     * Correct mistakes in compared string using array of matched pairs and correct string.
+     *
+     * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
+     */
+    protected function correct_mistakes() {
+        //TODO Birukova - create a new string from $comparedstring and matches
+        //This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
+        //Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
+    }
+
+    /**
+     * Returns description string for passed node. If there is no description, token value from compared string is used, 
+     * if it is not available too, than token value from correct string is used.  TODO - check the rules.
+     *
+     * @param $nodenumber number of node in the correct string
+     * @param $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param $at whether include position if token description is absent
+     * @return string - description of node if present, quoted node value otherwise.
+     */
+    public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
+        /* TODO - implement, this code from processed_string may be useful
+        $result = '';
+        if ($this->has_description($nodenumber)) {
+            return $this->descriptions[$nodenumber];
+        } else {
+            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            if (!is_string($value)) {
+                $value = $value->string();
+            }
+            if (!$quotevalue) {
+                return $value;
+            } else if ($at) {//Should return position information.
+                $a = new stdClass();
+                $a->value = $value;
+                $pos = $this->tokenstream->tokens[$nodenumber]->position();
+                $a->column = $pos->colstart();
+                if ($this->single_line_string()) {
+                    return get_string('quoteatsingleline', 'block_formal_langs', $a);
+                } else {
+                    $a->line = $pos->linestart();
+                    return get_string('quoteat', 'block_formal_langs', $a);
+                }
+            } else {//Just quote 
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }*/
     }
 }
 ?>

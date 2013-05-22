@@ -64,6 +64,11 @@ abstract class block_formal_langs_abstract_language {
     abstract public function description();
 
     /**
+     * User-visible default lexem name for the language.
+     */
+    abstract public function lexem_name();
+
+    /**
      * Returns true if this language has parser enabled.
      *
      * @return boolean
@@ -308,6 +313,10 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
      */
     public function description() {
         return $this->description;
+    }
+
+    public function lexem_name() {
+        return '';//TODO - implement when implementing language
     }
 
 }

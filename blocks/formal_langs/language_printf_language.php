@@ -4,7 +4,7 @@
  *
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Dmitriy Mamontov, Sergey Pashaev Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -28,6 +28,9 @@ class block_formal_langs_language_printf_language extends block_formal_langs_pre
     }
     public function name() {
         return 'printf_language';
+    }
+    public function lexem_name() {
+        return get_string('part', 'block_formal_langs');
     }
 }
 
