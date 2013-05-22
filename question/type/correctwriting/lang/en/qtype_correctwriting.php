@@ -18,12 +18,11 @@
 
 $string['absenthintpenaltyfactor'] = 'Penalty factor for absent token mistake hints';
 $string['absenthintpenaltyfactor_help'] = 'For hints, revealing a token text, absent token mistake is a special case. Other mistakes means student at least tried to typed anything close to this token anywhere in response, but absent token means he does not type it at all. So for that particular mistake hints will reveal more information. The factor allows you to increase penalty for such hints. If resulting penalty will exceed 1, the hint will be disabled.';
-$string['absentmistakemessage'] = '{$a->description} is missing';
-$string['absentmistakemessagenodescription'] = '"{$a->value}" is missing';
+$string['absentmistakemessage'] = '{$a} is missing';
 $string['absentmistakeweight'] = 'Penalty for missing token';
 $string['absentmistakeweight_help'] = 'Penalty for each missing token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
-$string['addedmistakemessage'] = 'there is extra "{$a->value}"';
-$string['addedmistakemessage_notexist'] = '"{$a->value}" should not be in response';
+$string['addedmistakemessage'] = 'there is extra "{$a}"';
+$string['addedmistakemessage_notexist'] = '"{$a}" should not be in response';
 $string['addedmistakeweight'] = 'Penalty for extra token';
 $string['addedmistakeweight_help'] = 'Penalty for each extra token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
 $string['and'] = ' and ';
@@ -55,10 +54,9 @@ $string['lexicalerrorweight'] = 'Penalty for lexical mistake';
 $string['lexicalerrorweight_help'] = 'Penalty for each lexical mistake in student\'s response: a typo, an extra or absent separator etc.';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes';
 $string['maxmistakepercentage_help'] = 'Maximum allowed number of mistakes in student\'s response as a percent of the number of the tokens in the answer. If the number of mistakes exceed that, answer will be considered not matched at all.';
-
+$string['movedmistakemessage'] = '{$a} misplaced';
 $string['missingseparator'] = 'Missing separator in "{$a->value}"';
 
-$string['movedmistakemessage'] = '{$a->description} misplaced';
 $string['movedmistakemessagenodescription'] = 'the "{$a->value}" at {$a->line}:{$a->position} is misplaced';
 $string['movedmistakeweight'] = 'Penalty for misplaced token';
 $string['movedmistakeweight_help'] = 'Penalty for each misplaced token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';

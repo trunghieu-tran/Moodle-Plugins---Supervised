@@ -127,7 +127,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
         $this->hintkey = $hintkey;
         $this->mistake = $mistake;
         if ($mistake !== null) {
-            $this->token = $this->mistake->token_descr_or_value($this->mistake->answermistaken[0]);
+            $this->token = $this->mistake->token_description($this->mistake->answermistaken[0]);
         }
     }
 
@@ -164,14 +164,14 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
             $a = new stdClass;
             $a->token = $this->token;
             if ($tokenindex == 0) {//First token
-                $a->before = $this->mistake->token_descr_or_value(1);
+                $a->before = $this->mistake->token_description(1);
                 $hinttext = get_string('wheretxtbefore', 'qtype_correctwriting', $a);
             } else if ($tokenindex == count($this->mistake->answer) - 1) {//Last token
-                $a->after = $this->mistake->token_descr_or_value($tokenindex - 1);
+                $a->after = $this->mistake->token_description($tokenindex - 1);
                 $hinttext = get_string('wheretxtafter', 'qtype_correctwriting', $a);
             } else {//Middle token
-                $a->after = $this->mistake->token_descr_or_value($tokenindex - 1);
-                $a->before = $this->mistake->token_descr_or_value($tokenindex + 1);
+                $a->after = $this->mistake->token_description($tokenindex - 1);
+                $a->before = $this->mistake->token_description($tokenindex + 1);
                 $hinttext = get_string('wheretxtbetween', 'qtype_correctwriting', $a);
             }
             //Capitalize first letter
@@ -209,7 +209,7 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $this->hintkey = $hintkey;
         $this->mistake = $mistake;
         if ($mistake !== null) {
-            $this->token = $this->mistake->token_descr_or_value($this->mistake->answermistaken[0]);
+            $this->token = $this->mistake->token_description($this->mistake->answermistaken[0]);
         }
     }
 
@@ -281,7 +281,7 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
     protected function prepare_image_data_for_absent_mistake() {
         $result = array();
         $result[]  = 'absent';
-        $result[] = base64_encode($this->mistake->token_descr_or_value($this->mistake->answermistaken[0]));
+        $result[] = base64_encode($this->mistake->token_description($this->mistake->answermistaken[0]));//TODO - check whether we really need to have token value not quoted (adding ", false" to token_description call) there.
         $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
         $result[] = $pos->position;
         $result[] = $pos->relative;
