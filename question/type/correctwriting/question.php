@@ -455,9 +455,10 @@ class qtype_correctwriting_question extends question_graded_automatically
        foreach($analyzer->mistakes() as $mistake) {
            // If this is lexical mistake, we should mark some lexeme as fixed
            if (is_a($mistake,'qtype_correctwriting_lexical_mistake')) {
-               if ($mistake->correctedresponseindex != null) {
-                   $fixedlexemes[] = $mistake->correctedresponseindex;
-               }
+               // A lexical mistakes are not supported in image, so this is commented part
+               //if ($mistake->correctedresponseindex != null) {
+               //    $fixedlexemes[] = $mistake->correctedresponseindex;
+               //}
            // Track added mistakes
            } elseif (count($mistake->answermistaken) == 0) {
                foreach ($mistake->responsemistaken as $index) {
