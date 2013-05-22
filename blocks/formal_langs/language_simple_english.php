@@ -4,7 +4,7 @@
  *
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Dmitriy Mamontov, Sergey Pashaev Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -28,6 +28,9 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
     }
     public function name() {
         return 'simple_english';
+    }
+    public function lexem_name() {
+        return get_string('word', 'block_formal_langs');
     }
 }
 
