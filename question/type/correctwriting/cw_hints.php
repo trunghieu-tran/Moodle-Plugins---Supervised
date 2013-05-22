@@ -110,7 +110,9 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
  */
 class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
 
-    //@var mistake, with which this hint is associated
+    /**
+     * @var qtype_correctwriting_response_mistake, with which this hint is associated
+     */
     protected $mistake;
     //@var token(s) descriptions for the hint or value if no description available
     protected $token = '';
@@ -120,7 +122,8 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
     }
 
     /**
-     * Constructs hint object, remember question to use.
+     * Constructs hint object, remember question to use
+     * @var qtype_correctwriting_response_mistake $mistake
      */
     public function __construct($question, $hintkey, $mistake) {
         $this->question = $question;
@@ -166,7 +169,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
             if ($tokenindex == 0) {//First token
                 $a->before = $this->mistake->token_description(1);
                 $hinttext = get_string('wheretxtbefore', 'qtype_correctwriting', $a);
-            } else if ($tokenindex == count($this->mistake->answer) - 1) {//Last token
+            } else if ($tokenindex == count($this->mistake->stringpair->correctedstring()->stream->tokens) - 1) {//Last token
                 $a->after = $this->mistake->token_description($tokenindex - 1);
                 $hinttext = get_string('wheretxtafter', 'qtype_correctwriting', $a);
             } else {//Middle token
@@ -272,7 +275,8 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
      * @return string
      */
     protected function create_response_text_for_image() {
-        $temp  = array_map('qtype_correctwriting_hintwherepic::to_string', $this->mistake->response);
+        $stream = $this->mistake->stringpair->correctedstring()->stream;
+        $temp  = array_map('qtype_correctwriting_hintwherepic::to_string', $stream->tokens);
         $temp = array_map('base64_encode', $temp);
         return implode('|', $temp);
     }
@@ -328,8 +332,9 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $dist = 1;
         $curposition = $position + $direction;
         $found = null;
+        $answerstream = $selmistake->stringpair->correctstring()->stream;
         //echo $direction;
-        while(($curposition > -1) && ($curposition < count($selmistake->answer)) && ($found === null)) {
+        while(($curposition > -1) && ($curposition < count($answerstream->tokens)) && ($found === null)) {
             //echo $curposition . ' ' . $found . '<br />';
             if (array_key_exists($curposition, $lcs)) {
                 $found = $lcs[$curposition];

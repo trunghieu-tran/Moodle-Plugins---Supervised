@@ -416,7 +416,10 @@ class qtype_correctwriting_question extends question_graded_automatically
         return null;
     }
 
-   //Creates all information about mistakes, passed into mistakes
+   /**
+    * Creates all information about mistakes, passed into mistakes
+    * @var qtype_correctwriting_lexical_analyzer $analyzer analuzer, which mistakes are taken
+    */
    public function create_image_information($analyzer) {
        $question = $this;
        $keys = array_keys($question->answers);
@@ -438,7 +441,7 @@ class qtype_correctwriting_question extends question_graded_automatically
        $resultsections[] = implode(',,,',$answertokenvalues);
        //Create response section
        $responsetokenvalues = array();
-       $responsetokens = $analyzer->get_corrected_response();
+       $responsetokens = $analyzer->get_corrected_response()->stream->tokens;
        foreach($responsetokens as $token) {
            $responsetokenvalues[] = base64_encode($token->value());
        }

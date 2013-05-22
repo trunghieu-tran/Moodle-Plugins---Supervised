@@ -59,20 +59,15 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
-     * @param array  $answer        answer tokens
+     * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
      * @param int    $answerindex   index of answer token
-     * @param array  $response      array response tokens
      * @param int    $responseindex index of response token
      */
-    public function __construct($language,$answer,$answerindex,$response,$responseindex) {
+    public function __construct($language,$stringpair,$answerindex,$responseindex) {
         $this->languagename = $language->name();
 
-        $this->answer = $answer->stream->tokens;
-        $this->response = $response->stream->tokens;
-
-        $this->position = $this->response[$responseindex]->position();
-
-        $this->answerstring = $answer;
+        $this->stringpair = $stringpair;
+        $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
         $this->mistakemsg = null;
         //Fill answer data
         $this->answermistaken = array();
@@ -110,35 +105,31 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
    /**
     * Constructs a new error, filling it with constant message
     * @param object $language      a language object
-    * @param array  $answer        answer tokens
-    * @param array  $response      array response tokens
+    * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
     * @param int    $responseindex index of response token
     */
-    public function __construct($language,$answer,$response,$responseindex) {
+    public function __construct($language,$stringpair,$responseindex) {
         $this->languagename = $language->name();
-
-        $this->answer = $answer->stream->tokens;
-        $this->response = $response->stream->tokens;
-
-        $this->position = $this->response[$responseindex]->position();
+        $this->stringpair = $stringpair;
+        $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
         //Fill answer data
         $this->answermistaken = array();
         //Fill response data
         $this->responsemistaken = array($responseindex);
 
-        $this->answerstring = null;
-
         //Find, if such token exists in answer (to call it extraneous) or not (to write that it should not be there)
         $exists = false;
-        foreach ($this->answer as $answertoken) {
-            if ($answertoken->value() == $this->response[$responseindex]->value()) {
+        $answertokens = $stringpair->correctstring()->stream->tokens;
+        $responsemistakenvalue =  $stringpair->correctedstring()->stream->tokens[$responseindex]->value();
+        foreach ($answertokens as $answertoken) {
+            if ($answertoken->value() == $responsemistakenvalue) {
                 $exists = true;
                 break;
             }
         }
 
         //Create a mistake message
-        $data = $this->response[$responseindex]->value();
+        $data = $responsemistakenvalue;
         if (!is_string($data)) {
             $data = $data->string();
         }
@@ -160,24 +151,21 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
-     * @param array  $answer        answer tokens
+     * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
      * @param int    $answerindex   index of answer token
-     * @param array  $response      array response tokens
      */
-    public function __construct($language,$answer,$answerindex,$response) {
+    public function __construct($language,$stringpair,$answerindex) {
        $this->languagename = $language->name();
 
-       $this->answer = $answer->stream->tokens;
-       $this->response = $response->stream->tokens;
+       $this->stringpair = $stringpair;
 
-       $this->position = $this->answer[$answerindex]->position();
+       $this->position = $this->stringpair->correctstring()->stream->tokens[$answerindex]->position();
        //Fill answer data
        $this->answermistaken=array();
        $this->answermistaken[] = $answerindex;
        //Fill response data
        $this->responsemistaken = array();
 
-       $this->answerstring = $answer;
        $this->mistakemsg = null;      
     }
 
