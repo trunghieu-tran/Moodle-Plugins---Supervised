@@ -1,0 +1,32 @@
+<?php
+/**
+ * A language strings file of block
+ *
+ * @package    formal_langs
+ * @copyright  2012 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+ 
+$string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'There is unknown character "{$a->symbol}" at {$a->line}:{$a->position}';
+$string['clanguageunmatchedquote'] = 'There is unmatched quote at {$a->line}:{$a->col}';
+$string['clanguageunmatchedsquote'] = 'There is unmatched single quote at {$a->line}:{$a->col}';
+$string['extraseparatormsg'] = 'there may be an extra separator inside {$a->correct[0]}';
+$string['lang_c_language'] = 'C programming language';
+$string['lang_c_language_help'] = 'C programming language. Scanning only.';
+$string['lang_cpp_language'] = 'C++ programming language';
+$string['lang_cpp_language_help'] = 'C++ programming language. Scanning only.';
+$string['lang_printf_language'] = 'Language for formatting string (C language, like in printf).';
+$string['lang_printf_language_help'] = 'Language for formatting string (C language, like in printf). Scanning only.';
+$string['lang_simple_english'] = 'English';
+$string['lang_simple_english_help'] = 'English Language with support for words, numbers and punctuation marks. Scanning only.';
+$string['lexical_error_message'] = 'Cannot match input {$a->symbol} near {$a->line}:{$a->position} ';
+$string['lexeme'] = 'lexeme';
+$string['missingseparatormsg'] = 'there is no separator between {$a->correct[0]} and {$a->correct[1]}';
+$string['part'] = 'part';
+$string['pluginname'] = 'Formal languages block';
+$string['quote'] = '"{$a}"';
+$string['quoteat'] = '"{$a->value}" starting from position {$a->line}:{$a->column}';
+$string['quoteatsingleline'] = '"{$a->value}" starting from character {$a->column}';
+$string['typomsg'] = 'there may be a typo in {$a->correct[0]}';
+$string['word'] = 'word';
