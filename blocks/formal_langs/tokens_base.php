@@ -232,6 +232,16 @@ class block_formal_langs_ast_node_base {
 }
 
 /**
+ * Class for options, controlling strings comparison process.
+ */
+class block_formal_langs_comparing_options {
+    /**
+     * @var bool true if comparing is case sensitive, false if insensitive
+     */
+    public $usecase;
+}
+
+/**
  * Class for base tokens.
  *
  * Class for storing tokens. Class - token, object of the token class
@@ -310,12 +320,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     /**
      * Calculates and return editing distance from
      * $this to $token
+     * @param $options - comparing options
      */
-    public function editing_distance($token) {
-        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now
-            $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value());
-        } else {//Distance not applicable, so return a big number 
-            $distance = strlen($this->value()) + strlen($token->value());
+    public function editing_distance($token, block_formal_langs_comparing_options $options) {
+        if ($this->is_same($token, $options->usecase)) {//If two tokens are identical, return 0.
+            return 0;
+        }
+        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now.
+            $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value(), $options);
+        } else {//Distance not applicable, so return a big number.
+            $distance = textlib::strlen($this->value()) + textlib::strlen($token->value());
         }
     }
 
@@ -323,7 +337,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      *
      * @return int Damerau-Levenshtein distance
      */
-    static public function damerau_levenshtein($str1, $str2) {
+    static public function damerau_levenshtein($str1, $str2, block_formal_langs_comparing_options $options) {
     }
 
     /**
@@ -339,10 +353,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param array $other - array of tokens  (other text)
      * @param integer $threshold - lexical mistakes threshold
      * @param boolean $iscorrect - true if type of token is correct and we should perform full search, false for compared text
+     * @param $options - comparing options (like case sensitivity)
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold, $iscorrect) {
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
         // TODO: generic mistakes handling
     }
 
@@ -548,7 +563,7 @@ class block_formal_langs_token_stream {
      * @param threshold editing distance threshold (in percents to token length)
      * @return array of block_formal_langs_matched_tokens_pair objects
      */
-    public function look_for_token_pairs($comparedstream, $threshold) {
+    public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
         //TODO Birukova
         //1. Find matched pairs (typos, typical errors etc) - Birukova
         //  - look_for_matches function
@@ -565,7 +580,7 @@ class block_formal_langs_token_stream {
      * @param $threshold threshold as a fraction of token length for creating pairs
      * @return array array of matched_tokens_pair objects representing all possible pairs within threshold
      */
-    public function look_for_matches($comparedstream, $threshold) {
+    public function look_for_matches($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
         //TODO Birukova
     }
 
@@ -1084,7 +1099,7 @@ class block_formal_langs_string_pair {
     /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
-    public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared) {
+    public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared, block_formal_langs_comparing_options $options) {
     }
 
     public function __construct($correct, $compared, $matches) {
