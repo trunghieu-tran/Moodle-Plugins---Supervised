@@ -1146,7 +1146,7 @@ class block_formal_langs_string_pair {
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }*/
-        return $this->correctedstring()->node_description($nodenumber, $quotevalue, $at);
+        return $this->correctstring()->node_description($nodenumber, $quotevalue, $at);
     }
 }
 ?>
