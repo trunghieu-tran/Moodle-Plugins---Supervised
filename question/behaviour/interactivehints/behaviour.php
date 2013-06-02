@@ -60,8 +60,9 @@ class qbehaviour_interactivehints extends qbehaviour_interactive implements beha
             $moodlehint = $this->question->get_hint(count($this->question->hints) -
                 $pendingstep->get_behaviour_var('_triesleft'), $this->qa);
             $pendingstep->set_behaviour_var('_hashint',true);
-            foreach ($moodlehint->hintkeys() as $hintkey) {
-                $hintkey = $this->adjust_hintkey($hintkey);
+            $hints = $this->adjust_hints($moodlehint->hintkeys());
+            $hints = $this->expand_choosen_mi_hints($hints, $pendingstep);
+            foreach ($hints as $hintkey) {
                 $pendingstep->set_behaviour_var('_render_'.$hintkey, true);
             }
         }
@@ -89,12 +90,39 @@ class qbehaviour_interactivehints extends qbehaviour_interactive implements beha
     /**
      * Adjust hints array, replacing every hintkey that ends with # with a whole 
      * bunch of hint numbers for hints, that should be shown in this step.
-     * For this behaviour only current hint is shown.
+     *
+     * For this behaviour only current hint is shown for sequential hint.
      */
     public function adjust_hints($hints) {
         $result = array();
         foreach ($hints as $hintkey) {
             $result[] = $this->adjust_hintkey($hintkey);
+        }
+        return $result;
+    }
+
+    /**
+     * Teacher can not possibly predict which instances of choosen multiple instances hints
+     * will be in a student's response on each stage of interactive behaviour, so teacher could
+     * only tell us a type of such hints to use - hintkey up to first '_'.
+     *
+     * This function will expand type of hints to all possible hintkeys of such hints.
+     */
+    public function expand_choosen_mi_hints($hints, $pendingstep) {
+
+        $result = array();
+        $response = $pendingstep->get_qt_data();
+        $availablehints = $this->question->available_specific_hints($response);
+        foreach ($hints as $hintkey) {
+            if (substr($hintkey, -1) == '_') {//Choosen multiple instance hints.
+                foreach($availablehints as $realhint) {
+                    if (substr($realhint, 0, strlen($hintkey)) == $hintkey) {//The hint should be rendered.
+                        $result[] = $realhint;
+                    }
+                }
+            } else {
+                $result[] = $hintkey;
+            }
         }
         return $result;
     }
