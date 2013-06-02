@@ -26,12 +26,11 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 
 if($ADMIN->fulltree) {
 
 $settings->add(new admin_setting_heading('questioneditingheading', get_string('questioneditingheading', 'qtype_correctwriting'), ''));
-$langs = block_formal_langs::available_langs();
-$settings->add(new admin_setting_configselect('qtype_correctwriting_defaultlang', get_string('defaultlanglabel', 'qtype_correctwriting'), get_string('defaultlangdescription', 'qtype_correctwriting'), '1', $langs));
+$settings->add(new block_formal_langs_admin_setting_language('qtype_preg_defaultlang', get_string('defaultlanglabel', 'qtype_preg'), get_string('defaultlangdescription', 'qtype_preg'), '1', null));
 
 }
