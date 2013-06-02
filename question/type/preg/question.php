@@ -455,6 +455,11 @@ class qtype_preg_question extends question_graded_automatically
              return new qbehaviour_adaptivehintsnopenalties($qa, $preferredbehaviour);
         }
 
+        if ($preferredbehaviour == 'interactive' && file_exists($CFG->dirroot.'/question/behaviour/interactivehints/')) {
+             question_engine::load_behaviour_class('interactivehints');
+             return new qbehaviour_interactivehints($qa, $preferredbehaviour);
+        }
+
         return parent::make_behaviour($qa, $preferredbehaviour);
      }
 
