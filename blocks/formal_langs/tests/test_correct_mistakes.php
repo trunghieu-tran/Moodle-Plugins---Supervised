@@ -13,9 +13,11 @@ global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 
 class blocks_formal_langs_token_base_correct_mistakes_test extends UnitTestCase {
+
     //masha eat cake
     //dasha eat my cake
     function test_correct_mistakes_1() {
+        /*$strpair=new block_formal_langs_string_pair();
         $lexem1=new block_formal_langs_token_base(null,'type','masha',null,0);
         $lexem2=new block_formal_langs_token_base(null,'type','eat',null,1);
         $lexem3=new block_formal_langs_token_base(null,'type','cake',null,2);
@@ -33,6 +35,7 @@ class blocks_formal_langs_token_base_correct_mistakes_test extends UnitTestCase 
         $pair12=new block_formal_langs_matched_tokens_pair(array(1),array(1),0);
         $pair13=new block_formal_langs_matched_tokens_pair(array(2),array(3),0);
         $group=array($pair11,$pair12,$pair13);
+        $strpair->correctstring=$correctstream;
         $res=$incorrectstream->correct_mistakes($correctstream,$group);
         $this->assertTrue(count($res->tokens)==4);
     }
@@ -88,6 +91,7 @@ class blocks_formal_langs_token_base_correct_mistakes_test extends UnitTestCase 
         $group=array($pair11);
         $res=$incorrectstream->correct_mistakes($correctstream,$group);
         $this->assertTrue(count($res->tokens)==1);
+        */
     }
     
 }
