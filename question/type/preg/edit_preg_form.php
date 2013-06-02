@@ -56,6 +56,43 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         return $repeated;
     }
+
+    protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
+        $mform = $this->_form;
+        list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
+
+        $langselect = $mform->getElement('langid');
+        $langs = $langselect->getSelected();
+        $langobj = block_formal_langs::lang_object($langs[0]);
+        $hintoptions = array('hintmatchingpart' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintcolouredstring', 'qtype_preg')),
+            'hintnextchar' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextchar', 'qtype_preg')),
+            'hintnextlexem' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()))
+        );
+
+        $repeated[] = $mform->createElement('select', 'interactivehint', get_string('hintbtn', 'qbehaviour_adaptivehints', ''), $hintoptions);
+        return array($repeated, $repeatedoptions);
+    }
+
+    /**
+     * Perform the necessary preprocessing for the hint fields.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
+    protected function data_preprocessing_hints($question, $withclearwrong = false,
+            $withshownumpartscorrect = false) {
+        if (empty($question->hints)) {
+            return $question;
+        }
+        $question = parent::data_preprocessing_hints($question, $withclearwrong, $withshownumpartscorrect);
+
+
+        foreach ($question->hints as $hint) {
+            $question->interactivehint[] = $hint->options;
+        }
+
+        return $question;
+    }
+
     /**
      * Add question-type specific form fields.
      *
@@ -242,4 +279,5 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     function qtype() {
         return 'preg';
     }
+
 }
