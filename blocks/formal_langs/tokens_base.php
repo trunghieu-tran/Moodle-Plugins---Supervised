@@ -339,6 +339,10 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return int Damerau-Levenshtein distance
      */
     static public function damerau_levenshtein($str1, $str2, block_formal_langs_comparing_options $options) {
+        if($options->usecase==false){
+            $str1=textlib::strtolower($str1);
+            $str2=textlib::strtolower($str2);
+        }
         if ($str1 == $str2) 
             return 0;//words identical
         $lenstr1 = textlib::strlen($str1);
@@ -446,15 +450,15 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      *
      * @return distance if possible or -1 if no possible
      */
-    public function possible_pair($token, $max){
+    public function possible_pair($token, $max, $options){
         $str1 = $this->value;
         $str2 = $token->value;
         $lenstr1 = textlib::strlen($str1);                 //define the length of str1
         $lenstr2 = textlib::strlen($str2);                 //define the length of str2
         if(!($lenstr1-$max<=$lenstr2 && $lenstr2<=$lenstr1+$max))
             return -1;
-        //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
-        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2);
+        //$distance=$this->editing_distance($token, $options);    //define the distance of damerau-levenshtein 
+        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2, $options);
         if($distance<=$max)
             return $distance;
         else
@@ -488,7 +492,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             //incorrect lexem            
             if($iscorrect == true) {
                 //possible pair (typo)
-                $dist = $this->possible_pair($other[$k], $max);
+                $dist = $this->possible_pair($other[$k], $max, $options);
                 if($dist != -1) {
                     $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist);
                     array_push($possiblepairs, $pair);
@@ -497,7 +501,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 if($k+1 != count($other)) {
                     $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
-                    $dist = $this->possible_pair($lexem, $max);
+                    $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist);
                         array_push($possiblepairs, $pair);
@@ -509,7 +513,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 if($k+1 != count($other)) {
                     $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
-                    $dist = $this->possible_pair($lexem, $max);
+                    $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
                         $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist);
                         array_push($possiblepairs,$pair);
@@ -732,7 +736,7 @@ class block_formal_langs_token_stream {
         //  - group_matches function, with criteria defined by compare_matches_groups function
         $allpossiblepairs = array();
         $bestgroups = array();
-        $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold);
+        $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
         $bestgroups = $this->group_matches($allpossiblepairs);
         return $bestgroups;
     }
@@ -751,10 +755,10 @@ class block_formal_langs_token_stream {
         $tokens=$this->tokens;
         $allpossiblepairs=array();
         for ($i=0; $i<count($this->tokens); $i++) {
-            array_push($allpossiblepairs, $tokens[$i]->look_for_matches($comparedstream, $threshold, true));
+            array_push($allpossiblepairs, $tokens[$i]->look_for_matches($comparedstream, $threshold, true, $options));
         }
         for($i=0; $i<count($comparedstream); $i++) {
-            array_push($allpossiblepairs, $comparedstream[$i]->look_for_matches($this->tokens, $threshold, false));
+            array_push($allpossiblepairs, $comparedstream[$i]->look_for_matches($this->tokens, $threshold, false, $options));
         }
         return $allpossiblepairs;
     }
@@ -800,8 +804,7 @@ class block_formal_langs_token_stream {
         return $arraybestgroupsmatches;
     }
     
-    
-    
+
     public function recurcive_backtracking(&$matches,&$status, &$setspairs){
         $place = -1;
         for ($i=0; $i<count($status); $i++) {
