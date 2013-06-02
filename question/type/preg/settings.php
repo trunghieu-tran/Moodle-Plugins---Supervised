@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 require_once($CFG->dirroot.'/question/type/preg/questiontype.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 
 if($ADMIN->fulltree) {
 
@@ -36,8 +36,7 @@ $engines = $qtypeobj->available_engines();
 $settings->add(new admin_setting_configselect('qtype_preg_defaultengine', get_string('defaultenginelabel', 'qtype_preg'), get_string('defaultenginedescription', 'qtype_preg'), 'nfa_matcher', $engines));
 $notations = $qtypeobj->available_notations();
 $settings->add(new admin_setting_configselect('qtype_preg_defaultnotation', get_string('defaultnotationlabel', 'qtype_preg'), get_string('defaultnotationdescription', 'qtype_preg'), 'native', $notations));
-$langs = block_formal_langs::available_langs();
-$settings->add(new admin_setting_configselect('qtype_preg_defaultlang', get_string('defaultlanglabel', 'qtype_preg'), get_string('defaultlangdescription', 'qtype_preg'), '2', $langs));
+$settings->add(new block_formal_langs_admin_setting_language('qtype_preg_defaultlang', get_string('defaultlanglabel', 'qtype_preg'), get_string('defaultlangdescription', 'qtype_preg'), '1', null));
 $settings->add(new admin_setting_configtext('qtype_preg_maxerrorsshown', get_string('maxerrorsshownlabel', 'qtype_preg'), get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
 $settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));
 
