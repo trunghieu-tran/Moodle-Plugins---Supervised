@@ -251,6 +251,12 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $qo->lexemedescriptions = $lexemedescriptions;
         return $qo;
     }
+
+    /** Overload hints functions to be able to work with interactivehints*/
+    protected function make_hint($hint) {
+        return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
+    }
+
     /** Removes a symbols from tables and everything about question.
      * @param int $questionid the question being deleted.
      * @param int $contextid the context this question belongs to.
@@ -261,5 +267,89 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         block_formal_langs_processed_string::delete_descriptions_by_id('question_answers',$answerids);
 
         parent::delete_question($questionid, $contextid);
+    }
+
+        public function save_hints($formdata, $withparts = false) {//TODO - remove, when Tim will add make_hint_options
+        global $DB;
+        $context = $formdata->context;
+
+        $oldhints = $DB->get_records('question_hints',
+                array('questionid' => $formdata->id), 'id ASC');
+
+        if (!empty($formdata->hint)) {
+            $numhints = max(array_keys($formdata->hint)) + 1;
+        } else {
+            $numhints = 0;
+        }
+
+        if ($withparts) {
+            if (!empty($formdata->hintclearwrong)) {
+                $numclears = max(array_keys($formdata->hintclearwrong)) + 1;
+            } else {
+                $numclears = 0;
+            }
+            if (!empty($formdata->hintshownumcorrect)) {
+                $numshows = max(array_keys($formdata->hintshownumcorrect)) + 1;
+            } else {
+                $numshows = 0;
+            }
+            $numhints = max($numhints, $numclears, $numshows);
+        }
+
+        for ($i = 0; $i < $numhints; $i += 1) {
+            if (html_is_blank($formdata->hint[$i]['text'])) {
+                $formdata->hint[$i]['text'] = '';
+            }
+
+            if ($withparts) {
+                $clearwrong = !empty($formdata->hintclearwrong[$i]);
+                $shownumcorrect = !empty($formdata->hintshownumcorrect[$i]);
+            }
+
+            if (empty($formdata->hint[$i]['text']) && empty($clearwrong) &&
+                    empty($shownumcorrect)) {
+                continue;
+            }
+
+            // Update an existing hint if possible.
+            $hint = array_shift($oldhints);
+            if (!$hint) {
+                $hint = new stdClass();
+                $hint->questionid = $formdata->id;
+                $hint->hint = '';
+                $hint->id = $DB->insert_record('question_hints', $hint);
+            }
+
+            $hint->hint = $this->import_or_save_files($formdata->hint[$i],
+                    $context, 'question', 'hint', $hint->id);
+            $hint->hintformat = $formdata->hint[$i]['format'];
+            if ($withparts) {
+                $hint->clearwrong = $clearwrong;
+                $hint->shownumcorrect = $shownumcorrect;
+            }
+            $hint->options = $this->make_hint_options($formdata, $i);
+            $DB->update_record('question_hints', $hint);
+        }
+
+        // Delete any remaining old hints.
+        $fs = get_file_storage();
+        foreach ($oldhints as $oldhint) {
+            $fs->delete_area_files($context->id, 'question', 'hint', $oldhint->id);
+            $DB->delete_records('question_hints', array('id' => $oldhint->id));
+        }
+    }
+
+    protected function make_hint_options($formdata, $number) {
+        $array = array();
+        if (!empty($formdata->whatis_[$number])) {
+            $array[] = 'whatis_';
+        }
+        if (!empty($formdata->wheretxt_[$number])) {
+            $array[] = 'wheretxt_';
+        }
+        if (!empty($formdata->wherepic_[$number])) {
+            $array[] = 'wherepic_';
+        }
+        return implode("\n", $array);
     }
 }
