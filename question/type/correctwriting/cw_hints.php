@@ -169,7 +169,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
             if ($tokenindex == 0) {//First token
                 $a->before = $this->mistake->token_description(1);
                 $hinttext = get_string('wheretxtbefore', 'qtype_correctwriting', $a);
-            } else if ($tokenindex == count($this->mistake->stringpair->correctedstring()->stream->tokens) - 1) {//Last token
+            } else if ($tokenindex == count($this->mistake->stringpair->correctstring()->stream->tokens) - 1) {//Last token
                 $a->after = $this->mistake->token_description($tokenindex - 1);
                 $hinttext = get_string('wheretxtafter', 'qtype_correctwriting', $a);
             } else {//Middle token
