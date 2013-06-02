@@ -106,10 +106,6 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
     $matches=array();
     
     $this->assertTrue(count($token_stream->group_matches($matches))==0);
-    list($result)=$token_stream->group_matches($matches);
-    $this->assertTrue($result->mistakeweight==0);
-    $this->assertTrue($result->correctcoverage==$correctcoverage);
-    $this->assertTrue($result->comparedcoverage==$comparedcoverage);
     }
 
 }

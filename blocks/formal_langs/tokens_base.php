@@ -332,6 +332,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         } else {//Distance not applicable, so return a big number.
             $distance = textlib::strlen($this->value()) + textlib::strlen($token->value());
         }
+        return $distance;
     }
 
     /* Calculates Damerau-Levenshtein distance between two strings.  
@@ -441,7 +442,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 $j --;
             }
         } while(($i != 0) || ($j != 0));
-        $redact = textlib::strrev($route);
+        $redact = strrev($route);
         return $redact;
     }
     
@@ -452,13 +453,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     public function possible_pair($token, $max, $options){
         $str1 = $this->value;
-        $str2 = $token->value;
+        $str2 = $token->value;/*
         $lenstr1 = textlib::strlen($str1);                 //define the length of str1
         $lenstr2 = textlib::strlen($str2);                 //define the length of str2
         if(!($lenstr1-$max<=$lenstr2 && $lenstr2<=$lenstr1+$max))
-            return -1;
-        //$distance=$this->editing_distance($token, $options);    //define the distance of damerau-levenshtein 
-        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2, $options);
+            return -1;*/
+        $distance=$this->editing_distance($token, $options);    //define the distance of damerau-levenshtein 
+        //$distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2, $options);
         if($distance<=$max)
             return $distance;
         else
@@ -783,20 +784,22 @@ class block_formal_langs_token_stream {
         $arraybestgroupsmatches = array();
         //recurcive_backtracking
         $this->recurcive_backtracking($matches, $status, $setspairs);
-        //first is the best
-        array_push($arraybestgroupsmatches, $setspairs[0]);
+        if(count($setspairs)>0){
+            //first is the best
+            array_push($arraybestgroupsmatches, $setspairs[0]);
 
-        //write the best
-        for($i = 1; $i<count($setspairs); $i++) {
-            //equal
-            if($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
-                array_push($arraybestgroupsmatches, $setspairs[$i]);
-            } else {
-                //new group
-                if($this->compare_matches_groups($arraybestgroupsmatches[0],$setspairs[$i]) < 0) {
-                    //clear    
-                    $arraybestgroupsmatches = array();
+            //write the best
+            for($i = 1; $i<count($setspairs); $i++) {
+                //equal
+                if($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
                     array_push($arraybestgroupsmatches, $setspairs[$i]);
+                } else {
+                    //new group
+                    if($this->compare_matches_groups($arraybestgroupsmatches[0],$setspairs[$i]) < 0) {
+                        //clear    
+                        $arraybestgroupsmatches = array();
+                        array_push($arraybestgroupsmatches, $setspairs[$i]);
+                    }
                 }
             }
         }
@@ -977,35 +980,7 @@ class block_formal_langs_token_stream {
      * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
      */
     public function correct_mistakes($correctstream, $matchedpairsgroup) {
-        //it not work((
-        //$newstream = clone $this;
-        //TODO Birukova - change tokens using pairs
-        $newstream = $this;   //incorrect lexems
-        $streamcorrect = new block_formal_langs_token_stream();
-        $streamcorrect->tokens = array();
-        //TODO Birukova - change tokens using pairs
-        for($i = 0; $i < count($newstream->tokens); $i++){
-            $flag = 0;
-            for ($j = 0; $j < count($matchedpairsgroup); $j) {
-                //not second
-                if(count($matchedpairsgroup[$j]->comparedtokens) == 2) {
-                    if($matchedpairsgroup[$j]->comparedtokens[1] == $i)
-                        $flag = 1;
-                }
-                //write correcttokens
-                if($matchedpairsgroup[$j]->comparedtokens[0]==$i) {
-                    for($k = 0; $k<count($matchedpairsgroup[$j]->correcttokens); $k++) {
-                        array_push($streamcorrect->tokens, $correctstream->tokens[$matchedpairsgroup[$j]->correcttokens[$k]]);
-                    }
-                    $flag=1;
-                }
-            }
-            //write comparedtoken
-            if($flag == 0) {
-                array_push($streamcorrect->tokens, $newstream->tokens[$i]);
-            }
-        }
-        return $streamcorrect;
+
     }
 }
 /**
@@ -1511,10 +1486,42 @@ class block_formal_langs_string_pair {
      * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
      */
     protected function correct_mistakes() {
+    /*
         //TODO Birukova - create a new string from $comparedstring and matches
         //This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
         //Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
-
+        //it not work((
+        //$newstream = clone $this;
+        //TODO Birukova - change tokens using pairs
+        $newstream = $this->comparedstring;   //incorrect lexems
+        $streamcorrect = new block_formal_langs_token_stream();
+        $streamcorrect->tokens = array();
+        //TODO Birukova - change tokens using pairs
+        for($i = 0; $i < count($newstream->tokens); $i++){
+            $flag = 0;
+            for ($j = 0; $j < count($this->matches); $j) {
+                //not second
+                if(count($matches[$j]->comparedtokens) == 2) {
+                    if($matches[$j]->comparedtokens[1] == $i)
+                        $flag = 1;
+                }
+                //write correcttokens
+                if($matches[$j]->comparedtokens[0]==$i) {
+                    for($k = 0; $k<count($matches[$j]->correcttokens); $k++) {
+                        array_push($streamcorrect->tokens, $correctstream->tokens[$matches[$j]->correcttokens[$k]]);
+                    }
+                    $flag=1;
+                }
+            }
+            //write comparedtoken
+            if($flag == 0) {
+                array_push($streamcorrect->tokens, $newstream->tokens[$i]);
+            }
+        }
+        return $streamcorrect;
+        
+        
+        */
         // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
         // corrected string
         return $this->comparedstring;
