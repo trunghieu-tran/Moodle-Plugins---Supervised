@@ -62,6 +62,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         $hints = $question->available_specific_hints(array('answer' => $currentanswer));
         $behaviour = $qa->get_behaviour();
         $behaviourrenderer =$behaviour->get_renderer($PAGE);
+        $step = $qa->get_last_step();
         if ($analyzer!=null && $options->feedback) {//Show feedback message only witho $options->feedback set, but Moodle hints - anyway
             //Output mistakes messages
             if (count($analyzer->mistakes()) > 0) {
@@ -93,7 +94,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                                 if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
                                     if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
                                         $msg .= $br . $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                                    } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
+                                    } else if ($hintobj->hint_available(array('answer' => $currentanswer)) && $step->has_behaviour_var('_resp_hintbtns')){//Hint is not requested, render button to be able to request it.
                                         $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
                                     }
                                 }
