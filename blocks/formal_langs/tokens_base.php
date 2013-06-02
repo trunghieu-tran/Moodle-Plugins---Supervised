@@ -670,19 +670,6 @@ class block_formal_langs_matched_tokens_pair {
 
     }
     
-    /**
-     * Tokens pair constructor.
-     *
-     * @param array $correcttokens - Indexes of the correct text tokens.
-     * @param array $comparedtokens - Indexes of the compared text tokens.
-     * @param integer $mistakeweight -  Mistake weight
-     * @return tokens pair
-     */
-    public function __construct($correcttokens, $comparedtokens, $mistakeweight) {
-        $this->correcttokens = $correcttokens;
-        $this->comparedtokens = $comparedtokens;
-        $this->mistakeweight = $mistakeweight;
-    }
 }
 
 class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pair {
@@ -1017,7 +1004,7 @@ class block_formal_langs_token_stream {
         }
         return $streamcorrect;
     }
-
+}
 /**
  * Represents possible set of correspondes between tokens of correct and compared streams
  */
