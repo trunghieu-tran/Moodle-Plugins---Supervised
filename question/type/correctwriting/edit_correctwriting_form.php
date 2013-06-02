@@ -241,6 +241,42 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         return $question;
     }
 
+    protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
+        $mform = $this->_form;
+        list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
+
+        $repeated[] = $mform->createElement('advcheckbox', 'whatis_', get_string('options', 'question'),
+                    get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('whatis', 'qtype_correctwriting', get_string('mistakentokens', 'qtype_correctwriting'))));
+        $repeated[] = $mform->createElement('advcheckbox', 'wheretxt_', '',
+                    get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('wheretxthint', 'qtype_correctwriting', get_string('mistakentokens', 'qtype_correctwriting'))));
+        $repeated[] = $mform->createElement('advcheckbox', 'wherepic_', '',
+                    get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('wherepichint', 'qtype_correctwriting', get_string('mistakentokens', 'qtype_correctwriting'))));
+        return array($repeated, $repeatedoptions);
+    }
+
+    /**
+     * Perform the necessary preprocessing for the hint fields.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
+    protected function data_preprocessing_hints($question, $withclearwrong = false,
+            $withshownumpartscorrect = false) {
+        if (empty($question->hints)) {
+            return $question;
+        }
+        $question = parent::data_preprocessing_hints($question, $withclearwrong, $withshownumpartscorrect);
+
+
+        foreach ($question->hints as $hint) {
+            $hints = explode("\n", $hint->options);
+            $question->whatis_[] = in_array('whatis_', $hints);
+            $question->wheretxt_[] = in_array('wheretxt_', $hints);
+            $question->wherepic_[] = in_array('wherepic_', $hints);
+        }
+
+        return $question;
+    }
+
     public function validation($data, $files) {
 
         $errors = parent::validation($data, $files);

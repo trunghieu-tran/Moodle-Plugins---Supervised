@@ -53,6 +53,7 @@ $string['lexicalerrorweight'] = 'Penalty for lexical mistake';
 $string['lexicalerrorweight_help'] = 'Penalty for each lexical mistake in student\'s response: a typo, an extra or absent separator etc.';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes';
 $string['maxmistakepercentage_help'] = 'Maximum allowed number of mistakes in student\'s response as a percent of the number of the tokens in the answer. If the number of mistakes exceed that, answer will be considered not matched at all.';
+$string['mistakentokens'] = 'mistaken tokens';
 $string['movedmistakemessage'] = '{$a} misplaced';
 $string['movedmistakeweight'] = 'Penalty for misplaced token';
 $string['movedmistakeweight_help'] = 'Penalty for each misplaced token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
