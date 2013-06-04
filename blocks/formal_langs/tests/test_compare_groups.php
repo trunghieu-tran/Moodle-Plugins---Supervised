@@ -78,14 +78,32 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $group41->matchedpairs=array($pair41,$pair42);
         $group42->matchedpairs=array($pair43,$pair44);
         $group41->mistakeweight=0;
-        $group42->mistakeweight=3;
+        $group42->mistakeweight=1;
         $group41->correctcoverage=array(0,1);
-        $group41->comparedcoverage=array(0,1);
+        $group41->comparedcoverage=array(1,2);
         $group42->correctcoverage=array(0,1,2);
         $group42->comparedcoverage=array(0,1);
         $this->assertTrue($arr->compare_matches_groups($group41,$group42)<0,'$group1 worse than $group2');
     }
     
+    function test_compare_matches_groups_5(){
+        $arr = new block_formal_langs_token_stream(array(),array());
+        $group51=new block_formal_langs_matches_group();
+        $group52=new block_formal_langs_matches_group();
+        $pair51=new block_formal_langs_matched_tokens_pair(array(0),array(1),0);
+        $pair52=new block_formal_langs_matched_tokens_pair(array(1),array(2),0);
+        $pair53=new block_formal_langs_matched_tokens_pair(array(0),array(0),0);
+        $pair54=new block_formal_langs_matched_tokens_pair(array(1),array(1,2),1);
+        $group51->matchedpairs=array($pair51,$pair52);
+        $group52->matchedpairs=array($pair53,$pair54);
+        $group51->mistakeweight=0;
+        $group52->mistakeweight=1;
+        $group51->correctcoverage=array(0,1);
+        $group51->comparedcoverage=array(1,2);
+        $group52->correctcoverage=array(0,1);
+        $group52->comparedcoverage=array(0,1,2);
+        $this->assertTrue($arr->compare_matches_groups($group51,$group52)<0,'$group1 worse than $group2');
+    }
 }
 
 
