@@ -79,24 +79,52 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $this->assertTrue($result->comparedcoverage==$comparedcoverage);
     }
 
-    /// добавить на неправил (0,1)
+    function test_group_matches_6(){
+        $mistakeweight=3;
+        $correctcoverage=array(0,1);
+        $comparedcoverage=array(0,1);
+        //tyour tyr
+        //ty our
+        $token_stream=new block_formal_langs_token_stream(array(),array());
+        $pair1=new block_formal_langs_matched_tokens_pair(array(0),array(0,1),1);
+        $pair2=new block_formal_langs_matched_tokens_pair(array(0),array(1),2);
+        $pair3=new block_formal_langs_matched_tokens_pair(array(1),array(0),1);
+
+        $matches=array();
+        array_push($matches,$pair1,$pair2,$pair3);
     
-    /*function test_group_matches_4() {
-    $sets_of_pairs=array();
-    $set_of_pairs1=block_formal_langs_matches_group();
-    $set_of_pairs1->mistakeweight=;
-    $set_of_pairs1->correctcoverage=array();
-    $set_of_pairs1->comparedcoverage=array();
-    $set_of_pairs2=block_formal_langs_matches_group();
-    $set_of_pairs2->mistakeweight=;
-    $set_of_pairs2->correctcoverage=array();
-    $set_of_pairs2->comparedcoverage=array();
-    array_push($sets_of_pairs,$set_of_pairs1);
-    array_push($sets_of_pairs,$set_of_pairs2);
-    $this->assertTrue();
-    $this->assertTrue();
-    $this->assertTrue();
-    }*/
+        list($result)=$token_stream->group_matches($matches);
+        $this->assertTrue(count($token_stream->group_matches($matches))==1);
+        $this->assertTrue($result->mistakeweight==3);
+        $this->assertTrue($result->correctcoverage==$correctcoverage);
+        $this->assertTrue($result->comparedcoverage==$comparedcoverage);
+    }
+    
+    function test_group_matches_4() {
+    //my life
+    //my live my
+        $pair1=new block_formal_langs_matched_tokens_pair(array(0),array(0),0);
+        $pair2=new block_formal_langs_matched_tokens_pair(array(0),array(2),0);
+        $pair3=new block_formal_langs_matched_tokens_pair(array(1),array(1),1);
+
+        $matches=array();
+        array_push($matches,$pair1,$pair2,$pair3);
+        $token_stream=new block_formal_langs_token_stream(array(),array());
+        $sets_of_pairs=array();
+        $set_of_pairs1=new block_formal_langs_matches_group();
+        $set_of_pairs1->mistakeweight=1;
+        $set_of_pairs1->correctcoverage=array(0,1);
+        $set_of_pairs1->comparedcoverage=array(0,1);
+        $set_of_pairs2=new block_formal_langs_matches_group();
+        $set_of_pairs2->mistakeweight=1;
+        $set_of_pairs2->correctcoverage=array(0,1);
+        $set_of_pairs2->comparedcoverage=array(1,2);
+        array_push($sets_of_pairs,$set_of_pairs1);
+        array_push($sets_of_pairs,$set_of_pairs2);
+        
+        list($result)=$token_stream->group_matches($matches);
+        $this->assertTrue(count($token_stream->group_matches($matches))==2);
+    }
     
     function test_group_matches_5() {
         $mistakeweight=0;
