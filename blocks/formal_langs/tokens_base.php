@@ -927,7 +927,7 @@ class block_formal_langs_token_stream {
                 //2 indexs
                 if(count($matches[$place]->comparedtokens) == 2) {
                     //1 index
-                    if($matches[$place]->comparedtokens[1] == $matches[i]->comparedtokens[0])
+                    if($matches[$place]->comparedtokens[1] == $matches[$i]->comparedtokens[0])
                         $status[$i]=0;
                     if(count($matches[$i]->comparedtokens) == 2) {
                         //2 indexs

@@ -85,7 +85,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $group42->comparedcoverage=array(0,1);
         $this->assertTrue($arr->compare_matches_groups($group41,$group42)<0,'$group1 worse than $group2');
     }
-    
+    ////
     function test_compare_matches_groups_5(){
         $arr = new block_formal_langs_token_stream(array(),array());
         $group51=new block_formal_langs_matches_group();
