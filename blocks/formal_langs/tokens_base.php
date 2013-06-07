@@ -1500,45 +1500,48 @@ class block_formal_langs_string_pair {
      * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
      */
     protected function correct_mistakes() {
-    /*
+    
         //TODO Birukova - create a new string from $comparedstring and matches
         //This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
         //Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
         //it not work((
         //$newstream = clone $this;
         //TODO Birukova - change tokens using pairs
-        $newstream = $this->comparedstring;   //incorrect lexems
-        $streamcorrect = new block_formal_langs_token_stream();
-        $streamcorrect->tokens = array();
+        $newstream = $this->comparedstring->stream;   //incorrect lexems
+        $correctstream=$this->correctstring->stream;
+        $streamcorrected = new block_formal_langs_token_stream();
+        $streamcorrected->tokens = array();
         //TODO Birukova - change tokens using pairs
         for($i = 0; $i < count($newstream->tokens); $i++){
             $flag = 0;
             for ($j = 0; $j < count($this->matches); $j) {
                 //not second
-                if(count($matches[$j]->comparedtokens) == 2) {
-                    if($matches[$j]->comparedtokens[1] == $i)
+                if(count($this->matches[$j]->comparedtokens) == 2) {
+                    if($this->matches[$j]->comparedtokens[1] == $i)
                         $flag = 1;
                 }
                 //write correcttokens
-                if($matches[$j]->comparedtokens[0]==$i) {
-                    for($k = 0; $k<count($matches[$j]->correcttokens); $k++) {
-                        array_push($streamcorrect->tokens, $correctstream->tokens[$matches[$j]->correcttokens[$k]]);
+                if($this->matches[$j]->comparedtokens[0]==$i) {
+                    for($k = 0; $k<count($this->matches[$j]->correcttokens); $k++) {
+                        array_push($streamcorrected->tokens, $correctstream->tokens[$this->matches[$j]->correcttokens[$k]]);
                     }
                     $flag=1;
                 }
             }
             //write comparedtoken
             if($flag == 0) {
-                array_push($streamcorrect->tokens, $newstream->tokens[$i]);
+                array_push($streamcorrected->tokens, $newstream->tokens[$i]);
             }
         }
-        return $streamcorrect;
+        $this->correctedstring->stream=$streamcorrected;
+        //return $streamcorrect;
+        return $this->correctedstring;
         
         
-        */
+        
         // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
         // corrected string
-        return $this->comparedstring;
+        //return $this->comparedstring;
     }
 
     /**
