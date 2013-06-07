@@ -509,7 +509,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 //possible pair (typo)
                 $dist = $this->possible_pair($other[$k], $max, $options);
                 if($dist != -1) {
-                    $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist);
+                    $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
                     array_push($possiblepairs, $pair);
                 }
                 //possible pair (extra separator)
@@ -518,7 +518,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
-                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist);
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
                         array_push($possiblepairs, $pair);
                     }
                     $str='';
@@ -530,7 +530,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
-                        $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist);
+                        $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist, false, '');
                         array_push($possiblepairs,$pair);
                     }
                     $str='';
