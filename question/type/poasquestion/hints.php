@@ -85,7 +85,8 @@ abstract class qtype_specific_hint {
      */
     const SINGLE_INSTANCE_HINT = 1;
     /** 
-     *  Choosen multiple instance hint allows several hint buttons, from which the user (either teacher or student, depending on behaviour) could choose one they want. 
+     *  Choosen multiple instance hint allows several hint buttons, from which the user
+     *  (either teacher or student, depending on behaviour) could choose one they want. 
      *  Example is hint, that would show how you should place misplaced lexem in correct writing question type.
      */
     const CHOOSEN_MULTIPLE_INSTANCE_HINT = 2;
@@ -142,7 +143,7 @@ abstract class qtype_specific_hint {
      * Returns whether response is used to calculate penalty (cost) for the hint.
      */
     public function penalty_response_based() {
-        return false;//Most hint have fixed penalty (cost)
+        return false;// Most hint have fixed penalty (cost).
     }
 
     /**
@@ -154,12 +155,14 @@ abstract class qtype_specific_hint {
     abstract public function penalty_for_specific_hint($response = null);
 
     /**
-     * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
+     * Question may decide to render buttons for some hints to place them in more appropriate place
+     * near a controls or in specific feedback.
      *
-     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour variable is set, depending on whether hint is response based.
+     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour
+     * variable is set, depending on whether hint is response based.
      */
     public function button_rendered_by_question() {
-        //By default, hint button should be rendered by behaviour.
+        // By default, hint button should be rendered by behaviour.
         return false;
     }
 
@@ -193,7 +196,7 @@ class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
     public function __construct($question, $hintkey) {
         $this->question = $question;
         $this->hintkey = $hintkey;
-        //Hintkey is like <hintname>#<number>
+        // Hintkey is like <hintname>#<number>
         $this->number = substr($hintkey, strpos($hintkey, '#') + 1);
     }
 
@@ -205,23 +208,23 @@ class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
         return get_string('teachertext', 'qtype_poasquestion', $number);
     }
 
-     public function hint_response_based() {
-        return false;//Teacher-defined text hint has nothing to do with student's response.
-     }
+    public function hint_response_based() {
+        return false;// Teacher-defined text hint has nothing to do with student's response.
+    }
 
-     public function hint_available($response = null) {
+    public function hint_available($response = null) {
         return is_numeric($this->number) && $this->number < count($this->question->hints);
-     }
+    }
 
-     public function penalty_for_specific_hint($response = null) {
+    public function penalty_for_specific_hint($response = null) {
         return $this->question->penalty;
-     }
+    }
 
-     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $hint = $this->question->hints[$this->number];
-        $hint->adjust_display_options($options);//For the hints like question_hint_with_parts.
+        $hint->adjust_display_options($options);// For the hints like question_hint_with_parts.
         return $this->question->format_hint($hint, $qa);
-     }
+    }
 }
 
 /**
@@ -240,7 +243,7 @@ class qtype_poasquestion_moodlehint_adapter extends question_hint_with_parts {
     /** @var specific hint options (a number of specific hint keys, separated by line break character). */
     public $options;
 
-    
+
     /**
      * Constructor.
      * @param int the hint id from the database.
@@ -269,9 +272,9 @@ class qtype_poasquestion_moodlehint_adapter extends question_hint_with_parts {
      * Returns an array of moodle hint keys for this hint.
      */
     public function hintkeys() {
-    
+
         $hintkeys = explode("\n", $this->options);
-        //$hintkeys[] = 'hintmoodle#';//Moodle hint always active. ???TODO - check if this is necessary
+        // $hintkeys[] = 'hintmoodle#';// Moodle hint always active. ???TODO - check if this is necessary.
         return $hintkeys;
     }
 }
