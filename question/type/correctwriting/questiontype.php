@@ -327,7 +327,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
                 $hint->clearwrong = $clearwrong;
                 $hint->shownumcorrect = $shownumcorrect;
             }
-            $hint->options = $this->make_hint_options($formdata, $i);
+            $hint->options = $this->save_hint_options($formdata, $i, $withparts);
             $DB->update_record('question_hints', $hint);
         }
 
@@ -339,7 +339,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         }
     }
 
-    protected function make_hint_options($formdata, $number) {
+    protected function save_hint_options($formdata, $number, $withparts) {
         $array = array();
         if (!empty($formdata->whatis_[$number])) {
             $array[] = 'whatis_';
