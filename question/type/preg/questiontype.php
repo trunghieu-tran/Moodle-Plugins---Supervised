@@ -183,7 +183,7 @@ class qtype_preg extends qtype_shortanswer {
                 $hint->clearwrong = $clearwrong;
                 $hint->shownumcorrect = $shownumcorrect;
             }
-            $hint->options = $this->make_hint_options($formdata, $i);
+            $hint->options = $this->save_hint_options($formdata, $i, $withparts);
             $DB->update_record('question_hints', $hint);
         }
 
@@ -195,7 +195,7 @@ class qtype_preg extends qtype_shortanswer {
         }
     }
 
-    protected function make_hint_options($formdata, $number) {
+    protected function save_hint_options($formdata, $number, $withparts) {
         $options = $formdata->interactivehint[$number];
         return $options;
     }
