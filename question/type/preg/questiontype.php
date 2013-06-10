@@ -40,9 +40,9 @@ class qtype_preg extends qtype_shortanswer {
      * key = engine indentifier, value = interface string with engine name.
      */
     public function available_engines() {
-        return array(   'php_preg_matcher' => get_string('php_preg_matcher','qtype_preg'),
-                        'dfa_matcher' => get_string('dfa_matcher','qtype_preg'),
-                        'nfa_matcher' => get_string('nfa_matcher','qtype_preg')/*,
+        return array(   'php_preg_matcher' => get_string('php_preg_matcher', 'qtype_preg'),
+                        'dfa_matcher' => get_string('dfa_matcher', 'qtype_preg'),
+                        'nfa_matcher' => get_string('nfa_matcher', 'qtype_preg')/*,
                         'backtracking_matcher' => 'backtracking_matcher'*/
                     );
     }
@@ -57,7 +57,7 @@ class qtype_preg extends qtype_shortanswer {
                     );
     }
 
-    function name() {
+    public function name() {
         return 'preg';
     }
 
@@ -68,12 +68,13 @@ class qtype_preg extends qtype_shortanswer {
         $answerskey = array_search('answers', $extraquestionfields);
         unset($extraquestionfields[$answerskey]);
         ///
-        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder', 'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder',
+                    'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
     }
 
-    function save_question_options($question) {
-        //Fill in some data that could be absent due to disabling form controls
+    public function save_question_options($question) {
+        // Fill in some data that could be absent due to disabling form controls.
         if (!isset($question->usecharhint)) {
             $question->usecharhint = false;
         }
@@ -96,7 +97,7 @@ class qtype_preg extends qtype_shortanswer {
             $question->hintgradeborder = 1;
         }
 
-        //Sanity check for engine capabilities - disabling form controls works really strange...
+        // Sanity check for engine capabilities - disabling form controls works really strange...
         $questionobj = new qtype_preg_question;
         $querymatcher = $questionobj->get_query_matcher($question->engine);
         if (!$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
@@ -110,7 +111,7 @@ class qtype_preg extends qtype_shortanswer {
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
         $qo = parent::import_from_xml($data, $question, $format, $extra);
-        $format->import_hints($qo, $data, false, false);//TODO - change last one to "true" when interactivehints will be implemented
+        $format->import_hints($qo, $data, false, true);
         return $qo;
     }
 
@@ -125,7 +126,7 @@ class qtype_preg extends qtype_shortanswer {
         return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
     }
 
-    public function save_hints($formdata, $withparts = false) {//TODO - remove, when Tim will add make_hint_options
+    public function save_hints($formdata, $withparts = false) {// TODO - remove, when Tim will add make_hint_options.
         global $DB;
         $context = $formdata->context;
 
