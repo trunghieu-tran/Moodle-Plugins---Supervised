@@ -72,7 +72,7 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
             $qtfield = $qtypeobj->questionid_column_name();
             $data->$qtfield = $newquestionid;
 
-            if (in_array('answers', $extraquestionfields))  {
+            if (in_array('answers', $extraquestionfields)) {
                 // Map sequence of question_answer ids.
                 $answersarr = explode(',', $data->answers);
                 foreach ($answersarr as $key => $answer) {
