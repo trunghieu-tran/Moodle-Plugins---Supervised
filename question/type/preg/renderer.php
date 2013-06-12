@@ -38,7 +38,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
-        $result = parent::formulation_and_controls($qa,$options);
+        $result = parent::formulation_and_controls($qa, $options);
 
         return $result;
     }
@@ -47,7 +47,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $question = $qa->get_question();
         $response = $qa->get_last_qt_var('answer');
 
-        if ($response) {//Generate response-specific correct answer if there is response
+        if ($response) {// Generate response-specific correct answer if there is response.
             $correctanswer = $question->get_correct_response_ext(array('answer' => $response));
         } else {
             $correctanswer = $question->get_correct_response();
@@ -60,17 +60,17 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return get_string('correctansweris', 'qtype_shortanswer', s($correctanswer['answer']));
     }
 
-    //Overloading feedback to add colored string
+    // Overloading feedback to add colored string.
     public function feedback(question_attempt $qa, question_display_options $options) {
 
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
-        if(!$currentanswer) {
+        if (!$currentanswer) {
             $currentanswer = '';
         }
 
-        //Render hints
-        $coloredhintrendered = false;//Is hint showing colored string rendered?
+        // Render hints.
+        $coloredhintrendered = false;// Is hint showing colored string rendered?
         $behaviour = $qa->get_behaviour();
         $hintmessage = '';
         $br =  html_writer::empty_tag('br');
@@ -88,7 +88,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             }
         }
 
-        //Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
+        // Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
         if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
             $hintobj = $question->hint_object('hintmatchingpart');
             $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
@@ -154,7 +154,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             return '';
         }
 
-        //////Teacher-defined feedback text for that answer
+        // Teacher-defined feedback text for that answer.
         return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
 }

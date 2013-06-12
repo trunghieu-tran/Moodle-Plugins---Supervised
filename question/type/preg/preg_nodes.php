@@ -248,7 +248,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         $result = true;
         // Check merged assertions first.
-        foreach($this->mergedassertions as $assert) {
+        foreach ($this->mergedassertions as $assert) {
             $result = $result && $assert->match($str, $pos, $length, $matcherstateobj);
         }
         // Now check this leaf.
@@ -413,7 +413,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     /**
      * Check if other charset is included in this. That means that any character matching other also matches this.
      * @param other charset to check.
-     * @return true if included, false otherwise
+     * @return true if included, false otherwise.
      */
     public function is_include(qtype_preg_leaf_charset $other) {
         /*$result = true;
@@ -422,7 +422,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $result = $result && (!$this->match($c, 0, $l) && $other->match($c, 0, $l));
         }
         return $result || $other===$this;*/
-        //getting ranges of this charset
+        // Getting ranges of this charset.
         foreach ($this->flags as $flags) {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
@@ -443,7 +443,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
             }
         }
-        //getting ranges of other charset
+        // Getting ranges of other charset.
         foreach ($other->flags as $flags) {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
@@ -464,7 +464,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
             }
         }
-        //comparing ranges of this and other charsets
+        // Comparing ranges of this and other charsets.
         if (is_array($ranges)) {
               $included = true;
         } else {
@@ -478,14 +478,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-               if (current($ranges)!=current($otherranges)) {
-                    $included = false;
-                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-                         next($ranges);
-                    }
-                    if (current($ranges)!==false) {
-                    $included = true;
-                    }*/
+            if (current($ranges)!=current($otherranges)) {
+                $included = false;
+                /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                    next($ranges);
+                }
+                if (current($ranges)!==false) {
+                $included = true;
+                }*/
                }
         }
         return $included;
@@ -913,7 +913,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         }
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 
     public function consumes($matcherstateobj = null) {
         return 0;
@@ -930,9 +930,9 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
 
     public function tohr() {
         switch ($this->subtype) {
-            case qtype_preg_leaf_meta::SUBTYPE_ENDREG:
+            case self::SUBTYPE_ENDREG:
                 return 'metaENDREG';
-            case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
+            case self::SUBTYPE_EMPTY:
                 return 'metaEPS';
             default:
                 return '';
@@ -976,7 +976,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
         return 0;
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         $result = false;
@@ -1311,7 +1311,7 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         // TODO - followpos for situations like {2,10}
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 }
 
 /**
@@ -1355,7 +1355,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         }
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 }
 
 /**
@@ -1504,7 +1504,7 @@ class qtype_preg_node_assert extends qtype_preg_operator {
         $this->lastpos = array($this->id);
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 }
 
 /**
@@ -1533,7 +1533,7 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
         return true;    // Subexpression is a subpattern.
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 }
 
 /**
@@ -1579,7 +1579,7 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
         // TODO what should be here?
     }
 
-    //TODO - ui_nodename()
+    // TODO - ui_nodename().
 }
 
 /**

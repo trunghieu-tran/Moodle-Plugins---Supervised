@@ -40,30 +40,30 @@ class qtype_preg_handling_options {
     const MODE_PCRE = 0;
     const MODE_POSIX = 1;
 
-    const MODIFIER_ANCHORED            = 0x000001;  // A // the pattern is forced to be anchored
-    //const MODIFIER_AUTO_CALLOUT      = 0x000002;
-    const MODIFIER_BSR_ANYCRLF         = 0x000004;  //   // \R matches CR, LF, or CRLF
-    const MODIFIER_BSR_UNICODE         = 0x000008;  //   // \R matches any Unicode newline sequence
-    const MODIFIER_CASELESS            = 0x000010;  // i // case insensitive match
-    const MODIFIER_DOLLAR_ENDONLY      = 0x000020;  // D // dollar metacharacter matches only at the end of the subject string
-    const MODIFIER_DOTALL              = 0x000040;  // s // dot matches newlines
-    const MODIFIER_DUPNAMES            = 0x000080;  // J // names used to identify capturing subpatterns need not be unique
-    const MODIFIER_EXTENDED            = 0x000100;  // x // ignore white spaces
-    //const MODIFIER_EXTRA             = 0x000200;  // X //
-    //const MODIFIER_FIRSTLINE         = 0x000400;
-    //const MODIFIER_JAVASCRIPT_COMPAT = 0x000800;
-    const MODIFIER_MULTILINE           = 0x001000;  // m // multiple lines match
-    const MODIFIER_NEWLINE_CR          = 0x002000;  //   // newline is indicated by CR
-    const MODIFIER_NEWLINE_LF          = 0x004000;  //   // newline is indicated by LF
-    const MODIFIER_NEWLINE_CRLF        = 0x008000;  //   // newline is indicated by CRLF
-    const MODIFIER_NEWLINE_ANYCRLF     = 0x010000;  //   // newline is indicated by CR, LF or CRLF
-    const MODIFIER_NEWLINE_ANY         = 0x020000;  //   // newline is indicated by any Unicode newline sequence
-    //const MODIFIER_NO_AUTO_CAPTURE   = 0x040000;
-    //const MODIFIER_NO_START_OPTIMIZE = 0x080000;
-    //const MODIFIER_UCP               = 0x100000;
-    const MODIFIER_UNGREEDY            = 0x200000;  // U // inverts the greediness of the quantifiers
-    const MODIFIER_UTF8                = 0x400000;  // u // regard both the pattern and the subject as UTF-8 strings
-    //const MODIFIER_NO_UTF8_CHECK     = 0x800000;
+    const MODIFIER_ANCHORED            = 0x000001;  // A // the pattern is forced to be anchored.
+    // const MODIFIER_AUTO_CALLOUT      = 0x000002;
+    const MODIFIER_BSR_ANYCRLF         = 0x000004;  //   // \R matches CR, LF, or CRLF.
+    const MODIFIER_BSR_UNICODE         = 0x000008;  //   // \R matches any Unicode newline sequence.
+    const MODIFIER_CASELESS            = 0x000010;  // i // case insensitive match.
+    const MODIFIER_DOLLAR_ENDONLY      = 0x000020;  // D // dollar metacharacter matches only at the end of the subject string.
+    const MODIFIER_DOTALL              = 0x000040;  // s // dot matches newlines.
+    const MODIFIER_DUPNAMES            = 0x000080;  // J // names used to identify capturing subpatterns need not be unique.
+    const MODIFIER_EXTENDED            = 0x000100;  // x // ignore white spaces.
+    // const MODIFIER_EXTRA             = 0x000200;  // X //
+    // const MODIFIER_FIRSTLINE         = 0x000400;
+    // const MODIFIER_JAVASCRIPT_COMPAT = 0x000800;
+    const MODIFIER_MULTILINE           = 0x001000;  // m // multiple lines match.
+    const MODIFIER_NEWLINE_CR          = 0x002000;  //   // newline is indicated by CR.
+    const MODIFIER_NEWLINE_LF          = 0x004000;  //   // newline is indicated by LF.
+    const MODIFIER_NEWLINE_CRLF        = 0x008000;  //   // newline is indicated by CRLF.
+    const MODIFIER_NEWLINE_ANYCRLF     = 0x010000;  //   // newline is indicated by CR, LF or CRLF.
+    const MODIFIER_NEWLINE_ANY         = 0x020000;  //   // newline is indicated by any Unicode newline sequence.
+    // const MODIFIER_NO_AUTO_CAPTURE   = 0x040000;
+    // const MODIFIER_NO_START_OPTIMIZE = 0x080000;
+    // const MODIFIER_UCP               = 0x100000;
+    const MODIFIER_UNGREEDY            = 0x200000;  // U // inverts the greediness of the quantifiers.
+    const MODIFIER_UTF8                = 0x400000;  // u // regard both the pattern and the subject as UTF-8 strings.
+    // const MODIFIER_NO_UTF8_CHECK     = 0x800000;
 
     /** @var boolean Regex compatibility mode. */
     public $mode = self::MODE_PCRE;
@@ -80,7 +80,7 @@ class qtype_preg_handling_options {
 
     public static function get_all_modifiers() {
         return array(self::MODIFIER_ANCHORED,
-                     //self::MODIFIER_AUTO_CALLOUT,
+                     // self::MODIFIER_AUTO_CALLOUT,
                      self::MODIFIER_BSR_ANYCRLF,
                      self::MODIFIER_BSR_UNICODE,
                      self::MODIFIER_CASELESS,
@@ -88,21 +88,21 @@ class qtype_preg_handling_options {
                      self::MODIFIER_DOTALL,
                      self::MODIFIER_DUPNAMES,
                      self::MODIFIER_EXTENDED,
-                     //self::MODIFIER_EXTRA,
-                     //self::MODIFIER_FIRSTLINE,
-                     //self::MODIFIER_JAVASCRIPT_COMPAT,
+                     // self::MODIFIER_EXTRA,
+                     // self::MODIFIER_FIRSTLINE,
+                     // self::MODIFIER_JAVASCRIPT_COMPAT,
                      self::MODIFIER_MULTILINE,
                      self::MODIFIER_NEWLINE_CR,
                      self::MODIFIER_NEWLINE_LF,
                      self::MODIFIER_NEWLINE_CRLF,
                      self::MODIFIER_NEWLINE_ANYCRLF,
                      self::MODIFIER_NEWLINE_ANY,
-                     //self::MODIFIER_NO_AUTO_CAPTURE,
-                     //self::MODIFIER_NO_START_OPTIMIZE,
-                     //self::MODIFIER_UCP,
+                     // self::MODIFIER_NO_AUTO_CAPTURE,
+                     // self::MODIFIER_NO_START_OPTIMIZE,
+                     // self::MODIFIER_UCP,
                      self::MODIFIER_UNGREEDY,
                      self::MODIFIER_UTF8,
-                     //self::MODIFIER_NO_UTF8_CHECK
+                     // self::MODIFIER_NO_UTF8_CHECK
                      );
     }
 
@@ -137,7 +137,7 @@ class qtype_preg_handling_options {
         switch ($mod) {
         case self::MODIFIER_ANCHORED:
             return 'A';
-        //case self::MODIFIER_AUTO_CALLOUT:
+        // case self::MODIFIER_AUTO_CALLOUT:
         case self::MODIFIER_BSR_ANYCRLF:
         case self::MODIFIER_BSR_UNICODE:
             return '';
@@ -151,10 +151,10 @@ class qtype_preg_handling_options {
             return 'J';
         case self::MODIFIER_EXTENDED:
             return 'x';
-        //case self::MODIFIER_EXTRA:
+        // case self::MODIFIER_EXTRA:
         //    return 'X';
-        //case self::MODIFIER_FIRSTLINE:
-        //case self::MODIFIER_JAVASCRIPT_COMPAT:
+        // case self::MODIFIER_FIRSTLINE:
+        // case self::MODIFIER_JAVASCRIPT_COMPAT:
         case self::MODIFIER_MULTILINE:
             return 'm';
         case self::MODIFIER_NEWLINE_CR:
@@ -162,14 +162,14 @@ class qtype_preg_handling_options {
         case self::MODIFIER_NEWLINE_CRLF:
         case self::MODIFIER_NEWLINE_ANYCRLF:
         case self::MODIFIER_NEWLINE_ANY:
-        //case self::MODIFIER_NO_AUTO_CAPTURE:
-        //case self::MODIFIER_NO_START_OPTIMIZE:
-        //case self::MODIFIER_UCP:
+        // case self::MODIFIER_NO_AUTO_CAPTURE:
+        // case self::MODIFIER_NO_START_OPTIMIZE:
+        // case self::MODIFIER_UCP:
         case self::MODIFIER_UNGREEDY:
             return 'U';
         case self::MODIFIER_UTF8:
             return 'u';
-        //case self::MODIFIER_NO_UTF8_CHECK:
+        // case self::MODIFIER_NO_UTF8_CHECK:
         default:
             return '';
         }
@@ -305,27 +305,27 @@ class qtype_preg_regex_handler {
 
     /**
      * Was there an error in regex?
-     * @return bool  errors exists
+     * @return bool  errors exists.
      */
     public function errors_exist() {
         return count($this->get_errors()) > 0;
     }
 
     /**
-     * Returns errors as objects
-     * @return array of errors
+     * Returns errors as objects.
+     * @return array of errors.
      */
     public function get_errors() {
         return $this->errors;
     }
 
     /**
-     * Returns error messages for regex
-     * @return array of error messages
+     * Returns error messages for regex.
+     * @return array of error messages.
      */
     public function get_error_messages() {
         $res = array();
-        foreach($this->get_errors() as $error) {
+        foreach ($this->get_errors() as $error) {
             $res[] = $error->errormsg;
         }
         return $res;
@@ -333,7 +333,7 @@ class qtype_preg_regex_handler {
 
     /**
      * Access function to the AST root.
-     * Used mainly for unit-testing and avoiding re-parsing
+     * Used mainly for unit-testing and avoiding re-parsing.
      */
     public function get_ast_root() {
         return $this->ast_root;
@@ -380,12 +380,12 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree
-     * @param pregnode qtype_preg_node child class instance
-     * @return corresponding xxx_preg_node child class instance
+     * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree.
+     * @param pregnode qtype_preg_node child class instance.
+     * @return corresponding xxx_preg_node child class instance.
      */
     public function from_preg_node($pregnode) {
-        if (!is_a($pregnode,'qtype_preg_node')) {
+        if (!is_a($pregnode, 'qtype_preg_node')) {
             return $pregnode;   // The node is already converted.
         }
 
@@ -475,8 +475,8 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * is this engine need a parsing of regular expression?
-     * @return bool if parsing needed
+     * Is this engine need a parsing of regular expression?
+     * @return bool if parsing needed.
      */
     protected function is_parsing_needed() {
         return true;    // Most engines will need parsing.
@@ -484,7 +484,7 @@ class qtype_preg_regex_handler {
 
     /**
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
-     * Returns true if node is supported or user interface string describing
+     * Returns true if node is supported or user interface string describing.
      * what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
@@ -492,7 +492,7 @@ class qtype_preg_regex_handler {
         if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
             return true;
         }
-        return false;    // Should be overloaded by child classes
+        return false;    // Should be overloaded by child classes.
     }
 
     /**
@@ -503,7 +503,7 @@ class qtype_preg_regex_handler {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
+        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher.
         $this->lexer->set_options($this->options);
 
         $this->parser = new qtype_preg_yyParser($this->options);
@@ -527,7 +527,7 @@ class qtype_preg_regex_handler {
 
         // Parser contains other errors inside AST nodes.
         $parseerrors = $this->parser->get_error_nodes();
-        foreach($parseerrors as $node) {
+        foreach ($parseerrors as $node) {
             // There can be a specific accepting error.
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED) {
                 $inscription = $node->addinfo;

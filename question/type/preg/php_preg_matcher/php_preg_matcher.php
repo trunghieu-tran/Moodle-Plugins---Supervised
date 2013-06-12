@@ -33,8 +33,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
     public function __construct($regex = null, $options = null) {
-        //This matcher sometimes use common lexer/parser to count subexpressions, since preg_match don't always return them all.
-        //We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
+        // This matcher sometimes use common lexer/parser to count subexpressions, since preg_match don't always return them all.
+        // We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
         if (is_object($options)) {
             $options->pcrestrict = true;
         }
@@ -47,7 +47,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             return true;
             break;
         }
-        return false; //Native matching doesn't support any partial matching capabilities
+        return false; // Native matching doesn't support any partial matching capabilities.
     }
 
     public function name() {
@@ -58,7 +58,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
      * Returns supported modifiers as bitwise union of constants MODIFIER_XXX.
      */
     public function get_supported_modifiers() {
-        return parent::get_supported_modifiers(); // TODO: imsxeADSUX
+        return parent::get_supported_modifiers(); // TODO: imsxeADSUX.
     }
 
     /**
@@ -66,7 +66,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
      * @return bool if parsing needed
      */
     protected function is_parsing_needed() {
-        //We need parsing if option is set for capture subexpressions.
+        // We need parsing if option is set for capture subexpressions.
         return $this->options->capturesubexpressions;
     }
 
@@ -75,23 +75,23 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Check regular expression for errors
-     * @return bool is tree accepted
+     * Check regular expression for errors.
+     * @return bool is tree accepted.
      */
     protected function accept_regex() {
 
-        //Clear away errors from parser - we don't really need them...
-        //TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict
-        //$this->errors = array();
+        // Clear away errors from parser - we don't really need them...
+        // TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict.
+        // $this->errors = array();
 
         $for_regexp = $this->regex;
-        if (strpos($for_regexp,'/') !== false) {//escape any slashes
-            $for_regexp = implode('\/',explode('/',$for_regexp));
+        if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
+            $for_regexp = implode('\/', explode('/', $for_regexp));
         }
         $for_regexp = '/'.$for_regexp.'/u';
 
-        if (preg_match($for_regexp,'test') === false) {//preg_match returns false when regular expression contains error
-            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex','qtype_preg'), '' , -2, -2, true);//Preserve error message to show the link
+        if (preg_match($for_regexp, 'test') === false) {// preg_match returns false when regular expression contains error.
+            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex', 'qtype_preg'), '' , -2, -2, true);// Preserve error message to show the link.
             return false;
         }
 
@@ -99,31 +99,31 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Do real matching
-     * @param str a string to match
+     * Do real matching.
+     * @param str a string to match.
      */
     protected function match_inner($str) {
-        //Prepare results
+        // Prepare results.
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());//Needed to invalidate match correctly.
+        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());// Needed to invalidate match correctly.
         $matchresults->invalidate_match();
 
-        //Preparing regexp
+        // Preparing regexp.
         $for_regexp = $this->regex;
-        if (strpos($for_regexp,'/') !== false) {//escape any slashes
-            $for_regexp = implode('\/',explode('/',$for_regexp));
+        if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
+            $for_regexp = implode('\/', explode('/', $for_regexp));
         }
         $for_regexp = '/'.$for_regexp.'/u';
         $for_regexp .= $this->options->modifiers_to_string();
 
-        //Do matching
+        // Do matching.
         $matches = array();
-        //No need to find all matches since preg_match don't return partial matches, any full match is sufficient
+        // No need to find all matches since preg_match don't return partial matches, any full match is sufficient.
         $full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
-        //$matches[0] - match with the whole regexp, $matches[1] - first subexpression etc
-        //$matches[$i] format is array(0=> match, 1 => offset of this match)
+        // $matches[0] - match with the whole regexp, $matches[1] - first subexpression etc.
+        // $matches[$i] format is array(0=> match, 1 => offset of this match).
         if ($full) {
-            $matchresults->full = true;//No partial matching from preg_match
+            $matchresults->full = true;// No partial matching from preg_match.
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
                 if ($match[1] !== -1) {

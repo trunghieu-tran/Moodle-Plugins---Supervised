@@ -30,20 +30,20 @@ require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 /**
- * Abstract notation class
+ * Abstract notation class.
  */
 abstract class qtype_preg_notation {
 
-    //Regular expression in this notation
+    // Regular expression in this notation.
     public $regex;
-    //Regular expression modifiers in this notation
+    // Regular expression modifiers in this notation.
     public $modifiers;
-    //Regular expression handling options
+    // Regular expression handling options.
     public $options;
 
     /**
-    * Constructs notation object, should suit most notations
-    */
+     * Constructs notation object, should suit most notations.
+     */
     public function __construct($regex, $modifiers = '', $options = null) {
         $this->regex = $regex;
         $this->modifiers = $modifiers;
@@ -54,21 +54,21 @@ abstract class qtype_preg_notation {
     }
 
     /**
-    * Return notation name
-    */
+     * Return notation name.
+     */
     abstract public function name();
 
     /**
-    * Returns regular expression in desired notation, should be overloaded
-    */
+     * Returns regular expression in desired notation, should be overloaded.
+     */
     public function convert_regex($targetnotation) {
         throw new qtype_preg_exception('Sorry, no conversion from '.$this->name().' to '.$targetnotation.' implemented yet.');
     }
 
     /**
-    * Returns regular expression options in desired notation, should suit most notations
-    * When overloading this, you probably would want to set some options based on notation
-    */
+     * Returns regular expression options in desired notation, should suit most notations.
+     * When overloading this, you probably would want to set some options based on notation.
+     */
     public function convert_options($targetnotation) {
         return $this->options;
     }
@@ -88,8 +88,8 @@ class qtype_preg_notation_native extends qtype_preg_notation {
 }
 
 /**
- * Moodle shortanswer notation is basically a string to match with '*' wildcard for any number of any characters
- * Easily converts to both native and PCRE strict notations
+ * Moodle shortanswer notation is basically a string to match with '*' wildcard for any number of any characters.
+ * Easily converts to both native and PCRE strict notations.
  */
 class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
 
@@ -100,7 +100,7 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
     public function convert_regex($targetnotation) {
 
         if ($targetnotation == 'native') {
-            //Code from qtype_shortanswer_question::compare_string_with_wildcard with proper respect for Tim Hunt
+            // Code from qtype_shortanswer_question::compare_string_with_wildcard with proper respect for Tim Hunt.
 
             // Break the string on non-escaped asterisks.
             $bits = preg_split('/(?<!\\\\)\*/', $this->regex);
@@ -116,4 +116,3 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
     }
 }
 
- ?>
