@@ -30,40 +30,40 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-//Other necessary requires
 
-//Base class for answer error
+// Base class for answer error.
 abstract class  qtype_correctwriting_response_mistake {
-    //Error position as qtype_correctwriting_node_position object
+    /** @var Error position as qtype_correctwriting_node_position object. */
     public $position;
-    //Language name
+    /** @var Language name. */
     public $languagename;
-    //Mistake message, can be changed from other parts and handled from some other classes
+    /** @var Mistake message, can be changed from other parts and handled from some other classes. */
     public $mistakemsg;
 
     /**
-     * A string pair with data of answer and response
+     * A string pair with data of answer and response.
      * @var block_formal_langs_string_pair
      */
     public $stringpair;
-    //Indexes of answer tokens involved (if applicable)
+    /** @var Indexes of answer tokens involved (if applicable). */
     public $answermistaken;
-    //Indexes of response tokens involved (if applicable)
+    /** @var Indexes of response tokens involved (if applicable). */
     public $responsemistaken;
-    //Weight of mistake used in mark computation
+    /** @var Weight of mistake used in mark computation. */
     public $weight;
 
 
 
     /**
-     * Return a comma-separated list of token desciprions of these tokens, null if there is none
+     * Return a comma-separated list of token desciprions of these tokens, null if there is none.
      * @param bool $andvalue  get strings like "{descr} is {value}"
      * @return string
      */
     public function token_descriptions($andvalue = false) {
         $descripts = array();
         foreach ($this->answermistaken as $answerindex) {
-            if (is_object($this->stringpair->correctstring()) && $this->stringpair->correctstring()->has_description($answerindex)) {//TODO should we check "has_description" or just add quoted value instead?
+            // TODO should we check "has_description" or just add quoted value instead?
+            if (is_object($this->stringpair->correctstring()) && $this->stringpair->correctstring()->has_description($answerindex)) {
                 $description = $this->stringpair->correctstring()->node_description($answerindex);
                 if ($andvalue) {
                     $a = new stdClass;
@@ -78,7 +78,7 @@ abstract class  qtype_correctwriting_response_mistake {
             }
         }
 
-        if (count($descripts) == 0) {//Return null if no descriptions available
+        if (count($descripts) == 0) {// Return null if no descriptions available.
             $descript = null;
         } else {
             $descript = $this->comma_and_list($descripts);
@@ -88,7 +88,7 @@ abstract class  qtype_correctwriting_response_mistake {
     }
 
     /**
-     * Returns a comma-separated list of strings, with 'and' as last separator
+     * Returns a comma-separated list of strings, with 'and' as last separator.
      */
     public function comma_and_list($strings) {
         $last = array_pop($strings);
@@ -102,31 +102,31 @@ abstract class  qtype_correctwriting_response_mistake {
     }
 
     /**
-      * Returns token description if available, token value in quotes otherwise.
-      */
+     * Returns token description if available, token value in quotes otherwise.
+     */
     public function token_description($answerindex, $quotevalue = true, $at = false) {
         return $this->stringpair->node_description($answerindex, $quotevalue, $at);
     }
 
-    /** Returns a message for mistakes. Used for lazy message initiallization.
-        @return string mistake message
+    /** 
+     * Returns a message for mistakes. Used for lazy message initiallization.
+     * @return string mistake message
      */
     public function get_mistake_message() {
         return $this->mistakemsg;
     }
 
     /**
-     * Returns a key, uniquely identifying mistake
+     * Returns a key, uniquely identifying mistake.
      *
      * Used for finding mistake for hinting etc.
      */
     abstract public function mistake_key();
 
     /**
-     * Returns an array of supported hint class names (without qtype_correctwriting prefix)
+     * Returns an array of supported hint class names (without qtype_correctwriting prefix).
      */
     public function supported_hints() {
         return array();
     }
 }
-?>

@@ -87,12 +87,12 @@ class qtype_correctwriting_preserving_serializator {
         $oldvalueskeys = array_keys($oldvalues);
         $this->oldvalues = $oldvalues;
         if (count($oldvalueskeys)) {
-             if (is_object($oldvalues[$oldvalueskeys[0]])) {
+            if (is_object($oldvalues[$oldvalueskeys[0]])) {
                 $this->oldvalues = array();
-                 foreach($oldvalues as $key => $object) {
-                     $this->oldvalues[$key] = $object->id;
-                 }
-             }
+                foreach ($oldvalues as $key => $object) {
+                    $this->oldvalues[$key] = $object->id;
+                }
+            }
         }
         $this->newvalues = $newvalues;
         $this->serializable = $s;
@@ -114,7 +114,7 @@ class qtype_correctwriting_preserving_serializator {
             $this->serializable->start_preserving_save($this->oldvalues, $this->newvalues, $this->storage);
         }
         if (count($this->newvalues)) {
-            foreach($this->newvalues as $key => $value) {
+            foreach ($this->newvalues as $key => $value) {
                 $this->serializable->save_stored_data($key, $value, $this->storage, $this->oldvalues);
             }
             if (count($this->oldvalues)) {
