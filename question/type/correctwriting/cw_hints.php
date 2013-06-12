@@ -40,9 +40,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
 
-    //@var mistake, with which this hint is associated
+    /** @var mistake, with which this hint is associated. */
     protected $mistake;
-    //@var token(s) descriptions for the hint
+    /** @var token(s) descriptions for the hint. */
     protected $tokendescr;
 
     public function hint_type() {
@@ -65,15 +65,15 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
         return get_string('whatis', 'qtype_correctwriting', $this->tokendescr);
     }
 
-    //"What is" hint is obviously response based, since it used to better understand mistake message.
+    // "What is" hint is obviously response based, since it used to better understand mistake message.
     public function hint_response_based() {
         return true;
     }
 
     /**
      * The hint is disabled when penalty is set above 1.
-     * Mistake === null if attempt to create hint was unsuccessfull
-     * Tokendescr === null if there are no token with description on this mistake
+     * Mistake === null if attempt to create hint was unsuccessfull.
+     * Tokendescr === null if there are no token with description on this mistake.
      */
     public function hint_available($response = null) {
         return $this->penalty_for_specific_hint($response) <= 1.0 && $this->mistake !== null && $this->tokendescr !== null;
@@ -87,7 +87,7 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
         return $penalty;
     }
 
-    //Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
+    // Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
     public function button_rendered_by_question() {
         return true;
     }
@@ -95,7 +95,7 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         if ($this->mistake !== null) {
             $hinttext = new qtype_poasquestion_string($this->mistake->token_descriptions(true));
-            //Capitalize first letter
+            // Capitalize first letter.
             $hinttext[0] = textlib::strtoupper($hinttext[0]);
             return $hinttext;
         }
@@ -111,19 +111,19 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
 class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
 
     /**
-     * @var qtype_correctwriting_response_mistake, with which this hint is associated
+     * @var qtype_correctwriting_response_mistake, with which this hint is associated.
      */
     protected $mistake;
-    //@var token(s) descriptions for the hint or value if no description available
+    /** @var token(s) descriptions for the hint or value if no description available. */
     protected $token = '';
-    
+
     public function hint_type() {
         return qtype_specific_hint::CHOOSEN_MULTIPLE_INSTANCE_HINT;
     }
 
     /**
-     * Constructs hint object, remember question to use
-     * @var qtype_correctwriting_response_mistake $mistake
+     * Constructs hint object, remember question to use.
+     * @var qtype_correctwriting_response_mistake $mistake.
      */
     public function __construct($question, $hintkey, $mistake) {
         $this->question = $question;
@@ -138,14 +138,14 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
         return get_string('wheretxthint', 'qtype_correctwriting', $this->token);
     }
 
-    //"Where" hint is obviously response based, since it used to better understand mistake message.
+    // "Where" hint is obviously response based, since it used to better understand mistake message.
     public function hint_response_based() {
         return true;
     }
 
     /**
      * The hint is disabled when penalty is set above 1.
-     * Mistake === null if attempt to create hint was unsuccessfull
+     * Mistake === null if attempt to create hint was unsuccessfull.
      */
     public function hint_available($response = null) {
         return $this->question->wheretxthintpenalty <= 1.0 && $this->mistake !== null;
@@ -155,7 +155,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
         return $this->question->wheretxthintpenalty;
     }
 
-    //Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
+    // Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
     public function button_rendered_by_question() {
         return true;
     }
@@ -166,18 +166,18 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
             $tokenindex = $this->mistake->answermistaken[0];
             $a = new stdClass;
             $a->token = $this->token;
-            if ($tokenindex == 0) {//First token
+            if ($tokenindex == 0) {// First token.
                 $a->before = $this->mistake->token_description(1);
                 $hinttext = get_string('wheretxtbefore', 'qtype_correctwriting', $a);
-            } else if ($tokenindex == count($this->mistake->stringpair->correctstring()->stream->tokens) - 1) {//Last token
+            } else if ($tokenindex == count($this->mistake->stringpair->correctstring()->stream->tokens) - 1) {// Last token.
                 $a->after = $this->mistake->token_description($tokenindex - 1);
                 $hinttext = get_string('wheretxtafter', 'qtype_correctwriting', $a);
-            } else {//Middle token
+            } else {// Middle token.
                 $a->after = $this->mistake->token_description($tokenindex - 1);
                 $a->before = $this->mistake->token_description($tokenindex + 1);
                 $hinttext = get_string('wheretxtbetween', 'qtype_correctwriting', $a);
             }
-            //Capitalize first letter
+            // Capitalize first letter.
             $hinttext = textlib::strtoupper(textlib::substr($hinttext, 0, 1))
                       . textlib::substr($hinttext, 1);
         }
@@ -198,7 +198,7 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
      * @var qtype_correctwriting_sequence_mistake
      */
     protected $mistake;
-    //@var token(s) descriptions for the hint or value if no description available
+    /** @var token(s) descriptions for the hint or value if no description available */
     protected $token = '';
 
     public function hint_type() {
@@ -221,14 +221,14 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         return get_string('wherepichint', 'qtype_correctwriting', $this->token);
     }
 
-    //"Where" hint is obviously response based, since it used to better understand mistake message.
+    // "Where" hint is obviously response based, since it used to better understand mistake message.
     public function hint_response_based() {
         return true;
     }
 
     /**
      * The hint is disabled when penalty is set above 1.
-     * Mistake === null if attempt to create hint was unsuccessfull
+     * Mistake === null if attempt to create hint was unsuccessfull.
      */
     public function hint_available($response = null) {
         return $this->question->wherepichintpenalty <= 1.0 && $this->mistake !== null;
@@ -238,16 +238,14 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         return $this->question->wherepichintpenalty;
     }
 
-    //Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
+    // Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
     public function button_rendered_by_question() {
         return true;
     }
 
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         global $CFG;
-        /**
-         * @var qtype_correctwriting_sequence_mistake $selmistake
-         */
+        /* @var qtype_correctwriting_sequence_mistake $selmistake */
         $selmistake = $this->mistake;
         $absent = 'absent_';
         if (textlib::substr($selmistake->mistake_key(), 0, textlib::strlen($absent)) == $absent) {
@@ -281,25 +279,22 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         return implode('|', $temp);
     }
     /**
-     * Prepares image data for added mistake
+     * Prepares image data for added mistake.
      */
     protected function prepare_image_data_for_absent_mistake() {
         $result = array();
         $result[]  = 'absent';
-        $result[] = base64_encode($this->mistake->token_description($this->mistake->answermistaken[0]));//TODO - check whether we really need to have token value not quoted (adding ", false" to token_description call) there.
+        // TODO - check whether we really need to have token value not quoted (adding ", false" to token_description call) there.
+        $result[] = base64_encode($this->mistake->token_description($this->mistake->answermistaken[0]));
         $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
         $result[] = $pos->position;
         $result[] = $pos->relative;
         $result[] = $this->create_response_text_for_image();
 
-        //echo '<pre>';
-        //print_r($result);
-        //echo '</pre>';
-
         return base64_encode(implode(',,,', $result));
     }
     /**
-     * Prepares image data for moved mistake
+     * Prepares image data for moved mistake.
      */
     protected function prepare_image_data_for_moved_mistake() {
         $result = array();
@@ -310,32 +305,24 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $result[] = $pos->relative;
         $result[] = $this->create_response_text_for_image();
 
-        //echo '<pre>';
-        //print_r($result);
-        //echo '</pre>';
-
         return base64_encode(implode(',,,', $result));
     }
     /**
-     * Finds a nearest position to known $position of answer in response LCS, searching in direction
-     * @param int $position  a position
-     * @param int $direction sequence length
-     * @param int $dist distance from requested position, where match was found
-     * @return null|int position
+     * Finds a nearest position to known $position of answer in response LCS, searching in direction.
+     * @param int $position  a position.
+     * @param int $direction sequence length.
+     * @param int $dist distance from requested position, where match was found.
+     * @return null|int position.
      */
     private function find_response_position($position, $direction, &$dist) {
-        /**
-         * @var qtype_correctwriting_sequence_mistake $selmistake
-         */
+        /* @var qtype_correctwriting_sequence_mistake $selmistake */
         $selmistake = $this->mistake;
         $lcs = $selmistake->lcs();
         $dist = 1;
         $curposition = $position + $direction;
         $found = null;
         $answerstream = $selmistake->stringpair->correctstring()->stream;
-        //echo $direction;
-        while(($curposition > -1) && ($curposition < count($answerstream->tokens)) && ($found === null)) {
-            //echo $curposition . ' ' . $found . '<br />';
+        while (($curposition > -1) && ($curposition < count($answerstream->tokens)) && ($found === null)) {
             if (array_key_exists($curposition, $lcs)) {
                 $found = $lcs[$curposition];
             } else {
@@ -346,15 +333,13 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         return $found;
     }
     /**
-     * Finds insertion position for current mistake in response
-     * @param int $position position of token in answer string
-     * @return stdClass  <int position, string  relative before|after> int position of token in response string, relative
-     * determines where token should be placed, before or after selected
+     * Finds insertion position for current mistake in response.
+     * @param int $position position of token in answer string.
+     * @return stdClass  <int position, string  relative before|after> int position of token in response string, relative.
+     * determines where token should be placed, before or after selected.
      */
     private function find_insertion_position_for($position) {
-        /**
-         * @var qtype_correctwriting_sequence_mistake $selmistake
-         */
+        /* @var qtype_correctwriting_sequence_mistake $selmistake */
         $selmistake = $this->mistake;
         $result = new stdClass();
         $lcs = $selmistake->lcs();
@@ -374,16 +359,16 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
                     $result->position = $posnext;
                     $result->relative = 'before';
                 }
-            }  else {
+            } else {
                 if ($posnext === null) {
                     $result->position = $posprevious;
                     $result->relative = 'after';
                 } else {
-                    // Pick nearest
+                    // Pick nearest.
                     if ($distprevious < $distnext) {
                         $result->position = $posprevious;
                         $result->relative = 'after';
-                    }  else {
+                    } else {
                         $result->position = $posnext;
                         $result->relative = 'before';
                     }
