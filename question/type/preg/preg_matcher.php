@@ -33,14 +33,14 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 class qtype_preg_matching_results {
 
-    //No match captured
+    // No match captured.
     const NO_MATCH_FOUND = -1;
-    //No next character generated
+    // No next character generated.
     const UNKNOWN_NEXT_CHARACTER = '';
-    //How many characters left is unknown
+    // How many characters left is unknown.
     const UNKNOWN_CHARACTERS_LEFT = 999999999;
 
-    ////Match data
+    //      Match data.
     /** @var boolean Is match full or partial? */
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subexpression etc. */
@@ -49,7 +49,7 @@ class qtype_preg_matching_results {
     public $length;
     /** @var integer The number of characters left to complete matching. */
     public $left;
-    /** @var object of qtype_preg_matching_results, containing string extended to give more close match than this ($this->extededmatch->left <= $this->left)
+    /** @var object of qtype_preg_matching_results, containing string extended to give more close match than this ($this->extededmatch->left <= $this->left).
      *
      * There are several ways this string could be generated:
      * add characters to the end of matching part (index_first[0]+length[0]);
@@ -58,34 +58,33 @@ class qtype_preg_matching_results {
      * Should be null if not generated.
      */
     public $extendedmatch;
-    /** @var integer Start index for the added characters in extendedmatch object
+    /** @var integer Start index for the added characters in extendedmatch object.
      *
      * May be less than index_first[0]+length[0] if there is no way to complete matching
      * from current point of fail due to assertions, backreferences or another reasons.
-     * This field is filled by qtype_preg_matching_results::validate() and should not be set by matching engine
+     * This field is filled by qtype_preg_matching_results::validate() and should not be set by matching engine.
      */
     public $extensionstart;
 
-    ////Source data
-    /** @var qtype_poasquestion_string A string being matched */
+    //      Source data.
+    /** @var qtype_poasquestion_string A string being matched. */
     protected $str;
-    /** @var integer Max number of a subexpression available in regular expression */
+    /** @var integer Max number of a subexpression available in regular expression. */
     protected $max_subexpr;
-    /** @var array A map where keys are subexpression names and values are their numbers */
+    /** @var array A map where keys are subexpression names and values are their numbers. */
     protected $subexpr_map;
 
-    public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
-                                $extendedmatch = null) {
+    public function __construct($full = false, $index_first = array(), $length = array(), $left = self::UNKNOWN_CHARACTERS_LEFT, $extendedmatch = null) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
         $this->left = $left;
         $this->extendedmatch = $extendedmatch;
-        $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+        $this->extensionstart = self::NO_MATCH_FOUND;
     }
 
     /**
-     * Sets info about string and regular expression, that is needed for some functions to work
+     * Sets info about string and regular expression, that is needed for some functions to work.
      */
     public function set_source_info($str = null, $max_subexpr = 0, $subexpr_map = array()) {
         $this->str = clone $str;
@@ -98,23 +97,23 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns keys for all subexpressions in regular expression
+     * Returns keys for all subexpressions in regular expression.
      *
-     * Use to enumerate subexpressions
+     * Use to enumerate subexpressions.
      */
     public function all_subexpressions() {
-        //Merge all numeric subexpression keys with named subexpressions from $subexpr_map
+        // Merge all numeric subexpression keys with named subexpressions from $subexpr_map.
         return array_merge(array_keys($this->index_first), array_keys($this->subexpr_map));
     }
 
     /**
-     * Return subexpression index in the index_first and length arrays
+     * Return subexpression index in the index_first and length arrays.
      *
      * If it is subexpression name, use $subexpr_map to find appropriate index,
      * otherwise (numbered subexpression) just return $subexpression.
      */
     public function subexpression_number($subexpression) {
-        if (isset($this->subexpr_map[$subexpression])) {//named subexpression
+        if (isset($this->subexpr_map[$subexpression])) {// Named subexpression.
             return $this->subexpr_map[$subexpression];
         }
         return $subexpression;
@@ -136,33 +135,33 @@ class qtype_preg_matching_results {
 
     /**
      * Any match found?
-     * The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
+     * The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts).
      */
     public function is_match() {
         if (isset($this->length[0])) {
             return $this->full || ($this->length[0] > 0);
-        } else {//no matching resutls at all
+        } else {// No matching resutls at all.
             return false;
         }
     }
 
     /**
-     * Returns true if there could be no better matching result, so we could stop loop looking for best match
+     * Returns true if there could be no better matching result, so we could stop loop looking for best match.
      *
-     * For now the first (leftmost) full match is enought
+     * For now the first (leftmost) full match is enought.
      */
     public function best() {
         return $this->full;
     }
 
     /**
-     * Compares two matching results and returns true if this result is worse than passed by argument
+     * Compares two matching results and returns true if this result is worse than passed by argument.
      *
-     * @param other object of qtype_preg_matching_results
-     * @param orequal make it worse-or-equal function
-     * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match
+     * @param other object of qtype_preg_matching_results.
+     * @param orequal make it worse-or-equal function.
+     * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match.
      * @param areequal reference to a variable to store boolean value - whether the objects are equal.
-     * @return whether @this is worse than $other
+     * @return whether @this is worse than $other.
      */
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
 
@@ -170,46 +169,46 @@ class qtype_preg_matching_results {
             $areequal = false;
         }
 
-        //1. The match is definitely best (full match)
+        // 1. The match is definitely best (full match).
         if (!$this->best() && $other->best()) {
             return true;
-        } elseif ($this->best() && !$other->best()) {
+        } else if ($this->best() && !$other->best()) {
             return false;
         }
 
-        //2. Is match
+        // 2. Is match.
         if (!$this->is_match() && $other->is_match()) {
             return true;
-        } elseif ($this->is_match() && !$other->is_match()) {
+        } else if ($this->is_match() && !$other->is_match()) {
             return false;
         }
 
         if (!$longestmatch) {
-            //3. Less characters left
+            // 3. Less characters left.
             if ($other->left < $this->left) {
                 return true;
-            } elseif ($this->left < $other->left) {
+            } else if ($this->left < $other->left) {
                 return false;
             }
 
-            //4. Longest match
+            // 4. Longest match.
             if ($other->length[0] > $this->length[0]) {
                 return true;
-            } elseif ($this->length[0] > $other->length[0]) {
+            } else if ($this->length[0] > $other->length[0]) {
                 return false;
             }
         } else {
-            //3. Longest match
+            // 3. Longest match.
             if ($other->length[0] > $this->length[0]) {
                 return true;
-            } elseif ($this->length[0] > $other->length[0]) {
+            } else if ($this->length[0] > $other->length[0]) {
                 return false;
             }
 
-            //4. Less characters left
+            // 4. Less characters left.
             if ($other->left < $this->left) {
                 return true;
-            } elseif ($this->left < $other->left) {
+            } else if ($this->left < $other->left) {
                 return false;
             }
 
@@ -218,68 +217,71 @@ class qtype_preg_matching_results {
         if ($areequal !== null) {
             $areequal = true;
         }
-        return $orequal;//results are equal
+        return $orequal;// Results are equal.
     }
 
     /**
-     * Invalidates match by setting all data to no match values
+     * Invalidates match by setting all data to no match values.
      */
     public function invalidate_match() {
         $this->full = false;
-        //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
+        // $this->left = self::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
         for ($i = 0; $i <= $this->max_subexpr; $i++) {
-            $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->index_first[$i] = self::NO_MATCH_FOUND;
+            $this->length[$i] = self::NO_MATCH_FOUND;
         }
-        $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+        $this->extensionstart = self::NO_MATCH_FOUND;
         if ($this->extendedmatch !== null) {
-            $this->extendedmatch->extensionstart = 0;//If there is no match, extension should start from the beginning of the string
+            $this->extendedmatch->extensionstart = 0;// If there is no match, extension should start from the beginning of the string.
         }
     }
 
     /**
-     * Throws exception if match results contain obvious abnormalities
-     * Also compute extensionstart field
+     * Throws exception if match results contain obvious abnormalities.
+     * Also compute extensionstart field.
      */
     public function validate() {
-        if ($this->is_match()) {//Match found
+        if ($this->is_match()) {// Match found.
             if (!isset($this->index_first[0]) || !isset($this->length[0])
-                || $this->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND || $this->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                || $this->index_first[0] === self::NO_MATCH_FOUND || $this->length[0] === self::NO_MATCH_FOUND) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
 
-            //Check that each subexpression lies inside overall match
+            // Check that each subexpression lies inside overall match.
             foreach ($this->index_first as $i => $start) {
-                if ($start === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    //No need to check subexpression that wasn't matched
+                if ($start === self::NO_MATCH_FOUND) {
+                    // No need to check subexpression that wasn't matched.
                     break;
                 }
                 if ($start < $this->index_first[0] || $start > $this->index_first[0] + $this->length[0]) {
-                    throw new qtype_preg_exception('Error: '.$i.' subexpression start '.$start.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                    throw new qtype_preg_exception('Error: '.$i.' subexpression start '.$start.' doesn\'t lie between match start '.
+                        $this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
                 }
                 $end = $start + $this->length[$i];
                 if ($end < $this->index_first[0] || $end > $this->index_first[0] + $this->length[0]) {
-                    throw new qtype_preg_exception('Error: '.$i.' subexpression end '.$end.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                    throw new qtype_preg_exception('Error: '.$i.' subexpression end '.$end.' doesn\'t lie between match start '.
+                        $this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
                 }
             }
         }
-        //Calculate extension start comparing existing and extended strings
-        //We could find it looking for the first different character in two strings
+        // Calculate extension start comparing existing and extended strings.
+        // We could find it looking for the first different character in two strings.
         if (!$this->full && is_object($this->extendedmatch)) {
-            //Find out extenstion start comparing two strings
+            // Find out extenstion start comparing two strings.
             $str1 = $this->str;
             $str2 = $this->extendedmatch->str;
             for ($i = 0; $i <= $this->length[0]; $i++) {
-                //One of the string ended or characters are different
-                if ($this->extendedmatch->index_first[0] + $i >= qtype_poasquestion_string::strlen($str2) || $this->index_first[0] + $i >= $str1->length() || $str1[$this->index_first[0] + $i] != $str2[$this->extendedmatch->index_first[0] + $i]) {
+                // One of the string ended or characters are different.
+                if ($this->extendedmatch->index_first[0] + $i >= qtype_poasquestion_string::strlen($str2) ||
+                        $this->index_first[0] + $i >= $str1->length() || $str1[$this->index_first[0] + $i] != $str2[$this->extendedmatch->index_first[0] + $i]) {
                     $this->extensionstart = $this->index_first[0] + $i;
                     $this->extendedmatch->extensionstart = $this->extendedmatch->index_first[0] + $i;
                     break;
                 }
             }
-        } elseif ($this->full && $this->extensionstart === qtype_preg_matching_results::NO_MATCH_FOUND) {
+        } else if ($this->full && $this->extensionstart === self::NO_MATCH_FOUND) {
             $this->extensionstart = $this->index_first[0] + $this->length[0];
         }
 
@@ -289,29 +291,29 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns non-matched heading before subexpression match
+     * Returns non-matched heading before subexpression match.
      */
     public function match_heading($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
         $wronghead = new qtype_poasquestion_string('');
-        if ($this->is_match()) {//There is match
-            if ($this->index_first[$subexpression] > 0) {//if there is wrong heading
+        if ($this->is_match()) {// There is match.
+            if ($this->index_first[$subexpression] > 0) {// If there is wrong heading.
                 $wronghead = $this->str->substring(0, $this->index_first[$subexpression]);
             }
-        } else {//No match, assuming all string is wrong heading (to display hint after it)
+        } else {// No match, assuming all string is wrong heading (to display hint after it).
             $wronghead = $this->str;
         }
         return $wronghead->string();
     }
 
     /**
-     * Returns matched part of the string for given subexpression
+     * Returns matched part of the string for given subexpression.
      */
     public function matched_part($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
         $correctpart = new qtype_poasquestion_string('');
-        if ($this->is_match()) {//There is match
-            if (isset($this->index_first[$subexpression]) && $this->index_first[$subexpression] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+        if ($this->is_match()) {// There is match.
+            if (isset($this->index_first[$subexpression]) && $this->index_first[$subexpression] !== self::NO_MATCH_FOUND) {
                 $correctpart = $this->str->substring($this->index_first[$subexpression], $this->length[$subexpression]);
             }
         }
@@ -319,37 +321,39 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns non-matched tail after subexpression match
+     * Returns non-matched tail after subexpression match.
      */
     public function match_tail($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
         $wrongtail = new qtype_poasquestion_string('');
-        if ($this->is_match()) {//There is match
-            if ($this->index_first[$subexpression] + $this->length[$subexpression] < qtype_poasquestion_string::strlen($this->str) && $this->length[$subexpression]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail = $this->str->substring($this->index_first[$subexpression] + $this->length[$subexpression], $this->str->length() - $this->index_first[$subexpression] - $this->length[$subexpression]);
+        if ($this->is_match()) {// There is match.
+            if ($this->index_first[$subexpression] + $this->length[$subexpression] < qtype_poasquestion_string::strlen($this->str) &&
+                $this->length[$subexpression]!== self::NO_MATCH_FOUND) {// If there is wrong tail.
+                $wrongtail = $this->str->substring($this->index_first[$subexpression] + $this->length[$subexpression], $this->str->length() -
+                        $this->index_first[$subexpression] - $this->length[$subexpression]);
             }
         }
         return $wrongtail->string();
     }
 
     /**
-     * Returns correct part before hint
+     * Returns correct part before hint.
      */
     public function correct_before_hint() {
         $correctbeforehint = new qtype_poasquestion_string('');
-        if ($this->is_match()) {//There is match
+        if ($this->is_match()) {// There is match.
             $correctbeforehint = $this->str->substring($this->index_first[0], $this->extensionstart - $this->index_first[0]);
         }
         return $correctbeforehint->string();
     }
 
     /**
-     * Returns tail after point where extension is started
+     * Returns tail after point where extension is started.
      */
     public function tail_to_delete() {
         $wrongtail = new qtype_poasquestion_string('');
-        if ($this->is_match()) {//There is match
-            if ($this->extensionstart < $this->str->length() && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+        if ($this->is_match()) {// There is match.
+            if ($this->extensionstart < $this->str->length() && $this->length[0]!== self::NO_MATCH_FOUND) {// If there is wrong tail.
                 $wrongtail = $this->str->substring($this->extensionstart, $this->str->length() - $this->extensionstart);
             }
         }
@@ -357,7 +361,7 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returns part of the string, added by matcher
+     * Returns part of the string, added by matcher.
      */
     public function string_extension() {
         $extension = new qtype_poasquestion_string('');
@@ -386,7 +390,7 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
     public $preferfordot = null;
 
     /** @var boolean Should matcher look for subexpression captures or the whole match only? */
-    //TODO - does we need to specify subexpressions we are looking for or there is no sense in it?
+    // TODO - does we need to specify subexpressions we are looking for or there is no sense in it?
     public $capturesubexpressions = true;
 }
 
@@ -395,7 +399,7 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
  */
 class qtype_preg_regex_anchoring {
 
-    //TODO - comment accurately before every field which asserts under which modifiers will lead to it!
+    // TODO - comment accurately before every field which asserts under which modifiers will lead to it!
     /** @var boolean Regex anchored from start. */
     public $start = false;
     /** @var boolean Regex anchored from start and after each line break.*/
@@ -407,36 +411,36 @@ class qtype_preg_regex_anchoring {
 }
 
 /**
- * Abstract base class for regular expression matcher
+ * Abstract base class for regular expression matcher.
  */
 class qtype_preg_matcher extends qtype_preg_regex_handler {
 
-    // Constants for the capabilities which could (or could not) be supported by matching engine
-    // Partial matching (returning the index of last matched character)
+    // Constants for the capabilities which could (or could not) be supported by matching engine.
+    // Partial matching (returning the index of last matched character).
     const PARTIAL_MATCHING = 0;
-    // Returning next possible character(s) after partial match
+    // Returning next possible character(s) after partial match.
     const CORRECT_ENDING = 1;
-    // Returning the smallest number of characters that needed to complete partial match
+    // Returning the smallest number of characters that needed to complete partial match.
     const CHARACTERS_LEFT = 2;
-    // Subexpression capturing during matching
+    // Subexpression capturing during matching.
     const SUBEXPRESSION_CAPTURING = 3;
-    // Always return full match as the correct ending (if at all possible)
+    // Always return full match as the correct ending (if at all possible).
     const CORRECT_ENDING_ALWAYS_FULL = 4;
 
     /**
-     * Returns true for supported capabilities
-     * @param capability the capability in question
-     * @return bool is capability supported
+     * Returns true for supported capabilities.
+     * @param capability the capability in question.
+     * @return bool is capability supported.
      */
     public function is_supporting($capability) {
-        return false;//abstract class supports nothing
+        return false;// Abstract class supports nothing.
     }
 
-    // Matching results as qtype_preg_matching_results object
+    // Matching results as qtype_preg_matching_results object.
     protected $matchresults;
-    // Cache of the matching results,  string for matching is the key
+    // Cache of the matching results,  string for matching is the key.
     protected $resultcache;
-    // Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored
+    // Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored.
     protected $anchor;
 
     public function name() {
@@ -444,9 +448,9 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-     * Parse regex and do all necessary preprocessing
-     * @param regex - regular expression to handle
-     * @param options - options to handle regex, object of qtype_preg_matching_options class
+     * Parse regex and do all necessary preprocessing.
+     * @param regex - regular expression to handle.
+     * @param options - options to handle regex, object of qtype_preg_matching_options class.
      */
     public function __construct($regex = null, $options = null) {
         // Set matching data empty.
@@ -486,52 +490,52 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-     * Match regular expression with given string, calls match_inner from a child class to do the real matching
-     * @param str a string to match
-     * @return object of qtype_preg_matching_results class
+     * Match regular expression with given string, calls match_inner from a child class to do the real matching.
+     * @param str a string to match.
+     * @return object of qtype_preg_matching_results class.
      */
     public function match($str) {
 
-        //Are there any errors?
+        // Are there any errors?
         if ($this->errors_exist()) {
             throw new qtype_preg_exception('Error: trying to do matching on regex with errors!');
         }
 
-        //Are results cached already?
+        // Are results cached already?
         if (isset($this->resultcache[$str])) {
             $this->matchresults = $this->resultcache[$str];
         } else {
             $str = new qtype_poasquestion_string($str);
-            //Reset match data and perform matching.
+            // Reset match data and perform matching.
             $this->matchresults = $this->match_inner($str);
-            //Save source data for the match
+            // Save source data for the match.
             $this->matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
 
-            //Set all string as incorrect if there were no matching
+            // Set all string as incorrect if there were no matching.
             if (!$this->matchresults->is_match()) {
                 $this->matchresults->invalidate_match();
-                //Fill extension start as start of the match in extended string if it was generated.
+                // Fill extension start as start of the match in extended string if it was generated.
                 if (is_object($this->matchresults->extendedmatch)) {
                     $this->matchresults->extendedmatch->extensionstart = $this->matchresults->extendedmatch->index_first[0];
                 }
             } else {
-                //Do some sanity checks and calculate necessary fields
+                // Do some sanity checks and calculate necessary fields.
                 $this->matchresults->validate();
             }
 
-            //Save results to the cache
+            // Save results to the cache.
             $this->resultcache[$str->string()] = $this->matchresults;
         }
         return $this->matchresults;
     }
 
     /**
-     * Perform a match of string from specified offset
+     * Perform a match of string from specified offset.
      *
-     * Should be implemented by child classes that use custom matching algorithms
-     * @param str a string to match
-     * @param offset position from where to match
-     * @return qtype_preg_matching_results object
+     * Should be implemented by child classes that use custom matching algorithms.
+     * @param str a string to match.
+     * @param offset position from where to match.
+     * @return qtype_preg_matching_results object.
      */
     public function match_from_pos($str, $offset) {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
@@ -556,7 +560,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
      * Do real matching.
      *
-     * This function should be re-implemented in child classes using standard matching functions
+     * This function should be re-implemented in child classes using standard matching functions.
      * that already contains starting positions loop inside. Implement match_from_pos otherwise.
      * @param qtype_poasquestion_string str a string to match.
      * @return qtype_preg_matching_results object.
@@ -573,19 +577,19 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $result->invalidate_match();
 
         if ($this->anchor->start) {
-            //The regex is anchored from start, so we really should check only start of the string and every line break if necessary.
-            //Results for other offsets would be same.
+            // The regex is anchored from start, so we really should check only start of the string and every line break if necessary.
+            // Results for other offsets would be same.
             $rightborders = array(0);
-            if ($this->anchor->startlinebreak) {//Looking for line breaks.
+            if ($this->anchor->startlinebreak) {// Looking for line breaks.
                 $offset = 0;
                 $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
                 while ($pos !== false) {
-                    $rightborders[] = $pos + 1;//Starting matching after line break.
+                    $rightborders[] = $pos + 1;// Starting matching after line break.
                     $offset = $pos + 1;
                     $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
                 }
             }
-            //Starting positions loop.
+            // Starting positions loop.
             foreach ($rightborders as $i) {
                 $tmp = $this->match_from_pos($str, $i);
                 if ($result->worse_than($tmp)) {
@@ -597,7 +601,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             }
         } else {// Match from all indexes.
             $rightborder = $str->length();
-            //Starting positions loop.
+            // Starting positions loop.
             for ($i = 0; $i <= $rightborder && !$result->best(); $i++) {
                 $tmp = $this->match_from_pos($str, $i);
                 if ($result->worse_than($tmp)) {
@@ -612,7 +616,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
      * Do a necessary preprocessing before matching loop.
      *
-     * If a @see{qtype_preg_matching_results} object is returned, it is treated as if match was decided during preprocessing
+     * If a @see{qtype_preg_matching_results} object is returned, it is treated as if match was decided during preprocessing.
      * and no actual matching needed.
      */
     protected function match_preprocess($str) {
@@ -620,19 +624,19 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-     * Fill anchor field to show if regex is anchored using ast_root
-     * If all top-level alternations starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
-     * If all top-level alternations ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+     * Fill anchor field to show if regex is anchored using ast_root.
+     * If all top-level alternations starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible).
+     * If all top-level alternations ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible).
      */
     protected function look_for_anchors() {
         $this->anchor = new qtype_preg_regex_anchoring;
-        $this->anchor->start = $this->look_for_circumflex($this->ast_root);//TODO - make $this->look_for_circumflex change $this->anchor instead of returning result.
-        $this->anchor->startlinebreak = $this->anchor->start;//TODO - temporary for compatibility reasons, remove when change in the string above will be made.
+        $this->anchor->start = $this->look_for_circumflex($this->ast_root);// TODO - make $this->look_for_circumflex change $this->anchor instead of returning result.
+        $this->anchor->startlinebreak = $this->anchor->start;// TODO - temporary for compatibility reasons, remove when change in the string above will be made.
     }
 
     protected function look_for_circumflex($node, $wasconcat = false) {
         if (is_a($node, 'qtype_preg_leaf')) {
-            // Expression starts from ^
+            // Expression starts from ^.
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         }
 

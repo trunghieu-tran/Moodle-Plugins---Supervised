@@ -32,9 +32,9 @@ class qtype_preg_error {
 
     // Human-understandable error message.
     public $errormsg;
-    //
+    // Index of the first character in erroneous sequence.
     public $index_first;
-    //
+    // Index of the last character in erroneous sequence.
     public $index_last;
 
     /**
@@ -56,7 +56,7 @@ class qtype_preg_error {
         }
     }
 
-     public function __construct($errormsg, $regex = '', $index_first = -1, $index_last = -1, $preservemsg = false) {
+    public function __construct($errormsg, $regex = '', $index_first = -1, $index_last = -1, $preservemsg = false) {
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
@@ -68,7 +68,7 @@ class qtype_preg_error {
         } else {
             $this->errormsg = $errormsg;
         }
-     }
+    }
 }
 
 // A syntax error occured while parsing a regex.

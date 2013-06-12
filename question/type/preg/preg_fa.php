@@ -70,8 +70,8 @@ class qtype_preg_fa_transition {
 }
 
 /**
-* Class for finite automaton state.
-*/
+ * Class for finite automaton state.
+ */
 class qtype_preg_fa_state {
 
     /** @var object reference to the qtype_preg_finite_automaton object this state belongs to.
@@ -106,8 +106,8 @@ class qtype_preg_fa_state {
     public function add_transition(&$transition) {
         $transition->from = $this;
         $this->outtransitions[] = $transition;
-        //TODO - check whether it makes a node non-deterministic
-        //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
+        // TODO - check whether it makes a node non-deterministic.
+        // TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class.
 
         if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
             $this->FA->epsilon_transtion_added();
@@ -134,7 +134,7 @@ class qtype_preg_fa_state {
      * @param newref - a reference to the new state.
      */
     public function update_state_references(&$oldref, &$newref) {
-        foreach($this->outtransitions as $transition) {
+        foreach ($this->outtransitions as $transition) {
             if ($transition->to === $oldref) {
                 $transition->to = $newref;
             }
@@ -149,7 +149,7 @@ class qtype_preg_fa_state {
      * Returns an array of transitions possible with current string and position.
      */
     public function possible_transitions($str, $pos) {
-        //TODO - use pregnode->match from transitions
+        // TODO - use pregnode->match from transitions.
     }
 
     /**
@@ -350,7 +350,7 @@ abstract class qtype_preg_finite_automaton {
      * @param state a reference to the state to be removed.
      */
     public function remove_state(&$state) {
-        foreach ($this->states as $key=>$curstate) {
+        foreach ($this->states as $key => $curstate) {
             if ($curstate === $state) {
                 $this->transitioncount -= count($curstate->outgoing_transitions());
                 $this->statecount--;
@@ -364,7 +364,7 @@ abstract class qtype_preg_finite_automaton {
      * Read and create a FA from dot-like language. Mainly used for unit-testing.
      */
     public function read_fa($dotstring) {
-        //TODO - kolesov
+        // TODO - kolesov.
     }
 
     /**
@@ -386,7 +386,7 @@ abstract class qtype_preg_finite_automaton {
      * Creates a dot-file for the given FA. Mainly used for debugging.
      */
     public function write_fa_to_dot($file) {
-        //TODO - kolesov
+        // TODO - kolesov.
     }
 
     /**
@@ -396,17 +396,17 @@ abstract class qtype_preg_finite_automaton {
      * @return boolean true if this FA equal to $another.
      */
     public function compare_fa($another) {
-        //TODO - streltsov
+        // TODO - streltsov.
     }
 
     /**
      * Merges simple assertion transitions into other transtions.
      */
     public function merge_simple_assertions() {
-        if (!$this->hasassertiontransitions) {    //Nothing to merge
+        if (!$this->hasassertiontransitions) {    // Nothing to merge.
             return;
         }
-        //TODO - merge
+        // TODO - merge.
         $this->hasassertiontransitions = false;
     }
 
@@ -414,10 +414,10 @@ abstract class qtype_preg_finite_automaton {
      * Deletes epsilon-transitions from the automaton.
      */
     public function aviod_eps() {
-        if (!$this->haseps) {    //Nothing to delete.
+        if (!$this->haseps) {    // Nothing to delete.
             return;
         }
-        //TODO - delete eps
+        // TODO - delete eps.
         $this->haseps = false;
     }
 
@@ -425,7 +425,7 @@ abstract class qtype_preg_finite_automaton {
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
     public function avoid_wordbreaks() {
-    //TODO - delete \b and \B
+    // TODO - delete \b and \B.
     }
 
     /**
@@ -436,13 +436,13 @@ abstract class qtype_preg_finite_automaton {
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      */
     public function instersect_fa($anotherfa, $stateidnex, $isstart) {
-        //TODO
+        // TODO.
     }
 
     /**
      * Return set substraction: $this - $anotherfa. Used to get negation.
      */
-    abstract public function substract_fa($anotherfa);//TODO - functions that could be implemented only for DFA should be moved to DFA class
+    abstract public function substract_fa($anotherfa);// TODO - functions that could be implemented only for DFA should be moved to DFA class.
 
     /**
      * Return inversion of fa.
@@ -450,15 +450,15 @@ abstract class qtype_preg_finite_automaton {
     abstract public function invert_fa();
 
     abstract public function match($str, $pos);
-    abstract public function next_character();//TODO - define arguments
+    abstract public function next_character();// TODO - define arguments.
 
     /**
      * Finds shortest possible string, completing partial given match.
      */
-    abstract public function complete_match();//TODO - define arguments
+    abstract public function complete_match();// TODO - define arguments.
 
     public function __clone() {
-        //TODO - clone automaton
+        // TODO - clone automaton.
     }
 
     /**
@@ -521,7 +521,7 @@ abstract class qtype_preg_finite_automaton {
         $tmpstr = '';
         $transition = self::read_transition($facode, $end);
         $end++;
-        while($facode[$end - 2] != '-' || $facode[$end - 1] != '>') {
+        while ($facode[$end - 2] != '-' || $facode[$end - 1] != '>') {
             $end++;
         }
         while ($facode[$end] != ';') {
@@ -577,7 +577,7 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     $error = true;
                     echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
-                    //TODO: correct error message
+                    // TODO: correct error message.
                 }
                 $i += 2;
             } while (!$error && $i < strlen($facode) && $facode[$i] != '#');

@@ -34,13 +34,15 @@ class qtype_preg_exception extends moodle_exception {
      * @param object $a
      * @param string $debuginfo
      */
-    function __construct($errorcode, $a = NULL, $debuginfo = null) {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
         parent::__construct($errorcode, '', '', $a, $debuginfo);
     }
 }
 
 /**
- * A special class, throwed by finite automata, should be catched to generate qtype_preg_too_complex_error object by the code building automata.
+ * A special class, throwed by finite automata, should be catched to 
+ * generate qtype_preg_too_complex_error object by the code building automata.
+ *
  * No actual info needed since it would be filled by catching code.
  */
 class qtype_preg_toolargefa_exception extends qtype_preg_exception {
@@ -49,7 +51,7 @@ class qtype_preg_toolargefa_exception extends qtype_preg_exception {
      * @param object $a
      * @param string $debuginfo
      */
-    function __construct($errorcode, $a = NULL, $debuginfo = null) {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
         parent::__construct($errorcode, $a, $debuginfo);
     }
 }
