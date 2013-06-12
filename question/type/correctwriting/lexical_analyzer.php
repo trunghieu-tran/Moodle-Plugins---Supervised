@@ -138,49 +138,59 @@ class qtype_correctwriting_lexical_analyzer {
         }
 
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
-        $answerstream=$answerstring->stream;
-        $responsestream=$responsestring->stream;
-        $best_groups=$answerstream->look_for_token_pairs($responsestream,$question->lexicalerrorthreshold);
-        
+        //$answerstream=$answerstring->stream;
+        //$responsestream=$responsestring->stream;
+        //$best_groups=$answerstream->look_for_token_pairs($responsestream,$question->lexicalerrorthreshold);
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase=$question->usecase;
+        $bestgroups = block_formal_langs_string_pair::best_string_pairs($answerstring, $responsestring, $question->lexicalerrorthreshold, $options);
 
         
         //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
-        $analyzer_array=array();
-        $correct_response_array=array();
-        for($i=0; $i<count($best_groups); $i++){
+        //$analyzer_array=array();
+        //$correct_response_array=array();
+        //for($i=0; $i<count($best_groups); $i++){
             //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-            $newcorrectstream=$responsestream->correct_mistakes($answerstream,$best_groups[$i]->matchedpairs);
-            array_push($correct_response_array, $newcorrectstream);
-            $analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
-            array_push($analyzer_array, $analyzer);
+        //    $newcorrectstream=$responsestream->correct_mistakes($answerstream,$best_groups[$i]->matchedpairs);
+          //  array_push($correct_response_array, $newcorrectstream);
+            //$analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
+            //array_push($analyzer_array, $analyzer);
+        //}
+        
+        $analyzerarray = array();
+        for($i=0; $i<count($bestgroups); $i++) {
+            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $bestgroups[$i]->correctedstring()->stream);
+            $analyzerarray[] = $analyzer;
         }
         
         //7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
-        $max_fit=$analyzer_array[0]->fitness();
-        $number_analyzer=0;
-        for($i=0; $i<count($analyzer_array); $i++){
-            if($analyzer_array[$i]->fitness()>$max_fit){
-                $max_fit=$analyzer_array[$i]->fitness();
-                $number_analyzer=$i;
+        if(count($analyzerarray)>0) {
+            $maxfit=$analyzerarray[0]->fitness();
+            $numberanalyzer=0;
+            for($i=0; $i<count($analyzerarray); $i++){
+                if($analyzerarray[$i]->fitness()>$maxfit){
+                    $maxfit=$analyzerarray[$i]->fitness();
+                    $numberanalyzer=$i;
+                }
             }
-        }
+        
         //8. Set array of mistakes accordingly - Birukova and Mamontov
         //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
         
         //???
         //$this->correctedresponse= $responsestring->stream->tokens;
-        $this->correctedresponse=$correct_response_array[$number_analyzer];
-        $lexical_mistakes = $matches_to_mistakes($best_groups[$number_analyzer]);
-        $this->mistakes = array_merge($mistakes, $lexical_mistakes);
+        
+        $this->correctedresponse=$bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
+        $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]->matches());
+        $this->mistakes = array_merge($mistakes, $lexicalmistakes);
         
         //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->mistakes = array_merge($mistakes, $analyzer_array[$number_analyzer]->mistakes());
+        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());
         
         //$this->fitness = $analyzer->fitness();
-        $this->fitness=$analyzer_array[$number_analyzer]->fitness();
-        
-        $this->fitness=$this->fitness-$max_fit;
-        
+        $this->fitness=$analyzerarray[$numberanalyzer]->fitness();   
+        $this->fitness=$this->fitness-$maxfit;
+        }
         //NOTE: if responsestr is null just check for errors - Mamontov
         //NOTE: if some stage create errors in answer, stop processing right there
         //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
@@ -194,7 +204,7 @@ class qtype_correctwriting_lexical_analyzer {
      */
     public function matches_to_mistakes($group) {
         $arrayofmistakes=array();
-        for($i=0; $i<count($group->matchedpairs); $i++){
+        for($i=0; $i<count($group->matchedpairs()); $i++){
             ////////////////////////////////////////////////////////////////////////
             array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
             ////////////////////////////////////////////////////////////////////////
