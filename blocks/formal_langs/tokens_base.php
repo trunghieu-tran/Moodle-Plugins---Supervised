@@ -510,7 +510,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 $dist = $this->possible_pair($other[$k], $max, $options);
                 if($dist != -1) {
                     $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
-                    array_push($possiblepairs, $pair);
+                    $possiblepairs[]=$pair;
                 }
                 //possible pair (extra separator)
                 if($k+1 != count($other)) {
@@ -519,7 +519,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
-                        array_push($possiblepairs, $pair);
+                        $possiblepairs[]=$pair;
                     }
                     $str='';
                 }
@@ -531,7 +531,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
                         $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist, false, '');
-                        array_push($possiblepairs,$pair);
+                        $possiblepairs[]=$pair;
                     }
                     $str='';
                 }
@@ -741,7 +741,7 @@ class block_formal_langs_token_stream {
      *
      * @param comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
      * @param threshold editing distance threshold (in percents to token length)
-     * @return array of block_formal_langs_matched_tokens_pair objects
+     * @return array of block_formal_langs_matches_group objects
      */
     public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
         //TODO Birukova
@@ -752,7 +752,8 @@ class block_formal_langs_token_stream {
         $allpossiblepairs = array();
         $bestgroups = array();
         $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
-        $bestgroups = $this->group_matches($allpossiblepairs);
+        if(count($allpossiblepairs)>0)
+            $bestgroups = $this->group_matches($allpossiblepairs);
         return $bestgroups;
     }
 
@@ -769,12 +770,18 @@ class block_formal_langs_token_stream {
         //TODO Birukova
         $tokens=$this->tokens;
         $allpossiblepairs=array();
-        for ($i=0; $i<count($this->tokens); $i++) {
-            array_push($allpossiblepairs, $tokens[$i]->look_for_matches($comparedstream, $threshold, true, $options));
+        $pairs=array();
+        for ($i=0; $i<count($tokens); $i++) {
+            $pairs=$tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options);
+            for($j=0; $j<count($pairs);$j++)
+                $allpossiblepairs[]=$pairs[$j];
         }
-        for($i=0; $i<count($comparedstream); $i++) {
-            array_push($allpossiblepairs, $comparedstream[$i]->look_for_matches($this->tokens, $threshold, false, $options));
+        for($i=0; $i<count($comparedstream->tokens); $i++) {
+            $pairs=$comparedstream->tokens[$i]->look_for_matches($this->tokens, $threshold, false, $options);
+            for($j=0; $j<count($pairs);$j++)
+                $allpossiblepairs[]=$pairs[$j];
         }
+        var_dump($allpossiblepairs);
         return $allpossiblepairs;
     }
 
@@ -786,15 +793,16 @@ class block_formal_langs_token_stream {
      * compared using compare_matches_groups function
      *
      * @param array $matches array of matched_tokens_pair objects representing all possible pairs within threshold
-     * @return array of  block_formal_langs_matches_group objects
+     * @return array of block_formal_langs_matches_group objects
      */
     public function group_matches($matches) {
         //TODO Birukova
         $status = array();
+        //var_dump($matches);
         for($i=0; $i < count($matches); $i++) {
             $status[] = 0;
         }
-        $setspairs = array();        
+        $setspairs = array();
         $arraybestgroupsmatches = array();
         //recurcive_backtracking
         $this->recurcive_backtracking($matches, $status, $setspairs);
@@ -850,9 +858,10 @@ class block_formal_langs_token_stream {
                     for ($k=0; $k<count($status); $k++) {
                         if($status[$k] == 1) {
                             array_push($setpairs->matchedpairs, $matches[$k]);
+                            //var_dump($matches[$k]);
                             $setpairs->mistakeweight += $matches[$k]->mistakeweight;
                             for($g=0; $g<count($matches[$k]->correcttokens); $g++)
-                                array_push($setpairs->correctcoverage, $matches[$k]->correcttokens[$g]);
+                               array_push($setpairs->correctcoverage, $matches[$k]->correcttokens[$g]);
                             for($g=0; $g<count($matches[$k]->comparedtokens); $g++)
                                 array_push($setpairs->comparedcoverage, $matches[$k]->comparedtokens[$g]);
                         }
@@ -1472,6 +1481,14 @@ class block_formal_langs_string_pair {
         return $this->correctedstring;
     }
 
+    public function comparedstring() {
+        return $this->comparedstring;
+    }
+    
+    public function matches() {
+        return $this->matches;
+    }
+    
     /**
      *  Returns a correct string.
      *  Used in analyzers, for mistake generation and other
@@ -1484,7 +1501,17 @@ class block_formal_langs_string_pair {
     /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
-    public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared, block_formal_langs_comparing_options $options) {
+    public static function best_string_pairs($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options) {
+        $bestgroups = array();
+        $correctstream = $correctstring->stream;
+        $comparedstream = $comparedstring->stream;
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options);
+        $arraystringpairs = array();
+        for($i = 0; $i < count($bestgroups); $i++) {
+            $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $arraystringpairs[] = $stringpair;
+        }
+        return $arraystringpairs;
     }
 
     public function __construct($correct, $compared, $matches) {
@@ -1507,12 +1534,12 @@ class block_formal_langs_string_pair {
         //it not work((
         //$newstream = clone $this;
         //TODO Birukova - change tokens using pairs
-        $newstream = $this->comparedstring->stream;   //incorrect lexems
-        $correctstream=$this->correctstring->stream;
+        $newstream = $this->comparedstring()->stream;   //incorrect lexems
+        $correctstream=$this->correctstring()->stream;
         $streamcorrected = new block_formal_langs_token_stream();
         $streamcorrected->tokens = array();
         //TODO Birukova - change tokens using pairs
-        for($i = 0; $i < count($newstream->tokens); $i++){
+        /*for($i = 0; $i < count($newstream->tokens); $i++){
             $flag = 0;
             for ($j = 0; $j < count($this->matches); $j) {
                 //not second
@@ -1533,7 +1560,9 @@ class block_formal_langs_string_pair {
                 array_push($streamcorrected->tokens, $newstream->tokens[$i]);
             }
         }
-        $this->correctedstring->stream=$streamcorrected;
+        
+        //$this->correctedstring()->stream=$streamcorrected;
+        $this->correctedstring()->set_corrected_stream($streamcorrected);*/
         //return $streamcorrect;
         return $this->correctedstring;
         
