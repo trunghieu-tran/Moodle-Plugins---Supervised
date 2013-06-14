@@ -781,7 +781,6 @@ class block_formal_langs_token_stream {
             for($j=0; $j<count($pairs);$j++)
                 $allpossiblepairs[]=$pairs[$j];
         }
-        var_dump($allpossiblepairs);
         return $allpossiblepairs;
     }
 
@@ -798,7 +797,6 @@ class block_formal_langs_token_stream {
     public function group_matches($matches) {
         //TODO Birukova
         $status = array();
-        //var_dump($matches);
         for($i=0; $i < count($matches); $i++) {
             $status[] = 0;
         }
@@ -858,7 +856,6 @@ class block_formal_langs_token_stream {
                     for ($k=0; $k<count($status); $k++) {
                         if($status[$k] == 1) {
                             array_push($setpairs->matchedpairs, $matches[$k]);
-                            //var_dump($matches[$k]);
                             $setpairs->mistakeweight += $matches[$k]->mistakeweight;
                             for($g=0; $g<count($matches[$k]->correcttokens); $g++)
                                array_push($setpairs->correctcoverage, $matches[$k]->correcttokens[$g]);
@@ -1146,7 +1143,7 @@ class block_formal_langs_processed_string {
      *  @return bool whether field exists
      */
     public function __isset($name) {
-        $getters = array('string', 'stream', 'syntaxtree', 'descriptions');
+        $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'language');
         return in_array($name, $getters);
     }
     /**
@@ -1157,6 +1154,7 @@ class block_formal_langs_processed_string {
     public function __get($name) {
         $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
         $gettertable['descriptions'] = 'node_descriptions_list';
+        $gettertable['language'] = 'get_lang';
         if (array_key_exists($name, $gettertable)) {
             $method = $gettertable[$name];
             return $this->$method();
@@ -1225,6 +1223,7 @@ class block_formal_langs_processed_string {
     public function set_corrected_stream($stream) {
         //TODO - change string to match $stream
         $this->tokenstream = $stream;
+        $this->syntaxtree=null;
     }
     /**
      * Sets a token stream. Must be used by lexer, to set a stream for scan
@@ -1428,6 +1427,10 @@ class block_formal_langs_processed_string {
     protected function get_string() {
         return $this->string;
     }
+    
+    protected function get_lang() {
+        return $this->language;
+    }
 }
 
 /**
@@ -1534,19 +1537,22 @@ class block_formal_langs_string_pair {
         //it not work((
         //$newstream = clone $this;
         //TODO Birukova - change tokens using pairs
-        $newstream = $this->comparedstring()->stream;   //incorrect lexems
-        $correctstream=$this->correctstring()->stream;
+        $newstream = $this->comparedstring->stream;   //incorrect lexems
+        $correctstream=$this->correctstring->stream;   //correct lexems
         $streamcorrected = new block_formal_langs_token_stream();
-        $streamcorrected->tokens = array();
+        $streamcorrected->tokens = array();     //corrected lexems
         //TODO Birukova - change tokens using pairs
-        /*for($i = 0; $i < count($newstream->tokens); $i++){
+        for($i = 0; $i < count($newstream->tokens); $i++){
             $flag = 0;
-            for ($j = 0; $j < count($this->matches); $j) {
+            //var_dump($this->matches);
+            //echo count($this->matches);
+            for ($j = 0; $j < count($this->matches); $j++) {
                 //not second
                 if(count($this->matches[$j]->comparedtokens) == 2) {
                     if($this->matches[$j]->comparedtokens[1] == $i)
                         $flag = 1;
                 }
+                
                 //write correcttokens
                 if($this->matches[$j]->comparedtokens[0]==$i) {
                     for($k = 0; $k<count($this->matches[$j]->correcttokens); $k++) {
@@ -1554,6 +1560,7 @@ class block_formal_langs_string_pair {
                     }
                     $flag=1;
                 }
+                
             }
             //write comparedtoken
             if($flag == 0) {
@@ -1561,8 +1568,9 @@ class block_formal_langs_string_pair {
             }
         }
         
-        //$this->correctedstring()->stream=$streamcorrected;
-        $this->correctedstring()->set_corrected_stream($streamcorrected);*/
+        $lang = $this->correctstring->language;
+        $this->correctedstring= new block_formal_langs_processed_string ($lang);
+        $this->correctedstring->set_corrected_stream($streamcorrected);
         //return $streamcorrect;
         return $this->correctedstring;
         
