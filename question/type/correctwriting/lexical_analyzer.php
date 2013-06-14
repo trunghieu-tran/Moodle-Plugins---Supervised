@@ -159,7 +159,7 @@ class qtype_correctwriting_lexical_analyzer {
         
         $analyzerarray = array();
         for($i=0; $i<count($bestgroups); $i++) {
-            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $bestgroups[$i]->correctedstring()->stream);
+            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $bestgroups[$i]->correctedstring());
             $analyzerarray[] = $analyzer;
         }
         
@@ -204,11 +204,11 @@ class qtype_correctwriting_lexical_analyzer {
      */
     public function matches_to_mistakes($group) {
         $arrayofmistakes=array();
-        for($i=0; $i<count($group->matchedpairs()); $i++){
+        //for($i=0; $i<count($group->matches()); $i++){
             ////////////////////////////////////////////////////////////////////////
-            array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
+            //array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
             ////////////////////////////////////////////////////////////////////////
-        }
+        //}
         return $arrayofmistakes;
     }
 
