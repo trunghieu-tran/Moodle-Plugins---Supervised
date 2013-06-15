@@ -9,7 +9,7 @@
  */
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_dotbased_authoring_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
 
 class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {

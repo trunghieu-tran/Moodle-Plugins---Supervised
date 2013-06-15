@@ -2,7 +2,7 @@
 /**
  * Defines abstract class which is common for all authoring tools.
  *
- * @copyright &copy; 2012  Vladimir Ivanov
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Vladimir Ivanov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -47,6 +47,14 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
     protected abstract function generate_json_for_unaccepted_regex(&$json_array, $id);
 
     protected abstract function generate_json_for_accepted_regex(&$json_array, $id);
+
+}
+
+abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
+
+    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
+        // TODO
+    }
 
 }
 

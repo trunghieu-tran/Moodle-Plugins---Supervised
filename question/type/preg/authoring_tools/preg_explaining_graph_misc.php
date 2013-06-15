@@ -2,7 +2,7 @@
 /**
  * Defines classes relates with graph.
  *
- * @copyright &copy; 2012  Vladimir Ivanov
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Vladimir Ivanov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -102,6 +102,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
     /**
      * Creates text with dot instructions.
+     * @return dot instructions of this graph.
      */
     public function create_dot() {
         $this->regenerate_id();
@@ -109,7 +110,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_explaining_graph_tool_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
@@ -118,7 +119,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($this->subgraphs as $iter) {
-            qtype_preg_explaining_graph_tool_subgraph::process_subgraph($iter, $instr);
+            $this->process_subgraph($iter, $instr);
         }
 
         foreach ($this->links as $iter) {
@@ -133,11 +134,12 @@ class qtype_preg_explaining_graph_tool_subgraph {
     }
 
     /**
-     * Creates html of character class for dot instructions
-     * @param lbl - label of node in graph
-     * @param invert - is charclass invert
+     * Creates html of character class for dot instructions.
+     * @param lbl - label of node in graph.
+     * @param invert - is charclass invert.
+     * @return html of character class.
      */
-    private static function compute_html($lbl, $invert) {
+    private function compute_html($lbl, $invert) {
         $elements = array();
         $result = '';
         if (count($lbl)) {
@@ -179,18 +181,18 @@ class qtype_preg_explaining_graph_tool_subgraph {
     }
 
     /**
-     * Creates dot instructions for subgraph
-     * @param gr - subgraph
-     * @param instr - array of dot instructions
+     * Creates dot instructions for subgraph.
+     * @param gr - subgraph.
+     * @param instr - array of dot instructions.
      */
-    private static function process_subgraph(&$gr, &$instr) {
+    private function process_subgraph(&$gr, &$instr) {
         $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'label="' . $gr->label . '";';
 
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record')
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_explaining_graph_tool_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
@@ -199,7 +201,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($gr->subgraphs as $iter)
-            qtype_preg_explaining_graph_tool_subgraph::process_subgraph($iter, $instr);
+            $this->process_subgraph($iter, $instr);
 
         foreach ($gr->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd';

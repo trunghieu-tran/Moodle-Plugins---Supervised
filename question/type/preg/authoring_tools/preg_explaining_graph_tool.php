@@ -2,7 +2,7 @@
 /**
  * Defines explain graph's handler class.
  *
- * @copyright &copy; 2012  Vladimir Ivanov
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Vladimir Ivanov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -10,7 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_dotbased_authoring_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_misc.php');
 
@@ -72,6 +72,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         case qtype_preg_node::TYPE_LEAF_ASSERT:
         case qtype_preg_node::TYPE_LEAF_BACKREF:
         case qtype_preg_node::TYPE_LEAF_RECURSION:
+        case qtype_preg_node::TYPE_LEAF_OPTIONS:
             return 'qtype_preg_authoring_tool_leaf';
         }
 
@@ -119,6 +120,11 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     public function __construct ($regex = null, $options = null) {
+        // Options should exist at least as a default object.
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+        }
+        $options->preserveallnodes = TRUE;
         parent::__construct($regex, $options);
         if ($regex === null) {
             return;

@@ -2,7 +2,7 @@
 /**
  * Create interactive tree, explain graph and description.
  *
- * @copyright &copy; 2012  Terechov Grigory
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
