@@ -34,6 +34,10 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
     public function mistake_key() {
         return '';//TODO - implement actually
     }
+    
+    
+    public function __construct(){
+    }
 }
 
 class qtype_correctwriting_scanning_mistake extends qtype_correctwriting_lexical_mistake {
