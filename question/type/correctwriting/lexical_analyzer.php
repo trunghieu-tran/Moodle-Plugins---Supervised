@@ -133,29 +133,23 @@ class qtype_correctwriting_lexical_analyzer {
             }
         }
 
+        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
+        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        $this->fitness = $analyzer->fitness();
+        
+        
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
-        //$answerstream=$answerstring->stream;
-        //$responsestream=$responsestring->stream;
-        //$best_groups=$answerstream->look_for_token_pairs($responsestream,$question->lexicalerrorthreshold);
         $options = new block_formal_langs_comparing_options();
         $options->usecase=$question->usecase;
         $bestgroups = block_formal_langs_string_pair::best_string_pairs($answerstring, $responsestring, $question->lexicalerrorthreshold, $options);
 
         
         //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
-        //$analyzer_array=array();
-        //$correct_response_array=array();
-        //for($i=0; $i<count($best_groups); $i++){
             //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-        //    $newcorrectstream=$responsestream->correct_mistakes($answerstream,$best_groups[$i]->matchedpairs);
-          //  array_push($correct_response_array, $newcorrectstream);
-            //$analyzer=new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $newcorrectstream);
-            //array_push($analyzer_array, $analyzer);
-        //}
         
         $analyzerarray = array();
         for($i=0; $i<count($bestgroups); $i++) {
-            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $bestgroups[$i]->correctedstring());
+            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $bestgroups[$i], $language);
             $analyzerarray[] = $analyzer;
         }
         
@@ -178,10 +172,10 @@ class qtype_correctwriting_lexical_analyzer {
         
         $this->correctedresponse=$bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
         $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]->matches());
-        $this->mistakes = array_merge($mistakes, $lexicalmistakes);
+        /*$this->mistakes = array_merge($mistakes, $lexicalmistakes);
         
         //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());
+        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());*/
         
         //$this->fitness = $analyzer->fitness();
         $this->fitness=$analyzerarray[$numberanalyzer]->fitness();   
