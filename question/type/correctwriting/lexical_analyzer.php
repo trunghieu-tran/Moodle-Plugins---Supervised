@@ -133,9 +133,9 @@ class qtype_correctwriting_lexical_analyzer {
             }
         }
 
-        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
-        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->fitness = $analyzer->fitness();
+        //$analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
+        //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        //$this->fitness = $analyzer->fitness();
         
         
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
@@ -169,6 +169,7 @@ class qtype_correctwriting_lexical_analyzer {
         
         //???
         //$this->correctedresponse= $responsestring->stream->tokens;
+        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());
         
         $this->correctedresponse=$bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
         $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]->matches());
@@ -192,13 +193,15 @@ class qtype_correctwriting_lexical_analyzer {
     /**
      * Returns an array of mistakes objects for given matches_group object
      */
-    public function matches_to_mistakes($group) {
+    public function matches_to_mistakes($matches) {
         $arrayofmistakes=array();
-        //for($i=0; $i<count($group->matches()); $i++){
+        for($i=0; $i<count($matches); $i++){
+            $arrayofmistakes[]=$matches[$i]->messageid;
             ////////////////////////////////////////////////////////////////////////
             //array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
             ////////////////////////////////////////////////////////////////////////
-        //}
+        }
+        var_dump($arrayofmistakes);
         return $arrayofmistakes;
     }
 
