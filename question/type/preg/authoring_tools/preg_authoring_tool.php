@@ -28,6 +28,12 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         return $result;
     }
 
+    /**
+     * Generates a json-array corresponding to $regex and core of tool.
+     * @param json_array - output array with json
+     * @param regex - our regular expression
+     * @param id - identifier of node which will be picked out in image.
+     */
     public function generate_json(&$json_array, $regex, $id) {
         $json_array['regex'] = $regex;
         $json_array['id'] = $id;
