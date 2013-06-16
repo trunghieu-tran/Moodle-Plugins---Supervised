@@ -21,6 +21,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Creates graph which explaining regular expression.
+     * @param id - identifier of node which will be picked out in image.
+     * @return explainning graph of regular expression.
      */
     public function create_graph($id = -1) {
         $graph = $this->dst_root->create_graph($id);
@@ -48,10 +50,16 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         return $graph;
     }
 
+    /**
+     * Overloaded from preg_regex_handler.
+     */
     public function name() {
-        return 'authoring_tool_explain_graph';
+        return 'explaining_graph_tool';
     }
 
+    /**
+     * Overloaded from preg_regex_handler.
+     */
     protected function get_engine_node_name($nodetype) {
         switch($nodetype) {
         case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
@@ -68,17 +76,25 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         case qtype_preg_node::TYPE_NODE_ASSERT:
             return 'qtype_preg_authoring_tool_operator_assert';
         case qtype_preg_node::TYPE_LEAF_CHARSET:
+            return 'qtype_preg_authoring_tool_leaf_charset';
         case qtype_preg_node::TYPE_LEAF_META:
+            return 'qtype_preg_authoring_tool_leaf_meta';
         case qtype_preg_node::TYPE_LEAF_ASSERT:
+            return 'qtype_preg_authoring_tool_leaf_assert';
         case qtype_preg_node::TYPE_LEAF_BACKREF:
+            return 'qtype_preg_authoring_tool_leaf_backref';
         case qtype_preg_node::TYPE_LEAF_RECURSION:
+            return 'qtype_preg_authoring_tool_leaf_recursion';
         case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            return 'qtype_preg_authoring_tool_leaf';
+            return 'qtype_preg_authoring_tool_leaf_options';
         }
 
         return parent::get_engine_node_name($nodetype);
     }
 
+    /**
+     * Overloaded from preg_regex_handler.
+     */
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
         case qtype_preg_node::TYPE_ABSTRACT:
@@ -91,16 +107,25 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
     }
 
+    /**
+     * Overloaded from preg_authoring_tool.
+     */
     protected function json_key() {
         return 'graph_src';
     }
 
+    /**
+     * Overloaded from preg_authoring_tool.
+     */
     protected function generate_json_for_empty_regex(&$json_array, $id) {
         $dotscript = 'digraph { }';
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
     }
 
+    /**
+     * Overloaded from preg_authoring_tool.
+     */
     protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
         $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the explaining graph!" [color=white]; }';
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
@@ -108,9 +133,9 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Generate image for explain graph
+     * Generate image for explain graph.
      *
-     * @param array $json_array contains link on image of explain graph
+     * @param array $json_array contains link on image of explain graph.
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
         $graph = $this->create_graph($id);
@@ -133,6 +158,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Merges two subgraphs, where acceptor is a main subgraph.
+     * @param acceptor - accumulated graph.
+     * @param donor - who gives.
      */
     public static function assume_subgraph(&$acceptor, &$donor) {
         foreach ($donor->nodes as $node) {
@@ -151,10 +178,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Optimizes explaining graph.
+     * @param graph - optimized graph.
+     * @param parent - ancestor of $graph.
      */
     private static function optimize_graph(&$graph, &$parent) {
-
-        //qtype_preg_explaining_graph_tool::process_alters($graph);
 
         qtype_preg_explaining_graph_tool::process_simple($graph);
 
@@ -167,18 +194,21 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Returns node which is right neighbor for $dn.
-     * Searches recursively in subgraph $gr
+     * Returns node which is right neighbor for $nd.
+     * Searches recursively in subgraph $gr.
+     * @param nd - node of graph (subgraph).
+     * @param gr - graph in which searching will occurs.
+     * @return found node or special 'error' node.
      */
-    private static function &find_neighbor_dst(&$dn, &$gr) {
+    private static function &find_neighbor_dst(&$nd, &$gr) {
         foreach ($gr->links as $iter) {
-            if ($iter->source === $dn) {
+            if ($iter->source === $nd) {
                 return $iter->destination;
             }
         }
 
         foreach ($gr->subgraphs as $iter) {
-            $result = qtype_preg_explaining_graph_tool::find_neighbor_dst($dn, $iter);
+            $result = qtype_preg_explaining_graph_tool::find_neighbor_dst($nd, $iter);
             if ($result->id != -2) {
                 return $result;
             }
@@ -190,18 +220,21 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Returns node which is left neighbor for $dn.
-     * Searches recursively in subgraph $gr
+     * Returns node which is left neighbor for $nd.
+     * Searches recursively in subgraph $gr.
+     * @param nd - node of graph (subgraph).
+     * @param gr - graph in which searching will occurs.
+     * @return found node or special 'error' node.
      */
-    private static function &find_neighbor_src(&$dn, &$gr) {
+    private static function &find_neighbor_src(&$nd, &$gr) {
         foreach ($gr->links as $iter) {
-            if ($iter->destination === $dn) {
+            if ($iter->destination === $nd) {
                 return $iter->source;
             }
         }
 
         foreach ($gr->subgraphs as $iter) {
-            $result = qtype_preg_explaining_graph_tool::find_neighbor_src($dn, $iter);
+            $result = qtype_preg_explaining_graph_tool::find_neighbor_src($nd, $iter);
             if ($result->id != -2) {
                 return $result;
             }
@@ -215,8 +248,12 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     private static $linkowner = null; // temporary link which is filled by function find_link and uses by various checkings
 
     /**
-     * Returns link with source = $src and destination = dst.
-     * Searches recursively in subgraph $gr
+     * Returns link with source = $src and destination = $dst.
+     * Searches recursively in subgraph $gr.
+     * @param src - source of link.
+     * @param dst - destination of link.
+     * @param gr - graph in which searching will occurs.
+     * @return found link.
      */
     private static function &find_link(&$src, &$dst, &$gr) {
         qtype_preg_explaining_graph_tool::$linkowner = null;
@@ -239,6 +276,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Second part of optimization - processing sequences of simple characters in graph.
+     * @param graph - processed graph.
      */
     private static function process_simple(&$graph) {
         for ($i = 0; $i < count($graph->nodes); $i++) {
@@ -278,6 +316,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Third part of optimization - processing sequences of asserts in graph and something more.
+     * @param graph - processed graph.
+     * @param parent - ancestor of $graph.
      */
     private static function process_asserts(&$graph, &$parent) {
         foreach ($graph->nodes as $iter) {
@@ -411,7 +451,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Returns true if child is subgraph of parent
+     * Checks relationship between $parent and $child.
+     * @param parent - outer subgraph.
+     * @param child - inner subraph.
+     * @return true if child is subgraph of parent.
      */
     private static function is_child(&$parent, &$child) {
         foreach ($parent->subgraphs as $iter) {
@@ -423,7 +466,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Integrate two labels of nodes or links
+     * Integrates two labels of nodes or links.
+     * @param lbl1 - first label (left side).
+     * @param lbl2 - second label (right side).
+     * @return integrated label.
      */
     private static function compute_label($lbl1, $lbl2) {
         $empty = '';
@@ -439,6 +485,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Fourth part of optimization - processing sequences of voids in graph.
+     * @param graph - processed graph.
      */
     private static function process_voids(&$graph) {
         foreach ($graph->nodes as $iter) {
@@ -462,7 +509,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Returns true if two nodes of graph are equal
+     * Compares two nodes.
+     * @param n1 - first node.
+     * @param n2 - second node.
+     * @return true if two nodes of graph are equal.
      */
     public static function cmp_nodes(&$n1, &$n2) {
         if ($n1->color != $n2->color) {
@@ -486,7 +536,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
-     * Returns true if two subgraphs of graph are equal
+     * Compares two graphs (subgraphs).
+     * @param g1 - first graph.
+     * @param g2 - second graph.
+     * @return true if two subgraphs are equal.
      */
     public static function cmp_graphs(&$g1, &$g2) {
         if ($g1->label != $g2->label) {
