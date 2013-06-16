@@ -22,8 +22,9 @@ class qtype_preg_explaining_graph_tool_node {
     public $invert = FALSE;      // flag of inversion of node
 
     /**
-     * Returns count of links in which node is. Searching executes in owner of node.
+     * Counts a number of links in which node is. Searching executes in owner of node.
      * @param type - boolean parameter; true - node is destination, false - node is source.
+     * @return a number of links.
      */
     public function links_count($type) {
         $cx = 0; // links counter
@@ -40,7 +41,8 @@ class qtype_preg_explaining_graph_tool_node {
     }
 
     /**
-     * Returns array of links in which node is as any instance.
+     * Searches links in which node is as any instance.
+     * @return array of links.
      */
     public function links() {
         $result = array();
@@ -212,6 +214,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $instr .= '}';
     }
 
+    /**
+     * Finds a maximum id of node in the graph.
+     * @return a maximum id.
+     */
     private function find_max_id() {
         $maxid = -1;
         foreach ($this->nodes as $node) {
@@ -226,6 +232,11 @@ class qtype_preg_explaining_graph_tool_subgraph {
         return $maxid;
     }
 
+    /**
+     * Fix all identifiers with value -1. 
+     * @param maxid - maximum id of node in graph.
+     * @return a new maximum id.
+     */
     private function regenerate_id($maxid = -1) {
         $maxid = $maxid == -1 ? $this->find_max_id() : $maxid;
 
