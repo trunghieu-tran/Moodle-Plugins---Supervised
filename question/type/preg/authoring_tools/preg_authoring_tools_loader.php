@@ -32,10 +32,10 @@ function qtype_preg_get_json_array() {
     }*/
 
     $id = optional_param('id', '', PARAM_INT);
-
+    $rankdirlr = optional_param('rankdirlr', false, PARAM_BOOL);
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_explaining_tree_tool($regextext),
+        'tree' => new qtype_preg_explaining_tree_tool($regextext, $rankdirlr),
         'graph' => new qtype_preg_explaining_graph_tool($regextext),
         'description' => new qtype_preg_description_tool($regextext)
     );
