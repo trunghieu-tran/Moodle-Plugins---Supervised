@@ -60,34 +60,20 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     /**
      * Overloaded from preg_regex_handler.
      */
+    protected function node_infix() {
+        // Nodes should be named like qtype_preg_authoring_tool_node_concat.
+        // This allows us to use the inherited get_engine_node_name() method.
+        return 'authoring_tool';
+    }
+
+    /**
+     * Overloaded from preg_regex_handler.
+     */
     protected function get_engine_node_name($nodetype) {
-        switch($nodetype) {
-        case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
-        case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
-            return 'qtype_preg_authoring_tool_operator_quant';
-        case qtype_preg_node::TYPE_NODE_CONCAT:
-            return 'qtype_preg_authoring_tool_operator_concat';
-        case qtype_preg_node::TYPE_NODE_ALT:
-            return 'qtype_preg_authoring_tool_operator_alt';
-        case qtype_preg_node::TYPE_NODE_SUBEXPR:
-            return 'qtype_preg_authoring_tool_operator_subexpr';
-        case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
-            return 'qtype_preg_authoring_tool_operator_condsubexpr';
-        case qtype_preg_node::TYPE_NODE_ASSERT:
-            return 'qtype_preg_authoring_tool_operator_assert';
-        case qtype_preg_node::TYPE_LEAF_CHARSET:
-            return 'qtype_preg_authoring_tool_leaf_charset';
-        case qtype_preg_node::TYPE_LEAF_META:
-            return 'qtype_preg_authoring_tool_leaf_meta';
-        case qtype_preg_node::TYPE_LEAF_ASSERT:
-            return 'qtype_preg_authoring_tool_leaf_assert';
-        case qtype_preg_node::TYPE_LEAF_BACKREF:
-            return 'qtype_preg_authoring_tool_leaf_backref';
-        case qtype_preg_node::TYPE_LEAF_RECURSION:
-            return 'qtype_preg_authoring_tool_leaf_recursion';
-        case qtype_preg_node::TYPE_LEAF_OPTIONS:
-            return 'qtype_preg_authoring_tool_leaf_options';
-        }
+
+        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT ||
+            $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT)
+            return 'qtype_preg_authoring_tool_node_quant';
 
         return parent::get_engine_node_name($nodetype);
     }
@@ -99,7 +85,6 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         switch ($pregnode->type) {
         case qtype_preg_node::TYPE_ABSTRACT:
         case qtype_preg_node::TYPE_LEAF_CONTROL:
-        case qtype_preg_node::TYPE_LEAF_OPTIONS:
         case qtype_preg_node::TYPE_NODE_ERROR:
             return false;
         default:

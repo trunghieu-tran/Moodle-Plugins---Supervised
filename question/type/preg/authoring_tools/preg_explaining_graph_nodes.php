@@ -18,7 +18,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 /**
  * Abstract class for both operators and leafs.
  */
-abstract class qtype_preg_authoring_tool_node {
+abstract class qtype_preg_authoring_tool_node_abstract {
 
     public $pregnode; // a reference to the corresponding preg_node
 
@@ -51,8 +51,7 @@ abstract class qtype_preg_authoring_tool_node {
 /**
  * Class for tree's leaf.
  */
-abstract class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node
-{
+abstract class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node_abstract {
     /**
      * Returns filling settings of node which will be in graph.
      * @return a string with filling settings of node.
@@ -408,7 +407,7 @@ class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_l
 /**
  * Class for tree's operator.
  */
-abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node {
+abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node_abstract {
 
     public $operands = array(); // an array of operands
     private $cond_id = -1;      // a number of conditional branch of conditional subexpression
@@ -451,7 +450,7 @@ abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_t
 /**
  * Class for tree's concatenation operator.
  */
-class qtype_preg_authoring_tool_operator_concat extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_concat extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -480,7 +479,7 @@ class qtype_preg_authoring_tool_operator_concat extends qtype_preg_authoring_too
 /**
  * Class for tree's alternation operator.
  */
-class qtype_preg_authoring_tool_operator_alt extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_alt extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -508,7 +507,7 @@ class qtype_preg_authoring_tool_operator_alt extends qtype_preg_authoring_tool_o
 /**
  * Class for tree's quantifier operator.
  */
-class qtype_preg_authoring_tool_operator_quant extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -539,7 +538,7 @@ class qtype_preg_authoring_tool_operator_quant extends qtype_preg_authoring_tool
 /**
  * Class for tree's subexpression operator.
  */
-class qtype_preg_authoring_tool_operator_subexpr extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -569,7 +568,7 @@ class qtype_preg_authoring_tool_operator_subexpr extends qtype_preg_authoring_to
 /**
  * Class for tree's conditional subexpression operator.
  */
-class qtype_preg_authoring_tool_operator_condsubexpr extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -587,26 +586,27 @@ class qtype_preg_authoring_tool_operator_condsubexpr extends qtype_preg_authorin
         $isAssert = FALSE;
         $tmp = NULL;
 
-        if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
-            $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+        $isSimpleCondition = $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
+            $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE;
 
-            switch ($this->pregnode->subtype) {
-            case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
-                $cond_subexpr->subgraphs[0]->nodes[] =
-                    new qtype_preg_explaining_graph_tool_node(
-                            array(is_integer($this->pregnode->number) ?
-                                    str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) :
-                                    str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
-                            'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
-                            );
-                break;
-            case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
-                $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                break;
-            case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
-                $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-                break;
-            }
+        if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+
+            $cond_subexpr->subgraphs[0]->nodes[] =
+                new qtype_preg_explaining_graph_tool_node(
+                        array(is_integer($this->pregnode->number) ?
+                                str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) :
+                                str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg'))),
+                        'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
+                        );
+
+        } else if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+
+            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+        
+        } else if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+
+            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
+       
         } else {
             $isAssert = TRUE; $index = 1;
             if (count($this->operands) == 3) {$index = 2;}
@@ -657,10 +657,18 @@ class qtype_preg_authoring_tool_operator_condsubexpr extends qtype_preg_authorin
 /**
  * Class for tree's assert operator.
  */
-class qtype_preg_authoring_tool_operator_assert extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_assert extends qtype_preg_authoring_tool_operator {
+
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
     }
+
+    private static $linkOptions = array(
+                                        qtype_preg_node_assert::SUBTYPE_PLA => 'normal, color="green"',
+                                        qtype_preg_node_assert::SUBTYPE_NLA => 'normal, color="red"',
+                                        qtype_preg_node_assert::SUBTYPE_PLB => 'inv, color="green"',
+                                        qtype_preg_node_assert::SUBTYPE_NLB => 'inv, color="red"'
+                                    );
 
     protected function process_operator($graph, $id) {
         $operand = $this->operands[0]->create_graph($id);
@@ -672,22 +680,7 @@ class qtype_preg_authoring_tool_operator_assert extends qtype_preg_authoring_too
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
 
-        switch ($this->pregnode->subtype) {
-        case qtype_preg_node_assert::SUBTYPE_PLA:
-            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="green"');
-            break;
-        case qtype_preg_node_assert::SUBTYPE_NLA:
-            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'normal, color="red"');
-            break;
-        case qtype_preg_node_assert::SUBTYPE_PLB:
-            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="green"');
-            break;
-        case qtype_preg_node_assert::SUBTYPE_NLB:
-            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], 'inv, color="red"');
-            break;
-        default:
-            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0]);
-        }
+        $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], self::$linkOptions[$this->pregnode->subtype]);
 
         $graph->subgraphs[] = $sub;
         $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
