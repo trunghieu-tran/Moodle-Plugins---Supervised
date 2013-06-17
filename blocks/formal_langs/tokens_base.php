@@ -473,11 +473,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         if(!($lenstr1-$max<=$lenstr2 && $lenstr2<=$lenstr1+$max))
             return -1;*/
         $distance=$this->editing_distance($token, $options);    //define the distance of damerau-levenshtein 
-        //$distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2, $options);
-        if($distance<=$max)
+        if($distance<=$max) {
             return $distance;
-        else
+        } else {
             return -1;
+        }
     }
     
     /**
@@ -510,7 +510,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 $dist = $this->possible_pair($other[$k], $max, $options);
                 if($dist != -1) {
                     $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
-                    $possiblepairs[]=$pair;
+                    $possiblepairs[] = $pair;
                 }
                 //possible pair (extra separator)
                 if($k+1 != count($other)) {
@@ -519,24 +519,29 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
-                        $possiblepairs[]=$pair;
+                        $possiblepairs[] = $pair;
                     }
                     $str='';
                 }
             } else {
                 //possible pair (missing separator)
                 if($k+1 != count($other)) {
+                    //$result = textlib::strlen($other[$k]->value)+textlib::strlen($other[$k+1]->value) - (textlib::strlen($other[$k]->value)+textlib::strlen($other[$k+1]->value) )* $threshold;
+                    //var_dump($result);
+                    //$max = round($result);
+                
                     $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
                     $dist = $this->possible_pair($lexem, $max, $options);
                     if($dist != -1) {
-                        $pair=new block_formal_langs_matched_tokens_pair(array($k,$k+1),array($this->tokenindex),$dist, false, '');
-                        $possiblepairs[]=$pair;
+                        $pair = new block_formal_langs_matched_tokens_pair(array($k,$k+1), array($this->tokenindex), $dist, false, '');
+                        $possiblepairs[] = $pair;
                     }
                     $str='';
                 }
              }
         }
+        var_dump($possiblepairs);
         return $possiblepairs;
     }
 
@@ -673,22 +678,23 @@ class block_formal_langs_matched_tokens_pair {
         if ($this->type == self::TYPE_NO_MISTAKE) {//Full match, no mistake.
             return '';
         }
-
         $a = new stdClass();
         $a->mistakeweight = $this->mistakeweight;
-        $a->correct = array();
+        $i = 0;
         foreach ($this->correcttokens as $index) {
-            $a->correct[] = $correctstring->node_description($index);
+            $name = 'correct'.$i;
+            $a->$name = $correctstring->node_description($index);
+            $i++;
         }
         $a->compared = array();
+        $j = 0;
         foreach ($this->comparedtokens as $index) {
-            $a->compared[] = $comparedstring->node_description($index);
+            $name = 'compared'.$j;
+            $a->$name = $comparedstring->node_description($index);
+            $j++;
         }
-
         return get_string($this->messageid, 'block_formal_langs', $a);
-
     }
-    
 }
 
 class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pair {
@@ -1544,8 +1550,6 @@ class block_formal_langs_string_pair {
         //TODO Birukova - change tokens using pairs
         for($i = 0; $i < count($newstream->tokens); $i++){
             $flag = 0;
-            //var_dump($this->matches);
-            //echo count($this->matches);
             for ($j = 0; $j < count($this->matches); $j++) {
                 //not second
                 if(count($this->matches[$j]->comparedtokens) == 2) {
