@@ -35,9 +35,6 @@ $string['correctwriting'] = 'Correct writing';
 $string['defaultlangdescription'] = 'Language selected by default when creating a new question';
 $string['defaultlanglabel'] = 'Default language';
 $string['enterlexemedescriptions']  = 'Please enter token descriptions';
-
-$string['extraseparator'] = 'Extra separator between "{}" and "{}"';
-
 $string['foundlexicalerrors']  = 'There are lexical errors in your answer. Please consider fixing following errors: ';
 $string['foundmistake'] = 'There is mistake in your response:';
 $string['foundmistakes'] = 'There are mistakes in your response:';
@@ -58,8 +55,6 @@ $string['maxmistakepercentage'] = 'Maximum percent of mistakes';
 $string['maxmistakepercentage_help'] = 'Maximum allowed number of mistakes in student\'s response as a percent of the number of the tokens in the answer. If the number of mistakes exceed that, answer will be considered not matched at all.';
 $string['mistakentokens'] = 'mistaken tokens';
 $string['movedmistakemessage'] = '{$a} misplaced';
-$string['missingseparator'] = 'Missing separator in "{$a->value}"';
-
 $string['movedmistakemessagenodescription'] = 'the "{$a->value}" at {$a->line}:{$a->position} is misplaced';
 $string['movedmistakeweight'] = 'Penalty for misplaced token';
 $string['movedmistakeweight_help'] = 'Penalty for each misplaced token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
@@ -72,9 +67,6 @@ $string['pluginnameediting'] = 'Editing a correct writing question';
 $string['pluginnamesummary'] = 'Question type that can automatically find mistakes in the string response and grade it with penalties. It currently supports token sequence errors: finding misplaced, absent and extra tokens.';
 $string['questioneditingheading'] = 'Question editing settings';
 $string['tokens'] = 'Tokens';
-
-$string['typo']='Typo in "{$a->value}"';
-
 $string['whatis'] = 'what is {$a}';
 $string['whatishint'] = 'the {$a->tokendescr} is "{$a->tokenvalue}"';
 $string['whatishintpenalty'] = 'Penalty for "what is" hint';
