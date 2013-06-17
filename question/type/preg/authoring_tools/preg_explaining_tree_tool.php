@@ -14,6 +14,13 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 
 class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
+    public $rankdir = false;
+
+    public function __construct($regex = null, $rankdirlr = false, $options = null) {
+        parent::__construct($regex, $options);
+        $this->rankdir = $rankdirlr;
+    }
+
     public function name() {
         return 'explaining_tree_tool';
     }
@@ -52,7 +59,7 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
         $context = new qtype_preg_dot_node_context(true, $id);
-        $dotscript = $this->get_dst_root()->dot_script($context);
+        $dotscript = $this->get_dst_root()->dot_script($context, $this->rankdir);
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
 

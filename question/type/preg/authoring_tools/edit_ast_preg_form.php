@@ -51,16 +51,19 @@ class qtype_preg_authoring_tool_form extends moodleform {
             $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
             $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
-        //add tree orientation radio buttons
-        $mform->addElement('html',
-                '<div id="tree_orientation_radioset">'
-                .'<input type="radio" name="authoring_tools_tree_orientation" value="vertical" checked>&nbsp;vertical<br>'
-                .'<input type="radio" name="authoring_tools_tree_orientation" value="horizontal">&nbsp;horizontal<br>'
-                .'</div>'
-                );//Add generated map
+        //Add generated map
         // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
+        //Add tree orientation radio buttons
+        $mform->addElement('html',
+                '<div id="tree_orientation_radioset">'
+                .'<input type="radio" name="authoring_tools_tree_orientation" id="vertical" value="vertical" checked>'
+                .'<label for="vertical">&nbsp;vertical</label><br>'
+                .'<input type="radio" name="authoring_tools_tree_orientation" id="horizontal" value="horizontal">'
+                .'<label for="horizontal">&nbsp;horizontal</label><br>'
+                .'</div>'
+                );
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_handler">' .
                                        '<div style="width:10px">' .
