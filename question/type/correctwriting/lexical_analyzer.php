@@ -140,7 +140,7 @@ class qtype_correctwriting_lexical_analyzer {
         
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
         $options = new block_formal_langs_comparing_options();
-        $options->usecase=$question->usecase;
+        $options->usecase = $question->usecase;
         $bestgroups = block_formal_langs_string_pair::best_string_pairs($answerstring, $responsestring, $question->lexicalerrorthreshold, $options);
 
         
@@ -164,23 +164,20 @@ class qtype_correctwriting_lexical_analyzer {
                 }
             }
         
-        //8. Set array of mistakes accordingly - Birukova and Mamontov
-        //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
+            //8. Set array of mistakes accordingly - Birukova and Mamontov
+            //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
         
-        //???
-        //$this->correctedresponse= $responsestring->stream->tokens;
-        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());
+            //$this->correctedresponse= $responsestring->stream->tokens;
+            $this->correctedresponse = $bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
+            $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]);
+            $this->mistakes = array_merge($mistakes, $lexicalmistakes);
+            $this->mistakes = array_merge($this->mistakes, $analyzerarray[$numberanalyzer]->mistakes());
         
-        $this->correctedresponse=$bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
-        $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]->matches());
-        /*$this->mistakes = array_merge($mistakes, $lexicalmistakes);
+            //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
         
-        //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->mistakes = array_merge($mistakes, $analyzerarray[$numberanalyzer]->mistakes());*/
-        
-        //$this->fitness = $analyzer->fitness();
-        $this->fitness=$analyzerarray[$numberanalyzer]->fitness();   
-        $this->fitness=$this->fitness-$maxfit;
+            //$this->fitness = $analyzer->fitness();
+            $this->fitness=$analyzerarray[$numberanalyzer]->fitness();   
+            $this->fitness=$this->fitness-$maxfit;
         }
         //NOTE: if responsestr is null just check for errors - Mamontov
         //NOTE: if some stage create errors in answer, stop processing right there
@@ -193,15 +190,25 @@ class qtype_correctwriting_lexical_analyzer {
     /**
      * Returns an array of mistakes objects for given matches_group object
      */
-    public function matches_to_mistakes($matches) {
+    public function matches_to_mistakes($group) {
         $arrayofmistakes=array();
+        $matches = array();
+        $matches = $group->matches();
         for($i=0; $i<count($matches); $i++){
-            $arrayofmistakes[]=$matches[$i]->messageid;
-            ////////////////////////////////////////////////////////////////////////
-            //array_push($arrayofmistakes,$group->matchedpairs[$i]->message($answerstring, $responsestring));
-            ////////////////////////////////////////////////////////////////////////
+            if($matches[$i]->mistakeweight>0){
+                $mistake = new qtype_correctwriting_lexical_mistake();
+                
+                $mistake->languagename = $this->question->get_used_language()->name();
+                //$mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
+                //$mistake->answermistaken = null;
+                //$mistake->responsemistaken = array( $error->tokenindex );
+                $mistake->weight = $this->question->lexicalerrorweight;
+                //$mistake->stringpair = $group->correctedstring();
+                $mistake->mistakemsg = $matches[$i]->message($group->correctstring(),$group->comparedstring());
+                $arrayofmistakes[]=$mistake;
+            }
         }
-        var_dump($arrayofmistakes);
+        //var_dump($arrayofmistakes);
         return $arrayofmistakes;
     }
 
