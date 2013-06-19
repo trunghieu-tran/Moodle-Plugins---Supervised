@@ -141,6 +141,7 @@ class qtype_correctwriting_lexical_analyzer {
         //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
         $options = new block_formal_langs_comparing_options();
         $options->usecase = $question->usecase;
+        //var_dump($question->lexicalerrorthreshold);
         $bestgroups = block_formal_langs_string_pair::best_string_pairs($answerstring, $responsestring, $question->lexicalerrorthreshold, $options);
 
         
@@ -151,6 +152,12 @@ class qtype_correctwriting_lexical_analyzer {
         for($i=0; $i<count($bestgroups); $i++) {
             $analyzer = new qtype_correctwriting_sequence_analyzer($question, $bestgroups[$i], $language);
             $analyzerarray[] = $analyzer;
+        }
+        
+        if(count($bestgroups)==0) {
+            $analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
+            $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+            $this->fitness = $analyzer->fitness();
         }
         
         //7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
@@ -170,9 +177,10 @@ class qtype_correctwriting_lexical_analyzer {
             //$this->correctedresponse= $responsestring->stream->tokens;
             $this->correctedresponse = $bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
             $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]);
+            
             $this->mistakes = array_merge($mistakes, $lexicalmistakes);
             $this->mistakes = array_merge($this->mistakes, $analyzerarray[$numberanalyzer]->mistakes());
-        
+            //var_dump($this->mistakes);
             //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
         
             //$this->fitness = $analyzer->fitness();

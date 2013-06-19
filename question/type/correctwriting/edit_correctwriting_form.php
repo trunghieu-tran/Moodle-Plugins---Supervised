@@ -46,8 +46,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      * There should be strings with "key" and "key_help" in the language file.
      */
      //TODO - uncomment first two fields when integrating Birukova code
-    private $floatfields = array(/*'lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
-                            'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),*/     //Lexical error weight field
+    private $floatfields = array('lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
+                            'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),       //Lexical error weight field
                             'absentmistakeweight' => array('default' => 0.1, 'advanced' => true),       //Absent token mistake weight field
                             'addedmistakeweight' => array('default' => 0.1, 'advanced' => true),        //Extra token mistake weight field
                             'movedmistakeweight' => array('default' => 0.05, 'advanced' => true),       //Moved token mistake weight field

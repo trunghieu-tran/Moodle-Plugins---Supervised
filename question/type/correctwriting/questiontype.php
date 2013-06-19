@@ -58,9 +58,9 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         // Penalty for moved lexeme mistake
         $result[] = 'movedmistakeweight';
         // A threshold for lexical error as fraction to it's length
-        //$result[] = 'lexicalerrorthreshold';
+        $result[] = 'lexicalerrorthreshold';
         // A penalty for error in symbol
-        //$result[] = 'lexicalerrorweight';
+        $result[] = 'lexicalerrorweight';
         // Minimal grade for  answer to be approximately matched with student response
         $result[] = 'hintgradeborder';
         // Maximum fraction of mistakes to length of teacher answer in lexemes
