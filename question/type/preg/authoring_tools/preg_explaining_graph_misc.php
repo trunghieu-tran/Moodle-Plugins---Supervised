@@ -99,7 +99,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public $subgraphs   = array();      // array of subgraphs in subgraph
     public $entries     = array();      // array if nodes "entries"
     public $exits       = array();      // array of nodes "exits"
-    public $id          = -1;
+    public $id          = -1;           // identifier of subgraph
 
     public function __construct($lbl, $stl, $id = -1) {
         $this->label = $lbl;
@@ -119,10 +119,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
-                $iter->label[0] = qtype_preg_authoring_tool::escape_string($iter->label[0]);
+                $iter->label[0] = qtype_preg_authoring_tool::escape_string(substr($iter->label[0], 1));
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
-                    'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
+                    'label="' . $iter->label[0] . '"' . $iter->fill . '];';
             }
         }
 
@@ -197,10 +197,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record')
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else {
-                $iter->label[0] = qtype_preg_authoring_tool::escape_string($iter->label[0]);
+                $iter->label[0] = qtype_preg_authoring_tool::escape_string(substr($iter->label[0], 1));
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
-                    'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
+                    'label="' . $iter->label[0] . '"' . $iter->fill . '];';
             }
         }
 
