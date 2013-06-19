@@ -556,7 +556,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $label = ($this->pregnode->number != -1 ? get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number : '');
 
-        $subexpr = new qtype_preg_explaining_graph_tool_subgraph($label, 'solid; color=black', $this->pregnode->id);
+        $subexpr = new qtype_preg_explaining_graph_tool_subgraph($label, ($this->pregnode->userinscription->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey', $this->pregnode->id);
         qtype_preg_explaining_graph_tool::assume_subgraph($subexpr, $operand);
 
         $graph->subgraphs[] = $subexpr;
