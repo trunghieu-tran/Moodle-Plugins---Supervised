@@ -508,12 +508,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             if($iscorrect == true) {
                 //possible pair (typo)
                 $dist = $this->possible_pair($other[$k], $max, $options);
+                //var_dump($threshold);
+                //var_dump($dist);
+                //var_dump($max);
                 if($dist != -1) {
                     $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
                     $possiblepairs[] = $pair;
                 }
                 //possible pair (extra separator)
                 if($k+1 != count($other)) {
+                    $max = 1;
                     $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
                     $dist = $this->possible_pair($lexem, $max, $options);
@@ -527,9 +531,8 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 //possible pair (missing separator)
                 if($k+1 != count($other)) {
                     //$result = textlib::strlen($other[$k]->value)+textlib::strlen($other[$k+1]->value) - (textlib::strlen($other[$k]->value)+textlib::strlen($other[$k+1]->value) )* $threshold;
-                    //var_dump($result);
                     //$max = round($result);
-                
+                    $max = 1;
                     $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
                     $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
                     $dist = $this->possible_pair($lexem, $max, $options);
@@ -541,7 +544,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 }
              }
         }
-        var_dump($possiblepairs);
+        //var_dump($possiblepairs);
         return $possiblepairs;
     }
 
@@ -760,6 +763,7 @@ class block_formal_langs_token_stream {
         $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
         if(count($allpossiblepairs)>0)
             $bestgroups = $this->group_matches($allpossiblepairs);
+        //var_dump($bestgroups);
         return $bestgroups;
     }
 
