@@ -8,6 +8,11 @@
  * @package questions
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
+
 /**
  * A node of explaining graph.
  */
@@ -114,9 +119,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
+                $iter->label[0] = qtype_preg_authoring_tool::escape_string($iter->label[0]);
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
-                    'label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
             }
         }
 
@@ -167,17 +173,12 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 if ($elements[$i][0] == chr(10))
                     $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
                 else
-                    $result .= '<TD>' . str_replace('"', '&#34;', $elements[$i]) . '</TD>';
+                    $elements[$i] = qtype_preg_authoring_tool::escape_string($elements[$i]);
+                    $result .= '<TD>' . $elements[$i] . '</TD>';
             }
 
             $result .= '</TR></TABLE>>';
         }
-
-        $result = str_replace(']', '&#93;', $result);
-        $result = str_replace('[', '&#91;', $result);
-        $result = str_replace('\\', '&#92;', $result);
-        $result = str_replace('{', '&#123;', $result);
-        $result = str_replace('}', '&#125;', $result);
 
         return $result;
     }
@@ -196,9 +197,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record')
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else {
+                $iter->label[0] = qtype_preg_authoring_tool::escape_string($iter->label[0]);
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
-                    'label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
             }
         }
 
