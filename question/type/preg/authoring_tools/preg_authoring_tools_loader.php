@@ -25,14 +25,17 @@ function qtype_preg_get_json_array() {
     $json_array = array();
     $regextext = optional_param('regex', '', PARAM_RAW);
 
-    /*if (isset($_POST['regex'])) {       // POST has precedence
-        $regextext = $_POST['regex'];
-    } else if (isset($_GET['regex'])) {
-        $regextext = $_GET['regex'];
-    }*/
-
     $id = optional_param('id', '', PARAM_INT);
-    $rankdirlr = optional_param('rankdirlr', false, PARAM_BOOL);
+    $tree_orientation = optional_param('tree_orientation', '', PARAM_TEXT);
+    
+    $rankdirlr = false;
+    if($tree_orientation == 'vertical'){
+        $rankdirlr = true;
+    }
+    else if($tree_orientation == 'horizontal'){
+        $rankdirlr = false;
+    }
+    
     // Array with authoring tools
     $tools = array(
         'tree' => new qtype_preg_explaining_tree_tool($regextext, $rankdirlr),
