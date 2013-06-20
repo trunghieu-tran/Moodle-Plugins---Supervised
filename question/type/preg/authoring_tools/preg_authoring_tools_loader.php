@@ -30,10 +30,10 @@ function qtype_preg_get_json_array() {
     
     $rankdirlr = false;
     if($tree_orientation == 'vertical'){
-        $rankdirlr = true;
+        $rankdirlr = false;
     }
     else if($tree_orientation == 'horizontal'){
-        $rankdirlr = false;
+        $rankdirlr = true;
     }
     
     // Array with authoring tools
