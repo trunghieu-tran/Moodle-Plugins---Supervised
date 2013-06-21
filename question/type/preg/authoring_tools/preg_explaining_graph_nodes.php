@@ -150,7 +150,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
      * Processes userinscription of charset to make an array of information which one will be in result graph.
      * @return an array with charset value.
      */
-    private function process_charset() {
+    public function process_charset() {
 
         $info = $this->pregnode->userinscription;   // refer a userinscription to new variable for convenience
         $result = array();                          // this will store a result
@@ -179,7 +179,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
             // so, iterate over all characters in $iter.
             for ($i = 0; $i < strlen($iter->data); $i++) {
 
-                // Check this pattern: [[:<something>:]] (it is POSIX class)
+                // Check this pattern: [:<something>:] (it is POSIX class)
                 // first char should be '['
                 if ($i == 0 && $iter->data[$i] == '[') {
                     $i += 2;
@@ -214,6 +214,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                         }
                     } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') { // it may be like this - \x<somthing> or \X<something>, where <something> is hex number
                         $i++;
+                        $tmp = '';
                         if (ctype_xdigit($iter->data[$i])) {
                             $tmp = $iter->data[$i];
                             $i++;
