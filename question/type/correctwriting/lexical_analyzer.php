@@ -204,19 +204,18 @@ class qtype_correctwriting_lexical_analyzer {
         $matches = $group->matches();
         for($i=0; $i<count($matches); $i++){
             if($matches[$i]->mistakeweight>0){
-                $mistake = new qtype_correctwriting_lexical_mistake();
+                $mistake = new qtype_correctwriting_lexical_mistake($matches[$i]);
                 
                 $mistake->languagename = $this->question->get_used_language()->name();
                 //$mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
-                //$mistake->answermistaken = null;
-                //$mistake->responsemistaken = array( $error->tokenindex );
+                $mistake->answermistaken = $matches[$i]->correcttokens;
+                $mistake->responsemistaken = $matches[$i]->comparedtokens;
                 $mistake->weight = $this->question->lexicalerrorweight;
-                //$mistake->stringpair = $group->correctedstring();
+                $mistake->stringpair = $group;
                 $mistake->mistakemsg = $matches[$i]->message($group->correctstring(),$group->comparedstring());
                 $arrayofmistakes[]=$mistake;
             }
         }
-        //var_dump($arrayofmistakes);
         return $arrayofmistakes;
     }
 

@@ -35,12 +35,22 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
      */
     public $tokenpair;
     
+    /*! Mistakekey
+        @var string
+    */
+    public $str;
+    
     public function mistake_key() {
-        return '';//TODO - implement actually
+        return $this->str;//TODO - implement actually
     }
     
+    public function supported_hints() {
+        return array('whatis');
+    }
     
-    public function __construct(){
+    public function __construct($tokenpair){
+        $this->tokenpair = $tokenpair;
+        $this->str='typo_'.$this->tokenpair->correcttokens[0];
     }
 }
 
