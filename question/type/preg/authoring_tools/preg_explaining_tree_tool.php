@@ -2,7 +2,7 @@
 /**
  * Defines class which is builder of graphical syntax tree.
  *
- * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
+ * @copyright &copy; 2012  Vladimir Ivanov
  * @author Terechov Grigory <grvlter@gmail.com>, Valeriy Streltsov <vostreltsov@gmail.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
@@ -13,13 +13,6 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
 
 class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {
-
-    public $rankdir = false;
-
-    public function __construct($regex = null, $rankdirlr = false, $options = null) {
-        parent::__construct($regex, $options);
-        $this->rankdir = $rankdirlr;
-    }
 
     public function name() {
         return 'explaining_tree_tool';
@@ -59,7 +52,7 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
         $context = new qtype_preg_dot_node_context(true, $id);
-        $dotscript = $this->get_dst_root()->dot_script($context, $this->rankdir);
+        $dotscript = $this->get_dst_root()->dot_script($context);
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
 

@@ -16,6 +16,105 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_nodes.php');
 
 class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
+
+    /**
+     * Compares two nodes.
+     * @param n1 - first node.
+     * @param n2 - second node.
+     * @return true if two nodes of graph are equal.
+     */
+    public static function cmp_nodes(&$n1, &$n2) {
+        if ($n1->color != $n2->color) {
+            print(chr(10));
+            print('Colors of nodes failed! ' . $n1->color . ' != ' . $n2->color);
+            print(chr(10));
+            return false;
+        }
+        if ($n1->label != $n2->label) {
+            print(chr(10));
+            print('Labels of nodes failed! '  . $n1->label . ' != ' . $n2->label);
+            return false;
+        }
+        if ($n1->shape != $n2->shape) {
+            print(chr(10));
+            print('Shapes of nodes failed! '  . $n1->shape . ' != ' . $n2->shape);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Compares two graphs (subgraphs).
+     * @param g1 - first graph.
+     * @param g2 - second graph.
+     * @return true if two subgraphs are equal.
+     */
+    public static function cmp_graphs(&$g1, &$g2) {
+        if ($g1->label != $g2->label) {
+            print(chr(10));
+            print('Labels of subgraphs failed!');
+            return false;
+        }
+        if ($g1->style != $g2->style) {
+            print(chr(10));
+            print('Styles of subgraphs failed!');
+            return false;
+        }
+
+        if (count($g1->nodes) == count($g2->nodes)) {
+            for ($i = 0; $i < count($g1->nodes); ++$i) {
+                if (!self::cmp_nodes($g1->nodes[$i], $g2->nodes[$i]))
+                    return false;
+            }
+        } else {
+            return false;
+        }
+
+        if (count($g1->entries) == count($g2->entries)) {
+            for ($i = 0; $i < count($g1->entries); ++$i) {
+                if (!self::cmp_nodes($g1->entries[$i], $g2->entries[$i]))
+                    return false;
+            }
+        }
+        else return false;
+
+        if (count($g1->exits) == count($g2->exits)) {
+            for ($i = 0; $i < count($g1->exits); ++$i) {
+                if (!self::cmp_nodes($g1->exits[$i], $g2->exits[$i]))
+                    return false;
+            }
+        } else {
+            return false;
+        }
+
+        if (count($g1->links) == count($g2->links)) {
+            for ($i = 0; $i < count($g1->links); ++$i) {
+                if ($g1->links[$i]->label != $g2->links[$i]->label)
+                    return false;
+                if (!self::cmp_nodes($g1->links[$i]->destination, $g2->links[$i]->destination))
+                    return false;
+                if (!self::cmp_nodes($g1->links[$i]->source, $g2->links[$i]->source))
+                    return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+        if (count($g1->subgraphs) == count($g2->subgraphs)) {
+            for ($i = 0; $i < count($g1->subgraphs); ++$i) {
+                if (!self::cmp_graphs($g1->subgraphs[$i], $g2->subgraphs[$i]))
+                    return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+        return true;
+    }
+
    function test_create_graph_subexpression() {
        $tree = new qtype_preg_explaining_graph_tool('(b)');
 
@@ -29,7 +128,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with subexpression!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with subexpression!');
 
        //-----------------------------------------------------------------------------
 
@@ -45,7 +144,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with grouping!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with grouping!');
    }
 
    function test_create_graph_alter() {
@@ -67,7 +166,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with alternation!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alternation!');
    }
 
    function test_create_graph_charclass() {
@@ -82,7 +181,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with charclass!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with charclass!');
    }
 
    function test_create_graph_alone_meta() {
@@ -97,7 +196,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with alone meta!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone meta!');
    }
 
    function test_create_graph_alone_simple() {
@@ -112,7 +211,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with alone simple!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone simple!');
    }
 
    function test_create_graph_asserts() {
@@ -125,7 +224,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with asserts!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with asserts!');
    }
 
    function test_create_graph_quantifiers() {
@@ -141,7 +240,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with quantifier +!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier +!');
 
        //-----------------------------------------------------------------------------
 
@@ -157,7 +256,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with quantifier *!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier *!');
 
        //-----------------------------------------------------------------------------
 
@@ -173,7 +272,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with quantifier ?!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier ?!');
 
        //-----------------------------------------------------------------------------
 
@@ -189,7 +288,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
    }
 
    function test_create_graph_assert_and_subgraph() {
@@ -207,7 +306,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
 
        //---------------------------------------------------------------------------
 
@@ -227,7 +326,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
 
        //---------------------------------------------------------------------------
 
@@ -247,7 +346,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
    }
 
    function test_create_graph_backref() {
@@ -265,7 +364,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with backreference!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with backreference!');
 
        //----------------------------------------------------------
 
@@ -283,7 +382,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with faked backreference!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with faked backreference!');
    }
 
    function test_create_graph_multialter() {
@@ -321,7 +420,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
        $result = $tree->create_graph();
 
-       $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with multialter!');
+       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with multialter!');
    }
 
    function test_create_graph_double_qoute() {
@@ -340,7 +439,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         $result = $tree->create_graph();
 
-        $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with double quote!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with double quote!');
    }
 
    function test_create_graph_recursion() {
@@ -358,7 +457,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         $result = $tree->create_graph();
 
-        $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with recursion!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with recursion!');
    }
 
    function test_create_graph_caseinsensetive() {
@@ -374,7 +473,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         $result = $tree->create_graph();
 
-        $this->assertTrue(qtype_preg_explaining_graph_tool::cmp_graphs($result, $etalon), 'Failed with caseinsensetive!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with caseinsensetive!');
    }
 
    function test_process_charset_interval() {
