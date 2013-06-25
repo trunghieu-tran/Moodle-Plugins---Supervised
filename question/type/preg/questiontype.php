@@ -31,10 +31,6 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
 
-    /*public function questionid_column_name() {
-        return 'questionid';
-    }*/
-
     /**
      * Returns an array of available engines.
      * key = engine indentifier, value = interface string with engine name.
@@ -63,11 +59,7 @@ class qtype_preg extends qtype_shortanswer {
 
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
-        array_splice($extraquestionfields, 0, 1, 'qtype_preg');
-        ///TODO - delete with "answers" field
-        $answerskey = array_search('answers', $extraquestionfields);
-        unset($extraquestionfields[$answerskey]);
-        ///
+        array_splice($extraquestionfields, 0, 1, 'qtype_preg_options');
         array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder',
                     'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
