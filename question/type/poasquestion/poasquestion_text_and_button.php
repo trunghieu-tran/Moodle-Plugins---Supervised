@@ -28,13 +28,13 @@
 global $CFG;
 global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->libdir.'/form/text.php');
+require_once($CFG->libdir.'/form/textarea.php');
 
 MoodleQuickForm::registerElementType('text_and_button',
     $CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php',
     'MoodleQuickForm_text_and_button');
 
-class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
+class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
 
     /** @var string html for help button, if empty then no help */
     var $_helpbutton = '';
@@ -68,7 +68,7 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
         if (!array_key_exists('width', $attributes)) {
             $attributes['width'] = '1000px';
         }
-        parent::MoodleQuickForm_text($elementName, $elementLabel, $attributes);
+        parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
         $this->idbutton = $elementButtonName;
         $this->linktopage = $elementLinks['link_to_page'];
         $this->linktobuttonimage = $elementLinks['link_to_button_image'];
