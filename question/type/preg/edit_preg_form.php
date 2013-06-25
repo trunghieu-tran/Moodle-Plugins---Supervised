@@ -143,6 +143,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setDefault('lexemusername', '');
         $mform->addHelpButton('lexemusername', 'lexemusername', 'qtype_preg');
         $mform->setAdvanced('lexemusername');
+        $mform->setType('lexemusername', PARAM_TEXT);
 
         $creategrades = get_grade_options();
         $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $creategrades->gradeoptions);
@@ -156,6 +157,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         $mform->addElement('text', 'correctanswer', get_string('correctanswer', 'qtype_preg'), array('size' => 54));
         $mform->addHelpButton('correctanswer', 'correctanswer', 'qtype_preg');
+        $mform->setType('correctanswer', PARAM_RAW);
 
         // Set hint availability determined by engine capabilities.
         foreach ($engines as $engine => $enginename) {

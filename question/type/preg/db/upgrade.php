@@ -184,5 +184,39 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // Preg savepoint reached.
         upgrade_plugin_savepoint(true, 2012090300, 'qtype', 'preg');
     }
+
+    if ($oldversion < 2013062600) {
+         // Rename field question on table qtype_preg to questionid.
+        $table = new xmldb_table('qtype_preg');
+        $field = new xmldb_field('question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Launch rename field question.
+        $dbman->rename_field($table, $field, 'questionid');
+
+        // Define field answers to be dropped from qtype_preg.
+        $table = new xmldb_table('qtype_preg');
+        $field = new xmldb_field('answers');
+
+        // Conditionally launch drop field answers.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Define key questionid (foreign-unique) to be added to qtype_preg.
+        $table = new xmldb_table('qtype_preg');
+        $key = new xmldb_key('questionid', XMLDB_KEY_FOREIGN_UNIQUE, array('questionid'), 'question', array('id'));
+
+        // Launch add key questionid.
+        $dbman->add_key($table, $key);
+
+        // Define table qtype_preg to be renamed to qtype_preg_options.
+        $table = new xmldb_table('qtype_preg');
+
+        // Launch rename table for qtype_preg.
+        $dbman->rename_table($table, 'qtype_preg_options');
+
+        // Preg savepoint reached.
+        upgrade_plugin_savepoint(true, 2013062600, 'qtype', 'preg');
+    }
     return true;
 }
