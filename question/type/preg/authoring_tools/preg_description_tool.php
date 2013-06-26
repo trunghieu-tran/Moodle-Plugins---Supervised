@@ -3,7 +3,7 @@
  * Defines handler for generating description of reg exp
  * Also defines specific tree, containing methods for generating descriptions of current node
  *
- * @copyright &copy; 2012 Pahomov Dmitry
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Pahomov Dmitry
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions

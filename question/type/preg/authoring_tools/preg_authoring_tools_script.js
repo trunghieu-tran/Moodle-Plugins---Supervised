@@ -1,7 +1,7 @@
 /**
  * Script for button "Check", "Back" and push in interactive tree
  *
- * @copyright &copy; 2012  Terechov Grigory, Pahomov Dmitry
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -36,7 +36,10 @@ M.preg_authoring_tools_script = (function() {
     node_id : '-1',
 
     /** @var {Object} cache of content; first dimension is regex, second is node id */
-    cache : {},
+    cache : {
+        vertical:{},
+        horizontal:{}
+    },
 
     /** @var {string} previously selected tree orientation */
     tree_orientation : null,
@@ -109,18 +112,18 @@ M.preg_authoring_tools_script = (function() {
     },
 
     // Stores images and description for the given regex and node id in the cache
-    cache_data : function(regex, id, t, m, g, d) {
-        if (!self.cache[regex]) {
-            self.cache[regex] = {};
+    cache_data : function(orientation, regex, id, t, m, g, d) {
+        if (!self.cache[orientation][regex]) {
+            self.cache[orientation][regex] = {};
         }
-        if (!self.cache[regex][id]) {
-            self.cache[regex][id] = {};
+        if (!self.cache[orientation][regex][id]) {
+            self.cache[orientation][regex][id] = {};
         }
 
-        self.cache[regex][id][self.TREE_KEY] = t;
-        self.cache[regex][id][self.TREE_MAP_KEY] = m;
-        self.cache[regex][id][self.GRAPH_KEY] = g;
-        self.cache[regex][id][self.DESCRIPTION_KEY] = d;
+        self.cache[orientation][regex][id][self.TREE_KEY] = t;
+        self.cache[orientation][regex][id][self.TREE_MAP_KEY] = m;
+        self.cache[orientation][regex][id][self.GRAPH_KEY] = g;
+        self.cache[orientation][regex][id][self.DESCRIPTION_KEY] = d;
     },
 
     // Displays given images and description
@@ -148,6 +151,7 @@ M.preg_authoring_tools_script = (function() {
 
         var jsonarray = Y.JSON.parse(o.responseText);
 
+        var orientation = self.get_orientation();
         var r = jsonarray[self.REGEX_KEY];
         var i = jsonarray[self.ID_KEY] + '';
         var t = jsonarray[self.TREE_KEY];
@@ -156,8 +160,8 @@ M.preg_authoring_tools_script = (function() {
         var d = jsonarray[self.DESCRIPTION_KEY];
 
         // Cache the data.
-        if (r && i && t && m && g && d) {
-            self.cache_data(r, i, t, m, g, d);
+        if (orientation && r && i && t && m && g && d) {
+            self.cache_data(orientation, r, i, t, m, g, d);
         }
 
         // Display the data.
@@ -178,7 +182,7 @@ M.preg_authoring_tools_script = (function() {
         var regex = self.main_input.get('value');
 
         // Check the cache.
-        var cachedregex = self.cache[regex];
+        var cachedregex = self.cache[self.get_orientation()][regex];
         var cachedid = null;
         if (cachedregex) {
             cachedid = cachedregex[id];
@@ -194,7 +198,7 @@ M.preg_authoring_tools_script = (function() {
                 + '&id='
                 + id
                 + '&tree_orientation='
-                + this.Y.one("#tree_orientation_radioset input:checked").get("value");
+                + this.get_orientation();
         var cfg = {
             method: 'GET',
             xdr: {
@@ -261,6 +265,10 @@ M.preg_authoring_tools_script = (function() {
      */
     regex_change : function(e) {
        self.textbutton_widget.data = self.main_input.get('value');
+    },
+
+    get_orientation : function() {
+        return this.Y.one("#tree_orientation_radioset input:checked").get("value");
     }
 };
 
