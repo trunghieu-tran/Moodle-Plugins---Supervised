@@ -72,15 +72,6 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
             $qtfield = $qtypeobj->questionid_column_name();
             $data->$qtfield = $newquestionid;
 
-            if (in_array('answers', $extraquestionfields)) {
-                // Map sequence of question_answer ids.
-                $answersarr = explode(',', $data->answers);
-                foreach ($answersarr as $key => $answer) {
-                    $answersarr[$key] = $this->get_mappingid('question_answer', $answer);
-                }
-                $data->answers = implode(',', $answersarr);
-            }
-
             // Insert record.
             $newitemid = $DB->insert_record($tablename, $data);
 
