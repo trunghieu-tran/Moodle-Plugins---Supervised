@@ -5,7 +5,7 @@
  * callbacks for button clicks.
  *
  * @package    qtype_preg
- * @copyright  &copy; 2013 Pahomov Dmitry <topt.iiiii@gmail.com>
+ * @copyright  &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author     Pahomov Dmitry <topt.iiiii@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

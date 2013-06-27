@@ -2,7 +2,7 @@
 /**
  * Defines graph's node classes.
  *
- * @copyright &copy; 2012  Vladimir Ivanov
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory <grvlter@gmail.com>, Valeriy Streltsov <vostreltsov@gmail.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
@@ -177,13 +177,13 @@ abstract class qtype_preg_explaining_tree_node {
  */
 class qtype_preg_explaining_tree_leaf extends qtype_preg_explaining_tree_node {
 
-    public function dot_script($context) {
+    public function dot_script($context, $rankdirlr = false) {
         // Calculate the node name, style and the result.
         $nodename = $this->pregnode->id;
         $style = $nodename . self::get_style($context) . ';';
         $dotscript = $nodename . ';';
         if ($context->isroot) {
-            $dotscript = self::get_dot_head() . $style . $dotscript . self::get_dot_tail();
+            $dotscript = self::get_dot_head($rankdirlr) . $style . $dotscript . self::get_dot_tail();
             return $dotscript;
         } else {
             return array($dotscript, $style);
@@ -210,7 +210,7 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
         }
     }
 
-    public function dot_script($context) {
+    public function dot_script($context, $rankdirlr = false) {
         // Calculate the node name and style.
         $nodename = $this->pregnode->id;
         $style = $nodename . self::get_style($context) . ';';
@@ -226,7 +226,7 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
                 $newcontext->selectid = $operand->pregnode->id;
             }
             // Recursive call to subtree.
-            $tmp = $operand->dot_script($newcontext);
+            $tmp = $operand->dot_script($newcontext, $rankdirlr);
             $childscripts[] = $tmp[0];
             $style .= $tmp[1];
         }
@@ -237,7 +237,7 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
             $dotscript .= $nodename . '->' . $childscript;
         }
         if ($context->isroot) {
-            $dotscript = self::get_dot_head() . $style . $dotscript . self::get_dot_tail();
+            $dotscript = self::get_dot_head($rankdirlr) . $style . $dotscript . self::get_dot_tail();
             return $dotscript;
         } else {
             return array($dotscript, $style);
