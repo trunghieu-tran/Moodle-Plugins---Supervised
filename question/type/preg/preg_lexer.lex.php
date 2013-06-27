@@ -653,12 +653,12 @@ class qtype_preg_lexer extends JLexBase  {
         array_pop($this->charset->userinscription);
         $userinscriptionstart = array_pop($this->charset->userinscription);
         $this->charset->userinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
-        if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
+        if (textlib::utf8ord($startchar) <= textlib::utf8ord($endchar)) {
             // Replace last 3 characters by all the characters between them.
             $this->charset_set = qtype_preg_unicode::substr($this->charset_set, 0, $this->charset_count - 3);
             $this->charset_count -= 3;
-            $curord = qtype_poasquestion_string::ord($startchar);
-            $endord = qtype_poasquestion_string::ord($endchar);
+            $curord = textlib::utf8ord($startchar);
+            $endord = textlib::utf8ord($endchar);
             while ($curord <= $endord) {
                 $this->charset_set .= qtype_preg_unicode::code2utf8($curord++);
                 $this->charset_count++;
@@ -716,7 +716,7 @@ class qtype_preg_lexer extends JLexBase  {
      */
     protected function calculate_cx($cx) {
         $x = qtype_preg_unicode::strtoupper(qtype_preg_unicode::substr($cx, 2));
-        $code = qtype_poasquestion_string::ord($x);
+        $code = textlib::utf8ord($x);
         if ($code > 127) {
             return null;
         }
