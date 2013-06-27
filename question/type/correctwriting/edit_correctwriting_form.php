@@ -153,8 +153,12 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 foreach($data['answer'] as $key => $value) {//This loop will pass only on non-empty answers.
                     $processedstring = $lang->create_from_string($value);
                     $tokens = $processedstring->stream->tokens;
-                    $fractionel = $mform->getElementValue('fraction[' . $key .']');
-                    $fraction = floatval($fractionel[0]);
+                    $fraction = 0;
+                    if (array_key_exists('fraction' , $data)) {
+                        if (array_key_exists($key, $data['fraction'])) {
+                            $fraction = floatval($data['fraction'][$key]);
+                        }
+                    }
                     if (count($tokens) > 0 && ($fraction >= $data['hintgradeborder'])) {//Answer needs token descriptions.
                         $textdata = array();
                         foreach($tokens as $token) {
