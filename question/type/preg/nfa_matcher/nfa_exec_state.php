@@ -86,6 +86,19 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $this->matcher->automaton->ast_root()->subpattern;
     }
 
+    public function count_captured_subpatters() {
+        $result = 0;
+        foreach ($this->matches as $subpatt => $repetitions) {
+            foreach ($repetitions as $repetition) {
+                if ($repetition[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    $result++;
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
     // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
     public function current_match($subpatt) {
         if (!isset($this->matches[$subpatt])) {
@@ -256,9 +269,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
     public function leftmost_longest($other) {
-        //echo $this->subexprs_to_string();
-        //echo $other->subexprs_to_string();
-
         // Check for full match.
         if ($this->full && !$other->full) {
             return true;
@@ -271,6 +281,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         } else if ($other->length > $this->length) {
             return false;
         }
+
+        $this_subpatt_count = $this->count_captured_subpatters();
+        $other_subpatt_count = $other->count_captured_subpatters();
 
         // Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
@@ -295,6 +308,11 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
 
             // POSIX mode selection goes on here.
+            if ($this_subpatt_count >= $other_subpatt_count && $this_count < $other_count) {
+                return true;
+            } else if ($other_subpatt_count >= $this_subpatt_count && $other_count < $this_count) {
+                return false;
+            }
 
             // Iterate over all repetitions.
             for ($j = 0; $j < min($this_count, $other_count); $j++) {
@@ -375,6 +393,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
             $res .= "\n";
         }
+        $res .= "\n";
         return $res;
     }
 
