@@ -256,6 +256,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
     public function leftmost_longest($other) {
+        //echo $this->subexprs_to_string();
+        //echo $other->subexprs_to_string();
+
         // Check for full match.
         if ($this->full && !$other->full) {
             return true;
@@ -263,10 +266,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
-        if (!$this->matcher->get_options()->capturesubexpressions) {
-            if ($this->length > $other->length) {
-                return true;
-            }
+        if ($this->length > $other->length) {
+            return true;
+        } else if ($other->length > $this->length) {
             return false;
         }
 
@@ -293,14 +295,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
 
             // POSIX mode selection goes on here.
-            if ($this_count < $other_count) {
-                return true;
-            } else if ($other_count < $this_count) {
-                return false;
-            }
 
             // Iterate over all repetitions.
-            for ($j = 0; $j < $this_count; $j++) {
+            for ($j = 0; $j < min($this_count, $other_count); $j++) {
                 $this_index = $this_match[$j][0];
                 $this_length = $this_match[$j][1];
                 $other_index = $other_match[$j][0];
@@ -318,14 +315,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                     return false;
                 }
 
-                // Leftmost.
-                if ($this_index < $other_index) {
-                    return true;
-                } else if ($other_index < $this_index) {
-                    return false;
-                }
-
-                // Longest.
+                // Longest of all possible matches.
                 if ($this_length > $other_length) {
                     return true;
                 } else if ($other_length > $this_length) {
@@ -372,5 +362,30 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this->subexpr_to_subpatt[$node->number] = $node->subpattern;
             }
         }
+    }
+
+    public function subpatts_to_string() {
+        $res = '';
+        foreach ($this->matches as $subpatt => $repetitions) {
+            $res .= $subpatt . ': ';
+            foreach ($repetitions as $repetition) {
+                $ind = $repetition[0];
+                $len = $repetition[1];
+                $res .= "($ind, $len) ";
+            }
+            $res .= "\n";
+        }
+        return $res;
+    }
+
+    public function subexprs_to_string() {
+        $res = '';
+        foreach ($this->subexpr_to_subpatt as $subexpr => $subpatt) {
+            $ind = $this->last_match($subpatt)[0];
+            $len = $this->last_match($subpatt)[1];
+            $res .= $subexpr . ": ($ind, $len) ";
+        }
+        $res .= "\n";
+        return $res;
     }
 }

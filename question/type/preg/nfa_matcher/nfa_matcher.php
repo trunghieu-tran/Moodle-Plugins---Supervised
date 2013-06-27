@@ -369,9 +369,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
         }
 
+        // Return array of all possible matches.
         $result = array();
         foreach ($fullmatches as $match) {
-            $result[] = $match->to_matching_results();
+            $result[] = $match;
         }
         if (count($fullmatches) == 0) {
             foreach ($partialmatches as $partialmatch) {
@@ -379,9 +380,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $path = $this->determine_characters_left($str, $partialmatch);
                 if ($path !== null) {
                     $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path->to_matching_results();
+                    $partialmatch->extendedmatch = $path;
                 }
-                $result[] = $partialmatch->to_matching_results();
+                $result[] = $partialmatch;
             }
         }
         return $result;
@@ -487,16 +488,16 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result = array();
         $endstatematch = $states[$endstate->number];
         if ($endstatematch !== null) {
-            $result[] = $endstatematch->to_matching_results();
+            $result[] = $endstatematch;
         } else {
             foreach ($partialmatches as $partialmatch) {
                 // TODO: if ($this->options === null || $this->options->extensionneeded).
                 $path = $this->determine_characters_left($str, $partialmatch);
                 if ($path !== null) {
                     $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path->to_matching_results();
+                    $partialmatch->extendedmatch = $path;
                 }
-                $result[] = $partialmatch->to_matching_results();
+                $result[] = $partialmatch;
             }
         }
         return $result;
@@ -515,13 +516,21 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // Choose the best one.
         $result = null;
         foreach ($possiblematches as $match) {
-            if ($result === null || $result->worse_than($match)) {
+            if ($result === null || $match->leftmost_longest($result)) {
                 $result = $match;
             }
         }
+
         if ($result === null) {
             return $this->create_nomatch_result($str);
         }
+
+        $extendedmatch = $result->extendedmatch !== null
+                       ? $result->extendedmatch->to_matching_results()
+                       : null;
+        $result = $result->to_matching_results();
+        $result->extendedmatch = $extendedmatch;
+
         return $result;
     }
 
