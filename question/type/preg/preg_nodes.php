@@ -210,7 +210,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public $mergedassertions = array();
 
     public function __clone() {
-        // When clonning a leaf we also want the merged assertions to be cloned
+        // When clonning a leaf we also want the merged assertions to be cloned.
         foreach ($this->mergedassertions as $i => $mergedassertion) {
             $this->mergedassertions[$i] = clone $mergedassertion;
         }
@@ -437,8 +437,9 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
                 $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
-                    foreach ($ranges as &$tmp)
+                    foreach ($ranges as &$tmp) {
                         $tmp['negative'] = true;
+                    }
                     $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
@@ -458,8 +459,9 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
                 $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
-                    foreach ($otherranges as &$tmp)
+                    foreach ($otherranges as &$tmp) {
                         $tmp['negative'] = true;
+                    }
                     $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
@@ -486,7 +488,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 if (current($ranges)!==false) {
                 $included = true;
                 }*/
-               }
+            }
         }
         return $included;
     }
@@ -513,13 +515,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
                 $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
-                    foreach ($ranges as &$tmp)
+                    foreach ($ranges as &$tmp) {
                         $tmp['negative'] = true;
+                    }
                     $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
-        //getting ranges of other charset
+        // Getting ranges of other charset.
         foreach ($other->flags as $flags) {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
@@ -534,13 +537,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
                 $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
-                    foreach ($otherranges as &$tmp)
+                    foreach ($otherranges as &$tmp) {
                         $tmp['negative'] = true;
+                    }
                     $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
-        //comparing ranges of this and other charsets
+        // Comparing ranges of this and other charsets.
         if (is_array($ranges)) {
               $included = false;
         } else {
@@ -554,15 +558,15 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-               if (current($ranges)==current($otherranges)) {
-                    $included = true;
-                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-                         next($ranges);
-                    }
-                    if (current($ranges)!==false) {
-                    $included = true;
-                    }*/
-               }
+            if (current($ranges)==current($otherranges)) {
+                $included = true;
+                /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                    next($ranges);
+                }
+                if (current($ranges)!==false) {
+                $included = true;
+                }*/
+            }
         }
         return $included;
     }
@@ -864,23 +868,23 @@ class qtype_preg_charset_flag {
     public function tohr() {
         $result = '';
         switch ($this->type) {
-        case self::CIRCUMFLEX:
-            $result = '^';
-            break;
-        case self::DOLLAR:
-            $result = '$';
-            break;
-        case self::SET:
-            $result = $this->data;
-            break;
-        case self::FLAG:
-            $result = $this->data;
-            break;
-        case self::UPROP:
-            $result = 'todo';
-            break;
-        default:
-            return '';
+            case self::CIRCUMFLEX:
+                $result = '^';
+                break;
+            case self::DOLLAR:
+                $result = '$';
+                break;
+            case self::SET:
+                $result = $this->data;
+                break;
+            case self::FLAG:
+                $result = $this->data;
+                break;
+            case self::UPROP:
+                $result = 'todo';
+                break;
+            default:
+                return '';
         }
         if ($this->negative) {
             $result = '!' . $result;
@@ -894,9 +898,9 @@ class qtype_preg_charset_flag {
  */
 class qtype_preg_leaf_meta extends qtype_preg_leaf {
 
-    // Leaf with empty in alternation (something|)
+    // Leaf with empty in alternation (something|).
     const SUBTYPE_EMPTY = 'empty_leaf_meta';
-    // Service subtype - end of regex, but not end of string
+    // Service subtype - end of regex, but not end of string.
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
 
     public function __construct($subtype = null) {
