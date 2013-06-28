@@ -47,13 +47,18 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @return array of form fields.
      */
 
-    protected function get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption) {
-        $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
-
-        $tmp = & $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
-                                       get_string('answer', 'question'), null, array('rows' => '1', 'cols' => '80'));
-        array_splice($repeated, 1, 1, array( '0' => $tmp));
-
+    protected function get_per_answer_fields($mform, $label, $gradeoptions,
+            &$repeatedoptions, &$answersoption) {
+        $repeated = array();
+        $repeated[] = $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
+                $label, null, array('size' => 80/*'rows' => 1, 'cols' => 80*/));
+        $repeated[] = $mform->createElement('select', 'fraction',
+                get_string('grade'), $gradeoptions);
+        $repeated[] = $mform->createElement('editor', 'feedback',
+                get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+        $repeatedoptions['answer']['type'] = PARAM_RAW;
+        $repeatedoptions['fraction']['default'] = 0;
+        $answersoption = 'answers';
         return $repeated;
     }
 
