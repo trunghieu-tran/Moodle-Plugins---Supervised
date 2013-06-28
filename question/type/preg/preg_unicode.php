@@ -7748,7 +7748,7 @@ class qtype_preg_unicode extends textlib {
     public static function get_ranges_from_charset($charset) {
         $ords = array();
         for ($i = 0; $i < $charset->length(); $i++) {
-            $ords[] = qtype_poasquestion_string::ord($charset[$i]);
+            $ords[] = self::utf8ord($charset[$i]);
         }
         sort($ords, SORT_NUMERIC);
         $prevord = $ords[0];
@@ -7807,7 +7807,7 @@ class qtype_preg_unicode extends textlib {
         if ($utf8chr === null || $utf8chr === '') {
             return false;
         }
-        $ord = qtype_poasquestion_string::ord($utf8chr);
+        $ord = self::utf8ord($utf8chr);
         return (self::search_number_binary($ord, $ranges) !== false);
     }
 

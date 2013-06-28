@@ -353,7 +353,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         return count($this->pregnode->flags)===1
             && $flag->type===qtype_preg_charset_flag::SET
             && $flag->data->length()===1
-            && self::is_chr_printable(qtype_poasquestion_string::ord($flag->data[0]));
+            && self::is_chr_printable(textlib::utf8ord($flag->data[0]));
     }
 
     /**
@@ -401,7 +401,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      */
     public static function describe_chr($utf8chr,$escapehtml=true,$form=null){
         $iscode = is_int($utf8chr);
-        $code = $iscode ? $utf8chr : qtype_poasquestion_string::ord($utf8chr);
+        $code = $iscode ? $utf8chr : textlib::utf8ord($utf8chr);
         $result = self::describe_nonprinting($code);
         if($result===null){
             //   &        >       <       "       '
@@ -441,7 +441,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         $curcode = -1;
         for($i=0;$i<$lenth;$i++){
             // if-else magic 8-)
-            $curcode = qtype_poasquestion_string::ord($str[$i]);
+            $curcode = textlib::utf8ord($str[$i]);
             if ($state==self::FIRST_CHAR) {
                 $state = self::OUT_OF_RANGE;
             } else if ($state == self::INTO_RANGE) {

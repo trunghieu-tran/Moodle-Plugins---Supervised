@@ -86,6 +86,19 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $this->matcher->automaton->ast_root()->subpattern;
     }
 
+    public function count_captured_subpatters() {
+        $result = 0;
+        foreach ($this->matches as $subpatt => $repetitions) {
+            foreach ($repetitions as $repetition) {
+                if ($repetition[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    $result++;
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
     // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
     public function current_match($subpatt) {
         if (!isset($this->matches[$subpatt])) {
@@ -263,12 +276,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
-        if (!$this->matcher->get_options()->capturesubexpressions) {
-            if ($this->length > $other->length) {
-                return true;
-            }
+        if ($this->length > $other->length) {
+            return true;
+        } else if ($other->length > $this->length) {
             return false;
         }
+
+        $this_subpatt_count = $this->count_captured_subpatters();
+        $other_subpatt_count = $other->count_captured_subpatters();
 
         // Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
@@ -293,14 +308,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
 
             // POSIX mode selection goes on here.
-            if ($this_count < $other_count) {
+            if ($this_subpatt_count >= $other_subpatt_count && $this_count < $other_count) {
                 return true;
-            } else if ($other_count < $this_count) {
+            } else if ($other_subpatt_count >= $this_subpatt_count && $other_count < $this_count) {
                 return false;
             }
 
             // Iterate over all repetitions.
-            for ($j = 0; $j < $this_count; $j++) {
+            for ($j = 0; $j < min($this_count, $other_count); $j++) {
                 $this_index = $this_match[$j][0];
                 $this_length = $this_match[$j][1];
                 $other_index = $other_match[$j][0];
@@ -318,14 +333,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                     return false;
                 }
 
-                // Leftmost.
-                if ($this_index < $other_index) {
-                    return true;
-                } else if ($other_index < $this_index) {
-                    return false;
-                }
-
-                // Longest.
+                // Longest of all possible matches.
                 if ($this_length > $other_length) {
                     return true;
                 } else if ($other_length > $this_length) {
@@ -372,5 +380,31 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this->subexpr_to_subpatt[$node->number] = $node->subpattern;
             }
         }
+    }
+
+    public function subpatts_to_string() {
+        $res = '';
+        foreach ($this->matches as $subpatt => $repetitions) {
+            $res .= $subpatt . ': ';
+            foreach ($repetitions as $repetition) {
+                $ind = $repetition[0];
+                $len = $repetition[1];
+                $res .= "($ind, $len) ";
+            }
+            $res .= "\n";
+        }
+        $res .= "\n";
+        return $res;
+    }
+
+    public function subexprs_to_string() {
+        $res = '';
+        foreach ($this->subexpr_to_subpatt as $subexpr => $subpatt) {
+            $ind = $this->last_match($subpatt)[0];
+            $len = $this->last_match($subpatt)[1];
+            $res .= $subexpr . ": ($ind, $len) ";
+        }
+        $res .= "\n";
+        return $res;
     }
 }

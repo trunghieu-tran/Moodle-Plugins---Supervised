@@ -127,32 +127,4 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
     public function offsetUnset($offset) {
         // Do nothing.
     }
-
-    /**
-     * Returns the code of a UTF-8 character.
-     * @param utf8chr - a UTF-8 character.
-     * @return int the code corresponding to the given UTF-8 character.
-     */
-    public static function ord($utf8chr) {
-        if ($utf8chr === '') {
-            return 0;
-        }
-        $ord0 = ord($utf8chr{0});
-        if ($ord0 >= 0 && $ord0 <= 127) {
-            return $ord0;
-        }
-        $ord1 = ord($utf8chr{1});
-        if ($ord0 >= 192 && $ord0 <= 223) {
-            return ($ord0 - 192) * 64 + ($ord1 - 128);
-        }
-        $ord2 = ord($utf8chr{2});
-        if ($ord0 >= 224 && $ord0 <= 239) {
-            return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-        }
-        $ord3 = ord($utf8chr{3});
-        if ($ord0 >= 240 && $ord0 <= 247) {
-            return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-        }
-        return false;
-    }
 }
