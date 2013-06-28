@@ -77,7 +77,7 @@ class JLexBase {
     protected function yy_advance() {
         if ($this->yy_buffer_index < $this->yy_buffer_read) {
             $char = $this->yy_buffer[$this->yy_buffer_index++];
-            return qtype_poasquestion_string::ord($char);
+            return textlib::utf8ord($char);
         }
         if ($this->yy_buffer_start != 0) {
             // Shunt.
@@ -89,22 +89,22 @@ class JLexBase {
             $this->yy_buffer_index = $j;
 
             $data = fread($this->yy_reader, 8192);
-            if ($data === false || !qtype_poasquestion_string::strlen($data)) {
+            if ($data === false || !textlib::strlen($data)) {
                 return $this->YY_EOF;
             }
             $this->yy_buffer->concatenate($data);
-            $this->yy_buffer_read .= qtype_poasquestion_string::strlen($data);
+            $this->yy_buffer_read .= textlib::strlen($data);
         }
         while ($this->yy_buffer_index >= $this->yy_buffer_read) {
             $data = fread($this->yy_reader, 8192);
-            if ($data === false || !qtype_poasquestion_string::strlen($data)) {
+            if ($data === false || !textlib::strlen($data)) {
                 return $this->YY_EOF;
             }
             $this->yy_buffer->concatenate($data);
-            $this->yy_buffer_read .= qtype_poasquestion_string::strlen($data);
+            $this->yy_buffer_read .= textlib::strlen($data);
         }
         $char = $this->yy_buffer[$this->yy_buffer_index++];
-        return qtype_poasquestion_string::ord($char);
+        return textlib::utf8ord($char);
     }
 
     protected function yy_move_end() {

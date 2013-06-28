@@ -235,36 +235,36 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
     function test_get_ranges_from_charset() {
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('a'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][0] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === textlib::utf8ord('a'));
 
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('ab'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
+        $this->assertTrue($ranges[0][0] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === textlib::utf8ord('b'));
 
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abc'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('c'));
+        $this->assertTrue($ranges[0][0] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === textlib::utf8ord('c'));
 
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abde'));
         $this->assertTrue(count($ranges) === 2);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
-        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('d'));
-        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('e'));
+        $this->assertTrue($ranges[0][0] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === textlib::utf8ord('b'));
+        $this->assertTrue($ranges[1][0] === textlib::utf8ord('d'));
+        $this->assertTrue($ranges[1][1] === textlib::utf8ord('e'));
 
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('acdfghj'));
         $this->assertTrue(count($ranges) === 4);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('c'));
-        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('d'));
-        $this->assertTrue($ranges[2][0] === qtype_poasquestion_string::ord('f'));
-        $this->assertTrue($ranges[2][1] === qtype_poasquestion_string::ord('h'));
-        $this->assertTrue($ranges[3][0] === qtype_poasquestion_string::ord('j'));
-        $this->assertTrue($ranges[3][1] === qtype_poasquestion_string::ord('j'));
+        $this->assertTrue($ranges[0][0] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === textlib::utf8ord('a'));
+        $this->assertTrue($ranges[1][0] === textlib::utf8ord('c'));
+        $this->assertTrue($ranges[1][1] === textlib::utf8ord('d'));
+        $this->assertTrue($ranges[2][0] === textlib::utf8ord('f'));
+        $this->assertTrue($ranges[2][1] === textlib::utf8ord('h'));
+        $this->assertTrue($ranges[3][0] === textlib::utf8ord('j'));
+        $this->assertTrue($ranges[3][1] === textlib::utf8ord('j'));
     }
 
     function test_ranges_binary_search() {
@@ -311,7 +311,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
     function test_ranges_negation() {
         // Empty array.
         $ranges = array();
-        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, $this->maxcode)));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === qtype_preg_unicode::dot_ranges());
         // One big range from 0 to maxcode.
         $ranges = array(array(0, $this->maxcode));
         $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array());

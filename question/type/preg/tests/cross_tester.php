@@ -220,19 +220,19 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     }
 
     function dump_boolean($label, $value) {
-        echo $label . ($value ? 'TRUE' : 'FALSE') . "\n";
+        return $label . ($value ? 'TRUE' : 'FALSE') . "\n";
     }
 
     function dump_scalar($label, $value) {
-        echo $label . $value . "\n";
+        return $label . $value . "\n";
     }
 
     function dump_scalar_array($label, $values) {
-        echo $label;
+        $result = $label;
         foreach ($values as $key => $value) {
-            echo $key . '=>' . $value . ', ';
+            $result .= $key . '=>' . $value . ', ';
         }
-        echo "\n";
+        return $result . "\n";
     }
 
     function check_next_character($regex, $char) {
@@ -349,65 +349,57 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             return $passed;
         }
 
-        $enginename = $matcher->name();
-        $failedstr = $mods == ''
-                     ? "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname)\n"
-                     : "$enginename failed on regex '$regex' string '$str' and modifiers '$modstr' ($classname, $methodname)\n";
-        $expectedstr = "expected:\n";
+        $obtainedstr = '';
+        $expectedstr = '';
 
         // is_match
         if (!$ismatchpassed) {
-            echo $failedstr;
-            $this->dump_boolean('IS_MATCH:    ', $obtained->is_match());
-            echo $expectedstr;
-            $this->dump_boolean('IS_MATCH:    ', $expected['is_match']);
-            echo "\n";
+            $obtainedstr .= $this->dump_boolean('IS_MATCH:    ', $obtained->is_match());
+            $expectedstr .= $this->dump_boolean('IS_MATCH:    ', $expected['is_match']);
         }
 
         // full
         if (!$fullpassed) {
-            echo $failedstr;
-            $this->dump_boolean('FULL:        ', $obtained->full);
-            echo $expectedstr;
-            $this->dump_boolean('FULL:        ', $expected['full']);
-            echo "\n";
+            $obtainedstr .= $this->dump_boolean('FULL:        ', $obtained->full);
+            $expectedstr .= $this->dump_boolean('FULL:        ', $expected['full']);
         }
 
         // index_first
         if (!$indexfirstpassed) {
-            echo $failedstr;
-            $this->dump_scalar_array('INDEX_FIRST: ', $obtained->index_first);
-            echo $expectedstr;
-            $this->dump_scalar_array('INDEX_FIRST: ', $expected['index_first']);
-            echo "\n";
+            $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST: ', $obtained->index_first);
+            $expectedstr .= $this->dump_scalar_array('INDEX_FIRST: ', $expected['index_first']);
         }
 
         // length
         if (!$lengthpassed) {
-            echo $failedstr;
-            $this->dump_scalar_array('LENGTH:      ', $obtained->length);
-            echo $expectedstr;
-            $this->dump_scalar_array('LENGTH:      ', $expected['length']);
-            echo "\n";
+            $obtainedstr .= $this->dump_scalar_array('LENGTH:      ', $obtained->length);
+            $expectedstr .= $this->dump_scalar_array('LENGTH:      ', $expected['length']);
         }
 
         // next
         if (!$nextpassed) {
-            echo $failedstr;
-            $this->dump_scalar('NEXT:        ', $obtainednext);
-            echo $expectedstr;
-            $this->dump_scalar('NEXT:        ', $expected['next']);
-            echo "\n";
+            $obtainedstr .= $this->dump_scalar('NEXT:        ', $obtainednext);
+            $expectedstr .= $this->dump_scalar('NEXT:        ', $expected['next']);
         }
 
         // left
         if (!$leftpassed) {
-            echo $failedstr;
-            $this->dump_scalar('LEFT:        ', $obtained->left);
+            $obtainedstr .= $this->dump_scalar('LEFT:        ', $obtained->left);
+            $expectedstr .= $this->dump_scalar('LEFT:        ', $expected['left'][0]);
+        }
+
+        $enginename = $matcher->name();
+
+        if (!$passed) {
+            echo $mods == '' ?
+                 "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname):\n" :
+                 "$enginename failed on regex '$regex' string '$str' and modifiers '$modstr' ($classname, $methodname):\n";
+            echo $obtainedstr;
+            echo "expected:\n";
             echo $expectedstr;
-            $this->dump_scalar('LEFT:        ', $expected['left'][0]);
             echo "\n";
         }
+
 
         // Return true if everything is correct, false otherwise.
         return $passed;
@@ -506,11 +498,14 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 }
             }
         }
-        echo "=======================\n";
+        if ($this->failcount == 0 && $this->exceptionscount == 0 && $this->passcount > 0) {
+            echo "\n\nWow! All tests passed!\n\n";
+        }
+        echo "======================\n";
         echo 'PASSED:     ' . $this->passcount . "\n";
         echo 'FAILED:     ' . $this->failcount . "\n";
         echo 'SKIPPED:    ' . $this->skipcount . "\n";
         echo 'EXCEPTIONS: ' . $this->exceptionscount . "\n";
-        echo "=======================\n";
+        echo "======================";
     }
 }
