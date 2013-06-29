@@ -105,6 +105,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
             }
             $mform->addElement('hidden', 'confirmed', true);
+            // Warning in Moodle 2.5 shows, that we must explicitly setType for
+            // this field
+            $mform->setType('confirmed', PARAM_BOOL);
         }
 
         parent::definition_inner($mform);
@@ -145,20 +148,41 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $mform =& $this->_form;
         $data = $mform->exportValues();
-        //Get information about field data
+        // Extract created question, loaded by get_options
+        $question = (array)$this->question;
+        // Get information about field data
         if (array_key_exists('answer', $data)) {
             $lang = block_formal_langs::lang_object($data['langid']);
             if ($lang!=null) {
+                $index = 0;
                 //Parse descriptions to populate script
                 foreach($data['answer'] as $key => $value) {//This loop will pass only on non-empty answers.
                     $processedstring = $lang->create_from_string($value);
                     $tokens = $processedstring->stream->tokens;
                     $fraction = 0;
+                    $fractionloaded = false;
+                    // If submitted form, take  fraction from POST-array
+                    // otherwise, we can use submitted question to get information on answer
                     if (array_key_exists('fraction' , $data)) {
                         if (array_key_exists($key, $data['fraction'])) {
                             $fraction = floatval($data['fraction'][$key]);
+                            $fractionloaded = true;
                         }
                     }
+
+                    // If loading from post array failed, try get fraction from base question options
+                    if ($fractionloaded == false) {
+                        // If we created question for first time, there will be no options in question
+                        // so we skip them
+                        if (array_key_exists('options', $question)) {
+                            $answers = $question['options']->answers;
+                            $answerids = array_keys($answers);
+                            $answerid = $answerids[$index];
+                            $fraction = floatval($answers[$answerid]->fraction);
+                        }
+                    }
+                    $index++;
+
                     if (count($tokens) > 0 && ($fraction >= $data['hintgradeborder'])) {//Answer needs token descriptions.
                         $textdata = array();
                         foreach($tokens as $token) {
