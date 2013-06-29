@@ -216,8 +216,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
+        // A replace for standard get_per_answer_fields, extending a fields for
+        // answer and moving fraction to a next line
+        $repeated = array();
+        $repeated[] = $mform->createElement('text', 'answer',
+            $label, array('size' => 80));
+        $repeated[] = $mform->createElement('select', 'fraction',
+            get_string('grade'), $gradeoptions);
+        $repeated[] = $mform->createElement('editor', 'feedback',
+            get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+        $repeatedoptions['answer']['type'] = PARAM_RAW;
+        $repeatedoptions['fraction']['default'] = 0;
+        $answersoption = 'answers';
 
-        $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
         $repeated[] = $mform->createElement('static', 'descriptionslabel', get_string('tokens', 'qtype_correctwriting'), get_string('lexemedescriptions', 'qtype_correctwriting'));
         $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
