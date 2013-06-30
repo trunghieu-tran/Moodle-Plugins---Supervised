@@ -79,7 +79,7 @@ class qtype_preg_fa_state {
      * We are violating principle "a child shouldn't know the parent" there, but the state need to signal important information back to
      * automaton during its construction: becoming non-deterministic, having eps or pure-assert transitions etc.
      */
-    protected $FA;
+    protected $fa;
     /** @var array of qtype_preg_fa_transition child objects, indexed. */
     protected $outtransitions;
     /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
@@ -87,15 +87,15 @@ class qtype_preg_fa_state {
     /** @var int number of the state. */
     public $number;
 
-    public function __construct(&$FA = null) {
-        $this->FA = $FA;
+    public function __construct(&$fa = null) {
+        $this->fa = $fa;
         $this->number = -1;    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
         $this->outtransitions = array();
         $this->deterministic = true;
     }
 
-    public function set_FA(&$FA) {
-        $this->FA = $FA;
+    public function set_fa(&$fa) {
+        $this->fa = $fa;
     }
 
     /**
@@ -110,14 +110,14 @@ class qtype_preg_fa_state {
         // TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class.
 
         if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-            $this->FA->epsilon_transtion_added();
+            $this->fa->epsilon_transtion_added();
         }
 
         if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_ASSERT) {
-            $this->FA->assertion_transition_added();
+            $this->fa->assertion_transition_added();
         }
 
-        $this->FA->transition_added();
+        $this->fa->transition_added();
     }
 
     /**
@@ -337,7 +337,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_state(&$state) {
         $this->states[] = $state;
-        $state->set_FA($this);
+        $state->set_fa($this);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
@@ -425,7 +425,7 @@ abstract class qtype_preg_finite_automaton {
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
     public function avoid_wordbreaks() {
-    // TODO - delete \b and \B.
+        // TODO - delete \b and \B.
     }
 
     /**
@@ -531,7 +531,7 @@ abstract class qtype_preg_finite_automaton {
         $lst = (int)$tmpstr;
         if (!isset($this->states[$fir])) {
             $this->states[$fir] = new qtype_preg_fa_state();
-            $this->states[$fir]->set_FA($this);
+            $this->states[$fir]->set_fa($this);
             $this->statecount++;
             if ($this->statecount > $this->statelimit) {
                 throw new qtype_preg_toolargefa_exception('');
@@ -539,7 +539,7 @@ abstract class qtype_preg_finite_automaton {
         }
         if (!isset($this->states[$lst])) {
             $this->states[$lst] = new qtype_preg_fa_state();
-            $this->states[$lst]->set_FA($this);
+            $this->states[$lst]->set_fa($this);
             $this->statecount++;
             if ($this->statecount > $this->statelimit) {
                 throw new qtype_preg_toolargefa_exception('');

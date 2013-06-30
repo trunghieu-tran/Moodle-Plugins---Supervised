@@ -401,9 +401,9 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($ranges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
-                    //if ($this->match($c, 0, $l)) {
+                    // if ($this->match($c, 0, $l)) {
                     return $c;
-                    //}
+                    // }
                 }
             }
         }
@@ -985,53 +985,53 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
         $length = 0;
         $result = false;
         switch ($this->subtype) {
-        case self::SUBTYPE_ESC_B:
-            // \b (\B) matches at (not) a word boundary.
-            $alnumrange = qtype_preg_unicode::alnum_ranges();
-            $ch0 = $str[0];
-            $ch1 = $str[$pos - 1];
+            case self::SUBTYPE_ESC_B:
+                // \b (\B) matches at (not) a word boundary.
+                $alnumrange = qtype_preg_unicode::alnum_ranges();
+                $ch0 = $str[0];
+                $ch1 = $str[$pos - 1];
 
-            $flag0 = $ch0 == '_' || qtype_preg_unicode::is_in_range($ch0, $alnumrange);
-            $flag1 = $ch1 == '_' || qtype_preg_unicode::is_in_range($ch1, $alnumrange);
+                $flag0 = $ch0 == '_' || qtype_preg_unicode::is_in_range($ch0, $alnumrange);
+                $flag1 = $ch1 == '_' || qtype_preg_unicode::is_in_range($ch1, $alnumrange);
 
-            $start = $flag0 && $pos == 0;
-            $end = $flag1 && $pos == $str->length();
-            $wW = false;
-            $Ww = false;
+                $start = $flag0 && $pos == 0;
+                $end = $flag1 && $pos == $str->length();
+                $wnotw = false;
+                $notww = false;
 
-            if ($pos > 0 && $pos < $str->length()) {
-                $ch2 = $str[$pos];
-                $flag2 = $ch2 == '_' || qtype_preg_unicode::is_in_range($ch2, $alnumrange);
-                $wW = $flag1 && !$flag2;
-                $Ww = !$flag1 && $flag2;
-            }
-            $result = ($start || $end || $wW || $Ww);
-            $result = ($result xor $this->negative);
-            break;
-        case self::SUBTYPE_ESC_A:
-            // \A matches at the very start of the string.
-            $result = ($pos == 0);
-            break;
-        case self::SUBTYPE_ESC_Z:
-            if ($this->negative) {
-                // \Z matches at the end of the string, also matches before the very last newline.
-                $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
-            } else {
-                // \z matches only at the end of the string.
-                $result = ($pos == $str->length());
-            }
-            break;
-        case self::SUBTYPE_ESC_G:
-            // TODO matches at the first matching position in the string.
-            break;
-        case self::SUBTYPE_CIRCUMFLEX:
-            // Used only in multiline mode. Matches at the very start of the string or after any \n.
-            $result = ($pos == 0) || ($str[$pos - 1] == "\n");
-            break;
-        case self::SUBTYPE_DOLLAR:
-            // Used only in multiline mode. Matches at the end of the string and before any \n.
-            $result = ($pos == $str->length()) || ($str[$pos] == "\n");
-            break;
+                if ($pos > 0 && $pos < $str->length()) {
+                    $ch2 = $str[$pos];
+                    $flag2 = $ch2 == '_' || qtype_preg_unicode::is_in_range($ch2, $alnumrange);
+                    $wnotw = $flag1 && !$flag2;
+                    $notww = !$flag1 && $flag2;
+                }
+                $result = ($start || $end || $wnotw || $notww);
+                $result = ($result xor $this->negative);
+                break;
+            case self::SUBTYPE_ESC_A:
+                // \A matches at the very start of the string.
+                $result = ($pos == 0);
+                break;
+            case self::SUBTYPE_ESC_Z:
+                if ($this->negative) {
+                    // \Z matches at the end of the string, also matches before the very last newline.
+                    $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
+                } else {
+                    // \z matches only at the end of the string.
+                    $result = ($pos == $str->length());
+                }
+                break;
+            case self::SUBTYPE_ESC_G:
+                // TODO matches at the first matching position in the string.
+                break;
+            case self::SUBTYPE_CIRCUMFLEX:
+                // Used only in multiline mode. Matches at the very start of the string or after any \n.
+                $result = ($pos == 0) || ($str[$pos - 1] == "\n");
+                break;
+            case self::SUBTYPE_DOLLAR:
+                // Used only in multiline mode. Matches at the end of the string and before any \n.
+                $result = ($pos == $str->length()) || ($str[$pos] == "\n");
+                break;
         }
         return $result;
     }
@@ -1502,7 +1502,7 @@ class qtype_preg_node_assert extends qtype_preg_operator {
     }
 
     public function calculate_nflf(&$followpos) {
-        //parent::calculate_nflf($followpos);
+        // parent::calculate_nflf($followpos);
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
