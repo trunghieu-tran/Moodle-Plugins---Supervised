@@ -70,6 +70,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Length of the last match.
     public $last_match_len;
 
+    // States to backtrack to when generating extensions of partial matches.
+    public $backtrack_states;
+
     public function __clone() {
         $this->str = clone $this->str;  // Needs to be cloned for correct string generation.
     }
