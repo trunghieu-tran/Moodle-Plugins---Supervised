@@ -31,14 +31,16 @@
 *  An array of expected results ($testi) should look like:
 *
 *    array(
-*          'str'=>'aaa',                    // A string to match.
-*          'is_match'=>true,                // Is there a match?
-*          'full'=>true,                    // Is the match full?
-*          'index_first'=>array(0=>0,1=>3), // Start indexes of subexpressions; not necessary to define unmatched subexpressions.
-*          'length'=>array(0=>3,1=>0),      // Lengths of subexpressions; not necessary to define unmatched subexpressions.
-*          'left'=>0,                       // (Defined for partial matches) number of characters left to complete the partial match.
-*          'next'=>'',                      // (Defined for partial matches) a regex matching possible next character.
-*          'tags'=>array());                // (Optional) tags for the string, default value is array().
+*          'str'=>'aaa',                        // A string to match.
+*          'is_match'=>true,                    // Is there a match?
+*          'full'=>false,                       // Is the match full?
+*          'index_first'=>array(0=>0,1=>3),     // Start indexes of subexpressions; not necessary to define unmatched subexpressions.
+*          'length'=>array(0=>3,1=>0),          // Lengths of subexpressions; not necessary to define unmatched subexpressions.
+*          'ext_index_first'=>array(0=>0,1=>3), // (Optional) the same indexes for generated extension.
+*          'ext_length'=>array(0=>4,1=>0),      // (Optional) the same lengths for generated extension.
+*          'left'=>0,                           // (Defined for partial matches) number of characters left to complete the partial match.
+*          'next'=>'',                          // (Defined for partial matches) a regex matching possible next character.
+*          'tags'=>array());                    // (Optional) tags for the string, default value is array().
 *
 *  Here's an example test function:
 *
@@ -290,107 +292,129 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $ismatchpassed = true;
         $indexfirstpassed = true;
         $lengthpassed = true;
+        $extindexfirstpassed = true;
+        $extlengthpassed = true;
         $nextpassed = true;
         $leftpassed = true;
 
-        // Check match existance.
-        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
-            $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
-        } else if (!$skippartialcheck) {
-            $ismatchpassed = $fullpassed;
-        }
+        if (!$skippartialcheck) {
+            // Check match existance.
+            if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
+                $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
+            } else {
+                $ismatchpassed = $fullpassed;
+            }
 
-        // Check indexes and lengths.
-        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING)) {
+            // Check indexes and lengths.
+            $subexprsupported = $matcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING);
             foreach ($obtained->index_first as $key => $index) {
+                if (!$subexprsupported && $key != 0) {
+                    continue;
+                }
                 $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $expected['index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                           (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->index_first[$key]));
-                if (!$indexfirstpassed) {
-                    break;
-                }
             }
             foreach ($obtained->length as $key => $index) {
+                if (!$subexprsupported && $key != 0) {
+                    continue;
+                }
                 $lengthpassed = $lengthpassed && ((!array_key_exists($key, $expected['length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                   (array_key_exists($key, $expected['length']) && $expected['length'][$key] === $obtained->length[$key]));
-                if (!$lengthpassed) {
-                    break;
+            }
+
+            if ($obtained->extendedmatch !== null && array_key_exists('ext_index_first', $expected)) {
+                foreach ($obtained->extendedmatch->index_first as $key => $index) {
+                    if (!$subexprsupported && $key != 0) {
+                        continue;
+                    }
+                    $extindexfirstpassed = $extindexfirstpassed && ((!array_key_exists($key, $expected['ext_index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                              (array_key_exists($key, $expected['ext_index_first']) && $expected['ext_index_first'][$key] === $obtained->extendedmatch->index_first[$key]));
+                }
+                foreach ($obtained->extendedmatch->length as $key => $index) {
+                    if (!$subexprsupported && $key != 0) {
+                        continue;
+                    }
+                    $extlengthpassed = $extlengthpassed && ((!array_key_exists($key, $expected['ext_length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                      (array_key_exists($key, $expected['ext_length']) && $expected['ext_length'][$key] === $obtained->extendedmatch->length[$key]));
                 }
             }
-        } else if (!$skippartialcheck) {
-            $indexfirstpassed = (!array_key_exists(0, $expected['index_first']) && $obtained->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                (array_key_exists(0, $expected['index_first']) && $expected['index_first'][0] === $obtained->index_first[0]);
-            $lengthpassed = (!array_key_exists(0, $expected['length']) && $obtained->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                            (array_key_exists(0, $expected['length']) && $expected['length'][0] === $obtained->length[0]);
-        }
 
-        // Check the next possible character.
-        $obtainednext = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
-        if (!$skippartialcheck && !$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-            if ($obtained->extendedmatch !== null) {
-                $obtainednext = $obtained->string_extension();
+            // Check the next possible character.
+            $obtainednext = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
+            if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+                if ($obtained->extendedmatch !== null) {
+                    $obtainednext = $obtained->string_extension();
+                }
+                $pattern = $expected['next'];
+                $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
+                $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                               ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
             }
-            $pattern = $expected['next'];
-            $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
-            $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
+
+            // Check the number of characters left.
+            if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
+                $leftpassed = in_array($obtained->left, $expected['left']);
+            }
+            if ($this->doextrachecks) {
+                $this->do_extra_check($regex, $notation, $mods, $obtained);
+            }
         }
 
-        // Check the number of characters left.
-        if (!$skippartialcheck && !$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
-            $leftpassed = in_array($obtained->left, $expected['left']);
-        }
-        if (!$skippartialcheck && $this->doextrachecks) {
-            $this->do_extra_check($regex, $notation, $mods, $obtained);
-        }
+        $passed = $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $extindexfirstpassed && $extlengthpassed && $nextpassed && $leftpassed;
 
-        $passed = $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $nextpassed && $leftpassed;
+        if (!$passed && $dumpfails) {
+            $obtainedstr = '';
+            $expectedstr = '';
 
-        if (!$dumpfails) {
-            return $passed;
-        }
+            // is_match
+            if (!$ismatchpassed) {
+                $obtainedstr .= $this->dump_boolean('IS_MATCH:        ', $obtained->is_match());
+                $expectedstr .= $this->dump_boolean('IS_MATCH:        ', $expected['is_match']);
+            }
 
-        $obtainedstr = '';
-        $expectedstr = '';
+            // full
+            if (!$fullpassed) {
+                $obtainedstr .= $this->dump_boolean('FULL:            ', $obtained->full);
+                $expectedstr .= $this->dump_boolean('FULL:            ', $expected['full']);
+            }
 
-        // is_match
-        if (!$ismatchpassed) {
-            $obtainedstr .= $this->dump_boolean('IS_MATCH:    ', $obtained->is_match());
-            $expectedstr .= $this->dump_boolean('IS_MATCH:    ', $expected['is_match']);
-        }
+            // index_first
+            if (!$indexfirstpassed) {
+                $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $obtained->index_first);
+                $expectedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $expected['index_first']);
+            }
 
-        // full
-        if (!$fullpassed) {
-            $obtainedstr .= $this->dump_boolean('FULL:        ', $obtained->full);
-            $expectedstr .= $this->dump_boolean('FULL:        ', $expected['full']);
-        }
+            // length
+            if (!$lengthpassed) {
+                $obtainedstr .= $this->dump_scalar_array('LENGTH:          ', $obtained->length);
+                $expectedstr .= $this->dump_scalar_array('LENGTH:          ', $expected['length']);
+            }
 
-        // index_first
-        if (!$indexfirstpassed) {
-            $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST: ', $obtained->index_first);
-            $expectedstr .= $this->dump_scalar_array('INDEX_FIRST: ', $expected['index_first']);
-        }
+            // ext_index_first
+            if (!$extindexfirstpassed) {
+                $obtainedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $obtained->extendedmatch->index_first);
+                $expectedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $expected['ext_index_first']);
+            }
 
-        // length
-        if (!$lengthpassed) {
-            $obtainedstr .= $this->dump_scalar_array('LENGTH:      ', $obtained->length);
-            $expectedstr .= $this->dump_scalar_array('LENGTH:      ', $expected['length']);
-        }
+            // ext_length
+            if (!$extlengthpassed) {
+                $obtainedstr .= $this->dump_scalar_array('EXT_LENGTH:      ', $obtained->extendedmatch->length);
+                $expectedstr .= $this->dump_scalar_array('EXT_LENGTH:      ', $expected['ext_length']);
+            }
 
-        // next
-        if (!$nextpassed) {
-            $obtainedstr .= $this->dump_scalar('NEXT:        ', $obtainednext);
-            $expectedstr .= $this->dump_scalar('NEXT:        ', $expected['next']);
-        }
+            // next
+            if (!$nextpassed) {
+                $obtainedstr .= $this->dump_scalar('NEXT:            ', $obtainednext);
+                $expectedstr .= $this->dump_scalar('NEXT:            ', $expected['next']);
+            }
 
-        // left
-        if (!$leftpassed) {
-            $obtainedstr .= $this->dump_scalar('LEFT:        ', $obtained->left);
-            $expectedstr .= $this->dump_scalar('LEFT:        ', $expected['left'][0]);
-        }
+            // left
+            if (!$leftpassed) {
+                $obtainedstr .= $this->dump_scalar('LEFT:            ', $obtained->left);
+                $expectedstr .= $this->dump_scalar('LEFT:            ', $expected['left'][0]);
+            }
 
-        $enginename = $matcher->name();
-
-        if (!$passed) {
+            $enginename = $matcher->name();
             echo $mods == '' ?
                  "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname):\n" :
                  "$enginename failed on regex '$regex' string '$str' and modifiers '$modstr' ($classname, $methodname):\n";
@@ -399,7 +423,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             echo $expectedstr;
             echo "\n";
         }
-
 
         // Return true if everything is correct, false otherwise.
         return $passed;
