@@ -400,8 +400,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function subexprs_to_string() {
         $res = '';
         foreach ($this->subexpr_to_subpatt as $subexpr => $subpatt) {
-            $ind = $this->last_match($subpatt)[0];
-            $len = $this->last_match($subpatt)[1];
+            $lastmatch = $this->last_match($subpatt);
+            $ind = $lastmatch[0];
+            $len = $lastmatch[1];
             $res .= $subexpr . ": ($ind, $len) ";
         }
         $res .= "\n";
