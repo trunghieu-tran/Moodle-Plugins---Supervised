@@ -2,18 +2,16 @@
  * Script for preg text+button widget
  *
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
- * @author Terechov Grigory, Pahomov Dmitry, Volgograd State Technical University
+ * @author Pahomov Dmitry, Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
 
-// requaries: 'node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-parse"
-
-M.poasquestion_text_and_button = (function(){
+M.poasquestion_text_and_button = (function() {
 
     var self = {
 
-    /** @var intupt, from witch we read data */
+    /** @var input, from witch we read data */
     currentlinput : null,
 
     /** @var data, readed from input */
@@ -25,8 +23,7 @@ M.poasquestion_text_and_button = (function(){
     /** @var reference to node with user html code of dialog */
     dialoghtmlnode : null,
 
-    /** @var YUI object with requaried extentions (sets in js_init_call) */
-    Y : null,
+    dialogtitle : null,
 
     /**
      * @var this function will be called only once, after dialog creation.
@@ -46,13 +43,18 @@ M.poasquestion_text_and_button = (function(){
     /** @var data for module-extender */
     extendeddata : null,
 
+    /** @var width of dialog */
+    dialogwidth: 1000,
+
     /** Just creates object */
-    init : function(Y) {
-        this.Y = this.Y || Y;
+    init : function(Y, dialogwidth, dialogtitle) {
+        self.dialogwidth = dialogwidth;
+        self.dialogtitle = dialogtitle;
     },
 
     /**
      * Sets handler for button with id = button_id and input with id input_id
+     * @param {Object} Y NOT USED! It need because moodle passes this object as first param anyway...
      * @param {string} button_id id of button for witch you want to set handler
      * @param {string} input_id id of input from witch you want to read data
      * @param {int} pagewidth width of modal window
@@ -68,37 +70,39 @@ M.poasquestion_text_and_button = (function(){
         if(input_id.indexOf('#') != 0) {
             input_id = '#' + input_id;
         }
-        var testregexbtn = this.Y.one(button_id);
-        var testregexlineedit = this.Y.one(input_id);
-        testregexbtn.on("click", this.btn_pressed, this, pagewidth, testregexlineedit);
+        var testregexbtn = $(button_id);
+        var testregexlineedit = $(input_id);
+        var eventdata = {
+            pagewidth: pagewidth,
+            targetinput: testregexlineedit
+        };
+        $(testregexbtn).click(eventdata, self.btn_pressed);
     },
 
     /**
-     * Handler of pressing on the button
-     * @param {int} pagewidth width of modal window
-     * @param {targetinput} input from which data should be readen
+     * Handler of jquery event: pressing on the button
+     * @param {targetinput} e.data.input from which data should be readen (should be passed as jquery event data)
      */
-    btn_pressed : function(e, pagewidth, targetinput) {
+    btn_pressed : function(e) {
 
         e.preventDefault();
-        pagewidth = pagewidth || 1000;// width of dialog
-        var is_first_press = this.dialog === null;
+        var is_first_press = self.dialog === null;
 
-        this.currentlinput = targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
-        this.data = this.currentlinput.get('value');
+        self.currentlinput = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
+        self.data = self.currentlinput.val();
         if (is_first_press) {
             // if the 'Test regex' button is first pressed, we should generate a dialog window
-            this.setup_dialog(pagewidth);
+            self.setup_dialog();
         }
 
-        if(is_first_press && typeof(this.onfirstpresscallback) === "function") {
-            this.onfirstpresscallback();
+        if(is_first_press && typeof(self.onfirstpresscallback) === "function") {
+            self.onfirstpresscallback();
         }
 
-        if(!is_first_press && typeof(this.oneachpresscallback) === "function") {
-            this.oneachpresscallback();
+        if(!is_first_press && typeof(self.oneachpresscallback) === "function") {
+            self.oneachpresscallback();
         }
-        this.dialog.show();
+        self.dialog.dialog('open');
     },
 
     /**
@@ -106,39 +110,15 @@ M.poasquestion_text_and_button = (function(){
      * @param {int} pagewidth width of dialog
      */
     setup_dialog : function(pagewidth) {
-        this.dialog = new this.Y.Panel({
-            contentBox: Y.Node.create('<div id="dialog" />'),
-            bodyContent: '<div class="message icon-warn">Loading...</div>',
-            width: pagewidth,
-            zIndex: 120,
-            centered: true,
-            modal: true, // modal behavior
-            render: '.example',
-            visible: true, // make visible explicitly with .show()
-            buttons: {
-                 footer: [
-                        {
-                            name: 'cancel',
-                            label: 'Cancel',
-                            action: function(e) {
-                                e.preventDefault();
-                                this.hide();
-                                this.callback = false;
-                            }
-                        },
-
-                        {
-                            name: 'proceed',
-                            label: 'OK',
-                            action: function(e) {
-                                e.preventDefault();
-                                self.close_and_set_new_data();
-                            }
-                        }
-                    ]
-            }
+        self.dialog = $('<div id="preg_authoring_tools_dialog"><p>Loading...</p></div>');
+        self.dialog.dialog({
+            modal: true,
+            width: self.dialogwidth,
+            title: self.dialogtitle,
+            buttons: [
+                {text: "Cancel", click: function() {$(this).dialog("close")}}
+            ]
         });
-        this.dialoghtmlnode = this.Y.one('#dialog .message');
     },
 
     /**
@@ -159,9 +139,9 @@ M.poasquestion_text_and_button = (function(){
      *   };
      */
     setup : function (options) {
-        this.onfirstpresscallback = options.onfirstpresscallback;
-        this.oneachpresscallback = options.oneachpresscallback;
-        this.extendeddata = options.extendeddata;
+        self.onfirstpresscallback = options.onfirstpresscallback;
+        self.oneachpresscallback = options.oneachpresscallback;
+        self.extendeddata = options.extendeddata;
     },
 
     /**
@@ -171,13 +151,12 @@ M.poasquestion_text_and_button = (function(){
      */
     close_and_set_new_data : function(_data) {
         if (typeof(_data) === "string") {
-            this.data = _data;
-            this.currentlinput.set('value',_data);
+            self.data = _data;
+            self.currentlinput.val(_data);
         } else {
-            this.currentlinput.set('value',this.data);
+            self.currentlinput.val(self.data);
         }
-        this.dialog.hide();
-        this.dialog.callback = false;
+        self.dialog.dialog('close');
     }
 };
 

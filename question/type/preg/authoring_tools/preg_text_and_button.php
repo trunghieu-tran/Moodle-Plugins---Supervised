@@ -23,34 +23,37 @@ class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_butt
 
     //private $parentjsobjname = 'M.poasquestion_text_and_button';
 
-    function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
+    private static $_preg_authoring_tools_script_included = false;
+
+    function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null) {
         global $CFG;
-        if ($attributes === null) {
-            $attributes = array();
-        }
-        $attributes['width'] = '90%';
+        $this->_dialog_title = get_string('authoring_tool_page_header', 'qtype_preg');
         $elementLinks = array(
                 'link_to_button_image' => $CFG->wwwroot . '/theme/image.php/standard/core/1359744739/t/edit',
                 'link_to_page' => $CFG->wwwroot . '/question/type/preg/authoring_tools/ast_preg_form.php'
                 );
-        parent::__construct($elementName, $elementButtonName, $elementLabel, $elementLinks, $attributes);
+        parent::__construct($elementName, $elementButtonName, $elementLabel, $elementLinks, '90%', array('rows' => 1, 'cols' => 80));
+        $this->include_preg_authoring_tools_script();
     }
 
     function toHtml() {
-        global $CFG;
-        global $PAGE;
         $parenthtml = parent::toHtml();
-        $jsmodule = array(  'name' => 'preg_text_and_button',
-                            'fullpath' => '/question/type/preg/authoring_tools/preg_authoring_tools_script.js',
-                            'requires' => array('node', 'io-base')
-        );
-        $jsargs = array(
-            $CFG->wwwroot,
-            'todo',
-        );
-        $PAGE->requires->js_init_call('M.preg_authoring_tools_script.init', $jsargs, true, $jsmodule);
-
         return $parenthtml;
     }
 
+    private function include_preg_authoring_tools_script() {
+        global $CFG;
+        global $PAGE;
+        if(self::$_preg_authoring_tools_script_included===false) {
+            $jsmodule = array(  'name' => 'preg_authoring_tools_script',
+                                'fullpath' => '/question/type/preg/authoring_tools/preg_authoring_tools_script.js'
+            );
+            $jsargs = array(
+                $CFG->wwwroot,
+                'todo - poasquestion_text_and_button_objname',
+            );
+            $PAGE->requires->js_init_call('M.preg_authoring_tools_script.init', $jsargs, true, $jsmodule);
+            self::$_preg_authoring_tools_script_included=true;
+        }
+    }
 }

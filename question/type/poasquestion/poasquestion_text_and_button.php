@@ -18,7 +18,7 @@
  * Defines authors tool widgets class.
  *
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
- * @author Terechov Grigory, Volgograd State Technical University
+ * @author Pahomov Dmitry, Terechov Grigory, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -52,6 +52,10 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
 
     private $_jsmodule = null;
 
+    protected $_dialog_title = 'someone forget to set dialog title :(';
+
+    private static $_poasquestion_text_and_button_included = false;
+
     /**
      * Constructor
      * @param string $elementName (optional) name of the text field
@@ -60,24 +64,28 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
      * @param array $elementLinks (optional) link on button image and link on new page
      * @param array $attributes (optional) Either a typical HTML attribute string or an associative array
      */
-    function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
+    function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $dialogWidth=null, $attributes=null) {
         global $PAGE;
-        if ($attributes === null) {
-            $attributes = array();
-        }
-        if (!array_key_exists('width', $attributes)) {
-            $attributes['width'] = '1000px';
-        }
         parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
         $this->idbutton = $elementButtonName;
         $this->linktopage = $elementLinks['link_to_page'];
         $this->linktobuttonimage = $elementLinks['link_to_button_image'];
-
+        if($dialogWidth===null) {
+            $dialogWidth = '90%';
+        }
         $this->_jsmodule = array('name'     => 'poasquestion_text_and_button',
-                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js',
-                                'requires' => array('node', 'panel', 'node-load', 'get', 'io-xdr', 'substitute'));
-        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', null, true, $this->_jsmodule);
-
+                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
+        $jsargs = array(
+            $dialogWidth,
+            $this->_dialog_title
+        );
+        $PAGE->requires->jquery();
+        $PAGE->requires->jquery_plugin('ui');
+        $PAGE->requires->jquery_plugin('ui-css');
+        if(self::$_poasquestion_text_and_button_included===false) {
+            $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $this->_jsmodule);
+            self::$_poasquestion_text_and_button_included=true;
+        }
     }
 
     function getInputId() {
@@ -86,10 +94,6 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
 
     function getButtonId() {
         return $this->getAttribute('id') . $this->_btn_id_postfix;
-    }
-
-    function getWidth() {
-        return $this->getAttribute('width');
     }
 
     /**
@@ -111,14 +115,13 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
         global $PAGE;
         //var_dump($CFG);
         $parenthtml = parent::toHtml();
+
         $jsargs = array(
             $this->getButtonId(),
-            $this->getInputId(),
-            $this->getWidth()
+            $this->getInputId()
         );
-        //var_dump($jsargs);
-        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->_jsmodule);
 
+        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->_jsmodule);
         return $parenthtml . '<a href="#" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() . '" >' .
                                  '<img src="' . $this->linktobuttonimage . '" />' .
                              '</a>';
@@ -133,7 +136,7 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
      * @todo MDL-31047 this api will be removed.
      * @see MoodleQuickForm::setHelpButton()
      */
-    function setHelpButton($helpbuttonargs, $function='helpbutton'){
+    function setHelpButton($helpbuttonargs, $function='helpbutton') {
         debugging('component setHelpButton() is not used any more, please use $mform->setHelpButton() instead');
     }
 

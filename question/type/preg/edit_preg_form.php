@@ -51,7 +51,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             &$repeatedoptions, &$answersoption) {
         $repeated = array();
         $repeated[] = $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
-                $label, null, array('size' => 80/*'rows' => 1, 'cols' => 80*/));
+                $label);
         $repeated[] = $mform->createElement('select', 'fraction',
                 get_string('grade'), $gradeoptions);
         $repeated[] = $mform->createElement('editor', 'feedback',

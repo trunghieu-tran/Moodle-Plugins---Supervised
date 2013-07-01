@@ -37,6 +37,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         // Add widget on form.
         $mform->addElement('header', 'regex_input_header', get_string('regex_edit_header_text', 'qtype_preg'));
+        $mform->setExpanded('regex_input_header', 1);
         $mform->addHelpButton('regex_input_header','regex_edit_header', 'qtype_preg');
 
         $mform->addElement('text', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('size' => 100));
@@ -55,6 +56,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         //Add generated map
         // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
+        $mform->setExpanded('regex_tree_header', 1);
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         //Add tree orientation radio buttons
         $mform->addElement('html',
@@ -73,11 +75,13 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         // Add graph.
         $mform->addElement('header', 'regex_graph_header', get_string('regex_graph_header', 'qtype_preg'));
+        $mform->setExpanded('regex_graph_header', 1);
         $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_handler"><div style="width:10px"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></div></br>');
 
         // Add description.
         $mform->addElement('header', 'regex_description_header', get_string('regex_description_header', 'qtype_preg'));
+        $mform->setExpanded('regex_description_header', 1);
         $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
 
