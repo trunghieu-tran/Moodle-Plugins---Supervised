@@ -92,6 +92,8 @@ M.preg_authoring_tools_script = (function() {
                     self.back_btn = $('#id_regex_back').click(self.back_regex_clicked);
                     $(self.main_input).val(self.textbutton_widget.data);
                     $("#tree_orientation_radioset input").change(self.radio_orientation_changed);
+                    // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
+                    $(".collapsible-actions").hide();
                     self.load_content_by_id('-1');
                 })
             },
