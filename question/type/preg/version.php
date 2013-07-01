@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version  = 2013062600;
+$plugin->version = 2013062600;
 $plugin->requires = 2013051400;
 $plugin->release = 'Preg 2.5';
 $plugin->maturity = MATURITY_BETA;
@@ -35,6 +35,6 @@ $plugin->dependencies = array(
     'qbehaviour_adaptivehints' => 2013011800,
     'qbehaviour_adaptivehintsnopenalties' => 2013011800,
     'qbehaviour_interactivehints' => 2013060200,
-    'qtype_poasquestion' => 2013011800,
+    'qtype_poasquestion' => 2013062900,
     'block_formal_langs' => 2012021400
 );
