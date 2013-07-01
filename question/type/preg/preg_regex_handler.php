@@ -251,6 +251,11 @@ class qtype_preg_regex_handler {
             }
         }
 
+        // Regex preprocessing: kill all newlines if modifier 'x' is not set.
+        if (!$options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
+            $regex = str_replace("\n", '', $regex);
+        }
+
         $this->regex = new qtype_poasquestion_string($regex);
         $this->options = $options;
 
