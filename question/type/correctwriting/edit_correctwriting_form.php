@@ -48,15 +48,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      //TODO - uncomment first two fields when integrating Birukova code
     private $floatfields = array(/*'lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
                             'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),*/     //Lexical error weight field
-                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true),       //Absent token mistake weight field
-                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true),        //Extra token mistake weight field
-                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true),       //Moved token mistake weight field
-                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true),           //Hint grade border
-                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true),      //Max mistake percentage
-                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false),        //"What is" hint penalty
-                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false),      //"Where" text hint penalty
-                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true),   //Absent token mistake hint penalty factor
-                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false)       //"Where" picture hint penalty
+                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),       //Absent token mistake weight field
+                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),        //Extra token mistake weight field
+                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true, 'min' => 0, 'max' => 1),       //Moved token mistake weight field
+                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           //Hint grade border
+                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      //Max mistake percentage
+                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),        //"What is" hint penalty
+                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),      //"Where" text hint penalty
+                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),   //Absent token mistake hint penalty factor
+                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)       //"Where" picture hint penalty
                             );
 
     /**  Fills an inner definition of form fields
@@ -223,18 +223,18 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $label, array('size' => 80));
         $repeated[] = $mform->createElement('select', 'fraction',
             get_string('grade'), $gradeoptions);
-        $repeated[] = $mform->createElement('editor', 'feedback',
-            get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
-        $repeatedoptions['answer']['type'] = PARAM_RAW;
-        $repeatedoptions['fraction']['default'] = 0;
-        $answersoption = 'answers';
-
-
         $repeated[] = $mform->createElement('static', 'descriptionslabel', get_string('tokens', 'qtype_correctwriting'), get_string('lexemedescriptions', 'qtype_correctwriting'));
         $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                             get_string('lexemedescriptions', 'qtype_correctwriting'),
                                             array('rows' => 2, 'cols' => 80));
+        $repeated[] = $mform->createElement('editor', 'feedback',
+            get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+
+        $repeatedoptions['answer']['type'] = PARAM_RAW;
         $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
+        $repeatedoptions['fraction']['default'] = 0;
+        $answersoption = 'answers';
+
         return $repeated;
     }
 
@@ -331,6 +331,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     public function validation($data, $files) {
 
         $errors = parent::validation($data, $files);
+
+        // Validate floating fields for min/max borders.
+        foreach ($this->floatfields as $name => $params) {
+            if ($data[$name] < $params['min']) {
+                $errors[$name] = get_string('toosmallfloatvalue', 'qtype_correctwriting', $params['min']);
+            }
+            if ($data[$name] > $params['max']) {
+                $errors[$name] = get_string('toobigfloatvalue', 'qtype_correctwriting', $params['max']);
+            }
+        }
 
         // Scan for errors
         $lang = block_formal_langs::lang_object($data['langid']);
