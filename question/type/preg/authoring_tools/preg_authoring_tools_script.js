@@ -74,6 +74,8 @@ M.preg_authoring_tools_script = (function() {
         self.load_content_by_id(self.node_id);
     },
 
+
+
     /**
      * Sets up options of M.poasquestion_text_and_button object
      * This method defines onfirstpresscallback method, that calls on very first
@@ -88,9 +90,11 @@ M.preg_authoring_tools_script = (function() {
                 $(self.textbutton_widget.dialog).load(self.preg_www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function() {
                     //TODO: set empty src in all field
                     self.check_btn = $('#id_regex_check').click(self.check_regex_clicked);
-                    self.main_input = $('#id_regex_text').change(self.regex_change);
+                    self.main_input =    $('#id_regex_text').change(self.regex_change)
+                                                            //.change(self.textbutton_widget.fix_textarea_rows)
+                                                            .keyup(self.textbutton_widget.fix_textarea_rows);
                     self.back_btn = $('#id_regex_back').click(self.back_regex_clicked);
-                    $(self.main_input).val(self.textbutton_widget.data);
+                    $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
                     $("#tree_orientation_radioset input").change(self.radio_orientation_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
