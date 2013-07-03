@@ -35,12 +35,20 @@ M.preg_authoring_tools_script = (function() {
 
     /** @var {Object} cache of content; first dimension is orientation, second id regex, third is node id */
     cache : {
-        vertical:{},
-        horizontal:{}
+        vertical: {
+            userinscription: {},
+            flags: {}
+        },
+        horizontal: {
+            userinscription: {},
+            flags: {}
+        }
     },
 
     /** @var {string} previously selected tree orientation */
     tree_orientation : null,
+
+    displayas : null,
 
     REGEX_KEY : 'regex',
 
@@ -70,11 +78,9 @@ M.preg_authoring_tools_script = (function() {
         this.setup_parent_object();
     },
 
-    radio_orientation_changed : function() {
+    radio_changed : function() {
         self.load_content_by_id(self.node_id);
     },
-
-
 
     /**
      * Sets up options of M.poasquestion_text_and_button object
@@ -95,7 +101,7 @@ M.preg_authoring_tools_script = (function() {
                                                             .keyup(self.textbutton_widget.fix_textarea_rows);
                     self.back_btn = $('#id_regex_back').click(self.back_regex_clicked);
                     $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
-                    $("#tree_orientation_radioset input").change(self.radio_orientation_changed);
+                    $("#tree_orientation_radioset input, #charset_process_radioset input").change(self.radio_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
                     self.load_content_by_id('-1');
@@ -113,18 +119,18 @@ M.preg_authoring_tools_script = (function() {
     },
 
     // Stores images and description for the given regex and node id in the cache
-    cache_data : function(orientation, regex, id, t, m, g, d) {
-        if (!self.cache[orientation][regex]) {
-            self.cache[orientation][regex] = {};
+    cache_data : function(orientation, displayas, regex, id, t, m, g, d) {
+        if (!self.cache[orientation][displayas][regex]) {
+            self.cache[orientation][displayas][regex] = {};
         }
-        if (!self.cache[orientation][regex][id]) {
-            self.cache[orientation][regex][id] = {};
+        if (!self.cache[orientation][displayas][regex][id]) {
+            self.cache[orientation][displayas][regex][id] = {};
         }
 
-        self.cache[orientation][regex][id][self.TREE_KEY] = t;
-        self.cache[orientation][regex][id][self.TREE_MAP_KEY] = m;
-        self.cache[orientation][regex][id][self.GRAPH_KEY] = g;
-        self.cache[orientation][regex][id][self.DESCRIPTION_KEY] = d;
+        self.cache[orientation][displayas][regex][id][self.TREE_KEY] = t;
+        self.cache[orientation][displayas][regex][id][self.TREE_MAP_KEY] = m;
+        self.cache[orientation][displayas][regex][id][self.GRAPH_KEY] = g;
+        self.cache[orientation][displayas][regex][id][self.DESCRIPTION_KEY] = d;
     },
 
     // Displays given images and description
@@ -160,6 +166,7 @@ M.preg_authoring_tools_script = (function() {
         var jsonarray = JSON.parse(data);
 
         var orientation = self.get_orientation();
+        var displayas = self.get_displayas();
         var r = jsonarray[self.REGEX_KEY];
         var i = jsonarray[self.ID_KEY] + '';
         var t = jsonarray[self.TREE_KEY];
@@ -168,8 +175,8 @@ M.preg_authoring_tools_script = (function() {
         var d = jsonarray[self.DESCRIPTION_KEY];
 
         // Cache the data.
-        if (orientation && r && i && t && m && g && d) {
-            self.cache_data(orientation, r, i, t, m, g, d);
+        if (orientation && displayas && r && i && t && m && g && d) {
+            self.cache_data(orientation, displayas, r, i, t, m, g, d);
         }
 
         // Display the data.
@@ -184,15 +191,20 @@ M.preg_authoring_tools_script = (function() {
     // Checks for cached data and if it doesn't exist, sends a request to the server
     load_content_by_id : function(id) {
         var currenttreeorientation = self.get_orientation();
-        if (self.node_id == id && self.tree_orientation===currenttreeorientation) {
+        var currentdisplayas = self.get_displayas();
+        var needdeselect = self.node_id == id
+                        && self.tree_orientation===currenttreeorientation
+                        && self.displayas===currentdisplayas;
+        if (needdeselect) {
             id = '-1';  // Deselect the node when clicked for the second time.
         }
         self.tree_orientation = currenttreeorientation;
+        self.displayas = currentdisplayas;
         self.node_id = id;
         var regex = self.main_input.val();
 
         // Check the cache.
-        var cachedregex = self.cache[self.get_orientation()][regex];
+        var cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
         var cachedid = null;
         if (cachedregex) {
             cachedid = cachedregex[id];
@@ -208,7 +220,8 @@ M.preg_authoring_tools_script = (function() {
             data: {
                 regex: regex,
                 id: id,
-                tree_orientation: self.tree_orientation
+                tree_orientation: self.tree_orientation,
+                displayas: self.displayas
             },
             success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
@@ -271,6 +284,10 @@ M.preg_authoring_tools_script = (function() {
 
     get_orientation : function() {
         return $("#tree_orientation_radioset input:checked").val();
+    },
+
+    get_displayas : function () {
+        return $("#charset_process_radioset input:checked").val();
     }
 };
 
