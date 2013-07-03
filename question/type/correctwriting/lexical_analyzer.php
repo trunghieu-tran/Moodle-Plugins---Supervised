@@ -41,17 +41,17 @@ require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php'
 require_once($CFG->dirroot.'/question/type/correctwriting/lexical_mistakes.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
-//Other necessary requires
+// Other necessary requires
 
 class qtype_correctwriting_lexical_analyzer {
-    protected $answerobj;//Correct answer as an object (answer, fraction, feedback, names for tokens or sematic nodes)
-    protected $question;//A reference to the question object with necessary data (language id, answers, threshold etc)
-    protected $language;//Language object - contains scaner, parser etc
-    protected $errors;//Array of error objects - teacher errors when entering answer
+    protected $answerobj;// Correct answer as an object (answer, fraction, feedback, names for tokens or sematic nodes)
+    protected $question;// A reference to the question object with necessary data (language id, answers, threshold etc)
+    protected $language;// Language object - contains scaner, parser etc
+    protected $errors;// Array of error objects - teacher errors when entering answer
 
-    protected $mistakes;//Array of mistake objects - student errors (merged from all stages)
+    protected $mistakes;// Array of mistake objects - student errors (merged from all stages)
 
-    protected $fitness;//Fitness, used to choose appropriate analyzer
+    protected $fitness;// Fitness, used to choose appropriate analyzer
     /**
      * A string pair with best matches, which can be passed to sequence analyzer
      * @var block_formal_langs_string_pair
@@ -71,23 +71,23 @@ class qtype_correctwriting_lexical_analyzer {
         $this->answerobj = $answer;
         $this->question = $question;
 
-        //TODO:
-        //0. Create language object
+        // TODO:
+        // 0. Create language object
         $language = $question->get_used_language();
-        //1. Scan answer and response - Mamontov
+        // 1. Scan answer and response - Mamontov
         //  - call language object to do it
         $responsestring = $language->create_from_string($responsestr);
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
         $this->bestmatchstring = new block_formal_langs_string_pair($answerstring, $responsestring, null);
-        //2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
+        // 2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
         $responsetokens = $responsestring->stream->tokens;
         $answertokens =  $answerstring->stream->tokens;
         if (count($responsetokens) == count($answertokens)) {
             $same = true;
             if (count($responsetokens) != 0) {
-               for($i = 0; $i < count($responsetokens); $i++) {
-                   $same = ($same && $responsetokens[$i]->is_same($answertokens[$i]));
-               }
+                for ($i = 0; $i < count($responsetokens); $i++) {
+                    $same = ($same && $responsetokens[$i]->is_same($answertokens[$i]));
+                }
             }
             if ($same) {
                 $this->correctedresponse = $responsetokens;
@@ -96,7 +96,7 @@ class qtype_correctwriting_lexical_analyzer {
                 return;
             }
         }
-        //3. Set array of mistakes from lexer errors - Mamontov
+        // 3. Set array of mistakes from lexer errors - Mamontov
         $mistakes = array();
         // Mapping from error kind to our own language string
         $mistakecustomhandling = array('clanguagemulticharliteral' => 'clanguagemulticharliteral');
@@ -104,7 +104,7 @@ class qtype_correctwriting_lexical_analyzer {
             /**
              * @var block_formal_langs_lexical_error $error
              */
-            foreach($responsestring->stream->errors as $index => $error) {
+            foreach ($responsestring->stream->errors as $index => $error) {
                 $mistake = new qtype_correctwriting_scanning_mistake();
 
                 $message =  $error->errormessage;
@@ -133,63 +133,59 @@ class qtype_correctwriting_lexical_analyzer {
             }
         }
 
-        //$analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
-        //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        //$this->fitness = $analyzer->fitness();
-        
-        
-        //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
+        // $analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
+        // $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        // $this->fitness = $analyzer->fitness();
+
+        // 4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
         $options = new block_formal_langs_comparing_options();
         $options->usecase = $question->usecase;
-        //var_dump($question->lexicalerrorthreshold);
         $bestgroups = block_formal_langs_string_pair::best_string_pairs($answerstring, $responsestring, $question->lexicalerrorthreshold, $options);
 
-        
-        //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
-            //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-        
+        // 6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
+        // 5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
+
         $analyzerarray = array();
-        for($i=0; $i<count($bestgroups); $i++) {
+        for ($i=0; $i<count($bestgroups); $i++) {
             $analyzer = new qtype_correctwriting_sequence_analyzer($question, $bestgroups[$i], $language);
             $analyzerarray[] = $analyzer;
         }
-        
-        if(count($bestgroups)==0) {
+
+        if (count($bestgroups) == 0) {
             $analyzer = new qtype_correctwriting_sequence_analyzer($question, $this->bestmatchstring, $language);
             $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
             $this->fitness = $analyzer->fitness();
         }
-        
-        //7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
-        if(count($analyzerarray)>0) {
+
+        // 7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
+        if (count($analyzerarray)>0) {
             $maxfit=$analyzerarray[0]->fitness();
             $numberanalyzer=0;
-            for($i=0; $i<count($analyzerarray); $i++){
-                if($analyzerarray[$i]->fitness()>$maxfit){
+            for ($i=0; $i<count($analyzerarray); $i++) {
+                if ($analyzerarray[$i]->fitness()>$maxfit) {
                     $maxfit=$analyzerarray[$i]->fitness();
                     $numberanalyzer=$i;
                 }
             }
-        
-            //8. Set array of mistakes accordingly - Birukova and Mamontov
+
+            // 8. Set array of mistakes accordingly - Birukova and Mamontov
             //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
-        
-            //$this->correctedresponse= $responsestring->stream->tokens;
+
+            // $this->correctedresponse= $responsestring->stream->tokens;
             $this->correctedresponse = $bestgroups[$numberanalyzer]->correctedstring()->stream->tokens;
             $lexicalmistakes = $this->matches_to_mistakes($bestgroups[$numberanalyzer]);
-            
+
             $this->mistakes = array_merge($mistakes, $lexicalmistakes);
             $this->mistakes = array_merge($this->mistakes, $analyzerarray[$numberanalyzer]->mistakes());
-            //var_dump($this->mistakes);
-            //$this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        
-            //$this->fitness = $analyzer->fitness();
-            $this->fitness=$analyzerarray[$numberanalyzer]->fitness();   
-            $this->fitness=$this->fitness-$maxfit;
+            // $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+
+            // $this->fitness = $analyzer->fitness();
+            $this->fitness = $analyzerarray[$numberanalyzer]->fitness();
+            $this->fitness = $this->fitness-$maxfit;
         }
-        //NOTE: if responsestr is null just check for errors - Mamontov
-        //NOTE: if some stage create errors in answer, stop processing right there
-        //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
+        // NOTE: if responsestr is null just check for errors - Mamontov
+        // NOTE: if some stage create errors in answer, stop processing right there
+        // NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
     }
 
     public function get_corrected_response() {
@@ -202,29 +198,28 @@ class qtype_correctwriting_lexical_analyzer {
         $arrayofmistakes=array();
         $matches = array();
         $matches = $group->matches();
-        for($i=0; $i<count($matches); $i++){
-            if($matches[$i]->mistakeweight>0){
+        for ($i=0; $i<count($matches); $i++) {
+            if ($matches[$i]->mistakeweight>0) {
                 $mistake = new qtype_correctwriting_lexical_mistake($matches[$i]);
-                
                 $mistake->languagename = $this->question->get_used_language()->name();
-                //$mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
+                // $mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
                 $mistake->answermistaken = $matches[$i]->correcttokens;
                 $mistake->responsemistaken = $matches[$i]->comparedtokens;
                 $mistake->weight = $this->question->lexicalerrorweight;
                 $mistake->stringpair = $group;
-                $mistake->mistakemsg = $matches[$i]->message($group->correctstring(),$group->comparedstring());
-                $arrayofmistakes[]=$mistake;
+                $mistake->mistakemsg = $matches[$i]->message($group->correctstring(), $group->comparedstring());
+                $arrayofmistakes[] = $mistake;
             }
         }
         return $arrayofmistakes;
     }
 
     /**
-    * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
-    * Used to choose best matched answer
-    * Fitness is negative or zero (no errors, full match)
-    * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
-    */
+     * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
+     * Used to choose best matched answer
+     * Fitness is negative or zero (no errors, full match)
+     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
+     */
     public function fitness() {
         return $this->fitness;
     }
@@ -241,7 +236,7 @@ class qtype_correctwriting_lexical_analyzer {
         return $this->errors;
     }
 
-    //Other necessary access methods
+    // Other necessary access methods
 }
 
 ?>
