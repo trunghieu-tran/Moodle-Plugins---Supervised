@@ -52,6 +52,11 @@ M.poasquestion_text_and_button = (function() {
         self.dialogtitle = dialogtitle;
     },
 
+    fix_textarea_rows : function(e) {
+        var jqtarget = $(e.target);
+        jqtarget.attr('rows',jqtarget.val().split('\n').length);
+    },
+
     /**
      * Sets handler for button with id = button_id and input with id input_id
      * @param {Object} Y NOT USED! It need because moodle passes this object as first param anyway...
@@ -77,6 +82,7 @@ M.poasquestion_text_and_button = (function() {
             targetinput: testregexlineedit
         };
         $(testregexbtn).click(eventdata, self.btn_pressed);
+        $(testregexlineedit).keyup(self.fix_textarea_rows).trigger('keyup');
     },
 
     /**
@@ -116,6 +122,7 @@ M.poasquestion_text_and_button = (function() {
             width: self.dialogwidth,
             title: self.dialogtitle,
             buttons: [
+                {text: "Save", click: self.close_and_set_new_data},
                 {text: "Cancel", click: function() {$(this).dialog("close")}}
             ]
         });
