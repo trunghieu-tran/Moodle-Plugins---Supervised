@@ -48,15 +48,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      //TODO - uncomment first two fields when integrating Birukova code
     private $floatfields = array('lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
                             'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),       //Lexical error weight field
-                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true),       //Absent token mistake weight field
-                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true),        //Extra token mistake weight field
-                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true),       //Moved token mistake weight field
-                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true),           //Hint grade border
-                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true),      //Max mistake percentage
-                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false),        //"What is" hint penalty
-                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false),      //"Where" text hint penalty
-                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true),   //Absent token mistake hint penalty factor
-                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false)       //"Where" picture hint penalty
+                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),       //Absent token mistake weight field
+                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),        //Extra token mistake weight field
+                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true, 'min' => 0, 'max' => 1),       //Moved token mistake weight field
+                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           //Hint grade border
+                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      //Max mistake percentage
+                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),        //"What is" hint penalty
+                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),      //"Where" text hint penalty
+                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),   //Absent token mistake hint penalty factor
+                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)       //"Where" picture hint penalty
                             );
 
     /**  Fills an inner definition of form fields
@@ -76,8 +76,20 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
 
-        $languages = block_formal_langs::available_langs();
-
+        $currentlanguages = block_formal_langs::available_langs();
+        $showedlanguages = $CFG->qtype_correctwriting_showablelangs;
+        $languages = array();
+        if (textlib::strlen($showedlanguages) != 0)
+        {
+            $showedlanguages = explode(',', $CFG->qtype_correctwriting_showablelangs);
+            foreach($showedlanguages as $langkey)
+            {
+                // Copy langugage to shown
+                $languages[$langkey] = $currentlanguages[$langkey];
+            }
+        } else {
+            $languages = $currentlanguages;
+        }
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
         $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
@@ -93,6 +105,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
             }
             $mform->addElement('hidden', 'confirmed', true);
+            // Warning in Moodle 2.5 shows, that we must explicitly setType for
+            // this field
+            $mform->setType('confirmed', PARAM_BOOL);
         }
 
         parent::definition_inner($mform);
@@ -133,16 +148,41 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $mform =& $this->_form;
         $data = $mform->exportValues();
-        //Get information about field data
+        // Extract created question, loaded by get_options
+        $question = (array)$this->question;
+        // Get information about field data
         if (array_key_exists('answer', $data)) {
             $lang = block_formal_langs::lang_object($data['langid']);
             if ($lang!=null) {
+                $index = 0;
                 //Parse descriptions to populate script
                 foreach($data['answer'] as $key => $value) {//This loop will pass only on non-empty answers.
                     $processedstring = $lang->create_from_string($value);
                     $tokens = $processedstring->stream->tokens;
-                    $fractionel = $mform->getElementValue('fraction[' . $key .']');
-                    $fraction = floatval($fractionel[0]);
+                    $fraction = 0;
+                    $fractionloaded = false;
+                    // If submitted form, take  fraction from POST-array
+                    // otherwise, we can use submitted question to get information on answer
+                    if (array_key_exists('fraction' , $data)) {
+                        if (array_key_exists($key, $data['fraction'])) {
+                            $fraction = floatval($data['fraction'][$key]);
+                            $fractionloaded = true;
+                        }
+                    }
+
+                    // If loading from post array failed, try get fraction from base question options
+                    if ($fractionloaded == false) {
+                        // If we created question for first time, there will be no options in question
+                        // so we skip them
+                        if (array_key_exists('options', $question)) {
+                            $answers = $question['options']->answers;
+                            $answerids = array_keys($answers);
+                            $answerid = $answerids[$index];
+                            $fraction = floatval($answers[$answerid]->fraction);
+                        }
+                    }
+                    $index++;
+
                     if (count($tokens) > 0 && ($fraction >= $data['hintgradeborder'])) {//Answer needs token descriptions.
                         $textdata = array();
                         foreach($tokens as $token) {
@@ -176,14 +216,25 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
-
-        $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
-
+        // A replace for standard get_per_answer_fields, extending a fields for
+        // answer and moving fraction to a next line
+        $repeated = array();
+        $repeated[] = $mform->createElement('text', 'answer',
+            $label, array('size' => 80));
+        $repeated[] = $mform->createElement('select', 'fraction',
+            get_string('grade'), $gradeoptions);
         $repeated[] = $mform->createElement('static', 'descriptionslabel', get_string('tokens', 'qtype_correctwriting'), get_string('lexemedescriptions', 'qtype_correctwriting'));
         $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                             get_string('lexemedescriptions', 'qtype_correctwriting'),
                                             array('rows' => 2, 'cols' => 80));
+        $repeated[] = $mform->createElement('editor', 'feedback',
+            get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+
+        $repeatedoptions['answer']['type'] = PARAM_RAW;
         $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
+        $repeatedoptions['fraction']['default'] = 0;
+        $answersoption = 'answers';
+
         return $repeated;
     }
 
@@ -280,6 +331,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     public function validation($data, $files) {
 
         $errors = parent::validation($data, $files);
+
+        // Validate floating fields for min/max borders.
+        foreach ($this->floatfields as $name => $params) {
+            if ($data[$name] < $params['min']) {
+                $errors[$name] = get_string('toosmallfloatvalue', 'qtype_correctwriting', $params['min']);
+            }
+            if ($data[$name] > $params['max']) {
+                $errors[$name] = get_string('toobigfloatvalue', 'qtype_correctwriting', $params['max']);
+            }
+        }
 
         // Scan for errors
         $lang = block_formal_langs::lang_object($data['langid']);
