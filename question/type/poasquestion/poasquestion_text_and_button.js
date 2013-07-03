@@ -82,7 +82,7 @@ M.poasquestion_text_and_button = (function() {
             targetinput: testregexlineedit
         };
         $(testregexbtn).click(eventdata, self.btn_pressed);
-        $(testregexlineedit).keyup(self.fix_textarea_rows).tigger('keyup');
+        $(testregexlineedit).keyup(self.fix_textarea_rows).trigger('keyup');
     },
 
     /**
@@ -122,6 +122,7 @@ M.poasquestion_text_and_button = (function() {
             width: self.dialogwidth,
             title: self.dialogtitle,
             buttons: [
+                {text: "Save", click: self.close_and_set_new_data},
                 {text: "Cancel", click: function() {$(this).dialog("close")}}
             ]
         });
