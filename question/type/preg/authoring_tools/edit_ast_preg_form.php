@@ -97,6 +97,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         $mform->addElement('text', 'regex_match_text', 'Input string', array('size' => 100));
 		$mform->setType('regex_match_text', PARAM_RAW);
+		$mform->addElement('html', '</br><div id="test_regex" ></div></br>');
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', 'Check string');
 
