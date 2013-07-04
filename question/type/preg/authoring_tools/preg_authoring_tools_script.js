@@ -83,7 +83,16 @@ M.preg_authoring_tools_script = (function() {
     },
 
     upd_answer_success : function(data, textStatus, jqXHR) {
-        $('#test_regex').html(data.regex_test);
+        // TODO: delete on release
+        var indexofbracket = data.indexOf('{');
+        if (indexofbracket != 0) {
+            alert(data.substr(0, indexofbracket));
+            data = data.substr(indexofbracket);
+        }
+        // End of TODO
+
+        var jsonarray = JSON.parse(data);
+        $('#test_regex').html(jsonarray.regex_test);
     },
 
     regex_check_string : function(e) {
@@ -177,7 +186,8 @@ M.preg_authoring_tools_script = (function() {
         // TODO: delete on release
         var indexofbracket = data.indexOf('{');
         if (indexofbracket != 0) {
-            alert(data.responseText.substr(0, indexofbracket));
+            alert(data.substr(0, indexofbracket));
+            data = data.substr(indexofbracket);
         }
         // End of TODO
 
