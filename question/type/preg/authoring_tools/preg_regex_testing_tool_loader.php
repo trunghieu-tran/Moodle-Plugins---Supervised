@@ -19,9 +19,7 @@ function qtype_preg_get_json_array() {
     global $CFG;
     $json_array = array();
     $regextext = optional_param('regex', '', PARAM_RAW);
-	var_dump($regextext);
 	$answer = optional_param('answer', '', PARAM_RAW);
-	var_dump($answer);
 	
 	$regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, array('answer' => $answer));
 	$regex_testing_tool->generate_json($json_array);
