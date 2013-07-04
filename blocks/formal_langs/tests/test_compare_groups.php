@@ -16,7 +16,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
     function test_compare_matches_groups_1() {
         $arr = new block_formal_langs_token_stream(array(), array());
         $group11 = new block_formal_langs_matches_group();
-        $group12=new block_formal_langs_matches_group();
+        $group12 = new block_formal_langs_matches_group();
         $pair11 = new block_formal_langs_matched_tokens_pair(array(0), array(0), 0);
         $pair12 = new block_formal_langs_matched_tokens_pair(array(1), array(1), 1);
         $pair13 = new block_formal_langs_matched_tokens_pair(array(0), array(1), 1);
