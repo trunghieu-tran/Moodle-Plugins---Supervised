@@ -92,7 +92,7 @@ M.preg_authoring_tools_script = (function() {
             url: self.preg_www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
             data: {
                 regex: self.main_input.val(),
-                answer: $('#id_regex_match_text').html(),
+                answer: $('#id_regex_match_text').val(),
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
