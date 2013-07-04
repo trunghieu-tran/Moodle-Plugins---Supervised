@@ -118,7 +118,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response.
      */
-    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+    public function render_hint($renderer, question_attempt $qa = null, question_display_options $options = null, $response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
@@ -130,7 +130,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         }
         return '';
     }
-
+	
     public function could_show_hint($matchresults) {
         $queryengine = $this->question->get_query_matcher($this->question->engine);
         // Correctness should be shown if engine support partial matching or a full match is achieved.
