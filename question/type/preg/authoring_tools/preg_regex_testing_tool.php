@@ -15,6 +15,9 @@ require_once($CFG->dirroot . '/question/type/rendererbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
+/*
+ * Testing regex on strings
+ */
 class qtype_preg_regex_testing_tool {
 
     private $renderer;
@@ -30,9 +33,9 @@ class qtype_preg_regex_testing_tool {
     }
 
     /**
-     * Generate image and map for ...
+     * Generate colored string showing matched and non-matched parts of response.
      *
-     * @param array $json_array contains link on image and text map of interactive tree
+     * @param array $json_array contains colored string
      */
     public function generate_json(&$json_array) {
         $this->generate_json_for_accepted_regex($json_array);
@@ -53,5 +56,4 @@ class qtype_preg_regex_testing_tool {
     protected function generate_json_for_accepted_regex(&$json_array){
 		$json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, $this->answer);
 	}
-
 }
