@@ -34,29 +34,24 @@ class qtype_preg_regex_testing_tool {
      *
      * @param array $json_array contains link on image and text map of interactive tree
      */
-    public function generate_json(&$json_array, $regex  = null, $id = null) {
-		$json_array['regex'] = $regex;
-        $json_array['id'] = $id;
-        $this->generate_json_for_accepted_regex($json_array, $id);
+    public function generate_json(&$json_array) {
+        $this->generate_json_for_accepted_regex($json_array);
     }
 	
     protected function json_key(){
 		return 'regex_test';
 	}
 
-    protected function generate_json_for_empty_regex(&$json_array, $id){
+    protected function generate_json_for_empty_regex(&$json_array){
 		$json_array[$this->json_key()] = '';
 	}
 
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id){
+    protected function generate_json_for_unaccepted_regex(&$json_array){
 		$json_array[$this->json_key()] = 'Ooops, i can\'t build text';
 	}
 
-    protected function generate_json_for_accepted_regex(&$json_array, $id){
+    protected function generate_json_for_accepted_regex(&$json_array){
 		$json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, $this->answer);
 	}
-	
-	/*public function render_hint(){
-		return $this->hintmatch->render_hint($this->renderer, null, null, $this->answer);
-	}*/
+
 }
