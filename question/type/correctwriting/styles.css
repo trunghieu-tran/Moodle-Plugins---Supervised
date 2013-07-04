@@ -64,3 +64,13 @@ body#page-question-type-correctwriting div[id^=fitem_id_][id*=feedback_] {
     border-top: 0;
     border-bottom: 0;
 }*/
+
+body#page-question-type-correctwriting div[id^=fitem_id_fraction_] + .fitem {
+    background: #EEE;
+    border-left: 1px solid #BBB;
+    border-right: 1px solid #BBB;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 5px;
+    padding-bottom: 1px;
+}
