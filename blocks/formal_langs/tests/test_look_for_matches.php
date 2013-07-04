@@ -121,7 +121,7 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $pair2=new block_formal_langs_matched_tokens_pair(array(0),array(3,4),1);
         $pair3=new block_formal_langs_matched_tokens_pair(array(0),array(4),2);
         $pair4=new block_formal_langs_matched_tokens_pair(array(3,4),array(0),1);
-        $array_correct=array($pair1,$pair2);
+        $array_correct=array($pair1,$pair2,$pair3);
         $array_incorrect=array($pair4);
         $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other,0.6,true,$options),$array_correct),'Two pairs (a typo and extra separator) for correct token');
         $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other,0.6,false,$options),$array_incorrect),'One pair (missed separator) for incorrect token');
