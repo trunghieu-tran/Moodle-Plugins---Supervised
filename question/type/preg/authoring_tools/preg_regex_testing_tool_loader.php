@@ -10,7 +10,6 @@
 require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
 global $PAGE;
-
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
 
 /**
@@ -20,11 +19,13 @@ function qtype_preg_get_json_array() {
     global $CFG;
     $json_array = array();
     $regextext = optional_param('regex', '', PARAM_RAW);
+	var_dump($regextext);
 	$answer = optional_param('answer', '', PARAM_RAW);
-
-	$regex_testing_tool = new qtype_preg_regex_testing_tool($regex, array('answer' => $answer));
+	var_dump($answer);
+	
+	$regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, array('answer' => $answer));
 	$regex_testing_tool->generate_json($json_array);
-
+	
     return $json_array;
 }
 
