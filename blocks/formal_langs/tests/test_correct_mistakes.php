@@ -13,9 +13,9 @@ global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 class blocks_formal_langs_token_base_correct_mistakes_test extends UnitTestCase {
-
-    //masha eat cake
-    //dasha eat my cake
+    /*
+    // masha eat cake
+    // dasha eat my cake
     function test_correct_mistakes_1() {
         $lexem1=new block_formal_langs_token_base(null,'type','masha',null,0);
         $lexem2=new block_formal_langs_token_base(null,'type','eat',null,1);
@@ -44,7 +44,7 @@ class blocks_formal_langs_token_base_correct_mistakes_test extends UnitTestCase 
         $res=$strpair->correct_mistakes();
         $this->assertTrue(count($res->correctedstring->stream->tokens)==4);
     }
-    /*
+    
         function test_correct_mistakes_2() {
         $lexem1=new block_formal_langs_token_base(null,'type','masha',null,0);
         $lexem2=new block_formal_langs_token_base(null,'type','eat',null,1);

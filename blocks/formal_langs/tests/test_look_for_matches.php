@@ -13,8 +13,8 @@ global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 
 class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase {
-//comparison of the two arrays
-        static public function standart_array_compare($op1, $op2) {
+    //comparison of the two arrays
+    static public function standart_array_compare($op1, $op2) {
         if(count($op1)==count($op2))
         {
             for($i=0;$i<count($op1);$i++)
@@ -28,7 +28,7 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         return true;
     }
     //comparison of the two pairs
-        static public function eq($x, $y) {
+    static public function eq($x, $y) {
         if($x->mistakeweight==$y->mistakeweight && blocks_formal_langs_token_base_look_for_matches_test::standart_array_compare($x->correcttokens, $y->correcttokens) && blocks_formal_langs_token_base_look_for_matches_test::standart_array_compare($x->comparedtokens, $y->comparedtokens))
             return true;
         else
@@ -105,7 +105,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $this->assertTrue(count($lexem3->look_for_matches($array_other,0.5,false,$options))==0,'Pairs are not found');
         $this->assertTrue(count($lexem3->look_for_matches($array_other,0.5,true,$options))==0,'Pairs are not found');
     }
-    //Test for correct token
+
+    // Test for correct token
     public function test_look_for_matches_4() {
         $options=new block_formal_langs_comparing_options();
         $options->usecase=true;    
@@ -120,11 +121,12 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $pair2=new block_formal_langs_matched_tokens_pair(array(0),array(3,4),1);
         $pair3=new block_formal_langs_matched_tokens_pair(array(0),array(4),2);
         $pair4=new block_formal_langs_matched_tokens_pair(array(3,4),array(0),1);
-        $array_correct=array($pair1,$pair2,$pair3);
+        $array_correct=array($pair1,$pair2);
         $array_incorrect=array($pair4);
         $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other,0.6,true,$options),$array_correct),'Two pairs (a typo and extra separator) for correct token');
         $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other,0.6,false,$options),$array_incorrect),'One pair (missed separator) for incorrect token');
    }
+
 }
 
 
