@@ -11,7 +11,7 @@ require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
 global $PAGE;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
-
+$PAGE->set_context(context_system::instance());
 /**
  * Generates json array which stores authoring tools' content.
  */
