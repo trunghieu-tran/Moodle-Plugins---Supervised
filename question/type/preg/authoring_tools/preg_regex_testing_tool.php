@@ -8,8 +8,10 @@
  * @package qtype_preg
  */
 
+require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
 global $PAGE;
+
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 class qtype_preg_regex_testing_tool {
@@ -17,7 +19,7 @@ class qtype_preg_regex_testing_tool {
     private $renderer;
     private $answer;
     private $hintmatch;
-    
+
     public function __construct($regex, $answer) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
@@ -42,7 +44,7 @@ class qtype_preg_regex_testing_tool {
             $this->generate_json_for_accepted_regex($json_array, $id);
         }
     }
-	
+
     protected function json_key(){
 		return 'regex_test';
 	}

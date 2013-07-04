@@ -82,6 +82,23 @@ M.preg_authoring_tools_script = (function() {
         self.load_content_by_id(self.node_id);
     },
 
+    upd_answer_success : function(data, textStatus, jqXHR) {
+        $('#test_regex').html(data.regex_test);
+    },
+
+    regex_check_string : function(e) {
+        $.ajax({
+            type: 'GET',
+            url: self.preg_www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
+            data: {
+                regex: self.main_input.val(),
+                answer: $('#id_regex_match_text').html(),
+            },
+            success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
+            error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
+        });
+    },
+
     /**
      * Sets up options of M.poasquestion_text_and_button object
      * This method defines onfirstpresscallback method, that calls on very first
@@ -104,8 +121,9 @@ M.preg_authoring_tools_script = (function() {
                     $("#tree_orientation_radioset input, #charset_process_radioset input").change(self.radio_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
+                    $('#id_regex_check_string').click(self.regex_check_string);
                     self.load_content_by_id('-1');
-                })
+                });
             },
 
             // Function called on non-first form openings.
@@ -224,7 +242,7 @@ M.preg_authoring_tools_script = (function() {
                 displayas: self.displayas
             },
             success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
-            error: self.upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
+            error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
         });
     },
 

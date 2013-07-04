@@ -7,9 +7,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
  */
-
+require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
 global $PAGE;
+
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
 
 /**
@@ -21,9 +22,9 @@ function qtype_preg_get_json_array() {
     $regextext = optional_param('regex', '', PARAM_RAW);
 	$answer = optional_param('answer', '', PARAM_RAW);
 
-	$regex_testing_tool = new preg_regex_testing_tool($regex, array('answer' => $answer));
+	$regex_testing_tool = new qtype_preg_regex_testing_tool($regex, array('answer' => $answer));
 	$regex_testing_tool->generate_json($json_array);
-	
+
     return $json_array;
 }
 

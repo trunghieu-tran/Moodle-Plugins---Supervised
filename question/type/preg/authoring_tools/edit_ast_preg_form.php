@@ -47,12 +47,20 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $agent = getenv('HTTP_USER_AGENT');
         if (stristr($agent, 'MSIE')) {
             $mform->addElement('html', '<div style="margin-left: 79px" >');
-            $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
-            $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        }
+        $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
+        $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        $mform->addElement('html',
+                '<div id="charset_process_radioset">'
+                .'How regex should be displayed?<br />'
+                .'<input type="radio" name="authoring_tools_charset_process" id="authoring_tools_charset_process_userinscription" value="userinscription" checked />'
+                .'<label for="authoring_tools_charset_process_userinscription" >&nbsp;as it was written by user</label><br>'
+                .'<input type="radio" name="authoring_tools_charset_process" id="authoring_tools_charset_process_flags" value="flags" />'
+                .'<label for="authoring_tools_charset_process_flags" >&nbsp;as it was interpreted by parser</label><br>'
+                .'</div>'
+        );
+        if (stristr($agent, 'MSIE')) {
             $mform->addElement('html', '</div>');
-        } else {
-            $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
-            $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
         //Add generated map
         // Add tree.
@@ -85,11 +93,11 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setExpanded('regex_description_header', 1);
         $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
-        
+
         /*$answer = array('answer' => 'Di bats eat cats?');
         $testing_tool = new qtype_preg_regex_testing_tool('33', $answer);
         $mform->addElement('html', $testing_tool->render_hint());*/
-        
+
         //Add tool for check regexp match
         $mform->addElement('header', 'regex_match_header', 'Input string for check here:');
 		$mform->setExpanded('regex_match_header', 1);
