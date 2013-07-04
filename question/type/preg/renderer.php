@@ -104,8 +104,8 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders matched part of the response */
     public function render_matched($str) {
         if ($str !== '') {
-			return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0), 'style'=>'background:green;'));
-            //return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(1)));
+			//return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0), 'style'=>'background:green;'));
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(1)));
         }
         return '';
     }
@@ -113,8 +113,8 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders unmatched part of the response */
     public function render_unmatched($str) {
         if ($str !== '') {
-			return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0), 'style'=>'background:red;'));
-            //return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0)));
+			//return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0), 'style'=>'background:red;'));
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0)));
         }
         return '';
     }
