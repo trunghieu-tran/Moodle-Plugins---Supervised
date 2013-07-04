@@ -486,12 +486,12 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
         // TODO: generic mistakes handling
         $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
-        $max = round($result);
         $str = '';
         $possiblepairs = array();
         for ($k=0; $k < count($other); $k++) {
             // incorrect lexem
             if ($iscorrect == true) {
+                $max = round($result);
                 // possible pair (typo)
                 $dist = $this->possible_pair($other[$k], $max, $options);
                 if ($dist != -1) {
