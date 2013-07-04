@@ -273,26 +273,6 @@ class qtype_preg_question extends question_graded_automatically
             $matcher = $this->matchers_cache[$answerid];
         } else {// Create and store matcher object.
 
-            // Convert to actually used notation if necessary.
-            $engineclass = 'qtype_preg_'.$engine;
-            $queryengine = new $engineclass;
-            $usednotation = $queryengine->used_notation();
-            // Initialise $notationobj so it won't disappear after condition and could be used later.
-            $notationobj = null;
-            if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
-                $notationclass = 'qtype_preg_notation_'.$notation;
-                $notationobj = new $notationclass($regex, $modifiers);
-                $regex = $notationobj->convert_regex($usednotation);
-            }
-
-            // Modify regex according with question properties.
-            $for_regexp=$regex;
-            if ($exact) {
-                // Grouping is needed in case regexp contains top-level alternations.
-                // Use non-capturing grouping to not mess-up with user subexpression capturing.
-                $for_regexp = '^(?:'.$for_regexp.')$';
-            }
-
             // Create and fill options object.
             $matchingoptions = new qtype_preg_matching_options();
             $matchingoptions->modifiers = $modifiers;
@@ -306,10 +286,26 @@ class qtype_preg_question extends question_graded_automatically
                 }
             }
 
-            // Convert options to desired notation.
-            if ($notation !== null && $notation != $usednotation) {
-                $notationobj->options = $matchingoptions;
+            // Convert to actually used notation if necessary.
+            $engineclass = 'qtype_preg_'.$engine;
+            $queryengine = new $engineclass;
+            $usednotation = $queryengine->used_notation();
+            // Initialise $notationobj so it won't disappear after condition and could be used later.
+            $notationobj = null;
+            if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
+                $notationclass = 'qtype_preg_notation_'.$notation;
+                $notationobj = new $notationclass($regex, $modifiers, $matchingoptions);
+                $regex = $notationobj->convert_regex($usednotation);
+                $modifiers = $notationobj->convert_modifiers($usednotation);
                 $matchingoptions = $notationobj->convert_options($usednotation);
+            }
+
+            // Modify regex according with question properties.
+            $for_regexp=$regex;
+            if ($exact) {
+                // Grouping is needed in case regexp contains top-level alternations.
+                // Use non-capturing grouping to not mess-up with user subexpression capturing.
+                $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
             $matcher = new $engineclass($for_regexp, $matchingoptions);
