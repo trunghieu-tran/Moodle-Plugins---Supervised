@@ -294,9 +294,8 @@ class qtype_preg_question extends question_graded_automatically
             $notationobj = null;
             if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
                 $notationclass = 'qtype_preg_notation_'.$notation;
-                $notationobj = new $notationclass($regex, $modifiers, $matchingoptions);
+                $notationobj = new $notationclass($regex, $matchingoptions);
                 $regex = $notationobj->convert_regex($usednotation);
-                $modifiers = $notationobj->convert_modifiers($usednotation);
                 $matchingoptions = $notationobj->convert_options($usednotation);
             }
 
