@@ -319,7 +319,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($matchresults->full);
 
         // Test extended notation.
-        $regex = "Do\\s+#question verb\nc a t s   \\s+#subject\n eat[ ]+#verb\nbats\?";
+        $regex = "Do\\s+#question verb\nc a t s   \\s+#subject\n eat[ ]+#verb\nbats\?#comment";
         $matcher = $testquestion->get_matcher($testquestion->engine, $regex, true, $testquestion->get_modifiers(false), null, 'pcreextended');
         $matchresults = $matcher->match('Do cats eat bats?');
         $this->assertTrue($matchresults->full);
