@@ -304,7 +304,9 @@ class qtype_preg_question extends question_graded_automatically
             if ($exact) {
                 // Grouping is needed in case regexp contains top-level alternations.
                 // Use non-capturing grouping to not mess-up with user subexpression capturing.
-                $for_regexp = '^(?:'.$for_regexp.')$';
+                // Add line break before last bracket since regex may end in the comment in extended notation.
+                // Line breaks will be ignored in other notations, so it's ok to add it anyway.
+                $for_regexp = '^(?:'.$for_regexp."\n)$";
             }
 
             $matcher = new $engineclass($for_regexp, $matchingoptions);
