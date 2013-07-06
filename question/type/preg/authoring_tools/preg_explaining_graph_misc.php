@@ -136,7 +136,7 @@ class qtype_preg_explaining_graph_tool_link {
     public $style = '';         // visual style of link (for image)
     public $owner = NULL;       // subgraph which has this link
 
-    public function __construct($lbl, &$src, &$dst, &$ownr = NULL,$stl = 'normal') {
+    public function __construct($lbl, $src, $dst, $ownr = NULL, $stl = 'normal') {
         $this->label = $lbl;
         $this->source = $src;
         $this->destination = $dst;
@@ -223,7 +223,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * Second part of optimization - processing sequences of simple characters in graph.
      * @param qtype_preg_explaining_graph_tool_subgraph $gmain Main subgraph.
      */
-    private function process_simple_characters(&$gmain) {
+    public function process_simple_characters(&$gmain) {
         for ($i = 0; $i < count($this->nodes); $i++) {
             $neighbor = NULL;   // no neighbor yet
 
@@ -271,7 +271,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $parent Processed graph of $this.  
      * @param qtype_preg_explaining_graph_tool_subgraph $gmain Main subgraph.
      */
-    private function process_asserts(&$parent, &$gmain) {
+    public function process_asserts(&$parent, &$gmain) {
         // lets find an assert
         foreach ($this->nodes as $iter) {
             $neighbor = null;
@@ -330,10 +330,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             $tmpdnode->label[0], $tmplabel2), $this->nodes[count($this->nodes) - 1], $neighborR, $this);
                     }
                 // third case - neighbors are not in the same subgraphs, but left neighbor is in same as assert
-                } else if ($neighborR->owner != $neighborL->owner && $neighborL->owner == $this && $neighborR->owner != $this) {
+                } else if ($neighborR->owner !== $neighborL->owner && $neighborL->owner === $this && $neighborR->owner !== $this) {
                     // find a label of link between left neighbor and assert
                     $tmplabel1 = $gmain->find_link($neighborL, $tmpdnode)->label;
-
                     // if current subgraph is parent of right neighbor's owner...
                     if ($this->is_child($neighborR->owner)) {
                         // if right neighbor is just a point...
@@ -447,7 +446,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * Fourth part of optimization - processing sequences of voids in graph.
      * @param qtype_preg_explaining_graph_tool_subgraph $graph Processed graph.
      */
-    private function process_voids(&$gmain) {
+    public function process_voids(&$gmain) {
         foreach ($this->nodes as $iter) {
             // void should has an orange color
             if ($iter->color == 'orange') {
