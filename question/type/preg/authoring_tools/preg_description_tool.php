@@ -406,8 +406,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         if($result===null){
             //   &        >       <       "       '
             // &#38;    &#62;   &#60;   &#34;   &#39;
-            if($escapehtml && ($code==34||$code==38||$code==39||$code==60||$code==62)){
-                $result = '&#'.$code.';';
+            if($escapehtml){
+                $result = qtype_preg_authoring_tool::escape_char_by_code($code,'html');
             } else {
                 $result = $iscode ? textlib::code2utf8($utf8chr) : $utf8chr;
             }
