@@ -267,6 +267,13 @@ abstract class qtype_preg_description_node{
     abstract public function pattern($node_parent=null,$form=null);
 
     /**
+     * Constructs {$a} object for get_string
+     *
+     * @return object object that should be passed to get_string for current node.
+     */
+    //abstract public function get_a();
+
+    /**
      * Recursively generates description of tree (subtree).
      *
      * @param string $numbering_pattern Pattern to track numbering.
@@ -284,12 +291,23 @@ abstract class qtype_preg_description_node{
      * @param string $s same as in get_string
      * @param string $form Required form.
      */
-    protected static function get_form_string($s,$form=null){
+    protected static function get_form_string($s, $a, $form=null){
 
+        if(!is_object($a)) {
+            $form = $a;
+            $a = null;
+        }
         if(isset($form) && $form !== ''){
             $s.='_'.$form;
         }
-        return get_string($s,'qtype_preg');
+        $str = get_string($s,'qtype_preg', $a);
+        // TODO process $a directly in classes
+        $str = str_replace('{a->firstoperand}', '%1', $str);
+        $str = str_replace('{a->secondoperand}', '%2', $str);
+        $str = str_replace('{a->thirdoperand}', '%3', $str);
+        $str = str_replace('{a->', '%', $str);
+        $str = str_replace('}', '', $str);
+        return $str;
     }
 
     /**
@@ -373,7 +391,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * @param int $code character code
      * @return string|null description of character (if character is non printable) or null.
      */
-    public static function describe_nonprinting($code,$form=null){
+    public static function describe_nonprinting($code,$form=null) {
         // null returns if description is not needed
         if ($code === null || self::is_chr_printable($code)) {
             return null;
@@ -381,8 +399,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
         $hexcode = strtoupper(dechex($code));
-        if($code<=32||$code==127||$code==160||$code==173
-            ||$code==8194||$code==8195||$code==8201||$code==8204||$code==8205){
+        if ($code<=32||$code==127||$code==160||$code==173
+            ||$code==8194||$code==8195||$code==8201||$code==8204||$code==8205) {
             $result = self::get_form_string('description_char'.$hexcode,$form);
         } else {
             $result = str_replace('%code',$hexcode,
