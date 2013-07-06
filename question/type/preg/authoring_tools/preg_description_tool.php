@@ -316,10 +316,10 @@ abstract class qtype_preg_description_node {
         }
         $str = get_string($s, 'qtype_preg', $a);
         // TODO process $a directly in classes
-        $str = str_replace('{a->firstoperand}', '%1', $str);
-        $str = str_replace('{a->secondoperand}', '%2', $str);
-        $str = str_replace('{a->thirdoperand}', '%3', $str);
-        $str = str_replace('{a->', '%', $str);
+        $str = str_replace('{$a->firstoperand}', '%1', $str);
+        $str = str_replace('{$a->secondoperand}', '%2', $str);
+        $str = str_replace('{$a->thirdoperand}', '%3', $str);
+        $str = str_replace('{$a->', '%', $str);
         $str = str_replace('}', '', $str);
         return $str;
     }

@@ -221,12 +221,12 @@ $string['description_wordbreak_neg'] = 'не на границе слова';
 $string['description_esc_a'] = 'в начале текста';
 $string['description_esc_z'] = 'в конце текста';
 // TYPE_LEAF_BACKREF
-$string['description_backref'] = 'обратная ссылка на подмаску №{a->number}';
-$string['description_backref_name'] = 'обратная ссылка на подмаску "{a->name}"';
+$string['description_backref'] = 'обратная ссылка на подмаску №{$a->number}';
+$string['description_backref_name'] = 'обратная ссылка на подмаску "{$a->name}"';
 // TYPE_LEAF_RECURSION
 $string['description_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
-$string['description_recursion'] = 'рекурсивное совпадение с подмаской  №{a->number}';
-$string['description_recursion_name'] = 'рекурсивное совпадение с подмаской "{a->name}"';
+$string['description_recursion'] = 'рекурсивное совпадение с подмаской  №{$a->number}';
+$string['description_recursion_name'] = 'рекурсивное совпадение с подмаской "{$a->name}"';
 // TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'регистронезависимо:';
 $string['description_unsetoption_i'] = 'регистрозависимо:';
@@ -241,71 +241,71 @@ $string['description_unsetoption_U'] = 'квантификаторы жадны�
 $string['description_option_J'] = 'повторение имен разрешено:';
 $string['description_unsetoption_J'] = 'повторение имен запрещено:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '{a->firstoperand} повторяется от {a->leftborder} до {a->rightborder} раз(а){a->greedy}';
-$string['description_finite_quant_strict'] = '{a->firstoperand} повторяется {a->count} раз(а){a->greedy}';
-$string['description_finite_quant_0'] = '{a->firstoperand} повторяется не более {a->rightborder} раз или отсутствует{a->greedy}';
-$string['description_finite_quant_1'] = '{a->firstoperand} повторяется не более {a->rightborder} раз{a->greedy}';
-$string['description_finite_quant_01'] = '{a->firstoperand} может отсутствовать{a->greedy}';
+$string['description_finite_quant'] = '{$a->firstoperand} повторяется от {$a->leftborder} до {$a->rightborder} раз(а){$a->greedy}';
+$string['description_finite_quant_strict'] = '{$a->firstoperand} повторяется {$a->count} раз(а){$a->greedy}';
+$string['description_finite_quant_0'] = '{$a->firstoperand} повторяется не более {$a->rightborder} раз или отсутствует{$a->greedy}';
+$string['description_finite_quant_1'] = '{$a->firstoperand} повторяется не более {$a->rightborder} раз{$a->greedy}';
+$string['description_finite_quant_01'] = '{$a->firstoperand} может отсутствовать{$a->greedy}';
 $string['description_finite_quant_borders_err'] = ' (некорректные границы у квантификатора)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '{a->firstoperand} повторяется хотябы {a->leftborder} раз(а){a->greedy}';
-$string['description_infinite_quant_0'] = '{a->firstoperand} повторяется любое количество раз или отсутствует{a->greedy}';
-$string['description_infinite_quant_1'] = '{a->firstoperand} повторяется любое количество раз{a->greedy}';
-// {a->greedy}
+$string['description_infinite_quant'] = '{$a->firstoperand} повторяется хотябы {$a->leftborder} раз(а){$a->greedy}';
+$string['description_infinite_quant_0'] = '{$a->firstoperand} повторяется любое количество раз или отсутствует{$a->greedy}';
+$string['description_infinite_quant_1'] = '{$a->firstoperand} повторяется любое количество раз{$a->greedy}';
+// {$a->greedy}
 $string['description_quant_lazy'] = ' (ленивый квантификатор)';
 $string['description_quant_greedy'] = '';
 $string['description_quant_possessive'] = ' (сверхжадный квантификатор)';
 // TYPE_NODE_CONCAT
-$string['description_concat'] = '{a->firstoperand} затем {a->secondoperand}';
-$string['description_concat_wcomma'] = '{a->firstoperand}, затем {a->secondoperand}';
-$string['description_concat_space'] = '{a->firstoperand} {a->secondoperand}';
-$string['description_concat_and'] = '{a->firstoperand} и {a->secondoperand}';
-$string['description_concat_short'] = '{a->firstoperand}{a->secondoperand}';
+$string['description_concat'] = '{$a->firstoperand} затем {$a->secondoperand}';
+$string['description_concat_wcomma'] = '{$a->firstoperand}, затем {$a->secondoperand}';
+$string['description_concat_space'] = '{$a->firstoperand} {$a->secondoperand}';
+$string['description_concat_and'] = '{$a->firstoperand} и {$a->secondoperand}';
+$string['description_concat_short'] = '{$a->firstoperand}{$a->secondoperand}';
 // TYPE_NODE_ALT
-$string['description_alt'] = '{a->firstoperand} или {a->secondoperand}';
-$string['description_alt_wcomma'] = '{a->firstoperand}, или {a->secondoperand}';
+$string['description_alt'] = '{$a->firstoperand} или {$a->secondoperand}';
+$string['description_alt_wcomma'] = '{$a->firstoperand}, или {$a->secondoperand}';
 // TYPE_NODE_ASSERT
-$string['description_pla_node_assert'] = 'текст далее должен соответствовать: [{a->firstoperand}]';
-$string['description_nla_node_assert'] = 'текст далее не должен соответствовать: [{a->firstoperand}]';
-$string['description_plb_node_assert'] = 'предыдущий текст должен соответствовать: [{a->firstoperand}]';
-$string['description_nlb_node_assert'] = 'предыдущий текст не должен соответствовать: [{a->firstoperand}]';
-$string['description_pla_node_assert_cond'] = 'текст далее соответствует: [{a->firstoperand}]';
-$string['description_nla_node_assert_cond'] = 'текст далее не соответсвует: [{a->firstoperand}]';
-$string['description_plb_node_assert_cond'] = 'предшествующий текст соответсвует: [{a->firstoperand}]';
-$string['description_nlb_node_assert_cond'] = 'предшествующий текст не соответствует: [{a->firstoperand}]';
+$string['description_pla_node_assert'] = 'текст далее должен соответствовать: [{$a->firstoperand}]';
+$string['description_nla_node_assert'] = 'текст далее не должен соответствовать: [{$a->firstoperand}]';
+$string['description_plb_node_assert'] = 'предыдущий текст должен соответствовать: [{$a->firstoperand}]';
+$string['description_nlb_node_assert'] = 'предыдущий текст не должен соответствовать: [{$a->firstoperand}]';
+$string['description_pla_node_assert_cond'] = 'текст далее соответствует: [{$a->firstoperand}]';
+$string['description_nla_node_assert_cond'] = 'текст далее не соответсвует: [{$a->firstoperand}]';
+$string['description_plb_node_assert_cond'] = 'предшествующий текст соответсвует: [{$a->firstoperand}]';
+$string['description_nlb_node_assert_cond'] = 'предшествующий текст не соответствует: [{$a->firstoperand}]';
 // TYPE_NODE_SUBEXPR
-$string['description_subexpression'] = 'подмаска №{a->number}: [{a->firstoperand}]';
-$string['description_subexpression_once'] = 'однократная подмаска №{a->number}: [{a->firstoperand}]';
-$string['description_subexpression_name'] = 'подмаска "{a->name}": [{a->firstoperand}]';
-$string['description_subexpression_once_name'] = 'однократная подмаска "{a->name}": [{a->firstoperand}]';
-$string['description_grouping'] = 'группировка: [{a->firstoperand}]';
-$string['description_grouping_duplicate'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [{a->firstoperand}]';
-// TYPE_NODE_COND_SUBEXPR ({a->firstoperand} - first option; {a->secondoperand} - second option; {a->cond} - condition )
-$string['description_node_cond_subexpr'] = 'если {a->cond}, тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_node_cond_subexpr_else'] = ' иначе проверить: [{a->secondoperand}]';
-$string['description_backref_node_cond_subexpr'] = 'если подмаска №{a->number} была успешно сопоставлена, тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_backref_node_cond_subexpr_name'] = 'если подмаска "{a->name}" была успешно сопоставлена, тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_recursive_node_cond_subexpr_all'] = 'если весь шаблон был рекурсивно сопоставлен тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_recursive_node_cond_subexpr'] = 'если подмаска №{a->number} была успешно рекурсивно сопоставлена, тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_recursive_node_cond_subexpr_name'] = 'если подмаска "{a->name}" была успешно рекурсивно сопоставлена, тогда проверить: [{a->firstoperand}]{a->else}';
-$string['description_define_node_cond_subexpr'] = 'описание {a->firstoperand}';
+$string['description_subexpression'] = 'подмаска №{$a->number}: [{$a->firstoperand}]';
+$string['description_subexpression_once'] = 'однократная подмаска №{$a->number}: [{$a->firstoperand}]';
+$string['description_subexpression_name'] = 'подмаска "{$a->name}": [{$a->firstoperand}]';
+$string['description_subexpression_once_name'] = 'однократная подмаска "{$a->name}": [{$a->firstoperand}]';
+$string['description_grouping'] = 'группировка: [{$a->firstoperand}]';
+$string['description_grouping_duplicate'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [{$a->firstoperand}]';
+// TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
+$string['description_node_cond_subexpr'] = 'если {$a->cond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_node_cond_subexpr_else'] = ' иначе проверить: [{$a->secondoperand}]';
+$string['description_backref_node_cond_subexpr'] = 'если подмаска №{$a->number} была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_backref_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursive_node_cond_subexpr_all'] = 'если весь шаблон был рекурсивно сопоставлен тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursive_node_cond_subexpr'] = 'если подмаска №{$a->number} была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursive_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_define_node_cond_subexpr'] = 'описание {$a->firstoperand}';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';
-$string['description_mark_name_leaf_control'] = 'set name to {a->name} to be passed back';
-$string['description_control_backtrack'] = 'if the rest of the pattern does not match {a->what}';
+$string['description_mark_name_leaf_control'] = 'set name to {$a->name} to be passed back';
+$string['description_control_backtrack'] = 'if the rest of the pattern does not match {$a->what}';
 $string['description_commit_leaf_control'] = 'overall failure, no advance of starting point';
 $string['description_prune_leaf_control'] = 'advance to next starting character';
 $string['description_skip_leaf_control'] = 'advance to current matching position';
-$string['description_skip_name_leaf_control'] = 'advance to (*MARK:{a->name})';
+$string['description_skip_name_leaf_control'] = 'advance to (*MARK:{$a->name})';
 $string['description_then_leaf_control'] = 'backtrack to next alternation';
-$string['description_control_newline'] = 'newline matches {a->what}';
+$string['description_control_newline'] = 'newline matches {$a->what}';
 $string['description_cr_leaf_control'] = 'carriage return only';
 $string['description_lf_leaf_control'] = 'linefeed only';
 $string['description_crlf_leaf_control'] = 'carriage return followed by linefeed';
 $string['description_anycrlf_leaf_control'] = 'carriage return, linefeed or carriage return followed by linefeed';
 $string['description_any_leaf_control'] = 'any Unicode newline sequence';
-$string['description_control_r'] = '\R matches {a->what}';
+$string['description_control_r'] = '\R matches {$a->what}';
 $string['description_bsr_anycrlf_leaf_control'] = 'CR, LF, or CRLF';
 $string['description_bsr_unicode_leaf_control'] = 'any Unicode newline sequence';
 $string['description_no_start_opt_leaf_control'] = 'no start-match optimization';
@@ -313,13 +313,13 @@ $string['description_utf8_leaf_control'] = 'UTF-8 mode';
 $string['description_utf16_leaf_control'] = 'UTF-16 mode';
 $string['description_ucp_leaf_control'] = 'PCRE_UCP';
 // TYPE_LEAF_CHARSET
-$string['description_charset'] = 'один из следующих символов: {a->characters};';
-$string['description_charset_negative'] = 'любой из символов кроме следующих: {a->characters};';
-$string['description_charset_one_neg'] = 'не {a->characters}';
-$string['description_charset_range'] = 'любой символ от {a->start} до {a->end}';
-$string['description_char'] = '<span style="color:blue">{a->char}</span>';
-$string['description_char_16value'] = 'символ с кодом 0x{a->code}';
-//$string['description_charset_one'] = '{a->characters}';
+$string['description_charset'] = 'один из следующих символов: {$a->characters};';
+$string['description_charset_negative'] = 'любой из символов кроме следующих: {$a->characters};';
+$string['description_charset_one_neg'] = 'не {$a->characters}';
+$string['description_charset_range'] = 'любой символ от {$a->start} до {$a->end}';
+$string['description_char'] = '<span style="color:blue">{$a->char}</span>';
+$string['description_char_16value'] = 'символ с кодом 0x{$a->code}';
+//$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_charflag_dot'] = 'any character';
 $string['description_charflag_slashd'] = 'decimal digit';
@@ -522,12 +522,12 @@ $string['description_errorbefore'] = '<span style="color:red">';
 $string['description_errorafter'] = '</span>';
 // for testing
 $string['description_charflag_word_g'] = 'word character(form g)';//for testing only
-$string['description_char_g'] = '<span style="color:blue">{a->char}</span>(form g)';//for testing only
+$string['description_char_g'] = '<span style="color:blue">{$a->char}</span>(form g)';//for testing only
 $string['description_dollar_g'] = 'end of the string(form g)';//for testing
-$string['description_concat_g'] = '{a->g1} then {a->g2}';
-$string['description_concat_short_g'] = '{a->g1}{a->g2}';
-$string['description_alt_g'] = '{a->g1} or {a->g2}';
-$string['description_alt_wcomma_g'] = '{a->g1} or {a->g2}';
+$string['description_concat_g'] = '{$a->g1} then {$a->g2}';
+$string['description_concat_short_g'] = '{$a->g1}{$a->g2}';
+$string['description_alt_g'] = '{$a->g1} or {$a->g2}';
+$string['description_alt_wcomma_g'] = '{$a->g1} or {$a->g2}';
 $string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
