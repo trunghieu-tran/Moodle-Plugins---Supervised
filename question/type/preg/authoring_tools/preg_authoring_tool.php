@@ -30,15 +30,23 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
     /**
      * Escaping a character by its code.
-     * @param code - character's code.
-     * @param codes - codes which should be escaped.
-     * @return escaped character.
+     * @param int $code - character's code.
+     * @param array|string $codesormode - array of codes which should be escaped
+     * or string containing escape mode: 'html' or 'dot'.
+     * @return string escaped character.
      */
-    public static function escape_char_by_code($code, $codes = NULL) {
-        if ($codes === NULL) {
-            $codes = self::$codes;
+    public static function escape_char_by_code($code, $codesormode = NULL) {
+        if ($codesormode === NULL) {
+            $codesormode = self::$codes;
         }
-        if (in_array($code, array_keys($codes))) {
+        if (is_string($codesormode)) {
+            if ($codesormode==='html') {
+                $codesormode = self::$htmlescapecodes;
+            } else if ($codesormode==='dot') {
+                $codesormode = self::$dotescapecodes;
+            }
+        }
+        if (in_array($code, $codesormode)) {
             return '&#'.$code.';';
         } else {
             return textlib::code2utf8($code);
@@ -64,9 +72,9 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
     public static function escape_string($stringToEscape, $extraCodes = NULL) {
 
         if (is_array($extraCodes) && sizeof($extraCodes) != 0) {
-            $codes = array_intersect(self::$codes, $extraCodes);
+            $codes = array_intersect(self::$dotescapecodes, $extraCodes);
         } else {
-            $codes = self::$codes;
+            $codes = self::$dotescapecodes;
         }
 
         $result = '';
@@ -77,7 +85,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         return $result;
     }
 
-    protected static $codes = array(34 /*=> '"'*/,
+    protected static $dotescapecodes = array(34 /*=> '"'*/,
                                     38 /*=> '&'*/,
                                     44 /*=> ','*/,
                                     60 /*=> '<'*/,
@@ -89,6 +97,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
                                     125 /*=> '}'*/,
                                     92 /*=> '\\'*/
                                    );
+
+    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
     /**
      * Generates a json-array corresponding to $regex and core of tool.
