@@ -544,3 +544,5 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
+$string['explain_to'] = ' to ';
+$string['explain_from'] = 'from ';
