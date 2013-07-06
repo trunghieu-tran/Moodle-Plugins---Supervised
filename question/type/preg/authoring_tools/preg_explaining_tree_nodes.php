@@ -302,7 +302,7 @@ class qtype_preg_explaining_tree_leaf_assert extends qtype_preg_explaining_tree_
 class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"Backreference to subexpression #' . $this->pregnode->number . '"';
+        return str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg'));
     }
 }
 
@@ -316,14 +316,14 @@ class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_
 class qtype_preg_explaining_tree_leaf_recursion extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"Recursion ' . $this->pregnode->number . '"';
+        return get_string('leaf_recursion', 'qtype_preg') . ' ' . $this->pregnode->number . '"';
     }
 }
 
 class qtype_preg_explaining_tree_leaf_control extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
-        return '"Control sequence ' . parent::label() . '"';
+        return get_string('leaf_control', 'qtype_preg') . ' ' . parent::label() . '"';
     }
 }
 
@@ -389,7 +389,7 @@ class qtype_preg_explaining_tree_node_cond_subexpr extends qtype_preg_explaining
 class qtype_preg_explaining_tree_node_error extends qtype_preg_explaining_tree_operator {
 
     protected function label() {
-        return '"Error"';
+        return get_string('node_error', 'qtype_preg');
     }
 
     protected function tooltip() {
