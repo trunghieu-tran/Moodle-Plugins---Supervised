@@ -409,7 +409,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             if($escapehtml && ($code==34||$code==38||$code==39||$code==60||$code==62)){
                 $result = '&#'.$code.';';
             } else {
-                $result = $iscode ? qtype_preg_unicode::code2utf8($utf8chr) : $utf8chr;
+                $result = $iscode ? textlib::code2utf8($utf8chr) : $utf8chr;
             }
             $result = str_replace('%char',$result,self::get_form_string('description_char' ,$form));
         }

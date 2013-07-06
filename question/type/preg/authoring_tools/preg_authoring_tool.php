@@ -39,7 +39,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         if (in_array($code, array_keys($codes))) {
             return '&#'.$code.';';
         } else {
-            return chr($code);
+            return textlib::code2utf8($code);
         }
     }
 
@@ -50,7 +50,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * @return escaped character.
      */
     public static function escape_char($character, $codes) {
-        return self::escape_char_by_code(ord($character), $codes);
+        return self::escape_char_by_code(textlib::utf8ord($character), $codes);
     }
 
     /**
