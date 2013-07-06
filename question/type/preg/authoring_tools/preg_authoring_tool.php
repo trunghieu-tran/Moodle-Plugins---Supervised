@@ -34,8 +34,10 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * @param codes - codes which should be escaped.
      * @return escaped character.
      */
-    public static function escape_char_by_code($code, $codes) {
-
+    public static function escape_char_by_code($code, $codes = NULL) {
+        if ($codes === NULL) {
+            $codes = self::$codes;
+        }
         if (in_array($code, array_keys($codes))) {
             return '&#'.$code.';';
         } else {
