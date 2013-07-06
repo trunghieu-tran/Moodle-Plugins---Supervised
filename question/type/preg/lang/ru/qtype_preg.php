@@ -544,3 +544,5 @@ $string['explain_unknow_charset_flag'] = 'неизвестный флаг наб
 $string['explain_not'] = 'не ';
 $string['explain_any_char'] = 'Любой символ из';
 $string['explain_any_char_except'] = 'Любой символ кроме';
+$string['explain_to'] = ' по ';
+$string['explain_from'] = ' c ';

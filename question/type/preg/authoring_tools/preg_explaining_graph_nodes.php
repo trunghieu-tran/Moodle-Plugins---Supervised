@@ -168,10 +168,16 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
             // if position is not in beginning and not in end...
             if ($mpos != 0 && $mpos != strlen($iter->data) - 1) {
                 if ($mpos == 1) // if <something>'s length is 1 then our range hasn't hex code
-                    $result[] = chr(10) . 'from ' . substr($iter->data, 0, $mpos) . ' to ' . substr($iter->data, $mpos + 1);
-                else            // else we deal with hex code in <something>
-                    $result[] = chr(10) . 'from ' . str_replace('%code', substr($iter->data, 2, $mpos-2), get_string('description_char_16value', 'qtype_preg')) .
-                        get_string('explain_to', 'qtype_preg') . str_replace('%code', substr($iter->data, $mpos + 3), get_string('description_char_16value', 'qtype_preg'));
+                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . substr($iter->data, 0, $mpos) . get_string('explain_to', 'qtype_preg') . substr($iter->data, $mpos + 1);
+                else {            // else we deal with hex code in <something>
+                    $tmp1 = substr($iter->data, 2, $mpos-2);
+                    $tmp2 = substr($iter->data, $mpos + 3);
+                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . str_replace('%code', $tmp1, get_string('description_char_16value', 'qtype_preg')) .
+                        get_string('explain_to', 'qtype_preg') . str_replace('%code', $tmp2, get_string('description_char_16value', 'qtype_preg'));
+
+                    // get_string('description_char_16value', 'qtype_preg', $tmp1)
+                    // get_string('description_char_16value', 'qtype_preg', $tmp2)
+                }
 
                 continue; // because we found range we iterate to next unserinscription element
             }
@@ -235,6 +241,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
 
                         // extract a value from lang-file
                         $result[] = chr(10) . str_replace('%code', $tmp, get_string('description_char_16value', 'qtype_preg'));
+                        // get_string('description_char_16value', 'qtype_preg', $tmp)
                     } else if ($iter->data[$i] == 'n') {
                         $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
                     } else if ($iter->data[$i] == 'r') {
@@ -349,10 +356,13 @@ class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_le
 class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        if (is_integer($this->pregnode->number))
-            return array(str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')));
+        $tmp = $this->pregnode->number;
+        if (is_integer($this->pregnode->number))    
+            return array(str_replace('%number', $tmp, get_string('description_backref', 'qtype_preg')));
+            // get_string('description_backref', 'qtype_preg', $tmp)
         else
-            return array(str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg')));
+            return array(str_replace('%name', $tmp, get_string('description_backref_name', 'qtype_preg')));
+            // get_string('description_backref_name', 'qtype_preg', $tmp)
     }
 
     public function get_color() {
@@ -370,12 +380,15 @@ class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_l
 class qtype_preg_authoring_tool_leaf_recursion extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        if ($this->pregnode->number == 0)
+        $tmp = $this->pregnode->number;
+        if ($tmp == 0)
             return array(get_string('description_recursion_all', 'qtype_preg'));
         else if (is_integer($this->pregnode->number))
-            return array(str_replace('%number', $this->pregnode->number, get_string('description_recursion', 'qtype_preg')));
+            return array(str_replace('%number', $tmp, get_string('description_recursion', 'qtype_preg')));
+            // get_string('description_recursion', 'qtype_preg', $tmp)
         else
-            return array(str_replace('%name', $this->pregnode->number, get_string('description_recursion_name', 'qtype_preg')));
+            return array(str_replace('%name', $tmp, get_string('description_recursion_name', 'qtype_preg')));
+            // get_string('description_recursion_name', 'qtype_preg', $tmp)
     }
 
     public function get_color() {

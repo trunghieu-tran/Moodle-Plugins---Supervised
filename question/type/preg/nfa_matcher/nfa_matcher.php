@@ -105,6 +105,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->str = clone $str;
         $result->last_transition = null;
         $result->last_match_len = 0;
+        $result->backtrack_states = array();
 
         return $result;
     }
@@ -150,6 +151,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->length += $length;
                 $newstate->write_subpatt_info($transition, $curpos, $length);
 
+                if ($transition->causes_backtrack()) {
+                    $newstate->backtrack_states[] = $curstate;
+                }
+
                 // Resolve ambiguities if any.
                 $number = $newstate->state->number;
                 if (!isset($result[$number]) || $newstate->leftmost_longest($result[$number])) {
@@ -179,7 +184,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $resumestate = null;
 
-        if ($laststate->last_match_len > 0) {
+        if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             // The last transition was a partially matched backreference; we can only continue from this transition.
             $backref_length = $laststate->length($laststate->last_transition->pregleaf->number);
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
@@ -341,6 +346,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $newstate->length += $length;
                     $newstate->write_subpatt_info($transition, $curpos, $length);
 
+                    if ($transition->causes_backtrack()) {
+                        $newstate->backtrack_states[] = $curstate;
+                    }
+
                     // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
                         if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
@@ -356,7 +365,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     // Transition not matched, save the partial match.
                     $partialmatch = clone $curstate;
                     $partialmatch->length += $length;
-                    $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
                     $partialmatch->last_transition = $transition;
                     $partialmatch->last_match_len = $length;
                     $partialmatches[] = $partialmatch;
@@ -439,6 +447,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate->length += $length;
                         $newstate->write_subpatt_info($transition, $curpos, $length);
 
+                        if ($transition->causes_backtrack()) {
+                            $newstate->backtrack_states[] = $curstate;
+                        }
+
                         // Save the current result.
                         if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
                             $lazystates[] = $newstate;
@@ -452,7 +464,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         // Transition not matched, save the partial match.
                         $partialmatch = clone $curstate;
                         $partialmatch->length += $length;
-                        $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length);
                         $partialmatch->last_transition = $transition;
                         $partialmatch->last_match_len = $length;
                         $partialmatches[] = $partialmatch;
@@ -514,21 +525,43 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
 
         // Generate an extension for partial matches.
+        $result->extendedmatch = null;
         if (!$result->full /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
-            $extension = $this->generate_extension($str, $result);
-            if ($extension !== null) {
-                $result->left = $extension->length - $result->length;
-                $result->extendedmatch = $extension;
+            // Try each backtrack state and choose the shortest one.
+            $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
+            foreach ($result->backtrack_states as $backtrack) {
+                $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
+
+                $tmp = $this->generate_extension($str, $backtrack);
+                // Choose the best one by:
+                // 1) minimizing length of the generated extension
+                // 2) minimizing abs(extension->length - result->length)
+                if ($result->extendedmatch === null) {
+                    $result->extendedmatch = $tmp;
+                } else {
+                    $diff1 = $result->extendedmatch->str->length() - $result->str->length();
+                    $diff2 = $tmp->str->length() - $result->str->length();
+                    if (($diff1 > $diff2) ||
+                        ($diff1 == $diff2 && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
+                        $result->extendedmatch = $tmp;
+                    }
+                }
             }
         }
 
-        $extendedmatch = $result->extendedmatch !== null
-                       ? $result->extendedmatch->to_matching_results()
-                       : null;
-        $result = $result->to_matching_results();
-        $result->extendedmatch = $extendedmatch;
+        if ($result->extendedmatch !== null) {
+            $i = 0;
+            while ($i < $result->str->length() && $i < $result->extendedmatch->str->length() &&
+                   $result->str[$i] == $result->extendedmatch->str[$i]) {
+                $i++;
+            }
+          //  var_dump($i . 'vs' . $result->extendedmatch->str->length() . ' - ' . $result->extendedmatch->str);
+            $result->left = $result->extendedmatch->str->length() - $i;
+            //$result->left = $result->extendedmatch->length - $result->length;
+            $result->extendedmatch = $result->extendedmatch->to_matching_results();
+        }
 
-        return $result;
+        return $result->to_matching_results();
     }
 
     /**
