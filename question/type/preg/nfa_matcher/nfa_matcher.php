@@ -167,7 +167,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    public function determine_characters_left($str, $laststate) {
+    public function generate_extension($str, $laststate) {
         $states = array();       // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();    // States which the automaton is in.
         $endstate = $this->automaton->end_state();
@@ -376,12 +376,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
         if (count($fullmatches) == 0) {
             foreach ($partialmatches as $partialmatch) {
-                // TODO: if ($this->options === null || $this->options->extensionneeded).
-                $path = $this->determine_characters_left($str, $partialmatch);
-                if ($path !== null) {
-                    $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path;
-                }
                 $result[] = $partialmatch;
             }
         }
@@ -491,12 +485,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result[] = $endstatematch;
         } else {
             foreach ($partialmatches as $partialmatch) {
-                // TODO: if ($this->options === null || $this->options->extensionneeded).
-                $path = $this->determine_characters_left($str, $partialmatch);
-                if ($path !== null) {
-                    $partialmatch->left = $path->length - $partialmatch->length;
-                    $partialmatch->extendedmatch = $path;
-                }
                 $result[] = $partialmatch;
             }
         }
@@ -523,6 +511,15 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         if ($result === null) {
             return $this->create_nomatch_result($str);
+        }
+
+        // Generate an extension for partial matches.
+        if (!$result->full /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+            $extension = $this->generate_extension($str, $result);
+            if ($extension !== null) {
+                $result->left = $extension->length - $result->length;
+                $result->extendedmatch = $extension;
+            }
         }
 
         $extendedmatch = $result->extendedmatch !== null

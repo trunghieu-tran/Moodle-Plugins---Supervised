@@ -66,6 +66,14 @@ abstract class qtype_preg_notation {
     }
 
     /**
+     * Returns regular expression modifiers in desired notation, should suit most notations.
+     * When overloading this, you probably would want to set/unset some modifiers based on notation.
+     */
+    public function convert_modifiers($targetnotation) {
+        return $this->modifiers;
+    }
+
+    /**
      * Returns regular expression options in desired notation, should suit most notations.
      * When overloading this, you probably would want to set some options based on notation.
      */
@@ -77,7 +85,7 @@ abstract class qtype_preg_notation {
 
 /**
  * Native notation, supported by internal regular expression parser and used by any regular expression handlers that using this parser.
- * You would usually convert other regexes to it with notable exception of preg_php_extension engine, that wants PCRE strict notation.
+ * You would usually convert other regexes to it.
  */
 class qtype_preg_notation_native extends qtype_preg_notation {
 
@@ -85,6 +93,32 @@ class qtype_preg_notation_native extends qtype_preg_notation {
         return 'native';
     }
 
+}
+
+/**
+ * Perl-compatible regular expression Extended notation is equivalent to PCRE_EXTENDED modifier.
+ * It is used to write complex regular expression with comments
+ * Easily converts to native notation by adding relevant modifier.
+ */
+class qtype_preg_notation_pcreextended extends qtype_preg_notation {
+
+    public function name() {
+        return 'pcreextended';
+    }
+
+    public function convert_regex($targetnotation) {
+        if ($targetnotation == 'native') {
+            return $this->regex;
+        }
+        parent::convert_regex($targetnotation);
+    }
+
+    public function convert_modifiers($targetnotation) {
+        if ($targetnotation == 'native') {
+            return $this->modifiers | qtype_preg_handling_options::MODIFIER_EXTENDED;
+        }
+        return $this->modifiers;
+    }
 }
 
 /**
@@ -115,4 +149,3 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
         parent::convert_regex($targetnotation);
     }
 }
-
