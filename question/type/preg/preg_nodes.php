@@ -48,39 +48,33 @@ class qtype_preg_userinscription {
         $this->data = $data;
         $this->type = $type;
     }
+
+    public function __toString() {
+        return $this->data;
+    }
 }
 
 /**
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
 class qtype_preg_lexem {
-    /** Subtype of the lexem. */
-    public $subtype;
-    /** Index of the first character of the lexem. */
+    /** Index of the line where the node begins. */
+    public $linefirst = -1;
+    /** Index of the line where the node ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line of this node in the regex. */
     public $indfirst = -1;
-    /** Index of the last character of the lexem. */
+    /** Index of the last character pn the last line of this node in the regex. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
 
-    public function __construct($subtype, $indfirst, $indlast, $userinscription) {
-        $this->subtype = $subtype;
+    public function __construct($linefirst, $linelast, $indfirst, $indlast, $userinscription) {
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
-    }
-}
-
-/**
- * Class for plain subexpression lexems.
- */
-class qtype_preg_lexem_subexpr extends qtype_preg_lexem {
-    /** Number of the subexpression. */
-    public $number;
-
-    public function __construct($subtype, $indfirst, $indlast, $userinscription, $number) {
-        parent::__construct($subtype, $indfirst, $indlast, $userinscription);
-        $this->number = $number;
     }
 }
 
@@ -149,9 +143,13 @@ abstract class qtype_preg_node {
     public $subtype;
     /** Errors found for this particular node. */
     public $errors = array();
-    /** Index of the first character of this node in the regex. */
+    /** Index of the line where the node begins. */
+    public $linefirst = -1;
+    /** Index of the line where the node ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line of this node in the regex. */
     public $indfirst = -1;
-    /** Index of the last character of this node in the regex. */
+    /** Index of the last character pn the last line of this node in the regex. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
@@ -195,7 +193,9 @@ abstract class qtype_preg_node {
     /**
      * Sets indexes and userinscription for the node.
      */
-    public function set_user_info($indfirst, $indlast, $userinscription = null) {
+    public function set_user_info($linefirst, $linelast, $indfirst, $indlast, $userinscription = null) {
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
@@ -1584,8 +1584,9 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     /** Subexpression number. */
     public $number = -1;
 
-    public function __construct($number = -1) {
+    public function __construct($subtype, $number = -1) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
+        $this->subtype = $subtype;
         $this->number = $number;
     }
 
