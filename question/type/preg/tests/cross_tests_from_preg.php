@@ -1098,14 +1098,14 @@ class qtype_preg_cross_tests_from_preg {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>3,2=>1,3=>1,4=>1));
+                        'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
+                        'length'=>array(0=>3,1=>0,2=>0,3=>0,4=>0));
 
         $test2 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3,3=>4,4=>5),
-                        'length'=>array(0=>6,1=>3,2=>1,3=>1,4=>1));
+                        'index_first'=>array(0=>0,1=>6,2=>6,3=>6,4=>6),
+                        'length'=>array(0=>6,1=>0,2=>0,3=>0,4=>0));
 
         return array('regex'=>'(([a*]|\b)([b*]|\b)([c*]|\b))+',
                      'tests'=>array($test1, $test2),
