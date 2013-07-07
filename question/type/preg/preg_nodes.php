@@ -181,6 +181,18 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
+     * Expands the subtrees of operands at the given indexes.
+     */
+    public function expand($from, $to, &$idcounter) {
+    }
+
+    /**
+     * Expands the subtrees of all operands.
+     */
+    public function expand_all(&$idcounter) {
+    }
+
+    /**
      * Sets indexes and userinscription for the node.
      */
     public function set_user_info($indfirst, $indlast, $userinscription = null) {
@@ -311,6 +323,50 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $this->firstpos = array();
             $this->lastpos = array();
         }
+    }
+
+    public function expand($from, $to, &$idcounter) {
+
+        for ($i = $from; $i <= $to; $i++) {
+            $this->operands[$i]->expand_all($idcounter);
+        }
+
+        if (count($this->operands) <= 2) {
+            return;
+        }
+
+        $operands = array();
+
+        // Copy 'left' operands.
+        for ($i = 0; $i < $from; $i++) {
+            $operands[] = $this->operands[$i];
+        }
+
+        // Form the new subtree and add it as operand.
+        $newnode = clone $this; // Will go down the tree.
+        $newnode->id = ++$idcounter;
+        $newnode->operands = array();
+        for ($i = $from; $i <= $to; $i++) {
+            $newnode->operands[] = $this->operands[$i];
+        }
+        $operands[] = $newnode;
+
+        // Copy 'right' operands.
+        for ($i = $to + 1; $i < count($this->operands); $i++) {
+            $operands[] = $this->operands[$i];
+        }
+
+        // Update operands of this node.
+        $this->operands = $operands;
+        $newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+
+        if (count($operands) == 1) {
+            $this->operands = $newnode->operands;
+        }
+    }
+
+    public function expand_all(&$idcounter) {
+        $this->expand(0, count($this->operands) - 1, $idcounter);
     }
 }
 
