@@ -2080,23 +2080,17 @@ class qtype_preg_cross_tests_from_preg {
                         'next'=>'h');
 
         $test3 = array( 'str'=>'abe',
-                        'is_match'=>true,         // TODO - LONGEST MATCH
+                        'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
+                        'ext_index_first'=>array(0=>0,1=>2),
+                        'ext_length'=>array(0=>5,1=>3),
                         'left'=>array(2),
                         'next'=>'f');
 
-        $test4 = array( 'str'=>'abe',
-                        'is_match'=>true,        // TODO - LESS CHARACTERS LEFT
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
-                        'left'=>array(1),
-                        'next'=>'h');
-
         return array('regex'=>'ab(cd|efg|h)',
-                     'tests'=>array($test1, $test2, /*$test3,*/ $test4),
+                     'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
@@ -2344,24 +2338,17 @@ class qtype_preg_cross_tests_from_preg {
                         'next'=>'a');
 
         $test2 = array( 'str'=>'0aaaaaaz',
-                        'is_match'=>true,        // TODO - Longest match.
+                        'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>7,1=>6),
-                        'left'=>array(9),
-                        'next'=>'[0-9]');
-
-        $test3 = array( 'str'=>'0aaaaaaz',
-                        'is_match'=>true,        // TODO - Less characters left.
-                        'full'=>false,
-                        'index_first'=>array(0=>0,1=>1),
-                        'length'=>array(0=>6,1=>5),
+                        'ext_index_first'=>array(0=>0,1=>1),
+                        'ext_length'=>array(0=>14,1=>5),
                         'left'=>array(8),
                         'next'=>'[0-9]');
 
-
         return array('regex'=>'0(a{5,10})[0-9]{3}\1',
-                     'tests'=>array($test1, /*$test2,*/ $test3),
+                     'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
