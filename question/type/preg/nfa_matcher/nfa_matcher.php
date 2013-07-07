@@ -500,36 +500,34 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
             foreach ($result->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
-
                 $tmp = $this->generate_extension($backtrack);
+                if ($tmp === null) {
+                    continue;
+                }
+                // Calculate 'left'.
+                $prefixlen = $startpos;
+                while ($prefixlen < $result->str->length() && $prefixlen < $tmp->str->length() &&
+                       $result->str[$prefixlen] == $tmp->str[$prefixlen]) {
+                    $prefixlen++;
+                }
+                $left = $tmp->str->length() - $prefixlen;
                 // Choose the best one by:
                 // 1) minimizing length of the generated extension
                 // 2) minimizing abs(extension->length - result->length)
                 if ($result->extendedmatch === null) {
                     $result->extendedmatch = $tmp;
-                } else {
-                    $diff1 = $result->extendedmatch->str->length() - $result->str->length();
-                    $diff2 = $tmp->str->length() - $result->str->length();
-                    if (($diff1 > $diff2) ||
-                        ($diff1 == $diff2 && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
-                        $result->extendedmatch = $tmp;
-                    }
+                    $result->left = $left;
+                } else if (($result->left > $left) ||
+                           ($result->left == $left && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
+                    $result->extendedmatch = $tmp;
+                    $result->left = $left;
                 }
             }
         }
 
         if ($result->extendedmatch !== null) {
-            $i = 0;
-            while ($i < $result->str->length() && $i < $result->extendedmatch->str->length() &&
-                   $result->str[$i] == $result->extendedmatch->str[$i]) {
-                $i++;
-            }
-            // var_dump($i . 'vs' . $result->extendedmatch->str->length() . ' - ' . $result->extendedmatch->str);
-            $result->left = $result->extendedmatch->str->length() - $i;
-            // $result->left = $result->extendedmatch->length - $result->length;
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
         }
-
         return $result->to_matching_results();
     }
 
