@@ -395,15 +395,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return str redaction distance
      */
     static public function redaction($str1, $str2) {
+        // lenght of tokens
         $lenstr1 = textlib::strlen($str1);
         $lenstr2 = textlib::strlen($str2);
+        // matrix operation and cost
         for ($i=0; $i < $lenstr1+1; $i++) {
             for ($j=0; $j < $lenstr2+1; $j++) {
                 $d[$i][$j] = 0;
-            }
-        }
-        for ($i=0; $i<$lenstr1+1; $i++) {
-            for ($j=0; $j < $lenstr2+1; $j++) {
                 $m[$i][$j] = 'i';
             }
         }
@@ -415,6 +413,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             $d[0][$i] = $i;
             $p[0][$i] = 'i';
         }
+        //operation from strings
         for ($i = 1; $i <= $lenstr1; $i++) {
             for ($j = 1; $j <= $lenstr2; $j++) {
                 $cost = ($str1[$i - 1] != $str2[$j - 1]) ? 1 : 0;
