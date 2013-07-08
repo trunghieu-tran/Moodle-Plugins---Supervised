@@ -21,4 +21,9 @@ require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php'
 
 class  qtype_correctwriting_enum_analyzer {
 
+    /**
+     * Array which contains orders of all enumerations, and give maximum length of LCS of correctstring and correctedstring
+     * @var array
+     */
+    private $orders;
 }
