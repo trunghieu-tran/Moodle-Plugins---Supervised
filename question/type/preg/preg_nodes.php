@@ -179,6 +179,42 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
+     * Finds the subtree by given indexes. Updates the indexes to the nearest suitable values.
+     */
+    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast) {
+        $result = $this;
+        $found = is_a($result, 'qtype_preg_leaf');
+        // Go down the tree.
+        while (!$found) {
+            $replaced = false;
+            foreach ($result->operands as $operand) {
+                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->indfirst >= $result->indfirst)) &&
+                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->indlast <= $result->indlast));
+
+                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) &&
+                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast));
+
+                if ($better_than_result && $suits_needed) {
+                    $result = $operand;
+                    $replaced = true;
+                }
+            }
+            $found = !$replaced || is_a($result, 'qtype_preg_leaf');
+        }
+        // If the node is found, update the indexes, return NULL otherwise.
+        if (($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
+            ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast))) {
+            $linefirst = $result->linefirst;
+            $linelast = $result->linelast;
+            $indfirst = $result->indfirst;
+            $indlast = $result->indlast;
+        } else {
+            $result = null;
+        }
+        return $result;
+    }
+
+    /**
      * Expands the subtrees of operands at the given indexes.
      */
     public function expand($from, $to, &$idcounter) {

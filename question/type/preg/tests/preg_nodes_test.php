@@ -41,7 +41,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($copyroot->operands[1]->operands[0] == $altnode->operands[1]->operands[0], 'B character node contents copied wrong');
         $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copied');
     }
-
     function test_backref_no_match() {
         $regex = '(abc)';
         $length = 0;
@@ -65,7 +64,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, 'abc');
     }
-
     function test_backref_partial_match() {
         $regex = '(abc)';
         $length = 0;
@@ -89,7 +87,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1);
         $this->assertEquals($ch, 'bc');
     }
-
     function test_backref_full_match() {
         $regex = '(abc)';
         $length = 0;
@@ -106,7 +103,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 3);
         $this->assertEquals($ch, '');
     }
-
     function test_backref_empty_match() {
         $regex = '(^$)';
         $length = 0;
@@ -124,7 +120,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, '');
     }
-
     function test_backref_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
@@ -147,7 +142,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
     }
-
     function test_anchoring() {
         $handler = new qtype_preg_nfa_matcher('^');
         $this->assertTrue($handler->is_regex_anchored());
@@ -176,7 +170,6 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) makes anchoring
         $this->assertTrue($handler->is_regex_anchored());
     }
-
     function test_syntax_errors() {
         $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
         $errors = $handler->get_errors();
@@ -210,6 +203,63 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->index_last == 3);
         $this->assertTrue($errors[1]->index_first == 10); // Backreference to unexisting subexpression.
         $this->assertTrue($errors[1]->index_last == 11);*/
-
+    }
+    function test_find_node_by_indexes() {
+        $handler = new qtype_preg_regex_handler("a");
+        $root = $handler->get_ast_root();
+        $linefirst = 0; $linelast = 0; $indexfirst = 0; $indexlast = 0;     // Exact selection.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root);
+        $linefirst = 0; $linelast = 1; $indexfirst = 0; $indexlast = 11;    // Too wide selection.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === null);
+        $handler = new qtype_preg_regex_handler("(abcd)+");
+        $root = $handler->get_ast_root();
+        $linefirst = 0; $linelast = 0; $indexfirst = 0; $indexlast = 5;     // Exact selection.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root->operands[0]);
+        $linefirst = 0; $linelast = 0; $indexfirst = 0; $indexlast = 4;     // Selection to be expanded to the whole subexpression.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root->operands[0]);
+        $linefirst = 0; $linelast = 0; $indexfirst = 2; $indexlast = 3;     // Selection to be expanded to the whole concatenation.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root->operands[0]->operands[0]);
+        $linefirst = 0; $linelast = 0; $indexfirst = 2; $indexlast = 6;     // Selection to be expanded to the whole quantifier.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root);
+        $handler = new qtype_preg_regex_handler("ab|cd");
+        $root = $handler->get_ast_root();
+        $linefirst = 0; $linelast = 0; $indexfirst = 3; $indexlast = 3;     // Exact selection.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $linefirst = 0; $linelast = 0; $indexfirst = 3; $indexlast = 4;     // Exact selection.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        $handler = new qtype_preg_regex_handler("ab|d\n(abcd)+\nqwe(?#comment\n)|alt");
+        $root = $handler->get_ast_root();
+        $linefirst = 0; $linelast = 0; $indexfirst = 0; $indexlast = 1;     // Exact selection 'b'.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        $linefirst = 1; $linelast = 1; $indexfirst = 1; $indexlast = 1;     // Exact selection 'b'.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $linefirst = 3; $linelast = 3; $indexfirst = 3; $indexlast = 3;     // Exact selection 't'.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $linefirst = 3; $linelast = 3; $indexfirst = 1; $indexlast = 3;     // Exact selection 'alt'.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT);
+        $linefirst = 2; $linelast = 2; $indexfirst = 0; $indexlast = 2;     // Selection 'qwe' to be expanded.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        $linefirst = 2; $linelast = 2; $indexfirst = 7; $indexlast = 7;     // Comment selection, should be expanded to the whole alternation.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node === $root);
+        $linefirst = 1; $linelast = 1; $indexfirst = 6; $indexlast = 6;     // Selection '+' to be expanded.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
+        $linefirst = 3; $linelast = 3; $indexfirst = 0; $indexlast = 0;     // Selection '|' to be expanded.
+        $node = $root->find_node_by_indexes($linefirst, $linelast, $indexfirst, $indexlast);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT);
     }
 }
