@@ -13,3 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
+
+//Other necessary requires
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
