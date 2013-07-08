@@ -26,4 +26,6 @@ class  qtype_correctwriting_enum_analyzer {
      * @var array
      */
     private $orders;
+
+    private $fitness;               //Fitness for response
 }
