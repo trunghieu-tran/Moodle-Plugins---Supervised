@@ -90,5 +90,6 @@ class  qtype_correctwriting_enum_analyzer {
                 //add -1 to array
                 $change_order_and_included_enums->included_enums[$i][] = -1;
 	    }
+        return $change_order_and_included_enums;
     }
 }
