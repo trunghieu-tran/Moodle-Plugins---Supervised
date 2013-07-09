@@ -226,6 +226,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
     }
+	
+	public function intersection_asserts($other){
+		$assert = new qtype_preg_leaf_assert;
+	}
 
     /**
      * Returns the number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf,
