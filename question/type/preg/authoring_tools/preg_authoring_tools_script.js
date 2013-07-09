@@ -102,6 +102,7 @@ M.preg_authoring_tools_script = (function() {
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
+                ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
@@ -249,7 +250,8 @@ M.preg_authoring_tools_script = (function() {
                 regex: regex,
                 id: id,
                 tree_orientation: self.tree_orientation,
-                displayas: self.displayas
+                displayas: self.displayas,
+                ajax: true
             },
             success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails

@@ -70,6 +70,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Length of the last match.
     public $last_match_len;
 
+    // States to backtrack to when generating extensions of partial matches.
+    public $backtrack_states;
+
     public function __clone() {
         $this->str = clone $this->str;  // Needs to be cloned for correct string generation.
     }
@@ -238,7 +241,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         } else {
             // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
             $skip = !$this->matcher->get_options()->capturesubexpressions;
-            $skip = $skip || $cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND;
+            $skip = $skip || ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND);
             $skip = $skip || ($skipwholematch && $node->subpattern == $this->root_subpatt_number());
             if (!$skip) {
                 $this->matches[$node->subpattern][] = self::empty_subpatt_match();
@@ -302,7 +305,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $other_last = $other->last_match($i);
                 if ($this_last[1] == 0 && $this_last[0] > $other_last[0]) {
                     return true;
-                } else  if ($other_last[1] == 0 && $other_last[0] > $this_last[0]) {
+                } else if ($other_last[1] == 0 && $other_last[0] > $this_last[0]) {
                     return false;
                 }
             }
