@@ -32,6 +32,12 @@ class block_formal_langs_token_base_test extends UnitTestCase {
         $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein(' ', '	', $options)==1);// spaces and tab
         $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('kmix ail', 'ksx aali', $options)==4);// large word
         $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('helllo', 'hlello', $options)==1);// 1 transposition
+        
+        $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('misha', 'masha', $options1)==1);
+        $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('misha', 'mish', $options1)==1);
+        $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('miha', 'misHa', $options1)==1);
+        $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('mamma', 'ma', $options1)==3);
+        $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('ca', 'abc', $options1)==3);
     }
 }
 ?>
