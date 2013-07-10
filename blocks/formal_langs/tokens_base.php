@@ -1001,16 +1001,21 @@ class block_formal_langs_processed_string {
      * Returns list of node descriptions.
      *
      * @return array of strings, keys are node numbers
+     * @throws coding_exception on error
      */
     public function node_descriptions_list() {
         global $DB;
         if ($this->descriptions == null)
         {
-         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
-         $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
-         foreach($records as $record) {
-            $this->descriptions[$record->number] = $record->description; 
-         }
+            $istablefilledincorrect = !is_string($this->tablename) || textlib::strlen($this->tablename) == 0;
+            if (!is_numeric($this->tableid)  || $istablefilledincorrect) {
+                throw new coding_exception('Trying to extract descriptions from unknown sources for string');
+            }
+            $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
+            $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
+            foreach($records as $record) {
+                $this->descriptions[$record->number] = $record->description;
+            }
         }
         return $this->descriptions;
     }
