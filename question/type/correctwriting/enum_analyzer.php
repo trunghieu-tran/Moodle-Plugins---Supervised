@@ -226,4 +226,53 @@ class  qtype_correctwriting_enum_analyzer {
         }
         return $enum_orders;
     }
+
+    /**
+     * Function to find orders of all enumerations in corrected answer.
+     * @param array $correctanswer - correct answer
+     * @param array $correctedanswer - corrected student answer
+     * @param array $enumdescription - enumerations description
+     * @return array of find orders
+     */
+    private function find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription) {
+        $enum_orders = array(); // Array to keep orders of one enumeration.
+        $all_enum_orders = array(); // Array to keep orders of all enumerations.
+        $complete_enum_orders = array(); // Array to keep complete orders of enumerations
+        $current_order = array(); // Array to keep current order of enumeration elements.
+        $count_of_all_enum_orders = 0; // Count of all enumeration orders.
+        $rows_for_one_order = 0; // Count of rows which will be keep same order for all enumerations.
+        // Find orders for all enumerations alternatively.
+        for ($i = 0; $i < count($enumdescription); $i++) {
+            $all_enum_orders[]=find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $i);
+        }
+        // Find count of complete orders of enumerations.
+        $count_of_all_enum_orders = 1;
+        for ($i = 0; $i < count($enumdescription); $i++) {
+            $count_of_all_enum_orders *= count($all_enum_orders[$i]);
+        }
+        // Paste together all enum orders.
+        $rows_for_one_order = $count_of_all_enum_orders;
+        for ($i = 0; $i < count($enumdescription); $i++) {
+            // Add to all complete orders, orders of enumeration alternatively.
+            $rows_for_one_order /= count($all_enum_orders[$i]);
+            for ($j = 0; $j < $count_of_all_enum_orders; $j) {
+                for ($f = 0; $f < count($all_enum_orders[$i]; $f++) {
+                    for ($k = 0; $k < $rows_for_one_order; $k++) {
+                        if (array_key_exists($j, $complete_enum_orders)) {
+                            $complete_enum_orders[$j] = array();
+                        }
+                        $complete_enum_orders[$j] = array_merge($complete_enum_orders[$j], $all_enum_orders[$i][$f]);
+                        $j++;
+                    }
+                }
+            }
+            // Add space if it needed.
+            if ($i!= count($enumdescription)-1) {
+                for ($j=0; $j < $count_of_all_enum_orders; $j++) {
+                    $complete_enum_orders[$j][] = -1;
+                }
+            }
+        }
+        return $complete_enum_orders;
+    }
 }
