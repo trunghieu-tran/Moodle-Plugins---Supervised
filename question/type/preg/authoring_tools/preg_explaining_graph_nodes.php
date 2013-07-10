@@ -704,7 +704,7 @@ class qtype_preg_authoring_tool_node_assert extends qtype_preg_authoring_tool_op
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
 
-        $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], self::$linkOptions[$this->pregnode->subtype], $graph);
+        $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], $graph, self::$linkOptions[$this->pregnode->subtype]);
 
         $graph->subgraphs[] = $sub;
         $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
