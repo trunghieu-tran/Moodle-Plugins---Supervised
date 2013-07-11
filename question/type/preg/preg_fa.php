@@ -295,6 +295,44 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Find index of state by its numbers.
+     *
+     * @param number1 - the first number of state.
+     * @param number2 - the second number of state.
+     * @return index of state if it was found and -1 if it wasn't found.
+     */
+    public function find_state_index($number1, $number2 = -1) {
+        $index = -1;
+        // Searching only by first numbers
+        if ($number2 == -1) {
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num1 = $this->states[$i]->firstnumbers[0];
+                if ($num1 == $number1) {
+                    $index = $i;
+                }
+            }
+        } else if ($number1==-1) {
+            // Searching only by second numbers
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num2 = $this->states[$i]->secondnumbers[0];
+                if ($num2 == $number2) {
+                    $index = $i;
+                }
+            }
+        } else {
+            // Searching by both numbers
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num1 = $this->states[$i]->firstnumbers[0];
+                $num2 = $this->states[$i]->secondnumbers[0];
+                if ($num1 == $number1 && $num2 == $number2) {
+                    $index = $i;
+                }
+            }
+        }
+        return $index;
+    }
+
+    /**
      * Set the start state of the automaton to given state.
      */
     public function set_start_state(&$state) {
