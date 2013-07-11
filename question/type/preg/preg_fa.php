@@ -33,6 +33,22 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_preg_fa_transition {
 
+    /** Empty transition. */
+    const TYPE_TRANSITION_EPS = 'eps_transition';
+    /** Transition with unmerged simple assert. */
+    const TYPE_TRANSITION_ASSERT = 'assert';
+    /** Empty transition or transition with unmerged simple assert. */
+    const TYPE_TRANSITION_BOTH = 'both';
+    /** Capturing transition. */
+    const TYPE_TRANSITION_CAPTURE = 'capturing';
+
+    /** Transition from first automata. */
+    const ORIGIN_TRANSITION_FIRST = 'first';
+    /** Transition from second automata. */
+    const ORIGIN_TRANSITION_SECOND = 'second';
+    /** Transition from intersection part. */
+    const ORIGIN_TRANSITION_INTER = 'intersection';
+
     /** @var object of qtype_preg_fa_state class - a state which transition starts from. */
     public $from;
     /** @var object of qtype_preg_leaf class - condition for this transition. */
