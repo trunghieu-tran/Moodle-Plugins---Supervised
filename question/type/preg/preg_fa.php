@@ -277,8 +277,8 @@ abstract class qtype_preg_finite_automaton {
      *
      * TODO - determine, whether we could get automaton with several end states - then return array.
      */
-    public function end_state() {
-        return $this->endstate;
+    public function end_states() {
+        return $this->endstates;
     }
 
     public function get_states() {
