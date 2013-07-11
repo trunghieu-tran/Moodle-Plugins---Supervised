@@ -24,6 +24,7 @@
  */
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
 
 /**
  * A basic token for block_formal_langs_printf_token_base
@@ -138,7 +139,8 @@ class block_formal_langs_token_printf_text extends block_formal_langs_token_base
             $statetext .= $c;
         } else {
             if (textlib::strlen($statetext) != 0) {
-                $result .= $this->$fun(array($statetext));
+                $funname = 'block_formal_langs_' . $fun;
+                $result .= $funname($statetext);
             } else {
                 $result .= $d;
             }

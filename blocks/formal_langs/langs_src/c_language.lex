@@ -18,7 +18,7 @@
  *
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Dmitriy Mamontov, Sergey Pashaev Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
 require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
@@ -38,29 +39,13 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
     
     public function name() {
         return 'c_language';
-    }    
-}
-
-function block_formal_langs_octal_to_decimal_char($matches) {
-    $code = $matches[0];
-    $code = octdec($code);
-    return chr(intval($code));
-}
-
-function block_formal_langs_hex_to_decimal_char($matches) {
-    $code = $matches[0];
-    $code = hexdec($code);
-    $string = '';
-    if (strlen($matches[0]) == 2) {
-        $string = chr(intval($code));
-    } else {
-        //  mb_convert_encoding left intentionally, because
-        // textlib uses iconv to convert, and iconv fails
-        // to conver from entities
-        $string = mb_convert_encoding('&#' . intval($code) . ';', 'UTF-8', 'HTML-ENTITIES');
     }
-    return $string;
+
+    public function lexem_name() {
+        return get_string('lexeme', 'block_formal_langs');
+    }
 }
+
 
 %%
 
