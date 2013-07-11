@@ -202,10 +202,10 @@ abstract class qtype_preg_finite_automaton {
 
     /** @var array of qtype_preg_fa_state, indexed by state numbers. */
     protected $states;
-    /** @var object of qtype_preg_fa_state - start state. */
-    protected $startstate;
-    /** @var object of qtype_preg_fa_state - end state. */
-    protected $endstate;
+    /** @var array of objects of qtype_preg_fa_state - start states. */
+    protected $startstates;
+    /** @var array of objects of qtype_preg_fa_state - end states. */
+    protected $endstates;
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
      *
