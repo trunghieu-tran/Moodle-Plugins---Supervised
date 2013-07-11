@@ -123,7 +123,7 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         list($result)=$token_stream->group_matches($matches);
         $this->assertTrue(count($token_stream->group_matches($matches))==2);
     }
-    
+
     function test_group_matches_5() {
         $mistakeweight=0;
         $correctcoverage=array();
@@ -136,5 +136,58 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $this->assertTrue(count($token_stream->group_matches($matches))==0);
     }
 
+    function test_group_matches_9() {
+        // you love big
+        // youlove lave bi your
+        $correctcoverage=array(0, 1, 2);
+        $comparedcoverage=array(1, 2, 3);
+        $pair1=new block_formal_langs_matched_tokens_pair(array(0, 1), array(0), 1);
+        $pair2=new block_formal_langs_matched_tokens_pair(array(0), array(3), 1);
+        $pair3=new block_formal_langs_matched_tokens_pair(array(1), array(1), 1);
+        $pair4=new block_formal_langs_matched_tokens_pair(array(2), array(2), 2);
+        $matches=array();
+        array_push($matches, $pair1, $pair2, $pair3, $pair4);
+        $token_stream=new block_formal_langs_token_stream(array(), array());
+        $this->assertTrue(count($token_stream->group_matches($matches))==1);
+        list($result)=$token_stream->group_matches($matches);
+        $this->assertTrue($result->mistakeweight==4);
+        $this->assertTrue($result->correctcoverage==$correctcoverage);
+        $this->assertTrue($result->comparedcoverage==$comparedcoverage);
+    }
+
+    function test_group_matches_7() {
+        $correctcoverage=array(0, 1);
+        $comparedcoverage=array(1, 2);
+        $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(1), 0);
+        $pair2=new block_formal_langs_matched_tokens_pair(array(0), array(2), 1);
+        $pair3=new block_formal_langs_matched_tokens_pair(array(1), array(2), 0);
+        $pair4=new block_formal_langs_matched_tokens_pair(array(2), array(1), 2);
+        $pair5=new block_formal_langs_matched_tokens_pair(array(2), array(2), 2);
+        $matches=array();
+        array_push($matches, $pair1, $pair2, $pair3, $pair4, $pair5);
+        $token_stream=new block_formal_langs_token_stream(array(), array());
+        $this->assertTrue(count($token_stream->group_matches($matches))==1);
+        list($result)=$token_stream->group_matches($matches);
+        $this->assertTrue($result->mistakeweight==0);
+        $this->assertTrue($result->correctcoverage==$correctcoverage);
+        $this->assertTrue($result->comparedcoverage==$comparedcoverage);
+    }
+    
+    function test_group_matches_8() {
+        // block tokens
+        $correctcoverage=array(0, 1, 2);
+        $comparedcoverage=array(0, 1);
+        $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(0), 0);
+        $pair2=new block_formal_langs_matched_tokens_pair(array(0, 1), array(1), 1);
+        $pair3=new block_formal_langs_matched_tokens_pair(array(2), array(0), 1);
+        $matches=array();
+        array_push($matches, $pair1, $pair2, $pair3);
+        $token_stream=new block_formal_langs_token_stream(array(), array());
+        $this->assertTrue(count($token_stream->group_matches($matches))==1);
+        list($result)=$token_stream->group_matches($matches);
+        $this->assertTrue($result->mistakeweight==2);
+        $this->assertTrue($result->correctcoverage==$correctcoverage);
+        $this->assertTrue($result->comparedcoverage==$comparedcoverage);
+    }
 }
 ?>
