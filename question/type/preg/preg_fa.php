@@ -227,8 +227,8 @@ abstract class qtype_preg_finite_automaton {
 
     public function __construct() {
         $this->states = array();
-        $this->startstate = null;
-        $this->endstate = null;
+        $this->startstates = array();
+        $this->endstates = array();
         $this->deterministic = true;
         $this->haseps = false;
         $this->hasassertiontransitions = false;
