@@ -102,10 +102,18 @@ class qtype_preg_fa_state {
     protected $fa;
     /** @var array of qtype_preg_fa_transition child objects, indexed. */
     protected $outtransitions;
+    /** @var array of qtype_preg_fa_transition child objects, indexed. */
+    protected $intotransitions;
+    /** @var boolean whether state is from intersection part or not. */
+    public $hasintersection;
+    /** @var boolean whether state was copied or not. */
+    public $wascopied;
     /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
     protected $deterministic;
-    /** @var int number of the state. */
-    public $number;
+    /** @var array of int - first numbers of the state. */
+    public $firstnumbers;
+    /** @var array of int - second numbers of the state, if state is from intersection part. */
+    public $secondnumbers;
 
     public function __construct(&$fa = null) {
         $this->fa = $fa;
