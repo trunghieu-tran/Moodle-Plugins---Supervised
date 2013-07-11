@@ -268,8 +268,8 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Returns the start state for automaton.
      */
-    public function start_state() {
-        return $this->startstate;
+    public function start_states() {
+        return $this->startstates;
     }
 
     /**
