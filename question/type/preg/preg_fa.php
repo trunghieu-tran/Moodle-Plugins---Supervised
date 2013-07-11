@@ -117,8 +117,12 @@ class qtype_preg_fa_state {
 
     public function __construct(&$fa = null) {
         $this->fa = $fa;
-        $this->number = -1;    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
+        $this->firstnumbers = array(-1);    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
+        $this->secondnumbers = array();
         $this->outtransitions = array();
+        $this->intotransitions = array();
+        $this->hasintersection = false;
+        $this->wascopied = false;
         $this->deterministic = true;
     }
 
