@@ -55,6 +55,10 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
+    /** @var type of the transition - should be equal to a constant defined in this class. */
+    public $type;
+    /** @var origin of the transition - should be equal to a constant defined in this class. */
+    public $origin;
 
     /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
     public $consumeschars;
