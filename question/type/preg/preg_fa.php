@@ -201,7 +201,7 @@ class qtype_preg_fa_state {
 abstract class qtype_preg_finite_automaton {
 
     /** @var array of qtype_preg_fa_state, indexed by state numbers. */
-    protected $states;
+    public $states;
     /** @var array of objects of qtype_preg_fa_state - start states. */
     protected $startstates;
     /** @var array of objects of qtype_preg_fa_state - end states. */
@@ -299,6 +299,14 @@ abstract class qtype_preg_finite_automaton {
      *
      */
     public function del_blind_states() {
+    }
+
+    /**
+     * Merging transitions without merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function go_round_transitions($del) {
     }
 
     /**
