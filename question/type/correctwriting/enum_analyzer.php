@@ -51,7 +51,7 @@ class  qtype_correctwriting_enum_analyzer {
                 if ( $i != $j) {
                     // Boolean variables to check including of enumerations.
                     $compare_left_borders_of_enums=$enumdescription[$i][0]->$begin >= $enumdescription[$j][0]->$begin;
-                    $compare_right_borders_of_enums=$enumdescription[$i][0]->$end >= $enumdescription[$j][0]->$end;
+                    $compare_right_borders_of_enums=$enumdescription[$i][0]->end >= $enumdescription[$j][0]->end;
                     // If left borders of i enum rather than j enum and right borders of j enum rather than i enum and...
                     // ...in included enums array for j enum not contains i.
                     // Else if left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
