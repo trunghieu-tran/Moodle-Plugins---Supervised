@@ -329,6 +329,15 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Merging all possible uncaptaring transitions in automata.
+     *
+     * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
+     * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
+     */
+    public function merger_uncapturing_transitions($transitiontype, $stateindex) {
+    }
+
+    /**
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
      *
      * @param source - automata-source for coping.
