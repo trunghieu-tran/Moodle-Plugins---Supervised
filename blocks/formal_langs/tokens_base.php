@@ -1005,7 +1005,7 @@ class block_formal_langs_processed_string {
      */
     public function node_descriptions_list() {
         global $DB;
-        if ($this->descriptions == null)
+        if ($this->descriptions === null)
         {
             $istablefilledincorrect = !is_string($this->tablename) || textlib::strlen($this->tablename) == 0;
             if (!is_numeric($this->tableid)  || $istablefilledincorrect) {
@@ -1018,6 +1018,21 @@ class block_formal_langs_processed_string {
             }
         }
         return $this->descriptions;
+    }
+
+    /**
+     * A unit-testing method for setting descriptions from associative array
+     *
+     * An example for such array is
+     * array(0 => 'A description for first lexeme',
+     *       1 => 'A description for second lexeme')
+     *
+     * DO NOT USE THIS FUNCTION IN PRODUCTION NOT FOR UNIT-TESTING.
+     *
+     * @param array $descriptions descriptions for lexemes
+     */
+    public function set_descriptions_from_array($descriptions) {
+        $this->descriptions = $descriptions;
     }
     /** Test, whether we have a lexeme descriptions for token with specified index
      *  @param int $index index of token
