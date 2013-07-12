@@ -121,8 +121,8 @@ abstract class block_formal_langs_abstract_language {
      *  @param string $string string
      *  @return block_formal_langs_processed_string string
      */
-     public function create_from_string($string) {
-        $result = new block_formal_langs_processed_string($this);
+     public function create_from_string($string, $classname = 'block_formal_langs_processed_string') {
+        $result = new $classname($this);
         $result->string = $string;
         return $result;
      }
@@ -134,8 +134,8 @@ abstract class block_formal_langs_abstract_language {
       *  @param string|null $string string data
       *  @return block_formal_langs_processed_string processed string
       */
-    public function create_from_db($tablename, $tableid, $string = null) {
-        $result = new block_formal_langs_processed_string($this);
+    public function create_from_db($tablename, $tableid, $string = null, $classname = 'block_formal_langs_processed_string') {
+        $result = new $classname($this);
         $result->set_table_params($tablename,$tableid);
         $result->string  = $string;
         return $result;
