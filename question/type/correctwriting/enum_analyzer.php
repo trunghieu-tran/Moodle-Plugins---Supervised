@@ -211,7 +211,7 @@ class  qtype_correctwriting_enum_analyzer {
             unset($elements_in_corrected_answer[0]);
             // Check that have next order in array of elements numbers which are ordered like in corrected student answer.
             $have_next_order= true;
-            for ($i = 0; $i < count($enumdescription[$number]; $i++) {
+            for ($i = 0; $i < count($enumdescription[$number]); $i++) {
                 if (!in_array($i, $elements_in_corrected_answer)) {
                     $have_next_order = false;
                 }
