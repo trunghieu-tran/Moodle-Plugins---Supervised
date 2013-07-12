@@ -1532,7 +1532,6 @@ class block_formal_langs_string_pair {
                 // write correcttokens
                 if ($this->matches[$j]->comparedtokens[0]==$i) {
                     for ($k = 0; $k<count($this->matches[$j]->correcttokens); $k++) {
-                        // array_push($streamcorrected->tokens, $correctstream->tokens[$this->matches[$j]->correcttokens[$k]]);
                         $streamcorrected->tokens[] = $correctstream->tokens[$this->matches[$j]->correcttokens[$k]];
                     }
                     $flag = 1;
@@ -1540,7 +1539,6 @@ class block_formal_langs_string_pair {
             }
             // write comparedtoken
             if ($flag == 0) {
-                // array_push($streamcorrected->tokens, $newstream->tokens[$i]);
                 $streamcorrected->tokens[] = $newstream->tokens[$i];
             }
         }
@@ -1553,6 +1551,19 @@ class block_formal_langs_string_pair {
         // return $this->comparedstring;
     }
 
+
+    private function count_indexs_correct($nodenumber) {
+        $count = 0;
+        return $count;
+    }
+    
+    private function count_indexs_incorrect($nodenumber) {
+        return $count;
+    }
+    
+    private function index_pair_from_lexem($nodenumber) {
+        return $index;
+    }
     /**
      * Returns description string for passed node. If there is no description, token value from compared string is used, 
      * if it is not available too, than token value from correct string is used.  TODO - check the rules.
@@ -1563,6 +1574,23 @@ class block_formal_langs_string_pair {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        $correctindexs = $this->count_indexs_correct($nodenumber);
+        $comparedindexs = $this->count_indexs_incorrect($nodenumber);
+        // typo
+        if (count($correctindexs)==1 && count($comparedindexs)==1) {
+            $index = $this->index_pair_from_lexem($nodenumber);
+            if($this->correctstring()->has_description($nodenumber)) {
+                return $this->correctstring()->node_description($nodenumber, false, true);
+            } else {
+                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
+        
+    
+    
+    
+    
         // $this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         /* TODO - implement, this code from processed_string may be useful
         $result = '';
