@@ -87,6 +87,17 @@ class qtype_preg_fa_transition {
             return "$index1->$index2" . "[label = $lab, style = dotted];";
         }
     }
+
+    /**
+     * Find intersection of two transitions.
+     *
+     * @param other - the second transition for intersection.
+     * @param resulttran - transition, where should be written result of intersection.
+     * @return flag intersection was successul or not.
+     */
+    public function intersection_transition($other, &$resulttran) {
+        return false;
+    }
 }
 
 /**
