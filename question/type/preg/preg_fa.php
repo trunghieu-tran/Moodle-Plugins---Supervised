@@ -310,6 +310,19 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
+     *
+     * @param source - automata-source for coping.
+     * @param oldFront - states from which coping starts.
+     * @param stopcoping - state to which automata will be copied.
+     * @param direction - direction of coping (0 - forward; 1 - back).
+     * @return automata after coping.
+     */
+    public function copy_modify_branches($source, &$oldFront, &$stopcoping, $direction) {
+        return $this;
+    }
+
+    /**
      * Find index of state by its numbers.
      *
      * @param number1 - the first number of state.
