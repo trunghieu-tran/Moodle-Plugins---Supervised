@@ -1472,7 +1472,7 @@ class block_formal_langs_string_pair {
     /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
-    public static function best_string_pairs($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options) {
+    public static function best_string_pairs($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
         $bestgroups = array();
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
