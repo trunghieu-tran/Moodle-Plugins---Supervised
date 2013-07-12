@@ -547,6 +547,19 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Find intersection part of automaton in case of intersection it with another one.
+     *
+     * @param anotherfa object automaton to intersect.
+     * @param result object automaton to write intersection part.
+     * @param start state of $this automaton with which to start intersection.
+     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata.
+     */
+    public function intersection_part ($anotherfa, &$result, $start, $isstart) {
+        return $result;
+    }
+
+    /**
      * Intersect automaton with another one.
      *
      * @param anotherfa object automaton to intersect.
