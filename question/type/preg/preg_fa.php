@@ -552,8 +552,21 @@ abstract class qtype_preg_finite_automaton {
      * @param anotherfa object automaton to intersect.
      * @param stateindex integer index of state of $this automaton with which to start intersection.
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata.
      */
-    public function intersect_fa($anotherfa, $stateidnex, $isstart) {
+    public function intersection_automata ($anotherfa, $stateindex, $isstart) {
+        return $this;
+    }
+
+    /**
+     * Intersect automaton with another one.
+     *
+     * @param anotherfa object automaton to intersect.
+     * @param stateindex integer index of state of $this automaton with which to start intersection.
+     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata without blind states with one end state and with merged asserts.
+     */
+    public function intersect_fa($anotherfa, $stateindex, $isstart) {
         return $this;
     }
 
