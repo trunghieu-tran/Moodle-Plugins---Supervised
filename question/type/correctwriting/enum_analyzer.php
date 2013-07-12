@@ -462,7 +462,7 @@ class  qtype_correctwriting_enum_analyzer {
                                 // ...else.
                                 // Calculate new description, use description of element, which contains current enumeration,...
                                 // ...and current element old description.
-                                $right_border_of_prev_elem = $enumdescription[$enum_number][$distances[$j*2]]->begin
+                                $right_border_of_prev_elem = $enumdescription[$enum_number][$distances[$j*2]]->begin;
                                 $left_border_of_elem_new = $right_border_of_prev_elem+$elements_distances[$k];
                                 $right_border_of_elem_new = $left_border_of_elem_new+$right_border_of_elem-$left_border_of_elem;
                             }
