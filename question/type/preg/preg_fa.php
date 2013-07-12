@@ -321,6 +321,14 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Merging transitions with merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merger_transitions($del) {
+    }
+
+    /**
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
      *
      * @param source - automata-source for coping.
