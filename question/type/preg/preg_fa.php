@@ -295,6 +295,13 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Delete all blind states in automata.
+     *
+     */
+    public function del_blind_states() {
+    }
+
+    /**
      * Find index of state by its numbers.
      *
      * @param number1 - the first number of state.
@@ -330,6 +337,15 @@ abstract class qtype_preg_finite_automaton {
             }
         }
         return $index;
+    }
+
+    /**
+     * Write automata as a dot-style string.
+     *
+     * @return dot_style string with the description of automata.
+     */
+    public function write_fa() {
+        return('');
     }
 
     /**
