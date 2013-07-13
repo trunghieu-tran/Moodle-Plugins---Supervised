@@ -297,8 +297,17 @@ abstract class qtype_preg_finite_automaton {
     }
 
     
+    /**
+     * Return array of all states' ids of automata.
+     *
+     */
     public function get_states() {
-        return $this->states;
+        if (count($this->adjacencymatrix) == 0) {
+            $states = array();
+        } else {
+            $states = array_keys($this->adjacencymatrix);
+        }
+        return $states;
     }
 
     /**
