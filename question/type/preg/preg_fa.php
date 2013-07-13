@@ -241,7 +241,7 @@ abstract class qtype_preg_finite_automaton {
 
 
     public function __construct() {
-        $this->states = array(array());
+        $this->adjacencymatrix = array(array());
         $this->startstates = array();
         $this->endstates = array();
         $this->deterministic = true;
