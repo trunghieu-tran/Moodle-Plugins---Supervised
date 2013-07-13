@@ -442,7 +442,7 @@ abstract class qtype_preg_finite_automaton {
         foreach ($states as $curstate) {
             //Current state wasn't passed
             if (array_search($curstate, $aregoneforward) == false || array_search($curstate, $aregoneback) == false) {
-                $this->del_state($curstate);
+                $this->remove_state($curstate);
             }
         }
     }
@@ -617,15 +617,15 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Removes a state from the automaton.
      *
-     * @param state a reference to the state to be removed.
+     * @param state an id of the state to be removed.
      */
-    public function remove_state(&$state) {
-        foreach ($this->states as $key => $curstate) {
-            if ($curstate === $state) {
-                $this->transitioncount -= count($curstate->outgoing_transitions());
-                $this->statecount--;
-                unset($this->states[$key]);
-                break;
+    public function remove_state($state) {
+        //Removing row
+        unset($this->adjacencymatrix[$state]);
+        //Removing column
+        foreach ($this->adjacencymatrix as $curcolumn) {
+            if (array_key_exists($state, $curcolumn)) {
+                unset($curcolomn[$state]);
             }
         }
     }
