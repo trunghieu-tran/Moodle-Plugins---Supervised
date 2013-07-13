@@ -240,7 +240,7 @@ abstract class qtype_preg_finite_automaton {
 
 
     public function __construct() {
-        $this->states = array();
+        $this->states = array(array());
         $this->startstates = array();
         $this->endstates = array();
         $this->deterministic = true;
@@ -295,6 +295,7 @@ abstract class qtype_preg_finite_automaton {
         return $this->endstates;
     }
 
+    
     public function get_states() {
         return $this->states;
     }
