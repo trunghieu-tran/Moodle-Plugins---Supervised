@@ -215,7 +215,8 @@ abstract class qtype_preg_finite_automaton {
     public $states;
     /** @var matrix of int id of states and their transitions. */
     public $adjacencymatrix;
-    
+    /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
+    public $statenumbers;
     /** @var array of int ids of states - start states. */
     protected $startstates;
     /** @var array of of int ids of states - end states. */
