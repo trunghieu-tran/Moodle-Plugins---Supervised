@@ -192,6 +192,11 @@ $string['nfa_transition_limit_description'] = 'Maximum number of transitions in 
 
 /********** Strings for authoring tools **********************/
 $string['authoring_tool_page_header'] = 'Test regex';
+$string['authoring_form_charset_mode'] = 'Режим отображения сложных символьных классов:';
+$string['authoring_form_charset_flags'] = 'точное значение (унифицированный формат)';
+$string['authoring_form_charset_userinscription'] = 'как написано в регулярном выражении';
+$string['authoring_form_tree_horiz'] = 'горизонтальное';
+$string['authoring_form_tree_vert'] = 'вертикальное';
 $string['regex_edit_header_text'] = 'Regex';
 $string['regex_edit_header'] = 'Input regex';
 $string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
