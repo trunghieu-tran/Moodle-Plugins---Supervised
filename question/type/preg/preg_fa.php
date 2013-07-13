@@ -432,6 +432,19 @@ abstract class qtype_preg_finite_automaton {
      *
      */
     public function del_blind_states() {
+        //Pass automata forward
+        $aregoneforward = $this->pass_automata(0);
+        //Pass automata forward
+        $aregoneback = $this->pass_automata(1);
+
+        //Check for each state of atomata was it gone or not
+        $states = $this->get_states();
+        foreach ($states as $curstate) {
+            //Current state wasn't passed
+            if (array_search($curstate, $aregoneforward) == false || array_search($curstate, $aregoneback) == false) {
+                $this->del_state($curstate);
+            }
+        }
     }
 
     /**
