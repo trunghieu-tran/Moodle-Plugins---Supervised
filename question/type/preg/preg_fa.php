@@ -211,11 +211,14 @@ class qtype_preg_fa_state {
  */
 abstract class qtype_preg_finite_automaton {
 
-    /** @var array of qtype_preg_fa_state, indexed by state numbers. */
+    /** @var array of qtype_preg_fa_state, indexed by state numbers(will be deleted, do not use). */
     public $states;
-    /** @var array of objects of qtype_preg_fa_state - start states. */
+    /** @var matrix of int id of states and their transitions. */
+    public $adjacencymatrix;
+    
+    /** @var array of int ids of states - start states. */
     protected $startstates;
-    /** @var array of objects of qtype_preg_fa_state - end states. */
+    /** @var array of of int ids of states - end states. */
     protected $endstates;
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
