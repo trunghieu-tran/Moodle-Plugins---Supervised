@@ -296,7 +296,6 @@ abstract class qtype_preg_finite_automaton {
         return $this->endstates;
     }
 
-    
     /**
      * Return array of all states' ids of automata.
      *
@@ -308,6 +307,24 @@ abstract class qtype_preg_finite_automaton {
             $states = array_keys($this->adjacencymatrix);
         }
         return $states;
+    }
+
+    /**
+     * Return column with key from matrix $array.
+     *
+     * @param array - matrix.
+     * @param key - key of column.
+     */
+    public function get_column($array, $key) {
+        $result = array();
+        foreach ($array as $element) {
+            foreach ($element as $value) {
+                if (array_key_exists($key, $element)) {
+                    $result[] = $element[$key];
+                }
+            }
+        }
+        return $result;
     }
 
     /**
@@ -325,7 +342,7 @@ abstract class qtype_preg_finite_automaton {
      * @param state - id of state which intotransitions are intresting.
      */
     public function get_state_intotransitions($state) {
-        return array_column($this->adjacencymatrix, $state);
+        return get_column($this->adjacencymatrix, $state);
     }
 
     public function state_exists(&$state) {
