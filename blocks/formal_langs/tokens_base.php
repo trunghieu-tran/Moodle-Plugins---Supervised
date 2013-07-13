@@ -1586,8 +1586,17 @@ class block_formal_langs_string_pair {
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
-        
-    
+        // extra separator
+        if(count($correctindexs)==1 && count($comparedindexs)==2) {
+            if($this->correctstring()->has_description($nodenumber)) {
+                return $this->correctstring()->node_description($nodenumber, false, true);
+            } else {
+                // TODO
+            }
+        }
+        if(count($correctindexs)==2 && count($comparedindexs)==1) {
+            // TODO
+        }
     
     
     
