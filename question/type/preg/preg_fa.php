@@ -300,6 +300,24 @@ abstract class qtype_preg_finite_automaton {
         return $this->states;
     }
 
+    /**
+     * Return outtransitions of state with id $state.
+     *
+     * @param state - id of state which outtransitions are intresting.
+     */
+    public function get_state_outtransitions($state) {
+        return $this->adjacencymatrix[$state];
+    }
+
+    /**
+     * Return intotransitions of state with id $state.
+     *
+     * @param state - id of state which intotransitions are intresting.
+     */
+    public function get_state_intotransitions($state) {
+        return array_column($this->adjacencymatrix, $state);
+    }
+
     public function state_exists(&$state) {
         foreach ($this->states as $curstate) {
             if ($curstate === $state) {
