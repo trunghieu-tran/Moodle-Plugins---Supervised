@@ -233,11 +233,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @param other - the second assert for intersection.
      * @return assert, which is intersection of ginen.
      */
-    public function intersection_asserts($other) {
+    public function intersect_asserts($other) {
         $esca = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_A);
         $escz = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
 
-        
         //Adding assert to array
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             array_unshift ($this->mergedassertions, $this);
