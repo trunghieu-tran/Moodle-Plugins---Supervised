@@ -98,6 +98,21 @@ class qtype_preg_fa_transition {
     public function intersection_transition($other, &$resulttran) {
         return false;
     }
+
+    /**
+     * Returns true if intersection of transitions is possible.
+     *
+     * @param other another transition for intersection.
+     * @param result transition for result of intersection transitions.
+     */
+    public function intersection_transitions($other, $resulttran) {
+        if ($this->pregleaf->intersection_leafs($other->pregleaf, $resultleaf)) {
+            $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 /**
