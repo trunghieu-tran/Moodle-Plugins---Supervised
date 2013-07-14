@@ -100,6 +100,23 @@ class qtype_preg_fa_transition {
     }
 
     /**
+     * Remove same elements from automata.
+     *
+     * @param array array for removing.
+     */
+    public function remove_same_elements(&$array) {
+        for ($i = 0; $i < count($array); $i++) {
+            for ($j = ($i+1); $j < count($array); $j++) {
+                if ($array[$i] == $array[$j]) {
+                unset($array[$j]);
+                $array = array_values($array);
+                $j--;
+                }
+            }
+        }
+    }
+
+    /**
      * Returns true if intersection of transitions is possible.
      *
      * @param other another transition for intersection.
