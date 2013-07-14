@@ -567,5 +567,28 @@ class qtype_correctwriting_question extends question_graded_automatically
         return new $hintclass($this, $hintkey, null);
     }
 
+    /**
+     * Checks, whether two lexeme sequences are equal. Only a corrected_string lexemes and correct_string
+     * tokens are checked
+     * @param block_formal_langs_string_pair $stringpair a pair of strings
+     * @return boolean
+     */
+    public function are_lexeme_sequences_equal(block_formal_langs_string_pair $stringpair) {
+        $responsetokens = $stringpair->correctedstring()->stream->tokens;
+        $answertokens =  $stringpair->correctstring()->stream->tokens;
+        $same = false;
+        if (count($responsetokens) == count($answertokens)) {
+            $same = true;
+            if (count($responsetokens) != 0) {
+                for($i = 0; $i < count($responsetokens); $i++) {
+                    /** @var block_formal_langs_token_base $token */
+                    $token =   $responsetokens[$i];
+                    $same = ($same && $token->is_same($answertokens[$i], $this->usecase));
+                }
+            }
+        }
+        return $same;
+    }
+
 }
  ?>
