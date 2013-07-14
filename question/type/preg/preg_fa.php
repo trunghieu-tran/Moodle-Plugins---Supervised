@@ -548,13 +548,13 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Set the start state of the automaton to given state.
+     * Add the start state of the automaton to given state.
      */
-    public function set_start_state(&$state) {
-        if ($this->state_exists($state)) {
-            $this->startstate = $state;
+    public function add_start_state($state) {
+        if (array_key_exsists($state, $this->adjacencymatrix) {
+            $this->startstates[] = $state;
         } else {
-            throw new qtype_preg_exception('set_start_state error: No state ' . $state->number . ' in automaton');
+            throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
         }
     }
 
