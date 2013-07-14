@@ -67,7 +67,7 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
+    public function __construct($from, &$pregleaf, $to, $consumeschars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
