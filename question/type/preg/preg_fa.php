@@ -175,6 +175,9 @@ abstract class qtype_preg_finite_automaton {
     /** @var object of qtype_preg_fa_state - end state. */
     protected $endstate;
 
+    /** @var two-dimensional array of qtype_preg_fa_transition objects: first index is "from", second index is "to"*/
+    protected $adjacencymatrix;
+
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
      *
      * May be used for optimisation when an NFA object actually stores a DFA.
