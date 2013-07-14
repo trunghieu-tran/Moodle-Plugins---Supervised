@@ -620,9 +620,9 @@ abstract class qtype_preg_finite_automaton {
      *
      * @param state a reference to an object of qtype_preg_fa_state class.
      */
-    public function add_state(&$state) {
-        $this->states[] = $state;
-        $state->set_fa($this);
+    public function add_state($statenumber) {
+        $this->adjacencymatrix[] = array();
+        $this->statenumbers[] = $statenumber;
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
