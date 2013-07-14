@@ -89,17 +89,6 @@ class qtype_preg_fa_transition {
     }
 
     /**
-     * Find intersection of two transitions.
-     *
-     * @param other - the second transition for intersection.
-     * @param resulttran - transition, where should be written result of intersection.
-     * @return flag intersection was successul or not.
-     */
-    public function intersection_transition($other, &$resulttran) {
-        return false;
-    }
-
-    /**
      * Remove same elements from automata.
      *
      * @param array array for removing.
@@ -120,15 +109,12 @@ class qtype_preg_fa_transition {
      * Returns true if intersection of transitions is possible.
      *
      * @param other another transition for intersection.
-     * @param result transition for result of intersection transitions.
      */
-    public function intersection_transitions($other, $resulttran) {
-        if ($this->pregleaf->intersection_leafs($other->pregleaf, $resultleaf)) {
+    public function intersect($other) {
+        if ($this->pregleaf->intersection_leafs($other->pregleaf) != null) {
             $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
-            return true;
-        } else {
-            return false;
         }
+        return $resulttran;
     }
 }
 
@@ -479,44 +465,7 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    /**
-     * Merging transitions without merging states.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    public function go_round_transitions($del) {
-    }
-
-    /**
-     * Merging transitions with merging states.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    public function merger_transitions($del) {
-    }
-
-    /**
-     * Merging all possible uncaptaring transitions in automata.
-     *
-     * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
-     * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
-     */
-    public function merger_uncapturing_transitions($transitiontype, $stateindex) {
-    }
-
-    /**
-     * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
-     *
-     * @param source - automata-source for coping.
-     * @param oldFront - states from which coping starts.
-     * @param stopcoping - state to which automata will be copied.
-     * @param direction - direction of coping (0 - forward; 1 - back).
-     * @return automata after coping.
-     */
-    public function copy_modify_branches($source, &$oldFront, &$stopcoping, $direction) {
-        return $this;
-    }
-
+    
     /**
      * Find index of state by its numbers.
      *
@@ -700,6 +649,43 @@ abstract class qtype_preg_finite_automaton {
     public function compare_fa($another) {
         // TODO - streltsov.
     }
+/**
+     * Merging transitions without merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function go_round_transitions($del) {
+    }
+
+    /**
+     * Merging transitions with merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merge_transitions($del) {
+    }
+
+    /**
+     * Merging all possible uncaptaring transitions in automata.
+     *
+     * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
+     * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
+     */
+    public function merge_uncapturing_transitions($transitiontype, $stateindex) {
+    }
+
+    /**
+     * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
+     *
+     * @param source - automata-source for coping.
+     * @param oldFront - states from which coping starts.
+     * @param stopcoping - state to which automata will be copied.
+     * @param direction - direction of coping (0 - forward; 1 - back).
+     * @return automata after coping.
+     */
+    public function copy_modify_branches($source, &$oldFront, &$stopcoping, $direction) {
+        return $this;
+    }
 
     /**
      * Merges simple assertion transitions into other transtions.
@@ -739,7 +725,7 @@ abstract class qtype_preg_finite_automaton {
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
-    public function intersection_part ($anotherfa, &$result, $start, $isstart) {
+    public function get_intersection_part ($anotherfa, &$result, $start, $isstart) {
         return $result;
     }
 
@@ -751,7 +737,7 @@ abstract class qtype_preg_finite_automaton {
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
-    public function intersection_automata ($anotherfa, $stateindex, $isstart) {
+    public function intersect ($anotherfa, $stateindex, $isstart) {
         return $this;
     }
 

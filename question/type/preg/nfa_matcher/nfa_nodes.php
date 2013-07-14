@@ -115,10 +115,10 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
      * Returns true if intersection of transitions is possible.
      *
      * @param other another transition for intersection.
-     * @param result transition for result of intersection transitions.
      */
-    public function intersect_transitions($other, $resulttran) {
-        if ($this->intersection_transitions($other, $resulttran)) {
+    public function intersect_transitions($other) {
+        $resulttran = parent::intersect($other);
+        if ($resulttran != null)        
             $resulttran->subpatt_start = array_merge($this->subpatt_start(), $other->subpatt_start());
             $resulttran->subpatt_end = array_merge($this->subpatt_end(), $other->subpatt_end());
             $resulttran->subexpr_start = array_merge($this->subexpr_start(), $other->subexpr_start());
@@ -127,9 +127,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
             remove_same_elements($resulttran->subpatt_end);
             remove_same_elements($resulttran->subexpr_start);
             remove_same_elements($resulttran->subexpr_end);
-        } else {
-            return false;
         }
+        return $resulttran;
     }
 }
 
