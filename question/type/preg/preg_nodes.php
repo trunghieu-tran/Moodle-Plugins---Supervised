@@ -234,7 +234,58 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @return assert, which is intersection of ginen.
      */
     public function intersection_asserts($other) {
-        $assert = new qtype_preg_leaf_assert;
+        $esca = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $escz = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
+
+        
+        //Adding assert to array
+        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            array_unshift ($this->mergedassertions, $this);
+        }
+        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            array_unshift ($other->mergedassertions, $other);
+        }
+        $result = array_merge($this->mergedassertions, $other->mergedassertions);
+        //Removing same asserts
+        for ($i = 0; $i < count($result); $i++) {
+            for ($j = ($i+1); $j < count($result); $j++) {
+                if ($result[$i]->subtype == $result[$j]->subtype) {
+                unset($result[$j]);
+                $result = array_values($result);
+                $j--;
+                }
+            }
+        }
+
+        foreach ($result as $assert) {
+            $assert->mergedassertions = array();
+        }
+        $result = array_values($result);
+
+        foreach ($result as $assert) {
+            $key = array_search($assert, $result);
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                //Searching compatible asserts
+                if (array_search($esca, $result) != false) {
+                    unset($result[$key]); 
+                    $result = array_values($result);
+                }
+            } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                //Searching compatible asserts
+                if (array_search($escz, $result) != false) {
+                    unset($result[$key]); 
+                    $result = array_values($result);
+                }
+            }
+        }
+
+        //Getting result leaf
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            $assert = $this;
+        } else {
+            $assert = new qtype_preg_leaf_assert($result[0]->subtype);
+        }
+        $assert->mergedassertions = $result;
         return $assert;
     }
 
