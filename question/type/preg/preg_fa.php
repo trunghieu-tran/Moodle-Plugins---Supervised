@@ -111,7 +111,8 @@ class qtype_preg_fa_transition {
      * @param other another transition for intersection.
      */
     public function intersect($other) {
-        if ($this->pregleaf->intersection_leafs($other->pregleaf) != null) {
+        $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf);
+        if ($resultleaf != null) {
             $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
         }
         return $resulttran;
