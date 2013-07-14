@@ -291,6 +291,33 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     }
 
     /**
+     * Returns true if intersection of leafs is possible.
+     *
+     * @param other another leaf for intersection.
+     */
+    public function intersect_leafs($other) {
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                $result = $this->intersect($other);
+                if ($result != null) {
+                    $result = $result->intersect_asserts($other);
+                }
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this->intersect_asserts($other);
+            }
+        } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $this->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this->intersect_asserts($other);
+            }
+        } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            $result = $this->intersect_asserts($other);
+        }
+        return $result;
+    }
+
+    /**
      * Returns the number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf,
      * 1 in case of a single character, n in case of a backreferense.
      * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
