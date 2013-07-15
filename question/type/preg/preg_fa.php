@@ -847,7 +847,62 @@ abstract class qtype_preg_finite_automaton {
      * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
      * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
      */
-    public function merge_uncapturing_transitions($transitiontype, $stateindex) {
+    public function merge_uncapturing_transitions($transitiontype, &$stateindex) {
+        $newfront = array();
+        $statechecked = array();
+        //Getting types of uncaptyring transitions
+        if ($transitiontype == qtype_preg_fa_transition::TYPE_TRANSITION_BOTH) {
+            $trantype1 = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
+            $trantype2 = qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT;
+        } else if {
+            $trantype1 = $transitiontype;
+            $trantype2 = $transitiontype;
+        }
+        
+        $oldfront = $this->startstates;
+        while (count($oldfront) != 0) {
+            $waschanged = false;
+            //Analysis transitions of each state
+            foreach ($oldfront as $state) {
+                if (!$waschanged && array_search($state, $stateschecked) === false) {
+                    $transitions = $this->get_state_outtransitions($state);
+                    //Searching transition of given type
+                    foreach ($transitions as $tran) {
+                        if ($tran->type == $trantype1 || $tran->type == $trantype2) {
+                            //Choice of merging way
+                            $intotransitions = $this->get_state_intotransitions($tran->to);
+                            if ($stateindex != null && $tran->from == $stateindex && count($intotransitions) > 1) {
+                                $this->go_round_transition($tran);
+                                $waschanged = true;
+                            } else {
+                                if ($tran->to == $stateindex) {
+                                    $stateindex = $tran->from;
+                                }
+                                $this->merge_transitions($tran);
+                            }
+                            //Adding changed state to new wavefront
+                            $newfront[] = $state;
+                            $outtransitions = $this->get_state_outtransitions($state);
+                            //Delete cycle of uncapturing transition
+                            $wasdel = false;
+                            foreach ($outtansitions as $outtran) {
+                                if ($wasdel) {
+                                    if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
+                                        unset($newfront[count($newfront)-1]);
+                                        $wasdel = true;
+                                    }
+                                }
+                            }
+                        } else {
+                            $newfront[] = $tran->to;
+                            $stateschecked[] = $state;
+                        }
+                    }
+                }
+            }
+            $oldfront = $newfront;
+            $newfront = array();
+        }
     }
 
     /**
