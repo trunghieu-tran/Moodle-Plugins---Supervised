@@ -593,6 +593,15 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Delete transition.
+     *
+     * @param del transition for deleting.
+     */
+    public function del_transition ($del) {
+        unset($this->adjacencymatrix[$del->from][$del->to]);
+    }
+
+    /**
      * Used from qype_preg_fa_state class to signal that an assert-transition was added to the automaton.
      * Note that only methods of the automaton the merge all assert-transitions and make property false.
      */
