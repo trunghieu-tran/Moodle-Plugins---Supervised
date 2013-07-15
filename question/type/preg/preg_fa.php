@@ -413,9 +413,9 @@ abstract class qtype_preg_finite_automaton {
 
                     //Analysis outtransitions if go forward and intotransitions if go back
                     if ($direction == 0) {
-                        $transitions = $this->get_outtransitions($curstate);
+                        $transitions = $this->get_state_outtransitions($curstate);
                     } else {
-                        $transitions = $this->get_intotransitions($curstate);
+                        $transitions = $this->get_state_intotransitions($curstate);
                     }
                     //Current state is not end state
                     if (!$isendstate) {
@@ -518,7 +518,7 @@ abstract class qtype_preg_finite_automaton {
      * Add the start state of the automaton to given state.
      */
     public function add_start_state($state) {
-        if (array_key_exsists($state, $this->adjacencymatrix) {
+        if (array_key_exists($state, $this->adjacencymatrix) {
             $this->startstates[] = $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
@@ -529,7 +529,7 @@ abstract class qtype_preg_finite_automaton {
      * Add the end state of the automaton to given state.
      */
     public function add_end_state(&$state) {
-        if (array_key_exsists($state, $this->adjacencymatrix) {
+        if (array_key_exists($state, $this->adjacencymatrix) {
             $this->endstates[] = $state;
         } else {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
