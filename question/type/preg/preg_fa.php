@@ -106,7 +106,7 @@ class qtype_preg_fa_transition {
     }
 
     /**
-     * Returns true if intersection of transitions is possible.
+     * Returns intersection of transitions.
      *
      * @param other another transition for intersection.
      */

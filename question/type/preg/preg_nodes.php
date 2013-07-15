@@ -291,7 +291,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     }
 
     /**
-     * Returns true if intersection of leafs is possible.
+     * Returns intersection of leafs.
      *
      * @param other another leaf for intersection.
      */
