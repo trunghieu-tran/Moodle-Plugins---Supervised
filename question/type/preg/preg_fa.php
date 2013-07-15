@@ -117,6 +117,24 @@ class qtype_preg_fa_transition {
         }
         return $resulttran;
     }
+
+    /**
+     * Returns true if transition is eps.
+     *
+     * @param other another transition for intersection.
+     */
+    public function is_eps() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_META && ($this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    }
+
+    /**
+     * Returns true if transition is with unmerged assert.
+     *
+     * @param other another transition for intersection.
+     */
+    public function is_unmerged_assert() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT);
+    }
 }
 
 /**
