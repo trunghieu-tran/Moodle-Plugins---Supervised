@@ -57,11 +57,11 @@ class  qtype_correctwriting_enum_analyzer {
                     // Else if left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
                     // ...in included enums array for i enum not contains j.
                     if ($compare_left_borders_of_enums && ! $compare_right_borders_of_enums
-                            && !in_array($i, $change_order_and_included_enums->incuded_enums[$j])) {
+                            && !in_array($i, $change_order_and_included_enums->included_enums[$j])) {
                         // Add i to included enums array for j enum.
                         $change_order_and_included_enums->included_enums[$j][] = $i;
                     } else if (! $compare_left_borders_of_enums && $compare_right_borders_of_enums
-                                && !in_array($j, $change_order_and_included_enums->incuded_enums[$i])) {
+                                && !in_array($j, $change_order_and_included_enums->included_enums[$i])) {
                         // Add j to included enums array for i enum.
                         $change_order_and_included_enums->included_enums[$i][] = $j;
                     }
