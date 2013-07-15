@@ -656,6 +656,19 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Check if this state is from intersection part of autmata.
+     */
+    public function is_intersectionstate($state) {
+        if (strpos($this->statenumbers[$state], ',') === false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    
+
+    /**
      * Read and create a FA from dot-like language. Mainly used for unit-testing.
      */
     public function read_fa($dotstring) {
