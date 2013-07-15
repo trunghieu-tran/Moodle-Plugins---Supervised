@@ -33,7 +33,7 @@ class  qtype_correctwriting_enum_analyzer {
      * Function to find order of changing enumeration, and included enumerations to all enumerations
      * @param array $enumdescription enumerations description
      */
-    private function get_enum_change_order($enumdescription) {
+   public function get_enum_change_order($enumdescription) {
         $change_order_and_included_enums = new stdClass();
         // Add fields to stdClass object.
         $change_order_and_included_enums->order = array(); // Enumerations change order.
