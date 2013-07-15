@@ -397,16 +397,16 @@ abstract class qtype_preg_finite_automaton {
                 $isendstate = false;
 
                 //State has not been already gone
-                if (array_search($curstate, $aregone) == false) {
+                if (array_search($curstate, $aregone) === false) {
                     $aregone[] = $curstate;
 
                     //Comparing with end states or start states
                     if ($direction == 0) {
-                        if (array_search($curstate, $this->endstates) != false) {
+                        if (array_search($curstate, $this->endstates) !== false) {
                             $isendstate = true;
                         }
                     } else {
-                        if (array_search($curstate, $this->startstates) != false) {
+                        if (array_search($curstate, $this->startstates) !== false) {
                             $isendstate = true;
                         }
                     }
@@ -460,7 +460,7 @@ abstract class qtype_preg_finite_automaton {
         $states = $this->get_states();
         foreach ($states as $curstate) {
             //Current state wasn't passed
-            if (array_search($curstate, $aregoneforward) == false || array_search($curstate, $aregoneback) == false) {
+            if (array_search($curstate, $aregoneforward) === false || array_search($curstate, $aregoneback) === false) {
                 $this->remove_state($curstate);
             }
         }
