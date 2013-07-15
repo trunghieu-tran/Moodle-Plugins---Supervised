@@ -79,7 +79,7 @@ class  qtype_correctwriting_enum_analyzer {
                     }
                 }
                 // If all included enumerations are in order and current enumeration aren't in order...
-                if ($all_included_enums_in_order && in_array($i, $change_order_and_included_enums->order)) {
+                if ($all_included_enums_in_order && !in_array($i, $change_order_and_included_enums->order)) {
                     // ...add current enumeration to order.
                     $change_order_and_included_enums->order[] = $i;
                 }
