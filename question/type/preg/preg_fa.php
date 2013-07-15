@@ -737,6 +737,30 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Merging states connected by uncapturing transition.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merge_states($del) {
+        //Getting real numbers of new merged state
+        $numbers = array();
+        //Merging intersection states
+        if ($this->is_intersectionstate($del->from)) {
+            $fromnumbers = explode(',', $this->statenumbers[$del->from], 2);
+            $tonumbers = explode(',', $this->statenumbers[$del->to], 2);
+            for ($i = 0; $i < 2; $i++) {
+                $numbers[] = $fromnumbers[$i] . '   ' . $tonumbers[$i];
+            }
+            $number = $numbers[0] . ',' . $numbers[1];
+        } else {
+            //Merging simple state
+            $number = $this->statenumbers[$del->from] . '   ' . $this->statenumbers[$del->to];
+        }
+
+        $this->statenumbers[$del->from] = $number;
+    }
+
+    /**
      * Merging transitions with merging states.
      *
      * @param del - uncapturing transition for deleting.
