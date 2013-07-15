@@ -728,12 +728,27 @@ abstract class qtype_preg_finite_automaton {
     public function compare_fa($another) {
         // TODO - streltsov.
     }
-/**
+ 
+    /**
      * Merging transitions without merging states.
      *
      * @param del - uncapturing transition for deleting.
      */
     public function go_round_transitions($del) {
+        $transitions = $this->get_state_outtransitions($del->to);
+        //Chenging leafs in case of merging
+        foreach ($transitions as &$tran) {
+            $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
+            $tran->pregleaf = $newleaf;
+        }
+        //Has deleting or changing transitions 
+        if (count($transitions) !=0) {
+            foreach ($transition as &$tran) {
+                $tran->from = $del->from;
+                $this->add_transition($tran);
+            }
+        }
+        $this->del_transition($del);
     }
 
     /**
