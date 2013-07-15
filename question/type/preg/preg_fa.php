@@ -766,6 +766,64 @@ abstract class qtype_preg_finite_automaton {
      * @param del - uncapturing transition for deleting.
      */
     public function merge_transitions($del) {
+        //Cycle with empty transition
+        if ($del->to == $del->from) {
+            $this->del_transition($delfrom, $delto);
+        }
+
+        //Transition for merging isn't cycle
+        if ($del->to != $del->from) {
+            $transitions = $this->get_state_outtransitions($del->to);
+            $intotransitions = $this->get_state_intotransitions($del->from);
+            //Possibility of merging with outtransitions
+            if (count($transitions) != 0) {
+                $needredacting = true;
+            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0) {
+                //Possibility of merging with intotransitions
+                $transitions = $intotransitions;
+            } else if ($this->statecount == 2 && del->is_eps()) {
+                //Possibility to get automata with one state
+                $this->merge_states($del);
+                //Checking if start state was merged
+                if ($this->has_endstate($del->to)) {
+                    $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                }
+                $this->remove_state($del->to);
+            }
+
+            //Chenging leafs in case of merging
+            foreach ($transitions as &$tran) {
+                $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
+                $tran->pregleaf = $newleaf;
+            }
+            //Has deleting or changing transitions 
+            if (count($transitions) !=0) {
+                $this->merge_states($del);
+                //Adding intotransitions from merged state
+                $intotransitions = get_intotransitios($del->to);
+                foreach ($intotransitions as &$tran) {
+                    if ($tran != $del) {
+                        $tran->to = $del->from;
+                        $this->add_transition($tran);
+                    }
+                }
+                //Adding outtransitions from merged state
+                if ($needredacting) {
+                    foreach ($transition as &$tran) {
+                        if ($tran->to == $del->from) {
+                            $tran->to = $del->from;
+                        }
+                        $tran->from = $del->from;
+                        $this->add_transition($tran);
+                    }
+                    //Checking if start state was merged
+                    if ($this->has_endstate($del->to)) {
+                        $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                    }
+                    $this->remove_state($del->to);
+                }
+            }
+        }
     }
 
     /**
