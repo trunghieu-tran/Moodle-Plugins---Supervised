@@ -666,7 +666,29 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    
+    /**
+     * Check if such state is in array of start states.
+     */
+    public function has_startstate($state) {
+        if (array_search($state, $this->startstates) === false) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    /**
+     * Check if such state is in array of end states.
+     */
+    public function has_endstate($state) {
+        if (array_search($state, $this->endstates) === false) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
     /**
      * Read and create a FA from dot-like language. Mainly used for unit-testing.
