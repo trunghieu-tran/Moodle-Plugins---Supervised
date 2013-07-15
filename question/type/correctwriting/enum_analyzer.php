@@ -74,7 +74,7 @@ class  qtype_correctwriting_enum_analyzer {
                 $all_included_enums_in_order = true;
                 // Check that all included enumerations are in order.
                 for ($j = 0; $j < count($change_order_and_included_enums->included_enums[$i]); $j++) {
-                    if (!in_array($change_order_and_included_enums->included_enums[$i], $change_order_and_included_enums->order)) {
+                    if (!in_array($change_order_and_included_enums->included_enums[$i][$j], $change_order_and_included_enums->order)) {
                         $all_included_enums_in_order = false;
                     }
                 }
