@@ -651,6 +651,8 @@ abstract class qtype_preg_finite_automaton {
                 unset($curcolomn[$state]);
             }
         }
+        //Removing real numbers
+        unset($this->statanumbers[$state]);
     }
 
     /**
