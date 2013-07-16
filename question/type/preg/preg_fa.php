@@ -124,7 +124,7 @@ class qtype_preg_fa_transition {
      * @param other another transition for intersection.
      */
     public function is_eps() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_META && ($this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_META && ($this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY));
     }
 
     /**
@@ -255,9 +255,9 @@ abstract class qtype_preg_finite_automaton {
     /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
     public $statenumbers;
     /** @var array of int ids of states - start states. */
-    protected $startstates;
+    public $startstates;
     /** @var array of of int ids of states - end states. */
-    protected $endstates;
+    public $endstates;
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
      *
@@ -536,7 +536,7 @@ abstract class qtype_preg_finite_automaton {
      * Add the start state of the automaton to given state.
      */
     public function add_start_state($state) {
-        if (array_key_exists($state, $this->adjacencymatrix) {
+        if (array_key_exists($state, $this->adjacencymatrix)) {
             $this->startstates[] = $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
@@ -547,7 +547,7 @@ abstract class qtype_preg_finite_automaton {
      * Add the end state of the automaton to given state.
      */
     public function add_end_state(&$state) {
-        if (array_key_exists($state, $this->adjacencymatrix) {
+        if (array_key_exists($state, $this->adjacencymatrix)) {
             $this->endstates[] = $state;
         } else {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
@@ -854,7 +854,7 @@ abstract class qtype_preg_finite_automaton {
         if ($transitiontype == qtype_preg_fa_transition::TYPE_TRANSITION_BOTH) {
             $trantype1 = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
             $trantype2 = qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT;
-        } else if {
+        } else {
             $trantype1 = $transitiontype;
             $trantype2 = $transitiontype;
         }
