@@ -686,6 +686,13 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Check if this state was copied.
+     */
+    public function is_copied_state($state) {
+        return (strpos($this->statenumbers[$state], ')'));
+    }
+
+    /**
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
