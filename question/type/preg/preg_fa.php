@@ -932,6 +932,29 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Get connected with given states in given direction.
+     *
+     * @param state - state for searching connexted.
+     * @param direction - direction of searching.
+     */
+    public function get_connected_states($state, $direction) {
+        $result = array();
+        if ($direction == 0) {
+            $outtransitions = $this->get_state_outtransitions($state);
+            foreach ($outtransitions as $tran) {
+                $result[] = $tran->to;
+            }
+        } else {
+            $intotransitions = $this->get_state_intotransitions($state);
+            foreach ($intotransitions as $tran) {
+                $result[] = $tran->from;
+            }
+        }
+    }
+
+    
+    
+    /**
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
      *
      * @param source - automata-source for coping.
