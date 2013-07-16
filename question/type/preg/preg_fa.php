@@ -382,6 +382,14 @@ abstract class qtype_preg_finite_automaton {
         return get_column($this->adjacencymatrix, $state);
     }
 
+    /**
+     * Get array with reak numbers of states of this automata.
+     *
+     */
+    public function get_state_numbers() {
+        return $this->statenumbers;
+    }
+
     public function state_exists(&$state) {
         foreach ($this->states as $curstate) {
             if ($curstate === $state) {
