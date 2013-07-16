@@ -492,7 +492,6 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    
     /**
      * Find index of state by its numbers.
      *
@@ -560,6 +559,18 @@ abstract class qtype_preg_finite_automaton {
         } else {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
         }
+    }
+
+    /**
+     * Set state as copied.
+     *
+     * @param state - state to be copied.
+     */
+    public function set_copied_state($state) {
+        $number = $this->statenumbers[$state];
+        $number = '(' . $number;
+        $number .= ')';
+        $this->statenumbers[$state] = $number;
     }
 
     /**
