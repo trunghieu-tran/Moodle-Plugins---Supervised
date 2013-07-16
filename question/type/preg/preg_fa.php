@@ -1033,7 +1033,78 @@ abstract class qtype_preg_finite_automaton {
      * @param direction - direction of coping (0 - forward; 1 - back).
      * @return automata after coping.
      */
-    public function copy_modify_branches($source, &$oldFront, &$stopcoping, $direction) {
+    public function copy_modify_branches(&$source, &$oldfront, &$stopcoping, $direction) {
+        //Getting origin of automata
+        $states = $source->get_states();
+        if (count($states) != 0) {
+            $keys = array_keys ($states);
+            $transitions = $this->get_state_outtransitions($states[$keys[0]]);
+            $keys = array_keys ($transitions);
+            $origin = $transitions[$keys[0]]->origin;
+        }
+        //Getting all states which are in automata for coping
+        $stateswere = $this->get_state_numbers();
+        //Cleaning end states
+        $endstates = $this->end_states();
+        foreach ($endstates as $endstate) {
+            $this->del_end_state($endstate);
+        }
+
+        //Coping
+        while (count ($oldfront) != 0) {
+            foreach ($oldfront as $curstate) {
+                if (!$this->is_copied_state($curstate)) {
+                    //Modify states
+                    $changedstate = $this->statenumbers[$curstate];
+                    $this->modify_state($changedstate, $origin);
+                    //Mark state as copied state
+                    $source->set_copied($curstate);
+                    $isfind = false;
+                    //Search among states which were in automata
+                    if (array_search($changedstate, $stateswere) !== false) {
+                        $isfind = true;
+                        $workstate = array_search($changedstate, $stateswere);
+                    }
+
+                    //Hasn't such state
+                    if (!$isfind) {
+                        $this->add_state($changedstate);
+                        $workstate = array_search($changedstate, $this->statenumbers);
+                        $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                    
+                        //Check end of coping
+                        if ($stopcoping !== null && $curstate == $stopcoping) {
+                            if ($direction == 0) {
+                                $this->add_end_state($workstate);
+                            }
+                        } else {
+                            $newmemoryfront[] = $workstate;
+                            //Adding connected states
+                            $connectedstates = $source($curstate, $direction);
+                            $newfront = array_merge($newfront, $connectedstates);
+                        }
+                        $stateswere[] = $changedstate;
+                    } else {
+                        $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                        $newmemoryfront[] = $workstate;
+                        //Adding connected states
+                        $connectedstates = $source($curstate, $direction);
+                        $newfront = array_merge($newfront, $connectedstates);
+                    }
+                } else {
+                    $changedstate = $this->statenumbers[$curstate];
+                    $changedstate = strtr($changedstate, '(', '');
+                    $changedstate = strtr($changedstate, ')', '');
+                    $this->modify_state($changedstate, $origin);
+                    $workstate = array_search($changedstate, $this->statenumbers);
+                    $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                }
+            }
+            $oldfront = $newfront;
+            $memoryfront = $newmemoryfront;
+            $newfront = array();
+            $newmemoryfront = array();
+        }
         return $this;
     }
 
