@@ -14,3 +14,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
+
+global $CFG;
+require_once($CFG->dirroot.'/question/type/correctwriting/enum_analyzer.php');
+
+class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase {
+
+}
+
