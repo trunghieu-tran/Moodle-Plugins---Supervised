@@ -966,7 +966,63 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    
+    /**
+     * Copy transitions to workstate from automata source in given direction.
+     *
+     * @param stateswere - states which were in automata.
+     * @param statefromsource - state from source automata which transitions are coped.
+     * @param memoryfront - states added to automata in last state.
+     * @param source - automata-source.
+     * @param direction - direction of coping (0 - forward; 1 - back).
+     */
+    public function copy_transitions($stateswere, $statefromsource, $workstate, $memoryfront, $source, $direction) {
+        //Get transition for analysis
+        if ($direction == 0) {
+            $transitions = $source->get_state_intotransitions($statefromsource);
+        } else {
+            $transitions = $source->get_state_outtransitions($statefromsource);
+        }
+        $numbers = $source->get_state_numbers();
+
+        //Search transition among states were
+        foreach ($stateswere as $state) {
+            //Get real number of source state
+            $number = strtr($state, ',', '');
+            $sourceindex = array_search($number, $numbers);
+            if ($sourcestate !== false) {
+                foreach ($transitions as $tran) {
+                    if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+                        //Add transition
+                        $memstate = array_search($state, $this->statenumbers);
+                        if ($direction == 0) {
+                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate);
+                        } else {
+                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate);
+                        }
+                        $this->add_transition($transition);
+                    }
+                }
+            }
+        }
+
+        //Serch transition among states added on last step
+        foreach ($memoryfront as $state) {
+            $number = $this->statenumbers[$state];
+            $number = strtr($state, ',', '');
+            foreach ($intotransitions as $tran) {
+                if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+                    //Add transition
+                    if ($direction == 0) {
+                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate);
+                    } else {
+                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state);
+                    }
+                    $this->add_transition($transition);
+                }
+            }
+        }
+    }
+
     
     /**
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
