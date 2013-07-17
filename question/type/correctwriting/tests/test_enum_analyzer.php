@@ -63,7 +63,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include_enums = array();
         $enum_change_order = array();
         // Expected result.
-        $enum_change_order = array(1, 0);
+        $enum_change_order = array(1, 2, 0);
         $include_enums[] = array(1, 2);
         $include_enums[] = array(-1);
         $include_enums[] = array(-1);
