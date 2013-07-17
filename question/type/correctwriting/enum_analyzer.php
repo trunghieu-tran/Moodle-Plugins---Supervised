@@ -18,6 +18,7 @@ defined('MOODLE_INTERNAL') || die();
 
 //Other necessary requires
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/string_pair.php');
 
 class  qtype_correctwriting_enum_analyzer {
 
