@@ -46,28 +46,32 @@ class  qtype_correctwriting_enum_analyzer {
         $all_included_enums_in_order = true;// Variable show that all, included in current enumeration, enumerations are fill...
                                             // ...in enumerations change order.
         // Find included enumerations to all enumerations.
-        for ($i = 0; $i < count($enumdescription); $i++) {
-            for ($j = 0; $j < count($enumdescription); $j++) {
+        $enum1_number = 0;
+        $enum2_number = 0;
+        foreach($enumdescription as $enum1) {
+            $enum2_number = 0;
+            foreach($enumdescription as $enum2) {
                 // If is not same enumerations.
-                if ( $i != $j) {
+                if ( $enum1 != $enum2) {
                     // Boolean variables to check including of enumerations.
-                    $compare_left_borders_of_enums=$enumdescription[$i][0]->begin >= $enumdescription[$j][0]->begin;
-                    $compare_right_borders_of_enums=$enumdescription[$i][0]->end >= $enumdescription[$j][0]->end;
-                    // If left borders of i enum rather than j enum and right borders of j enum rather than i enum and...
-                    // ...in included enums array for j enum not contains i.
-                    // Else if left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
+                    reset($enum1);//set iterator to first element in first enumeration
+                    reset($enum2);//set iterator to first element in second enumeration
+                    $compare_left_borders_of_enums = current($enum2)->begin - current($enum1)->begin;
+                    end($enum2);//set iterator to last element in first enumeration
+                    end($enum1);//set iterator to last element in second enumeration
+                    $compare_right_borders_of_enums = current($enum2)->end - current($enum1)->end;
+                    // If left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
                     // ...in included enums array for i enum not contains j.
-                    if ($compare_left_borders_of_enums && ! $compare_right_borders_of_enums
-                            && !in_array($i, $change_order_and_included_enums->included_enums[$j])) {
-                        // Add i to included enums array for j enum.
-                        $change_order_and_included_enums->included_enums[$j][] = $i;
-                    } else if (! $compare_left_borders_of_enums && $compare_right_borders_of_enums
-                                && !in_array($j, $change_order_and_included_enums->included_enums[$i])) {
+                    if ($compare_left_borders_of_enums >= 0 && $compare_right_borders_of_enums <= 0
+                        && !in_array($enum2_number, $change_order_and_included_enums->included_enums[$enum1_number])) {
                         // Add j to included enums array for i enum.
-                        $change_order_and_included_enums->included_enums[$i][] = $j;
+                        $change_order_and_included_enums->included_enums[$enum1_number][] = $enum2_number;
                     }
                 }
+                $enum2_number++;
             }
+            $enum1_number++;
+            unset($enum2);
         }
         // Create enumerations change order.
         while ( count($change_order_and_included_enums->order) != count($enumdescription)) {
