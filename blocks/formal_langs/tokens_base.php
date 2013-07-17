@@ -876,6 +876,36 @@ class block_formal_langs_processed_string {
     public function single_line_string() {
         return strpos($this->string, "\n") === FALSE;
     }
+
+    /**
+     * Returns true, if there is token, equal to given one from the student's viewpoint (i.e. node_description without position).
+     *
+     * Two tokens are equal if they have equal description, or if they values are same if the have no description.
+     */
+    public function token_has_equal_to_student($tokenindex) {
+        $result = false;
+        $tokens = $this->get_stream(); // Make sure string is tokenized.
+        $tokencount = count($this->tokenstream->tokens);
+        if($this->has_description($tokenindex)) {
+            $givendescription = $this->node_description($tokenindex);
+            // There is description of the given token.
+            for ($i = 0; $i < $tokencount; $i++) {
+                if ($i != $tokenindex && $this->has_description($i) && $givendescription == $this->node_description($i)) {
+                    $result = true;
+                }
+            }
+        } else {
+            // There is no description, compare the values instead.
+            for ($i = 0; $i < $tokencount; $i++) {
+                // Use case-sensitive search, since user could see case in the message.
+                if ($i != $tokenindex && !$this->has_description($i) && $this->tokenstream->tokens[$tokenindex]->is_same($this->tokenstream->tokens[$i], true)) {
+                    $result = true;
+                }
+            }
+        }
+        return $result;
+    }
+
     /**
      *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
      *  @param array $descriptions descriptions array
@@ -911,7 +941,7 @@ class block_formal_langs_processed_string {
             $index = $index + 1;
         }
         
-        //If some old descriptions left - delete it
+        // If some old descriptions left - delete it.
         if ($oldrecords != null) {
             $oldrecordids = array();
             foreach($oldrecords as $oldrecord) {
@@ -969,7 +999,6 @@ class block_formal_langs_processed_string {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
-        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         $result = '';
         if ($this->has_description($nodenumber)) {
             return $this->descriptions[$nodenumber];
@@ -980,7 +1009,7 @@ class block_formal_langs_processed_string {
             }
             if (!$quotevalue) {
                 return $value;
-            } else if ($at) {//Should return position information.
+            } else if ($at) {// Should return position information.
                 $a = new stdClass();
                 $a->value = $value;
                 $pos = $this->tokenstream->tokens[$nodenumber]->position();
@@ -991,7 +1020,7 @@ class block_formal_langs_processed_string {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {//Just quote 
+            } else {// Just quote.
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
@@ -1027,7 +1056,7 @@ class block_formal_langs_processed_string {
      * array(0 => 'A description for first lexeme',
      *       1 => 'A description for second lexeme')
      *
-     * DO NOT USE THIS FUNCTION IN PRODUCTION NOT FOR UNIT-TESTING.
+     * DO NOT USE THIS FUNCTION IN PRODUCTION, USE FOR UNIT-TESTING ONLY.
      *
      * @param array $descriptions descriptions for lexemes
      */
@@ -1039,8 +1068,9 @@ class block_formal_langs_processed_string {
      */
     public function has_description($index) {
        $this->node_descriptions_list();
-       if (isset($this->descriptions[$index]))
-           return strlen(trim($this->descriptions[$index]))!=0;
+       if (isset($this->descriptions[$index])) {
+           return strlen(trim($this->descriptions[$index])) != 0;
+        }
        return false;
     }
     /**
