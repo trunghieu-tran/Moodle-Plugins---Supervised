@@ -339,7 +339,7 @@ class  qtype_correctwriting_sequence_analyzer {
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language,
                                                              $this->bestmatchpair,
-                                                             $responseindex);
+                                                             $responseindex, $this->question->usecase);
     }
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped
