@@ -1158,6 +1158,18 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Generate real number of state from intersection part.
+     *
+     * @param firststate real number of state from first automata.
+     * @param secondstate real number of state from second automata.
+     * @return real number of state from intersection part.
+     */
+    public function get_inter_state($firststate, $secondstate) {
+        $state = $firstate . ',' . $secondstate;
+        return $state;
+    }
+
+    /**
      * Find intersection part of automaton in case of intersection it with another one.
      *
      * @param anotherfa object automaton to intersect.
