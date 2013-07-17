@@ -489,3 +489,17 @@ class  qtype_correctwriting_enum_analyzer {
     }
 }
 
+class enum_element {
+    public $begin; // Index of first element token.
+    public $end; // Index of last element token.
+
+    /**
+     * Function create enumeration element, which start on $first token, and ended by $last token.
+     * @param integer $first - first element token.
+     * @param integer $last - last element token.
+     */
+    public function __construct($first, $last) {
+        $this->begin = $first;
+        $this->end = $last;
+    }
+}
