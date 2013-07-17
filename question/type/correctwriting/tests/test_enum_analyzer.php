@@ -114,7 +114,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include_enums[] = array(-1);
         // Enumerations description.
         $enumdescription[] = array(new enum_element(1, 15), new enum_element(17, 27));
-        $enumdescription[] = array(new enum_element(3, 3), new enum_element(5, 9), new enum_element(11, 5));
+        $enumdescription[] = array(new enum_element(3, 3), new enum_element(5, 9), new enum_element(11, 15));
         $enumdescription[] = array(new enum_element(19, 19), new enum_element(21, 21), new enum_element(23, 27));
         $enumdescription[] = array(new enum_element(5, 5), new enum_element(7, 7), new enum_element(9, 9));
         $enumdescription[] = array(new enum_element(23, 23), new enum_element(25, 25), new enum_element(27, 27));
