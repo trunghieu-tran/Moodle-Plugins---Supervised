@@ -48,17 +48,17 @@ class  qtype_correctwriting_enum_analyzer {
         // Find included enumerations to all enumerations.
         $enum1_number = 0;
         $enum2_number = 0;
-        foreach($enumdescription as $enum1) {
+        foreach ($enumdescription as $enum1) {
             $enum2_number = 0;
-            foreach($enumdescription as $enum2) {
+            foreach ($enumdescription as $enum2) {
                 // If is not same enumerations.
                 if ( $enum1 != $enum2) {
                     // Boolean variables to check including of enumerations.
-                    reset($enum1);//set iterator to first element in first enumeration
-                    reset($enum2);//set iterator to first element in second enumeration
+                    reset($enum1);// Set iterator to first element in first enumeration.
+                    reset($enum2);// Set iterator to first element in second enumeration.
                     $compare_left_borders_of_enums = current($enum2)->begin - current($enum1)->begin;
-                    end($enum2);//set iterator to last element in first enumeration
-                    end($enum1);//set iterator to last element in second enumeration
+                    end($enum2);// Set iterator to last element in first enumeration.
+                    end($enum1);// Set iterator to last element in second enumeration.
                     $compare_right_borders_of_enums = current($enum2)->end - current($enum1)->end;
                     // If left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
                     // ...in included enums array for i enum not contains j.
