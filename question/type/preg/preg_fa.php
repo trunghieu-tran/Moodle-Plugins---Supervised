@@ -1133,6 +1133,24 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Get transitions from automata for intersection.
+     *
+     * @param workstate state for getting transitions.
+     * @param direction direction of intersection.
+     * @return array of transitions for intersection.
+     */
+    public function get_transitions_for_intersection($workstate, $direction) {
+        if ($direction == 0) {
+            //Add outtransitions
+            $transitions = $this->get_state_outtransitions($workstate);
+        } else {
+            //Add intotransitions
+            $transitions = $this->get_state_intotransitions($workstate);
+        }
+        return $transitions;
+    }
+
+    /**
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
     public function avoid_wordbreaks() {
