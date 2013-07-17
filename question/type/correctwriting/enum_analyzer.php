@@ -192,7 +192,7 @@ class  qtype_correctwriting_enum_analyzer {
                 }
                 // Add to end of order.
                 if (count($elements_in_corrected_answer) or array_pop($elements_in_corrected_answer) != $i+1) {
-                     $elements_in_corrected_answer[] = $i+1;
+                    $elements_in_corrected_answer[] = $i+1;
                 }
             }
         }
