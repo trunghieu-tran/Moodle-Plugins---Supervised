@@ -632,6 +632,7 @@ abstract class qtype_preg_finite_automaton {
      * Adds a state to the automaton.
      *
      * @param state a reference to an object of qtype_preg_fa_state class.
+     * @return state id of added state.
      */
     public function add_state($statenumber) {
         $this->adjacencymatrix[] = array();
@@ -640,6 +641,7 @@ abstract class qtype_preg_finite_automaton {
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
         }
+        return array_search($statenumber, $this->statenumbers);
     }
 
     /**
