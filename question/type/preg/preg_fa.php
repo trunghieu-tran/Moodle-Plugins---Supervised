@@ -1179,6 +1179,89 @@ abstract class qtype_preg_finite_automaton {
      * @return result automata.
      */
     public function get_intersection_part ($anotherfa, &$result, $start, $isstart) {
+        $oldfront = array();
+        $newfront = array();
+        $oldfront[] = $start;
+        //Work with each state
+        while (count($oldfront) != 0) {
+            foreach ($oldfront as $curstate) {
+                //Get states from first and second automata
+                $secondnumbers = $anotherfa->get_state_numbers;
+                $resnumbers = $result->get_state_numbers;
+                $numbers = explode(',', $resultnumbers[$curstate], 2);
+                $workstate1 = array_search($numbers[0], $this->statenumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                //Get transitions for ntersection
+                $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
+                $intertransitions2 = $second->get_transitions_for_intersection($workstate2, $direction);;
+                get_transitions_for_intersection();
+                //Intersect all possible transitions
+                $resulttransitions = array();
+                $resultnumbers = array();
+                foreach ($intertransitions1 as $intertran1) {
+                    foreach ($intertransitions2 as $intertran2) {
+                        $resulttran = $intertran1->intersect($intertran2);
+                        if ($resulttran !== null) {
+                            $resulttransitions[] = $resulttran;
+                            if ($direction == 0) {
+                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->to], $secondnumbers[$intertran2->to]);
+                            } else {
+                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->from], $secondnumbers[$intertran2->from]);
+                            }
+                        }
+                    }
+                }
+                //Analysis result transitions
+                for ($i = 0; $i < count($resulttransitions); $i++) {
+                    //Itersect forward
+                    //Search state with the same number in result automata
+                    $searcstate = array_search($resultnumbers[$i], $resnumbers);
+                    //State was found
+                    if ($searchstate !== false) {
+                        $newstate = $searchstate
+                    } else {
+                        //State wasn't found
+                        $newstate = $result->add_state($resultnumbers[$i]);
+                        $newfront[] = $newstate;
+                    }
+                    //Change transitions
+                    if ($direction == 0) {
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($curstate, $resulttransitions[$i]->pregleaf, $newstate);
+                    } else {
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($newstate, $resulttransitions[$i]->pregleaf, $curstate);
+                    }
+                    $result->add_transition($resulttransitions[$i]);
+                }
+                //Removing arrays
+                $intertransitions1 = array();
+                $intertransitions2 = array();
+                $resulttransitions = array();
+            }
+            $possibleend = $oldfront;
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+        //Set right start and end states
+        if($direction == 0) {
+            //Cleaning end states
+            $endstates = $result->end_states();
+            foreach ($endstates as $endstate) {
+                $result->del_end_state($endstate);
+            }
+            foreach ($possibleend as $end) {
+                $result->add_end_state($end);
+            }
+        } else {
+            $state = $result->get_inter_state(0, 0);
+            $state = array_search($state, $resnumbers);
+            if ($state !== false) {
+                $result->add_start_state($state);
+            } else {
+                foreach ($possibleend as $start) {
+                    $result->add_start_state($start);
+                }
+            }
+        }
         return $result;
     }
 
