@@ -370,9 +370,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $dotdescription = 'digraph example {
                     "0,";
                     ",2";
-                    0,->"1,0"[label="[a-z]",color=violet];
+                    "0,"->"1,0"[label="[a-z]",color=violet];
                     "1,0"->"2,1"[label="[0-9]",color=red];
-                    "2,1"->,2[label="[a-z]",color=blue];
+                    "2,1"->",2"[label="[a-z]",color=blue];
                     }';
 
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
