@@ -126,5 +126,143 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Six enums.");
     }
 
+    // Test for find_enum_orders_in_corrected_string, enumeration tokens are missed.
+    public function testfind_enum_orders_in_corrected_string_missing_enum_tokens() {
+        $correctanswer = array();
+        $correctedanswer = array();
+        $enumdescription = array();
+        $orders = array();
+        $number = 0;
+        // Expected result.
+        $orders[] = array(2, 1, 0);
+        $orders[] = array(2, 0, 1);
+        $orders[] = array(1, 2, 0);
+        $orders[] = array(1, 0, 2);
+        $orders[] = array(0, 2, 1);
+        $orders[] = array(0, 1, 2);
+        // Input data.
+        $number = 1;
+        $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
+        $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
+        $correctanswer = array('Today', 'I', 'meet', 'some', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
+                                'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
+        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and',
+                                 'my', 'neighbors', ',', 'with', 'their', 'three', 'children', '.');
+        // Test body.
+        $temp= new qtype_correctwriting_enum_analyzer();
+        $result = $temp->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number);
+        $equal = true;
+        foreach ($orders as $current_order) {
+            if(false === array_search($current_order, $result)) {
+                    $equal = false;
+            }
+        }
+        if (count($orders) != count($result)) {
+            $equal = false;
+        }
+        $this->assertTrue( $equal, "Error in find orders found!Missing tokens.");
+    }
+
+    // Test for find_enum_orders_in_corrected_string, several orders are expected.
+    public function testfind_enum_orders_in_corrected_string_several_orders() {
+        $correctanswer = array();
+        $correctedanswer = array();
+        $enumdescription = array();
+        $orders = array();
+        $number = 0;
+        // Expected result.
+        $orders[] = array(2, 0, 1);
+        $orders[] = array(0, 1, 2);
+        // Input data.
+        $number = 1;
+        $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
+        $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
+        $correctanswer = array('Today', 'I', 'meet', 'some', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
+            'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
+        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'Tom', ',',
+            'and', 'my', 'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
+        // Test body.
+        $temp= new qtype_correctwriting_enum_analyzer();
+        $result = $temp->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number);
+        $equal = true;
+        foreach ($orders as $current_order) {
+            if(false === array_search($current_order, $result)) {
+                $equal = false;
+            }
+        }
+        if (count($orders) != count($result)) {
+            $equal = false;
+        }
+        $this->assertTrue( $equal, "Error in find orders found!Several orders.");
+    }
+
+    // Test for find_enum_orders_in_corrected_string, several orders are expected.
+    public function testfind_enum_orders_in_corrected_string_one_order() {
+        $correctanswer = array();
+        $correctedanswer = array();
+        $enumdescription = array();
+        $orders = array();
+        $number = 0;
+        // Expected result.
+        $orders[] = array(1, 0);
+        // Input data.
+        $number = 0;
+        $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
+        $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
+        $correctanswer = array('Today', 'I', 'meet', 'some', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
+            'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
+        $correctedanswer = array('Today', 'I', 'meet', 'my', 'neighbors', ',', 'with', 'their', 'three', 'children', ':',
+            'Victoria', ',', 'Tom', 'and', 'and', 'Carry', 'some', 'friends', '.');
+        // Test body.
+        $temp= new qtype_correctwriting_enum_analyzer();
+        $result = $temp->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number);
+        $equal = true;
+        foreach ($orders as $current_order) {
+            if(false === array_search($current_order, $result)) {
+                $equal = false;
+            }
+        }
+        if (count($orders) != count($result)) {
+            $equal = false;
+        }
+        $this->assertTrue( $equal, "Error in find orders found!One order.");
+    }
+
+    // Test for find_enum_orders_in_corrected_string, all orders are expected.
+    public function testfind_enum_orders_in_corrected_string_all_orders() {
+        $correctanswer = array();
+        $correctedanswer = array();
+        $enumdescription = array();
+        $orders = array();
+        $number = 0;
+        // Expected result.
+        $orders[] = array(2, 1, 0);
+        $orders[] = array(2, 0, 1);
+        $orders[] = array(1, 2, 0);
+        $orders[] = array(1, 0, 2);
+        $orders[] = array(0, 2, 1);
+        $orders[] = array(0, 1, 2);
+        // Input data.
+        $number = 0;
+        $enumdescription[] = array(new enum_element(8, 9), new enum_element(11, 12), new enum_element(14, 15));
+        $correctanswer = array('Billy', 'was', 'like', 'the', 'other', 'rich', 'kids', 'had', 'a', 'nurse', ',', 'fast', 'bicycle',
+                               'and', 'swimming', 'pool', ',', 'but', 'he', 'never', 'played', 'in', 'the', 'street', ',', 'did',
+                               'not', 'talk', 'to', 'poor', 'people', '.');
+        $correctedanswer = array('Billy', 'was', 'like', 'the', 'other', 'rich', 'kids', 'had', 'a', ',', 'bicycle', 'swimming',
+                                 'and', 'and', 'nurse', ',', 'fast', ',', 'but', 'he', 'never', 'played', 'in', 'a', 'street', 'or', 'pool', 'a', '.');
+        // Test body.
+        $temp= new qtype_correctwriting_enum_analyzer();
+        $result = $temp->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number);
+        $equal = true;
+        foreach ($orders as $current_order) {
+            if(false === array_search($current_order, $result)) {
+                $equal = false;
+            }
+        }
+        if (count($orders) != count($result)) {
+            $equal = false;
+        }
+        $this->assertTrue( $equal, "Error in find orders found!All orders.");
+    }
 }
 
