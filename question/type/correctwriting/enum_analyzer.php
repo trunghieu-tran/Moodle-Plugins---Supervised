@@ -208,14 +208,17 @@ class  qtype_correctwriting_enum_analyzer {
             do {
                 $current_order = array();// Clear current enumeration order.
                 // Fill current order by $elements_in_corrected_answer.
-                for ($i = 0; $i < count($elements_in_corrected_answer); $i++) {
+                $i = 0;
+                unset($j);
+                foreach ($elements_in_corrected_answer as $j) {
                     // If that element number does not contains in current order and...
                     // ...his index does not equal number to skip or number to skip is zero.
-                    if (!in_array($elements_in_corrected_answer[$i], $current_order) &&
+                    if (!in_array($j, $current_order) &&
                             ($i != $number_of_element_to_skip || $number_of_element_to_skip == 0)) {
                         // Add element to order.
-                        $current_order[] = $elements_in_corrected_answer[$i];
+                        $current_order[] = $j;
                     }
+                    $i++;
                 }
                 $number_of_element_to_skip++;// Inc number to skip.
                 $enum_orders[] =$current_order;// Add order to array of enum orders.
