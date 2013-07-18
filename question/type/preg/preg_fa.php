@@ -684,6 +684,7 @@ abstract class qtype_preg_finite_automaton {
         }
         //Removing real numbers
         unset($this->statanumbers[$state]);
+        $this->statecount--;
     }
 
     /**
