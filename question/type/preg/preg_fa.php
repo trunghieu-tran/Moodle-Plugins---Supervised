@@ -33,12 +33,32 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_preg_fa_transition {
 
+    /** Empty transition. */
+    const TYPE_TRANSITION_EPS = 'eps_transition';
+    /** Transition with unmerged simple assert. */
+    const TYPE_TRANSITION_ASSERT = 'assert';
+    /** Empty transition or transition with unmerged simple assert. */
+    const TYPE_TRANSITION_BOTH = 'both';
+    /** Capturing transition. */
+    const TYPE_TRANSITION_CAPTURE = 'capturing';
+
+    /** Transition from first automata. */
+    const ORIGIN_TRANSITION_FIRST = 'first';
+    /** Transition from second automata. */
+    const ORIGIN_TRANSITION_SECOND = 'second';
+    /** Transition from intersection part. */
+    const ORIGIN_TRANSITION_INTER = 'intersection';
+
     /** @var object of qtype_preg_fa_state class - a state which transition starts from. */
     public $from;
     /** @var object of qtype_preg_leaf class - condition for this transition. */
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
+    /** @var type of the transition - should be equal to a constant defined in this class. */
+    public $type;
+    /** @var origin of the transition - should be equal to a constant defined in this class. */
+    public $origin;
 
     /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
     public $consumeschars;
@@ -47,7 +67,7 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
+    public function __construct($from, &$pregleaf, $to, $consumeschars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
@@ -67,6 +87,72 @@ class qtype_preg_fa_transition {
             return "$index1->$index2" . "[label = $lab, style = dotted];";
         }
     }
+
+    /**
+     * Remove same elements from automata.
+     *
+     * @param array array for removing.
+     */
+    public function remove_same_elements(&$array) {
+        for ($i = 0; $i < count($array); $i++) {
+            for ($j = ($i+1); $j < count($array); $j++) {
+                if ($array[$i] == $array[$j]) {
+                unset($array[$j]);
+                $array = array_values($array);
+                $j--;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns intersection of transitions.
+     *
+     * @param other another transition for intersection.
+     */
+    public function intersect($other) {
+        $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf);
+        if ($resultleaf != null) {
+            $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
+        }
+        return $resulttran;
+    }
+
+    /**
+     * Returns true if transition has any tag.
+     */
+    public function has_tags() {
+        return false;
+    }
+
+    /**
+     * Returns true if transition is eps.
+     *
+     * @param other another transition for intersection.
+     */
+    public function is_eps() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_META && ($this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY));
+    }
+
+    /**
+     * Returns true if transition is with unmerged assert.
+     *
+     * @param other another transition for intersection.
+     */
+    public function is_unmerged_assert() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT);
+    }
+
+    /**
+     * Save tags from other transition in this transition.
+     * This function has overloaded version in nfa, because it has tags. In this class does nothing.
+     *
+     * @param other another transition for saving tags.
+     * @return result transition.
+     */
+    public function save_tags($other) {
+        return $this;
+    }
 }
 
 /**
@@ -82,15 +168,27 @@ class qtype_preg_fa_state {
     protected $fa;
     /** @var array of qtype_preg_fa_transition child objects, indexed. */
     protected $outtransitions;
+    /** @var array of qtype_preg_fa_transition child objects, indexed. */
+    protected $intotransitions;
+    /** @var boolean whether state is from intersection part or not. */
+    public $hasintersection;
+    /** @var boolean whether state was copied or not. */
+    public $wascopied;
     /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
     protected $deterministic;
-    /** @var int number of the state. */
-    public $number;
+    /** @var array of int - first numbers of the state. */
+    public $firstnumbers;
+    /** @var array of int - second numbers of the state, if state is from intersection part. */
+    public $secondnumbers;
 
     public function __construct(&$fa = null) {
         $this->fa = $fa;
-        $this->number = -1;    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
+        $this->firstnumbers = array(-1);    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
+        $this->secondnumbers = array();
         $this->outtransitions = array();
+        $this->intotransitions = array();
+        $this->hasintersection = false;
+        $this->wascopied = false;
         $this->deterministic = true;
     }
 
@@ -168,12 +266,16 @@ class qtype_preg_fa_state {
  */
 abstract class qtype_preg_finite_automaton {
 
-    /** @var array of qtype_preg_fa_state, indexed by state numbers. */
-    protected $states;
-    /** @var object of qtype_preg_fa_state - start state. */
-    protected $startstate;
-    /** @var object of qtype_preg_fa_state - end state. */
-    protected $endstate;
+    /** @var array of qtype_preg_fa_state, indexed by state numbers(will be deleted, do not use). */
+    public $states;
+    /** @var matrix of int id of states and their transitions. */
+    public $adjacencymatrix;
+    /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
+    public $statenumbers;
+    /** @var array of int ids of states - start states. */
+    public $startstates;
+    /** @var array of of int ids of states - end states. */
+    public $endstates;
 
     /** @var two-dimensional array of qtype_preg_fa_transition objects: first index is "from", second index is "to"*/
     protected $adjacencymatrix;
@@ -197,9 +299,9 @@ abstract class qtype_preg_finite_automaton {
 
 
     public function __construct() {
-        $this->states = array();
-        $this->startstate = null;
-        $this->endstate = null;
+        $this->adjacencymatrix = array(array());
+        $this->startstates = array();
+        $this->endstates = array();
         $this->deterministic = true;
         $this->haseps = false;
         $this->hasassertiontransitions = false;
@@ -239,8 +341,8 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Returns the start state for automaton.
      */
-    public function start_state() {
-        return $this->startstate;
+    public function start_states() {
+        return $this->startstates;
     }
 
     /**
@@ -248,12 +350,65 @@ abstract class qtype_preg_finite_automaton {
      *
      * TODO - determine, whether we could get automaton with several end states - then return array.
      */
-    public function end_state() {
-        return $this->endstate;
+    public function end_states() {
+        return $this->endstates;
     }
 
+    /**
+     * Return array of all states' ids of automata.
+     *
+     */
     public function get_states() {
-        return $this->states;
+        if (count($this->adjacencymatrix) == 0) {
+            $states = array();
+        } else {
+            $states = array_keys($this->adjacencymatrix);
+        }
+        return $states;
+    }
+
+    /**
+     * Return column with key from matrix $array.
+     *
+     * @param array - matrix.
+     * @param key - key of column.
+     */
+    public function get_column($array, $key) {
+        $result = array();
+        foreach ($array as $element) {
+            foreach ($element as $value) {
+                if (array_key_exists($key, $element)) {
+                    $result[] = $element[$key];
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Return outtransitions of state with id $state.
+     *
+     * @param state - id of state which outtransitions are intresting.
+     */
+    public function get_state_outtransitions($state) {
+        return $this->adjacencymatrix[$state];
+    }
+
+    /**
+     * Return intotransitions of state with id $state.
+     *
+     * @param state - id of state which intotransitions are intresting.
+     */
+    public function get_state_intotransitions($state) {
+        return get_column($this->adjacencymatrix, $state);
+    }
+
+    /**
+     * Get array with reak numbers of states of this automata.
+     *
+     */
+    public function get_state_numbers() {
+        return $this->statenumbers;
     }
 
     public function state_exists(&$state) {
@@ -266,25 +421,201 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Set the start state of the automaton to given state.
+     * Passing automata in given direction.
+     *
+     * @param direction - direction of passing(0-forward; 1-back).
+     * @return array with ids of passed states.
      */
-    public function set_start_state(&$state) {
-        if ($this->state_exists($state)) {
-            $this->startstate = $state;
+    public function pass_automata($direction) {
+        //Initialization wavefront
+        if ($direction == 0) {
+            //Going forward in automata
+            $oldfront = array_values($this->startstates);
         } else {
-            throw new qtype_preg_exception('set_start_state error: No state ' . $state->number . ' in automaton');
+            //Going back in automata
+            $oldfront = array_values($this->endstates);
+        }
+
+        $aregone = array();
+        //Working with states from currendt front of wave
+        while (count($oldfront)!=0) {
+            //Searching ways from current state
+            foreach ($oldfront as $curstate) {
+                $isendstate = false;
+
+                //State has not been already gone
+                if (array_search($curstate, $aregone) === false) {
+                    $aregone[] = $curstate;
+
+                    //Comparing with end states or start states
+                    if ($direction == 0) {
+                        if (array_search($curstate, $this->endstates) !== false) {
+                            $isendstate = true;
+                        }
+                    } else {
+                        if (array_search($curstate, $this->startstates) !== false) {
+                            $isendstate = true;
+                        }
+                    }
+
+                    //Analysis outtransitions if go forward and intotransitions if go back
+                    if ($direction == 0) {
+                        $transitions = $this->get_state_outtransitions($curstate);
+                    } else {
+                        $transitions = $this->get_state_intotransitions($curstate);
+                    }
+                    //Current state is not end state
+                    if (!$isendstate) {
+                        //No any interconnecting states
+                        if (count($transitions) == 0) {
+                            unset($aregone[count($aregone)-1]);
+                        }
+                    }
+
+                    //Has interconnecting states
+                    if (count($transitions) != 0) {
+                        //Adding interconnecting states to new wave front
+                        foreach ($transitions as $curtran) {
+                            if ($direction == 0) {
+                                $newfront[] = $curtran->to;
+                            } else {
+                                $newfront[] = $curtran->from;
+                            }
+                        }
+                    }
+                }
+            }
+            //Coping new wavefront to old
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+
+        return $aregone;
+    }
+
+    /**
+     * Delete all blind states in automata.
+     *
+     */
+    public function del_blind_states() {
+        //Pass automata forward
+        $aregoneforward = $this->pass_automata(0);
+        //Pass automata forward
+        $aregoneback = $this->pass_automata(1);
+
+        //Check for each state of atomata was it gone or not
+        $states = $this->get_states();
+        foreach ($states as $curstate) {
+            //Current state wasn't passed
+            if (array_search($curstate, $aregoneforward) === false || array_search($curstate, $aregoneback) === false) {
+                $this->remove_state($curstate);
+            }
         }
     }
 
     /**
-     * Set the end state of the automaton to given state.
+     * Find index of state by its numbers.
+     *
+     * @param number1 - the first number of state.
+     * @param number2 - the second number of state.
+     * @return index of state if it was found and -1 if it wasn't found.
      */
-    public function set_end_state(&$state) {
-        if ($this->state_exists($state)) {
-            $this->endstate = $state;
+    public function find_state_index($number1, $number2 = -1) {
+        $index = -1;
+        // Searching only by first numbers
+        if ($number2 == -1) {
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num1 = $this->states[$i]->firstnumbers[0];
+                if ($num1 == $number1) {
+                    $index = $i;
+                }
+            }
+        } else if ($number1==-1) {
+            // Searching only by second numbers
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num2 = $this->states[$i]->secondnumbers[0];
+                if ($num2 == $number2) {
+                    $index = $i;
+                }
+            }
         } else {
-            throw new qtype_preg_exception('set_end_state error: No state ' . $state->number . ' in automaton');
+            // Searching by both numbers
+            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
+                $num1 = $this->states[$i]->firstnumbers[0];
+                $num2 = $this->states[$i]->secondnumbers[0];
+                if ($num1 == $number1 && $num2 == $number2) {
+                    $index = $i;
+                }
+            }
         }
+        return $index;
+    }
+
+    /**
+     * Write automata as a dot-style string.
+     *
+     * @return dot_style string with the description of automata.
+     */
+    public function write_fa() {
+        return('');
+    }
+
+    /**
+     * Add the start state of the automaton to given state.
+     */
+    public function add_start_state($state) {
+        if (array_key_exists($state, $this->adjacencymatrix)) {
+            $this->startstates[] = $state;
+        } else {
+            throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
+        }
+    }
+
+    /**
+     * Add the end state of the automaton to given state.
+     */
+    public function add_end_state(&$state) {
+        if (array_key_exists($state, $this->adjacencymatrix)) {
+            $this->endstates[] = $state;
+        } else {
+            throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
+        }
+    }
+
+    /**
+     * Remove the end state of the automaton.
+     */
+    public function remove_end_state($state) {
+        unset($this->endstates[$state]);
+    }
+
+    /**
+     * Remove the start state of the automaton.
+     */
+    public function remove_start_state($state) {
+        unset($this->starttates[$state]);
+    }
+
+    /**
+     * Set state as copied.
+     *
+     * @param state - state to be copied.
+     */
+    public function set_copied_state($state) {
+        $number = $this->statenumbers[$state];
+        $number = '(' . $number;
+        $number .= ')';
+        $this->statenumbers[$state] = $number;
+    }
+
+    /**
+     * Change real number of state.
+     *
+     * @param state - state to change.
+     * @param realnumber - new real number.
+     */
+    public function change_real_number($state, $realnumber) {
+        $this->statenumbers[$state] = $realnumber;
     }
 
     /**
@@ -326,6 +657,15 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Delete transition.
+     *
+     * @param del transition for deleting.
+     */
+    public function del_transition ($del) {
+        unset($this->adjacencymatrix[$del->from][$del->to]);
+    }
+
+    /**
      * Used from qype_preg_fa_state class to signal that an assert-transition was added to the automaton.
      * Note that only methods of the automaton the merge all assert-transitions and make property false.
      */
@@ -337,29 +677,112 @@ abstract class qtype_preg_finite_automaton {
      * Adds a state to the automaton.
      *
      * @param state a reference to an object of qtype_preg_fa_state class.
+     * @return state id of added state.
      */
-    public function add_state(&$state) {
-        $this->states[] = $state;
-        $state->set_fa($this);
+    public function add_state($statenumber) {
+        $this->adjacencymatrix[] = array();
+        $this->statenumbers[] = $statenumber;
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
+        }
+        return array_search($statenumber, $this->statenumbers);
+    }
+
+    /**
+     * Add transition.
+     *
+     * @param transition transition for adding.
+     */
+    public function add_transition($transition) {
+        $outtransitions = $this->get_state_outtransitions($transition->from);
+        if (array_key_exists($transition->to, $outtransitions)) {
+            $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
+            $tran->pregleaf = $tran->pregleaf->unite_leafs($transition->pregleaf);
+        } else {
+            $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
         }
     }
 
     /**
      * Removes a state from the automaton.
      *
-     * @param state a reference to the state to be removed.
+     * @param state an id of the state to be removed.
      */
-    public function remove_state(&$state) {
-        foreach ($this->states as $key => $curstate) {
-            if ($curstate === $state) {
-                $this->transitioncount -= count($curstate->outgoing_transitions());
-                $this->statecount--;
-                unset($this->states[$key]);
-                break;
+    public function remove_state($state) {
+        //Removing row
+        unset($this->adjacencymatrix[$state]);
+        //Removing column
+        foreach ($this->adjacencymatrix as $curcolumn) {
+            if (array_key_exists($state, $curcolumn)) {
+                unset($curcolomn[$state]);
             }
+        }
+        //Removing real numbers
+        unset($this->statanumbers[$state]);
+        $this->statecount--;
+    }
+
+    /**
+     * Removes this fa. Return enpty fa.
+     */
+    public function remove_fa() {
+        $this = new qtype_preg_finite_automaton();
+        return $this;
+    }
+
+    /**
+     * Check if this state is from intersection part of autmata.
+     */
+    public function is_intersectionstate($state) {
+        if (strpos($this->statenumbers[$state], ',') === false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Check if this state was copied.
+     */
+    public function is_copied_state($state) {
+        return (strpos($this->statenumbers[$state], ')'));
+    }
+
+    /**
+     * Check if this state is full intersect state, it means it has two numbers from both automata.
+     */
+    public function is_full_intersect_state($state) {
+        $number = $this->statenumbers[$state];
+        $number = explode(',', $numbers, 2);
+        if (count($number) == 2 && $number[0] != '' && $number[1] != '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if such state is in array of start states.
+     */
+    public function has_startstate($state) {
+        if (array_search($state, $this->startstates) === false) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    /**
+     * Check if such state is in array of end states.
+     */
+    public function has_endstate($state) {
+        if (array_search($state, $this->endstates) === false) {
+            return false;
+        }
+        else {
+            return true;
         }
     }
 
@@ -401,6 +824,415 @@ abstract class qtype_preg_finite_automaton {
     public function compare_fa($another) {
         // TODO - streltsov.
     }
+ 
+    /**
+     * Decide if the intersection was successful or not.
+     *
+     * @param fa qtype_preg_finite_automaton object - first automata taking part in intersection.
+     * @param anotherfa qtype_preg_finite_automaton object - second automata taking part in intersection.
+     * @return boolean true if intersection was successful.
+     */
+    public function has_successful_intersection($fa, $anotherfa, $direction) {
+        $issuccessful = false;
+        //Analysis of result intersection
+        if ($direction == 0) {
+            //Analysis if the end state of intersection includes one of end states of given automata
+            $fastates = $fa->end_states();
+            $anotherfastates = $anotherfa->end_state();
+            $states = $this->endstates;
+        } else {
+            //Analysis if the start state of intersection includes one of start states of given automata
+            $fastates = $fa->start_states();
+            $anotherfastates = $anotherfa->start_state();
+            $states = $this->startstates;
+        }
+        //Get real numbers
+        $numbers = $fa->get_state_numbers();
+        $realfanumbers = array();
+        $realanotherfanumbers = array();
+        foreach ($fastates as $state) {
+            $realfanumbers[] = $numbers[$state];
+        }
+        $numbers = $anotherfa->get_state_numbers();
+        foreach ($anotherfastates as $state) {
+            $realanotherfanumbers[] = $numbers[$state];
+        }
+        $result = array();
+        foreach ($states as $state) {
+            $result[] = $this->statenumbers[$state];
+        }
+        //Compare real numbers
+        foreach ($realfanumbers as $num1) {
+            foreach ($result as $num2) {
+                if (strpos($num2, $num1) !== false) {
+                    $issuccessful = true;
+                }
+            }
+        }
+        foreach ($realanotherfanumbers as $num1) {
+            foreach ($result as $num2) {
+                if (strpos($num2, $num1) !== false) {
+                    $issuccessful = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Merging transitions without merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function go_round_transitions($del) {
+        $transitions = $this->get_state_outtransitions($del->to);
+        //Changing leafs in case of merging
+        foreach ($transitions as &$tran) {
+            $tran = $tran->save_tags($del);
+            $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
+            $tran->pregleaf = $newleaf;
+        }
+        //Has deleting or changing transitions 
+        if (count($transitions) !=0) {
+            foreach ($transition as &$tran) {
+                $tran->from = $del->from;
+                $this->add_transition($tran);
+            }
+        }
+        $this->del_transition($del);
+    }
+
+    /**
+     * Merging states connected by uncapturing transition.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merge_states($del) {
+        //Getting real numbers of new merged state
+        $numbers = array();
+        //Merging intersection states
+        if ($this->is_intersectionstate($del->from)) {
+            $fromnumbers = explode(',', $this->statenumbers[$del->from], 2);
+            $tonumbers = explode(',', $this->statenumbers[$del->to], 2);
+            for ($i = 0; $i < 2; $i++) {
+                $numbers[] = $fromnumbers[$i] . '   ' . $tonumbers[$i];
+            }
+            $number = $numbers[0] . ',' . $numbers[1];
+        } else {
+            //Merging simple state
+            $number = $this->statenumbers[$del->from] . '   ' . $this->statenumbers[$del->to];
+        }
+
+        $this->statenumbers[$del->from] = $number;
+    }
+
+    /**
+     * Merging transitions with merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merge_transitions($del) {
+        //Cycle with empty transition
+        if ($del->to == $del->from) {
+            $this->del_transition($delfrom, $delto);
+        }
+
+        //Transition for merging isn't cycle
+        if ($del->to != $del->from) {
+            $transitions = $this->get_state_outtransitions($del->to);
+            $intotransitions = $this->get_state_intotransitions($del->from);
+            //Possibility of merging with outtransitions
+            if (count($transitions) != 0) {
+                $needredacting = true;
+            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
+                //Possibility of merging with intotransitions
+                $transitions = $intotransitions;
+            } else if ($this->statecount == 2 && del->is_eps()) {
+                //Possibility to get automata with one state
+                $this->merge_states($del);
+                //Checking if start state was merged
+                if ($this->has_endstate($del->to)) {
+                    $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                }
+                $this->remove_state($del->to);
+            }
+
+            //Changing leafs in case of merging
+            foreach ($transitions as &$tran) {
+                $tran = $tran->save_tags($del);
+                $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
+                $tran->pregleaf = $newleaf;
+            }
+            //Has deleting or changing transitions 
+            if (count($transitions) !=0) {
+                $this->merge_states($del);
+                //Adding intotransitions from merged state
+                $intotransitions = get_intotransitios($del->to);
+                foreach ($intotransitions as &$tran) {
+                    if ($tran != $del) {
+                        $tran->to = $del->from;
+                        $this->add_transition($tran);
+                    }
+                }
+                //Adding outtransitions from merged state
+                if ($needredacting) {
+                    foreach ($transition as &$tran) {
+                        if ($tran->to == $del->from) {
+                            $tran->to = $del->from;
+                        }
+                        $tran->from = $del->from;
+                        $this->add_transition($tran);
+                    }
+                    //Checking if start state was merged
+                    if ($this->has_endstate($del->to)) {
+                        $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                    }
+                    $this->remove_state($del->to);
+                }
+            }
+        }
+    }
+
+    /**
+     * Merging all possible uncaptaring transitions in automata.
+     *
+     * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
+     * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
+     */
+    public function merge_uncapturing_transitions($transitiontype, &$stateindex) {
+        $newfront = array();
+        $statechecked = array();
+        //Getting types of uncaptyring transitions
+        if ($transitiontype == qtype_preg_fa_transition::TYPE_TRANSITION_BOTH) {
+            $trantype1 = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
+            $trantype2 = qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT;
+        } else {
+            $trantype1 = $transitiontype;
+            $trantype2 = $transitiontype;
+        }
+        
+        $oldfront = $this->startstates;
+        while (count($oldfront) != 0) {
+            $waschanged = false;
+            //Analysis transitions of each state
+            foreach ($oldfront as $state) {
+                if (!$waschanged && array_search($state, $stateschecked) === false) {
+                    $transitions = $this->get_state_outtransitions($state);
+                    //Searching transition of given type
+                    foreach ($transitions as $tran) {
+                        if ($tran->type == $trantype1 || $tran->type == $trantype2) {
+                            //Choice of merging way
+                            $intotransitions = $this->get_state_intotransitions($tran->to);
+                            if ($stateindex != null && $tran->from == $stateindex && count($intotransitions) > 1) {
+                                $this->go_round_transition($tran);
+                                $waschanged = true;
+                            } else {
+                                if ($tran->to == $stateindex) {
+                                    $stateindex = $tran->from;
+                                }
+                                $this->merge_transitions($tran);
+                            }
+                            //Adding changed state to new wavefront
+                            $newfront[] = $state;
+                            $outtransitions = $this->get_state_outtransitions($state);
+                            //Delete cycle of uncapturing transition
+                            $wasdel = false;
+                            foreach ($outtansitions as $outtran) {
+                                if ($wasdel) {
+                                    if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
+                                        unset($newfront[count($newfront)-1]);
+                                        $wasdel = true;
+                                    }
+                                }
+                            }
+                        } else {
+                            $newfront[] = $tran->to;
+                            $stateschecked[] = $state;
+                        }
+                    }
+                }
+            }
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+    }
+
+    /**
+     * Get connected with given states in given direction.
+     *
+     * @param state - state for searching connexted.
+     * @param direction - direction of searching.
+     */
+    public function get_connected_states($state, $direction) {
+        $result = array();
+        if ($direction == 0) {
+            $outtransitions = $this->get_state_outtransitions($state);
+            foreach ($outtransitions as $tran) {
+                $result[] = $tran->to;
+            }
+        } else {
+            $intotransitions = $this->get_state_intotransitions($state);
+            foreach ($intotransitions as $tran) {
+                $result[] = $tran->from;
+            }
+        }
+    }
+
+    /**
+     * Modify state for adding to automata which is intersection of two others.
+     *
+     * @param changedstate - state for modifying.
+     * @param origin - origin of automata with this state.
+     */
+    public function modify_state(&$changedstate, $origin) {
+        if ($origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
+            $changedstate = ',' . $changedstate;
+        } else {
+            $changedstate .= ',';
+        }
+    }
+
+    /**
+     * Copy transitions to workstate from automata source in given direction.
+     *
+     * @param stateswere - states which were in automata.
+     * @param statefromsource - state from source automata which transitions are coped.
+     * @param memoryfront - states added to automata in last state.
+     * @param source - automata-source.
+     * @param direction - direction of coping (0 - forward; 1 - back).
+     */
+    public function copy_transitions($stateswere, $statefromsource, $workstate, $memoryfront, $source, $direction) {
+        //Get transition for analysis
+        if ($direction == 0) {
+            $transitions = $source->get_state_intotransitions($statefromsource);
+        } else {
+            $transitions = $source->get_state_outtransitions($statefromsource);
+        }
+        $numbers = $source->get_state_numbers();
+
+        //Search transition among states were
+        foreach ($stateswere as $state) {
+            //Get real number of source state
+            $number = strtr($state, ',', '');
+            $sourceindex = array_search($number, $numbers);
+            if ($sourcestate !== false) {
+                foreach ($transitions as $tran) {
+                    if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+                        //Add transition
+                        $memstate = array_search($state, $this->statenumbers);
+                        if ($direction == 0) {
+                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate);
+                        } else {
+                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate);
+                        }
+                        $this->add_transition($transition);
+                    }
+                }
+            }
+        }
+
+        //Serch transition among states added on last step
+        foreach ($memoryfront as $state) {
+            $number = $this->statenumbers[$state];
+            $number = strtr($state, ',', '');
+            foreach ($intotransitions as $tran) {
+                if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+                    //Add transition
+                    if ($direction == 0) {
+                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate);
+                    } else {
+                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state);
+                    }
+                    $this->add_transition($transition);
+                }
+            }
+        }
+    }
+
+    
+    /**
+     * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
+     *
+     * @param source - automata-source for coping.
+     * @param oldFront - states from which coping starts.
+     * @param stopcoping - state to which automata will be copied.
+     * @param direction - direction of coping (0 - forward; 1 - back).
+     * @return automata after coping.
+     */
+    public function copy_modify_branches(&$source, &$oldfront, &$stopcoping, $direction) {
+        //Getting origin of automata
+        $states = $source->get_states();
+        if (count($states) != 0) {
+            $keys = array_keys ($states);
+            $transitions = $this->get_state_outtransitions($states[$keys[0]]);
+            $keys = array_keys ($transitions);
+            $origin = $transitions[$keys[0]]->origin;
+        }
+        //Getting all states which are in automata for coping
+        $stateswere = $this->get_state_numbers();
+        //Cleaning end states
+        $endstates = $this->end_states();
+        foreach ($endstates as $endstate) {
+            $this->remove_end_state($endstate);
+        }
+
+        //Coping
+        while (count ($oldfront) != 0) {
+            foreach ($oldfront as $curstate) {
+                if (!$this->is_copied_state($curstate)) {
+                    //Modify states
+                    $changedstate = $this->statenumbers[$curstate];
+                    $this->modify_state($changedstate, $origin);
+                    //Mark state as copied state
+                    $source->set_copied($curstate);
+                    $isfind = false;
+                    //Search among states which were in automata
+                    if (array_search($changedstate, $stateswere) !== false) {
+                        $isfind = true;
+                        $workstate = array_search($changedstate, $stateswere);
+                    }
+
+                    //Hasn't such state
+                    if (!$isfind) {
+                        $this->add_state($changedstate);
+                        $workstate = array_search($changedstate, $this->statenumbers);
+                        $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                    
+                        //Check end of coping
+                        if ($stopcoping !== null && $curstate == $stopcoping) {
+                            $stopcoping = $workstate;
+                            if ($direction == 0) {
+                                $this->add_end_state($workstate);
+                            }
+                        } else {
+                            $newmemoryfront[] = $workstate;
+                            //Adding connected states
+                            $connectedstates = $source($curstate, $direction);
+                            $newfront = array_merge($newfront, $connectedstates);
+                        }
+                        $stateswere[] = $changedstate;
+                    } else {
+                        $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                        $newmemoryfront[] = $workstate;
+                        //Adding connected states
+                        $connectedstates = $source($curstate, $direction);
+                        $newfront = array_merge($newfront, $connectedstates);
+                    }
+                } else {
+                    $changedstate = $this->statenumbers[$curstate];
+                    $changedstate = strtr($changedstate, '(', '');
+                    $changedstate = strtr($changedstate, ')', '');
+                    $this->modify_state($changedstate, $origin);
+                    $workstate = array_search($changedstate, $this->statenumbers);
+                    $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                }
+            }
+            $oldfront = $newfront;
+            $memoryfront = $newmemoryfront;
+            $newfront = array();
+            $newmemoryfront = array();
+        }
+        return $this;
+    }
 
     /**
      * Merges simple assertion transitions into other transtions.
@@ -425,10 +1257,315 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Get transitions from automata for intersection.
+     *
+     * @param workstate state for getting transitions.
+     * @param direction direction of intersection.
+     * @return array of transitions for intersection.
+     */
+    public function get_transitions_for_intersection($workstate, $direction) {
+        if ($direction == 0) {
+            //Add outtransitions
+            $transitions = $this->get_state_outtransitions($workstate);
+        } else {
+            //Add intotransitions
+            $transitions = $this->get_state_intotransitions($workstate);
+        }
+        return $transitions;
+    }
+
+    /**
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
     public function avoid_wordbreaks() {
         // TODO - delete \b and \B.
+    }
+
+    /**
+     * Generate real number of state from intersection part.
+     *
+     * @param firststate real number of state from first automata.
+     * @param secondstate real number of state from second automata.
+     * @return real number of state from intersection part.
+     */
+    public function get_inter_state($firststate, $secondstate) {
+        $state = $firstate . ',' . $secondstate;
+        return $state;
+    }
+
+    /**
+     * Find intersection part of automaton in case of intersection it with another one.
+     *
+     * @param anotherfa object automaton to intersect.
+     * @param result object automaton to write intersection part.
+     * @param start state of $this automaton with which to start intersection.
+     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata.
+     */
+    public function get_intersection_part ($anotherfa, &$result, $start, $isstart) {
+        $oldfront = array();
+        $newfront = array();
+        $oldfront[] = $start;
+        //Work with each state
+        while (count($oldfront) != 0) {
+            foreach ($oldfront as $curstate) {
+                //Get states from first and second automata
+                $secondnumbers = $anotherfa->get_state_numbers;
+                $resnumbers = $result->get_state_numbers;
+                $numbers = explode(',', $resultnumbers[$curstate], 2);
+                $workstate1 = array_search($numbers[0], $this->statenumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                //Get transitions for ntersection
+                $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
+                $intertransitions2 = $second->get_transitions_for_intersection($workstate2, $direction);;
+                get_transitions_for_intersection();
+                //Intersect all possible transitions
+                $resulttransitions = array();
+                $resultnumbers = array();
+                foreach ($intertransitions1 as $intertran1) {
+                    foreach ($intertransitions2 as $intertran2) {
+                        $resulttran = $intertran1->intersect($intertran2);
+                        if ($resulttran !== null) {
+                            $resulttransitions[] = $resulttran;
+                            if ($direction == 0) {
+                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->to], $secondnumbers[$intertran2->to]);
+                            } else {
+                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->from], $secondnumbers[$intertran2->from]);
+                            }
+                        }
+                    }
+                }
+                //Analysis result transitions
+                for ($i = 0; $i < count($resulttransitions); $i++) {
+                    //Itersect forward
+                    //Search state with the same number in result automata
+                    $searcstate = array_search($resultnumbers[$i], $resnumbers);
+                    //State was found
+                    if ($searchstate !== false) {
+                        $newstate = $searchstate
+                    } else {
+                        //State wasn't found
+                        $newstate = $result->add_state($resultnumbers[$i]);
+                        $newfront[] = $newstate;
+                    }
+                    //Change transitions
+                    if ($direction == 0) {
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($curstate, $resulttransitions[$i]->pregleaf, $newstate);
+                    } else {
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($newstate, $resulttransitions[$i]->pregleaf, $curstate);
+                    }
+                    $result->add_transition($resulttransitions[$i]);
+                }
+                //Removing arrays
+                $intertransitions1 = array();
+                $intertransitions2 = array();
+                $resulttransitions = array();
+            }
+            $possibleend = $oldfront;
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+        //Set right start and end states
+        if($direction == 0) {
+            //Cleaning end states
+            $endstates = $result->end_states();
+            foreach ($endstates as $endstate) {
+                $result->remove_end_state($endstate);
+            }
+            foreach ($possibleend as $end) {
+                $result->add_end_state($end);
+            }
+        } else {
+            $state = $result->get_inter_state(0, 0);
+            $state = array_search($state, $resnumbers);
+            if ($state !== false) {
+                $result->add_start_state($state);
+            } else {
+                foreach ($possibleend as $start) {
+                    $result->add_start_state($start);
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Lead all end states to one with epsilon-transitions.
+     */
+    public function lead_to_one_end() {
+        $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $i = count($this->endstates) - 1;
+        $to = $this->endstates[0];
+        //Connect end states with first while automata has only one end state
+        while ($i > 0) {
+            $exendstate = $this->endstates[$i];
+            $epstran = qtype_preg_fa_transition ($exendstate, $newleaf, $to);
+            $this->add_transition($epstran);
+            $i--;
+            $this->remove_end_state($exendstate);
+        }
+    }
+
+    /**
+     * Intersect automaton with another one.
+     *
+     * @param anotherfa object automaton to intersect.
+     * @param stateindex string with real number of state of $this automaton with which to start intersection.
+     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata.
+     */
+    public function intersect ($anotherfa, $stateindex, $isstart) {
+        //Check right direction
+        if ($isstart != 0 || $isstart !=1) {
+            throw new qtype_preg_exception('intersect error: Wrong direction');
+        }
+        $number = array_search($stateindex, $this->statenumbers);
+        if ($number === false) {
+            throw new qtype_preg_exception('intersect error: No state with number' . $stateindex . '.');
+        }
+        //Prepare automata for intersection
+        $this->del_blind_states();
+        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number);
+        if ($isstart == 0) {
+            $number2 = $anotherfa->start_states();
+        } else {
+            $number2 = $anotherfa->start_states();
+        }
+        $number2 = $number2[0];
+        $anotherfa->del_blind_states();
+        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number2);
+        $result = $this->intersect_fa($anotherfa, $number, $isstart);
+        $result->del_blind_states();
+        $result->lead_to_one_end();
+    }
+
+    /**
+     * Complete branches ends with state, one number of which isn't start or end state depending on direction.
+     *
+     * @param fa object automaton to check start/end states.
+     * @param anotherfa object automaton check start/end states.
+     * @param durection direction of coping.
+     */
+    public function complete_non_intersection_branches($fa, $anotherfa, $direction) {
+        $front = array();
+        $secondnumbers = $anotherfa->get_state_numbers;
+        $firstnumbers = $fa->get_state_numbers;
+        //Find uncompleted branches
+        if ($direction == 0) {
+            $states = $this->endstates;
+            foreach ($states as $state) {
+                if ($this->is_full_intersect_state($state)) {
+                    $front[] = $state;
+                }
+            }
+            foreach ($front as $state) {
+                $isend = false;
+                //Get states from first and second automata
+                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($fa->has_endstate($workstate1)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $fa->get_state_outtransitions($workstate1);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->to;
+                    }
+                    $this->copy_modify_branches($fa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->to];
+                        $number = trim($number, '()');
+                        $number = $number . ',';
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $this->add_transition($addtran);
+                    }
+                }
+                $isend = false;
+                if ($anotherfa->has_endstate($workstate2)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $anotherfa->get_state_outtransitions($workstate2);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->to;
+                    }
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->to];
+                        $number = trim($number, '()');
+                        $number = ',' . $number;
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $this->add_transition($addtran);
+                    }
+                }
+            }
+        } else {
+            $states = $this->startstates;
+            foreach ($states as $state) {
+                if ($this->is_full_intersect_state($state)) {
+                    $front[] = $state;
+                }
+            }
+            foreach ($front as $state) {
+                $isstart = false;
+                //Get states from first and second automata
+                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($fa->has_startstate($workstate1)) {
+                    $isstart = true;
+                }
+                if (!$isstart) {
+                    $transitions = $fa->get_state_intotransitions($workstate1);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->from;
+                    }
+                    $this->copy_modify_branches($fa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->from];
+                        $number = trim($number, '()');
+                        $number = $number . ',';
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $this->add_transition($addtran);
+                    }
+                }
+                $isend = false;
+                if ($anotherfa->has_endstate($workstate2)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $anotherfa->get_state_intotransitions($workstate2);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->from;
+                    }
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->from];
+                        $number = trim($number, '()');
+                        $number = ',' . $number;
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $this->add_transition($addtran);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -437,9 +1574,40 @@ abstract class qtype_preg_finite_automaton {
      * @param anotherfa object automaton to intersect.
      * @param stateindex integer index of state of $this automaton with which to start intersection.
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata without blind states with one end state and with merged asserts.
      */
-    public function instersect_fa($anotherfa, $stateidnex, $isstart) {
-        // TODO.
+    public function intersect_fa($anotherfa, $stateindex, $isstart) {
+         $result = new qtype_preg_finite_automaton();
+        $stopcoping = $stateindex;
+        //Get states for starting coping
+        if ($isstart == 0) {
+            $oldfront = $this->start_states();
+        } else {
+            $oldfront = $this->end_states();
+        }
+        //Copy branches
+        $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+        //Change state first from intersection
+        $numbers = $result->get_state_numbers();
+        $secondnumbers = $anotherfa->get_state_numbers();
+        if ($isstart == 0) {
+            $states = $second->start_states();
+        } else {
+            $states = $second->end_states();
+        }
+        $secforinter = $secondnumbers[$states[0]];
+        $state = $result->get_inter_state($numbers[$stopcoping], $secforinter);
+        $result->change_real_number($stopcoping, $state);
+        //Find intersection part
+        $this->get_intersection_part($anotherfa, $result, $stopcoping, $isstart);
+        //Set end states
+        //Set start states
+        if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
+            $result->completion_non_intersection_branches($this, $anotherfa, $isstart);
+        } else {
+            $result->remove_fa();
+        }
+        return $result;
     }
 
     /**
