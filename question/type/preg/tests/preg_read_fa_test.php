@@ -37,8 +37,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
+        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription);
+        $automata->read_fa($dotdescription, $origin);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
