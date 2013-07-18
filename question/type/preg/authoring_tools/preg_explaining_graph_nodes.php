@@ -571,9 +571,16 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
             $operand = $this->operands[0]->create_graph($id);
         } else {
             $operand = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-            $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
-            $operand->entries[] = end($operand->nodes);
-            $operand->exits[] = end($operand->nodes);
+            if ($this->operands[0]->pregnode->id == $id) {
+                $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=darkgreen');
+                $operand->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand->subgraphs[0], -1);
+                $operand->entries[] = end($operand->subgraphs[0]->nodes);
+                $operand->exits[] = end($operand->subgraphs[0]->nodes);
+            } else {
+                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+                $operand->entries[] = end($operand->nodes);
+                $operand->exits[] = end($operand->nodes);
+            }
         }
 
         $label = ($this->pregnode->number != -1 ? get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number : '');
@@ -612,11 +619,7 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
         $isassert = false;
         $tmp = null;
 
-        $is_simple_condition = $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR ||
-                               $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
-                               $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE;
-
-        if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+        if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
 
             $a = new stdClass();
             $a->number = $this->pregnode->number;
@@ -630,7 +633,7 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
                         'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
                         );
 
-        } else if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+        } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
 
             $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
                                                         array(get_string('description_recursion_all', 'qtype_preg')),
@@ -640,7 +643,7 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
                                                         -1
                                                     );
 
-        } else if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+        } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
 
             $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
                                                         array(get_string('explain_define', 'qtype_preg')),
