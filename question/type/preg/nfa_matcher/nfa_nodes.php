@@ -138,6 +138,21 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         }
         return $resulttran;
     }
+
+    /**
+     * Save tags from other transition in this transition.
+     *
+     * @param other another transition for saving tags.
+     * @return result transition.
+     */
+    public function save_tags($other) {
+        $this->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
+        $this->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
+        $this->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
+        $this->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
+        return $this;
+    }
+
 }
 
 /**
