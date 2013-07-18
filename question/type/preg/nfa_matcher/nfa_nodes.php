@@ -112,6 +112,13 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     }
 
     /**
+     * Returns true if transition has any tag.
+     */
+    public function has_tags() {
+        return (count($this->subpatt_start) || count($this->subpatt_end) || count($this->subexpr_start) || count($this->subexpr_end));
+    }
+
+    /**
      * Returns intersection of transitions.
      *
      * @param other another transition for intersection.

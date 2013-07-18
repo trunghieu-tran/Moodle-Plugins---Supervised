@@ -119,6 +119,13 @@ class qtype_preg_fa_transition {
     }
 
     /**
+     * Returns true if transition has any tag.
+     */
+    public function has_tags() {
+        return false;
+    }
+
+    /**
      * Returns true if transition is eps.
      *
      * @param other another transition for intersection.
