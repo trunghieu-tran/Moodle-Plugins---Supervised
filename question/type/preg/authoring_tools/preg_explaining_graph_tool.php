@@ -1,4 +1,19 @@
 <?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Defines explain graph's handler class.
  *
@@ -67,8 +82,9 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     protected function get_engine_node_name($nodetype) {
 
         if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT ||
-            $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT)
+            $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
             return 'qtype_preg_authoring_tool_node_quant';
+        }
 
         return parent::get_engine_node_name($nodetype);
     }
@@ -78,12 +94,12 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      */
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
-        case qtype_preg_node::TYPE_ABSTRACT:
-        case qtype_preg_node::TYPE_LEAF_CONTROL:
-        case qtype_preg_node::TYPE_NODE_ERROR:
-            return false;
-        default:
-            return true;
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -129,12 +145,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         if ($options === null) {
             $options = new qtype_preg_handling_options();
         }
-        $options->preserveallnodes = TRUE;
+        $options->preserveallnodes = true;
         parent::__construct($regex, $options);
         if ($regex === null) {
             return;
         }
     }
 }
-
-?>
