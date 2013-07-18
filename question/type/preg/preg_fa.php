@@ -1161,6 +1161,7 @@ abstract class qtype_preg_finite_automaton {
                     
                         //Check end of coping
                         if ($stopcoping !== null && $curstate == $stopcoping) {
+                            $stopcoping = $workstate;
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
