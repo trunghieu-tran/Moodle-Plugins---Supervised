@@ -574,6 +574,16 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Change real number of state.
+     *
+     * @param state - state to change.
+     * @param realnumber - new real number.
+     */
+    public function change_real_number($state, $realnumber) {
+        $this->statenumbers[$state] = $realnumber;
+    }
+
+    /**
      * Replaces oldref with newref in every transition of the automaton.
      *
      * @param oldref - a reference to the old state.
