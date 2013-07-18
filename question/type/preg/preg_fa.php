@@ -142,6 +142,17 @@ class qtype_preg_fa_transition {
     public function is_unmerged_assert() {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT);
     }
+
+    /**
+     * Save tags from other transition in this transition.
+     * This function has overloaded version in nfa, because it has tags. In this class does nothing.
+     *
+     * @param other another transition for saving tags.
+     * @return result transition.
+     */
+    public function save_tags($other) {
+        return $this;
+    }
 }
 
 /**
