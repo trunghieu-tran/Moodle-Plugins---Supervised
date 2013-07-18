@@ -661,13 +661,14 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_transition($transition) {
         $outtransitions = $this->get_state_outtransitions($transition->from);
-        if (array_key_exists($transition->to)) {
+        if (array_key_exists($transition->to, $outtransitions)) {
             $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
             $tran->pregleaf = $tran->pregleaf->unite_leafs($transition->pregleaf);
         } else {
             $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
         }
     }
+
     /**
      * Removes a state from the automaton.
      *
