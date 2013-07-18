@@ -637,7 +637,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     protected function look_for_circumflex($node, $wasconcat = false) {
         if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^.
-            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+            return $node->type == qtype_preg_node::TYPE_LEAF_ASSERT && $node->is_start_anchor();
         }
 
         /*if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {

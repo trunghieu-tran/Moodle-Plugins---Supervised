@@ -48,39 +48,33 @@ class qtype_preg_userinscription {
         $this->data = $data;
         $this->type = $type;
     }
+
+    public function __toString() {
+        return $this->data;
+    }
 }
 
 /**
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
 class qtype_preg_lexem {
-    /** Subtype of the lexem. */
-    public $subtype;
-    /** Index of the first character of the lexem. */
+    /** Index of the line where the node begins. */
+    public $linefirst = -1;
+    /** Index of the line where the node ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line of this node in the regex. */
     public $indfirst = -1;
-    /** Index of the last character of the lexem. */
+    /** Index of the last character pn the last line of this node in the regex. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
 
-    public function __construct($subtype, $indfirst, $indlast, $userinscription) {
-        $this->subtype = $subtype;
+    public function __construct($linefirst, $linelast, $indfirst, $indlast, $userinscription) {
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
-    }
-}
-
-/**
- * Class for plain subexpression lexems.
- */
-class qtype_preg_lexem_subexpr extends qtype_preg_lexem {
-    /** Number of the subexpression. */
-    public $number;
-
-    public function __construct($subtype, $indfirst, $indlast, $userinscription, $number) {
-        parent::__construct($subtype, $indfirst, $indlast, $userinscription);
-        $this->number = $number;
     }
 }
 
@@ -149,9 +143,13 @@ abstract class qtype_preg_node {
     public $subtype;
     /** Errors found for this particular node. */
     public $errors = array();
-    /** Index of the first character of this node in the regex. */
+    /** Index of the line where the node begins. */
+    public $linefirst = -1;
+    /** Index of the line where the node ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line of this node in the regex. */
     public $indfirst = -1;
-    /** Index of the last character of this node in the regex. */
+    /** Index of the last character pn the last line of this node in the regex. */
     public $indlast = -1;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
@@ -181,9 +179,59 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
+     * Finds the subtree by given indexes. Updates the indexes to the nearest suitable values.
+     */
+    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast) {
+        $result = $this;
+        $found = is_a($result, 'qtype_preg_leaf');
+        // Go down the tree.
+        while (!$found) {
+            $replaced = false;
+            foreach ($result->operands as $operand) {
+                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->indfirst >= $result->indfirst)) &&
+                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->indlast <= $result->indlast));
+
+                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) &&
+                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast));
+
+                if ($better_than_result && $suits_needed) {
+                    $result = $operand;
+                    $replaced = true;
+                }
+            }
+            $found = !$replaced || is_a($result, 'qtype_preg_leaf');
+        }
+        // If the node is found, update the indexes, return NULL otherwise.
+        if (($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
+            ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast))) {
+            $linefirst = $result->linefirst;
+            $linelast = $result->linelast;
+            $indfirst = $result->indfirst;
+            $indlast = $result->indlast;
+        } else {
+            $result = null;
+        }
+        return $result;
+    }
+
+    /**
+     * Expands the subtrees of operands at the given indexes.
+     */
+    public function expand($from, $to, &$idcounter) {
+    }
+
+    /**
+     * Expands the subtrees of all operands.
+     */
+    public function expand_all(&$idcounter) {
+    }
+
+    /**
      * Sets indexes and userinscription for the node.
      */
-    public function set_user_info($indfirst, $indlast, $userinscription = null) {
+    public function set_user_info($linefirst, $linelast, $indfirst, $indlast, $userinscription = null) {
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
@@ -405,6 +453,50 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $this->firstpos = array();
             $this->lastpos = array();
         }
+    }
+
+    public function expand($from, $to, &$idcounter) {
+
+        for ($i = $from; $i <= $to; $i++) {
+            $this->operands[$i]->expand_all($idcounter);
+        }
+
+        if (count($this->operands) <= 2) {
+            return;
+        }
+
+        $operands = array();
+
+        // Copy 'left' operands.
+        for ($i = 0; $i < $from; $i++) {
+            $operands[] = $this->operands[$i];
+        }
+
+        // Form the new subtree and add it as operand.
+        $newnode = clone $this; // Will go down the tree.
+        $newnode->id = ++$idcounter;
+        $newnode->operands = array();
+        for ($i = $from; $i <= $to; $i++) {
+            $newnode->operands[] = $this->operands[$i];
+        }
+        $operands[] = $newnode;
+
+        // Copy 'right' operands.
+        for ($i = $to + 1; $i < count($this->operands); $i++) {
+            $operands[] = $this->operands[$i];
+        }
+
+        // Update operands of this node.
+        $this->operands = $operands;
+        $newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+
+        if (count($operands) == 1) {
+            $this->operands = $newnode->operands;
+        }
+    }
+
+    public function expand_all(&$idcounter) {
+        $this->expand(0, count($this->operands) - 1, $idcounter);
     }
 }
 
@@ -1622,8 +1714,9 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     /** Subexpression number. */
     public $number = -1;
 
-    public function __construct($number = -1) {
+    public function __construct($subtype, $number = -1) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
+        $this->subtype = $subtype;
         $this->number = $number;
     }
 

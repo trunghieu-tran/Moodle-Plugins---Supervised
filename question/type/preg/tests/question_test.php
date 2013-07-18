@@ -304,6 +304,30 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($hintobj->could_show_hint($matchresults));
     }
 
+    public function test_get_matcher() {
+        // Test case insensitivity.
+        $testquestion = clone $this->testquestion;
+        $matcher = $testquestion->get_matcher($testquestion->engine, $testquestion->answers[100]->answer, true, $testquestion->get_modifiers(false));
+        $matchresults = $matcher->match('do CaTs eat bAtS?');
+        $this->assertTrue($matchresults->full);
+
+        // Test case sensitivity.
+        $matcher = $testquestion->get_matcher($testquestion->engine, $testquestion->answers[100]->answer, true, $testquestion->get_modifiers(true));
+        $matchresults = $matcher->match('do CaTs eat bAtS?');
+        $this->assertFalse($matchresults->full);
+        $matchresults = $matcher->match('Do cats eat bats?');
+        $this->assertTrue($matchresults->full);
+
+        // Test extended notation.
+        $regex = "Do\\s+#question verb\nc a t s   \\s+#subject\n eat[ ]+#verb\nbats\?#comment";
+        $matcher = $testquestion->get_matcher($testquestion->engine, $regex, true, $testquestion->get_modifiers(false), null, 'pcreextended');
+        $matchresults = $matcher->match('Do cats eat bats?');
+        $this->assertTrue($matchresults->full);
+        // Test space inside square brackets.
+        $matchresults = $matcher->match('Do cats eatbats?');
+        $this->assertFalse($matchresults->full);
+    }
+
     public function test_insert_subexpressions() {
         $testquestion = clone $this->testquestion;
 

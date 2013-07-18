@@ -120,10 +120,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Returns an array of states which can be reached without consuming characters.
      * @param qtype_preg_nfa_exec_state startstates states to go from.
-     * @param qtype_poasquestion_string str string being matched.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
-    public function epsilon_closure($startstates, $str) {
+    public function epsilon_closure($startstates) {
         $curstates = $startstates;
         $result = $startstates;
 
@@ -168,20 +167,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
-     * @param qtype_poasquestion_string str string being matched.
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    public function generate_extension($str, $laststate) {
-        $states = array();       // Objects of qtype_preg_nfa_exec_state.
-        $curstates = array();    // States which the automaton is in.
+    public function generate_extension($laststate) {
         $endstate = $this->automaton->end_state();
-
-        // Create an array of processing states for all nfa states (the only state where match was stopped, other states are null yet).
-        foreach ($this->automaton->get_states() as $curstate) {
-            $states[$curstate->number] = null;
-        }
-
         $resumestate = null;
 
         if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
@@ -212,9 +202,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if ($transition->is_loop || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                     continue;
                 }
-                $closure = $this->epsilon_closure(array($laststate->state->number => $laststate), $str);   // TODO!!!
+                $closure = $this->epsilon_closure(array($laststate->state->number => $laststate));
                 foreach ($closure as $curclosure) {
-                    if ($curclosure === $endstate) {
+                    if ($curclosure->state === $endstate) {
                         // The end state is reachable; return it immediately.
                         $result = clone $laststate;
                         $result->state = $curclosure;
@@ -233,82 +223,61 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $resumestate = $laststate;
         }
 
-        $closure = $this->epsilon_closure(array($resumestate->state->number => $resumestate), $str);
-        foreach ($closure as $curclosure) {
-            $states[$curclosure->state->number] = $curclosure;
-            $curstates[] = $curclosure->state->number;
-        }
+        $curstates = array($resumestate);
+        $result = null;
 
         while (count($curstates) != 0) {
-            $reached = array();
-            while (count($curstates) != 0) {
-                $curstate = $states[array_pop($curstates)];
-                foreach ($curstate->state->outgoing_transitions() as $transition) {
-                    if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        continue;
-                    }
-                    // Check for anchors.
-                    // \A and ^ are only valid on start position and thus can only be matched, but can't generate strings.
-                    // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
-                    $assert = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
-                    $anchorstart = $assert && $transition->pregleaf->is_start_anchor();
-                    $anchorend = $assert && $transition->pregleaf->is_end_anchor() && $transition->to !== $endstate;
-                    if ($anchorstart || $anchorend) {
-                        continue;
-                    }
-
-                    // Only generated subpatterns can be passed.
-                    $length = $transition->pregleaf->consumes($curstate);
-                    if ($length == qtype_preg_matching_results::NO_MATCH_FOUND) {
-                        continue;
-                    }
-
-                    // Is it longer than existing one?
-                    if ($states[$endstate->number] !== null && $curstate->length + $length > $states[$endstate->number]->length) {
-                        continue;
-                    }
-
-                    // Create a new state.
-                    $newstate = clone $curstate;
-                    $newstate->state = $transition->to;
-
-                    $newstate->full = ($newstate->state === $endstate);
-                    $newstate->left = $newstate->full ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                    $newstate->extendedmatch = null;
-
-                    $newstate->last_transition = $transition;
-                    $newstate->last_match_len = $length;
-
-                    $newstate->length += $length;
-                    $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
-
-                    // Generate a next character.
-                    if ($length > 0) {
-                        $newchr = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
-                        $newstate->str->concatenate($newchr);
-                    }
-
-                    // Save all reached states.
-                    $closure = $this->epsilon_closure(array($newstate->state->number => $newstate), $str);
-                    foreach ($closure as $curclosure) {
-                        $number = $curclosure->state->number;
-                        if (!isset($reached[$number]) || $reached[$number]->length > $newstate->length) {
-                            $reached[$number] = $curclosure;
-                        }
-                    }
-                }
+            $curstate = array_pop($curstates);
+            if ($curstate->state === $endstate && ($result === null || $result->length > $curstate->length)) {
+                $result = $curstate;
             }
-
-            // Replace curstates with reached.
-            foreach ($reached as $curstate) {
-                $number = $curstate->state->number;
-                if ($states[$number] === null || $states[$number]->length > $curstate->length) {
-                    $states[$number] = $curstate;
-                    $curstates[] = $number;
+            foreach ($curstate->state->outgoing_transitions() as $transition) {
+                // Check loops and for anchors.
+                // \A and ^ are only valid on start position and thus can only be matched, but can't generate strings.
+                // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
+                $assert = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
+                $anchorstart = $assert && $transition->pregleaf->is_start_anchor();
+                $anchorend = $assert && $transition->pregleaf->is_end_anchor() && $transition->to !== $endstate;
+                if ($transition->is_loop || $anchorstart || $anchorend) {
+                    continue;
                 }
+
+                // Only generated subpatterns can be passed.
+                $length = $transition->pregleaf->consumes($curstate);
+                if ($length == qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
+                    continue;
+                }
+
+                // Is it longer than existing one?
+                if ($result !== null && $curstate->length + $length > $result->length) {
+                    continue;
+                }
+
+                // Create a new state.
+                $newstate = clone $curstate;
+                $newstate->state = $transition->to;
+
+                $newstate->full = ($newstate->state === $endstate);
+                $newstate->left = $newstate->full ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
+                $newstate->extendedmatch = null;
+
+                $newstate->last_transition = $transition;
+                $newstate->last_match_len = $length;
+
+                $newstate->length += $length;
+                $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
+
+                // Generate a next character.
+                if ($length > 0) {
+                    $newchr = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                    $newstate->str->concatenate($newchr);
+                }
+
+                // Save the new state.
+                $curstates[] = $newstate;
             }
         }
-        return $states[$endstate->number];
+        return $result;
     }
 
     /**
@@ -413,7 +382,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
 
         // Get an epsilon-closure of the initial state.
-        $closure = $this->epsilon_closure(array($startstate->number => $states[$startstate->number]), $str);
+        $closure = $this->epsilon_closure(array($startstate->number => $states[$startstate->number]));
         foreach ($closure as $curclosure) {
             $states[$curclosure->state->number] = $curclosure;
             $curstates[] = $curclosure->state->number;
@@ -476,7 +445,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $reached[] = array_pop($lazystates);
             }
 
-            $reached = $this->epsilon_closure($reached, $str);
+            $reached = $this->epsilon_closure($reached);
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
@@ -531,36 +500,34 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
             foreach ($result->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
-
-                $tmp = $this->generate_extension($str, $backtrack);
+                $tmp = $this->generate_extension($backtrack);
+                if ($tmp === null) {
+                    continue;
+                }
+                // Calculate 'left'.
+                $prefixlen = $startpos;
+                while ($prefixlen < $result->str->length() && $prefixlen < $tmp->str->length() &&
+                       $result->str[$prefixlen] == $tmp->str[$prefixlen]) {
+                    $prefixlen++;
+                }
+                $left = $tmp->str->length() - $prefixlen;
                 // Choose the best one by:
                 // 1) minimizing length of the generated extension
                 // 2) minimizing abs(extension->length - result->length)
                 if ($result->extendedmatch === null) {
                     $result->extendedmatch = $tmp;
-                } else {
-                    $diff1 = $result->extendedmatch->str->length() - $result->str->length();
-                    $diff2 = $tmp->str->length() - $result->str->length();
-                    if (($diff1 > $diff2) ||
-                        ($diff1 == $diff2 && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
-                        $result->extendedmatch = $tmp;
-                    }
+                    $result->left = $left;
+                } else if (($result->left > $left) ||
+                           ($result->left == $left && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
+                    $result->extendedmatch = $tmp;
+                    $result->left = $left;
                 }
             }
         }
 
         if ($result->extendedmatch !== null) {
-            $i = 0;
-            while ($i < $result->str->length() && $i < $result->extendedmatch->str->length() &&
-                   $result->str[$i] == $result->extendedmatch->str[$i]) {
-                $i++;
-            }
-            // var_dump($i . 'vs' . $result->extendedmatch->str->length() . ' - ' . $result->extendedmatch->str);
-            $result->left = $result->extendedmatch->str->length() - $i;
-            // $result->left = $result->extendedmatch->length - $result->length;
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
         }
-
         return $result->to_matching_results();
     }
 

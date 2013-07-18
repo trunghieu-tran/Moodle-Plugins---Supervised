@@ -575,7 +575,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(2),
-                        'next'=>'b',
+                        'next'=>'[ab]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test10 = array( 'str'=>'aaac',
@@ -3877,7 +3877,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>3,1=>3),
+                        'ext_index_first'=>array(0=>0,1=>0,2=>0),
+                        'ext_length'=>array(0=>4,1=>0,2=>4),
                         'left'=>array(4),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -4036,7 +4038,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>0),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -4117,7 +4121,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>0),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -4126,7 +4132,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>0),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -4179,7 +4187,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>0),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -4188,7 +4198,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>0),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -14794,10 +14806,12 @@ class qtype_preg_cross_tests_from_pcre {
         $test4 = array( 'str'=>'abcd:',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>0),
-                        'length'=>array(0=>4,2=>4),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5),
+                        'ext_index_first'=>array(0=>0,2=>0),
+                        'ext_length'=>array(0=>1,2=>1),
+                        'left'=>array(1),
+                        'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'([\w:]+::)?(\w+)$',
@@ -18755,10 +18769,12 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_748() {
         $test1 = array( 'str'=>'bacxxx',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0,1=>0,2=>0),
+                        'ext_length'=>array(0=>1,1=>1,2=>1),
                         'left'=>array(1),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
