@@ -1360,7 +1360,135 @@ abstract class qtype_preg_finite_automaton {
      * @return result automata.
      */
     public function intersect ($anotherfa, $stateindex, $isstart) {
-        return $this;
+    }
+
+    /**
+     * Complete branches ends with state, one number of which isn't start or end state depending on direction.
+     *
+     * @param fa object automaton to check start/end states.
+     * @param anotherfa object automaton check start/end states.
+     * @param durection direction of coping.
+     */
+    public function complete_non_intersection_branches($fa, $anotherfa, $direction) {
+        $front = array();
+        $secondnumbers = $anotherfa->get_state_numbers;
+        $firstnumbers = $fa->get_state_numbers;
+        //Find uncompleted branches
+        if ($direction == 0) {
+            $states = $this->endstates;
+            foreach ($states as $state) {
+                if ($this->is_full_intersect_state($state)) {
+                    $front[] = $state;
+                }
+            }
+            foreach ($front as $state) {
+                $isend = false;
+                //Get states from first and second automata
+                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($fa->has_endstate($workstate1)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $fa->get_state_outtransitions($workstate1);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->to;
+                    }
+                    $this->copy_modify_branches($fa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->to];
+                        $number = trim($number, '()');
+                        $number = $number . ',';
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $this->add_transition($addtran);
+                    }
+                }
+                $isend = false;
+                if ($anotherfa->has_endstate($workstate2)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $anotherfa->get_state_outtransitions($workstate2);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->to;
+                    }
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->to];
+                        $number = trim($number, '()');
+                        $number = ',' . $number;
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $this->add_transition($addtran);
+                    }
+                }
+            }
+        } else {
+            $states = $this->startstates;
+            foreach ($states as $state) {
+                if ($this->is_full_intersect_state($state)) {
+                    $front[] = $state;
+                }
+            }
+            foreach ($front as $state) {
+                $isstart = false;
+                //Get states from first and second automata
+                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($fa->has_startstate($workstate1)) {
+                    $isstart = true;
+                }
+                if (!$isstart) {
+                    $transitions = $fa->get_state_intotransitions($workstate1);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->from;
+                    }
+                    $this->copy_modify_branches($fa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->from];
+                        $number = trim($number, '()');
+                        $number = $number . ',';
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $this->add_transition($addtran);
+                    }
+                }
+                $isend = false;
+                if ($anotherfa->has_endstate($workstate2)) {
+                    $isend = true;
+                }
+                if (!$isend) {
+                    $transitions = $anotherfa->get_state_intotransitions($workstate2);
+                    foreach ($transitions as $tran) {
+                        $oldfront[] = $tran->from;
+                    }
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    //Connect last state of intersection and copied branch
+                    foreach ($transitions as $tran) {
+                        //Get number of copied state
+                        $number = $firstnumbers[$tran->from];
+                        $number = trim($number, '()');
+                        $number = ',' . $number;
+                        $copiedstate = array_search($number, $this->statenumbers);
+                        //Add transition
+                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $this->add_transition($addtran);
+                    }
+                }
+            }
+        }
     }
 
     /**
