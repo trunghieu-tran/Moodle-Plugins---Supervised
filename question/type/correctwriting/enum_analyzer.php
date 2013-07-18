@@ -223,7 +223,7 @@ class  qtype_correctwriting_enum_analyzer {
             // Remove duplicate orders.
             array_unique($enum_orders);
             // Remove first element from array of elements numbers which are ordered like in corrected student answer.
-            unset($elements_in_corrected_answer[0]);
+            array_shift($elements_in_corrected_answer);
             // Check that have next order in array of elements numbers which are ordered like in corrected student answer.
             $have_next_order = true;
             for ($i = 0; $i < count($enumdescription[$number]); $i++) {
