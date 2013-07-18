@@ -1500,7 +1500,37 @@ abstract class qtype_preg_finite_automaton {
      * @return result automata without blind states with one end state and with merged asserts.
      */
     public function intersect_fa($anotherfa, $stateindex, $isstart) {
-        return $this;
+         $result = new qtype_preg_finite_automaton();
+        $stopcoping = $stateindex;
+        //Get states for starting coping
+        if ($isstart == 0) {
+            $oldfront = $this->start_states();
+        } else {
+            $oldfront = $this->end_states();
+        }
+        //Copy branches
+        $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+        //Change state first from intersection
+        $numbers = $result->get_state_numbers();
+        $secondnumbers = $anotherfa->get_state_numbers();
+        if ($isstart == 0) {
+            $states = $second->start_states();
+        } else {
+            $states = $second->end_states();
+        }
+        $secforinter = $secondnumbers[$states[0]];
+        $state = $result->get_inter_state($numbers[$stopcoping], $secforinter);
+        $result->change_real_number($stopcoping, $state);
+        //Find intersection part
+        $this->get_intersection_part($anotherfa, $result, $stopcoping, $isstart);
+        //Set end states
+        //Set start states
+        if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
+            $result->completion_non_intersection_branches($this, $anotherfa, $isstart);
+        } else {
+            $result->remove_fa();
+        }
+        return $result;
     }
 
     /**
