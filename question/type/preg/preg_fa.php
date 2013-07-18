@@ -1387,11 +1387,33 @@ abstract class qtype_preg_finite_automaton {
      * Intersect automaton with another one.
      *
      * @param anotherfa object automaton to intersect.
-     * @param stateindex integer index of state of $this automaton with which to start intersection.
+     * @param stateindex string with real number of state of $this automaton with which to start intersection.
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
     public function intersect ($anotherfa, $stateindex, $isstart) {
+        //Check right direction
+        if ($isstart != 0 || $isstart !=1) {
+            throw new qtype_preg_exception('intersect error: Wrong direction');
+        }
+        $number = array_search($stateindex, $this->statenumbers);
+        if ($number === false) {
+            throw new qtype_preg_exception('intersect error: No state with number' . $stateindex . '.');
+        }
+        //Prepare automata for intersection
+        $this->del_blind_states();
+        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number);
+        if ($isstart == 0) {
+            $number2 = $anotherfa->start_states();
+        } else {
+            $number2 = $anotherfa->start_states();
+        }
+        $number2 = $number2[0];
+        $anotherfa->del_blind_states();
+        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number2);
+        $result = $this->intersect_fa($anotherfa, $number, $isstart);
+        $result->del_blind_states();
+        $result->lead_to_one_end();
     }
 
     /**
