@@ -221,7 +221,14 @@ class  qtype_correctwriting_enum_analyzer {
                 $enum_orders[] =$current_order;// Add order to array of enum orders.
             } while ($number_of_element_to_skip != count($elements_in_corrected_answer));
             // Remove duplicate orders.
-            array_unique($enum_orders);
+            foreach ($enum_orders as $current_order) {
+                $duplicates = array_keys($enum_orders, $current_order);
+                array_shift($duplicates);
+                foreach ($duplicates as $remove_index) {
+                    unset($enum_orders[$remove_index]);
+                }
+
+            }
             // Remove first element from array of elements numbers which are ordered like in corrected student answer.
             array_shift($elements_in_corrected_answer);
             // Check that have next order in array of elements numbers which are ordered like in corrected student answer.
