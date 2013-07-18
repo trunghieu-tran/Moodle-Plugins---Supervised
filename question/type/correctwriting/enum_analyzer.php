@@ -126,7 +126,7 @@ class  qtype_correctwriting_enum_analyzer {
         $number_of_element_to_skip = 0;// Element number, which will be skip in elements_in_corrected_answer on current iteration.
         $enum_orders=array();// Array which contain find orders of enumeration.
         // For all elements of enumeration create array of indexes in corrected answers, which are kept in ascending order.
-        for ($i = 0; $i < count($enumdescription); $i++) {
+        for ($i = 0; $i < count($enumdescription[$number]); $i++) {
             // Find tokens which include in current element of enumeration individually.
             $indexes_of_tokens = array();
             $token_number = 0;
