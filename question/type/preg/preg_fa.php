@@ -882,7 +882,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function go_round_transitions($del) {
         $transitions = $this->get_state_outtransitions($del->to);
-        //Chenging leafs in case of merging
+        //Changing leafs in case of merging
         foreach ($transitions as &$tran) {
             $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
             $tran->pregleaf = $newleaf;
@@ -952,7 +952,7 @@ abstract class qtype_preg_finite_automaton {
                 $this->remove_state($del->to);
             }
 
-            //Chenging leafs in case of merging
+            //Changing leafs in case of merging
             foreach ($transitions as &$tran) {
                 $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
                 $tran->pregleaf = $newleaf;
