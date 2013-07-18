@@ -117,6 +117,9 @@ class  qtype_correctwriting_enum_analyzer {
         $indexes_of_tokens = array();// Array with contains indexes of tokens which are members of enumeration...
                                                      // ... in corrected student answer.
         $indexes_of_elements = array();// Array with indexes of elements of enumeration in corrected answer.
+        $element_indexes = array(); // Array with indexes of one element of enumeration in corrected answer.
+        $previewelement = null; // Contain preview element value.
+        $key = 0; // Current key of some array.
         $elements_in_corrected_answer = array();// Array to keep indexes elements of enumeration in order, which...
                                                 // ... it has in corrected student answer, with included missed elements.
         $current_order = array();// Array to keep current order of enumeration elements.
