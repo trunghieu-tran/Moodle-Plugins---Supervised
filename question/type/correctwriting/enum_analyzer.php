@@ -139,7 +139,7 @@ class  qtype_correctwriting_enum_analyzer {
             $indexes_of_elements[] = array();
             for ($j = 0; $j < count($indexes_of_tokens); $j++) {
                 // If token number j are find in corrected answer, add it's indexes in $indexes_of_elements_in_corrected_answer[i].
-                if ($indexes_of_tokens[$j][0]!=-1) {
+                if ($indexes_of_tokens[$j] != null) {
                     // For all indexes find place to insert, because array is kept in  ascending order.
                     for ($k = 0; $k < count($indexes_of_tokens[$j]); $k++) {
                         // Find place to insert.
