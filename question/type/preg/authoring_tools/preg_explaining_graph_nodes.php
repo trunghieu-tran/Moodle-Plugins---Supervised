@@ -1,4 +1,19 @@
 <?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Defines graph's node classes.
  *
@@ -20,7 +35,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 abstract class qtype_preg_authoring_tool_node_abstract {
 
-    public $pregnode; // a reference to the corresponding preg_node
+    public $pregnode; // A reference to the corresponding preg_node.
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
@@ -38,12 +53,12 @@ abstract class qtype_preg_authoring_tool_node_abstract {
      */
     public function accept() {
         switch ($this->pregnode->type) {
-        case qtype_preg_node::TYPE_ABSTRACT:
-        case qtype_preg_node::TYPE_LEAF_CONTROL:
-        case qtype_preg_node::TYPE_NODE_ERROR:
-            return false;
-        default:
-            return true;
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+                return false;
+            default:
+                return true;
         }
     }
 }
@@ -89,8 +104,9 @@ abstract class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_
         $graph = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->pregnode->id, $this->get_filled());
-        if ($this->pregnode->negative)
+        if ($this->pregnode->negative) {
             $graph->nodes[0]->invert = true;
+        }
 
         if ($id == $this->pregnode->id) {
             $graph->style .= '; color=darkgreen';
@@ -123,10 +139,11 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
     public function get_color() {
         $tmp = $this->get_value();
         if (count($tmp) == 1) {
-            if ($tmp[0][0] == chr(10))
+            if ($tmp[0][0] == chr(10)) {
                 return 'hotpink';
-            else
+            } else {
                 return 'black';
+            }
         } else {
             return 'black';
         }
@@ -137,12 +154,13 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
         if (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
         } else {
-            if ($this->get_color() == 'hotpink')
+            if ($this->get_color() == 'hotpink') {
                 return 'ellipse';
-            else if ($this->pregnode->flags[0][0]->data->length() > 1)
+            } else if ($this->pregnode->flags[0][0]->data->length() > 1) {
                 return 'record';
-            else
+            } else {
                 return 'ellipse';
+            }
         }
     }
 
@@ -152,61 +170,62 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
      */
     public function process_charset() {
 
-        $info = $this->pregnode->userinscription;   // refer a userinscription to new variable for convenience
-        $result = array();                          // this will store a result
+        $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
+        $result = array();                          // This will store a result.
 
-        $result[] = '';                             // create a first empty element
+        $result[] = '';                             // Create a first empty element.
 
-        // now, iterate over userinscription elements
+        // Now, iterate over userinscription elements.
         foreach ($info as $iter) {
-               
-            /* 
-             * First, we need to define: is it range?
-             * So, check this pattern: <something>-<something>.
-             */
+
+            // First, we need to define: is it range?
+            // So, check this pattern: <something>-<something>.
             $mpos = strpos($iter->data, '-'); // find a position of '-'
-            // if position is not in beginning and not in end...
+            // If position is not in beginning and not in end...
             if ($mpos != 0 && $mpos != strlen($iter->data) - 1) {
-                if ($mpos == 1) // if <something>'s length is 1 then our range hasn't hex code
-                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . substr($iter->data, 0, $mpos) . get_string('explain_to', 'qtype_preg') . substr($iter->data, $mpos + 1);
-                else {            // else we deal with hex code in <something>
+                if ($mpos == 1) { // If <something>'s length is 1 then our range hasn't hex code.
+                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . substr($iter->data, 0, $mpos) .
+                                          get_string('explain_to', 'qtype_preg') . substr($iter->data, $mpos + 1);
+                } else {            // ...else we deal with hex code in <something>.
                     $a = new stdClass();
                     $a->code = substr($iter->data, 2, $mpos-2);
-                    $tmp = chr(10) . get_string('explain_from', 'qtype_preg') . get_string('description_char_16value', 'qtype_preg', $a) . get_string('explain_to', 'qtype_preg');
+                    $tmp = chr(10) . get_string('explain_from', 'qtype_preg') .
+                                     get_string('description_char_16value', 'qtype_preg', $a) . get_string('explain_to', 'qtype_preg');
                     $a->code = substr($iter->data, $mpos + 3);
                     $result[] = $tmp . get_string('description_char_16value', 'qtype_preg', $a);
                 }
 
-                continue; // because we found range we iterate to next unserinscription element
+                continue; // Because we found range we iterate to next unserinscription element.
             }
 
-            // now we know that this $iter hasn't a range.
-            // so, iterate over all characters in $iter.
+            // Now we know that this $iter hasn't a range.
+            // So, iterate over all characters in $iter.
             for ($i = 0; $i < strlen($iter->data); $i++) {
 
-                // Check this pattern: [:<something>:] (it is POSIX class)
-                // first char should be '['
+                // Check this pattern: [:<something>:] (it is POSIX class).
+                // First char should be '['.
                 if ($i == 0 && $iter->data[$i] == '[') {
                     $i += 2;
-                    $tmp = '';  // third char should be ':'
+                    $tmp = '';  // Third char should be ':'.
                     while ($iter->data[$i] != ':') { // iterate to next ':'
-                        $tmp .= $iter->data[$i]; // accumulate <something>'s characters
+                        $tmp .= $iter->data[$i]; // Accumulate <something>'s characters.
                         $i++;
                     }
-                    $i++; // move to last ']'
+                    $i++; // Move to last ']'.
 
-                    // extract POSIX class from lang-file
+                    // Extract POSIX class from lang-file.
                     $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
 
-                } else if ($iter->data[$i] == '\\') { // here we check another pattern: \<something>
-                    $i++; // move to next character
+                } else if ($iter->data[$i] == '\\') { // Here we check another pattern: \<something>.
+                    $i++; // Move to next character.
 
-                    /* now we're just checking all possible <something> variants. */
-                    if ($iter->data[$i] == '\\')    // \-escaping
+                    // Now we're just checking all possible <something> variants.
+                    if ($iter->data[$i] == '\\') {    // Here is \-escaping.
                         $result[count($result) - 1] .= '\\';
-                    if ($iter->data[$i] == 'p') {  // unicode property
-                        $i++;     
-                        if ($iter->data[$i] == '{') { // it may be like this - \p{<something>}
+                    }
+                    if ($iter->data[$i] == 'p') {  // Unicode property.
+                        $i++;
+                        if ($iter->data[$i] == '{') { // It may be like this - \p{<something>}.
                             $tmp = '';
                             $i++;
                             while ($iter->data[$i] != '}') {
@@ -214,10 +233,10 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                                 $i++;
                             }
                             $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
-                        } else { // or just like this \p<something>
+                        } else { // Or just like this \p<something>.
                             $result[] = chr(10) . get_string('description_charflag_' . $iter->data[$i], 'qtype_preg');
                         }
-                    } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') { // it may be like this - \x<somthing> or \X<something>, where <something> is hex number
+                    } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') { // It may be like this - \x<somthing> or \X<something>, where <something> is hex number.
                         $i++;
                         $tmp = '';
                         if (ctype_xdigit($iter->data[$i])) {
@@ -226,7 +245,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                             if (ctype_xdigit($iter->data[$i])) {
                                 $tmp .= $iter->data[$i];
                             }
-                        } else if ($iter->data[$i] == '{') { // it also may looks like \x{<something>}
+                        } else if ($iter->data[$i] == '{') { // It also may looks like \x{<something>}.
                             $i++;
                             while ($iter->data[$i] != '}') {
                                 $tmp .= $iter->data[$i];
@@ -237,7 +256,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                             $i--;
                         }
 
-                        // extract a value from lang-file
+                        // Extract a value from lang-file.
                         $a = new stdClass();
                         $a->code = $tmp;
                         $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', $a);
@@ -278,18 +297,15 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                     $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
                 } else if ($iter->data[$i] == "\t") {
                     $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                } else if ($iter->data[$i] == '.') {    // .-escaping
-                    //if ($iter->type == qtype_preg_userinscription::TYPE_GENERAL)
-                    //    $result[] = $iter->data[$i];
-                    //else
+                } else if ($iter->data[$i] == '.') {    // Here is .-escaping.
                         $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
                 } else {
-                    $result[0] .= $iter->data[$i]; // all another characters are not special
+                    $result[0] .= $iter->data[$i]; // All another characters are not special.
                 }
             }
         }
 
-        // if first element is empty then delete it
+        // If first element is empty then delete it.
         if ($result[0] == '') {
             unset($result[0]);
             $result = array_values($result);
@@ -327,18 +343,19 @@ class qtype_preg_authoring_tool_leaf_meta extends qtype_preg_authoring_tool_leaf
 class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
+        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
             return array(get_string('description_circumflex', 'qtype_preg'));
-        else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
+        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
             return array(get_string('description_dollar', 'qtype_preg'));
-        else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
+        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B) {
             return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
-        else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
             return array(get_string('description_esc_a', 'qtype_preg'));
-        else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
+        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
             return array(get_string('description_esc_z', 'qtype_preg'));
-        else
+        } else {
             return array(get_string('explain_unknow_assert', 'qtype_preg'));
+        }
     }
 
     public function get_color() {
@@ -429,8 +446,8 @@ class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_l
  */
 abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node_abstract {
 
-    public $operands = array(); // an array of operands
-    private $cond_id = -1;      // a number of conditional branch of conditional subexpression
+    public $operands = array(); // An array of operands.
+    private $cond_id = -1;      // A number of conditional branch of conditional subexpression.
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -472,17 +489,13 @@ abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_t
  */
 class qtype_preg_authoring_tool_node_concat extends qtype_preg_authoring_tool_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-    }
-
     protected function process_operator($graph, $id) {
         $left = $this->operands[0]->create_graph($id);
         $graph->assume_subgraph($left);
         $graph->entries[] = end($left->entries);
 
         $n = count($this->operands);
-        for($i = 1; $i < $n; ++$i) {
+        for ($i = 1; $i < $n; ++$i) {
             $right = $this->operands[$i]->create_graph($id);
             $graph->assume_subgraph($right);
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $graph);
@@ -501,15 +514,11 @@ class qtype_preg_authoring_tool_node_concat extends qtype_preg_authoring_tool_op
  */
 class qtype_preg_authoring_tool_node_alt extends qtype_preg_authoring_tool_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-    }
-
     protected function process_operator($graph, $id) {
         $left = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
         $right = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
 
-        foreach($this->operands as $operand) {
+        foreach ($this->operands as $operand) {
             $new_operand = $operand->create_graph($id);
             $graph->assume_subgraph($new_operand);
 
@@ -529,19 +538,16 @@ class qtype_preg_authoring_tool_node_alt extends qtype_preg_authoring_tool_opera
  */
 class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-    }
-
     protected function process_operator($graph, $id) {
         $operand = $this->operands[0]->create_graph($id);
 
         if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
             $label = 'from ' . $this->pregnode->leftborder . ' to ';
-            if ($this->pregnode->rightborder == 1)
+            if ($this->pregnode->rightborder == 1) {
                 $label .= $this->pregnode->rightborder . ' time';
-            else
+            } else {
                 $label .= $this->pregnode->rightborder .' times';
+            }
         } else {
             $label = 'from ' . $this->pregnode->leftborder . ' to infinity times';
         }
@@ -560,10 +566,6 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
  */
 class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-    }
-
     protected function process_operator($graph, $id) {
         if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
             $operand = $this->operands[0]->create_graph($id);
@@ -576,7 +578,11 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $label = ($this->pregnode->number != -1 ? get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number : '');
 
-        $subexpr = new qtype_preg_explaining_graph_tool_subgraph($label, ($this->pregnode->userinscription->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey', $this->pregnode->id);
+        $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
+                        $label,
+                        ($this->pregnode->userinscription->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey',
+                        $this->pregnode->id
+                    );
         $subexpr->assume_subgraph($operand);
 
         $graph->subgraphs[] = $subexpr;
@@ -603,13 +609,14 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
     protected function process_operator($graph, $id) {
         $cond_subexpr = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black', $this->pregnode->id);
         $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=purple', 0.1 + $this->pregnode->id);
-        $isAssert = FALSE;
-        $tmp = NULL;
+        $isassert = false;
+        $tmp = null;
 
-        $isSimpleCondition = $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
-            $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE;
+        $is_simple_condition = $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR ||
+                               $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION ||
+                               $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE;
 
-        if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+        if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
 
             $a = new stdClass();
             $a->number = $this->pregnode->number;
@@ -623,17 +630,31 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
                         'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1
                         );
 
-        } else if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+        } else if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
 
-            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('description_recursion_all', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-        
-        } else if ($isSimpleCondition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
+                                                        array(get_string('description_recursion_all', 'qtype_preg')),
+                                                        'ellipse',
+                                                        'blue',
+                                                        $cond_subexpr->subgraphs[0],
+                                                        -1
+                                                    );
 
-            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_define', 'qtype_preg')), 'ellipse', 'blue', $cond_subexpr->subgraphs[0], -1);
-       
+        } else if ($is_simple_condition && $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+
+            $cond_subexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
+                                                        array(get_string('explain_define', 'qtype_preg')),
+                                                        'ellipse',
+                                                        'blue',
+                                                        $cond_subexpr->subgraphs[0],
+                                                        -1
+                                                    );
+
         } else {
-            $isAssert = TRUE; $index = 1;
-            if (count($this->operands) == 3) {$index = 2;}
+            $isassert = true; $index = 1;
+            if (count($this->operands) == 3) {
+                $index = 2;
+            }
             $tmp = $this->operands[$index]->create_graph($id);
 
             $cond_subexpr->subgraphs[0]->assume_subgraph($tmp);
@@ -643,14 +664,19 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
         $cond_subexpr->subgraphs[0]->entries[] = $point;
         $cond_subexpr->subgraphs[0]->exits[] = $point;
 
-        $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? ''/*'true'*/ : '', 'dashed; color=purple', 0.2 + $this->pregnode->id);
+        $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(
+                                            $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? '' : '',
+                                            'dashed; color=purple',
+                                            0.2 + $this->pregnode->id
+                                        );
         $tmp = $this->operands[0]->create_graph($id);
         $cond_subexpr->subgraphs[1]->assume_subgraph($tmp);
         $cond_subexpr->subgraphs[1]->entries[] = end($tmp->entries);
         $cond_subexpr->subgraphs[1]->exits[] = end($tmp->exits);
 
-        if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-            $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(''/*'false'*/, 'dashed; color=purple', 0.3 + $this->pregnode->id);
+        if (((count($this->operands) == 2 && !$isassert) || (count($this->operands) == 3 && $isassert))
+            && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+            $cond_subexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'dashed; color=purple', 0.3 + $this->pregnode->id);
             $tmp = $this->operands[1]->create_graph($id);
             $cond_subexpr->subgraphs[2]->assume_subgraph($tmp);
             $cond_subexpr->subgraphs[2]->entries[] = end($tmp->entries);
@@ -660,7 +686,8 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
         $graph->subgraphs[] = $cond_subexpr;
         $graph->entries[] = $point;
 
-        if (((count($this->operands) == 2 && !$isAssert) || (count($this->operands) == 3 && $isAssert)) && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
+        if (((count($this->operands) == 2 && !$isassert) || (count($this->operands) == 3 && $isassert))
+            && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
             $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
             $graph->exits[] = $graph->subgraphs[0]->nodes[0];
             $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
@@ -683,11 +710,7 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
  */
 class qtype_preg_authoring_tool_node_assert extends qtype_preg_authoring_tool_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-    }
-
-    private static $linkOptions = array(
+    private static $link_options = array(
                                         qtype_preg_node_assert::SUBTYPE_PLA => 'normal, color="green"',
                                         qtype_preg_node_assert::SUBTYPE_NLA => 'normal, color="red"',
                                         qtype_preg_node_assert::SUBTYPE_PLB => 'inv, color="green"',
@@ -699,17 +722,24 @@ class qtype_preg_authoring_tool_node_assert extends qtype_preg_authoring_tool_op
 
         $color = (($this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLA || $this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLB) ? 'green' : 'red');
 
-        $sub = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; edge[style=dotted, color=' . $color . ']; node[style=dashed, color=' . $color . ']; color=grey', $this->pregnode->id);
+        $sub = new qtype_preg_explaining_graph_tool_subgraph(
+                    '',
+                    'solid; edge[style=dotted, color=' . $color . ']; node[style=dashed, color=' . $color . ']; color=grey',
+                    $this->pregnode->id
+                );
         $sub->assume_subgraph($operand);
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
 
-        $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 1], $operand->entries[0], $graph, self::$linkOptions[$this->pregnode->subtype]);
+        $graph->links[] = new qtype_preg_explaining_graph_tool_link(
+                                '',
+                                $graph->nodes[count($graph->nodes) - 1],
+                                $operand->entries[0], $graph,
+                                self::$link_options[$this->pregnode->subtype]
+                            );
 
         $graph->subgraphs[] = $sub;
         $graph->entries[] = $graph->nodes[count($graph->nodes) - 1];
         $graph->exits[] = $graph->nodes[count($graph->nodes) - 1];
     }
 }
-
-?>
