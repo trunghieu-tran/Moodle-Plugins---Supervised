@@ -714,6 +714,19 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Check if this state is full intersect state, it means it has two numbers from both automata.
+     */
+    public function is_full_intersect_state($state) {
+        $number = $this->statenumbers[$state];
+        $number = explode(',', $numbers, 2);
+        if (count($number) == 2 && $number[0] != '' && $number[1] != '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
