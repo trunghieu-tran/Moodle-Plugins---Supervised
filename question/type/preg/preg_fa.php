@@ -790,6 +790,59 @@ abstract class qtype_preg_finite_automaton {
     }
  
     /**
+     * Decide if the intersection was successful or not.
+     *
+     * @param fa qtype_preg_finite_automaton object - first automata taking part in intersection.
+     * @param anotherfa qtype_preg_finite_automaton object - second automata taking part in intersection.
+     * @return boolean true if intersection was successful.
+     */
+    public function has_successful_intersection($fa, $anotherfa, $direction) {
+        $issuccessful = false;
+        //Analysis of result intersection
+        if ($direction == 0) {
+            //Analysis if the end state of intersection includes one of end states of given automata
+            $fastates = $fa->end_states();
+            $anotherfastates = $anotherfa->end_state();
+            $states = $this->endstates;
+        } else {
+            //Analysis if the start state of intersection includes one of start states of given automata
+            $fastates = $fa->start_states();
+            $anotherfastates = $anotherfa->start_state();
+            $states = $this->startstates;
+        }
+        //Get real numbers
+        $numbers = $fa->get_state_numbers();
+        $realfanumbers = array();
+        $realanotherfanumbers = array();
+        foreach ($fastates as $state) {
+            $realfanumbers[] = $numbers[$state];
+        }
+        $numbers = $anotherfa->get_state_numbers();
+        foreach ($anotherfastates as $state) {
+            $realanotherfanumbers[] = $numbers[$state];
+        }
+        $result = array();
+        foreach ($states as $state) {
+            $result[] = $this->statenumbers[$state];
+        }
+        //Compare real numbers
+        foreach ($realfanumbers as $num1) {
+            foreach ($result as $num2) {
+                if (strpos($num2, $num1) !== false) {
+                    $issuccessful = true;
+                }
+            }
+        }
+        foreach ($realanotherfanumbers as $num1) {
+            foreach ($result as $num2) {
+                if (strpos($num2, $num1) !== false) {
+                    $issuccessful = true;
+                }
+            }
+        }
+    }
+
+    /**
      * Merging transitions without merging states.
      *
      * @param del - uncapturing transition for deleting.
