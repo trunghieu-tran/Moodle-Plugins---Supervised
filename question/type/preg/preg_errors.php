@@ -33,9 +33,9 @@ class qtype_preg_error {
     // Human-understandable error message.
     public $errormsg;
     // Index of the first character in erroneous sequence.
-    public $index_first;
+    public $indexfirst;
     // Index of the last character in erroneous sequence.
-    public $index_last;
+    public $indexlast;
 
     /**
      * Returns a string with first character in upper case and the rest of the string in lower case.
@@ -56,15 +56,15 @@ class qtype_preg_error {
         }
     }
 
-    public function __construct($errormsg, $regex = '', $index_first = -1, $index_last = -1, $preservemsg = false) {
+    public function __construct($errormsg, $regex = '', $indexfirst = -1, $indexlast = -1, $preservemsg = false) {
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
         }
-        $this->index_first = $index_first;
-        $this->index_last = $index_last;
-        if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last) . '<br/>' . $errormsg;
+        $this->indexfirst = $indexfirst;
+        $this->indexlast = $indexlast;
+        if ($indexfirst != -2) {
+            $this->errormsg = $this->highlight_regex($regex, $indexfirst, $indexlast) . '<br/>' . $errormsg;
         } else {
             $this->errormsg = $errormsg;
         }
@@ -82,11 +82,11 @@ class qtype_preg_parsing_error extends qtype_preg_error {
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    public function __construct($regex, $matchername, $nodename, $index_first = -1, $index_last = -1) {
+    public function __construct($regex, $matchername, $nodename, $indexfirst = -1, $indexlast = -1) {
         $a = new stdClass;
         $a->nodename = $nodename;
-        $a->indfirst = $index_first;
-        $a->indlast = $index_last;
+        $a->indfirst = $indexfirst;
+        $a->indlast = $indexlast;
         $a->engine = get_string($matchername, 'qtype_preg');
 
         $errormsg = get_string('unsupported', 'qtype_preg', $a);
@@ -112,12 +112,12 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
-    public function __construct($regex, $matcher, $index_first = -1, $index_last = -1) {
+    public function __construct($regex, $matcher, $indexfirst = -1, $indexlast = -1) {
         global $CFG;
 
-        if ($index_first == -1 || $index_last == -1) {
-            $index_first = 0;
-            $index_last = qtype_poasquestion_string::strlen($regex) - 1;
+        if ($indexfirst == -1 || $indexlast == -1) {
+            $indexfirst = 0;
+            $indexlast = qtype_poasquestion_string::strlen($regex) - 1;
         }
 
         $a = new stdClass;
@@ -128,6 +128,6 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
 
         $errormsg = get_string('too_large_fa', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $index_first, $index_last);
+        parent::__construct($errormsg, $regex, $indexfirst, $indexlast);
     }
 }
