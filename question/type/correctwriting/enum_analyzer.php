@@ -169,18 +169,23 @@ class  qtype_correctwriting_enum_analyzer {
             }
         }
         // Change indexes by numbers of elements enumeration, execute repeat contiguous elements.
-        for ($i = 0; $i < count($elements_in_corrected_answer); $i++) {
+        $previewelement = null;
+        foreach ($elements_in_corrected_answer as $key => $i) {
             // Find element by index.
-            for ($j = 0; $j < count($indexes_of_elements); $j++) {
-                if ( in_array($elements_in_corrected_answer[$i], $indexes_of_elements[$j])) {
+            $j = 0;
+            unset($element_indexes);
+            foreach ($indexes_of_elements as $element_indexes) {
+                if ( in_array($i, $element_indexes)) {
                     // Change index by element number.
-                    $elements_in_corrected_answer[$i] = $j;
+                    $elements_in_corrected_answer[$key] = $j;
                     // If element are repeated.
-                    if ($i != 0 && $elements_in_corrected_answer[$i - 1] == $elements_in_corrected_answer[$i]) {
-                        unset($elements_in_corrected_answer[$i]);
-                        $i--;
+                    if ($previewelement != null && $previewelement == $i) {
+                        unset($elements_in_corrected_answer[$key]);
+                    } else {
+                        $previewelement = $i;
                     }
                 }
+                $j++;
             }
         }
         // Add to array number of element, which do not contains in corrected student answer.
