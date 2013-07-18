@@ -317,6 +317,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
+    public function unite_leafs($other) {
+        return $this;
+    }
+
     /**
      * Returns the number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf,
      * 1 in case of a single character, n in case of a backreferense.
