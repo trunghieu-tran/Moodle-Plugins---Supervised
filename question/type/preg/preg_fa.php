@@ -688,6 +688,14 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Removes this fa. Return enpty fa.
+     */
+    public function remove_fa() {
+        $this = new qtype_preg_finite_automaton();
+        return $this;
+    }
+
+    /**
      * Check if this state is from intersection part of autmata.
      */
     public function is_intersectionstate($state) {
