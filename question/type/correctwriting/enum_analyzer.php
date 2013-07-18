@@ -113,7 +113,7 @@ class  qtype_correctwriting_enum_analyzer {
      * @param integer $number - number of enumeration to search orders
      * @return array of find orders
      */
-    private function find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number) {
+    public function find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number) {
         $indexes_of_tokens = array();// Array with contains indexes of tokens which are members of enumeration...
                                                      // ... in corrected student answer.
         $indexes_of_elements = array();// Array with indexes of elements of enumeration in corrected answer.
