@@ -233,10 +233,9 @@ class  qtype_correctwriting_enum_analyzer {
             }
         } while ($have_next_order);
         // Remove from array of orders not complete orders.
-        for ($i = 0; $i < count($enum_orders); $i++) {
-            if (count($enum_orders[$i]) != count($enumdescription[$number])) {
-                unset($enum_orders[$i]);
-                $i--;
+        foreach ($enum_orders as $key => $current_order) {
+            if (count($current_order) != count($enumdescription[$number])) {
+                unset($enum_orders[$key]);
             }
         }
         return $enum_orders;
