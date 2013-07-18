@@ -37,9 +37,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -89,9 +88,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(4,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -141,9 +139,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(1,$pregleaf, 0);
         $resultautomata->add_transition($transition);
         
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -195,9 +192,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(6,$pregleaf, 1);
         $resultautomata->add_transition($transition);
         
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -249,9 +245,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 0);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -285,9 +280,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -331,9 +325,8 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -361,14 +354,12 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
-
+        $automata->read_fa($dotdescription);
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
-
-    public function test_different_automata() {
+    
+    public function test_different_automata(){
         $dotdescription = 'digraph example {
                     "0,";
                     ",2";
@@ -376,7 +367,6 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
                     "1,0"->"2,1"[label="[0-9]",color=red];
                     "2,1"->",2"[label="[a-z]",color=blue];
                     }';
-
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $resultautomata->add_state('"0,"');
         $resultautomata->add_state('",2"');
@@ -387,19 +377,21 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         //fill pregleaf
         $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $resultautomata->add_transition($transition);
         //fill pregleaf
         $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER;
         $resultautomata->add_transition($transition);
         //fill pregleaf
         $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
