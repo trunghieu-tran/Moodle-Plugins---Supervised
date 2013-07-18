@@ -884,6 +884,7 @@ abstract class qtype_preg_finite_automaton {
         $transitions = $this->get_state_outtransitions($del->to);
         //Changing leafs in case of merging
         foreach ($transitions as &$tran) {
+            $tran = $tran->save_tags($del);
             $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
             $tran->pregleaf = $newleaf;
         }
@@ -939,7 +940,7 @@ abstract class qtype_preg_finite_automaton {
             //Possibility of merging with outtransitions
             if (count($transitions) != 0) {
                 $needredacting = true;
-            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0) {
+            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
                 //Possibility of merging with intotransitions
                 $transitions = $intotransitions;
             } else if ($this->statecount == 2 && del->is_eps()) {
@@ -954,6 +955,7 @@ abstract class qtype_preg_finite_automaton {
 
             //Changing leafs in case of merging
             foreach ($transitions as &$tran) {
+                $tran = $tran->save_tags($del);
                 $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
                 $tran->pregleaf = $newleaf;
             }
