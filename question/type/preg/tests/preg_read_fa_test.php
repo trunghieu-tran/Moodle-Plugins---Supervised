@@ -12,7 +12,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $dotdescription = 'digraph example {
                     0;
                     3;
-                    0->1[label="[((/(a-z)/"];
+                    0->1[label="[((/(a-z)/]"];
                     1->2[label="[b-k/)]"];
                     2->3[label="[(/c-z/))]"];
                     }';
@@ -22,24 +22,23 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[3][1] = $transition;
+        $resultautomata->add_transition($transition);
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
-        $automata->read_fa($dotdescription, $origin);
+        $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -62,32 +61,32 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
         $resultautomata->add_state('3');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[2][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[3][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 4);
-        $resultautomata->adjacencymatrix[3][4] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(4,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[4][1] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -114,32 +113,32 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
         $resultautomata->add_state('3');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[3][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 4);
-        $resultautomata->adjacencymatrix[0][4] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(4,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[4][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(1,$pregleaf, 0);
-        $resultautomata->adjacencymatrix[1][0] = $transition;
+        $resultautomata->add_transition($transition);
         
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -168,32 +167,32 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('3');
         $resultautomata->add_state('4');
         $resultautomata->add_state('5');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 4);
-        $resultautomata->adjacencymatrix[3][4] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(4,$pregleaf, 5);
-        $resultautomata->adjacencymatrix[4][5] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(5,$pregleaf, 6);
-        $resultautomata->adjacencymatrix[5][6] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(6,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[6][1] = $transition;
+        $resultautomata->add_transition($transition);
         
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -220,32 +219,34 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('2');
         $resultautomata->add_state('4');
         $resultautomata->add_state('3');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1, 1 => 2, 2 => 3,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
+        $resultautomata->add_end_state(2);
+        $resultautomata->add_end_state(3);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[0][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(1,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[1][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 4);
-        $resultautomata->adjacencymatrix[0][4] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(4,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[4][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 0);
-        $resultautomata->adjacencymatrix[3][0] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -268,20 +269,20 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[3][1] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -306,28 +307,28 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[3][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[0][1] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[2][1] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -347,17 +348,17 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
-        $resultautomata->add_state('"1    2"');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_state('"1   2"');
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[2][1] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -376,24 +377,24 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
                     }';
 
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
-        $resultautomata->add_state('0,');
-        $resultautomata->add_state(',2');
-        $resultautomata->add_state('1,0');
-        $resultautomata->add_state('2,1');
-        $resultautomata->startstates = array(0 => 0,);
-        $resultautomata->endstates = array(0 => 1,);
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_state('"0,"');
+        $resultautomata->add_state('",2"');
+        $resultautomata->add_state('"1,0"');
+        $resultautomata->add_state('"2,1"');
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
-        $resultautomata->adjacencymatrix[0][2] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
-        $resultautomata->adjacencymatrix[2][3] = $transition;
-        $pregleaf = new qtype_preg_leaf_charset();
+        $resultautomata->add_transition($transition);
         //fill pregleaf
+        $pregleaf = new qtype_preg_leaf_charset();
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
-        $resultautomata->adjacencymatrix[3][1] = $transition;
+        $resultautomata->add_transition($transition);
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
         $automata = new qtype_preg_nfa(0, 0, 0, array());
