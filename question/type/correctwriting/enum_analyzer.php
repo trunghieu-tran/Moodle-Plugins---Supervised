@@ -193,6 +193,14 @@ class  qtype_correctwriting_enum_analyzer {
                     } else {
                         $previewelement = $i;
                     }
+                    // Remove index from array.
+                    $isremoved = false;
+                    foreach ($indexes_of_elements[$k1] as $k => $element) {
+                        if ($element === $i && !$isremoved) {
+                            unset($indexes_of_elements[$k1][$k]);
+                            $isremoved = true;
+                        }
+                    }
                 }
                 $j++;
             }
