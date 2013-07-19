@@ -264,5 +264,40 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         }
         $this->assertTrue( $equal, "Error in find orders found!All orders.");
     }
+
+    // Test for find_enum_orders_in_corrected_string, two include in other.
+    public function testfind_enum_orders_in_corrected_string_two_include_in_other() {
+        $correctanswer = array();
+        $correctedanswer = array();
+        $enumdescription = array();
+        $orders = array();
+        $number = 1;
+        // Expected result.
+        $orders[] = array(0, 1);
+        $orders[] = array(1, 0);
+        // Input data.
+        $enumdescription[] = array(new enum_element(6, 6), new enum_element(8, 8), new enum_element(10, 10));
+        $enumdescription[] = array(new enum_element(3, 10), new enum_element(13, 25));
+        $enumdescription[] = array(new enum_element(21, 21), new enum_element(23, 23), new enum_element(25, 25));
+        $correctanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and', 'my',
+            'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Victoria', ',', 'Carry', 'and',
+            'Tom', '.');
+        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and', 'my',
+            'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Tom', ',', 'Carry', 'and',
+            'Victoria', '.');
+        // Test body.
+        $temp= new qtype_correctwriting_enum_analyzer();
+        $result = $temp->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number);
+        $equal = true;
+        foreach ($orders as $current_order) {
+            if(false === array_search($current_order, $result)) {
+                $equal = false;
+            }
+        }
+        if (count($orders) != count($result)) {
+            $equal = false;
+        }
+        $this->assertTrue( $equal, "Error in find orders found!Two include in other.");
+    }
 }
 
