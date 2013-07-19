@@ -266,7 +266,11 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
      * @var string
      */
     private $description;
-
+    /**
+     * Names for lexemes, serialized in base
+     * @var string names
+     */
+    private $lexemenames;
     /**
      * True if parser enabled, false otherwise.
      * @var boolean.
@@ -276,7 +280,7 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
     public function __construct($id, $version=1, $langdbrecord = NULL) {
 
         $this->id = $id;
-
+        $this->lexemenames = $langdbrecord->lexemename;
         if ($langdbrecord) {
             // get all info from it            
         } else {
@@ -330,7 +334,9 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
     }
 
     public function lexem_name() {
-        return '';//TODO - implement when implementing language
+        $lang  = current_language();
+        $names  = (array)json_decode($this->lexemenames);
+        return  $names[$lang];
     }
 
 }

@@ -33,26 +33,34 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 class block_formal_langs_token_base_is_same extends PHPUnit_Framework_TestCase {
     // Case, when a tokens are totally equal
     public function test_equal_tokens() {
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = true;
         $answer = new block_formal_langs_token_base(null, 'type', 'value', true, null);
         $response = new block_formal_langs_token_base(null, 'type', 'value', false, null);
-        $this->assertTrue($answer->is_same($response), 'Tokens with equal types and values are detected as non-equal!');
+        $this->assertTrue($answer->is_same($response, $options), 'Tokens with equal types and values are detected as non-equal!');
     }
     // Case, when tokens are totally equal and both values is null
     public function test_equal_tokens_is_null() {
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = true;
         $answer = new block_formal_langs_token_base(null, 'type', null, true, null);
         $response = new block_formal_langs_token_base(null, 'type', null, false, null);
-        $this->assertTrue($answer->is_same($response), 'Tokens with equal types and null values are detected as non-equal!');
+        $this->assertTrue($answer->is_same($response, $options), 'Tokens with equal types and null values are detected as non-equal!');
     }
     // Case, when tokens are not equal, because values are different
     public function test_inequal_values() {
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = true;
         $answer = new block_formal_langs_token_base(null, 'type', null, true, null);
         $response = new block_formal_langs_token_base(null, 'type', 'test', false, null);
-        $this->assertFalse($answer->is_same($response), 'Tokens with inequal values are detected as equal!');
+        $this->assertFalse($answer->is_same($response, $options), 'Tokens with inequal values are detected as equal!');
     }
     // Case, when tokens are not equal, because types are different
     public function test_inequal_types() {
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = true;
         $answer=new block_formal_langs_token_base(null, 'type', 'test', true, null);
         $response=new block_formal_langs_token_base(null, 'type2', 'test', false, null);
-        $this->assertFalse($answer->is_same($response), 'Tokens with inequal types are detected as equal');
+        $this->assertFalse($answer->is_same($response, $options), 'Tokens with inequal types are detected as equal');
     }
 }

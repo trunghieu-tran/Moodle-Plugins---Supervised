@@ -72,7 +72,7 @@ class block_formal_langs extends block_base {
                 $result[$record->id] = $record->ui_name;
             }
         }
-        
+
         return $result;
     }
 
