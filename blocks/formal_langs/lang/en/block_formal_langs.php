@@ -42,5 +42,7 @@ $string['pluginname'] = 'Formal languages block';
 $string['quote'] = '"{$a}"';
 $string['quoteat'] = '"{$a->value}" starting from position {$a->line}:{$a->column}';
 $string['quoteatsingleline'] = '"{$a->value}" starting from character {$a->column}';
+$string['showedlangsdescription'] = 'Languages, that will be shown in language list of form';
+$string['showedlangslabel'] =  'Languages, shown in list';
 $string['typomsg'] = 'there may be a typo in {$a->correct[0]}';
 $string['word'] = 'word';
