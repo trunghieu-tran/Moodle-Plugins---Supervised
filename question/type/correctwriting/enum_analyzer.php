@@ -285,7 +285,7 @@ class  qtype_correctwriting_enum_analyzer {
             for ($j = 0; $j < $count_of_all_enum_orders; $j) {
                 foreach ($all_enum_orders[$i] as $enum_orders) {
                     for ($k = 0; $k < $rows_for_one_order; $k++) {
-                        if (array_key_exists($j, $complete_enum_orders)) {
+                        if (!array_key_exists($j, $complete_enum_orders)) {
                             $complete_enum_orders[$j] = array();
                         }
                         $complete_enum_orders[$j] = array_merge($complete_enum_orders[$j], $enum_orders);
