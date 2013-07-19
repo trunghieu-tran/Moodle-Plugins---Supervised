@@ -525,7 +525,33 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 $neighbor_l = $iter->find_neighbor_src($gmain);
                 $neighbor_r = $iter->find_neighbor_dst($gmain);
 
-                if ($this->style != 'solid; color=darkgreen') {
+                if ($iter->shape != 'box') {
+                    if ($this->style != 'solid; color=darkgreen') {
+                        // Find a link between left neighbor and void.
+                        $tmpneighbor = $gmain->find_link($neighbor_l, $iter);
+                        $tmpneighbor->destination = $neighbor_r;    // Set a new destination.
+
+                        // Find a link between void and right neighbor and destroy it.
+                        $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
+                        unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
+                        $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                    } else {
+                        $pointl = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
+                        $pointr = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
+                        $this->nodes[] = $pointl;
+                        $this->nodes[] = $pointr;
+
+                        // Find a link between left neighbor and void.
+                        $tmpneighbor = $gmain->find_link($neighbor_l, $iter);
+                        $tmpneighbor->destination = $pointl;    // Set a new destination.
+
+                        // Find a link between void and right neighbor.
+                        $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
+                        $tmpneighbor->source = $pointr;    // Set a new source.
+
+                        $this->links[] = new qtype_preg_explaining_graph_tool_link('', $pointl, $pointr, $this);
+                    }
+                } else {
                     // Find a link between left neighbor and void.
                     $tmpneighbor = $gmain->find_link($neighbor_l, $iter);
                     $tmpneighbor->destination = $neighbor_r;    // Set a new destination.
@@ -534,22 +560,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
                     unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
                     $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
-                } else {
-                    $pointl = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
-                    $pointr = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
-                    $this->nodes[] = $pointl;
-                    $this->nodes[] = $pointr;
-
-                    // Find a link between left neighbor and void.
-                    $tmpneighbor = $gmain->find_link($neighbor_l, $iter);
-                    $tmpneighbor->destination = $pointl;    // Set a new destination.
-
-                    // Find a link between void and right neighbor.
-                    $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
-                    $tmpneighbor->source = $pointr;    // Set a new source.
-
-                    $this->links[] = new qtype_preg_explaining_graph_tool_link('', $pointl, $pointr, $this);
                 }
+
 
                 // Destroy void-node.
                 unset($this->nodes[array_search($iter, $this->nodes)]);
