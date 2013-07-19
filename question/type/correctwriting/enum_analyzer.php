@@ -261,7 +261,7 @@ class  qtype_correctwriting_enum_analyzer {
      * @param array $enumdescription - enumerations description
      * @return array of find orders
      */
-    private function find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription) {
+    public function find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription) {
         $enum_orders = array(); // Array to keep orders of one enumeration.
         $all_enum_orders = array(); // Array to keep orders of all enumerations.
         $complete_enum_orders = array(); // Array to keep complete orders of enumerations
