@@ -181,7 +181,7 @@ class  qtype_correctwriting_enum_analyzer {
             // Find element by index.
             $j = 0;
             unset($element_indexes);
-            foreach ($indexes_of_elements as $element_indexes) {
+            foreach ($indexes_of_elements as $k1 => $element_indexes) {
                 if ( in_array($i, $element_indexes)) {
                     // Change index by element number.
                     $elements_in_corrected_answer[$key] = $j;
