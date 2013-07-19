@@ -129,6 +129,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $storage->currentid = 0;
         $storage->lang = block_formal_langs::lang_object($question->langid);
 
+
         $serializator = new qtype_correctwriting_preserving_serializator(
                             $oldanswerunused, $newanswers, $this, $storage
                         );
@@ -145,7 +146,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      * @param array    $oldvalues  Old values of serialized data
      */
     public function save_stored_data($key, $answer, &$storage, $oldvalues) {
-        if ($answer->fraction > $storage->question->hintgradeborder) {
+        if ($answer->fraction >= $storage->question->hintgradeborder) {
             //Check was removed, because if answer was saved
             // it must have a descriptions and all checks are made by shortanswer
             $description = $storage->descriptions[$storage->currentdescription];
@@ -189,13 +190,15 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $string = $langobj->create_from_db('question_answers', 0);
         $descriptions = $string->get_descriptions_as_array('question_answers', array_keys($question->options->answers));
         foreach ($question->options->answers as $key => $answerdata) {
+            $lang .= '        <answer_description>' . PHP_EOL;
+            if (array_key_exists($key, $descriptions)) {
                 $answerdescriptions = $descriptions[$key];
-                $lang .= '        <answer_description>' . PHP_EOL;
                 foreach($answerdescriptions as $description) {
                     $value = $format->xml_escape(str_replace(array("\n", "\r"),array('', ''), $description));
                     $lang .= '            <description>'. $value .'</description>' . PHP_EOL;
                 }
-                $lang .= '        </answer_description>' . PHP_EOL;
+            }
+            $lang .= '        </answer_description>' . PHP_EOL;
         }
         $lang .= '    </descriptions>' . PHP_EOL;
 
@@ -231,8 +234,10 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
             if (count($answerdescription)) {
                 $descrarray = array();
                 $tokendescriptions  = $format->getpath($answerdescription, array('#', 'description'), '');
-                foreach($tokendescriptions as $description) {
-                    $descrarray[] = $description['#'];
+                if (is_array($tokendescriptions)) {
+                    foreach($tokendescriptions as $description) {
+                        $descrarray[] = $description['#'];
+                    }
                 }
                 if (count($descrarray) != 0) {
                     $stringdescrs = implode(PHP_EOL, $descrarray);
