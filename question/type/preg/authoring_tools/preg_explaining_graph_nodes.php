@@ -433,11 +433,11 @@ class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_l
     }
 
     public function get_color() {
-        return 'black';
+        return 'orange';
     }
 
     public function get_shape() {
-        return 'ellipse';
+        return 'box';
     }
 }
 
