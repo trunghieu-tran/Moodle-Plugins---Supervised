@@ -30,6 +30,7 @@ require_once($CFG->dirroot . '/question/type/correctwriting/lexical_analyzer.php
 require_once($CFG->dirroot . '/question/type/correctwriting/cw_hints.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
 
 /**
  * Represents a correctwriting question.
@@ -387,7 +388,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         $language = $this->get_used_language();
         $responsestring = $language->create_from_string($response);
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
-        $string = new block_formal_langs_string_pair($answerstring, $responsestring, null);
+        $string = new qtype_correctwriting_string_pair($answerstring, $responsestring, null);
         $analyzer = new qtype_correctwriting_lexical_analyzer($this, $string, $language);
         return $analyzer;
     }

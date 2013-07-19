@@ -53,7 +53,7 @@ class qtype_correctwriting_lexical_analyzer {
     protected $fitness;//Fitness, used to choose appropriate analyzer
     /**
      * A string pair with best matches, which can be passed to sequence analyzer
-     * @var block_formal_langs_string_pair
+     * @var qtype_correctwriting_string_pair
      */
     protected $bestmatchstring;
     /**
@@ -62,7 +62,7 @@ class qtype_correctwriting_lexical_analyzer {
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      *
      * @param qtype_correctwriting_question $question
-     * @param block_formal_langs_string_pair $bestmatchpair a pair
+     * @param qtype_correctwriting_string_pair $bestmatchpair a pair
      * @param block_formal_langs_abstract_language $language a language
      */
     public function __construct($question, $bestmatchpair, $language) {
