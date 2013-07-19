@@ -1140,6 +1140,11 @@ class block_formal_langs_string_pair {
      */
     protected $correctedstring;
 
+    /**
+     * LCS for sequence analyzer
+     * @var array
+     */
+    protected $lcs;
 
     //TODO - anyone -  access functions
     //TODO - functions for the lexical and sequence analyzers, and mistake classes.
@@ -1228,6 +1233,24 @@ class block_formal_langs_string_pair {
             }
         }*/
         return $this->correctstring()->node_description($nodenumber, $quotevalue, $at);
+    }
+
+    /**
+     * Creates a new string as a copy of this with a lcs
+     * @param array $lcs LCS
+     * @return block_formal_langs_string_pair
+     */
+    public function copy_with_lcs($lcs) {
+        $pair = new block_formal_langs_string_pair($this->correctstring, $this->comparedstring, $this->matches);
+        $pair->lcs = $lcs;
+    }
+
+    /**
+     * Returns an LCS for tokens
+     * @return array
+     */
+    public function lcs() {
+        return $this->lcs;
     }
 }
 ?>
