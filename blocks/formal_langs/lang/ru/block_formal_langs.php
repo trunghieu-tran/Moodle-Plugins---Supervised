@@ -41,5 +41,7 @@ $string['part'] = 'часть';
 $string['pluginname'] = 'Блок формальных языков';
 $string['quoteat'] = '"{$a->value}" начинающееся с позиции {$a->line}:{$a->column}';
 $string['quoteatsingleline'] = '"{$a->value}" начинающееся с символа {$a->column}';
+$string['showedlangsdescription'] = 'Языки, которые будут показаны в форме выбора языка';
+$string['showedlangslabel'] =  'Показываемые языки';
 $string['typomsg'] = '{$a->correct[0]} возможно содержит опечатку';
 $string['word'] = 'слово';
