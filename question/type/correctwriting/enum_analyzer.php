@@ -283,12 +283,12 @@ class  qtype_correctwriting_enum_analyzer {
             // Add to all complete orders, orders of enumeration alternatively.
             $rows_for_one_order /= count($all_enum_orders[$i]);
             for ($j = 0; $j < $count_of_all_enum_orders; $j) {
-                for ($f = 0; $f < count($all_enum_orders[$i]); $f++) {
+                foreach ($all_enum_orders[$i] as $enum_orders) {
                     for ($k = 0; $k < $rows_for_one_order; $k++) {
                         if (array_key_exists($j, $complete_enum_orders)) {
                             $complete_enum_orders[$j] = array();
                         }
-                        $complete_enum_orders[$j] = array_merge($complete_enum_orders[$j], $all_enum_orders[$i][$f]);
+                        $complete_enum_orders[$j] = array_merge($complete_enum_orders[$j], $enum_orders);
                         $j++;
                     }
                 }
