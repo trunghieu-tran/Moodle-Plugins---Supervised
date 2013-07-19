@@ -164,15 +164,15 @@ class  qtype_correctwriting_enum_analyzer {
         // Fill array of indexes elements of enumeration in ascending order.
         foreach ($indexes_of_elements as $element_indexes) {
             // Find place to insert in array for all indexes.
-            for ($j = 0; $j < count($element_indexes); $j++) {
+            foreach ($element_indexes as $current_index) {
                 // Find place to insert.
                 $insert_place = 0;
                 while ($insert_place < count($elements_in_corrected_answer) &&
-                           $elements_in_corrected_answer[$insert_place] < $element_indexes[$j]) {
+                           $elements_in_corrected_answer[$insert_place] < $current_index) {
                     $insert_place++;
                 }
                 // Insert current index in array.
-                array_splice($elements_in_corrected_answer, $insert_place, 0, $element_indexes[$j]);
+                array_splice($elements_in_corrected_answer, $insert_place, 0, $current_index);
             }
         }
         // Change indexes by numbers of elements enumeration, execute repeat contiguous elements.
