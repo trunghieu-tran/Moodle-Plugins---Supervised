@@ -54,9 +54,12 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
+     * @param qtype_correctwriting_question $question
+     * @param block_formal_langs_string_pair $bestmatchpair a pair
+     * @param block_formal_langs_abstract_language $language a language
      */
-    public function __construct($pair, $language, $lcs=null) {
-        $this->pair = $pair;
+    public function __construct($question, $bestmatchpair, $language) {
+        $this->pair = $bestmatchpair;
         $this->errors = array();
         $this->mistakes  = array();
 

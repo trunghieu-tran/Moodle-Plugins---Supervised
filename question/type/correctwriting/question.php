@@ -313,7 +313,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         $language = $this->get_used_language();
         // Scan answers for match
         foreach($answers as $id => $answer) {
-            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
+            $analyzer = $this->make_analyzer($answer, $response);
             //Get lexeme count from answer
             $answerstring = $language->create_from_string($answer->answer);
             $answerstream= $answerstring->stream;
@@ -379,8 +379,17 @@ class qtype_correctwriting_question extends question_graded_automatically
 
         $this->matchedanswerid = $fid;
         $answer = $this->answers[$fid];
-        $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
+        $this->matchedanalyzer = $this->make_analyzer($answer, $response);
         $this->matchedgradestate = array(0, question_state::$gradedwrong);
+    }
+
+    protected function make_analyzer($answer, $response) {
+        $language = $this->get_used_language();
+        $responsestring = $language->create_from_string($response);
+        $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+        $string = new block_formal_langs_string_pair($answerstring, $responsestring, null);
+        $analyzer = new qtype_correctwriting_lexical_analyzer($this, $string, $language);
+        return $analyzer;
     }
 
     /**  Returns matching answer. Must return matching answer found when response was being graded.
