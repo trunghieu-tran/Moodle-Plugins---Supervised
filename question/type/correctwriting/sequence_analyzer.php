@@ -57,7 +57,11 @@ class  qtype_correctwriting_sequence_analyzer {
 
     private   $fitness;              // Fitness for response
 
-    private   $question;             // Used question by analyzer
+    /**
+     * Used question by analyzer
+     * @var qtype_correctwriting_question
+     */
+    private   $question;
 
     /**
      * Do all processing and fill all member variables
@@ -105,7 +109,8 @@ class  qtype_correctwriting_sequence_analyzer {
     private function scan_response_mistakes($weights) {
         $answertokens = $this->bestmatchpair->correctstring()->stream;
         $responsetokens = $this->bestmatchpair->correctedstring()->stream;
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $this->question->usecase);
+        $options = $this->question->token_comparing_options();
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
             $alllcs[] = array();
@@ -149,10 +154,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * There may be more than one lcs for a given pair of strings.
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
      * @param  block_formal_langs_token_stream $responsestream array of response tokens
-     * @param  bool $casesensitive whether comparisons must be case sensitive
+     * @param  block_formal_langs_comparing_options $options options for comparing lexemes
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answerstream, $responsestream, $casesensitive = true) {
+    public static function lcs($answerstream, $responsestream, $options) {
         // Extract data from method
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
@@ -162,7 +167,7 @@ class  qtype_correctwriting_sequence_analyzer {
         // Match is defined as tuple <i,j>
         for ($i = 0; $i < count($answer); $i++) {
             for($j = 0; $j < count($response); $j++) {
-                if ($answer[$i]->is_same($response[$j], $casesensitive)) {
+                if ($answer[$i]->is_same($response[$j], $options)) {
                     $matches[] = array($i, $j);
                 }
             }
@@ -392,6 +397,9 @@ class  qtype_correctwriting_sequence_analyzer {
             $responseused[$responseindex] = true;
         }
 
+
+        $options = $this->question->token_comparing_options();
+
         // Determine removed and moved lexemes by scanning answer
         for ($i = 0;$i < $answercount;$i++) {
             // If this lexeme is not in LCS
@@ -401,7 +409,7 @@ class  qtype_correctwriting_sequence_analyzer {
                 $movedpos = -1;
                 for ($j = 0;$j < $responsecount && $ismoved == false;$j++) {
                     // Check whether lexemes are equal
-                    $isequal = $answer[$i]->is_same($response[$j], $this->question->usecase);
+                    $isequal = $answer[$i]->is_same($response[$j], $options);
                     if ($isequal == true && $responseused[$j] == false) {
                         $ismoved = true;
                         $movedpos = $j;
