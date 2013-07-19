@@ -120,6 +120,11 @@ class  qtype_correctwriting_enum_analyzer {
         $element_indexes = array(); // Array with indexes of one element of enumeration in corrected answer.
         $previewelement = null; // Contain preview element value.
         $key = 0; // Current key of some array.
+        $ischanged = true; // Is current index changed?
+        $isremoved = true; // Is index removed already?
+        $current_index = 0; // Current index value.
+        $remove_index = 0; // Remove index value.
+        $duplicates = array(); // Array for help to remove duplicate orders.
         $elements_in_corrected_answer = array();// Array to keep indexes elements of enumeration in order, which...
                                                 // ... it has in corrected student answer, with included missed elements.
         $current_order = array();// Array to keep current order of enumeration elements.
