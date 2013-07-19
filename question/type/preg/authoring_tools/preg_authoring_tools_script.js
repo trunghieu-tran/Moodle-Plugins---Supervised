@@ -239,7 +239,7 @@ M.preg_authoring_tools_script = (function() {
             cachedid = cachedregex[id];
         }
         if (cachedid) {
-            self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_ID], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
+            self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_KEY], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
             return;
         }
 
