@@ -574,20 +574,32 @@ class qtype_correctwriting_question extends question_graded_automatically
      * @return boolean
      */
     public function are_lexeme_sequences_equal(block_formal_langs_string_pair $stringpair) {
+
         $responsetokens = $stringpair->correctedstring()->stream->tokens;
         $answertokens =  $stringpair->correctstring()->stream->tokens;
         $same = false;
+        $options = $this->token_comparing_options();
         if (count($responsetokens) == count($answertokens)) {
             $same = true;
             if (count($responsetokens) != 0) {
                 for($i = 0; $i < count($responsetokens); $i++) {
                     /** @var block_formal_langs_token_base $token */
                     $token =   $responsetokens[$i];
-                    $same = ($same && $token->is_same($answertokens[$i], $this->usecase));
+                    $same = ($same && $token->is_same($answertokens[$i], $options));
                 }
             }
         }
         return $same;
+    }
+
+    /**
+     * Returns an options for token comparting
+     * @return block_formal_langs_comparing_options
+     */
+    public function token_comparing_options() {
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = $this->usecase;
+        return $options;
     }
 
 }
