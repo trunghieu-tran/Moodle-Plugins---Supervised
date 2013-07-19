@@ -43,5 +43,13 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $DB->insert_record('block_formal_langs',$lang);
     }
 
+    if ($oldversion < 2013071900) {
+        $dbman = $DB->get_manager();
+        $bfl = new xmldb_table('block_formal_langs');
+        $lexemenamefield = new xmldb_field('lexemename', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'visible');
+        $dbman->add_field($bfl, $lexemenamefield);
+
+    }
+
     return true;
 }
