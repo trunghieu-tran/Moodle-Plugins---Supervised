@@ -181,9 +181,11 @@ class  qtype_correctwriting_enum_analyzer {
             // Find element by index.
             $j = 0;
             unset($element_indexes);
+            $ischanged = false;
             foreach ($indexes_of_elements as $k1 => $element_indexes) {
-                if ( in_array($i, $element_indexes)) {
+                if ( in_array($i, $element_indexes) && !$ischanged) {
                     // Change index by element number.
+                    $ischanged = true;
                     $elements_in_corrected_answer[$key] = $j;
                     // If element are repeated.
                     if ($previewelement != null && $previewelement == $i) {
