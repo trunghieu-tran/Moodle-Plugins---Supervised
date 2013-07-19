@@ -25,6 +25,7 @@ function xmldb_block_formal_langs_install() {
     $lang->parserules = null;
     $lang->version='1.0';
     $lang->visible = 1;
+	$lang->lexemname = '';
     
     $DB->insert_record('block_formal_langs',$lang);
 
@@ -36,6 +37,7 @@ function xmldb_block_formal_langs_install() {
     $lang->parserules = null;
     $lang->version='1.0';
     $lang->visible = 1;
+	$lang->lexemname = '';
     
     $DB->insert_record('block_formal_langs',$lang);
 
@@ -59,6 +61,7 @@ function xmldb_block_formal_langs_install() {
     $lang->parserules = null;
     $lang->version='1.0';
     $lang->visible = 1;
+	$lang->lexemname = '';
 
     $DB->insert_record('block_formal_langs',$lang);
 
