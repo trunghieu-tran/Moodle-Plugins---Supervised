@@ -157,6 +157,10 @@ class  qtype_correctwriting_enum_analyzer {
                 }
             }
         }
+        // Remove duplicates in indexes of elements.
+        foreach ($indexes_of_elements as $key => $element_indexes) {
+            $indexes_of_elements[$key] = array_unique($indexes_of_elements[$key]);
+        }
         // Fill array of indexes elements of enumeration in ascending order.
         foreach ($indexes_of_elements as $element_indexes) {
             // Find place to insert in array for all indexes.
