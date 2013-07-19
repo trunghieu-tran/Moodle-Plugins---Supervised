@@ -77,19 +77,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         }
 
         $currentlanguages = block_formal_langs::available_langs();
-        $showedlanguages = $CFG->qtype_correctwriting_showablelangs;
-        $languages = array();
-        if (textlib::strlen($showedlanguages) != 0)
-        {
-            $showedlanguages = explode(',', $CFG->qtype_correctwriting_showablelangs);
-            foreach($showedlanguages as $langkey)
-            {
-                // Copy langugage to shown
-                $languages[$langkey] = $currentlanguages[$langkey];
-            }
-        } else {
-            $languages = $currentlanguages;
-        }
+        $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
         $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
