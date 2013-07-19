@@ -122,8 +122,12 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         $exists = false;
         $answertokens = $stringpair->correctstring()->stream->tokens;
         $responsemistaken =  $stringpair->correctedstring()->stream->tokens[$responseindex];
+        
+        $options = new block_formal_langs_comparing_options();
+        $options->usecase = $usecase;
+        
         foreach ($answertokens as $answertoken) {
-            if ($responsemistaken->is_same($answertoken, $usecase)) {
+            if ($responsemistaken->is_same($answertoken, $options)) {
                 $exists = true;
                 break;
             }
