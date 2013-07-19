@@ -1168,6 +1168,15 @@ class block_formal_langs_string_pair {
     }
 
     /**
+     *  Returns a compared string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
+    public function comparedstring() {
+        return $this->comparedstring;
+    }
+
+    /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
     public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared, block_formal_langs_comparing_options $options) {
