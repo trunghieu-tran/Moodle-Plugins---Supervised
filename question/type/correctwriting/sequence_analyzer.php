@@ -37,10 +37,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 //Other necessary requires
-require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/sequence_mistakes.php');
-
+require_once($CFG->dirroot . '/question/type/correctwriting/syntax_analyzer.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/sequence_mistakes.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
 
 
 class  qtype_correctwriting_sequence_analyzer {
@@ -50,7 +50,7 @@ class  qtype_correctwriting_sequence_analyzer {
 
     /**
      * A string pair with best matches, which can be passed to sequence analyzer
-     * @var block_formal_langs_string_pair
+     * @var qtype_correctwriting_string_pair
      */
     protected $bestmatchpair;
     protected $mistakes;             // Array of mistake objects - student errors (structural errors)
