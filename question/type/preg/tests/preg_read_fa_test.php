@@ -47,12 +47,12 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $dotdescription = 'digraph example {
                     0;
                     4;
-                    0->1[label="[0-9]"]; 
-                    1->2[label="[abc]"]; 
-                    1->4[label="[01]"]; 
-                    2->2[label="[a-z]"]; 
-                    2->3[label="[-?,]"]; 
-                    3->4[label="[a]"]; 
+                    0->1[label="[0-9]"];
+                    1->2[label="[abc]"];
+                    1->4[label="[01]"];
+                    2->2[label="[a-z]"];
+                    2->3[label="[-?,]"];
+                    3->4[label="[a]"];
                     }';
 
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
