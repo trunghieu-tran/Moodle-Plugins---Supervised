@@ -76,7 +76,8 @@ class  qtype_correctwriting_sequence_analyzer {
             if ($this->bestmatchpair->correctedstring() == null) {
                 // Scan errors by syntax_analyzer
                 if ($language->could_parse()) {
-                    $analyzer = new qtype_correctwriting_syntax_analyzer($answer, $language, null, null);
+                    $pair = $bestmatchpair->copy_with_lcs(null);
+                    $analyzer = new qtype_correctwriting_syntax_analyzer($question, $pair, $language);
                     $this->errors = $analyzer->errors();
                 }
             } else {
@@ -123,8 +124,9 @@ class  qtype_correctwriting_sequence_analyzer {
             $isfirst = true;
             $haserrors = false;
             for ($i = 0;$i < count($alllcs) && $haserrors == false;$i++) {
-                $analyzer = new qtype_correctwriting_syntax_analyzer($this->bestmatchpair, $this->language,
-                                                                     $alllcs[$i]);
+                $pair = $this->bestmatchpair->copy_with_lcs($alllcs[$i]);
+                $analyzer = new qtype_correctwriting_syntax_analyzer($this->question, $this->language,
+                                                                     $pair);
                 $fitness = $analyzer->fitness();
 
                 //If answer has errors stop processing here

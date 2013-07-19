@@ -44,7 +44,6 @@ require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 //Other necessary requires
 
 class qtype_correctwriting_lexical_analyzer {
-    protected $answerobj;//Correct answer as an object (answer, fraction, feedback, names for tokens or sematic nodes)
     protected $question;//A reference to the question object with necessary data (language id, answers, threshold etc)
     protected $language;//Language object - contains scaner, parser etc
     protected $errors;//Array of error objects - teacher errors when entering answer
@@ -62,23 +61,19 @@ class qtype_correctwriting_lexical_analyzer {
      *
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      *
-     * @param qtype_correctwriting_question $question question object
-     * @param object $answer answer object for which lcs is created
-     * @param string $responsestr student response as a string
+     * @param qtype_correctwriting_question $question
+     * @param block_formal_langs_string_pair $bestmatchpair a pair
+     * @param block_formal_langs_abstract_language $language a language
      */
-    public function __construct($question, $answer, $responsestr=null) {
-
-        $this->answerobj = $answer;
+    public function __construct($question, $bestmatchpair, $language) {
         $this->question = $question;
 
         //TODO:
         //0. Create language object
-        $language = $question->get_used_language();
+        $this->language = $language;
         //1. Scan answer and response - Mamontov
         //  - call language object to do it
-        $responsestring = $language->create_from_string($responsestr);
-        $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
-        $this->bestmatchstring = new block_formal_langs_string_pair($answerstring, $responsestring, null);
+        $this->bestmatchstring = $bestmatchpair;
         //2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
         if ($question->are_lexeme_sequences_equal($this->bestmatchstring)) {
             $this->mistakes = array();
@@ -89,16 +84,16 @@ class qtype_correctwriting_lexical_analyzer {
         $mistakes = array();
         // Mapping from error kind to our own language string
         $mistakecustomhandling = array('clanguagemulticharliteral' => 'clanguagemulticharliteral');
-        if (count($responsestring->stream->errors) != 0) {
+        if (count($bestmatchpair->comparedstring()->stream->errors) != 0) {
             /**
              * @var block_formal_langs_lexical_error $error
              */
-            foreach($responsestring->stream->errors as $index => $error) {
+            foreach($bestmatchpair->comparedstring()->stream->errors as $index => $error) {
                 $mistake = new qtype_correctwriting_scanning_mistake();
 
                 $message =  $error->errormessage;
                 $mistake->languagename = $question->get_used_language()->name();
-                $mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
+                $mistake->position = $bestmatchpair->comparedstring()->stream->tokens[$error->tokenindex]->position();
                 $mistake->answermistaken = null;
                 $mistake->responsemistaken = array( $error->tokenindex );
                 $mistake->weight = $question->lexicalerrorweight;
@@ -114,7 +109,7 @@ class qtype_correctwriting_lexical_analyzer {
                     $a->colstart = $pos->colstart();
                     $a->lineend = $pos->lineend();
                     $a->colend = $pos->colend();
-                    $a->value = $responsestring->stream->tokens[$error->tokenindex]->value();
+                    $a->value = $bestmatchpair->comparedstring()->stream->tokens[$error->tokenindex]->value();
                     $message = get_string($mistakecustomhandling[$error->errorkind],  'qtype_correctwriting', $a);
                 }
                 $mistake->mistakemsg = $message;
