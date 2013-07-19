@@ -265,7 +265,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
 
             foreach ($question->options->answers as $id => $answer) {
-                if ($answer->fraction > $question->hintgradeborder) {
+                if ($answer->fraction >= $question->hintgradeborder) {
                     // $string = $lang->create_from_db('question_answers',$id);
                     $string = '';
                     if (count($descriptions[$id]) != 0) {
