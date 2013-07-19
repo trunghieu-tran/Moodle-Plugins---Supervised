@@ -270,7 +270,7 @@ class  qtype_correctwriting_enum_analyzer {
         $rows_for_one_order = 0; // Count of rows which will be keep same order for all enumerations.
         // Find orders for all enumerations alternatively.
         for ($i = 0; $i < count($enumdescription); $i++) {
-            $all_enum_orders[]=find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $i);
+            $all_enum_orders[]=$this->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $i);
         }
         // Find count of complete orders of enumerations.
         $count_of_all_enum_orders = 1;
