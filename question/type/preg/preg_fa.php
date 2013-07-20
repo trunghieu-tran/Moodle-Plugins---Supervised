@@ -1353,12 +1353,14 @@ abstract class qtype_preg_finite_automaton {
      * @param anotherfa object automaton to intersect.
      * @param result object automaton to write intersection part.
      * @param start state of $this automaton with which to start intersection.
-     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @param direction boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @param withcycle boolean intersect in case of forming right cycle.
      * @return result automata.
      */
-    public function get_intersection_part ($anotherfa, &$result, $start, $isstart) {
+    public function get_intersection_part ($anotherfa, &$result, $start, $direction, $withcycle) {
         $oldfront = array();
         $newfront = array();
+        $clones = array();
         $oldfront[] = $start;
         //Work with each state
         while (count($oldfront) != 0) {
@@ -1372,7 +1374,6 @@ abstract class qtype_preg_finite_automaton {
                 //Get transitions for ntersection
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
                 $intertransitions2 = $second->get_transitions_for_intersection($workstate2, $direction);;
-                get_transitions_for_intersection();
                 //Intersect all possible transitions
                 $resulttransitions = array();
                 $resultnumbers = array();
@@ -1391,12 +1392,15 @@ abstract class qtype_preg_finite_automaton {
                 }
                 //Analysis result transitions
                 for ($i = 0; $i < count($resulttransitions); $i++) {
-                    //Itersect forward
                     //Search state with the same number in result automata
-                    $searcstate = array_search($resultnumbers[$i], $resnumbers);
+                    if ($withcycle) {
+                        $searcstate = $result->have_add_state_in_cycle($anotherfa, $resulttransitions, $curstate, $clones, $resultnumbers[$i], $i);
+                    } else {
+                        $searcstate = array_search($resultnumbers[$i], $resnumbers);
+                    }
                     //State was found
                     if ($searchstate !== false) {
-                        $newstate = $searchstate
+                        $newstate = array_search($resultnumbers[$i], $resnumbers);
                     } else {
                         //State wasn't found
                         $newstate = $result->add_state($resultnumbers[$i]);
