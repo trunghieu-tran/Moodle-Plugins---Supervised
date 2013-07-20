@@ -1075,6 +1075,7 @@ abstract class qtype_preg_finite_automaton {
                 $result[] = $tran->from;
             }
         }
+        return result;
     }
 
     /**
