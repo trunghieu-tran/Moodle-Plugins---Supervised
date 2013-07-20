@@ -1294,6 +1294,60 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Find state which should be added in way of passing cycle.
+     *
+     * @param anotherfa object automaton to find.
+     * @param resulttransitions array of intersected transitions.
+     * @param curstate last added state.
+     * @param clones transitions appeared in case of several ways.
+     * @param realnumber real number of $curstate.
+     * @param index index of transition in $resulttransitions for analysis.
+     * @return boolean flag if automata has state which should be added in way of passing cycle.
+     */
+    public function have_add_state_in_cycle($anotherfa, &$resulttransitions, $curstate, &$clones, $realnumber, $index) {
+        $resnumbers = $this->get_state_numbers;
+        $hasalready = false;
+        $wasdel = false;
+        //No transitions from last state
+        if (count($clones) <= 1) {
+            $ispossible = false;
+            if ($direction == 0) {
+                $ispossible = $this->has_same_state_forward($anotherfa, $resulttransitions[$index], $curstate, $clones, $realnumber);
+            } else {
+                $ispossible = $this->has_same_state_back($anotherfa, $resulttransitions[$index], $curstate, $clones, $realnumber);
+            }
+            //It's possible to add state in case of having state
+            if ($ispossible) {
+                //Search same state in result automata
+                if (array_search($realnumber, $resnumbers) !== false) {
+                    $hasalready = true;
+                }
+            } else {
+                //It's impossible to add state
+                unset($resulttransitions[$i]);
+                $wasdel = true;
+            }
+        } else {
+            //Has transitions from previous states
+            if (array_search($realnumber, $resnumbers) !== false) {
+                $hasalredy = true;
+            }
+            unset($clones[count($clones) - 2]);
+        }
+        if ($hasAlready || $wasdel) {
+            return true;
+        } else {
+            //Coping transition copies
+            if (count($clones) > 1) {
+                for ($i = count($clones) - 2; $i >= 0; $i--) {
+                    array_splice($resulttransitions, $index + 1, 0, $clones[$i]);
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
      * Find intersection part of automaton in case of intersection it with another one.
      *
      * @param anotherfa object automaton to intersect.
