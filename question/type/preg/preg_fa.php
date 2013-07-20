@@ -1399,12 +1399,7 @@ abstract class qtype_preg_finite_automaton {
         $wasdel = false;
         //No transitions from last state
         if (count($clones) <= 1) {
-            $ispossible = false;
-            if ($direction == 0) {
-                $ispossible = $this->has_same_state_forward($anotherfa, $resulttransitions[$index], $curstate, $clones, $realnumber);
-            } else {
-                $ispossible = $this->has_same_state_back($anotherfa, $resulttransitions[$index], $curstate, $clones, $realnumber);
-            }
+            $ispossible = $this->has_same_state($anotherfa, $resulttransitions[$index], $curstate, $clones, $realnumber, $direction);
             //It's possible to add state in case of having state
             if ($ispossible) {
                 //Search same state in result automata
