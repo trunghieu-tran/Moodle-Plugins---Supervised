@@ -1257,6 +1257,94 @@ abstract class qtype_preg_finite_automaton {
         $this->haseps = false;
     }
 
+    public function has_same_state($anotherfa, &$transition, $laststate, &$clones, $realnumber, $direction) {
+        $oldfront = array();
+        $isfind = false;
+        $aregone = array();
+        $newfront = array();
+        //Get right clones in case of divarication
+        $clones = array();
+        $clones[] = $transition;
+        $numbers = explode(',', $realnumber, 2);
+        $numbertofind = $numbers[0];
+        $oldfront[] = $laststate;
+        $secnumbers = $anotherfa->get_state_numbers();
+
+        //While there are states for analysis
+        while (count($oldfront) != 0 && !$isfind) {
+            foreach ($oldfront as $state) {
+                $aregone[] = $state;
+                $numbers = explode(',', $this->statenumbers[$state], 2);
+                //State with same number is found
+                if ($isfind && $numbers[0] == $numbertofind && $numbers[1] !== '') {
+                    //State with same number was found and there is one more
+                    if ($isfind) {
+                        $clones[] = $clones[count($clones) - 1];
+                        //Get added numbers
+                        $tran = &$clones[count($clones) - 2];
+                    } else {
+                        //State wasn't found earlier but this state is a searched state
+                        $isfind = true;
+                        $tran = &$transition;
+                    }
+                    if ($direction == 0) {
+                        $clone = $tran->to;
+                    } else {
+                        $clone = $tran->from;
+                    }
+                    $clonenumbers = explode(',', $this->statenumbers[$clone], 2);
+                    $addnumber = $numbers[0] . ',' . $clonesnumbers[1] . '   ' . $numbers[1];
+                    $statefromsecond = array_search($numbers[1], $secnumbers);
+                    if ($direction == 0) {
+                        $transitions = $anotherfa->get_intotransitions($statefromsecond);
+                    } else {
+                        $transitions = $anotherfa->get_outtransitions($statefromsecond);
+                    }
+                    //There are transitions for analysis
+                    if (count($transitions) != 0) {
+                        $intertran = $tran->intersect($transitions[0]);
+                        if ($intertran !== null) {
+                            $hasintersection = true;
+                            //Form new transition
+                            $addstate = $this->add_state($addnumber);
+                            if ($direction == 0) {
+                                $tran->to = $addstate;
+                            } else {
+                                $tran->from = $addstate;
+                            }
+                        }
+                    } else {
+                        //Form new transition
+                        $addstate = $this->add_state($addnumber);
+                        if ($direction == 0) {
+                            $tran->to = $addstate;
+                        } else {
+                            $tran->from = $addstate;
+                        }
+                    }
+                } else {
+                    //Add connected states to new wave front
+                    if ($direction == 0) {
+                        $conectstates = get_connected_states($state, 1);
+                    } else {
+                        $conectstates = get_connected_states($state, 0);
+                    }
+                    foreach ($conectstates as $conectstate) {
+                        if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone)) {
+                            $newfront[] = $conectstate;
+                        }
+                    }
+                }
+            }
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+        if (!$isfind) {
+            $hasintersection = true;
+        }
+        return $hasintersection;
+    }
+
     /**
      * Get transitions from automata for intersection.
      *
