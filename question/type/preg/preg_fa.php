@@ -1393,7 +1393,7 @@ abstract class qtype_preg_finite_automaton {
      * @param index index of transition in $resulttransitions for analysis.
      * @return boolean flag if automata has state which should be added in way of passing cycle.
      */
-    public function have_add_state_in_cycle($anotherfa, &$resulttransitions, $curstate, &$clones, $realnumber, $index) {
+    public function have_add_state_in_cycle($anotherfa, &$resulttransitions, $curstate, &$clones, $realnumber, $index, $direction) {
         $resnumbers = $this->get_state_numbers;
         $hasalready = false;
         $wasdel = false;
