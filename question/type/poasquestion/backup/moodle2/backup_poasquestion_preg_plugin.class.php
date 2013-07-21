@@ -59,7 +59,7 @@ class backup_qtype_poasquestion_plugin extends backup_qtype_plugin {
         $pluginwrapper->add_child($child);
 
         // Set source to populate the data.
-        $child->set_source_table($tablename, array($qtypeobj->questionid_column_name() => backup::VAR_PARENTID));
+        $child->set_source_table($tablename, array('question' => backup::VAR_PARENTID));
 
         // Don't need to annotate ids nor files.
         return $plugin;
