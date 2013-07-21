@@ -11,12 +11,14 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_merging_first_state() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[]"];
                                 1->2[label="[0-9]"];
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1";
                         2;
                         "0   1"->2[label="[0-9]"];
                     }';
@@ -40,6 +42,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_capturing_transitions_between_states() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[^]"];
                                 0->1[label="[a]"];
@@ -47,6 +50,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1";
                         2;
                         "0   1"->2[label="[^ab]"];
                         "0   1"->"0   1"[label="[a]"];
@@ -71,6 +75,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_several_outtransitions() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[\\A]"];
                                 0->1[label="[^]"];
@@ -78,6 +83,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1";
                         2;
                         "0   1"->2[label="[\\A0-9]"];
                     }';
@@ -101,6 +107,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_merging_two_asserts() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[0-9]"];
                                 1->2[label="[^]"];
@@ -108,6 +115,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        0;
                         3;
                         0->"1   2"[label="[0-9]"];
                         "1   2"->3[label="[\\A0-9]"];
@@ -132,6 +140,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_merging_one_state_several_times() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[^]"];
                                 1->2[label="[]"];
@@ -139,6 +148,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1   2";
                         3;
                         "0   1   2"->3[label="[^0-9]"];
                     }';
@@ -162,6 +172,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_only_eps_transitions() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[]"];
                                 1->2[label="[]"];
@@ -169,6 +180,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1   2   3";
                         "0   1   2   3";
                     }';
 
@@ -191,6 +203,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_another_way_without_state_for_intersection() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 5;
                                 0->1[label="[a-z]"];
                                 1->2[label="[0-9]"];
@@ -201,6 +214,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        0;
                         5;
                         0->1[label="[a-z]"];
                         1->2[label="[0-9]"];
@@ -230,6 +244,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_different_ways_of_merging() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 5;
                                 0->1[label="[$]"];
                                 1->2[label="[0-9]"];
@@ -240,6 +255,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1";
                         5;
                         "0   1"->2[label="[$0-9]"];
                         "0   1"->3[label="[xy]"];
@@ -268,6 +284,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_merging_state_for_intersection() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[0-9]"];
                                 1->2[label="[^]"];
@@ -275,6 +292,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        0;
                         3;
                         0->"1   2"[label="[0-9]"];
                         "1   2"->3[label="[\\A0-9]"];
@@ -299,6 +317,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
     public function test_merging_with_cycle() {
         $dotdescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[^]"];
                                 1->2[label="[a-z]"];
@@ -307,6 +326,7 @@ class qtype_preg_fa_merger_uncap_transitions_test extends PHPUnit_Framework_Test
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0   1";
                         3;
                         "0   1"->2[label="[^a-z]"];
                         2->3[label="[0-9]"];
