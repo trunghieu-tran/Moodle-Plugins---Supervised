@@ -24,10 +24,10 @@ class qtype_preg_regex_testing_tool {
     private $answer;
     private $hintmatch;
     
-    public function __construct($regex, $answer) {
+    public function __construct($regex, $answer, $mathcer) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
-        $regular = qtype_preg_question::question_from_regex($regex, false, true, 'nfa_matcher', 'native');
+        $regular = qtype_preg_question::question_from_regex($regex, false, true, $mathcer, 'native');
         $this->hintmatch = $regular->hint_object('hintmatchingpart');
         $this->answer = $answer;
     }
