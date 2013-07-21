@@ -11,6 +11,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_whole_branch() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[df]"];
                                 0->2[label="[0-9]"];
@@ -20,6 +21,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "1,";"4,";
                         "0,"->"1,"[label="[df]"];
                         "0,"->"2,"[label="[0-9]"];
@@ -46,6 +48,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_impliciment_cycle() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[ab]"];
                                 0->2[label="[0-9]"];
@@ -55,6 +58,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "1,";"3,";
                         "0,"->"1,"[label="[ab]"];
                         "0,"->"2,"[label="[0-9]"];
@@ -81,6 +85,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_cycle_end() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->1[label="[0-9]"];
@@ -88,6 +93,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "1,";
                         "0,"->"1,"[label="[ab]"];
                     }';
@@ -111,6 +117,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_not_empty_direct() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[df]"];
                                 0->2[label="[0-9]"];
@@ -120,6 +127,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "4,";
                         "0,"->"1,"[label="[df]"];
                         "0,"->"2,"[label="[0-9]"];
@@ -129,6 +137,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                     }';
         $directdescription = 'digraph example 
                             {
+                                "0,";
                                 "1,";
                                 "0,"->"1,"[label="[df]"];
                             }';
@@ -153,6 +162,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_direct_has_states_for_coping() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
@@ -160,6 +170,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "2,";
                         "0,"->"1,"[label="[ab]"];
                         "1,"->"2,"[label="[ab]"];
@@ -167,6 +178,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                     }';
         $directdescription = 'digraph example 
                             {
+                                "0,";
                                 "1,";
                                 "0,"->"1,"[label="[ab]"];
                             }';
@@ -191,6 +203,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_coping_not_nessesary() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
@@ -198,6 +211,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        "0,";
                         "2,";
                         "0,"->"1,"[label="[ab]"];
                         "1,"->"2,"[label="[ab]"];
@@ -205,6 +219,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                     }';
         $directdescription = 'digraph example 
                             {
+                                "0,";
                                 "2,";
                                 "0,"->"1,"[label="[ab]"];
                                 "1,"->"2,"[label="[ab]"];
@@ -235,6 +250,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_coping_back() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[df]"];
                                 0->2[label="[0-9]"];
@@ -244,6 +260,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         "4,";
                         "3,"->"4,"[label="[.]",color=violet];
                         "1,"->"3,"[label="[abc]",color=violet];
@@ -282,6 +299,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        ",0";
                         ",1";",4";
                         ",0"->",1"[label="[df]"];
                         ",0"->",2"[label="[0-9]"];
@@ -309,6 +327,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_second_cycle() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[ab]"];
                                 0->2[label="[0-9]"];
@@ -318,6 +337,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        ",0";
                         ",1";",3";
                         ",0"->",1"[label="[ab]"];
                         ",0"->",2"[label="[0-9]"];
@@ -345,6 +365,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_copy_not_empty_second() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[df]"];
                                 0->2[label="[0-9]"];
@@ -354,6 +375,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        ",0";
                         ",4";
                         ",0"->",1"[label="[df]"];
                         ",0"->",2"[label="[0-9]"];
@@ -363,6 +385,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                     }';
         $directdescription = 'digraph example 
                             {
+                                ",0";
                                 ",1";
                                 ",0"->",1"[label="[df]"];
                             }';
@@ -388,6 +411,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     public function test_coping_not_nessesary_second() {
         $sourcedescription = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
@@ -395,6 +419,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example 
                     {
+                        ",0";
                         ",2";
                         ",0"->",1"[label="[ab]"];
                         ",1"->",2"[label="[ab]"];
@@ -402,6 +427,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                     }';
         $directdescription = 'digraph example 
                             {
+                                ",0";
                                 ",2";
                                 ",0"->",1"[label="[ab]"];
                                 ",1"->",2"[label="[ab]"];

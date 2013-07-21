@@ -11,6 +11,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_without_blind_states() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             3;
                             0->1[label="[01]"];
                             1->2[label="[abc]"];
@@ -18,6 +19,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         3;
                         0->1[label="[01]"];
                         1->2[label="[abc]"];
@@ -37,6 +39,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_one_blind_state() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             3;
                             0->1[label="[01]"];
                             1->2[label="[abc]"];
@@ -44,6 +47,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         3;
                         0->1[label="[01]"];
                         1->3[label="[01]"];
@@ -62,6 +66,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_several_linked_blind_states() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             2;
                             0->1[label="[01]"];
                             1->2[label="[a]"];
@@ -70,6 +75,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
@@ -88,6 +94,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_blind_cycle() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             2;
                             0->1[label="[01]"];
                             1->2[label="[a]"];
@@ -97,6 +104,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
@@ -115,6 +123,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_cycle() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             2;
                             0->1[label="[01]"];
                             1->2[label="[a]"];
@@ -124,6 +133,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
@@ -145,6 +155,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_del_merged_blind_states() {
         $dotdescription = 'digraph example
                         {
+                            0;
                             5;
                             0->"1   2   3"[label="[01]"];
                             "1   2   3"->4[label="[01]"];
@@ -155,6 +166,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        0;
                         5;
                         0->"1   2   3"[label="[01]"];
                         "1   2   3"->4[label="[01]"];
@@ -175,6 +187,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_del_states_with_intersection() {
         $dotdescription = 'digraph example
                         {
+                            "0,";
                             ",5";
                             "0,"->"1,2"[label="[01]"];
                             "1,2"->",3"[label="[01]"];
@@ -185,6 +198,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph example
                     {
+                        "0,";
                         ",5";
                         "0,"->"1,2"[label="[01]"];
                         "1,2"->",3"[label="[01]"];
@@ -205,6 +219,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_blind_states_from_start() {
         $dotdescription = 'digraph example
                             {
+                                0;
                                 2;
                                 0->1[label="[01]"];
                                 1->2[label="[a]"];
@@ -215,6 +230,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
@@ -233,6 +249,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_blind_cycle_from_start() {
         $dotdescription = 'digraph example
                             {
+                                0;
                                 2;
                                 0->1[label="[01]"];
                                 1->2[label="[a]"];
@@ -244,6 +261,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
@@ -262,6 +280,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
     public function test_cycle_from_start() {
         $dotdescription = 'digraph example
                             {
+                                0;
                                 2;
                                 0->1[label="[01]"];
                                 1->2[label="[a]"];
@@ -274,6 +293,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph example
                     {
+                        0;
                         2;
                         0->1[label="[01]"];
                         1->2[label="[a]"];
