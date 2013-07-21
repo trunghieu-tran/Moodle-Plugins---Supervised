@@ -1284,6 +1284,15 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
         }
         return $result.')';
     }
+
+    //TODO: костыль для теста (?i)lol
+    public function dot_script($context, $rankdirlr = false) {
+        if ($context->isroot) {
+            return "";
+        } else {
+            return array("", "");
+        }
+    }
 }
 
 class qtype_preg_leaf_recursion extends qtype_preg_leaf {

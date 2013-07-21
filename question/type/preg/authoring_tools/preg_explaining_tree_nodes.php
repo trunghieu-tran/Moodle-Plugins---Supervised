@@ -227,8 +227,11 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
             }
             // Recursive call to subtree.
             $tmp = $operand->dot_script($newcontext, $rankdirlr);
-            $childscripts[] = $tmp[0];
-            $style .= $tmp[1];
+            //TODO: костыль для qtype_preg_leaf_option
+            if($tmp[0] !== "") {
+                $childscripts[] = $tmp[0];
+                $style .= $tmp[1];
+            }
         }
 
         // Form the result.

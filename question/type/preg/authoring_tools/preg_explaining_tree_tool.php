@@ -17,6 +17,14 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
     public $rankdir = false;
 
     public function __construct($regex = null, $rankdirlr = false, $options = null) {
+        if ($regex === null) {
+            return;
+        }
+        // Options should exist at least as a default object.
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+        }
+        $options->preserveallnodes = TRUE;
         parent::__construct($regex, $options);
         $this->rankdir = $rankdirlr;
     }
