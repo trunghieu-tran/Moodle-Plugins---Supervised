@@ -132,10 +132,10 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
             $resulttran->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
             $resulttran->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
             $resulttran->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
-            remove_same_elements($resulttran->subpatt_start);
-            remove_same_elements($resulttran->subpatt_end);
-            remove_same_elements($resulttran->subexpr_start);
-            remove_same_elements($resulttran->subexpr_end);
+            $resulttran->remove_same_elements($resulttran->subpatt_start);
+            $resulttran->remove_same_elements($resulttran->subpatt_end);
+            $resulttran->remove_same_elements($resulttran->subexpr_start);
+            $resulttran->remove_same_elements($resulttran->subexpr_end);
         }
         return $resulttran;
     }
