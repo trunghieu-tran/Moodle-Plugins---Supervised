@@ -285,7 +285,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $esca = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_A);
         $escz = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
 
-        //Adding assert to array
+        // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             array_unshift ($this->mergedassertions, $this);
         }
@@ -293,13 +293,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             array_unshift ($other->mergedassertions, $other);
         }
         $result = array_merge($this->mergedassertions, $other->mergedassertions);
-        //Removing same asserts
+        // Removing same asserts.
         for ($i = 0; $i < count($result); $i++) {
             for ($j = ($i+1); $j < count($result); $j++) {
                 if ($result[$i]->subtype == $result[$j]->subtype) {
-                unset($result[$j]);
-                $result = array_values($result);
-                $j--;
+                    unset($result[$j]);
+                    $result = array_values($result);
+                    $j--;
                 }
             }
         }
@@ -312,21 +312,21 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         foreach ($result as $assert) {
             $key = array_search($assert, $result);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-                //Searching compatible asserts
+                // Searching compatible asserts.
                 if (array_search($esca, $result)) {
-                    unset($result[$key]); 
+                    unset($result[$key]);
                     $result = array_values($result);
                 }
             } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
-                //Searching compatible asserts
+                // Searching compatible asserts.
                 if (array_search($escz, $result)) {
-                    unset($result[$key]); 
+                    unset($result[$key]);
                     $result = array_values($result);
                 }
             }
         }
 
-        //Getting result leaf
+        // Getting result leaf.
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             $assert = $this;
         } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
