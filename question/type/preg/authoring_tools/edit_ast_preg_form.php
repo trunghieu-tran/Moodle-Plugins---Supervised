@@ -51,15 +51,13 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
         $mform->addElement('button', 'regex_show_selection', 'show selection (todo - get_string)');
         $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
-        $mform->addElement('html',
-                '<div id="charset_process_radioset">'
-                .get_string('authoring_form_charset_mode', 'qtype_preg') . '<br />'
-                .'<input type="radio" name="authoring_tools_charset_process" id="authoring_tools_charset_process_userinscription" value="userinscription" checked />'
-                .'<label for="authoring_tools_charset_process_userinscription" >&nbsp;' . get_string('authoring_form_charset_userinscription', 'qtype_preg') . '</label><br>'
-                .'<input type="radio" name="authoring_tools_charset_process" id="authoring_tools_charset_process_flags" value="flags" />'
-                .'<label for="authoring_tools_charset_process_flags" >&nbsp;' . get_string('authoring_form_charset_flags', 'qtype_preg') . '</label><br>'
-                .'</div>'
-        );
+        
+        $radiocharsetprocessarray=array();
+        $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_userinscription', 'qtype_preg'), 'userinscription', null);
+        $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_flags', 'qtype_preg'), 'flags', null);
+        $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
+        $mform->setDefault('authoring_tools_charset_process', 'userinscription');
+
         if (stristr($agent, 'MSIE')) {
             $mform->addElement('html', '</div>');
         }
@@ -69,14 +67,12 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setExpanded('regex_tree_header', 1);
         $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         // Add tree orientation radio buttons.
-        $mform->addElement('html',
-                '<div id="tree_orientation_radioset">'
-                .'<input type="radio" name="authoring_tools_tree_orientation" id="vertical" value="vertical" checked>'
-                .'<label for="vertical">&nbsp;' . get_string('authoring_form_tree_vert', 'qtype_preg') . '</label><br>'
-                .'<input type="radio" name="authoring_tools_tree_orientation" id="horizontal" value="horizontal">'
-                .'<label for="horizontal">&nbsp;' . get_string('authoring_form_tree_horiz', 'qtype_preg') . '</label><br>'
-                .'</div>'
-                );
+        $radiotreeorientationsarray=array();
+        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('authoring_form_tree_vert', 'qtype_preg'), 'vertical', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('authoring_form_tree_horiz', 'qtype_preg'), 'horizontal', null);
+        $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
+        $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
+
         $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_handler">' .
                                        '<div style="width:10px">' .

@@ -134,7 +134,7 @@ M.preg_authoring_tools_script = (function($) {
                                                             .keyup(self.textbutton_widget.fix_textarea_rows);
                     self.back_btn = $('#id_regex_back').click(self.back_regex_clicked);
                     $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
-                    $("#tree_orientation_radioset input, #charset_process_radioset input").change(self.radio_changed);
+                    $("#fgroup_id_tree_orientation_radioset input, #fgroup_id_charset_process_radioset input").change(self.radio_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
                     $('#id_regex_check_string').click(self.regex_check_string);
@@ -335,11 +335,11 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     get_orientation : function() {
-        return $("#tree_orientation_radioset input:checked").val();
+        return $("#fgroup_id_tree_orientation_radioset input:checked").val();
     },
 
     get_displayas : function () {
-        return $("#charset_process_radioset input:checked").val();
+        return $("#fgroup_id_charset_process_radioset input:checked").val();
     },
 
     regex_selection_widget : {
