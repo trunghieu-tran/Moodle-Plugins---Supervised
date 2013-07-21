@@ -21,9 +21,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 class qtype_preg_authoring_tool_form extends moodleform {
 
-    /*function __constructor(){
+    private $isblok;
+
+    function __constructor($_isblock = false){
+        $isblok = $_isblock;
         parent::moodleform();
-    }*/
+    }
 
     //Add elements to form
     function definition() {
@@ -46,7 +49,9 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
         $mform->addElement('button', 'regex_show_selection', 'show selection (todo - get_string)');
-        $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        if(!$isblok){
+            $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+        }
         
         $radiocharsetprocessarray=array();
         $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_userinscription', 'qtype_preg'), 'userinscription', null);
