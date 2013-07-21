@@ -948,7 +948,7 @@ abstract class qtype_preg_finite_automaton {
             } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
                 //Possibility of merging with intotransitions
                 $transitions = $intotransitions;
-            } else if ($this->statecount == 2 && del->is_eps()) {
+            } else if ($this->statecount == 2 && $del->is_eps()) {
                 //Possibility to get automata with one state
                 $this->merge_states($del);
                 //Checking if start state was merged
