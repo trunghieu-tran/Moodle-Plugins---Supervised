@@ -343,7 +343,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      *
      * @param other another leaf for intersection.
      */
-    public function intersect_leafs($other) {
+    public function intersect_leafs($other, $thishastags, $otherhastags) {
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect($other);
@@ -352,12 +352,16 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                 }
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                 $result = $this->intersect_asserts($other);
+            } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $otherhastags) {
+                $result = $this;
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $this->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                 $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                 $result = $this->intersect_asserts($other);
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET && $thishastags) {
+                $result = $other;
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $result = $this->intersect_asserts($other);
