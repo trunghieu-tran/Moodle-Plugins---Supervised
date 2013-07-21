@@ -67,7 +67,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // Does this transition make a infinite quantifier loop?
     public $is_loop;
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
+    public function __construct($from, &$pregleaf, $to, $consumeschars = true) {
         parent::__construct($from, $pregleaf, $to, $consumeschars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
