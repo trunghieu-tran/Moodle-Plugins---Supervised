@@ -102,6 +102,7 @@ M.preg_authoring_tools_script = (function($) {
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
+                matcher: $('#id_engine :selected').val(),
                 ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
