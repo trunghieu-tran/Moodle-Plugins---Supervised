@@ -126,7 +126,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
      */
     public function intersect($other) {
         $resulttran = parent::intersect($other);
-        if ($resulttran != null)        
+        $resulttran = new qtype_preg_nfa_transition ($resulttran->from, $resulttran->pregleaf, $resulttran->to);
+        if ($resulttran != null) {    
             $resulttran->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
             $resulttran->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
             $resulttran->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
