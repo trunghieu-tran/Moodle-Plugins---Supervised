@@ -44,10 +44,6 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('textarea', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('cols' => 100, 'rows' => 1));
         $mform->setType('regex_text', PARAM_RAW);
 
-        $agent = getenv('HTTP_USER_AGENT');
-        if (stristr($agent, 'MSIE')) {
-            $mform->addElement('html', '<div style="margin-left: 79px" >');
-        }
         $mform->addElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
         $mform->addElement('button', 'regex_show_selection', 'show selection (todo - get_string)');
         $mform->addElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
@@ -97,12 +93,12 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         //Add tool for check regexp match
         $mform->addElement('header', 'regex_match_header', 'Input string for check here:');
-		$mform->setExpanded('regex_match_header', 1);
+        $mform->setExpanded('regex_match_header', 1);
         $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
 
         $mform->addElement('text', 'regex_match_text', 'Input string', array('size' => 100));
-		$mform->setType('regex_match_text', PARAM_RAW);
-		$mform->addElement('html', '</br><div id="test_regex" ></div></br>');
+        $mform->setType('regex_match_text', PARAM_RAW);
+        $mform->addElement('html', '</br><div id="test_regex" ></div></br>');
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', 'Check string');
 
