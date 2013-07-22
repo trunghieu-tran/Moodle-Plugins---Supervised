@@ -48,24 +48,25 @@ class block_formal_langs extends block_base {
         $showedlanguages = $CFG->block_formal_langs_showablelangs;
         if (textlib::strlen($showedlanguages) != 0)
         {
-            $languages = array();
+            $availablelanguages = array();
             $showedlanguages = explode(',', $showedlanguages);
             foreach($showedlanguages as $langkey)
             {
                 // Copy only visible langugages.
-                $languages[$langkey] = $currentlanguages[$langkey];
+                $availablelanguages[$langkey] = $languages[$langkey];
             }
+        } else {
+            $availablelanguages = $languages;
         }
-        return $languages;
+        return $availablelanguages;
     }
 
     /**
      * This function returns all languages.
-     * PHP does not have any friend keywords and setting are re-created any time,
-     * Moodle wants to, so any possible way to get around this situation is to make this
-     * method public.
-     * DO NOT USE IT IN PRODUCTION.
-     * @return array
+     *
+     * It is used in language configuration only and doesn't respect admin setting for available languages. 
+     * For interaction with user please use function available_langs().
+     * @return array where key is language id and value is user interface language name (received throught get_string)
      */
     public static function all_languages() {
         global $DB;
