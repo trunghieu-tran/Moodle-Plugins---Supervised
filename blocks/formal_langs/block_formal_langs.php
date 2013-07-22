@@ -43,42 +43,24 @@ class block_formal_langs extends block_base {
      */
     public static function available_langs($contextid = null) {
         global $CFG;
-        $currentlanguages = block_formal_langs::all_languages();
+        $languages = block_formal_langs::all_languages();
+        // TODO - create a table with eye icons and set "visible" DB field for the language accordingly instead of using $CFG->xxx.
         $showedlanguages = $CFG->block_formal_langs_showablelangs;
-        $languages = array();
         if (textlib::strlen($showedlanguages) != 0)
         {
-            $showedlanguages = explode(',', $CFG->block_formal_langs_showablelangs);
+            $languages = array();
+            $showedlanguages = explode(',', $showedlanguages);
             foreach($showedlanguages as $langkey)
             {
-                // Copy langugage to shown
+                // Copy only visible langugages.
                 $languages[$langkey] = $currentlanguages[$langkey];
             }
-        } else {
-            $languages = $currentlanguages;
         }
         return $languages;
     }
 
     /**
-     * Returns a setting, which can be used in settings
-     * @return block_formal_langs_admin_setting_showable_languages
-     */
-    public static function showable_lang_setting() {
-        $cfgname = 'block_formal_langs_showablelangs';
-        $label =  get_string('showedlangslabel', 'block_formal_langs');
-        $description = get_string('showedlangsdescription', 'block_formal_langs');
-        $languages = block_formal_langs::all_languages();
-        $values = array_flip(array_keys($languages));
-        $cname = 'block_formal_langs_admin_setting_showable_languages';
-        /** @var block_formal_langs_admin_setting_showable_languages $setting */
-        $setting  = new $cname($cfgname, $label, $description, $values, null);
-        $setting->lazychoices = $languages;
-        return $setting;
-    }
-
-    /**
-     * This function returns all languages, accessible from a context
+     * This function returns all languages.
      * PHP does not have any friend keywords and setting are re-created any time,
      * Moodle wants to, so any possible way to get around this situation is to make this
      * method public.
