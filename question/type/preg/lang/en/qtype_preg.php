@@ -19,8 +19,6 @@ $string['correctanswer_help'] = 'Enter a correct answer (not a regular expressio
 $string['debugheading'] = 'Debug settings';
 $string['defaultenginedescription'] = 'Matching engine selected by default when creating a new question';
 $string['defaultenginelabel'] = 'Default matching engine';
-$string['defaultlangdescription'] = 'Language selected by default when creating a new question';
-$string['defaultlanglabel'] = 'Default language';
 $string['defaultnotationdescription'] = 'Notation selected by default when creating a new question';
 $string['defaultnotationlabel'] = 'Default notation';
 $string['dfa_matcher'] = 'Deterministic finite state automata';
@@ -49,6 +47,7 @@ $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
 $string['notation_pcreextended'] = 'Regular expression (extended)';
 $string['nosubexprcapturing'] = '{$a} engine doesn\'t support subexpression capturing, please remove placeholders (except {$0}) from the feedback or choose another engine';
+$string['objectname'] = 'question';
 $string['pluginname'] = 'Regular expression';
 $string['pluginname_help'] = '<p>Regular expressions are a form of writing patterns to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match a part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p><p>This question uses the PHP perl-compatible regular expression syntax as the default notation. There are many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression here: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p><p>You can also use this question as the advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions! Just select <b>Moodle shortanswer</b> as notation for your questions.</p>';
 $string['php_preg_matcher'] = 'PHP preg extension';
