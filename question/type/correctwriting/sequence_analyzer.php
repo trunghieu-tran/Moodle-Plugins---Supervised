@@ -346,7 +346,7 @@ class  qtype_correctwriting_sequence_analyzer {
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language,
                                                              $this->bestmatchpair,
-                                                             $responseindex, $this->question->usecase);
+                                                             $responseindex, $this->question->token_comparing_options());
     }
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped

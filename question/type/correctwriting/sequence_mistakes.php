@@ -108,8 +108,9 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
      * @param object $language      a language object
      * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
      * @param int    $responseindex index of response token
+     * @param block_formal_langs_comparing_options $options  options for comparting tokens
      */
-    public function __construct($language, $stringpair, $responseindex, $usecase) {
+    public function __construct($language, $stringpair, $responseindex, $options) {
         $this->languagename = $language->name();
         $this->stringpair = $stringpair;
         $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
@@ -123,9 +124,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         $answertokens = $stringpair->correctstring()->stream->tokens;
         $responsemistaken =  $stringpair->correctedstring()->stream->tokens[$responseindex];
         
-        $options = new block_formal_langs_comparing_options();
-        $options->usecase = $usecase;
-        
+
         foreach ($answertokens as $answertoken) {
             if ($responsemistaken->is_same($answertoken, $options)) {
                 $exists = true;
