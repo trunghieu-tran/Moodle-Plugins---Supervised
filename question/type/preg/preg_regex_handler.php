@@ -395,14 +395,14 @@ class qtype_preg_regex_handler {
             $acceptresult = $enginenode->accept();
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast, $pregnode->linefirst, $pregnode->linelast);
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);
             }
         } else {
             $enginenode = $pregnode;
             $acceptresult = $this->is_preg_node_acceptable($pregnode);
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast, $pregnode->linefirst, $pregnode->linelast);
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);
             }
         }
         return $enginenode;

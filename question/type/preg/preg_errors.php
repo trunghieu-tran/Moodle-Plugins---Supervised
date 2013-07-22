@@ -116,18 +116,18 @@ class qtype_preg_parsing_error extends qtype_preg_error {
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    public function __construct($regex, $matchername, $nodename, $indexfirst = -1, $indexlast = -1, $linefirst = -1, $linelast = -1, $preservemsg = false) {
+    public function __construct($regex, $matchername, $nodename, $pregnode) {
         $a = new stdClass;
         $a->nodename = $nodename;
-        $a->linefirst = $linefirst;
-        $a->linelast = $linelast;
-        $a->indfirst = $indexfirst;
-        $a->indlast = $indexlast;
+        $a->linefirst = $pregnode->linefirst;
+        $a->linelast = $pregnode->linelast;
+        $a->indfirst = $pregnode->indexfirst;
+        $a->indlast = $pregnode->indexlast;
         $a->engine = get_string($matchername, 'qtype_preg');
 
         $errormsg = get_string('unsupported', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $indexfirst, $indexlast, $linefirst, $linelast);
+        parent::__construct($errormsg, $regex, $pregnode->indexfirst, $pregnode->indexlast, $pregnode->linefirst, $pregnode->linelast);
     }
 }
 
@@ -148,7 +148,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
-    public function __construct($regex, $matcher, $indexfirst = -1, $indexlast = -1, $linefirst = -1, $linelast = -1, $preservemsg = false) {
+    public function __construct($regex, $matcher, $indexfirst = -1, $indexlast = -1, $linefirst = -1, $linelast = -1) {
         global $CFG;
 
         if ($indexfirst == -1 || $indexlast == -1) {
