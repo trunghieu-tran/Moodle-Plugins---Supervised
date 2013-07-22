@@ -336,7 +336,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -371,7 +371,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -409,7 +409,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -451,7 +451,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -494,7 +494,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -557,7 +557,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
@@ -595,7 +595,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
                                                                   $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
-            if(false === array_search($current_order, $result)) {
+            if (false === array_search($current_order, $result)) {
                 $equal = false;
             }
         }
