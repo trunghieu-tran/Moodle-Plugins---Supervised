@@ -124,6 +124,7 @@ class  qtype_correctwriting_enum_analyzer {
         $isremoved = true; // Is index removed already?
         $current_index = 0; // Current index value.
         $remove_index = 0; // Remove index value.
+        $token = 0; // One token from array.
         $duplicates = array(); // Array for help to remove duplicate orders.
         $elements_in_corrected_answer = array();// Array to keep indexes elements of enumeration in order, which...
                                                 // ... it has in corrected student answer, with included missed elements.
@@ -140,7 +141,11 @@ class  qtype_correctwriting_enum_analyzer {
             $token_number = 0;
             // For all tokens of current element of enumeration find indexes of equal tokens in corrected student answer.
             for ($j = $enumdescription[$number][$i]->begin; $j < $enumdescription[$number][$i]->end +1; $j++) {
-                $indexes_of_tokens[$token_number] = array_keys($correctedanswer, $correctanswer[$j]);
+                foreach ($correctedanswer as $key => $token) {
+                    if ($token->value() == $correctanswer[$j]->value()) {
+                        $indexes_of_tokens[$token_number][] = $key;
+                    }
+                }
                 $token_number++;
             }
             // Create array of indexes tokens of current element enumeration in corrected student answer.
