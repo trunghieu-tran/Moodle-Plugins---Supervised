@@ -169,7 +169,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         if (isset($this->dst_root)) {
             // var_dump(123);
             $string = $this->dst_root->description($numbering_pattern, null, null);
-            $string = self::postprocessing($string);
+            $string = $this->postprocessing($string);
         } else {
             $string = 'tree was not built';
         }
@@ -181,7 +181,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         return $string;
     }
 
-    private static function postprocessing($s) {
+    private function postprocessing($s) {
 
         $result = preg_replace('%;((?:</span>)?)]%', '\1]', $s);
         return $result;
@@ -462,7 +462,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
      * @param $str object of qtype_poasquestion_string.
      * @return mixed[] array with ranges and simple characters (see description of the function).
      */
-    public static function find_ranges($str) {
+    public function find_ranges($str) {
         $lenth = $str->length();
         $badparams = !($str instanceof qtype_poasquestion_string) && $lenth < 1;
         if ($badparams)
@@ -534,7 +534,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             if ($flag->data->length()==1) {
                 $characters[] = self::describe_chr($flag->data[0], true, $form);
             } else {
-                $ranges = self::find_ranges($flag->data);
+                $ranges = $this->find_ranges($flag->data);
                 // var_dump($ranges);
                 $rangelengthmax =& $this->handler->options->rangelengthmax;
                 foreach ($ranges as $range) {
