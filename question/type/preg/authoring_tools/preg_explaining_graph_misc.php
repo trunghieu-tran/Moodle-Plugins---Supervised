@@ -547,10 +547,16 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $tmpneighbor = $gmain->find_link($neighbor_l, $iter);
                         $tmpneighbor->destination = $neighbor_r;    // Set a new destination.
 
-                        // Find a link between void and right neighbor and destroy it.
-                        $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
-                        unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
-                        $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                        if ($neighbor_r !== null) {
+                            // Find a link between void and right neighbor and destroy it.
+                            $tmpneighbor = $gmain->find_link($iter, $neighbor_r);
+                            unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
+                            $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                        } else {
+                            $point = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
+                            $this->nodes[] = $point;
+                            $tmpneighbor->destination = $point;    // Set a new destination.
+                        }
                     } else {
                         $pointl = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                         $pointr = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
