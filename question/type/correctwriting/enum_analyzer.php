@@ -133,7 +133,7 @@ class  qtype_correctwriting_enum_analyzer {
         $insert_place = 0;// Place to insert in one of arrays.
         $have_next_order = false;// Is has in $elements_in_corrected_answer next order.
         $number_of_element_to_skip = 0;// Element number, which will be skip in elements_in_corrected_answer on current iteration.
-        $enum_orders=array();// Array which contain find orders of enumeration.
+        $enum_orders = array();// Array which contain find orders of enumeration.
         // For all elements of enumeration create array of indexes in corrected answers, which are kept in ascending order.
         for ($i = 0; $i < count($enumdescription[$number]); $i++) {
             // Find tokens which include in current element of enumeration individually.
