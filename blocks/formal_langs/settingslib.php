@@ -46,9 +46,16 @@ class block_formal_langs_admin_setting_language extends admin_setting_configsele
 /**
  * Admin settings class for showed languages at language select
  */
-class block_formal_langs_admin_setting_showable_languages extends admin_setting_configmulticheckbox {
+class block_formal_langs_admin_setting_visible_languages extends admin_setting_configmulticheckbox {
 
     public function load_choices() {
+        global $CFG;
+
+        if (is_array($this->choices)) {
+            return true;
+        }
+
+        require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $this->choices = block_formal_langs::all_languages();
         return true;
     }

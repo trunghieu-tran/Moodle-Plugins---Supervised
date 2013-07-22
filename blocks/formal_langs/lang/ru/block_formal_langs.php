@@ -44,4 +44,6 @@ $string['quoteatsingleline'] = '"{$a->value}" начинающееся с сим
 $string['showedlangsdescription'] = 'Языки, которые будут показаны в форме выбора языка';
 $string['showedlangslabel'] =  'Показываемые языки';
 $string['typomsg'] = '{$a->correct[0]} возможно содержит опечатку';
+$string['visiblelangsdescription'] = 'Пользователи вашего сайта смогут использовать только эти языки, остальные будут скрыты и неактивны';
+$string['visiblelangslabel'] =  'Доступные языки';
 $string['word'] = 'слово';
