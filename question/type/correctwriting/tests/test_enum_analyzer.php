@@ -316,20 +316,24 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correctedanswer = array();
         $expectedorders = array();
         $result = array();
+        $lang = new block_formal_langs_language_simple_english;
         $temp = 0;
         // Expected result.
         $expectedorders[] = array(0, 2, 1, -1, 0, 1);
         // Input data.
         $enumdescription[] = array(new enum_element(8, 9), new enum_element(11, 11), new enum_element(13, 14));
         $enumdescription[] = array(new enum_element(17, 22), new enum_element(24, 29));
-        $correctanswer = array('Billy', 'was', 'like', 'the', 'other', 'rich', 'kids', 'had', 'a', 'nurse', ',', 'bicycle', 'and',
-            'swimming', 'pool', ',', 'but', 'he', 'never', 'played', 'in', 'the', 'street', ',', 'did', 'not',
-            'talk', 'to', 'poor', 'people', '.');
-        $correctedanswer = array('Billy', 'was', 'like', 'the', 'other', 'rich', 'kids', 'had', 'a', 'nurse', ',', 'pool', 'and',
-            'bicycle', ',', 'but', 'he', 'never', 'played', 'in', 'street', ',', 'did', 'not', 'talk', 'to', 'poor', 'people', '.');
+        $string = 'Billy was like the other rich kids had a nurse, bicycle and swimming pool, but he never played in the street, ';
+        $string = $string.'did not talk to poor people.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string = 'Billy was like the other rich kids had a nurse, pool and bicycle, but he never played in street, did not talk ';
+        $string = $string.'to poor people.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens,
+                                                                  $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -350,19 +354,21 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $expectedorders = array();
         $result = array();
         $temp = 0;
+        $lang = new block_formal_langs_language_simple_english;
         // Expected result.
         $expectedorders[] = array(0, 1, -1, 0, 2, 1);
         $expectedorders[] = array(1, 0, -1, 0, 2, 1);
         // Input data.
         $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
         $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
-        $correctanswer = array('Today', 'I', 'meet', 'some', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
-            'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
-        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
-            'children', ':', 'Victoria', ',', 'Tom', 'and', 'Carry', '.');
+        $string = 'Today I meet some friends and my neighbors, with their three children: Victoria, Carry and Tom.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string = 'Today I meet my friends and my neighbors, with their three children: Victoria, Tom and Carry.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -382,6 +388,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correctedanswer = array();
         $expectedorders = array();
         $result = array();
+        $lang = new block_formal_langs_language_simple_english;
         $temp = 0;
         // Expected result.
         $expectedorders[] = array(0, 1, 2, -1, 0, 1, -1, 2, 1, 0);
@@ -390,15 +397,16 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(6, 6), new enum_element(8, 8), new enum_element(10, 10));
         $enumdescription[] = array(new enum_element(3, 10), new enum_element(13, 25));
         $enumdescription[] = array(new enum_element(21, 21), new enum_element(23, 23), new enum_element(25, 25));
-        $correctanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and', 'my',
-            'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Victoria', ',', 'Carry', 'and',
-            'Tom', '.');
-        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and', 'my',
-            'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Tom', ',', 'Carry', 'and',
-            'Victoria', '.');
+        $string = 'Today I meet my friends: Sam, Dine and Michel, and my neighbors, with their three children: Victoria, ';
+        $string = $string.'Carry and Tom.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string = 'Today I meet my friends: Sam, Dine and Michel, and my neighbors, with their three children: Tom, Carry and ';
+        $string = $string.'Victoria.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -418,6 +426,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correctedanswer = array();
         $expectedorders = array();
         $result = array();
+        $lang = new block_formal_langs_language_simple_english;
         $temp = 0;
         // Expected result.
         $expectedorders[] = array(1, 0, -1, 0, 1, -1, 2, 1, 0);
@@ -430,15 +439,16 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(29, 29), new enum_element(31, 31));
         $enumdescription[] = array(new enum_element(23, 24), new enum_element(26, 34));
         $enumdescription[] = array(new enum_element(13, 13), new enum_element(15, 15), new enum_element(17, 35));
-        $correctanswer = array('I', 'see', 'a', 'big', 'group', 'of', 'people', ',', 'which', 'contains', 'three', 'parts', ':',
-            'children', ',', 'women', 'and', 'men', ',', 'who', 'was', 'weared', 'in', 'blue', 'overall', 'or',
-            'strange', 'suits', 'with', 'red', 'and', 'green', 'line', 'in', 'front', '.');
-        $correctedanswer = array('I', 'see', 'a', 'big', 'group', 'of', 'people', ',', 'which', 'contains', 'three', 'parts', ':',
-            'women', ',', 'children', 'and', 'men', ',', 'who', 'was', 'weared', 'in', 'blue', 'overall', 'or',
-            'strange', 'suits', 'with', 'green', 'and', 'red', 'line', 'in', 'front', '.');
+        $string = 'I see a big group of people, which contains three parts: children, women and men, who was weared in blue ';
+        $string = $string.'overall or strange suits with red and green line in front.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string = 'I see a big group of people, which contains three parts: women, children and men, who was weared in blue ';
+        $string = $string.'overall or strange suits with green and red line in front.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -457,6 +467,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correctedanswer = array();
         $enumdescription = array();
         $expectedorders = array();
+        $result = array();
+        $lang = new block_formal_langs_language_simple_english;
         // Expected result.
         $expectedorders[] = array(0, 1, 2, -1, 0, 1, -1, 2, 1, 0);
         $expectedorders[] = array(0, 1, 2, -1, 0, 1, -1, 0, 2, 1);
@@ -470,15 +482,16 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(6, 6), new enum_element(8, 8), new enum_element(10, 10));
         $enumdescription[] = array(new enum_element(3, 10), new enum_element(13, 25));
         $enumdescription[] = array(new enum_element(21, 21), new enum_element(23, 23), new enum_element(25, 25));
-        $correctanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', 'and', 'Michel', ',', 'and', 'my',
-            'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Victoria', ',', 'Carry', 'and',
-            'Tom', '.');
-        $correctedanswer = array('Today', 'I', 'meet', 'my', 'friends', ':', 'Sam', ',', 'Dine', ',', 'Victoria', 'and', 'Michel',
-            ',', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three', 'children', ':', 'Tom', ',',
-            'Carry', ',', 'Sam', 'and', 'Victoria', '.');
+        $string = 'Today I meet my friends: Sam, Dine and Michel, and my neighbors, with their three children: Victoria, Carry ';
+        $string = $string.'and Tom .';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string =  'Today I meet my friends: Sam, Dine, Victoria and Michel, and my neighbors, with their three children: Tom, ';
+        $string = $string.'Carry, Sam and Victoria.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -498,6 +511,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correctedanswer = array();
         $expectedorders = array();
         $result = array();
+        $lang = new block_formal_langs_language_simple_english;
         $temp = 0;
         // Expected result.
         $expectedorders[] = array(1, 0, -1, 0, 1, -1, 2, 1, 0);
@@ -531,16 +545,16 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(29, 29), new enum_element(31, 31));
         $enumdescription[] = array(new enum_element(23, 24), new enum_element(26, 34));
         $enumdescription[] = array(new enum_element(13, 13), new enum_element(15, 15), new enum_element(17, 35));
-        $correctanswer = array('I', 'see', 'a', 'big', 'group', 'of', 'people', ',', 'which', 'contains', 'three', 'parts', ':',
-            'children', ',', 'women', 'and', 'men', ',', 'who', 'was', 'weared', 'in', 'blue', 'overall', 'or',
-            'strange', 'suits', 'with', 'red', 'and', 'green', 'line', 'in', 'front', '.');
-        $correctedanswer = array('I', 'see', 'a', 'big', 'group', 'of', 'people', ',', 'which', 'contains', 'three', 'parts', ':',
-            'women', ',', 'children', 'and', 'women', 'men', ',', 'who', 'was', 'weared', 'in', 'blue',
-            'overall', 'or', 'strange', 'suits', 'with', 'green', 'and', 'red', 'line', 'in', 'front', 'or',
-            'green', 'overall', '.');
+        $string = 'I see a big group of people, which contains three parts: children, women and men, who was weared in blue ';
+        $string = $string.'overall or strange suits with red and green line in front.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string =  'I see a big group of people, which contains three parts: women, children and women men, who was weared in ';
+        $string = $string.'blue overall or strange suits with green and red line in front or green overall.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
@@ -558,6 +572,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription = array();
         $correctanswer = array();
         $correctedanswer = array();
+        $lang = new block_formal_langs_language_simple_english;
         $expectedorders = array();
         $result = array();
         $temp = 0;
@@ -569,13 +584,15 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Input data.
         $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
         $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
-        $correctanswer = array('Today', 'I', 'meet', 'some', 'friends', 'and', 'my', 'neighbors', ',', 'with', 'their', 'three',
-            'children', ':', 'Victoria', ',', 'Carry', 'and', 'Tom', '.');
-        $correctedanswer = array('Today', 'I', 'meet', 'my', 'neighbors', 'and', 'my', 'friends', ',', 'with', 'their', 'three',
-            'children', ':', 'Victoria', ',', 'Tom', 'and', 'Carry', 'and', 'some', 'children', 'Tom', '.');
+        $string = 'Today I meet some friends and my neighbors, with their three children: Victoria, Carry and Tom.';
+        $correctanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
+        $string =  'Today I meet my neighbors and my friends, with their three children: Victoria, Tom and Carry and some ';
+        $string = $string.'children Tom.';
+        $correctedanswer = $lang->create_from_string($string, 'qtype_correctwriting_proccesedstring');
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
-        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription);
+        $result = $temp->find_all_enum_orders_in_corrected_string($correctanswer->stream->tokens, $correctedanswer->stream->tokens,
+                                                                  $enumdescription);
         $equal = true;
         foreach ($expectedorders as $current_order) {
             if(false === array_search($current_order, $result)) {
