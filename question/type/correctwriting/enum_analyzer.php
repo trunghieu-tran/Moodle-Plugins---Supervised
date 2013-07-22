@@ -141,6 +141,7 @@ class  qtype_correctwriting_enum_analyzer {
             $token_number = 0;
             // For all tokens of current element of enumeration find indexes of equal tokens in corrected student answer.
             for ($j = $enumdescription[$number][$i]->begin; $j < $enumdescription[$number][$i]->end +1; $j++) {
+                $indexes_of_tokens[] = array();
                 foreach ($correctedanswer as $key => $token) {
                     if ($token->value() == $correctanswer[$j]->value()) {
                         $indexes_of_tokens[$token_number][] = $key;
