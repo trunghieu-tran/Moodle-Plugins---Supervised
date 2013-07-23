@@ -348,6 +348,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
                 if ($result != null) {
+                    $result->mergedassertions = $this->mergedassertions;
                     $result = $result->intersect_asserts($other);
                 }
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
