@@ -765,7 +765,9 @@ abstract class qtype_preg_finite_automaton {
             $subexpr_start = array();
             $subexpr_end = array();
             $currentindex = 0;
+            // Parse a string into components.
             while($currentindex < strlen($arraystrings[2])) {
+                // If subpatt_start.
                 if($arraystrings[2][$currentindex] == '(') {
                     if($currentindex == 0 || $arraystrings[2][$currentindex - 1] != '\\') {
                         while($arraystrings[2][$currentindex] != '/') {
@@ -774,6 +776,7 @@ abstract class qtype_preg_finite_automaton {
                         }
                     }
                     $currentindex++;
+                    // If subexpr_start.
                     if($arraystrings[2][$currentindex] == '(') {
                         while($arraystrings[2][$currentindex] == '(') {
                             $subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
@@ -781,6 +784,7 @@ abstract class qtype_preg_finite_automaton {
                         }
                     }
                 }
+                // If subexpr_start without subpatt_start.
                 else if($arraystrings[2][$currentindex] == '/' && $arraystrings[2][$currentindex + 1] == '(') {
                     $currentindex++;
                     while($arraystrings[2][$currentindex] == '(') {
@@ -788,6 +792,7 @@ abstract class qtype_preg_finite_automaton {
                         $currentindex++;
                     }
                 }
+                // If current symbol is back_slash.
                 else if($arraystrings[2][$currentindex] == '\\') {
                     switch($arraystrings[2][$currentindex+1]) {
                         case 'b': $asserts[] = '\\b'; break;
@@ -800,21 +805,25 @@ abstract class qtype_preg_finite_automaton {
                     }
                     $currentindex = $currentindex + 2;
                 }
+                // If current symbol is assert.
                 else if($arraystrings[2][$currentindex] == '^' || $arraystrings[2][$currentindex] == '$') {
                     $asserts[] = $arraystrings[2][$currentindex];
                     $currentindex++;
                 }
+                // If subexpr_end.
                 else if($arraystrings[2][$currentindex] == ')') {
                     while($arraystrings[2][$currentindex] != '/') {
                         $subexpr_end[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                         $currentindex++;
                     }
                     $currentindex++;
+                    // If subpatt_end.
                     while($currentindex < strlen($arraystrings[2]) && $arraystrings[2][$currentindex] == ')') {
                         $subpatt_end[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                         $currentindex++;
                     }
                 }
+                // If subpatt_end without subexpr_end
                 else if($arraystrings[2][$currentindex] == '/' && $arraystrings[2][$currentindex + 1] == ')') {
                     $currentindex++;
                     while($currentindex < strlen($arraystrings[2])) {
@@ -822,11 +831,13 @@ abstract class qtype_preg_finite_automaton {
                         $currentindex++;
                     }
                 }
+                // Current symbol just symbol.
                 else {
                     $chars = $chars.$arraystrings[2][$currentindex];
                     $currentindex++;
                 }
             }
+            // Fill transition.
             if(strlen($arraystrings[2]) > 0) {
                 if(strlen($chars) != 0) {
                     $pregleaf = new qtype_preg_leaf_charset();
@@ -890,6 +901,7 @@ abstract class qtype_preg_finite_automaton {
             }
             else {
                 $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                $transition = new qtype_preg_fa_transition($statefrom, $pregleaf, $stateto);
             }
             // Search color of current transition.
             if ($arraystrings[3] == ',') {
