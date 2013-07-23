@@ -59,9 +59,6 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
         $mform->setDefault('authoring_tools_charset_process', 'userinscription');
 
-        if (stristr($agent, 'MSIE')) {
-            $mform->addElement('html', '</div>');
-        }
         // Add generated map.
         // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('regex_tree_header', 'qtype_preg'));
