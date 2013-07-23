@@ -577,7 +577,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Add the end state of the automaton to given state.
      */
-    public function add_end_state(&$state) {
+    public function add_end_state($state) {
         if (array_key_exists($state, $this->adjacencymatrix)) {
             $this->endstates[] = $state;
         } else {
