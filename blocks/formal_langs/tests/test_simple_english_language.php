@@ -1,10 +1,24 @@
 <?php
+// This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Formal Languages block is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Formal Languages block is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Defines unit-tests for Simple English language
  *
  * For a complete info, see qtype_correctwriting_token_base
  *
- * @copyright &copy; 2011  Dmitry Mamontov
+ * @copyright &copy; 2011 Oleg Sychev
  * @author Oleg Sychev, Dmitriy Mamontov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -24,8 +38,17 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
      */
     protected $utils;
 
+
     public function __construct() {
         $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_simple_english', $this);
+    }
+
+    public function test_other_unicode() {
+        $lang = new block_formal_langs_language_simple_english();
+        $processedstring = $lang->create_from_string('а');
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 1, 'There must be one lexeme');
+        $this->assertTrue($result[0]->value() == 'а');
     }
 
     // Tests a lexer of simple english language
