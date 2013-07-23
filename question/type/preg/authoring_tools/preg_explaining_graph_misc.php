@@ -246,8 +246,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
                     //find a link between neighbor and his right neighbor, then change source to new node
                     $tmpneighbor = $neighbor->find_neighbor_dst($gmain);
-                    $tmpneighbor = $gmain->find_link($neighbor, $tmpneighbor);
-                    $tmpneighbor->source = $tmp;
+                    if (!($tmpneighbor->label[0] == 'error' and $tmpneighbor->id == -2)) {
+                        $tmpneighbor = $gmain->find_link($neighbor, $tmpneighbor);
+                        $tmpneighbor->source = $tmp;
+                    }
 
                     // destroy old link
                     $tmpneighbor = $gmain->find_link($tmpdnode, $neighbor);
@@ -454,14 +456,31 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 $neighborL = $iter->find_neighbor_src($gmain);
                 $neighborR = $iter->find_neighbor_dst($gmain);
 
-                // find a link between left neighbor and void
-                $tmpneighbor = $gmain->find_link($neighborL, $iter);
-                $tmpneighbor->destination = $neighborR;    // set a new destination
+                if ($this->style != 'solid; color=darkgreen') {
+                    // find a link between left neighbor and void
+                    $tmpneighbor = $gmain->find_link($neighborL, $iter);
+                    $tmpneighbor->destination = $neighborR;    // set a new destination
 
-                // find a link between void and right neighbor and destroy it
-                $tmpneighbor = $gmain->find_link($iter, $neighborR);
-                unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
-                $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                    // find a link between void and right neighbor and destroy it
+                    $tmpneighbor = $gmain->find_link($iter, $neighborR);
+                    unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
+                    $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                } else {
+                    $pointl = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
+                    $pointr = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
+                    $this->nodes[] = $pointl;
+                    $this->nodes[] = $pointr;
+
+                    // find a link between left neighbor and void
+                    $tmpneighbor = $gmain->find_link($neighborL, $iter);
+                    $tmpneighbor->destination = $pointl;    // set a new destination
+
+                    // find a link between void and right neighbor
+                    $tmpneighbor = $gmain->find_link($iter, $neighborR);
+                    $tmpneighbor->source = $pointr;    // set a new source
+
+                    $this->links[] = new qtype_preg_explaining_graph_tool_link('', $pointl, $pointr, $this);
+                }
 
                 // destroy void-node
                 unset($this->nodes[array_search($iter, $this->nodes)]);
@@ -526,7 +545,6 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
-                $iter->label[0] = qtype_preg_authoring_tool::escape_string(substr($iter->label[0], 1));
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
                     'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
@@ -604,7 +622,6 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->shape == 'record')
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else {
-                $iter->label[0] = qtype_preg_authoring_tool::escape_string(substr($iter->label[0], 1));
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') . 
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') . 
                     'label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';

@@ -11,6 +11,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
     public function test_big_forward() {
         $dotdescription1 = 'digraph example
                             {
+                                0;
                                 9;
                                 0->1[label="[a-c]"];
                                 1->2[label="[ab]"];
@@ -28,6 +29,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotdescription2 = 'digraph example
                             {
+                                0;
                                 9;
                                 0->1[label="[a-z]"];
                                 1->2[label="[ab]"];
@@ -46,6 +48,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         "9,";
                         "0,"->"1,"[label="[a-c]",color=violet];
                         "1,"->"5,0"[label="[a-z]",color=violet];
@@ -240,6 +243,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
     public function test_big_back() {
         $dotdescription1 = 'digraph example
                             {
+                                0;
                                 9;
                                 0->1[label="[a-c]"];
                                 1->2[label="[ab]"];
@@ -257,6 +261,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotdescription2 = 'digraph example
                             {
+                                0;
                                 9;
                                 0->1[label="[a-z]"];
                                 1->2[label="[ab]"];
@@ -275,6 +280,7 @@ class qtype_preg_fa_intersect_fa_big_test extends PHPUnit_Framework_TestCase {
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";",0";
                         "9,";
                         "9,"->"2,"[label="[ab]",color=violet];
                         "9,"->"2,0"[label="[ab]",color=violet];

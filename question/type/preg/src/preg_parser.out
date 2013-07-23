@@ -1,6 +1,6 @@
 State 0:
           start ::= * expr
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -24,7 +24,7 @@ State 0:
 
                     CLOSEBRACK shift  24
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -32,7 +32,7 @@ State 0:
                           expr shift  4
 
 State 1:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -65,7 +65,7 @@ State 1:
 
                     CLOSEBRACK shift  3
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -73,7 +73,7 @@ State 1:
                      {default} reduce 19
 
 State 2:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -104,7 +104,7 @@ State 2:
 
                     CLOSEBRACK shift  6
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -112,7 +112,7 @@ State 2:
                      {default} reduce 20
 
 State 3:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -141,7 +141,7 @@ State 3:
 
                     CLOSEBRACK shift  19
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -150,7 +150,7 @@ State 3:
 
 State 4:
       (0) start ::= expr *
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -179,7 +179,7 @@ State 4:
 
                     CLOSEBRACK shift  20
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -187,7 +187,7 @@ State 4:
                      {default} reduce 0
 
 State 5:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -217,14 +217,14 @@ State 5:
 
                     CLOSEBRACK shift  15
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
                           expr shift  14
 
 State 6:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -251,7 +251,7 @@ State 6:
 
                     CLOSEBRACK shift  17
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -259,7 +259,7 @@ State 6:
                      {default} reduce 15
 
 State 7:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -290,7 +290,7 @@ State 7:
 
                     CLOSEBRACK shift  23
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -298,7 +298,7 @@ State 7:
                      {default} reduce 16
 
 State 8:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -329,7 +329,7 @@ State 8:
 
                     CLOSEBRACK shift  22
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -337,7 +337,7 @@ State 8:
                      {default} reduce 18
 
 State 9:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -365,7 +365,7 @@ State 9:
 
                     CLOSEBRACK shift  18
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -373,7 +373,7 @@ State 9:
                      {default} reduce 17
 
 State 10:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -398,7 +398,7 @@ State 10:
           expr ::= * QUANT
 
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -406,7 +406,7 @@ State 10:
                      {default} reduce 6
 
 State 11:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -435,7 +435,7 @@ State 11:
           expr ::= * QUANT
 
                            ALT shift  12
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -443,7 +443,7 @@ State 11:
                      {default} reduce 5
 
 State 12:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
           expr ::= expr ALT * expr
@@ -470,7 +470,7 @@ State 12:
           expr ::= * QUANT
 
                            ALT shift  10
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  25
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -478,7 +478,7 @@ State 12:
                      {default} reduce 4
 
 State 13:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
           expr ::= * expr ALT expr
@@ -507,7 +507,7 @@ State 13:
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                      PARSLEAF shift  16
+                     PARSELEAF shift  16
                          QUANT shift  21
                      OPENBRACK shift  9
                    CONDSUBEXPR shift  2
@@ -515,7 +515,7 @@ State 13:
                      {default} reduce 3
 
 State 14:
-          expr ::= * PARSLEAF
+          expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
       (2) expr ::= expr expr *
@@ -557,7 +557,7 @@ State 15:
                      {default} reduce 12
 
 State 16:
-      (1) expr ::= PARSLEAF *
+      (1) expr ::= PARSELEAF *
 
                      {default} reduce 1
 

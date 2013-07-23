@@ -135,7 +135,14 @@ class JLexBase {
             }
             if ($this->yy_count_chars) {
                 $this->yychar += $this->yy_buffer_index - $this->yy_buffer_start;
-                $this->yycol += $this->yy_buffer_index - $this->yy_buffer_start;
+                //$this->yycol += $this->yy_buffer_index - $this->yy_buffer_start;
+                $i = $this->yy_buffer_index - 1;
+                while ($i >= $this->yy_buffer_start &&
+                       !($this->yy_buffer[$i] == "\r" ||    // \r
+                        ($i > 0 && $this->yy_buffer[$i - 1] != "\r" && $this->yy_buffer[$i] == "\n"))) {   // \n not preceeded by \r
+                    $this->yycol++;
+                    $i--;
+                }
             }
             $this->yy_buffer_start = $this->yy_buffer_index;
         }
