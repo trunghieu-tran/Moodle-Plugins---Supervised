@@ -163,6 +163,7 @@ M.poasquestion_text_and_button = (function() {
         } else {
             self.currentlinput.val(self.data);
         }
+		$('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
         self.dialog.dialog('close');
     }
 };

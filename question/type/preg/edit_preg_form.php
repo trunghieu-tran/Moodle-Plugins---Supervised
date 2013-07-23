@@ -50,6 +50,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     protected function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
         $repeated = array();
+        $repeated[] = $mform->createElement('hidden', 'regextests', '');
         $repeated[] = $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
                 $label);
         $repeated[] = $mform->createElement('select', 'fraction',
@@ -57,6 +58,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $repeated[] = $mform->createElement('editor', 'feedback',
                 get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
         $repeatedoptions['answer']['type'] = PARAM_RAW;
+        $repeatedoptions['regextests']['type'] = PARAM_RAW;
         $repeatedoptions['fraction']['default'] = 0;
         $answersoption = 'answers';
         return $repeated;
