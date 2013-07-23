@@ -901,8 +901,8 @@ abstract class qtype_preg_finite_automaton {
                 $tran->from = $del->from;
                 $this->add_transition($tran);
             }
+            $this->del_transition($del);
         }
-        $this->del_transition($del);
     }
 
     /**
