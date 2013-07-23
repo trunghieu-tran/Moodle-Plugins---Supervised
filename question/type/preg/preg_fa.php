@@ -885,16 +885,19 @@ abstract class qtype_preg_finite_automaton {
      * @param del - uncapturing transition for deleting.
      */
     public function go_round_transitions($del) {
+        $clonetransitions = array();
         $transitions = $this->get_state_outtransitions($del->to);
         // Changing leafs in case of merging.
-        foreach ($transitions as &$tran) {
+        foreach ($transitions as $transition) {
+            $tran = clone($transition);
             $tran = $tran->save_tags($del);
             $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
             $tran->pregleaf = $newleaf;
+            $clonetransitions[] = $tran;
         }
         // Has deleting or changing transitions.
         if (count($transitions) !=0) {
-            foreach ($transition as &$tran) {
+            foreach ($clonetransitions as &$tran) {
                 $tran->from = $del->from;
                 $this->add_transition($tran);
             }
