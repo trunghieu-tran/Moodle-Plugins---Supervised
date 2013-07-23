@@ -810,6 +810,26 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $result;
     }
 
+    public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
+        $ranges = array();
+        $charset = $this->intersect($other);
+        foreach ($charset->flags as $flags) {
+            foreach ($flags as $flag) {
+                $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+            }
+        }
+        if (count($ranges) >= 2) {
+            $resrange = qtype_preg_unicode::kinda_operator($ranges[0], $ranges[1], true, false, false, false);
+            for ($i = 2; $i < count($ranges); $i++) {
+                $resrange = qtype_preg_unicode::kinda_operator($resrange, $ranges[$i], true, false, false, false);
+            }
+        }
+        if (count($resrange) == 0) {
+            $charset = null;
+        }
+        return $charset;
+    }
+
     /**
      * Substracts other charset from this.
      * @param other charset to substract.
