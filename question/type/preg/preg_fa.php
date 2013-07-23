@@ -113,6 +113,7 @@ class qtype_preg_fa_transition {
     public function intersect($other) {
         $thishastags = $this->has_tags();
         $otherhastags = $other->has_tags();
+        $resulttran = null;
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
             $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
