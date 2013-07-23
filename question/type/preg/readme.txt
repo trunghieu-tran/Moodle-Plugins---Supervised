@@ -3,12 +3,16 @@ Perl-compatible regular expression question
 
 Authors:
 1. Idea, design, question type code, error reporting, hinting - Oleg Sychev
-2. Parsing regular expression, DFA regular expression matching engine - Dmitriy Kolesov
-3. NFA regular expression matching engine, backreferences, matchers cross-testing, Unicode support - Valeriy Streltsov
+2. DFA regular expression matching engine (deprecated for now) - Dmitriy Kolesov
+3. NFA regular expression matching engine, parsing regular expression, backreferences, matchers cross-testing, unicode support - Valeriy Streltsov
+4. Explaining graph (authoring tool) - Vladimir Ivanov
+5. Regular expression description (authoring tool) - Dmitriy Pahomov
+6. Syntax tree, regex testing (authoring tools) - Grigoriy Terehov
 
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;
-* Tim Hunt - for his polite and useful answers and commentaries that helped writing this question.
+* Tim Hunt - for his polite and useful answers and commentaries that helped writing this question;
+* Bondarenko Vitaly - for conversion of a vast set of PCRE library regular expression matching tests.
 
 1. Description
 The question was primarily intended to allow the use of php perl-compatible regular expressions in short answer
@@ -33,8 +37,8 @@ directory of Moodle installation (the one containing config.php) - it will insta
 
 If you downloaded all parts separately (for example because Moodle Plugins Directory don't allow
 them to be downloaded together), you should get 5 archives. Place "preg" and "poasquestion" folders in the question/type
-folder of Moodle installation. "adaptivehints" and "adaptivehintsnopenalties" should be placed in question/behaviour folder.
-"formal_langs" should be placed in the blocks folder.
+folder of Moodle installation. "adaptivehints", "interactivehints" and "adaptivehintsnopenalties" should be placed
+in question/behaviour folder. "formal_langs" should be placed in the blocks folder.
 
 After having files in place login as administrator and go to the notifications page.
 
@@ -61,8 +65,27 @@ If you regular expressions are not that hardcore, but you want to make heavy use
 Then just experiment. If some engine don't allow you to do something you need (you get messages that something is unsupported, or
 regular expression is too complex or hinting is inactive etc) or just have bug in you particular regular expression - try another one.
 
+5. Authoring tools
+Authoring tools are there to help you with regular expression development. For now they are concentrated on the describing you regular
+expression in different ways.
 
-5. Bugs, suggestions and giving back
+Syntax tree shows you an internal structure of expression - what is inside what. If you understand regular expressions throught operators
+and operands, it can be of a great help to you. If not, it can help you determine if repeating or alternative applied to the correct parts
+of the expression, did you need to use parenthesis and where they should be placed.
+
+Explaining graph graphically shows you how expression works: it's nodes are characters or their sequences; concatenation, alternative and
+simple assertions shown by edges, while rectangles show you repetition and subpattern capturing.
+
+Description is an natural language sentence, generated from regular expression, which explain you how you expression will work.
+
+To better understand how parts of the regular expression affects the entire picture, you could select part of regular expression to be 
+highlighted on the syntax tree, explaining graph and description tools.
+
+Testing tool allows you to see how you regexes matches with different strings. It expected to be much more convenient than question previewing.
+Entered test strings will be saved in database with the question for future use.
+
+
+6. Bugs, suggestions and giving back
 Please report bugs in GoogleCode tracker (set Component-Preg label) - this is preferable way - or Moodle tracker.
 Google Code tracker could be found there: http://code.google.com/p/oasychev-moodle-plugins/issues/list
 You also may post a suggestions of how to develop question type in the future, but please accompany them with information of
