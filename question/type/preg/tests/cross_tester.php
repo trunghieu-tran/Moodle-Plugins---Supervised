@@ -469,16 +469,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 }
 
                 // Try to get matcher for the regex.
-                try {
+
                     $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
                     $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
                     $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
                     $matcher->set_options($options);
-                } catch (Exception $e) {
-                    echo 'EXCEPTION CATCHED DURING BUILDING MATCHER, test name is ' . $methodname .  "\n" . $e->getMessage() . "\n";
-                    $this->exceptionscount++;
-                    continue;
-                }
+
 
                 // Skip to the next regex if there's something wrong.
                 if ($this->check_for_errors($matcher)) {

@@ -1,7 +1,21 @@
 <?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for explain graph tool.
+ * Unit tests for explainning graph tool.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -65,8 +79,10 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         if (count($g1->nodes) == count($g2->nodes)) {
             for ($i = 0; $i < count($g1->nodes); ++$i) {
-                if (!self::cmp_nodes($g1->nodes[$i], $g2->nodes[$i]))
+                $isnodesnotequal = !self::cmp_nodes($g1->nodes[$i], $g2->nodes[$i]);
+                if ($isnodesnotequal) {
                     return false;
+                }
             }
         } else {
             return false;
@@ -74,16 +90,21 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         if (count($g1->entries) == count($g2->entries)) {
             for ($i = 0; $i < count($g1->entries); ++$i) {
-                if (!self::cmp_nodes($g1->entries[$i], $g2->entries[$i]))
+                $isnodesnotequal = !self::cmp_nodes($g1->entries[$i], $g2->entries[$i]);
+                if ($isnodesnotequal) {
                     return false;
+                }
             }
+        } else {
+            return false;
         }
-        else return false;
 
         if (count($g1->exits) == count($g2->exits)) {
             for ($i = 0; $i < count($g1->exits); ++$i) {
-                if (!self::cmp_nodes($g1->exits[$i], $g2->exits[$i]))
+                $isnodesnotequal = !self::cmp_nodes($g1->exits[$i], $g2->exits[$i]);
+                if ($isnodesnotequal) {
                     return false;
+                }
             }
         } else {
             return false;
@@ -91,340 +112,342 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         if (count($g1->links) == count($g2->links)) {
             for ($i = 0; $i < count($g1->links); ++$i) {
-                if ($g1->links[$i]->label != $g2->links[$i]->label)
+                if ($g1->links[$i]->label != $g2->links[$i]->label) {
                     return false;
-                if (!self::cmp_nodes($g1->links[$i]->destination, $g2->links[$i]->destination))
+                }
+                if (!self::cmp_nodes($g1->links[$i]->destination, $g2->links[$i]->destination)) {
                     return false;
-                if (!self::cmp_nodes($g1->links[$i]->source, $g2->links[$i]->source))
+                }
+                if (!self::cmp_nodes($g1->links[$i]->source, $g2->links[$i]->source)) {
                     return false;
+                }
             }
-        }
-        else {
+        } else {
             return false;
         }
 
         if (count($g1->subgraphs) == count($g2->subgraphs)) {
             for ($i = 0; $i < count($g1->subgraphs); ++$i) {
-                if (!self::cmp_graphs($g1->subgraphs[$i], $g2->subgraphs[$i]))
+                if (!self::cmp_graphs($g1->subgraphs[$i], $g2->subgraphs[$i])) {
                     return false;
+                }
             }
-        }
-        else {
+        } else {
             return false;
         }
 
         return true;
     }
 
-   function test_create_graph_subexpression() {
-       $tree = new qtype_preg_explaining_graph_tool('(b)');
+    public function test_create_graph_subexpression() {
+        $tree = new qtype_preg_explaining_graph_tool('(b)');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with subexpression!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with subexpression!');
 
-       //-----------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('(?:\d)');
+        $tree = new qtype_preg_explaining_graph_tool('(?:\d)');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'decimal digit'), 'ellipse', 'hotpink', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'decimal digit'), 'ellipse', 'hotpink', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with grouping!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with grouping!');
+    }
 
-   function test_create_graph_alter() {
-       $tree = new qtype_preg_explaining_graph_tool('.|\D');
+    public function test_create_graph_alter() {
+        $tree = new qtype_preg_explaining_graph_tool('.|\D');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'hotpink', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not decimal digit'), 'ellipse', 'hotpink', $etalon, 1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[3]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[1]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[3]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[2]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[5]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'printing character (including space)'), 'ellipse', 'hotpink', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not decimal digit'), 'ellipse', 'hotpink', $etalon, 1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[3]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[3]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[2]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[5]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alternation!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alternation!');
+    }
 
-   function test_create_graph_charclass() {
-       $tree = new qtype_preg_explaining_graph_tool('[ab0-9?]');
+    public function test_create_graph_charclass() {
+        $tree = new qtype_preg_explaining_graph_tool('[ab0-9?]');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('ab?', chr(10).'from 0 to 9'), 'record', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('ab?', chr(10).'from 0 to 9'), 'record', 'black', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with charclass!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with charclass!');
+    }
 
-   function test_create_graph_alone_meta() {
-       $tree = new qtype_preg_explaining_graph_tool('\W');
+    public function test_create_graph_alone_meta() {
+        $tree = new qtype_preg_explaining_graph_tool('\W');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not word character'), 'ellipse', 'hotpink', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(chr(10).'not word character'), 'ellipse', 'hotpink', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone meta!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone meta!');
+    }
 
-   function test_create_graph_alone_simple() {
-       $tree = new qtype_preg_explaining_graph_tool('test');
+    public function test_create_graph_alone_simple() {
+        $tree = new qtype_preg_explaining_graph_tool('test');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('test'), 'ellipse', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('test'), 'ellipse', 'black', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone simple!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with alone simple!');
+    }
 
-   function test_create_graph_asserts() {
-       $tree = new qtype_preg_explaining_graph_tool('^$');
+    public function test_create_graph_asserts() {
+        $tree = new qtype_preg_explaining_graph_tool('^$');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string\nend of the string', $etalon->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string\nend of the string', $etalon->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with asserts!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with asserts!');
+    }
 
-   function test_create_graph_quantifiers() {
-       $tree = new qtype_preg_explaining_graph_tool('x+');
+    public function test_create_graph_quantifiers() {
+        $tree = new qtype_preg_explaining_graph_tool('x+');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 1 to infinity times', 'dotted; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 1 to infinity times', 'dotted; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier +!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier +!');
 
-       //-----------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('x*');
+        $tree = new qtype_preg_explaining_graph_tool('x*');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to infinity times', 'dotted; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to infinity times', 'dotted; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier *!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier *!');
 
-       //-----------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('x?');
+        $tree = new qtype_preg_explaining_graph_tool('x?');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to 1 time', 'dotted; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to 1 time', 'dotted; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier ?!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier ?!');
 
-       //-----------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('x{3,7}');
+        $tree = new qtype_preg_explaining_graph_tool('x{3,7}');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 3 to 7 times', 'dotted; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 3 to 7 times', 'dotted; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
+    }
 
-   function test_create_graph_assert_and_subgraph() {
-       $tree = new qtype_preg_explaining_graph_tool('^(a)');
+    public function test_create_graph_assert_and_subgraph() {
+        $tree = new qtype_preg_explaining_graph_tool('^(a)');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
 
-       //---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('a(\b)');
+        $tree = new qtype_preg_explaining_graph_tool('a(\b)');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('at a word boundary', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[2]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('at a word boundary', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[2]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
 
-       //---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('^(a)$');
+        $tree = new qtype_preg_explaining_graph_tool('^(a)$');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[2]);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('end of the string', $etalon->subgraphs[0]->nodes[2], $etalon->nodes[1]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[2]);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('end of the string', $etalon->subgraphs[0]->nodes[2], $etalon->nodes[1]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
+    }
 
-   function test_create_graph_backref() {
-       $tree = new qtype_preg_explaining_graph_tool('(b)\1');
+    public function test_create_graph_backref() {
+        $tree = new qtype_preg_explaining_graph_tool('(b)\1');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('back reference to subexpression #1'), 'ellipse', 'blue', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('back reference to subexpression #1'), 'ellipse', 'blue', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with backreference!');
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with backreference!');
 
-       //----------------------------------------------------------
+        // ----------------------------------------------------------
 
-       $tree = new qtype_preg_explaining_graph_tool('(b)\2');
+        $tree = new qtype_preg_explaining_graph_tool('(b)\2');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('back reference to subexpression #2'), 'ellipse', 'blue', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('back reference to subexpression #2'), 'ellipse', 'blue', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with faked backreference!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with faked backreference!');
+    }
 
-   function test_create_graph_multialter() {
-       $tree = new qtype_preg_explaining_graph_tool('abc|acb|bac|bca|cab|cba');
+    public function test_create_graph_multialter() {
+        $tree = new qtype_preg_explaining_graph_tool('abc|acb|bac|bca|cab|cba');
 
-       $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
 
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('abc'), 'ellipse', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('acb'), 'ellipse', 'black', $etalon, 5);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('bac'), 'ellipse', 'black', $etalon, 11);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('bca'), 'ellipse', 'black', $etalon, 17);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('cab'), 'ellipse', 'black', $etalon, 23);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('cba'), 'ellipse', 'black', $etalon, 29);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('abc'), 'ellipse', 'black', $etalon, 0);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('acb'), 'ellipse', 'black', $etalon, 5);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('bac'), 'ellipse', 'black', $etalon, 11);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('bca'), 'ellipse', 'black', $etalon, 17);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('cab'), 'ellipse', 'black', $etalon, 23);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('cba'), 'ellipse', 'black', $etalon, 29);
 
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
 
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
 
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[0]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[1]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[2]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[3]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[4]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[5]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[5], $etalon->nodes[7]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[8], $etalon->nodes[6]);
-       $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[7], $etalon->nodes[9]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[2]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[3]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[4]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[6], $etalon->nodes[5]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[5], $etalon->nodes[7]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[8], $etalon->nodes[6]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[7], $etalon->nodes[9]);
 
-       $result = $tree->create_graph();
+        $result = $tree->create_graph();
 
-       $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with multialter!');
-   }
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with multialter!');
+    }
 
-   function test_create_graph_double_qoute() {
+    public function test_create_graph_double_qoute() {
         $tree = new qtype_preg_explaining_graph_tool('".\\"');
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
@@ -441,15 +464,21 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result = $tree->create_graph();
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with double quote!');
-   }
+    }
 
-   function test_create_graph_recursion() {
+    public function test_create_graph_recursion() {
         $tree = new qtype_preg_explaining_graph_tool('(abc(?R))');
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1', 'solid; color=black');
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('abc'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('recursive match with whole regular expression'), 'ellipse', 'blue', $etalon->subgraphs[0], 5);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
+                                array('recursive match with whole regular expression'),
+                                'ellipse',
+                                'blue',
+                                $etalon->subgraphs[0],
+                                5
+                                );
         $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[1]);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
@@ -459,9 +488,9 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result = $tree->create_graph();
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with recursion!');
-   }
+    }
 
-   function test_create_graph_caseinsensetive() {
+    public function test_create_graph_caseinsensetive() {
         $tree = new qtype_preg_explaining_graph_tool('(?i:abc)');
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
@@ -475,117 +504,117 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result = $tree->create_graph();
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with caseinsensetive!');
-   }
+    }
 
-   function test_process_charset_interval() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('0-9'));
+    public function test_process_charset_interval() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('0-9'));
 
-       $result = $node->process_charset();
+        $result = $node->process_charset();
 
-       $etalon = array(chr(10) . 'from 0 to 9');
+        $etalon = array(chr(10) . 'from 0 to 9');
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed common range.');
-       
-       // ----------------------------------------------------
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed common range.');
 
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x30-\x39'));
+        // ----------------------------------------------------
 
-       $result = $node->process_charset();
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x30-\x39'));
 
-       $etalon = array(chr(10) . 'from character with code 0x30 to character with code 0x39');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed hex range.');
-   }
+        $etalon = array(chr(10) . 'from character with code 0x30 to character with code 0x39');
 
-   function test_process_charset_posix() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('[:alpha:]'));
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed hex range.');
+    }
 
-       $result = $node->process_charset();
+    public function test_process_charset_posix() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('[:alpha:]'));
 
-       $etalon = array(chr(10) . 'letter');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed posix class.');
-   }
+        $etalon = array(chr(10) . 'letter');
 
-   function test_process_charset_unicode() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\p{C}'));
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed posix class.');
+    }
 
-       $result = $node->process_charset();
+    public function test_process_charset_unicode() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\p{C}'));
 
-       $etalon = array(chr(10) . 'other unicode property');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed unicode property with { }.');
+        $etalon = array(chr(10) . 'other unicode property');
 
-       // ---------------------------------------------------
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed unicode property with { }.');
 
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\pC'));
+        // ---------------------------------------------------
 
-       $result = $node->process_charset();
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\pC'));
 
-       $etalon = array(chr(10) . 'other unicode property');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed unicode property without { }.');
-   }
+        $etalon = array(chr(10) . 'other unicode property');
 
-   function test_process_charset_code() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x{30}'));
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed unicode property without { }.');
+    }
 
-       $result = $node->process_charset();
+    public function test_process_charset_code() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x{30}'));
 
-       $etalon = array(chr(10) . 'character with code 0x30');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed character code with { }.');
+        $etalon = array(chr(10) . 'character with code 0x30');
 
-       // ---------------------------------------------------
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed character code with { }.');
 
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\X30'));
+        // ---------------------------------------------------
 
-       $result = $node->process_charset();
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\X30'));
 
-       $etalon = array(chr(10) . 'character with code 0x30');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed character code without { }.');
-   }
+        $etalon = array(chr(10) . 'character with code 0x30');
 
-   function test_process_charset_special() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\d'));
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed character code without { }.');
+    }
 
-       $result = $node->process_charset();
+    public function test_process_charset_special() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\d'));
 
-       $etalon = array(chr(10) . 'decimal digit');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed special.');
-   }
+        $etalon = array(chr(10) . 'decimal digit');
 
-   function test_process_charset_nospecial() {
-       $node = new qtype_preg_authoring_tool_leaf_charset(NULL, NULL);
-       $node->pregnode = new qtype_preg_leaf_charset();
-       $node->pregnode->userinscription = array(new qtype_preg_userinscription('\y'));
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed special.');
+    }
 
-       $result = $node->process_charset();
+    public function test_process_charset_nospecial() {
+        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node->pregnode = new qtype_preg_leaf_charset();
+        $node->pregnode->userinscription = array(new qtype_preg_userinscription('\y'));
 
-       $etalon = array('y');
+        $result = $node->process_charset();
 
-       $this->assertTrue(sizeof(array_diff($etalon, $result)) == 0, 'Failed nospecial.');
-   }
+        $etalon = array('y');
 
-    function test_process_simple_characters() {
+        $this->assertTrue(count(array_diff($etalon, $result)) == 0, 'Failed nospecial.');
+    }
+
+    public function test_process_simple_characters() {
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('abc'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
@@ -607,7 +636,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result->process_simple_characters($result);
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with combinable characters!');
-        
+
         // ----------------------------------------------------------------------------------
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
@@ -633,14 +662,14 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with uncombinable characters!');
     }
 
-    function recurse_process_asserts($graph, $parent, $gmain) {
+    public function recurse_process_asserts($graph, $parent, $gmain) {
         $graph->process_asserts($parent, $gmain);
         foreach ($graph->subgraphs as $subgraph) {
             $subgraph->process_asserts($graph, $gmain);
         }
     }
 
-    function test_process_asserts() {
+    public function test_process_asserts() {
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
@@ -686,7 +715,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed first case!');
 
         // -----------------------------------------------------------------------------
-        
+
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon, 2, '');
@@ -712,7 +741,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed second case when left neighbor is child!');
 
         // -----------------------------------------------------------------------------
-        
+
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', -1);
@@ -742,13 +771,18 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed second case when left neighbor is not child!');
 
         // -----------------------------------------------------------------------------
-        
+
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', -1);
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0, '');
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link(
+                                                'beginning of the string',
+                                                $etalon->subgraphs[0]->nodes[0],
+                                                $etalon->subgraphs[0]->nodes[1],
+                                                $etalon->subgraphs[0]
+                                            );
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
         $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0], $etalon);
@@ -766,19 +800,24 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->subgraphs[0]->nodes[1], $result->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->nodes[1], $result->subgraphs[0]->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->nodes[0], $result->nodes[2], $result);
-        
+
         $this->recurse_process_asserts($result, $result, $result);
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed third case when right neighbor is child!');
 
         // -----------------------------------------------------------------------------
-        
+
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         // ---------------------------------
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', -1);
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0, '');
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
-        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('beginning of the string', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link(
+                                                'beginning of the string',
+                                                $etalon->subgraphs[0]->nodes[0],
+                                                $etalon->subgraphs[0]->nodes[1],
+                                                $etalon->subgraphs[0]
+                                            );
         // ---------------------------------
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', -1);
         $etalon->subgraphs[1]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon, 0, '');
@@ -804,13 +843,13 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->subgraphs[0]->nodes[1], $result->subgraphs[1]->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->nodes[0], $result->subgraphs[0]->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->subgraphs[1]->nodes[0], $result->nodes[1], $result);
-        
+
         $this->recurse_process_asserts($result, $result, $result);
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed third case when right neighbor is not child!');
 
         // -----------------------------------------------------------------------------
-        
+
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         // ---------------------------------
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', -1);
@@ -844,13 +883,13 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->nodes[0], $result->subgraphs[1]->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->nodes[1], $result->subgraphs[0]->nodes[0], $result);
         $result->links[] = new qtype_preg_explaining_graph_tool_link('', $result->subgraphs[1]->nodes[0], $result->nodes[2], $result);
-        
+
         $this->recurse_process_asserts($result, $result, $result);
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed fourth case!');
     }
 
-    function test_process_voids() {
+    public function test_process_voids() {
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 0, '');
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('b'), 'ellipse', 'black', $etalon, 2, '');
@@ -874,7 +913,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $result->process_voids($result);
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with void!');
-        
+
         // ----------------------------------------------------------------------------------
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
@@ -903,6 +942,52 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed without void!');
     }
-}
 
-?>
+    function test_node_assert() {
+        $tree = new qtype_preg_explaining_graph_tool('(?=xy)z');
+
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; edge[style=dotted, color=green]; node[style=dashed, color=green]; color=grey');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('xy'), 'ellipse', 'black', $etalon->subgraphs[0], 3);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('z'), 'ellipse', 'black', $etalon, 2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0], $etalon, 'normal, color="green"');
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[3]);
+
+        $result = $tree->create_graph();
+
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with node assert!');
+    }
+
+    function test_empty_selection() {
+        $tree = new qtype_preg_explaining_graph_tool('a||c');
+
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=darkgreen');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, 2);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('c'), 'ellipse', 'black', $etalon, 4);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[0], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[3], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->subgraphs[0]->nodes[0], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[2], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[1], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[3], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[2], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[5], $etalon);
+
+        $result = $tree->create_graph(3);
+
+        $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with empty selection!');
+    }
+}

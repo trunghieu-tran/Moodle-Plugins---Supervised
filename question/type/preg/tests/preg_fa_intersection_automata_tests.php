@@ -11,6 +11,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_no_intersection() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 2;4;
                                 0->1[label="[a-z]"];
                                 1->2[label="[0-9]"];
@@ -20,6 +21,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;4;
                                 0->1[label="[01]"];
                                 1->2[label="[4]"];
@@ -52,6 +54,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_end() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[0-9]"];
                                 1->2[label="[abc]"];
@@ -62,6 +65,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[01]"];
                                 1->2[label="[?]"];
@@ -70,6 +74,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";"0,0";
                         "4,";
                         "1,"->"4,"[label="[01]",color=violet];
                         "3,"->"4,"[label="[a]",color=violet];
@@ -100,6 +105,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_cycles() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[01]"];
                                 1->2[label="[a-z]"];
@@ -108,6 +114,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[a-z]"];
                                 1->2[label="[a-c]"];
@@ -117,6 +124,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         "2,2";
                         "0,"->"1,0"[label="[01]",color=violet];
                         "1,0"->"2,1"[label="[a-z]",color=red];
@@ -146,6 +154,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_implicent_cycles() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
@@ -153,6 +162,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 0->2[label="[ab]"];
@@ -161,6 +171,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         "2,2";
                         "0,"->"1,0"[label="[ab]",color=violet];
                         "1,0"->"2,1"[label="[ab]",color=red];
@@ -193,6 +204,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_no_way_to_end_state() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[xy]"];
                                 1->2[label="[0-9]"];
@@ -201,6 +213,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[01]"];
                                 1->2[label="[a-z]"];
@@ -230,6 +243,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_no_way_to_start_state() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[xy]"];
                                 1->2[label="[0-9]"];
@@ -238,6 +252,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[01]"];
                                 1->2[label="[0-9]"];
@@ -267,18 +282,21 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_branches_from_first_and_second() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[a-z]"];
                                 1->2[label="[0-9]"];
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[0-9]"];
                                 1->2[label="[a-z]"];
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         ",2";
                         "0,"->"1,0"[label="[a-z]",color=violet];
                         "1,0"->"2,1"[label="[0-9]",color=red];
@@ -305,6 +323,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_cycle() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[0-9]"];
                                 1->2[label="[abc0-9]"];
@@ -315,6 +334,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->1[label="[01]"];
                                 1->2[label="[?]"];
@@ -323,6 +343,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";"0,0";
                         "4,";
                         "1,"->"4,"[label="[01]",color=violet];
                         "3,"->"4,"[label="[a]",color=violet];
@@ -356,6 +377,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_divarication_into_cycle() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[a-c]"];
                                 1->2[label="[0-9]"];
@@ -366,6 +388,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 4;
                                 0->1[label="[c-n]"];
                                 1->2[label="[ab]"];
@@ -374,6 +397,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         "4,";"4,4";
                         "0,"->"1,"[label="[a-c]",color=violet];
                         "0,"->"3,"[label="[01]",color=violet];
@@ -406,6 +430,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_big_cycle() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
@@ -413,6 +438,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 0->2[label="[ab]"];
@@ -421,6 +447,7 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";"0,0";
                         "2,";
                         "2,"->"0,"[label="[ab]",color=violet];
                         "1,2"->"2,"[label="[ab]",color=violet];
@@ -465,18 +492,21 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_intersection_with_merged_states() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->"1   2"[label="[ab]"];
                                 "1   2"->3[label="[ab]"];
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,";
                         ",2";
                         "0,"->"1   2,0"[label="[ab]",color=violet];
                         "1   2,0"->"3,1"[label="[ab]",color=red];
@@ -503,18 +533,21 @@ class qtype_preg_fa_intersection_automata_test extends PHPUnit_Framework_TestCas
     public function test_full_intersection() {
         $dotdescription1 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->"1   2"[label="[ab]"];
                                 "1   2"->3[label="[ab]"];
                             }';
         $dotdescription2 = 'digraph example 
                             {
+                                0;
                                 3;
                                 0->"1   2"[label="[ab]"];
                                 "1   2"->3[label="[ab]"];
                             }';
         $dotresult = 'digraph res 
                     {
+                        "0,0";
                         "3,3";
                         "0,0"->"1   2,1   2"[label="[ab]",color=red];
                         "1   2,1   2"->"3,3"[label="[ab]",color=red];

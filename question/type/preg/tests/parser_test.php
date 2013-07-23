@@ -97,6 +97,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->indfirst === 0);
         $this->assertTrue($root->indlast === 6);
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 0);
         for ($i = 0; $i < count($root->operands); $i++) {
             $this->assertTrue($root->operands[$i]->nullable === false);
             $this->assertTrue($root->operands[$i]->firstpos == array($i + 2));
@@ -192,6 +194,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $followpos = $parser->get_followpos();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription->data === '++');
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 0);
         $this->assertTrue($root->indfirst === 0);
         $this->assertTrue($root->indlast === 16);
         $this->assertTrue($root->possessive);
@@ -633,6 +637,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     function test_parser_index() {
         $parser = $this->run_parser('abcdefgh|(abcd)*', $errornodes);
         $root = $parser->get_root();
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 0);
         $this->assertTrue($root->indfirst === 0);
         $this->assertTrue($root->indlast === 15);
         $this->assertTrue($root->operands[0]->indfirst === 0);
@@ -1102,5 +1108,30 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->operands[2]->leftborder === 1);
         $this->assertTrue($root->operands[2]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+    }
+    function test_multiline_regex() {
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser("a\nbcd\nef", $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 2);
+        $this->assertTrue($root->indfirst === 0);
+        $this->assertTrue($root->indlast === 1);
+        $parser = $this->run_parser("(?:a(?#com\r\nment\nhere)bcd\nef)+", $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 3);
+        $this->assertTrue($root->indfirst === 0);
+        $this->assertTrue($root->indlast === 3);
+        $parser = $this->run_parser("(a\nbcd\n\r\n\nef)", $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->linefirst === 0);
+        $this->assertTrue($root->linelast === 4);
+        $this->assertTrue($root->indfirst === 0);
+        $this->assertTrue($root->indlast === 2);
     }
 }

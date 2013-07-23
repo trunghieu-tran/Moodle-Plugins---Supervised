@@ -67,7 +67,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // Does this transition make a infinite quantifier loop?
     public $is_loop;
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
+    public function __construct($from, &$pregleaf, $to, $consumeschars = true) {
         parent::__construct($from, $pregleaf, $to, $consumeschars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
@@ -112,24 +112,48 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     }
 
     /**
+     * Returns true if transition has any tag.
+     */
+    public function has_tags() {
+        return (count($this->subpatt_start) || count($this->subpatt_end) || count($this->subexpr_start) || count($this->subexpr_end));
+    }
+
+    /**
      * Returns intersection of transitions.
      *
      * @param other another transition for intersection.
+     * @return result transition.
      */
-    public function intersect_transitions($other) {
+    public function intersect($other) {
         $resulttran = parent::intersect($other);
-        if ($resulttran != null)    {    
-            $resulttran->subpatt_start = array_merge($this->subpatt_start(), $other->subpatt_start());
-            $resulttran->subpatt_end = array_merge($this->subpatt_end(), $other->subpatt_end());
-            $resulttran->subexpr_start = array_merge($this->subexpr_start(), $other->subexpr_start());
-            $resulttran->subexpr_end = array_merge($this->subexpr_end(), $other->subexpr_end());
-            remove_same_elements($resulttran->subpatt_start);
-            remove_same_elements($resulttran->subpatt_end);
-            remove_same_elements($resulttran->subexpr_start);
-            remove_same_elements($resulttran->subexpr_end);
+        if ($resulttran != null) {
+            $resulttran = new qtype_preg_nfa_transition ($resulttran->from, $resulttran->pregleaf, $resulttran->to);    
+            $resulttran->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
+            $resulttran->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
+            $resulttran->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
+            $resulttran->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
+            $resulttran->remove_same_elements($resulttran->subpatt_start);
+            $resulttran->remove_same_elements($resulttran->subpatt_end);
+            $resulttran->remove_same_elements($resulttran->subexpr_start);
+            $resulttran->remove_same_elements($resulttran->subexpr_end);
         }
         return $resulttran;
     }
+
+    /**
+     * Save tags from other transition in this transition.
+     *
+     * @param other another transition for saving tags.
+     * @return result transition.
+     */
+    public function save_tags($other) {
+        $this->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
+        $this->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
+        $this->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
+        $this->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
+        return $this;
+    }
+
 }
 
 /**

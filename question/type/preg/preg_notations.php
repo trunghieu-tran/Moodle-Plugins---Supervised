@@ -36,17 +36,14 @@ abstract class qtype_preg_notation {
 
     // Regular expression in this notation.
     public $regex;
-    // Regular expression modifiers in this notation.
-    public $modifiers;
     // Regular expression handling options.
     public $options;
 
     /**
      * Constructs notation object, should suit most notations.
      */
-    public function __construct($regex, $modifiers = '', $options = null) {
+    public function __construct($regex, $options = null) {
         $this->regex = $regex;
-        $this->modifiers = $modifiers;
         if ($options === null) {
             $options = new qtype_preg_handling_options;
         }
@@ -63,14 +60,6 @@ abstract class qtype_preg_notation {
      */
     public function convert_regex($targetnotation) {
         throw new qtype_preg_exception('Sorry, no conversion from '.$this->name().' to '.$targetnotation.' implemented yet.');
-    }
-
-    /**
-     * Returns regular expression modifiers in desired notation, should suit most notations.
-     * When overloading this, you probably would want to set/unset some modifiers based on notation.
-     */
-    public function convert_modifiers($targetnotation) {
-        return $this->modifiers;
     }
 
     /**
@@ -113,11 +102,11 @@ class qtype_preg_notation_pcreextended extends qtype_preg_notation {
         parent::convert_regex($targetnotation);
     }
 
-    public function convert_modifiers($targetnotation) {
+    public function convert_options($targetnotation) {
         if ($targetnotation == 'native') {
-            return $this->modifiers | qtype_preg_handling_options::MODIFIER_EXTENDED;
+            $this->options->modifiers = $this->options->modifiers | qtype_preg_handling_options::MODIFIER_EXTENDED;
         }
-        return $this->modifiers;
+        return $this->options;
     }
 }
 
