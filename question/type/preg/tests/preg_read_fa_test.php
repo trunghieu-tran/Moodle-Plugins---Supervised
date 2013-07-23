@@ -612,4 +612,59 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
+    
+    public function test_eps_transition() {
+        $dotdescription = 'digraph example {
+                    0;
+                    3;
+                    0->2[label="[]"];
+                    0->1[label="[0-9]"];
+                    1->3[label="[]"];
+                    2->3[label="[a-z]"];
+                    }';
+        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata->add_state('0');
+        $resultautomata->add_state('3');
+        $resultautomata->add_state('2');
+        $resultautomata->add_state('1');
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
+        // Fill pregleaf.
+        $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $chars = '[0-9]';
+        StringStreamController::createRef('regex', $chars);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $pregleaf = $lexer->nextToken()->value;
+        $transition = new qtype_preg_fa_transition(0, $pregleaf, 3);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition = new qtype_preg_fa_transition(3, $pregleaf, 1);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $chars = '[a-z]';
+        StringStreamController::createRef('regex', $chars);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $pregleaf = $lexer->nextToken()->value;
+        $transition = new qtype_preg_fa_transition(2, $pregleaf, 1);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $resultautomata->add_transition($transition);
+        
+        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata->read_fa($dotdescription);
+
+        $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
+    }
+    
+    public function test_imposition_transitions() {
+        // TODO
+    }
 }
