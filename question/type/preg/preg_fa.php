@@ -1383,9 +1383,9 @@ abstract class qtype_preg_finite_automaton {
         // Getting origin of automata.
         $states = $source->get_states();
         if (count($states) != 0) {
-            $keys = array_keys ($states);
-            $transitions = $this->get_state_outtransitions($states[$keys[0]]);
-            $keys = array_keys ($transitions);
+            $keys = array_keys($states);
+            $transitions = $source->get_state_outtransitions($states[$keys[0]]);
+            $keys = array_keys($transitions);
             $origin = $transitions[$keys[0]]->origin;
         }
         // Getting all states which are in automata for coping.
@@ -1399,9 +1399,9 @@ abstract class qtype_preg_finite_automaton {
         // Coping.
         while (count ($oldfront) != 0) {
             foreach ($oldfront as $curstate) {
-                if (!$this->is_copied_state($curstate)) {
+                if (!$source->is_copied_state($curstate)) {
                     // Modify states.
-                    $changedstate = $this->statenumbers[$curstate];
+                    $changedstate = $source->statenumbers[$curstate];
                     $this->modify_state($changedstate, $origin);
                     // Mark state as copied state.
                     $source->set_copied($curstate);
