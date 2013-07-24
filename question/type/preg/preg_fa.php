@@ -1168,7 +1168,7 @@ abstract class qtype_preg_finite_automaton {
             if (count($transitions) !=0) {
                 $this->merge_states($del);
                 // Adding intotransitions from merged state.
-                $intotransitions = get_intotransitios($del->to);
+                $intotransitions = $this->get_state_intotransitions($del->to);
                 foreach ($intotransitions as &$tran) {
                     if ($tran != $del) {
                         $tran->to = $del->from;
