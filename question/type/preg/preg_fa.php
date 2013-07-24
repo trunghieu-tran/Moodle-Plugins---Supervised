@@ -705,9 +705,9 @@ abstract class qtype_preg_finite_automaton {
         if (array_key_exists($transition->to, $outtransitions)) {
             $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
             $tran->pregleaf = $tran->pregleaf->unite_leafs($transition->pregleaf);
-        } else {*/
+        } else {
             $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
-        //}
+        }
     }
 
     /**
