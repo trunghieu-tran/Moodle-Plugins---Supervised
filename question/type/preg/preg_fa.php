@@ -1413,11 +1413,13 @@ abstract class qtype_preg_finite_automaton {
                             $workstate = array_search($changedstate, $stateswere);
                         }
                     }
-
                     // Hasn't such state.
                     if (!$isfind) {
                         $this->add_state($changedstate);
                         $workstate = array_search($changedstate, $this->statenumbers);
+                        if (count($stateswere) == 0) {
+                            $stateswere = array();
+                        }
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
 
                         // Check end of coping.
