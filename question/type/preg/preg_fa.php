@@ -932,14 +932,14 @@ abstract class qtype_preg_finite_automaton {
                 else if(count($asserts) != 0) {
                     $type = '';
                     switch($asserts[0]) {
-                        case '\\b': $type = SUBTYPE_ESC_B; break;
-                        case '\\B': $type = SUBTYPE_ESC_B; break;
-                        case '\\A': $type = SUBTYPE_ESC_A; break;
-                        case '\\z': $type = SUBTYPE_ESC_Z; break;
-                        case '\\Z': $type = SUBTYPE_ESC_Z; break;
-                        case '\\G': $type = SUBTYPE_ESC_G; break;
-                        case '^': $type = SUBTYPE_CIRCUMFLEX; break;
-                        case '$': $type = SUBTYPE_DOLLAR; break;
+                        case '\\b': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_B; break;
+                        case '\\B': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_B; break;
+                        case '\\A': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_A; break;
+                        case '\\z': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_Z; break;
+                        case '\\Z': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_Z; break;
+                        case '\\G': $type = qtype_preg_leaf_assert::SUBTYPE_ESC_G; break;
+                        case '^': $type = qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX; break;
+                        case '$': $type = qtype_preg_leaf_assert::SUBTYPE_DOLLAR; break;
                     }
                     $pregleaf = new qtype_preg_leaf_assert($type);
                     for($j = 1; $j < count($asserts); $j++) {
