@@ -287,10 +287,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            array_unshift ($this->mergedassertions, $this);
+            $thisclone = clone($this);
+            array_unshift ($this->mergedassertions, $thisclone);
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            array_unshift ($other->mergedassertions, $other);
+            $otherclone = clone($other);
+            array_unshift ($other->mergedassertions, $otherclone);
         }
         $result = array_merge($this->mergedassertions, $other->mergedassertions);
         // Removing same asserts.
@@ -304,9 +306,9 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             }
         }
 
-        foreach ($result as $assert) {
+        /*foreach ($result as &$assert) {
             $assert->mergedassertions = array();
-        }
+        }*/
         $result = array_values($result);
 
         foreach ($result as $assert) {
@@ -333,8 +335,15 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $assert = $other;
         } else {
             $assert = new qtype_preg_leaf_assert($result[0]->subtype);
+            unset($result[0]);
         }
         $assert->mergedassertions = $result;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            unset($this->mergedassertions[0]);
+        }
+        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            unset($other->mergedassertions[0]);
+        }
         return $assert;
     }
 
