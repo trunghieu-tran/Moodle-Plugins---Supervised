@@ -1293,9 +1293,9 @@ abstract class qtype_preg_finite_automaton {
      */
     public function modify_state(&$changedstate, $origin) {
         if ($origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
-            $changedstate = ',' . $changedstate;
-        } else {
             $changedstate .= ',';
+        } else {
+            $changedstate = ',' . $changedstate;
         }
     }
 
