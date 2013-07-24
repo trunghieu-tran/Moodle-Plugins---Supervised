@@ -1457,6 +1457,13 @@ abstract class qtype_preg_finite_automaton {
             $newfront = array();
             $newmemoryfront = array();
         }
+        if (count($this->startstates) == 0) {
+            if ($direction == 0) {
+                $this->add_start_state(array_search('0,', $this->statenumbers));
+            } else {
+                $this->add_start_state(array_search(',0', $this->statenumbers));
+            }
+        }
         return $this;
     }
 
