@@ -201,6 +201,7 @@ $string['regex_edit_header_text'] = 'Regex';
 $string['regex_edit_header'] = 'Input regex';
 $string['regex_edit_header_help'] = 'Here you can input regular expression for which you\'ll see syntax tree, explaining graph and description. In the regular expressions field you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and description.';
 $string['regex_text_text'] = 'Enter regular expression there';
+$string['regex_show_selection'] = 'show selection';
 $string['regex_check_text'] = 'Check';
 $string['regex_back_text'] = 'Back (and save regex in this field)';
 $string['regex_tree_build'] = 'Build tree...';
