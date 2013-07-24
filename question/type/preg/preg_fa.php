@@ -1407,9 +1407,11 @@ abstract class qtype_preg_finite_automaton {
                     $source->set_copied_state($curstate);
                     $isfind = false;
                     // Search among states which were in automata.
-                    if (array_search($changedstate, $stateswere) !== false) {
-                        $isfind = true;
-                        $workstate = array_search($changedstate, $stateswere);
+                    if (count($stateswere) != 0) {
+                        if (array_search($changedstate, $stateswere) !== false) {
+                            $isfind = true;
+                            $workstate = array_search($changedstate, $stateswere);
+                        }
                     }
 
                     // Hasn't such state.
