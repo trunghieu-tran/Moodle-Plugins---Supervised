@@ -1136,7 +1136,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function merge_transitions($del) {
         // Cycle with empty transition
-        if ($del->to == $del->from) {
+        if ($del->to == $del->from && $del->is_eps()) {
             $this->del_transition($del);
         }
 
