@@ -1404,7 +1404,7 @@ abstract class qtype_preg_finite_automaton {
                     $changedstate = $source->statenumbers[$curstate];
                     $this->modify_state($changedstate, $origin);
                     // Mark state as copied state.
-                    $source->set_copied($curstate);
+                    $source->set_copied_state($curstate);
                     $isfind = false;
                     // Search among states which were in automata.
                     if (array_search($changedstate, $stateswere) !== false) {
