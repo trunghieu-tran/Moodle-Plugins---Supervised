@@ -536,7 +536,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
-        $resultautomata->add_state('"1   2"');
+        $resultautomata->add_state('1   2');
         $resultautomata->add_start_state(0);
         $resultautomata->add_end_state(1);
         // Fill pregleaf.
@@ -573,10 +573,10 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
                     "2,1"->",2"[label="[a-z]",color=blue];
                     }';
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
-        $resultautomata->add_state('"0,"');
-        $resultautomata->add_state('",2"');
-        $resultautomata->add_state('"1,0"');
-        $resultautomata->add_state('"2,1"');
+        $resultautomata->add_state('0,');
+        $resultautomata->add_state(',2');
+        $resultautomata->add_state('1,0');
+        $resultautomata->add_state('2,1');
         $resultautomata->add_start_state(0);
         $resultautomata->add_end_state(1);
         // Fill pregleaf.
