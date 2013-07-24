@@ -179,7 +179,6 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\A]"];
         $resulttran = $transition1->intersect($transition2);
-        $transition2->pregleaf->mergedassertions = array($leaf2);
         $this->assertEquals($transition2, $resulttran, 'Result transition is not equal to expected');
     }
 
@@ -189,7 +188,6 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
         $resulttran = $transition1->intersect($transition2);
-        $transition1->pregleaf->mergedassertions = array($leaf1);;
         $this->assertEquals($transition1, $resulttran, 'Result transition is not equal to expected');
     }
 
