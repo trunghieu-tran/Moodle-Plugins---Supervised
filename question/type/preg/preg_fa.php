@@ -305,7 +305,7 @@ abstract class qtype_preg_finite_automaton {
 
 
     public function __construct() {
-        $this->adjacencymatrix = array(array());
+        $this->adjacencymatrix = array();
         $this->startstates = array();
         $this->endstates = array();
         $this->deterministic = true;
@@ -992,7 +992,6 @@ abstract class qtype_preg_finite_automaton {
             // Append transition in automata.
             $this->add_transition($transition);
         }
-        unset($this->adjacencymatrix[$this->statecount]);
     }
 
     /**
