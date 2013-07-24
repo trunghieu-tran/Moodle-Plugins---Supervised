@@ -97,23 +97,15 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('html', $testing_tool->render_hint());*/
 
         //Add tool for check regexp match
-        $mform->addElement('header', 'regex_match_header', 'Input string for check here:');
+        $mform->addElement('header', 'regex_match_header', get_string('regex_match_header', 'qtype_preg'));
         $mform->setExpanded('regex_match_header', 1);
         $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
 
         //$mform->addElement('textarea', 'regex_match_text', 'Input string', array('cols' => 100));
         //$mform->setType('regex_match_text', PARAM_RAW);
         //$mform->addElement('html', '<div id="test_regex" ></div>');
-
-        /*$testareaarray=array();
-        $testareaarray[] =& $mform->createElement('textarea', 'regex_match_text', 'Input strings', array('cols' => 50));
-        //$testareaarray[] =& $mform->createElement('textarea', 'test_regex', '', array('cols' => 50));
-        $testareaarray[] =& $mform->createElement('html', '<div id="test_regex" ></div>');
-        //$static = $mform->createElement('static', 'test_regex', "test_regex", "test_regex");
-        //$testareaarray[] = $static;
-        $mform->addGroup($testareaarray, 'textarray', '', array(' '), false);*/
         
-        $mform->addElement('preg_textarea', 'regex_match_text', 'Input strings', array('cols' => 50));
+        $mform->addElement('preg_textarea', 'regex_match_text', get_string('regex_match_textarea', 'qtype_preg'), array('cols' => 50));
         
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', 'Check string');

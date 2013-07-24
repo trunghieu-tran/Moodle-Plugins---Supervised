@@ -216,6 +216,8 @@ $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression.';
 $string['regex_match_header'] = 'Input string for check';
 $string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+$string['regex_match_header'] =  'Regex test';
+$string['regex_match_textarea'] = 'Input strings';
 
 // Strings for node description
 
