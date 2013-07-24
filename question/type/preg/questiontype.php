@@ -67,6 +67,8 @@ class qtype_preg extends qtype_shortanswer {
     }
 
     public function save_question_options($question) {
+		global $DB;
+	
         // Fill in some data that could be absent due to disabling form controls.
         if (!isset($question->usecharhint)) {
             $question->usecharhint = false;
@@ -97,9 +99,64 @@ class qtype_preg extends qtype_shortanswer {
             $question->usecharhint = false;
             $question->uselexemhint = false;
         }
-
+	
         parent::save_question_options($question);
+		
+		// regextests[0..n]  "qtype_preg_regex_tests"
+		// tablename = question_answers
+		// tableid = это id ансвера
+		
+		// Get old versions of the objects.
+        $oldanswers = $DB->get_records('question_answers',
+                array('question' => $question->id), 'id ASC');
+		
+		$oldid = array()
+		foreach ($oldanswers as $oldanswer) {
+			$oldid[] = $oldanswer->id;
+		}								// SELECT * FROM qtype_preg_regex_tests WHERE tableid IN $oldid
+		$oldregextests = $DB->get_records_list('qtype_preg_regex_tests',
+				'tableid', $oldid, null, 'id ASC');
+
+        foreach ($question->regextests as $key => $regextest) {
+            // Check for, and ingore, completely blank answer from the form.
+            if (trim($regextest) == '') {
+                continue;
+            }
+
+            // Update an existing answer if possible.
+            $oldregexttest = array_shift($oldregextests);
+            if (!$oldregexttest) {
+                $oldregexttest = new stdClass();
+                $oldregexttest->tablename = 'question_answers';
+                $oldregexttest->tableid = array_shift($oldid);
+				$oldregexttest->regextests = $regextest;
+                $DB->insert_record('qtype_preg_regex_tests', $oldregexttest);
+            } else {
+				$oldregexttest = new stdClass();
+                $oldregexttest->tablename = 'question_answers';
+                $oldregexttest->tableid = ;
+				$oldregexttest->regextests = $regextest;
+				$oldregexttest->id = $oldregexttest->id;
+				$DB->update_record('qtype_preg_regex_tests', $oldregexttest);
+			}
+        }
     }
+	
+	public function save_question_options($question) {
+		parent::get_question_options($question);
+		
+		$answersid = array()
+		foreach ($question->answers as $answer) {
+			$answersid[] = $answer->id;
+		}
+		
+		$regextests = $DB->get_records_list('qtype_preg_regex_tests',
+				'tableid', $answersid, null, 'id ASC');
+				
+		foreach ($regextests as $regextest) {
+			$question->regextests[] = $regextest->regextests;
+		}
+	}
 
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {

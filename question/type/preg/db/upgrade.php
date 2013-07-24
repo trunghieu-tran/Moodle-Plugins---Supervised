@@ -218,5 +218,28 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // Preg savepoint reached.
         upgrade_plugin_savepoint(true, 2013062600, 'qtype', 'preg');
     }
+	
+	if ($oldversion < 2013071400) {
+
+        // Define table qtype_preg_regex_tests to be created.
+        $table = new xmldb_table('qtype_preg_regex_tests');
+
+        // Adding fields to table qtype_preg_regex_tests.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('tablename', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tableid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('regextests', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table qtype_preg_regex_tests.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for qtype_preg_regex_tests.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Preg savepoint reached.
+        upgrade_plugin_savepoint(true, 2013071400, 'qtype', 'preg');
+    }
     return true;
 }
