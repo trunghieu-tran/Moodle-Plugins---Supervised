@@ -47,15 +47,15 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('textarea', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('cols' => 100, 'rows' => 1));
         $mform->setType('regex_text', PARAM_RAW);
 
-        $topline=array();
+        $topline = array();
         $topline[] =& $mform->createElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
-        $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));
+        /*$topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));*/
         if(!$this->isblok){
             $topline[] =& $mform->createElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }        
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
-        $radiocharsetprocessarray=array();
+        $radiocharsetprocessarray = array();
         $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_userinscription', 'qtype_preg'), 'userinscription', null);
         $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_flags', 'qtype_preg'), 'flags', null);
         $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
