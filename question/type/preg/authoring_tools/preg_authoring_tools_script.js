@@ -11,7 +11,7 @@
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
  */
-M.preg_authoring_tools_script = (function() {
+M.preg_authoring_tools_script = (function($) {
 
     var self = {
 
@@ -102,12 +102,18 @@ M.preg_authoring_tools_script = (function() {
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
-				matcher: $('#id_engine :selected').val(),
+                matcher: $('#id_engine :selected').val(),
                 ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
         });
+    },
+
+    regex_show_selection_clicked : function() {
+
+        var range = self.regex_selection_widget.get_selected_text_range(self.main_input[0]);
+        self.load_content_by_range(range.start, range.end);
     },
 
     /**
@@ -129,22 +135,26 @@ M.preg_authoring_tools_script = (function() {
                                                             .keyup(self.textbutton_widget.fix_textarea_rows);
                     self.back_btn = $('#id_regex_back').click(self.back_regex_clicked);
                     $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
-                    $("#tree_orientation_radioset input, #charset_process_radioset input").change(self.radio_changed);
+                    $("#fgroup_id_tree_orientation_radioset input, #fgroup_id_charset_process_radioset input").change(self.radio_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
                     $('#id_regex_check_string').click(self.regex_check_string);
+                    $('#id_regex_show_selection').click(self.regex_show_selection_clicked);
+                    // get testing data from hidden field and put it into ui
+                    $('#id_regex_match_text')   .val( $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val() )
+                                                .keyup(self.textbutton_widget.fix_textarea_rows)
+                                                .trigger('keyup');
+                    self.regex_selection_widget._init();
                     self.load_content_by_id('-1');
-					
-					$('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
                 });
             },
 
             // Function called on non-first form openings.
             oneachpresscallback : function() {
-                self.main_input.val(self.textbutton_widget.data);
+                self.main_input.val(self.textbutton_widget.data).trigger('keyup');
+                // get testing data from hidden field and put it into ui
+                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
                 self.load_content_by_id('-1');
-				
-				$('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
             }
         };
 
@@ -222,8 +232,16 @@ M.preg_authoring_tools_script = (function() {
        alert('ERROR\n'+textStatus+'\n'+jqXHR.responseText);
     },
 
+    load_content_by_range : function(start, end) {
+        self._load_content('-1', start, end, true);
+    },
+
     // Checks for cached data and if it doesn't exist, sends a request to the server
-    load_content_by_id : function(id) {
+    load_content_by_id : function(id, start, end) {
+        self._load_content(id);
+    },
+
+    _load_content : function(id, start, end, no_cache) {
         var currenttreeorientation = self.get_orientation();
         var currentdisplayas = self.get_displayas();
         var needdeselect = self.node_id == id
@@ -238,26 +256,32 @@ M.preg_authoring_tools_script = (function() {
         var regex = self.main_input.val();
 
         // Check the cache.
-        var cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
-        var cachedid = null;
-        if (cachedregex) {
-            cachedid = cachedregex[id];
+        if(!no_cache) {
+            var cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
+            var cachedid = null;
+            if (cachedregex) {
+                cachedid = cachedregex[id];
+            }
+            if (cachedid) {
+                self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_KEY], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
+                return;
+            }
         }
-        if (cachedid) {
-            self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_ID], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
-            return;
+        var data = {
+            regex: regex,
+            id: id,
+            tree_orientation: self.tree_orientation,
+            displayas: self.displayas,
+            ajax: true
+        };
+        if(start && end) {
+            data.start = start;
+            data.end = end;
         }
-
         $.ajax({
             type: 'GET',
             url: self.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
-            data: {
-                regex: regex,
-                id: id,
-                tree_orientation: self.tree_orientation,
-                displayas: self.displayas,
-                ajax: true
-            },
+            data: data,
             success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
         });
@@ -318,14 +342,92 @@ M.preg_authoring_tools_script = (function() {
     },
 
     get_orientation : function() {
-        return $("#tree_orientation_radioset input:checked").val();
+        return $("#fgroup_id_tree_orientation_radioset input:checked").val();
     },
 
     get_displayas : function () {
-        return $("#charset_process_radioset input:checked").val();
+        return $("#fgroup_id_charset_process_radioset input:checked").val();
+    },
+
+    regex_selection_widget : {
+
+        _fake_selection_el : null,
+
+        _init : function () {
+            this._fake_selection_el = document.createElement("div");
+            $(this._fake_selection_el)  .css('border','1px dashed red')
+                                        .css('position','absolute')
+                                        .css('z-index','1000')
+                                        .hide();
+            $('#preg_authoring_tools_dialog').append(this._fake_selection_el);
+        },
+
+        _get_selection_position : function () {
+            //TODO
+        },
+
+        get_selected_text_range : function(el) {
+            var start = 0, end = 0, normalizedValue, range,
+                textInputRange, len, endRange;
+
+            if (typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") {
+                start = el.selectionStart;
+                end = el.selectionEnd;
+            } else {
+                range = document.selection.createRange();
+
+                if (range && range.parentElement() == el) {
+                    len = el.value.length;
+                    normalizedValue = el.value.replace(/\r\n/g, "\n");
+
+                    // Create a working TextRange that lives only in the input
+                    textInputRange = el.createTextRange();
+                    textInputRange.moveToBookmark(range.getBookmark());
+
+                    // Check if the start and end of the selection are at the very end
+                    // of the input, since moveStart/moveEnd doesn't return what we want
+                    // in those cases
+                    endRange = el.createTextRange();
+                    endRange.collapse(false);
+
+                    if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+                        start = end = len;
+                    } else {
+                        start = -textInputRange.moveStart("character", -len);
+                        start += normalizedValue.slice(0, start).split("\n").length - 1;
+
+                        if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
+                            end = len;
+                        } else {
+                            end = -textInputRange.moveEnd("character", -len);
+                            end += normalizedValue.slice(0, end).split("\n").length - 1;
+                        }
+                    }
+                }
+            }
+            return { start: start, end: end };
+        },
+
+        /**
+         * @param object coords coordinates of fake div: {top, bottom, left, right, height, width}
+         */
+        draw_fake_selection : function(coords) {
+            $(this._fake_selection_el)  .css('top', coords.top)
+                                        .css('bottom', coords.bottom)
+                                        .css('left', coords.left)
+                                        .css('right', coords.right)
+                                        .css('height', coords.height)
+                                        .css('width', coords.width)
+                                        .show();
+            return true;
+        },
+
+        hide_fake_selection : function() {
+            $(this._fake_selection_el).hide();
+        }
     }
 };
 
 return self;
 
-})();
+})(jQuery);
