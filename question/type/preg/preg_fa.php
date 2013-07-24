@@ -988,6 +988,7 @@ abstract class qtype_preg_finite_automaton {
             // Append transition in automata.
             $this->add_transition($transition);
         }
+        unset($this->adjacencymatrix[$this->statecount]);
     }
 
     /**
