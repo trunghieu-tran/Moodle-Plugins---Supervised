@@ -107,10 +107,10 @@ class qtype_preg extends qtype_shortanswer {
 		// tableid = это id ансвера
 		
 		// Get old versions of the objects.
-        $oldanswers = $DB->get_records('question_answers',
+        /*$oldanswers = $DB->get_records('question_answers',
                 array('question' => $question->id), 'id ASC');
 		
-		$oldid = array()
+		$oldid = array();
 		foreach ($oldanswers as $oldanswer) {
 			$oldid[] = $oldanswer->id;
 		}								// SELECT * FROM qtype_preg_regex_tests WHERE tableid IN $oldid
@@ -134,18 +134,20 @@ class qtype_preg extends qtype_shortanswer {
             } else {
 				$oldregexttest = new stdClass();
                 $oldregexttest->tablename = 'question_answers';
-                $oldregexttest->tableid = ;
+                $oldregexttest->tableid = array_shift($oldid);
 				$oldregexttest->regextests = $regextest;
 				$oldregexttest->id = $oldregexttest->id;
 				$DB->update_record('qtype_preg_regex_tests', $oldregexttest);
 			}
-        }
+        }*/
     }
 	
-	public function save_question_options($question) {
+	public function get_question_options($question) {
+        global $DB;
+
 		parent::get_question_options($question);
 		
-		$answersid = array()
+		/*$answersid = array();
 		foreach ($question->answers as $answer) {
 			$answersid[] = $answer->id;
 		}
@@ -155,7 +157,7 @@ class qtype_preg extends qtype_shortanswer {
 				
 		foreach ($regextests as $regextest) {
 			$question->regextests[] = $regextest->regextests;
-		}
+		}*/
 	}
 
     /** Overload import from Moodle XML format to import hints */
