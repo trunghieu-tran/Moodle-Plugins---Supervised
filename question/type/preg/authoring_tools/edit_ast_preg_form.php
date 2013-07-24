@@ -100,7 +100,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setExpanded('regex_match_header', 1);
         $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
 
-        $mform->addElement('text', 'regex_match_text', 'Input string', array('size' => 100));
+        $mform->addElement('textarea', 'regex_match_text', 'Input string', array('cols' => 100));
         $mform->setType('regex_match_text', PARAM_RAW);
         $mform->addElement('html', '</br><div id="test_regex" ></div></br>');
         $mform->registerNoSubmitButton('regex_check_string');
