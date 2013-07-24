@@ -15,6 +15,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
+    protected $linefirst = null; 
+    protected $linelast = null; 
+    protected $indfirst = null; 
+    protected $indlast = null;
     /**
      * Overloaded since parsing errors are normal for authoring tools.
      */
@@ -26,6 +30,13 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
             }
         }
         return $result;
+    }
+
+    public function build_dst() {
+        if ($this->linefirst && $this->linelast && $this->indfirst && $this->indlast) {
+            // TODO
+        }
+        parent::build_dst();
     }
 
     /**

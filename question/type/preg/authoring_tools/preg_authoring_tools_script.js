@@ -138,6 +138,7 @@ M.preg_authoring_tools_script = (function($) {
                     $("#fgroup_id_tree_orientation_radioset input, #fgroup_id_charset_process_radioset input").change(self.radio_changed);
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
+                    $("#fgroup_id_charset_process_radioset").hide(); // TODO - hidden for beta
                     $('#id_regex_check_string').click(self.regex_check_string);
                     $('#id_regex_show_selection').click(self.regex_show_selection_clicked);
                     // get testing data from hidden field and put it into ui
@@ -233,7 +234,30 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     load_content_by_range : function(start, end) {
-        self._load_content('-1', start, end, true);
+        var text = self.main_input.val();
+        var firstline = 0;
+        var lastline = 0;
+        var pos = 0;
+        var lastpos =0;
+        pos=text.indexOf("\n");
+        while ( pos != -1 && pos < start ) {
+            ++firstline;
+            lastpos = pos;
+            pos=text.indexOf("\n", pos+1);
+        }
+        if (firstline>0) {
+            start -= lastpos;
+        }
+        while ( pos != -1 && pos < end ) {
+            ++lastline;
+            lastpos = pos;
+            pos=text.indexOf("\n", pos+1);
+        }
+        if (lastline>0) {
+            end -= lastpos;
+        }
+        --end;
+        self._load_content('-1', {linefirst: firstline, linelast: lastline, indfirst: start, indlast: end}, true);
     },
 
     // Checks for cached data and if it doesn't exist, sends a request to the server
@@ -241,7 +265,7 @@ M.preg_authoring_tools_script = (function($) {
         self._load_content(id);
     },
 
-    _load_content : function(id, start, end, no_cache) {
+    _load_content : function(id, coordinates, no_cache) {
         var currenttreeorientation = self.get_orientation();
         var currentdisplayas = self.get_displayas();
         var needdeselect = self.node_id == id
@@ -274,9 +298,9 @@ M.preg_authoring_tools_script = (function($) {
             displayas: self.displayas,
             ajax: true
         };
-        if(start && end) {
-            data.start = start;
-            data.end = end;
+        if(coordinates) {
+            $.extend(data,coordinates);
+            data.rangeselection = true;
         }
         $.ajax({
             type: 'GET',
