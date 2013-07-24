@@ -1951,7 +1951,7 @@ abstract class qtype_preg_finite_automaton {
      * @return result automata without blind states with one end state and with merged asserts.
      */
     public function intersect_fa($anotherfa, $stateindex, $isstart) {
-         $result = new qtype_preg_finite_automaton();
+        $result = new qtype_preg_finite_automaton();
         $stopcoping = $stateindex;
         // Get states for starting coping.
         if ($isstart == 0) {
