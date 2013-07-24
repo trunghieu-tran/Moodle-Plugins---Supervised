@@ -266,6 +266,83 @@ class qtype_preg_fa_state {
     }*/
 }
 
+/**
+ * Class for finite automaton group of states.
+ */
+ class qtype_preg_fa_group {
+    /** @var reference to qtype_preg_finite_automaton object this group of states belongs to. */
+    protected $fa;
+    /** @var array of int ids of states, which include in this group. */
+    protected $states;
+    /** @var first character on which it made transition to this group. */
+    protected $char;
+    /** @var array of qtype_preg_fa_group through which are in this group. */
+    public $prev_groups;
+    
+    public function __construct(&$fa = null) {
+        $this->fa = $fa;
+        $this->states = array();
+        $this->char = 0;
+        $this->prev_groups = array();
+    }
+    
+    /**
+     * Change reference to qtype_preg_finite_automaton object this group of states belongs to. 
+     *
+     * @param fa - a reference to new automata.
+     */
+    public function set_fa(&$fa) {
+        $this->fa = $fa;
+    }
+    
+    /**
+     * Return character on which it made transition to this group.
+     */
+    public function get_char() {
+        return $this->char;
+    }
+    
+    /**
+     * Change character on which it made transition to this group.
+     *
+     * @param char - new character on which it made transition to this group.
+     */
+    public function set_char($char) {
+        $this->char = $char;
+    }
+    
+    /**
+     * Return array of int ids of states, which include in this group.
+     */
+    public function get_states() {
+        return $this->states;
+    }
+    
+    /**
+     * Append new state in group.
+     *
+     * @param state - new state, which include in this group.
+     */
+    public function add_state($state) {
+        $this->state[] = $state;
+    }
+    
+    /**
+     * Return array of group through which are in this group.
+     */
+    public function get_prev_groups() {
+        return $this->prev_groups;
+    }
+    
+    /**
+     * Fill array of group through which are in this group.
+     *
+     * @param prev_groups - new array of group through which are in this group.
+     */
+    public function fill_prev_groups($prev_groups) {
+        $this->prev_groups = $prev_groups;
+    }
+ }
 
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
