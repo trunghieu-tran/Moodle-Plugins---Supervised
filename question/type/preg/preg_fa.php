@@ -406,7 +406,7 @@ abstract class qtype_preg_finite_automaton {
      * @param state - id of state which intotransitions are intresting.
      */
     public function get_state_intotransitions($state) {
-        return get_column($this->adjacencymatrix, $state);
+        return $this->get_column($this->adjacencymatrix, $state);
     }
 
     /**
