@@ -801,6 +801,7 @@ abstract class qtype_preg_finite_automaton {
         // Append start states in automata.
         for ($i = 0; $i < count($startstates) - 1; $i++) {
             $startstates[$i] = trim($startstates[$i]);
+            $startstates[$i] = trim($startstates[$i],'"');
             $this->add_state($startstates[$i]);
             $this->add_start_state(($this->statecount) - 1);
         }
@@ -809,6 +810,7 @@ abstract class qtype_preg_finite_automaton {
         // Append end states in automata.
         for ($i = 0; $i < count($endstates) - 1; $i++) {
             $endstates[$i] = trim($endstates[$i]);
+            $endstates[$i] = trim($endstates[$i],'"');
             $this->add_state($endstates[$i]);
             $this->add_end_state(($this->statecount) - 1);
         }
@@ -817,12 +819,14 @@ abstract class qtype_preg_finite_automaton {
             $arraystrings = preg_split('/(->|\[label="\[|\]"|color=|\];$)/u',$dotstring[$i]);
             // Delete the spaces at the beginning and end of line.
             $arraystrings[0] = trim($arraystrings[0]);
+            $arraystrings[0] = trim($arraystrings[0],'"');
             if(array_search($arraystrings[0], $this->statenumbers) === false) {
                 $this->add_state($arraystrings[0]);
             }
             $statefrom = array_search($arraystrings[0], $this->statenumbers);
             // Delete the spaces at the beginning and end of line.
             $arraystrings[1] = trim($arraystrings[1]);
+            $arraystrings[1] = trim($arraystrings[1],'"');
             if(array_search($arraystrings[1], $this->statenumbers) === false) {
                 $this->add_state($arraystrings[1]);
             }
