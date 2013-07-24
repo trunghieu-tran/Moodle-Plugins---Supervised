@@ -1207,7 +1207,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function merge_uncapturing_transitions($transitiontype, &$stateindex) {
         $newfront = array();
-        $statechecked = array();
+        $stateschecked = array();
         // Getting types of uncaptyring transitions.
         if ($transitiontype == qtype_preg_fa_transition::TYPE_TRANSITION_BOTH) {
             $trantype1 = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
