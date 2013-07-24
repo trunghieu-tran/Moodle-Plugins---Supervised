@@ -721,7 +721,7 @@ abstract class qtype_preg_finite_automaton {
         // Removing column.
         foreach ($this->adjacencymatrix as $curcolumn) {
             if (array_key_exists($state, $curcolumn)) {
-                unset($curcolomn[$state]);
+                unset($curcolumn[$state]);
             }
         }
         // Removing real numbers.
