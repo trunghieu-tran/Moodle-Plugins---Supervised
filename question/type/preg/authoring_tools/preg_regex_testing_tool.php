@@ -21,15 +21,15 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 class qtype_preg_regex_testing_tool {
 
     private $renderer;
-    private $answer;
+    private $answers;
     private $hintmatch;
     
-    public function __construct($regex, $answer, $mathcer) {
+    public function __construct($regex, $answers, $mathcer) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
         $regular = qtype_preg_question::question_from_regex($regex, false, true, $mathcer, 'native');
         $this->hintmatch = $regular->hint_object('hintmatchingpart');
-        $this->answer = $answer;
+        $this->answers = $answers;
     }
 
     /**

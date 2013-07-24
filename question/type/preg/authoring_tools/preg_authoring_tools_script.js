@@ -141,7 +141,9 @@ M.preg_authoring_tools_script = (function($) {
                     $('#id_regex_check_string').click(self.regex_check_string);
                     $('#id_regex_show_selection').click(self.regex_show_selection_clicked);
                     // get testing data from hidden field and put it into ui
-                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                    $('#id_regex_match_text')   .val( $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val() )
+                                                .keyup(self.textbutton_widget.fix_textarea_rows)
+                                                .trigger('keyup');
                     self.regex_selection_widget._init();
                     self.load_content_by_id('-1');
                 });
