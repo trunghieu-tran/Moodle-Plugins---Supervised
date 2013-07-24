@@ -1377,6 +1377,9 @@ abstract class qtype_preg_finite_automaton {
      * @return automata after coping.
      */
     public function copy_modify_branches(&$source, &$oldfront, &$stopcoping, $direction) {
+        $memoryfront = array();
+        $newfront = array();
+        $newmemoryfront = array();
         // Getting origin of automata.
         $states = $source->get_states();
         if (count($states) != 0) {
