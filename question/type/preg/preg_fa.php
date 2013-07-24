@@ -1322,7 +1322,7 @@ abstract class qtype_preg_finite_automaton {
             // Get real number of source state.
             $number = strtr($state, ',', '');
             $sourceindex = array_search($number, $numbers);
-            if ($sourcestate !== false) {
+            if ($sourceindex !== false) {
                 foreach ($transitions as $tran) {
                     if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
                         // Add transition.
