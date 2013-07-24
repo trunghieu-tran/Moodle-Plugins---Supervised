@@ -1175,9 +1175,10 @@ abstract class qtype_preg_finite_automaton {
                         $this->add_transition($tran);
                     }
                 }
+
                 // Adding outtransitions from merged state.
                 if ($needredacting) {
-                    foreach ($transition as &$tran) {
+                    foreach ($transitions as &$tran) {
                         if ($tran->to == $del->from) {
                             $tran->to = $del->from;
                         }
