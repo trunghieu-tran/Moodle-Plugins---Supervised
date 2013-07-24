@@ -92,7 +92,7 @@ M.preg_authoring_tools_script = (function($) {
         // End of TODO
 
         var jsonarray = JSON.parse(data);
-        $('#test_regex').html(jsonarray.regex_test);
+        $('label[for=id_test_regex]').html(jsonarray.regex_test);
     },
 
     regex_check_string : function(e) {
@@ -139,6 +139,7 @@ M.preg_authoring_tools_script = (function($) {
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
                     $("#fgroup_id_charset_process_radioset").hide(); // TODO - hidden for beta
+                    $("#id_regex_cancel").click(function(){self.textbutton_widget.dialog.dialog("close");});
                     $('#id_regex_check_string').click(self.regex_check_string);
                     $('#id_regex_show_selection').click(self.regex_show_selection_clicked);
                     // get testing data from hidden field and put it into ui

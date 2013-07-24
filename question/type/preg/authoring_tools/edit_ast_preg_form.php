@@ -52,7 +52,8 @@ class qtype_preg_authoring_tool_form extends moodleform {
         /*$topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));*/
         if(!$this->isblok){
             $topline[] =& $mform->createElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
-        }        
+        }
+        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('regex_cancel_text', 'qtype_preg'));        
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
         $radiocharsetprocessarray = array();
@@ -100,9 +101,16 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setExpanded('regex_match_header', 1);
         $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
 
-        $mform->addElement('textarea', 'regex_match_text', 'Input string', array('cols' => 100));
-        $mform->setType('regex_match_text', PARAM_RAW);
-        $mform->addElement('html', '</br><div id="test_regex" ></div></br>');
+        $testareaarray=array();
+        $testareaarray[] =& $mform->createElement('textarea', 'regex_match_text', 'Input strings', array('cols' => 50));
+        $testareaarray[] =& $mform->createElement('textarea', 'test_regex', '', array('cols' => 50));
+        $testareaarray[1]->freeze();
+        $testareaarray[1]->setPersistantFreeze(false);
+        //$testareaarray[] =& $mform->createElement('html', '<div id="test_regex" ></div>');
+        //$static = $mform->createElement('static', 'test_regex', "test_regex", "test_regex");
+        //$testareaarray[] = $static;
+        $mform->addGroup($testareaarray, 'textarray', '', array(' '), false);
+
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', 'Check string');
 
