@@ -1139,6 +1139,7 @@ abstract class qtype_preg_finite_automaton {
 
         // Transition for merging isn't cycle.
         if ($del->to != $del->from) {
+            $needredacting = false;
             $transitions = $this->get_state_outtransitions($del->to);
             $intotransitions = $this->get_state_intotransitions($del->from);
             // Possibility of merging with outtransitions.
