@@ -1099,8 +1099,9 @@ abstract class qtype_preg_finite_automaton {
      * @param another qtype_preg_finite_automaton object - FA to compare.
      * @return boolean true if this FA equal to $another.
      */
-    public function compare_fa($another) {
+    public function compare_fa(&$another, &$differences) {
         // TODO - streltsov.
+        return false;
     }
 
     /**
