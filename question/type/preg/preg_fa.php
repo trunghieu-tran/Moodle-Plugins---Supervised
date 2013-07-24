@@ -1428,10 +1428,11 @@ abstract class qtype_preg_finite_automaton {
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
+                            $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
-                            $connectedstates = $source($curstate, $direction);
+                            $connectedstates = $source->get_connected_states($curstate, $direction);
                             $newfront = array_merge($newfront, $connectedstates);
                         }
                         $stateswere[] = $changedstate;
