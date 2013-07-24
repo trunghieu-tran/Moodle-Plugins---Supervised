@@ -102,7 +102,7 @@ M.preg_authoring_tools_script = (function() {
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
-				matcher: $('#id_engine :selected').val(),
+                matcher: $('#id_engine :selected').val(),
                 ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
@@ -134,8 +134,8 @@ M.preg_authoring_tools_script = (function() {
                     $(".collapsible-actions").hide();
                     $('#id_regex_check_string').click(self.regex_check_string);
                     self.load_content_by_id('-1');
-					
-					$('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                    
+                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
                 });
             },
 
@@ -143,8 +143,8 @@ M.preg_authoring_tools_script = (function() {
             oneachpresscallback : function() {
                 self.main_input.val(self.textbutton_widget.data);
                 self.load_content_by_id('-1');
-				
-				$('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                
+                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
             }
         };
 
