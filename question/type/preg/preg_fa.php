@@ -1320,11 +1320,16 @@ abstract class qtype_preg_finite_automaton {
         // Search transition among states were.
         foreach ($stateswere as $state) {
             // Get real number of source state.
-            $number = strtr($state, ',', '');
+            $number = trim($state, ',');
             $sourceindex = array_search($number, $numbers);
             if ($sourceindex !== false) {
                 foreach ($transitions as $tran) {
-                    if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+                    if ($direction == 0) {
+                        $sourcenum = trim($numbers[$tran->from], '()');
+                    } else {
+                        $sourcenum = trim($numbers[$tran->to], '()');
+                    }
+                    if ($sourcenum == $number) {
                         // Add transition.
                         $memstate = array_search($state, $this->statenumbers);
                         if ($direction == 0) {
@@ -1338,12 +1343,17 @@ abstract class qtype_preg_finite_automaton {
             }
         }
 
-        // Serch transition among states added on last step.
+        // Search transition among states added on last step.
         foreach ($memoryfront as $state) {
             $number = $this->statenumbers[$state];
-            $number = strtr($state, ',', '');
-            foreach ($intotransitions as $tran) {
-                if (($direction == 0 && $numbers[$tran->from] == $number) || ($direction == 1 && $numbers[$tran->to] == $number)) {
+            $number = trim($number, ',');
+            foreach ($transitions as $tran) {
+                if ($direction == 0) {
+                    $sourcenum = trim($numbers[$tran->from], '()');
+                } else {
+                    $sourcenum = trim($numbers[$tran->to], '()');
+                }
+                if ($sourcenum == $number) {
                     // Add transition.
                     if ($direction == 0) {
                         $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate);
