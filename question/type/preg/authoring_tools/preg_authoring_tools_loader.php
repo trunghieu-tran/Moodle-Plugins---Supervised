@@ -27,6 +27,8 @@ function qtype_preg_get_json_array() {
 
     $id = optional_param('id', '', PARAM_INT);
     $tree_orientation = optional_param('tree_orientation', '', PARAM_TEXT);
+    $notation = optional_param('notation', '', PARAM_RAW);
+    $engine = optional_param('engine', '', PARAM_RAW);
     
     $rankdirlr = false;
     if($tree_orientation == 'vertical'){
@@ -38,9 +40,9 @@ function qtype_preg_get_json_array() {
     
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_explaining_tree_tool($regextext, $rankdirlr),
-        'graph' => new qtype_preg_explaining_graph_tool($regextext),
-        'description' => new qtype_preg_description_tool($regextext)
+        'tree' => new qtype_preg_explaining_tree_tool($regextext, $engine, $notation, $rankdirlr),
+        'graph' => new qtype_preg_explaining_graph_tool($regextext, $engine, $notation),
+        'description' => new qtype_preg_description_tool($regextext, $engine, $notation)
     );
 
     // Fill json array.

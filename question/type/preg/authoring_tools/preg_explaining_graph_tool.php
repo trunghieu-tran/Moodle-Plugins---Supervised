@@ -140,13 +140,13 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
     }
 
-    public function __construct ($regex = null, $options = null) {
+    public function __construct ($regex = null, $engine = null, $notation = null, $options = null) {
         // Options should exist at least as a default object.
         if ($options === null) {
             $options = new qtype_preg_handling_options();
         }
         $options->preserveallnodes = true;
-        parent::__construct($regex, $options);
+        parent::__construct($regex, $options, $engine, $notation);
         if ($regex === null) {
             return;
         }

@@ -24,10 +24,10 @@ class qtype_preg_regex_testing_tool {
     private $answers;
     private $hintmatch;
     
-    public function __construct($regex, $answers, $mathcer) {
+    public function __construct($regex, $answers, $mathcer, $usecase, $exactmatch, $notation = 'native') {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
-        $regular = qtype_preg_question::question_from_regex($regex, false, true, $mathcer, 'native');
+        $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $mathcer, $notation);
         $this->hintmatch = $regular->hint_object('hintmatchingpart');
         $this->answers = $answers;
     }
@@ -56,7 +56,7 @@ class qtype_preg_regex_testing_tool {
     protected function generate_json_for_accepted_regex(&$json_array){
         $answer = strtok($this->answers, "\n");
         $json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . "</br>";
-        while(($answer = strtok("\n")) !== false)	{
+        while(($answer = strtok("\n")) !== false) {
             $json_array[$this->json_key()] .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . "</br>";
         }
     }
