@@ -1448,6 +1448,9 @@ abstract class qtype_preg_finite_automaton {
         // Coping.
         while (count ($oldfront) != 0) {
             foreach ($oldfront as $curstate) {
+                if (count($stateswere) == 0) {
+                            $stateswere = array();
+                }
                 if (!$source->is_copied_state($curstate)) {
                     // Modify states.
                     $changedstate = $source->statenumbers[$curstate];
@@ -1466,25 +1469,19 @@ abstract class qtype_preg_finite_automaton {
                     if (!$isfind) {
                         $this->add_state($changedstate);
                         $workstate = array_search($changedstate, $this->statenumbers);
-                        if (count($stateswere) == 0) {
-                            $stateswere = array();
-                        }
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
 
                         // Check end of coping.
                         if ($stopcoping !== null && $curstate == $stopcoping) {
-                            $stopcoping = $workstate;
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
-                            $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
                             $connectedstates = $source->get_connected_states($curstate, $direction);
                             $newfront = array_merge($newfront, $connectedstates);
                         }
-                        $stateswere[] = $changedstate;
                     } else {
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                         $newmemoryfront[] = $workstate;
