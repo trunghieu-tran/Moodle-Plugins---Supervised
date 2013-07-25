@@ -603,14 +603,16 @@ abstract class qtype_preg_finite_automaton {
      * Remove the end state of the automaton.
      */
     public function remove_end_state($state) {
-        unset($this->endstates[$state]);
+        unset($this->endstates[array_search($state, $this->endstates)]);
+        $this->endstates = array_values($this->endstates);
     }
 
     /**
      * Remove the start state of the automaton.
      */
     public function remove_start_state($state) {
-        unset($this->starttates[$state]);
+        unset($this->starttates[array_search($state, $this->startstates)]);
+        $this->startstates = array_values($this->startstates);
     }
 
     /**
