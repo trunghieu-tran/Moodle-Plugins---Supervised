@@ -92,7 +92,7 @@ M.preg_authoring_tools_script = (function($) {
         // End of TODO
 
         var jsonarray = JSON.parse(data);
-        $('label[for=id_test_regex]').html(jsonarray.regex_test);
+        $('#id_test_regex').html(jsonarray.regex_test);
     },
 
     regex_check_string : function(e) {
@@ -103,6 +103,8 @@ M.preg_authoring_tools_script = (function($) {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
                 matcher: $('#id_engine :selected').val(),
+                usecase: $('#id_usecase :selected').val(),
+                exactmatch: $('#id_exactmatch :selected').val(),
                 ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
