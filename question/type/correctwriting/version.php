@@ -32,8 +32,8 @@ $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2013050100,
-    'qbehaviour_adaptivehints' => 2013011800,
-    'qbehaviour_adaptivehintsnopenalties' => 2013011800,
+    'qbehaviour_adaptivehints' => 2013052500,
+    'qbehaviour_adaptivehintsnopenalties' => 2013052500,
     'qbehaviour_interactivehints' => 2013060200,
     'qtype_poasquestion' => 2013062900,
     'block_formal_langs' => 2013071900
