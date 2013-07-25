@@ -446,7 +446,7 @@ class  qtype_correctwriting_enum_analyzer {
                         $left_border_of_elem_new =$enumerations[$enum_number][$current_order[$j+1]]->begin;
                         $right_border_of_elem = $enumerations[$enum_number][$current_order[$j]]->end;
                         for ($z = 0; $z < $left_border_of_elem_new-$right_border_of_elem-1; $z++) {
-                            $for_change_enum_order[0] = $for_change_enum_order[$z+$right_border_of_elem-$left_border_of_enum+1];
+                            $for_change_enum_order[] = $for_change_enum_order[$z+$right_border_of_elem-$left_border_of_enum+1];
                         }
                     }
                 }
