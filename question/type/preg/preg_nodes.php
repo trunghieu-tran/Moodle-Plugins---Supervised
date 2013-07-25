@@ -379,8 +379,26 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
-    public function unite_leafs($other) {
-        return $this;
+    public function unite_leafs($other, $thishastags, $otherhastags) {
+        $result = null;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                if ($thishastags || $otherhastags) {
+                    if ($this->has_equal_tags($other)) {
+                        if ($this->mergedassertions == $other->mergedassertions) {
+                            $result = $this->unite($other);
+                        }
+                    }
+                } else if ($this->mergedassertions == $other->mergedassertions) {
+                    $result = $this->unite($other);
+                }
+            }
+        } else if ($this == $other) {
+            if ((!$thishastags && !$otherhastags) || (($thishastags || $otherhastags) && $this->has_equal_tags($other))) {
+                $result = $this;
+            }
+        }
+        return $result;
     }
 
     /**
