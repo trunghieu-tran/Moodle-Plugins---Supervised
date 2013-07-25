@@ -103,7 +103,7 @@ M.preg_authoring_tools_script = (function($) {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
                 matcher: $('#id_engine :selected').val(),
-                usecase: $('#id_usecase :selected').val(),
+                usecase: $('#id_usecase :selected').val(), // TODO matcher and engine are equals ?!
                 exactmatch: $('#id_exactmatch :selected').val(),
                 notation: $('#id_notation :selected').val(),
                 ajax: true
@@ -142,13 +142,23 @@ M.preg_authoring_tools_script = (function($) {
                     // TODO - FIND GOOD WAY TO HIDE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
                     $("#fgroup_id_charset_process_radioset").hide(); // TODO - hidden for beta
-                    $("#id_regex_cancel").click(function(){self.textbutton_widget.dialog.dialog("close");});
+                    $("#id_regex_cancel").click(options.oncancelclicked);
                     $('#id_regex_check_string').click(self.regex_check_string);
                     $('#id_regex_show_selection').click(self.regex_show_selection_clicked);
                     // get testing data from hidden field and put it into ui
                     $('#id_regex_match_text')   .val( $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val() )
                                                 .keyup(self.textbutton_widget.fix_textarea_rows)
                                                 .trigger('keyup');
+                    $("#id_regex_input_header").after('<div>'
+                        + 'matcher: '
+                        + $('#id_engine :selected').text()
+                        + '<br />usecase: '
+                        + $('#id_usecase :selected').text()
+                        + '<br />exactmatch: '
+                        + $('#id_exactmatch :selected').text()
+                        + '<br />notation: '
+                        + $('#id_notation :selected').text()
+                        + '</div>');
                     self.regex_selection_widget._init();
                     self.load_content_by_id('-1');
                 });
@@ -160,6 +170,18 @@ M.preg_authoring_tools_script = (function($) {
                 // get testing data from hidden field and put it into ui
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
                 self.load_content_by_id('-1');
+            },
+
+            oncancelclicked : function() {
+                self.textbutton_widget.dialog.dialog("close");
+                $('#id_test_regex').html('');
+            },
+
+            onsaveclicked : function() {
+                self.textbutton_widget.currentlinput.val(self.textbutton_widget.data);
+                $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+                self.textbutton_widget.dialog.dialog('close');
+                $('#id_test_regex').html('');
             }
         };
 
@@ -299,6 +321,8 @@ M.preg_authoring_tools_script = (function($) {
             regex: regex,
             id: id,
             tree_orientation: self.tree_orientation,
+            notation: $('#id_notation :selected').val(),
+            engine: $('#id_engine :selected').val(),
             displayas: self.displayas,
             ajax: true
         };
