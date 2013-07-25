@@ -1339,12 +1339,13 @@ abstract class qtype_preg_finite_automaton {
      * @param changedstate - state for modifying.
      * @param origin - origin of automata with this state.
      */
-    public function modify_state(&$changedstate, $origin) {
+    public function modify_state($changedstate, $origin) {
         if ($origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
-            $changedstate .= ',';
+            $resultstate = $changedstate . ',';
         } else {
-            $changedstate = ',' . $changedstate;
+            $resultstate = ',' . $changedstate;
         }
+        return $resultstate;
     }
 
     /**
