@@ -1502,13 +1502,29 @@ abstract class qtype_preg_finite_automaton {
             $newfront = array();
             $newmemoryfront = array();
         }
+        $sourcenumbers = $source->get_state_numbers();
+        // Add start states if fa has no one.
         if (count($this->startstates) == 0) {
-            if ($direction == 0) {
-                $this->add_start_state(array_search('0,', $this->statenumbers));
-            } else {
-                $this->add_start_state(array_search(',0', $this->statenumbers));
+            $sourcestart = $source->start_states();
+            foreach ($sourcestart as $start) {
+                $realnumber = $sourcenumbers[$start];
+                $realnumber = trim($realnumber,'()');
+                $newstart = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
+                $this->add_start_state($newstart);
             }
         }
+        // Add end states if fa has no one.
+        //if (count($this->endstates) == 0) {
+            $sourceend = $source->end_states();
+            foreach ($sourceend as $end) {
+                $realnumber = $sourcenumbers[$end];
+                $realnumber = trim($realnumber,'()');
+                $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
+                if ($newend !== false) {
+                    $this->add_end_state($newend);
+                }
+            }
+        //}
         return $this;
     }
 
