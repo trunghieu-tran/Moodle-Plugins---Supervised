@@ -102,7 +102,7 @@ M.preg_authoring_tools_script = (function($) {
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
-                matcher: $('#id_engine :selected').val(),
+                engine: $('#id_engine :selected').val(),
                 usecase: $('#id_usecase :selected').val(), // TODO matcher and engine are equals ?!
                 exactmatch: $('#id_exactmatch :selected').val(),
                 notation: $('#id_notation :selected').val(),
@@ -158,7 +158,7 @@ M.preg_authoring_tools_script = (function($) {
                         + $('#id_exactmatch :selected').text()
                         + '<br />notation: '
                         + $('#id_notation :selected').text()
-                        + '</div>');
+                        + '</div>');                    
                     self.regex_selection_widget._init();
                     self.load_content_by_id('-1');
                 });

@@ -21,7 +21,7 @@ function qtype_preg_get_json_array() {
     $json_array = array();
     $regextext = optional_param('regex', '', PARAM_RAW);
     $answers = optional_param('answer', '', PARAM_RAW);
-    $matcher = optional_param('matcher', '', PARAM_RAW);
+    $engine = optional_param('engine', '', PARAM_RAW);
     $usecase = optional_param('usecase', '', PARAM_INT);
     $exactmatch = optional_param('exactmatch', '', PARAM_INT);
     $notation = optional_param('notation', '', PARAM_RAW);
@@ -38,7 +38,7 @@ function qtype_preg_get_json_array() {
         $exactmatch = false;
     }
     
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, $answers, $matcher, $usecase, $exactmatch);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, $answers, $engine, $usecase, $exactmatch);
     $regex_testing_tool->generate_json($json_array);
 
     return $json_array;
