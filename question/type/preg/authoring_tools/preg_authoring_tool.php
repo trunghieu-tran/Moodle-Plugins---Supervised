@@ -12,13 +12,36 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
-    protected $linefirst = null; 
-    protected $linelast = null; 
-    protected $indfirst = null; 
-    protected $indlast = null;
+    public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
+        //TODO: move to qtype_preg_regex_handler
+        if($regex === null){
+            return;
+        }
+        if($options === null){
+            $options = new qtype_preg_handling_options();
+        }
+        $options->preserveallnodes = TRUE;
+        // Convert to actually used notation if necessary.
+        $engineclass = 'qtype_preg_'.$engine;
+        $queryengine = new $engineclass;
+        $usednotation = $queryengine->used_notation();
+        // Initialise $notationobj so it won't disappear after condition and could be used later.
+        $notationobj = null;
+        if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
+            $notationclass = 'qtype_preg_notation_'.$notation;
+            $notationobj = new $notationclass($regex);
+            $regex = $notationobj->convert_regex($usednotation);
+        }
+        parent::__construct($regex, $options);
+    }
+    
     /**
      * Overloaded since parsing errors are normal for authoring tools.
      */
@@ -30,13 +53,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
             }
         }
         return $result;
-    }
-
-    public function build_dst() {
-        if ($this->linefirst && $this->linelast && $this->indfirst && $this->indlast) {
-            // TODO
-        }
-        parent::build_dst();
     }
 
     /**
