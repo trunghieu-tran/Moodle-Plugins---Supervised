@@ -121,13 +121,13 @@ class qtype_preg_accepting_error extends qtype_preg_error {
         $a->nodename = $nodename;
         $a->linefirst = $pregnode->linefirst;
         $a->linelast = $pregnode->linelast;
-        $a->indfirst = $pregnode->indexfirst;
-        $a->indlast = $pregnode->indexlast;
+        $a->indfirst = $pregnode->indfirst;
+        $a->indlast = $pregnode->indlast;
         $a->engine = get_string($matchername, 'qtype_preg');
 
         $errormsg = get_string('unsupported', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $pregnode->indexfirst, $pregnode->indexlast, $pregnode->linefirst, $pregnode->linelast);
+        parent::__construct($errormsg, $regex, $pregnode->indfirst, $pregnode->indlast, $pregnode->linefirst, $pregnode->linelast);
     }
 }
 
