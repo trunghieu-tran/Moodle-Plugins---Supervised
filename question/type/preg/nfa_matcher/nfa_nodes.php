@@ -67,8 +67,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // Does this transition make a infinite quantifier loop?
     public $is_loop;
 
-    public function __construct($from, &$pregleaf, $to, $consumeschars = true) {
-        parent::__construct($from, $pregleaf, $to, $consumeschars);
+    public function __construct($from, &$pregleaf, $to, $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, $consumeschars = true) {
+        parent::__construct($from, $pregleaf, $to, $origin, $consumeschars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
         $this->subexpr_start = array();
@@ -127,7 +127,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     public function intersect($other) {
         $resulttran = parent::intersect($other);
         if ($resulttran != null) {
-            $resulttran = new qtype_preg_nfa_transition ($resulttran->from, $resulttran->pregleaf, $resulttran->to);    
+            $resulttran = new qtype_preg_nfa_transition ($resulttran->from, $resulttran->pregleaf, $resulttran->to, $resulttran->origin);    
             $resulttran->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
             $resulttran->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
             $resulttran->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
