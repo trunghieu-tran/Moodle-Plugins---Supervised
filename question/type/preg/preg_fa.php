@@ -1490,10 +1490,9 @@ abstract class qtype_preg_finite_automaton {
                         $newfront = array_merge($newfront, $connectedstates);
                     }
                 } else {
-                    $changedstate = $this->statenumbers[$curstate];
-                    $changedstate = strtr($changedstate, '(', '');
-                    $changedstate = strtr($changedstate, ')', '');
-                    $this->modify_state($changedstate, $origin);
+                    $changedstate = $source->statenumbers[$curstate];
+                    $changedstate = trim($changedstate, '()');
+                    $changedstate = $this->modify_state($changedstate, $origin);
                     $workstate = array_search($changedstate, $this->statenumbers);
                     $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                 }
