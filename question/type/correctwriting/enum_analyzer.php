@@ -425,11 +425,15 @@ class  qtype_correctwriting_enum_analyzer {
             if ($current_order != $enums_orders[$enum_number]) {
                 // Copy current enumeration to temp array and remove it from correct answer.
                 $for_change_enum_order = array();
-                $left_border_of_enum = $enumdescription[$enum_number][$current_order[0]]->begin;
-                $right_border_of_enum = $enumdescription[$enum_number][array_pop($current_order)]->end;
-                for ($j = 0; $j < $right_border_of_enum-$left_border_of_enum+1; $j++) {
-                    $for_change_enum_order[] = $correctanswer[$enumdescription[$enum_number][$current_order[0]]->begin];
-                    unset($correctanswer[$enumdescription[$enum_number][$current_order[0]]->begin]);
+                $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
+                $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
+                $j = 0;
+                foreach ($stringpair->correctstring()->stream->tokens as $key => $token) {
+                    if ($j >= $left_border_of_enum && $j <= $right_border_of_enum) {
+                        $for_change_enum_order[] = $token;
+                        unset($stringpair->correctstring()->stream->tokens[$key]);
+                    }
+                    $j++;
                 }
                 // Change current order to new in enumeration.
                 // Copy elements in new order.
