@@ -1486,7 +1486,7 @@ abstract class qtype_preg_finite_automaton {
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                         $newmemoryfront[] = $workstate;
                         // Adding connected states.
-                        $connectedstates = $source($curstate, $direction);
+                        $connectedstates = $source->get_connected_states($curstate, $direction);
                         $newfront = array_merge($newfront, $connectedstates);
                     }
                 } else {
