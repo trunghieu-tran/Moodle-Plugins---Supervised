@@ -362,7 +362,6 @@ class  qtype_correctwriting_enum_analyzer {
         $enumschangecorrectstring = array(); // Indexes of enumerations which take biggest changes in correct answer.
         $includearray = array(); // Array with indexes of include enumeration for one enumeration.
         $isenumincluded = false; // Is current enumeration included in other enumeration.
-        $previewsorder = array(); // Array with previews order of enumerations.
         $position = 0; // Position to change correct string.
         $indexesintable = array(); // Array of indexes for correct string's tokens.
         // Fill array to keep enums orders separately.
