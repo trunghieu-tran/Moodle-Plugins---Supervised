@@ -614,5 +614,188 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         }
         $this->assertTrue( $equal, "Error in all find orders found!One include in other.");
     }
+
+    // Test for change_enum_order, two enumerations without including.
+    public function testchange_enum_order_without_including() {
+        $lang = new block_formal_langs_language_simple_english;
+        // Input data.
+        $string = 'int k = j / h + t + o - r ; bool g = kill = live ;';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $order = array(1, 0, 2, -1, 1, 0);
+        $enumorder = array(0, 1);
+        $enumdescription = array();
+        $include = array();
+        $include[] = array(-1);
+        $include[] = array(-1);
+        $enumdescription[] = array(new enum_element(3, 5), new enum_element(7, 7), new enum_element(9, 11));
+        $enumdescription[] = array(new enum_element(16, 16), new enum_element(18, 18));
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        // Expected result.
+        $string = 'int k = t + j / h + o - r ; bool g = live = kill ;';
+        $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(5, 7), new enum_element(3, 3), new enum_element(9, 11));
+        $enumdescription[] = array(new enum_element(18, 18), new enum_element(16, 16));
+        $newcorrect->enumerations = $enumdescription;
+        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $indexesintable = array(0, 1, 2, 7, 6, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 18, 17, 16, 19);
+        $newpair->set_indexes_in_table($indexesintable);
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer();
+        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+    }
+
+    // Test for change_enum_order, two enumeration, one include in other.
+    public function testchange_enum_order_one_include_in_other() {
+        $lang = new block_formal_langs_language_simple_english;
+        // Input data.
+        $string = 'Today I meet some friends and my neighbors , with their three children : Victoria , Carry and Tom .';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $order = array(1, 0, -1, 2, 0, 1);
+        $enumorder = array(1, 0);
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(3, 4), new enum_element(6, 18));
+        $enumdescription[] = array(new enum_element(14, 14), new enum_element(16, 16), new enum_element(18, 18));
+        $include = array();
+        $include[] = array(1);
+        $include[] = array(-1);
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        // Expected result.
+        $string = 'Today I meet my neighbors , with their three children : Tom , Victoria and Carry and some friends .';
+        $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(17, 18), new enum_element(3, 15));
+        $enumdescription[] = array(new enum_element(13, 13), new enum_element(15, 15), new enum_element(11, 11));
+        $newcorrect->enumerations = $enumdescription;
+        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $indexesintable = array(0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 18, 15, 14, 17, 16, 5, 3, 4, 19);
+        $newpair->set_indexes_in_table($indexesintable);
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer();
+        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+    }
+
+    // Test for change_enum_order, three enumeration, two include in other.
+    public function testchange_enum_order_two_include_in_other() {
+        $lang = new block_formal_langs_language_simple_english;
+        // Input data.
+        $string = 'Today I meet my friends : Sam , Dine and Michel , and my neighbors , with their three children : Victoria ,';
+        $string = $string.' Carry and Tom .';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $order = array(1, 0, -1, 0, 2, 1, -1, 2, 1, 0);
+        $enumorder = array(1, 2, 0);
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(3, 10), new enum_element(13, 25));
+        $enumdescription[] = array(new enum_element(6, 6), new enum_element(8, 8), new enum_element(10, 10));
+        $enumdescription[] = array(new enum_element(21, 21), new enum_element(23, 23), new enum_element(25, 25));
+        $include = array();
+        $include[] = array(1, 2);
+        $include[] = array(-1);
+        $include[] = array(-1);
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        // Expected result.
+        $string = 'Today I meet my neighbors , with their three children : Tom , Carry and Victoria , and my friends : Sam , ';
+        $string = $string.'Michel and Dine .';
+        $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(18, 25), new enum_element(3, 15));
+        $enumdescription[] = array(new enum_element(21, 21), new enum_element(25, 25), new enum_element(23, 23));
+        $enumdescription[] = array(new enum_element(15, 15), new enum_element(13, 13), new enum_element(11, 11));
+        $newcorrect->enumerations = $enumdescription;
+        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $indexesintable = array(0, 1, 2, 13, 14, 15, 16, 17, 18, 19 , 20, 25, 22, 23, 24, 21, 11, 12, 3, 4, 5, 6, 7, 10, 9, 8, 26);
+        $newpair->set_indexes_in_table($indexesintable);
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer();
+        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+    }
+
+    // Test for change_enum_order, three enumeration, matrioshka.
+    public function testchange_enum_order_three_enums_matrioshka() {
+        $lang = new block_formal_langs_language_simple_english;
+        // Input data.
+        $string = 'I see a big group of people , which contains three parts : children , women and men , who was weared in blue ';
+        $string = $string.'overall or strange suits with red and green line in front.';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $order = array(0, 1, -1, 1, 0, -1, 1, 2, 0);
+        $enumorder = array(0, 1, 2);
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(29, 29), new enum_element(31, 31));
+        $enumdescription[] = array(new enum_element(23, 24), new enum_element(26, 34));
+        $enumdescription[] = array(new enum_element(13, 13), new enum_element(15, 15), new enum_element(17, 34));
+        $include = array();
+        $include[] = array(-1);
+        $include[] = array(0);
+        $include[] = array(0, 1);
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        // Expected result.
+        $string = 'I see a big group of people , which contains three parts : women , men , who was weared in strange suits with';
+        $string = $string.' red and green line in front or blue overall and children .';
+        $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(24, 24), new enum_element(26, 26));
+        $enumdescription[] = array(new enum_element(31, 32), new enum_element(21, 29));
+        $enumdescription[] = array(new enum_element(34, 34), new enum_element(13, 13), new enum_element(15, 32));
+        $newcorrect->enumerations = $enumdescription;
+        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $indexesintable = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 14, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31,
+                                32, 33, 34, 25, 23, 24, 16, 13, 35);
+        $newpair->set_indexes_in_table($indexesintable);
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer();
+        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+    }
+
+    // Test for change_enum_order, six enumerations.
+    public function testchange_enum_order_six_enums() {
+        $lang = new block_formal_langs_language_simple_english;
+        // Input data.
+        $string = 'int a = b + c * d * f + k * z * e , p = j + h + t * r * w ;';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $order = array(1, 0, -1, 1, 0, 2, -1, 2, 0, 1, -1, 0, 2, 1, -1, 0, 2, 1, -1, 2, 1, 0);
+        $enumorder = array(3, 4, 5, 1, 2, 0);
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(1, 15), new enum_element(17, 27));
+        $enumdescription[] = array(new enum_element(3, 3), new enum_element(5, 9), new enum_element(11, 15));
+        $enumdescription[] = array(new enum_element(19, 19), new enum_element(21, 21), new enum_element(23, 27));
+        $enumdescription[] = array(new enum_element(5, 5), new enum_element(7, 7), new enum_element(9, 9));
+        $enumdescription[] = array(new enum_element(23, 23), new enum_element(25, 25), new enum_element(27, 27));
+        $enumdescription[] = array(new enum_element(11, 11), new enum_element(13, 13), new enum_element(15, 15));
+        $include = array();
+        $include[] = array(1, 2, 3, 4, 5);
+        $include[] = array(3, 5);
+        $include[] = array(4);
+        $include[] = array(-1);
+        $include[] = array(-1);
+        $include[] = array(-1);
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        // Expected result.
+        $string = 'int p = t * w * r + j + h , a = c * f * d + b + e * z * k ;';
+        $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(13, 27), new enum_element(1, 11));
+        $enumdescription[] = array(new enum_element(21, 21), new enum_element(15, 19), new enum_element(23, 27));
+        $enumdescription[] = array(new enum_element(9, 9), new enum_element(11, 11), new enum_element(3, 7));
+        $enumdescription[] = array(new enum_element(15, 15), new enum_element(19, 19), new enum_element(17, 17));
+        $enumdescription[] = array(new enum_element(3, 3), new enum_element(7, 7), new enum_element(5, 5));
+        $enumdescription[] = array(new enum_element(27, 27), new enum_element(25, 25), new enum_element(23, 23));
+        $newcorrect->enumerations = $enumdescription;
+        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $indexesintable = array(0, 17, 18, 23, 24, 27, 26, 25, 20, 19, 22, 21, 16, 1, 2, 5, 6, 9, 8, 7, 4, 3, 10, 15, 12, 13, 14, 11, 28);
+        $newpair->set_indexes_in_table($indexesintable);
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer();
+        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+    }
 }
 
