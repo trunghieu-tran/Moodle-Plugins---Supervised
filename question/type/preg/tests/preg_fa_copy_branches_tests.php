@@ -8,9 +8,8 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 
 class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
 
-    public function test_copy_whole_branch() {
-        $sourcedescription = 'digraph example 
-                            {
+    /*public function test_copy_whole_branch() {
+        $sourcedescription = 'digraph example {
                                 0;
                                 4;
                                 0->1[label="[df]"];
@@ -19,8 +18,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->4[label="[.]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "1,";"4,";
                         "0,"->"1,"[label="[df]"];
@@ -33,21 +31,17 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(0)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('0', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_impliciment_cycle() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 3;
                                 0->1[label="[ab]"];
@@ -56,8 +50,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->0[label="[a]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "1,";"3,";
                         "0,"->"1,"[label="[ab]"];
@@ -69,30 +62,25 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($sourcedescription);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
-        $direct = new qtype_preg_nfa;
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(0)]);
+        $direct = new qtype_preg_nfa(0, 0, 0, array());
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('0', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
-    }
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+    }*/
 
     public function test_copy_cycle_end() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->1[label="[0-9]"];
                                 1->2[label="[a]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "1,";
                         "0,"->"1,"[label="[ab]"];
@@ -102,21 +90,17 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(0)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('0', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_copy_not_empty_direct() {
-        $sourcedescription = 'digraph example 
-                            {
+    /*public function test_copy_not_empty_direct() {
+        $sourcedescription = 'digraph example {
                                 0;
                                 4;
                                 0->1[label="[df]"];
@@ -125,8 +109,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->4[label="[.]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "4,";
                         "0,"->"1,"[label="[df]"];
@@ -135,8 +118,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                         "2,"->"3,"[label="[01]"];
                         "3,"->"4,"[label="[.]"];
                     }';
-        $directdescription = 'digraph example 
-                            {
+        $directdescription = 'digraph example {
                                 "0,";
                                 "1,";
                                 "0,"->"1,"[label="[df]"];
@@ -147,37 +129,32 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
         $direct->read_fa($directdescription);
-
-        $stopcoping = $source->states[$source->find_state_index(4)];
-        $oldfront = array(source->states[$source->find_state_index(2)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('4', $numbers);
+        $oldfront = array(array_search('2', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
     public function test_direct_has_states_for_coping() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
                                 2->0[label="[ab]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "2,";
                         "0,"->"1,"[label="[ab]"];
                         "1,"->"2,"[label="[ab]"];
                         "2,"->"0,"[label="[ab]"];
                     }';
-        $directdescription = 'digraph example 
-                            {
+        $directdescription = 'digraph example {
                                 "0,";
                                 "1,";
                                 "0,"->"1,"[label="[ab]"];
@@ -188,37 +165,32 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
         $direct->read_fa($directdescription);
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(2)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('2', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
-    }
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+    }*/
 
     public function test_coping_not_nessesary() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
                                 2->0[label="[ab]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         "0,";
                         "2,";
                         "0,"->"1,"[label="[ab]"];
                         "1,"->"2,"[label="[ab]"];
                         "2,"->"0,"[label="[ab]"];
                     }';
-        $directdescription = 'digraph example 
-                            {
+        $directdescription = 'digraph example {
                                 "0,";
                                 "2,";
                                 "0,"->"1,"[label="[ab]"];
@@ -229,27 +201,19 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($sourcedescription);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
-        $direct = new qtype_preg_nfa;
+        $direct = new qtype_preg_nfa(0, 0, 0, array());
         $direct->read_fa($directdescription);
-
-        $source->states[0]->wascopied = true;
-        $source->states[1]->wascopied = true;
-        $source->states[2]->wascopied = true;
-
-        $stopcoping = $source->states[$source->find_state_index(0)];
-        $oldfront = array(source->states[$source->find_state_index(2)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('0', $numbers);
+        $oldfront = array(array_search('2', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_coping_back() {
-        $sourcedescription = 'digraph example 
-                            {
+    /*public function test_coping_back() {
+        $sourcedescription = 'digraph example {
                                 0;
                                 4;
                                 0->1[label="[df]"];
@@ -258,8 +222,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->4[label="[.]"];
                             }';
-        $dotresult = 'digraph res 
-                    {
+        $dotresult = 'digraph res {
                         "0,";
                         "4,";
                         "3,"->"4,"[label="[.]",color=violet];
@@ -275,21 +238,19 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-
-        $stopcoping = $source->states[$source->find_state_index(0)];
-        $oldfront = array(source->states[$source->find_state_index(4)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('0', $numbers);
+        $oldfront = array(array_search('4', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 1);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_second_automata() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
+                                0;
                                 4;
                                 0->1[label="[df]"];
                                 0->2[label="[0-9]"];
@@ -297,8 +258,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->4[label="[.]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         ",0";
                         ",1";",4";
                         ",0"->",1"[label="[df]"];
@@ -312,21 +272,18 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription, $origin);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(0)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('0', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_second_cycle() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 3;
                                 0->1[label="[ab]"];
@@ -335,8 +292,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->0[label="[a]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         ",0";
                         ",1";",3";
                         ",0"->",1"[label="[ab]"];
@@ -350,21 +306,18 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription, $origin);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-
-        $stopcoping = $source->states[$source->find_state_index(1)];
-        $oldfront = array(source->states[$source->find_state_index(0)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('1', $numbers);
+        $oldfront = array(array_search('0', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_not_empty_second() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 4;
                                 0->1[label="[df]"];
@@ -373,8 +326,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 2->3[label="[01]"];
                                 3->4[label="[.]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         ",0";
                         ",4";
                         ",0"->",1"[label="[df]"];
@@ -383,8 +335,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                         ",2"->",3"[label="[01]"];
                         ",3"->",4"[label="[.]"];
                     }';
-        $directdescription = 'digraph example 
-                            {
+        $directdescription = 'digraph example {
                                 ",0";
                                 ",1";
                                 ",0"->",1"[label="[df]"];
@@ -396,37 +347,32 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
         $direct->read_fa($directdescription);
-
-        $stopcoping = $source->states[$source->find_state_index(4)];
-        $oldfront = array(source->states[$source->find_state_index(2)]);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('4', $numbers);
+        $oldfront = array(array_search('2', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
-    }
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        var_dump($resultautomata);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+    }*/
 
     public function test_coping_not_nessesary_second() {
-        $sourcedescription = 'digraph example 
-                            {
+        $sourcedescription = 'digraph example {
                                 0;
                                 2;
                                 0->1[label="[ab]"];
                                 1->2[label="[ab]"];
                                 2->0[label="[ab]"];
                             }';
-        $dotresult = 'digraph example 
-                    {
+        $dotresult = 'digraph example {
                         ",0";
                         ",2";
                         ",0"->",1"[label="[ab]"];
                         ",1"->",2"[label="[ab]"];
                         ",2"->",0"[label="[ab]"];
                     }';
-        $directdescription = 'digraph example 
-                            {
+        $directdescription = 'digraph example {
                                 ",0";
                                 ",2";
                                 ",0"->",1"[label="[ab]"];
@@ -439,16 +385,13 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $source->read_fa($sourcedescription, $origin);
         $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
         $direct = new qtype_preg_nfa(0, 0, 0, array());
-        $direct->read_fa($directdescription);
-
-        $stopcoping = $source->states[$source->find_state_index(0)];
-        $oldfront = array(source->states[$source->find_state_index(2)]);
+        $direct->read_fa($directdescription, $origin);
+        $numbers = $source->get_state_numbers();
+        $stopcoping = array_search('0', $numbers);
+        $oldfront = array(array_search('2', $numbers));
         $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = $resultautomata->write_fa();
-        $search = '
-                    ';
-        $replace = '\n';
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $this->assertEquals($result, $dotresult, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult, $origin);
+        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
 }
