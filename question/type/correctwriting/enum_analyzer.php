@@ -23,10 +23,10 @@ require_once($CFG->dirroot.'/question/type/correctwriting/string_pair.php');
 class  qtype_correctwriting_enum_analyzer {
 
     /**
-     * Array which contains orders of all enumerations, and give maximum length of LCS of correctstring and correctedstring
+     * Array which contains pairs of answer, with maximum length of LCS in correctstring and correctedstring
      * @var array
      */
-    private $orders;
+    private $pairs;
 
     private $fitness;               // Fitness for response.
 
