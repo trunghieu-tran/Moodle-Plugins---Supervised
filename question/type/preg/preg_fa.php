@@ -713,11 +713,46 @@ abstract class qtype_preg_finite_automaton {
      *
      * @param transition transition for adding.
      */
-    public function add_transition($transition) {
+    public function add_transition(&$transition) {
         $outtransitions = $this->get_state_outtransitions($transition->from);
         if (array_key_exists($transition->to, $outtransitions)) {
             $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
-            $tran->pregleaf = $tran->pregleaf->unite_leafs($transition->pregleaf);
+            if ($tran != $transition) {
+                var_dump($tran);
+                var_dump($transition);
+                $thishastags = $tran->has_tags();
+                $otherhastags = $transition->has_tags();
+                $newleaf = $tran->pregleaf->unite_leafs($transition->pregleaf, $thishastags, $otherhastags);
+                if ($newleaf === null) {
+                    $clones = array();
+                    $outtransitions = $this->get_state_outtransitions($tran->to);
+                    $intotransitions = $this->get_state_intotransitions($tran->to);
+                    $newnumber = '/' . $this->statenumbers[$transition->to];
+                    $this->add_state($newnumber);
+                    $states = $this->get_state_numbers();
+                    $newto = array_search($newnumber, $states);
+                    $transition->to = $newto;
+                    foreach ($outtransitions as $outtran) {
+                        $clone = clone($outtran);
+                        $clone->from = $newto;
+                        $clones[] = $clone;
+                    }
+                    foreach ($intotransitions as $intotran) {
+                        if ($tran->from != $intotran->from) {
+                            $clone = clone($intotran);
+                            $clone->to = $newto;
+                            $clones[] = $clone;
+                        }
+                    }
+                    foreach ($clones as $clone) {
+                        $this->add_transition($clone);
+                    }
+                    $this->adjacencymatrix[$transition->from][$newto] = $transition;
+                } else {
+                    $transition->pregleaf = $newleaf;
+                    $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
+                }
+            }
         } else {
             $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
         }
