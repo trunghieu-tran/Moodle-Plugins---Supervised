@@ -630,7 +630,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(3, 5), new enum_element(7, 7), new enum_element(9, 11));
         $enumdescription[] = array(new enum_element(16, 16), new enum_element(18, 18));
         $correct->enumerations = $enumdescription;
-        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        $pair = new qtype_correctwriting_string_pair($correct, $correct, null);
         // Expected result.
         $string = 'int k = t + j / h + o - r ; bool g = live = kill ;';
         $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -638,7 +638,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(5, 7), new enum_element(3, 3), new enum_element(9, 11));
         $enumdescription[] = array(new enum_element(18, 18), new enum_element(16, 16));
         $newcorrect->enumerations = $enumdescription;
-        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $newpair = new qtype_correctwriting_string_pair($newcorrect, $correct, null);
         $indexesintable = array(0, 1, 2, 7, 6, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 18, 17, 16, 19);
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
@@ -662,7 +662,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include[] = array(1);
         $include[] = array(-1);
         $correct->enumerations = $enumdescription;
-        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        $pair = new qtype_correctwriting_string_pair($correct, $correct, null);
         // Expected result.
         $string = 'Today I meet my neighbors , with their three children : Tom , Victoria and Carry and some friends .';
         $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -670,7 +670,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(17, 18), new enum_element(3, 15));
         $enumdescription[] = array(new enum_element(13, 13), new enum_element(15, 15), new enum_element(11, 11));
         $newcorrect->enumerations = $enumdescription;
-        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $newpair = new qtype_correctwriting_string_pair($newcorrect, $correct, null);
         $indexesintable = array(0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 18, 15, 14, 17, 16, 5, 3, 4, 19);
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
@@ -697,7 +697,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include[] = array(-1);
         $include[] = array(-1);
         $correct->enumerations = $enumdescription;
-        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        $pair = new qtype_correctwriting_string_pair($correct, $correct, null);
         // Expected result.
         $string = 'Today I meet my neighbors , with their three children : Tom , Carry and Victoria , and my friends : Sam , ';
         $string = $string.'Michel and Dine .';
@@ -707,7 +707,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(21, 21), new enum_element(25, 25), new enum_element(23, 23));
         $enumdescription[] = array(new enum_element(15, 15), new enum_element(13, 13), new enum_element(11, 11));
         $newcorrect->enumerations = $enumdescription;
-        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $newpair = new qtype_correctwriting_string_pair($newcorrect, $correct, null);
         $indexesintable = array(0, 1, 2, 13, 14, 15, 16, 17, 18, 19 , 20, 25, 22, 23, 24, 21, 11, 12, 3, 4, 5, 6, 7, 10, 9, 8, 26);
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
@@ -734,7 +734,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include[] = array(0);
         $include[] = array(0, 1);
         $correct->enumerations = $enumdescription;
-        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        $pair = new qtype_correctwriting_string_pair($correct, $correct, null);
         // Expected result.
         $string = 'I see a big group of people , which contains three parts : women , men , who was weared in strange suits with';
         $string = $string.' red and green line in front or blue overall and children .';
@@ -744,7 +744,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(31, 32), new enum_element(21, 29));
         $enumdescription[] = array(new enum_element(34, 34), new enum_element(13, 13), new enum_element(15, 32));
         $newcorrect->enumerations = $enumdescription;
-        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
+        $newpair = new qtype_correctwriting_string_pair($newcorrect, $correct, null);
         $indexesintable = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 14, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31,
                                 32, 33, 34, 25, 23, 24, 16, 13, 35);
         $newpair->set_indexes_in_table($indexesintable);
@@ -777,7 +777,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $include[] = array(-1);
         $include[] = array(-1);
         $correct->enumerations = $enumdescription;
-        $pair = new qtype_correctwriting_string_pair($correct,$correct, null);
+        $pair = new qtype_correctwriting_string_pair($correct, $correct, null);
         // Expected result.
         $string = 'int p = t * w * r + j + h , a = c * f * d + b + e * z * k ;';
         $newcorrect = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -789,8 +789,9 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $enumdescription[] = array(new enum_element(3, 3), new enum_element(7, 7), new enum_element(5, 5));
         $enumdescription[] = array(new enum_element(27, 27), new enum_element(25, 25), new enum_element(23, 23));
         $newcorrect->enumerations = $enumdescription;
-        $newpair = new qtype_correctwriting_string_pair($newcorrect,$correct, null);
-        $indexesintable = array(0, 17, 18, 23, 24, 27, 26, 25, 20, 19, 22, 21, 16, 1, 2, 5, 6, 9, 8, 7, 4, 3, 10, 15, 12, 13, 14, 11, 28);
+        $newpair = new qtype_correctwriting_string_pair($newcorrect, $correct, null);
+        $indexesintable = array(0, 17, 18, 23, 24, 27, 26, 25, 20, 19, 22, 21, 16, 1, 2, 5, 6, 9, 8, 7, 4, 3, 10, 15, 12, 13, 14,
+                                11, 28);
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
