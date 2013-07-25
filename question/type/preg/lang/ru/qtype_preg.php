@@ -192,7 +192,7 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** Strings for authoring tools **********************/
-$string['authoring_tool_page_header'] = 'Test regex';
+$string['authoring_tool_page_header'] = 'Инструменты автора';
 $string['authoring_form_charset_mode'] = 'Режим отображения сложных символьных классов:';
 $string['authoring_form_charset_flags'] = 'точное значение (унифицированный формат)';
 $string['authoring_form_charset_userinscription'] = 'как написано в регулярном выражении';
@@ -214,10 +214,9 @@ $string['regex_graph_header'] = 'Explaining graph';
 $string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
 $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression.';
-$string['regex_match_header'] = 'Input string for check';
-$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
-$string['regex_match_header'] =  'Regex test';
-$string['regex_match_textarea'] = 'Input strings';
+$string['regex_match_header'] = 'Тестирование регулярных выражений';
+$string['regex_match_header_help'] = 'Введите строки для проверки своего регулярного выражения. Справа вы увидите эти строки в цвете: зеленым выделена совпавшая часть, красным - не совпавшие части (аналогичные цветные строки показываются студентам).';
+$string['regex_match_textarea'] = 'Введите строки для проверки';
 
 // Strings for node description
 

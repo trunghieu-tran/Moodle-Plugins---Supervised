@@ -192,7 +192,7 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** Strings for authoring tools form**********************/
-$string['authoring_tool_page_header'] = 'Test regular expression';
+$string['authoring_tool_page_header'] = 'Authoring tools';
 $string['authoring_form_charset_mode'] = 'Display mode for complex character classes:';
 $string['authoring_form_charset_flags'] = 'real meaning (unified format)';
 $string['authoring_form_charset_userinscription'] = 'as written in regular expressions';
@@ -214,10 +214,11 @@ $string['regex_graph_header'] = 'Explaining graph';
 $string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of the tree marks corresponding subgraph with dark green rectangle.';
 $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
-$string['regex_match_header'] = 'Enter string for testing regular expression';
-$string['regex_match_header_help'] = 'Here you can input a string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
-$string['regex_match_header'] =  'Regex test';
-$string['regex_match_textarea'] = 'Input strings';
+$string['regex_match_header'] = 'Regular expression testing';
+$string['regex_match_header_help'] = 'Here you can input a strings for testing you regex. In field "Input strings for matching" you can input strings; each string will be matched against you regular expression and you\'ll see results on the right: matched part is green, unmatched parts are red (the same colored strings will see you students).';
+$string['regex_match_textarea'] = 'Input strings for matching';
+
+
 // Strings for node description
 
 // TYPE_LEAF_META
