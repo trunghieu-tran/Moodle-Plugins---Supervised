@@ -387,9 +387,11 @@ class  qtype_correctwriting_enum_analyzer {
                     // ...find element, which contain current included enumeration.
                     for ($elem_number = 0; $elem_number < count($enumerations[$enum_number]) && !$elem_find; $elem_number++) {
                         $left_border_of_elem = $enumerations[$enum_number][$elem_number]->begin;
-                        $left_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][reset($enums_orders[$include_enums[$enum_number][$j]])]->begin;
+                        $second_index = reset($enums_orders[$include_enums[$enum_number][$j]]);
+                        $left_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][$second_index]->begin;
                         $right_border_of_elem = $enumerations[$enum_number][$elem_number]->end;
-                        $right_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][end($enums_orders[$include_enums[$enum_number][$j]])]->end;
+                        $second_index = end($enums_orders[$include_enums[$enum_number][$j]]);
+                        $right_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][$second_index]->end;
                         // If enumeration borders are between element borders, then element find.
                         if ($left_border_of_elem <= $left_border_of_enum && $right_border_of_elem >= $right_border_of_enum) {
                             $elem_find = true;
