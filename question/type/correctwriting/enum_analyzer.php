@@ -451,7 +451,7 @@ class  qtype_correctwriting_enum_analyzer {
                     }
                 }
                 // Remove old order from temp array.
-                $right_border_of_enum = $enumdescription[$enum_number][array_pop($current_order)]->end;
+                $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
                 array_splice($for_change_enum_order, 0, $right_border_of_enum - $left_border_of_enum +1);
                 // Copy enumeration in correct answer, token for token.
                 array_splice($stringpair->correctstring()->stream->tokens, $left_border_of_enum, 0, $for_change_enum_order);
