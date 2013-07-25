@@ -122,8 +122,8 @@ M.poasquestion_text_and_button = (function() {
             width: self.dialogwidth,
             title: self.dialogtitle,
             buttons: [
-                {text: "Save", click: self.close_and_set_new_data},
-                {text: "Cancel", click: function() {$(this).dialog("close")}}
+                {text: "Save", click: self.onsaveclicked},
+                {text: "Cancel", click: self.oncancelclicked}
             ]
         });
     },
@@ -148,6 +148,8 @@ M.poasquestion_text_and_button = (function() {
     setup : function (options) {
         self.onfirstpresscallback = options.onfirstpresscallback;
         self.oneachpresscallback = options.oneachpresscallback;
+        self.oncancelclicked = options.oncancelclicked;
+        self.onsaveclicked = options.onsaveclicked;
         self.extendeddata = options.extendeddata;
     },
 
@@ -157,6 +159,7 @@ M.poasquestion_text_and_button = (function() {
      * @param {String} _data data to set into current input
      */
     close_and_set_new_data : function(_data) {
+        
         if (typeof(_data) === "string") {
             self.data = _data;
             self.currentlinput.val(_data);
@@ -164,6 +167,7 @@ M.poasquestion_text_and_button = (function() {
             self.currentlinput.val(self.data);
         }
 		$('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+        $('#id_test_regex').html('');
         self.dialog.dialog('close');
     }
 };
