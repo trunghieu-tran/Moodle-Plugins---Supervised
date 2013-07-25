@@ -147,19 +147,21 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
                                 0->1[label="[a-z]"];
                                 1->2[label="[0-9]"];
                                 2->3[label="[]"];
-                                2->3[label="[01]"];
                                 0->3[label="[xy]"];
                                 3->4[label="[a-c]"];
+                                2->3[label="[01]"];
                             }';
         $dotresult = 'digraph example {
                         0;
                         4;
                         0->1[label="[a-z]"];
                         1->2[label="[0-9]"];
-                        2->3[label="[01]"];
+                        3->4[label="[a-c]"];
+                        2->"/3"[label="[01]"];
+                        "/3"->4[label="[a-c]"];
                         2->4[label="[a-c]"];
                         0->3[label="[xy]"];
-                        3->4[label="[a-c]"];
+                        0->"/3"[label="[xy]"];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
