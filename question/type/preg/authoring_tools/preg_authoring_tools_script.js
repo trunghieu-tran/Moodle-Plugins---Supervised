@@ -159,6 +159,18 @@ M.preg_authoring_tools_script = (function($) {
                 // get testing data from hidden field and put it into ui
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
                 self.load_content_by_id('-1');
+            },
+
+            oncancelclicked : function() {
+                self.textbutton_widget.dialog.dialog("close");
+                $('#id_test_regex').html('');
+            },
+
+            onsaveclicked : function() {
+                self.textbutton_widget.currentlinput.val(self.textbutton_widget.data);
+                $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+                self.textbutton_widget.dialog.dialog('close');
+                $('#id_test_regex').html('');
             }
         };
 
