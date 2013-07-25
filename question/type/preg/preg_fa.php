@@ -1454,7 +1454,7 @@ abstract class qtype_preg_finite_automaton {
                 if (!$source->is_copied_state($curstate)) {
                     // Modify states.
                     $changedstate = $source->statenumbers[$curstate];
-                    $this->modify_state($changedstate, $origin);
+                    $changedstate = $this->modify_state($changedstate, $origin);
                     // Mark state as copied state.
                     $source->set_copied_state($curstate);
                     $isfind = false;
