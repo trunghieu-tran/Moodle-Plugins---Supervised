@@ -41,9 +41,9 @@ function qtype_preg_get_json_array() {
         
         // Array with authoring tools
         $tools = array(
-            'tree' => new qtype_preg_explaining_tree_tool($regextext, $engine, $notation, $rankdirlr)
-            //'graph' => new qtype_preg_explaining_graph_tool($regextext),
-            //'description' => new qtype_preg_description_tool($regextext)
+            'tree' => new qtype_preg_explaining_tree_tool($regextext, $engine, $notation, $rankdirlr),
+            'graph' => new qtype_preg_explaining_graph_tool($regextext, $engine, $notation),
+            'description' => new qtype_preg_description_tool($regextext, $engine, $notation)
         );
 
         // Fill json array.
@@ -53,7 +53,7 @@ function qtype_preg_get_json_array() {
 
         return $json_array;
     //} catch (Exception $e) {
-    //    echo 'Выброшено исключение: ',  $e->getMessage(), "\n";
+    //    echo 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: ',  $e->getMessage(), "\n";
     //}
 }
 
