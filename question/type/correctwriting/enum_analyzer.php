@@ -537,9 +537,55 @@ class  qtype_correctwriting_enum_analyzer {
                 }
             }
         }
-        $changed_data->correctanswer = $correctanswer;
-        $changed_data->enumdescription = $enumdescription;
-        return $changed_data;
+        // Find enumerations which enough to change in correctstring to make it like we need.
+        for ($i = 0; $i < count($enumerations); $i++) {
+            $enumschangecorrectstring[] = $i;
+            $isenumincluded = false;
+            // Is current enumeration include in some others.
+            foreach ($include_enums as $includearray) {
+                if (false !== array_search($i, $includearray)) {
+                    $isenumincluded = true;
+                }
+            }
+            // If current enumeration is included in other enumeration remove it from array.
+            if ($isenumincluded === true) {
+                array_pop($enumschangecorrectstring);
+            }
+        }
+        // Change table indexes for tokens in correct answer.
+        foreach ($stringpair->correctstring()->stream->tokens as $token) {
+            $indexesintable[] = $token->token_index();
+        }
+        $stringpair->set_indexes_in_table($indexesintable);
+        // Change correctstring.
+        $tokens = $stringpair->correctstring()->stream->tokens;
+        foreach ($enumschangecorrectstring as $i) {
+            $tempstringbegin = '';
+            $tempstringend = '';
+            $position = reset($enums_orders[$i]);
+            $position = $enumerations[$i][$position]->begin-1;
+            $position = $stringpair->correctstring()->stream->tokens[$position]->position()->colend();
+            $tempstringbegin = $stringpair->correctstring()->string->substring(0, $position + 1);
+            $position = end($enums_orders[$i]);
+            $position = $enumerations[$i][$position]->end+1;
+            $position= $stringpair->correctstring()->stream->tokens[$position]->position()->colstart();
+            $tempstringend = $stringpair->correctstring()->string->substring($position);
+            $tempstringbegin = $tempstringbegin.' ';
+            $second_index = end($enums_orders[$i]);
+            for ($j = $enumerations[$i][reset($enums_orders[$i])]->begin; $j <= $enumerations[$i][$second_index]->end; $j++) {
+                $tempstringbegin = $tempstringbegin.$tokens[$j]->value();
+                $tempstringbegin = $tempstringbegin.' ';
+            }
+            $tempstringbegin = $tempstringbegin.$tempstringend;
+            // Update correct string.
+            $stringpair->correctstring()->string = new qtype_poasquestion_string($tempstringbegin);
+            // Update enumerations descriptions.
+            $stringpair->correctstring()->enumerations = $enumerations;
+            // Update token indexes.
+            $stringpair->correctstring()->stream = null;
+            $stringpair->correctstring()->stream->tokens;
+        }
+        return $stringpair;
     }
 }
 
