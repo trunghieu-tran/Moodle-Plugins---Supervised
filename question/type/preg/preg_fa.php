@@ -1382,9 +1382,9 @@ abstract class qtype_preg_finite_automaton {
                         // Add transition.
                         $memstate = array_search($state, $this->statenumbers);
                         if ($direction == 0) {
-                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate);
+                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate, $tran->origin);
                         } else {
-                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate);
+                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin);
                         }
                         $this->add_transition($transition);
                     }
@@ -1405,9 +1405,9 @@ abstract class qtype_preg_finite_automaton {
                 if ($sourcenum == $number) {
                     // Add transition.
                     if ($direction == 0) {
-                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate);
+                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate, $tran->origin);
                     } else {
-                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state);
+                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin);
                     }
                     $this->add_transition($transition);
                 }
@@ -1773,9 +1773,9 @@ abstract class qtype_preg_finite_automaton {
                     }
                     // Change transitions.
                     if ($direction == 0) {
-                        $resulttransitions[$i] = new qtype_preg_fa_transition ($curstate, $resulttransitions[$i]->pregleaf, $newstate);
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($curstate, $resulttransitions[$i]->pregleaf, $newstate, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
                     } else {
-                        $resulttransitions[$i] = new qtype_preg_fa_transition ($newstate, $resulttransitions[$i]->pregleaf, $curstate);
+                        $resulttransitions[$i] = new qtype_preg_fa_transition ($newstate, $resulttransitions[$i]->pregleaf, $curstate, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
                     }
                     $result->add_transition($resulttransitions[$i]);
                 }
