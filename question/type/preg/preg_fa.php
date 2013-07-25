@@ -120,7 +120,13 @@ class qtype_preg_fa_transition {
         $resulttran = null;
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
-            $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1);
+            if (($this->is_eps() || $this->is_unmerged_assert()) && (!$other->is_eps() && !$other->is_unmerged_assert())) {
+                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $other->origin);
+            } else if (($other->is_eps() || $other->is_unmerged_assert()) && (!$this->is_eps() && !$this->is_unmerged_assert())) {
+                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $this->origin);
+            } else {
+                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
+            }
         }
         return $resulttran;
     }
