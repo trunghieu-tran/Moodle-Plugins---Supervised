@@ -25,7 +25,7 @@
  */
  
 $plugin->component = 'qbehaviour_adaptivehints';
-$plugin->version  = 2013011800;
+$plugin->version  = 2013052500;
 $plugin->requires = 2013051400;
 $plugin->release = 'Adaptive with hints behaviour 2.5';
 $plugin->maturity = MATURITY_STABLE;
