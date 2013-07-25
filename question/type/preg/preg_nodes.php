@@ -858,6 +858,23 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $charset;
     }
 
+    public function unite(qtype_preg_leaf_charset $other) {
+        if (count($this->flags) == 1 && count($this->flags[0]) == 1 && count($other->flags) == 1 && count($this->flags[0]) == 1) {
+            $resultstring = $this->flags[0][0]->data->string() . $other->flags[0][0]->data->string();
+            preg_replace('#(.)\\1{2,}#ius', '\\1', $resultstring);
+            var_dump($resultstring);
+            $resflag = new qtype_preg_charset_flag;
+            $resflag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($resultstring));
+            $resflags = array(array($resflag));
+            $result = new qtype_preg_leaf_charset;
+        } else {
+            $resflags = array_merge($this->flags, $other->flags);
+        }
+        $result->flags = $resflags;
+        $result->israngecalculated = false;
+        return $result;
+    }
+
     /**
      * Substracts other charset from this.
      * @param other charset to substract.
