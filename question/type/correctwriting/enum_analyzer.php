@@ -336,7 +336,7 @@ class  qtype_correctwriting_enum_analyzer {
      * @param array $new_enum_order - new orders for all enumeration
      * @return object $changed_data - changed correct answer and description
      */
-    private function change_enum_order($correctanswer, $enumdescription, $enum_change_order, $include_enums, $new_enum_order) {
+    public function change_enum_order($correctanswer, $enumdescription, $enum_change_order, $include_enums, $new_enum_order) {
         $enums_orders = array(); // Array to keep enums orders separately.
         $current_order = array(); // Array to keep current order of enum.
         $for_change_enum_order = array(); // Array keep temp information for change enumeration order.
