@@ -423,6 +423,7 @@ class  qtype_correctwriting_enum_analyzer {
                 // Add element to order.
                 array_splice($current_order, $insert_place, 0, $j);
             }
+            // If current order not equal order which needed now.
             if ($current_order != $enums_orders[$enum_number]) {
                 // Copy current enumeration to temp array and remove it from correct answer.
                 $for_change_enum_order = array();
