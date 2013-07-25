@@ -24,6 +24,7 @@ function qtype_preg_get_json_array() {
     $matcher = optional_param('matcher', '', PARAM_RAW);
     $usecase = optional_param('usecase', '', PARAM_INT);
     $exactmatch = optional_param('exactmatch', '', PARAM_INT);
+    $notation = optional_param('notation', '', PARAM_INT);
     
     if($usecase == 1){
         $usecase = true;

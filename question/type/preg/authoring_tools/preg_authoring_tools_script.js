@@ -105,6 +105,7 @@ M.preg_authoring_tools_script = (function($) {
                 matcher: $('#id_engine :selected').val(),
                 usecase: $('#id_usecase :selected').val(),
                 exactmatch: $('#id_exactmatch :selected').val(),
+                notation: $('#id_notation :selected').val(),
                 ajax: true
             },
             success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
