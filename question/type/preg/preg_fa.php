@@ -779,8 +779,6 @@ abstract class qtype_preg_finite_automaton {
         if (array_key_exists($transition->to, $outtransitions)) {
             $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
             if ($tran != $transition) {
-                var_dump($tran);
-                var_dump($transition);
                 $thishastags = $tran->has_tags();
                 $otherhastags = $transition->has_tags();
                 $newleaf = $tran->pregleaf->unite_leafs($transition->pregleaf, $thishastags, $otherhastags);
