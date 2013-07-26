@@ -787,9 +787,14 @@ abstract class qtype_preg_finite_automaton {
                     $outtransitions = $this->get_state_outtransitions($tran->to);
                     $intotransitions = $this->get_state_intotransitions($tran->to);
                     $newnumber = '/' . $this->statenumbers[$transition->to];
-                    $this->add_state($newnumber);
+                    $newto = $this->add_state($newnumber);
+                    if (array_search($tran->to, $this->startstates) !== false) {
+                        $this->add_start_state($newto);
+                    }
+                    if (array_search($tran->to, $this->endstates) !== false) {
+                        $this->add_end_state($newto);
+                    }
                     $states = $this->get_state_numbers();
-                    $newto = array_search($newnumber, $states);
                     $transition->to = $newto;
                     foreach ($outtransitions as $outtran) {
                         $clone = clone($outtran);
