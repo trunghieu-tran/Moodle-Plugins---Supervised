@@ -168,6 +168,16 @@ class qtype_preg_fa_transition {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT);
     }
 
+    public function set_transition_type() {
+        if ($this->is_eps()) {
+            $this->type = self::TYPE_TRANSITION_EPS;
+        } else if ($this->is_unmerged_assert()) {
+            $this->type = self::TYPE_TRANSITION_ASSERT;
+        } else {
+            $this->type = self::TYPE_TRANSITION_CAPTURE;
+        }
+    }
+
     /**
      * Save tags from other transition in this transition.
      * This function has overloaded version in nfa, because it has tags. In this class does nothing.
