@@ -758,11 +758,13 @@ abstract class qtype_preg_finite_automaton {
      * @return state id of added state.
      */
     public function add_state($statenumber) {
-        $this->adjacencymatrix[] = array();
-        $this->statenumbers[] = $statenumber;
-        $this->statecount++;
-        if ($this->statecount > $this->statelimit) {
-            throw new qtype_preg_toolargefa_exception('');
+        if ((count($this->statenumbers) != 0 && array_search($statenumber, $this->statenumbers) === false) || count($this->statenumbers) == 0) {
+            $this->adjacencymatrix[] = array();
+            $this->statenumbers[] = $statenumber;
+            $this->statecount++;
+            if ($this->statecount > $this->statelimit) {
+                throw new qtype_preg_toolargefa_exception('');
+            }
         }
         return array_search($statenumber, $this->statenumbers);
     }
