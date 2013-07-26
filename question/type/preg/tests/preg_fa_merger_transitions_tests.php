@@ -31,7 +31,6 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->merge_transitions($del);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
-        var_dump($input);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
