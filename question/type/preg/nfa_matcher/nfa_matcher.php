@@ -44,7 +44,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_NODE_CONCAT:
             case qtype_preg_node::TYPE_NODE_ALT:
             case qtype_preg_node::TYPE_NODE_SUBEXPR:
-            case qtype_preg_node::TYPE_NODE_ERROR:
                 return 'qtype_preg_nfa_' . $nodetype;
             case qtype_preg_node::TYPE_LEAF_CHARSET:
             case qtype_preg_node::TYPE_LEAF_META:
@@ -80,6 +79,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
+            case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
                 return get_string($pregnode->type, 'qtype_preg');
