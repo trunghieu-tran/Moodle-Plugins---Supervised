@@ -1264,7 +1264,7 @@ abstract class qtype_preg_finite_automaton {
             } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
                 // Possibility of merging with intotransitions.
                 $transitions = $intotransitions;
-                $needredacting = true;
+                //$needredacting = true;
             } else if ($this->statecount == 2 && $del->is_eps()) {
                 // Possibility to get automata with one state.
                 $this->merge_states($del);
@@ -1302,12 +1302,12 @@ abstract class qtype_preg_finite_automaton {
                         $tran->from = $del->from;
                         $this->add_transition($tran);
                     }
-                    // Checking if start state was merged.
-                    if ($this->has_endstate($del->to)) {
-                        $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
-                    }
-                    $this->remove_state($del->to);
                 }
+                // Checking if start state was merged.
+                if ($this->has_endstate($del->to)) {
+                    $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                }
+                $this->remove_state($del->to);
             }
         }
     }
