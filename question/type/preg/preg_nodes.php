@@ -315,13 +315,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $key = array_search($assert, $result);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                 // Searching compatible asserts.
-                if (array_search($esca, $result)) {
+                if (array_search($esca, $result) !== false) {
                     unset($result[$key]);
                     $result = array_values($result);
                 }
             } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (array_search($escz, $result)) {
+                if (array_search($escz, $result) !== false) {
                     unset($result[$key]);
                     $result = array_values($result);
                 }
