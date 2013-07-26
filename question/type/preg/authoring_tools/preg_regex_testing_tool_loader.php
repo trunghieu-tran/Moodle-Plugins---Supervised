@@ -38,7 +38,7 @@ function qtype_preg_get_json_array() {
         $exactmatch = false;
     }
     
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, $answers, $engine, $usecase, $exactmatch);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, $answers, $engine, $usecase, $exactmatch, $notation);
     $regex_testing_tool->generate_json($json_array);
 
     return $json_array;

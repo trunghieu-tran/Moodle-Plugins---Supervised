@@ -24,7 +24,7 @@ class qtype_preg_regex_testing_tool {
     private $answers;
     private $hintmatch;
     
-    public function __construct($regex, $answers, $mathcer, $usecase, $exactmatch, $notation = 'native') {
+    public function __construct($regex, $answers, $mathcer, $usecase, $exactmatch, $notation) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
         $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $mathcer, $notation);
