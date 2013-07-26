@@ -217,6 +217,7 @@ $string['regex_description_header_help'] = 'Here you can see description of regu
 $string['regex_match_header'] = 'Тестирование регулярных выражений';
 $string['regex_match_header_help'] = 'Введите строки для проверки своего регулярного выражения. Справа вы увидите эти строки в цвете: зеленым выделена совпавшая часть, красным - не совпавшие части (аналогичные цветные строки показываются студентам).';
 $string['regex_match_textarea'] = 'Введите строки для проверки';
+$string['regex_match_textarea'] = 'regex_check_string(s)';
 
 // Strings for node description
 
