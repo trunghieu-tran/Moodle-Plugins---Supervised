@@ -1338,12 +1338,13 @@ abstract class qtype_preg_finite_automaton {
                 if (!$waschanged && array_search($state, $stateschecked) === false) {
                     $transitions = $this->get_state_outtransitions($state);
                     // Searching transition of given type.
-                    foreach ($transitions as $tran) {
+                    foreach ($transitions as &$tran) {
+                        $tran->set_transition_type();
                         if ($tran->type == $trantype1 || $tran->type == $trantype2) {
                             // Choice of merging way.
                             $intotransitions = $this->get_state_intotransitions($tran->to);
-                            if ($stateindex != null && $tran->from == $stateindex && count($intotransitions) > 1) {
-                                $this->go_round_transition($tran);
+                            if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
+                                $this->go_round_transitions($tran);
                                 $waschanged = true;
                             } else {
                                 if ($tran->to == $stateindex) {
@@ -1353,10 +1354,14 @@ abstract class qtype_preg_finite_automaton {
                             }
                             // Adding changed state to new wavefront.
                             $newfront[] = $state;
+                            $addedstate = array_search($state, $stateschecked);
+                            if ($addedstate !== false) {
+                                unset($stateschecked[$addedstate]);
+                            }
                             $outtransitions = $this->get_state_outtransitions($state);
                             // Delete cycle of uncapturing transition.
                             $wasdel = false;
-                            foreach ($outtansitions as $outtran) {
+                            foreach ($outtransitions as $outtran) {
                                 if ($wasdel) {
                                     if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
                                         unset($newfront[count($newfront)-1]);
@@ -1366,7 +1371,9 @@ abstract class qtype_preg_finite_automaton {
                             }
                         } else {
                             $newfront[] = $tran->to;
-                            $stateschecked[] = $state;
+                            if (array_search($state, $newfront) === false) {
+                                $stateschecked[] = $state;
+                            }
                         }
                     }
                 }
