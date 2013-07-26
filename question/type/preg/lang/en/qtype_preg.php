@@ -216,7 +216,8 @@ $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
 $string['regex_match_header'] = 'Regular expression testing';
 $string['regex_match_header_help'] = 'Here you can input a strings for testing you regex. In field "Input strings for matching" you can input strings; each string will be matched against you regular expression and you\'ll see results on the right: matched part is green, unmatched parts are red (the same colored strings will see you students).';
-$string['regex_match_textarea'] = 'Input strings for matching';
+$string['regex_match_textarea'] = 'Input strings to match (one per line)';
+$string['regex_match_textarea'] = 'regex_check_string(s)';
 
 
 // Strings for node description
