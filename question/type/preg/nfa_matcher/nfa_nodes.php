@@ -643,17 +643,3 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
         $automaton->on_subexpr_added($this->pregnode);
     }
 }
-
-/**
- * Class for error nodes.
- */
-class qtype_preg_nfa_node_error extends qtype_preg_nfa_operator {
-
-    public function accept() {
-        return true;
-    }
-
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
-        // Nothing interesting here.
-    }
-}
