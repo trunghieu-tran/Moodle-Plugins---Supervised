@@ -1204,7 +1204,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
             case self::SUBTYPE_ENDREG:
                 return 'metaENDREG';
             case self::SUBTYPE_EMPTY:
-                return 'metaEPS';
+                return '';
             default:
                 return '';
         }
