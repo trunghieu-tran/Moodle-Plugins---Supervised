@@ -85,7 +85,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     }
 
     // Overriden for subpatterns information
-    public function get_label_for_dot() {
+    public function get_lab_for_dot() {
         $lab = $this->pregleaf->tohr() . ',';
 
         if (count($this->subpatt_start) > 0) {
@@ -108,6 +108,34 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
             return $this->from->number . '->' . $this->to->number . "[label = $lab];";
         } else {
             return $this->from->number . '->' . $this->to->number . "[label = $lab, style = dotted];";  // Dummy transitions are displayed dotted.
+        }
+    }
+
+    public function get_label_for_dot($index1, $index2) {
+        $addedcharacters = '/(), ';
+        if (strpbrk($index1, $addedcharacters) !== false) {
+            $index1 = '"' . $index1 . '"';
+        }
+        if (strpbrk($index2, $addedcharacters) !== false) {
+            $index2 = '"' . $index2 . '"';
+        }
+        if ($this->origin == self::ORIGIN_TRANSITION_FIRST) {
+            $color = 'violet';
+        } else if ($this->origin == self::ORIGIN_TRANSITION_SECOND) {
+            $color = 'blue';
+        } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
+            $color = 'red';
+        }
+        $lab = $this->open_tags_tohr();
+        $lab .= $this->pregleaf->leaf_tohr();
+        $lab .= $this->close_tags_tohr();
+        $lab = '"[' . str_replace('"', '\"', $lab) . ']"';
+
+        // Dummy transitions are displayed dotted.
+        if ($this->consumeschars) {
+            return "$index1->$index2" . "[label = $lab, color = $color];";
+        } else {
+            return "$index1->$index2" . "[label = $lab, color = $color, style = dotted];";
         }
     }
 
