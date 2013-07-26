@@ -182,6 +182,33 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         return $this;
     }
 
+    public function open_tags_tohr() {
+        $result ='';
+        if (count($this->subpatt_start) != 0 || count($this->subexpr_start) != 0) {
+            foreach ($this->subpatt_start as $subpatt) {
+                $result .= '(';
+            }
+            $result .= '/';
+            foreach ($this->subexpr_start as $subpatt) {
+                $result .= '(';
+            }
+            return $result;
+        }
+    }
+
+    public function close_tags_tohr() {
+        $result ='';
+        if (count($this->subpatt_end) != 0 || count($this->subexpr_end) != 0) {
+            foreach ($this->subexpr_end as $subpatt) {
+                $result .= ')';
+            }
+            $result .= '/';
+            foreach ($this->subpatt_end as $subpatt) {
+                $result .= ')';
+            }
+            return $result;
+        }
+    }
 }
 
 /**
