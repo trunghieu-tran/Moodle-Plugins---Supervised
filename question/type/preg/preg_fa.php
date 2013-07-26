@@ -98,9 +98,9 @@ class qtype_preg_fa_transition {
 
         // Dummy transitions are displayed dotted.
         if ($this->consumeschars) {
-            return "$index1->$index2" . "[label = $lab];";
+            return "$index1->$index2" . "[label = $lab, color = $color];";
         } else {
-            return "$index1->$index2" . "[label = $lab, style = dotted];";
+            return "$index1->$index2" . "[label = $lab, color = $color, style = dotted];";
         }
     }
 
