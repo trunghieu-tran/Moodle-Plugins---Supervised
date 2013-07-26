@@ -1102,6 +1102,7 @@ abstract class qtype_preg_finite_automaton {
                 $transition->origin = $origin;
             }
             // Append transition in automata.
+            $transition->set_transition_type();
             $this->add_transition($transition);
         }
     }
@@ -1450,6 +1451,7 @@ abstract class qtype_preg_finite_automaton {
                         } else {
                             $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin);
                         }
+                        $transition->set_transition_type();
                         $this->add_transition($transition);
                     }
                 }
@@ -1473,6 +1475,7 @@ abstract class qtype_preg_finite_automaton {
                     } else {
                         $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin);
                     }
+                    $transition->set_transition_type();
                     $this->add_transition($transition);
                 }
             }
