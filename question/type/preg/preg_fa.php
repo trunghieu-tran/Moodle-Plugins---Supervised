@@ -592,7 +592,44 @@ abstract class qtype_preg_finite_automaton {
      * @return dot_style string with the description of automata.
      */
     public function write_fa() {
-        return('');
+        $addedcharacters = '/(), ';
+        $result = "digraph res {\n    ";
+        if ($this->statecount != 0) {
+            // Add start states.
+            foreach ($this->startstates as $start) {
+                $realnumber = $this->statenumbers[$start];
+                if (strpbrk($realnumber, $addedcharacters) !== false) {
+                    $result .= '"' . $realnumber . '"';
+                } else {
+                    $result .= $realnumber;
+                }
+                $result .= ';'; 
+            }
+            $result .= "\n    ";
+            // Add end states.
+            foreach ($this->endstates as $end) {
+                $realnumber = $this->statenumbers[$end];
+                if (strpbrk($realnumber, $addedcharacters) !== false) {
+                    $result .= '"' . $realnumber . '"';
+                } else {
+                    $result .= $realnumber;
+                }
+                $result .= ';'; 
+            }
+            // Add connected states.
+            $states = $this->get_states();
+            foreach ($states as $curstate) {
+                $outtransitions = $this->get_state_outtransitions($curstate);
+                foreach ($outtransitions as $tran) {
+                    $result .= "\n    ";
+                    $fromindex = $this->statenumbers[$tran->from];
+                    $toindex = $this->statenumbers[$tran->to];
+                    $result .= $tran->get_label_for_dot($fromindex, $toindex);
+                }
+            }
+        }
+        $result .= "\n}";
+        return $result;
     }
 
     /**
