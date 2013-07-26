@@ -334,8 +334,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             $assert = $other;
         } else {
-            $assert = new qtype_preg_leaf_assert($result[0]->subtype);
-            unset($result[0]);
+            if (count($result) != 0) {
+                $assert = new qtype_preg_leaf_assert($result[0]->subtype);
+                unset($result[0]);
+            } else {
+                $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            }
         }
         $assert->mergedassertions = $result;
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
