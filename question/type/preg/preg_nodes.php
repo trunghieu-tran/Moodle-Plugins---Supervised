@@ -1331,11 +1331,15 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     }
     public function tohr() {
         switch ($this->subtype) {
-            case self::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case self::SUBTYPE_ESC_A:
+                $type = '\\A';
+                break;    // Because there can be only one line is the response.
             case self::SUBTYPE_CIRCUMFLEX:
                 $type = '^';
                 break;
-            case self::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case self::SUBTYPE_ESC_Z:
+                $type = '\\Z';
+                break;    // Because there can be only one line is the response.
             case self::SUBTYPE_DOLLAR:
                 $type = '$';
                 break;
@@ -1344,9 +1348,9 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
                 break;
         }
         if ($this->negative) {
-            return '!assert' . $type;
+            return '!' . $type;
         } else {
-            return 'assert' . $type;
+            return $type;
         }
     }
 }
