@@ -50,10 +50,11 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         $topline=array();
         $topline[] =& $mform->createElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
-        $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));
+        /*$topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));*/
         if(!$this->isblok){
             $topline[] =& $mform->createElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
-        }        
+        }
+        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('regex_cancel_text', 'qtype_preg'));        
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
         $radiocharsetprocessarray=array();
