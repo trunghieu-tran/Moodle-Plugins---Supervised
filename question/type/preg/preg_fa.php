@@ -78,11 +78,23 @@ class qtype_preg_fa_transition {
         $this->consumeschars = $consumeschars;
     }
 
-    public function get_label_for_dot() {
-        $index1 = $this->from->number;
-        $index2 = $this->to->number;
-        $lab = $this->pregleaf->tohr();
-        $lab = '"' . str_replace('"', '\"', $lab) . '"';
+    public function get_label_for_dot($index1, $index2) {
+        $addedcharacters = '/(), ';
+        if (strpbrk($index1, $addedcharacters) !== false) {
+            $index1 = '"' . $index1 . '"';
+        }
+        if (strpbrk($index2, $addedcharacters) !== false) {
+            $index2 = '"' . $index2 . '"';
+        }
+        if ($this->origin == self::ORIGIN_TRANSITION_FIRST) {
+            $color = 'violet';
+        } else if ($this->origin == self::ORIGIN_TRANSITION_SECOND) {
+            $color = 'blue';
+        } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
+            $color = 'red';
+        }
+        $lab = $this->pregleaf->leaf_tohr();
+        $lab = '"[' . str_replace('"', '\"', $lab) . ']"';
 
         // Dummy transitions are displayed dotted.
         if ($this->consumeschars) {
