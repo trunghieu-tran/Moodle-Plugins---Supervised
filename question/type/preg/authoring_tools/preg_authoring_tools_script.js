@@ -169,6 +169,16 @@ M.preg_authoring_tools_script = (function($) {
                 self.main_input.val(self.textbutton_widget.data).trigger('keyup');
                 // get testing data from hidden field and put it into ui
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                $("#id_regex_input_header").after('<div>'
+                        + 'engine: '
+                        + $('#id_engine :selected').text()
+                        + '<br />usecase: '
+                        + $('#id_usecase :selected').text()
+                        + '<br />exactmatch: '
+                        + $('#id_exactmatch :selected').text()
+                        + '<br />notation: '
+                        + $('#id_notation :selected').text()
+                        + '</div>'); 
                 self.load_content_by_id('-1');
             },
 
