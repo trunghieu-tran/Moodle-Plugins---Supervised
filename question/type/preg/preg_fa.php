@@ -168,6 +168,9 @@ class qtype_preg_fa_transition {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT);
     }
 
+    /**
+     * Set this transition right type.
+     */
     public function set_transition_type() {
         if ($this->is_eps()) {
             $this->type = self::TYPE_TRANSITION_EPS;
@@ -776,31 +779,44 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_transition(&$transition) {
         $outtransitions = $this->get_state_outtransitions($transition->from);
+        // Automata  has already such ttransition.
         if (array_key_exists($transition->to, $outtransitions)) {
+            // Get transition which it had before.
             $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
+            // Transitions are not equal.
             if ($tran != $transition) {
+                // Find tags.
                 $thishastags = $tran->has_tags();
                 $otherhastags = $transition->has_tags();
+                // Get union of leafs.
                 $newleaf = $tran->pregleaf->unite_leafs($transition->pregleaf, $thishastags, $otherhastags);
+                // Union isn't possible.
                 if ($newleaf === null) {
-                    $clones = array();
+                    $clones = array();  // array of clones of coping transitions.
+                    // Get coping transitions.
                     $outtransitions = $this->get_state_outtransitions($tran->to);
                     $intotransitions = $this->get_state_intotransitions($tran->to);
+                    // Get new number of cloned state.
                     $newnumber = '/' . $this->statenumbers[$transition->to];
                     $newto = $this->add_state($newnumber);
+                    // Add clone state in start states if it's possible.
                     if (array_search($tran->to, $this->startstates) !== false) {
                         $this->add_start_state($newto);
                     }
+                    // Add clone state in end states if it's possible
                     if (array_search($tran->to, $this->endstates) !== false) {
                         $this->add_end_state($newto);
                     }
                     $states = $this->get_state_numbers();
+                    // Change transition.
                     $transition->to = $newto;
+                    // Copy outtransitions for clone state.
                     foreach ($outtransitions as $outtran) {
                         $clone = clone($outtran);
                         $clone->from = $newto;
                         $clones[] = $clone;
                     }
+                    // Copy intotransitions for clone state.
                     foreach ($intotransitions as $intotran) {
                         if ($tran->from != $intotran->from) {
                             $clone = clone($intotran);
@@ -808,16 +824,20 @@ abstract class qtype_preg_finite_automaton {
                             $clones[] = $clone;
                         }
                     }
+                    // Add transitions of clone to automata.
                     foreach ($clones as $clone) {
                         $this->add_transition($clone);
                     }
+                    // Add transition.
                     $this->adjacencymatrix[$transition->from][$newto] = $transition;
                 } else {
+                    // Add union of transitions.
                     $transition->pregleaf = $newleaf;
                     $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
                 }
             }
         } else {
+            // No such transition.
             $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
         }
     }
