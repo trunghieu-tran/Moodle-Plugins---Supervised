@@ -150,7 +150,7 @@ M.preg_authoring_tools_script = (function($) {
                                                 .keyup(self.textbutton_widget.fix_textarea_rows)
                                                 .trigger('keyup');
                     $("#id_regex_input_header").after('<div>'
-                        + 'matcher: '
+                        + 'engine: '
                         + $('#id_engine :selected').text()
                         + '<br />usecase: '
                         + $('#id_usecase :selected').text()
