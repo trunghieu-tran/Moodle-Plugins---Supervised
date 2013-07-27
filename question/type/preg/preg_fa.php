@@ -1837,9 +1837,10 @@ abstract class qtype_preg_finite_automaton {
         while (count($oldfront) != 0) {
             foreach ($oldfront as $curstate) {
                 // Get states from first and second automata.
-                $secondnumbers = $anotherfa->get_state_numbers;
-                $resnumbers = $result->get_state_numbers;
-                $numbers = explode(',', $resultnumbers[$curstate], 2);
+                $secondnumbers = $anotherfa->get_state_numbers();
+                $resnumbers = $result->get_state_numbers();
+                $resultnumber = $resnumbers[$curstate];
+                $numbers = explode(',', $resultnumber, 2);
                 $workstate1 = array_search($numbers[0], $this->statenumbers);
                 $workstate2 = array_search($numbers[1], $secondnumbers);
                 // Get transitions for ntersection.
@@ -1889,6 +1890,7 @@ abstract class qtype_preg_finite_automaton {
                 $intertransitions1 = array();
                 $intertransitions2 = array();
                 $resulttransitions = array();
+                $resultnumbers = array();
             }
             $possibleend = $oldfront;
             $oldfront = $newfront;
