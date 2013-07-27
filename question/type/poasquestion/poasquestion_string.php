@@ -35,6 +35,33 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
         $this->set_string($str);
     }
 
+    /**
+     * Replaces $search with $replace in $subject string.
+     */
+    public static function replace($search, $replace, $subject) {
+        $searchlen = self::strlen($search);
+
+        if ($searchlen == 0) {
+            return $subject;
+        }
+
+        $result = '';
+        do {
+            $to = self::strpos($subject, $search);
+            if ($to === false) {
+                $result .= $subject;
+                $subject = '';
+            } else {
+                $result .= self::substr($subject, 0, $to) . $replace;
+                $subject = self::substr($subject, $to + $searchlen);
+            }
+
+        }
+        while ($subject != '');
+
+        return $result;
+    }
+
     public function __toString() {
         return $this->fstring;
     }

@@ -70,4 +70,23 @@ class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($str3[10] === 'я');
         $this->assertTrue($str3[11] === null);
     }
+
+    public function test_replace() {
+        $result = qtype_poasquestion_string::replace('abcdef', 'qwe', 'abcdef');
+        $this->assertTrue($result === 'qwe');
+        $result = qtype_poasquestion_string::replace('xyz', 'абв', 'abcdef');
+        $this->assertTrue($result === 'abcdef');
+        $result = qtype_poasquestion_string::replace('й', 'Ё', 'йж');
+        $this->assertTrue($result === 'Ёж');
+        $result = qtype_poasquestion_string::replace('abcdef', '', 'abcdef');
+        $this->assertTrue($result === '');
+        $result = qtype_poasquestion_string::replace('', 'qwe', 'abcdef');
+        $this->assertTrue($result === 'abcdef');
+        $result = qtype_poasquestion_string::replace('abcdef', 'abcdef', 'abcdef');
+        $this->assertTrue($result === 'abcdef');
+        $result = qtype_poasquestion_string::replace('abcdefabcdef', 'abcdef', 'abcdefabcdef');
+        $this->assertTrue($result === 'abcdef');
+        $result = qtype_poasquestion_string::replace('abcdef', 'abcdef', 'abcdefabcdef');
+        $this->assertTrue($result === 'abcdefabcdef');
+    }
 }
