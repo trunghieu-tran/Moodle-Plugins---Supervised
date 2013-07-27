@@ -357,6 +357,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @param other another leaf for intersection.
      */
     public function intersect_leafs($other, $thishastags, $otherhastags) {
+        $result = null;
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
