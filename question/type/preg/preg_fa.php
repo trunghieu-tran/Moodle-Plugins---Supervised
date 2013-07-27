@@ -673,7 +673,7 @@ abstract class qtype_preg_finite_automaton {
      * Remove the start state of the automaton.
      */
     public function remove_start_state($state) {
-        unset($this->starttates[array_search($state, $this->startstates)]);
+        unset($this->startstates[array_search($state, $this->startstates)]);
         $this->startstates = array_values($this->startstates);
     }
 
@@ -891,7 +891,7 @@ abstract class qtype_preg_finite_automaton {
      * Check if this state is full intersect state, it means it has two numbers from both automata.
      */
     public function is_full_intersect_state($state) {
-        $number = $this->statenumbers[$state];
+        $numbers = $this->statenumbers[$state];
         $number = explode(',', $numbers, 2);
         if (count($number) == 2 && $number[0] != '' && $number[1] != '') {
             return true;
@@ -1765,7 +1765,7 @@ abstract class qtype_preg_finite_automaton {
      * @return real number of state from intersection part.
      */
     public function get_inter_state($firststate, $secondstate) {
-        $state = $firstate . ',' . $secondstate;
+        $state = $firststate . ',' . $secondstate;
         return $state;
     }
 
@@ -1844,7 +1844,7 @@ abstract class qtype_preg_finite_automaton {
                 $workstate2 = array_search($numbers[1], $secondnumbers);
                 // Get transitions for ntersection.
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
-                $intertransitions2 = $second->get_transitions_for_intersection($workstate2, $direction);;
+                $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);;
                 // Intersect all possible transitions.
                 $resulttransitions = array();
                 $resultnumbers = array();
@@ -1865,9 +1865,9 @@ abstract class qtype_preg_finite_automaton {
                 for ($i = 0; $i < count($resulttransitions); $i++) {
                     // Search state with the same number in result automata.
                     if ($withcycle) {
-                        $searcstate = $result->have_add_state_in_cycle($anotherfa, $resulttransitions, $curstate, $clones, $resultnumbers[$i], $i);
+                        $searchstate = $result->have_add_state_in_cycle($anotherfa, $resulttransitions, $curstate, $clones, $resultnumbers[$i], $i);
                     } else {
-                        $searcstate = array_search($resultnumbers[$i], $resnumbers);
+                        $searchstate = array_search($resultnumbers[$i], $resnumbers);
                     }
                     // State was found.
                     if ($searchstate !== false) {
