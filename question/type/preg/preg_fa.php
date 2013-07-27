@@ -1907,6 +1907,14 @@ abstract class qtype_preg_finite_automaton {
                 $result->add_end_state($end);
             }
         } else {
+            // Cleaning start states.
+            $startstates = $result->start_states();
+            foreach ($startstates as $startstate) {
+                if ($result->is_full_intersect_state($startstate)) {
+                    $result->remove_start_state($startstate);
+                }
+            }
+            // Add new start states.
             $state = $result->get_inter_state(0, 0);
             $state = array_search($state, $resnumbers);
             if ($state !== false) {
