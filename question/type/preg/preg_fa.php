@@ -1827,6 +1827,44 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    public function set_start_end_states_after_intersect($fa, $anotherfa) {
+        $faends = $fa->end_states();
+        $anotherfaends = $anotherfa->end_states();
+        $fastarts = $fa->start_states();
+        $anotherfastarts = $anotherfa->start_states();
+        //Set start states.
+        foreach ($this->startstates)
+        // Set right start and end states.
+        if ($direction == 0) {
+            // Cleaning end states.
+            $endstates = $result->end_states();
+            foreach ($endstates as $endstate) {
+                $result->remove_end_state($endstate);
+            }
+            foreach ($possibleend as $end) {
+                $result->add_end_state($end);
+            }
+        } else {
+            // Cleaning start states.
+            $startstates = $result->start_states();
+            foreach ($startstates as $startstate) {
+                if ($result->is_full_intersect_state($startstate)) {
+                    $result->remove_start_state($startstate);
+                }
+            }
+            // Add new start states.
+            $state = $result->get_inter_state(0, 0);
+            $state = array_search($state, $resnumbers);
+            if ($state !== false) {
+                $result->add_start_state($state);
+            } else {
+                foreach ($possibleend as $start) {
+                    $result->add_start_state($start);
+                }
+            }
+        }
+    }
+
     /**
      * Find intersection part of automaton in case of intersection it with another one.
      *
