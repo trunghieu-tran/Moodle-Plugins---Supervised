@@ -1075,6 +1075,7 @@ abstract class qtype_preg_finite_automaton {
             else {
                 $transition->origin = $origin;
             }
+            $transition->consumeschars = ($transition->origin != qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
             // Append transition in automata.
             $this->add_transition($transition);
         }
