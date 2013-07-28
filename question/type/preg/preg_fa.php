@@ -2164,6 +2164,8 @@ abstract class qtype_preg_finite_automaton {
                 if ($anotherfa->has_endstate($workstate2)) {
                     $isend = true;
                 }
+                var_dump($workstate2);
+                var_dump($isend);
                 if (!$isend) {
                     $transitions = $anotherfa->get_state_outtransitions($workstate2);
                     foreach ($transitions as $tran) {
@@ -2282,15 +2284,34 @@ abstract class qtype_preg_finite_automaton {
         }
         // Find intersection part.
         $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
-        // Set end states.
-        // Set start states.
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
+            // Cleaning end states.
+            $endstates = $result->end_states();
+            foreach ($endstates as $endstate) {
+                $result->remove_end_state($endstate);
+            }
+            // Cleaning start states.
+            $startstates = $result->start_states();
+            foreach ($startstates as $startstate) {
+                $result->remove_start_state($startstate);
+            }
+            $result->set_start_end_states_after_intersect($this, $anotherfa);
+            var_dump($result);
             $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
+            // Cleaning end states.
+            $endstates = $result->end_states();
+            foreach ($endstates as $endstate) {
+                $result->remove_end_state($endstate);
+            }
+            // Cleaning start states.
+            $startstates = $result->start_states();
+            foreach ($startstates as $startstate) {
+                $result->remove_start_state($startstate);
+            }
+            $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
             $result = $result->remove_fa();
         }
-        // Set end states.
-        // Set start states.
         return $result;
     }
 
