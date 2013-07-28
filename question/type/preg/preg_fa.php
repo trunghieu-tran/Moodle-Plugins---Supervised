@@ -1520,7 +1520,8 @@ abstract class qtype_preg_finite_automaton {
      * @param direction - direction of coping (0 - forward; 1 - back).
      * @return automata after coping.
      */
-    public function copy_modify_branches(&$source, &$oldfront, &$stopcoping, $direction) {
+    public function copy_modify_branches(&$source, &$oldfront, $stopcoping, $direction) {
+        $resultstop = null;
         $memoryfront = array();
         $newfront = array();
         $newmemoryfront = array();
@@ -1571,6 +1572,7 @@ abstract class qtype_preg_finite_automaton {
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
+                            $resultstop = $workstate;
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
@@ -1616,11 +1618,15 @@ abstract class qtype_preg_finite_automaton {
                 $realnumber = trim($realnumber,'()');
                 $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
                 if ($newend !== false) {
+                    // Get last copied state. 
+                    if ($resultstop === null) {
+                        $resultstop = $newend;
+                    }
                     $this->add_end_state($newend);
                 }
             }
         //}
-        return $this;
+        return $resultstop;
     }
 
     /**
