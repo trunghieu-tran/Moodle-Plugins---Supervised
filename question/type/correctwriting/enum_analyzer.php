@@ -564,7 +564,7 @@ class  qtype_correctwriting_enum_analyzer {
         }
         $stringpair->set_indexes_in_table($indexesintable);
         // Change correctstring.
-        $tokens = $stringpair->correctstring()->stream->tokens;
+        $stringpair->correctstring()->stream->tokens = $tokens;
         foreach ($enumschangecorrectstring as $i) {
             $tempstringbegin = '';
             $tempstringend = '';
