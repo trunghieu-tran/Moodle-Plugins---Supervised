@@ -643,8 +643,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
-        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
-        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+        $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $pair, "Error change order found!Without including");
     }
 
     // Test for change_enum_order, two enumeration, one include in other.
@@ -675,8 +675,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
-        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
-        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+        $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $pair, "Error change order found!One include in other");
     }
 
     // Test for change_enum_order, three enumeration, two include in other.
@@ -712,8 +712,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
-        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
-        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+        $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $pair, "Error change order found!Two include in other");
     }
 
     // Test for change_enum_order, three enumeration, matrioshka.
@@ -750,8 +750,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
-        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
-        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+        $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $pair, "Error change order found!Matrioska");
     }
 
     // Test for change_enum_order, six enumerations.
@@ -795,8 +795,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $newpair->set_indexes_in_table($indexesintable);
         // Test body.
         $temp = new qtype_correctwriting_enum_analyzer();
-        $result = $temp->change_enum_order($pair, $enumorder, $include, $order);
-        $this->assertEquals($newpair, $result, "Error change order found!Without including");
+        $temp->change_enum_order($pair, $enumorder, $include, $order);
+        $this->assertEquals($newpair, $pair, "Error change order found!Six enumerations");
     }
 }
 
