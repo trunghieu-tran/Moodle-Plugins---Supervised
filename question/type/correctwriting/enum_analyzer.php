@@ -572,8 +572,8 @@ class  qtype_correctwriting_enum_analyzer {
             $position = $enumerations[$i][$position]->begin;
             if ($position !== 0) {
                 $position--;
-                $position = $string_pair->correctstring()->stream->tokens[$position]->position()->colend();
-                $tempstringbegin = $string_pair->correctstring()->string->substring(0, $position + 1);
+                $position = $stringpair->correctstring()->stream->tokens[$position]->position()->colend();
+                $tempstringbegin = $stringpair->correctstring()->string->substring(0, $position + 1);
                 $tempstringbegin = $tempstringbegin.' ';
             } else {
                 $tempstringbegin = '';
@@ -582,8 +582,8 @@ class  qtype_correctwriting_enum_analyzer {
             $position = $enumerations[$i][$position]->end;
             if ($position !== count($tokens) - 1) {
                 $position++;
-                $position= $string_pair->correctstring()->stream->tokens[$position]->position()->colstart();
-                $tempstringend = $string_pair->correctstring()->string->substring($position);
+                $position= $stringpair->correctstring()->stream->tokens[$position]->position()->colstart();
+                $tempstringend = $stringpair->correctstring()->string->substring($position);
             } else {
                 $tempstringend = '';
             }
