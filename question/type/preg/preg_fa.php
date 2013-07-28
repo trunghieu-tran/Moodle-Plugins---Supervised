@@ -1037,7 +1037,7 @@ abstract class qtype_preg_finite_automaton {
                     }
                 }
                 else {
-                    $pregleaf = new qtype_preg_leaf_charset();
+                    $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                 }
                 if(count($subpatt_start) == 0 && count($subexpr_start) == 0 && count($subpatt_end) == 0 && count($subexpr_end) == 0) {
                     $transition = new qtype_preg_fa_transition($statefrom,$pregleaf, $stateto);
