@@ -298,6 +298,83 @@ class qtype_preg_fa_state {
     }*/
 }
 
+/**
+ * Class for finite automaton group of states.
+ */
+ class qtype_preg_fa_group {
+    /** @var reference to qtype_preg_finite_automaton object this group of states belongs to. */
+    protected $fa;
+    /** @var array of int ids of states, which include in this group. */
+    protected $states;
+    /** @var first character on which it made transition to this group. */
+    protected $char;
+    /** @var array of qtype_preg_fa_group through which are in this group. */
+    public $prev_groups;
+    
+    public function __construct(&$fa = null) {
+        $this->fa = $fa;
+        $this->states = array();
+        $this->char = 0;
+        $this->prev_groups = array();
+    }
+    
+    /**
+     * Change reference to qtype_preg_finite_automaton object this group of states belongs to. 
+     *
+     * @param fa - a reference to new automata.
+     */
+    public function set_fa(&$fa) {
+        $this->fa = $fa;
+    }
+    
+    /**
+     * Return character on which it made transition to this group.
+     */
+    public function get_char() {
+        return $this->char;
+    }
+    
+    /**
+     * Change character on which it made transition to this group.
+     *
+     * @param char - new character on which it made transition to this group.
+     */
+    public function set_char($char) {
+        $this->char = $char;
+    }
+    
+    /**
+     * Return array of int ids of states, which include in this group.
+     */
+    public function get_states() {
+        return $this->states;
+    }
+    
+    /**
+     * Append new state in group.
+     *
+     * @param state - new state, which include in this group.
+     */
+    public function add_state($state) {
+        $this->state[] = $state;
+    }
+    
+    /**
+     * Return array of group through which are in this group.
+     */
+    public function get_prev_groups() {
+        return $this->prev_groups;
+    }
+    
+    /**
+     * Fill array of group through which are in this group.
+     *
+     * @param prev_groups - new array of group through which are in this group.
+     */
+    public function fill_prev_groups($prev_groups) {
+        $this->prev_groups = $prev_groups;
+    }
+ }
 
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
@@ -971,6 +1048,7 @@ abstract class qtype_preg_finite_automaton {
             $subexpr_start = array();
             $subexpr_end = array();
             $currentindex = 0;
+            $point = false;
             // Parse a string into components.
             while($currentindex < strlen($arraystrings[2])) {
                 // If subpatt_start.
@@ -1039,6 +1117,9 @@ abstract class qtype_preg_finite_automaton {
                 }
                 // Current symbol just symbol.
                 else {
+                    if ($arraystrings[2][$currentindex] == '.') {
+                        $point = true;
+                    }
                     $chars = $chars.$arraystrings[2][$currentindex];
                     $currentindex++;
                 }
@@ -1047,7 +1128,12 @@ abstract class qtype_preg_finite_automaton {
             if(strlen($arraystrings[2]) > 0) {
                 if(strlen($chars) != 0) {
                     $pregleaf = new qtype_preg_leaf_charset();
-                    $chars = '['.$chars.']';
+                    if ($point) {
+                        $chras = '.';
+                    }
+                    else {
+                        $chars = '['.$chars.']';
+                    }
                     StringStreamController::createRef('regex', $chars);
                     $pseudofile = fopen('string://regex', 'r');
                     $lexer = new qtype_preg_lexer($pseudofile);
@@ -1080,19 +1166,19 @@ abstract class qtype_preg_finite_automaton {
                     $pregleaf = new qtype_preg_leaf_assert($type);
                     for($j = 1; $j < count($asserts); $j++) {
                         switch($asserts[0]) {
-                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_B); break;
-                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_B); break;
-                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_A); break;
-                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_Z); break;
-                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_Z); break;
-                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_G); break;
-                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_CIRCUMFLEX); break;
-                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_DOLLAR); break;
+                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B); break;
+                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B); break;
+                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A); break;
+                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z); break;
+                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z); break;
+                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_G); break;
+                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX); break;
+                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR); break;
                         }
                     }
                 }
                 else {
-                    $pregleaf = new qtype_preg_leaf_charset();
+                    $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                 }
                 if(count($subpatt_start) == 0 && count($subexpr_start) == 0 && count($subpatt_end) == 0 && count($subexpr_end) == 0) {
                     $transition = new qtype_preg_fa_transition($statefrom,$pregleaf, $stateto);
@@ -1121,6 +1207,7 @@ abstract class qtype_preg_finite_automaton {
             else {
                 $transition->origin = $origin;
             }
+            $transition->consumeschars = ($transition->origin != qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
             // Append transition in automata.
             $transition->set_transition_type();
             $this->add_transition($transition);
@@ -1155,8 +1242,9 @@ abstract class qtype_preg_finite_automaton {
      * @param another qtype_preg_finite_automaton object - FA to compare.
      * @return boolean true if this FA equal to $another.
      */
-    public function compare_fa($another) {
+    public function compare_fa(&$another, &$differences) {
         // TODO - streltsov.
+        return false;
     }
 
     /**
