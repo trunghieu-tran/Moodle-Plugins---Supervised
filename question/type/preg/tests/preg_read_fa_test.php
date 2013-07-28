@@ -605,6 +605,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pregleaf = $lexer->nextToken()->value;
         $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
+        $transition->consumeschars = false;
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
