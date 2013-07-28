@@ -218,7 +218,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    /*public function test_intersection_with_unmerged_eps() {
+    public function test_intersection_with_unmerged_eps() {
         $dotdescription1 = 'digraph example {
                                 0;
                                 2;
@@ -238,8 +238,8 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $dotresult = 'digraph res {
                         "0,0";
                         "2,2";
-                        "1,1"->"2,2"[label="[(/)/]",color=red];
-                        "0,0"->"1,1"[label="[a]",color=red];
+                        "1,1"->"2,2"[label = "[(/)/]", color = red];
+                        "0,0"->"1,1"[label = "[a&&a]", color = red];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -260,7 +260,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
-    }*/
+    }
 
     public function test_intersection_with_merged_asserts() {
         $dotdescription1 = 'digraph example {
@@ -306,7 +306,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    /*public function test_intersection_with_unmerged_asserts() {
+    public function test_intersection_with_unmerged_asserts() {
         $dotdescription1 = 'digraph example {
                                 0;
                                 2;
@@ -326,8 +326,8 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $dotresult = 'digraph res {
                         "0,0";
                         "2,2";
-                        "1,1"->"2,2"[label="[(/$b/)]",color=blue];
-                        "0,0"->"1,1"[label="[^a]",color=blue];
+                        "1,1"->"2,2"[label = "[(/$b/)]", color = blue, style = dotted];
+                        "0,0"->"1,1"[label = "[^a]", color = blue, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -348,7 +348,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
-    }*/
+    }
 
     public function test_intersection_with_cycle() {
         $dotdescription1 = 'digraph example {
