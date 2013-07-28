@@ -660,7 +660,10 @@ class  qtype_correctwriting_enum_analyzer {
                     $maxlcslength = $count;
                     $this->pairs = array();
                     $this->pairs[] = $currentstringpair;
-                }
+            }  
+            // If maximal LCS length is equal zero array of pair must be empty.
+            if ($maxlcslength === 0) {
+                $this->pairs = array();
             }
         }
     }
