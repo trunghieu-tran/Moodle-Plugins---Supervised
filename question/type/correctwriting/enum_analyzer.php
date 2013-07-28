@@ -569,9 +569,15 @@ class  qtype_correctwriting_enum_analyzer {
             $tempstringbegin = '';
             $tempstringend = '';
             $position = reset($enums_orders[$i]);
-            $position = $enumerations[$i][$position]->begin-1;
-            $position = $stringpair->correctstring()->stream->tokens[$position]->position()->colend();
-            $tempstringbegin = $stringpair->correctstring()->string->substring(0, $position + 1);
+            $position = $enumerations[$i][$position]->begin;
+            if ($position !== 0) {
+                $position--;
+                $position = $string_pair->correctstring()->stream->tokens[$position]->position()->colend();
+                $tempstringbegin = $string_pair->correctstring()->string->substring(0, $position + 1);
+                $tempstringbegin = $tempstringbegin.' ';
+            } else {
+                $tempstringbegin = '';
+            }
             $position = end($enums_orders[$i]);
             $position = $enumerations[$i][$position]->end+1;
             $position= $stringpair->correctstring()->stream->tokens[$position]->position()->colstart();
