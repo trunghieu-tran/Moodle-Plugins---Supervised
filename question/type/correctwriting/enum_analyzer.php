@@ -579,10 +579,14 @@ class  qtype_correctwriting_enum_analyzer {
                 $tempstringbegin = '';
             }
             $position = end($enums_orders[$i]);
-            $position = $enumerations[$i][$position]->end+1;
-            $position= $stringpair->correctstring()->stream->tokens[$position]->position()->colstart();
-            $tempstringend = $stringpair->correctstring()->string->substring($position);
-            $tempstringbegin = $tempstringbegin.' ';
+            $position = $enumerations[$i][$position]->end;
+            if ($position !== count($tokens) - 1) {
+                $position++;
+                $position= $string_pair->correctstring()->stream->tokens[$position]->position()->colstart();
+                $tempstringend = $string_pair->correctstring()->string->substring($position);
+            } else {
+                $tempstringend = '';
+            }
             $second_index = end($enums_orders[$i]);
             for ($j = $enumerations[$i][reset($enums_orders[$i])]->begin; $j <= $enumerations[$i][$second_index]->end; $j++) {
                 $tempstringbegin = $tempstringbegin.$tokens[$j]->value();
