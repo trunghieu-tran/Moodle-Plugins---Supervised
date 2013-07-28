@@ -2206,8 +2206,6 @@ abstract class qtype_preg_finite_automaton {
                 if ($anotherfa->has_endstate($workstate2)) {
                     $isend = true;
                 }
-                var_dump($workstate2);
-                var_dump($isend);
                 if (!$isend) {
                     $transitions = $anotherfa->get_state_outtransitions($workstate2);
                     foreach ($transitions as $tran) {
