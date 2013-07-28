@@ -629,6 +629,7 @@ class  qtype_correctwriting_enum_analyzer {
             $correctedstream = $string_pair->correctedstring()->stream; // Stream of corrected answer.
             $options = new block_formal_langs_comparing_options(); // Options needed to find lcs.
             $options->usecase = true;
+            $count = 0; // Count of LCS tokens for current pair.
             // Get enumerations change order and include enumeration arrays.
             $forstd = $this->get_enum_change_order($enumdescription);
             $enumchangeorder = $forstd->order;
@@ -643,13 +644,20 @@ class  qtype_correctwriting_enum_analyzer {
                 // Find LCS of correct and corrected answers.
                 $currentcorrectstream = $currentstringpair->correctstring()->stream;
                 $lcsarray = qtype_correctwriting_sequence_analyzer::lcs($currentcorrectstream, $correctedstream, $options);
+                // If lcs exist keep it's length...
+                // Else length is zero.
+                if (count($lcsarray) === 0) {
+                    $count = 0;
+                } else {
+                    $count = count($lcsarray[0]);
+                }
                 // If length of current lcs are equal length of lcs, which were found early add string pair to array...
                 // ...Else if length of current lcs more than length of lcs, which were found early, clear array...
                 // ... and add string pair to array.
-                if ($maxlcslength == count(reset($lcsarray))) {
+                if ($maxlcslength === $count) {
                     $this->pairs[] = $currentstringpair;
-                } else if ($maxlcslength < count(reset($lcsarray))) {
-                    $maxlcslength = count(reset($lcsarray));
+                } else if ($maxlcslength < $count) {
+                    $maxlcslength = $count;
                     $this->pairs = array();
                     $this->pairs[] = $currentstringpair;
                 }
