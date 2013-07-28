@@ -369,6 +369,7 @@ class  qtype_correctwriting_enum_analyzer {
         $isenumincluded = false; // Is current enumeration included in other enumeration.
         $position = 0; // Position to change correct string.
         $indexesintable = array(); // Array of indexes for correct string's tokens.
+        $tokens = $stringpair->correctstring()->stream->tokens; // Array of tokens in correctstring.
         // Fill array to keep enums orders separately.
         for ($i = 0; $i < count($new_enum_order); $i++) {
             // For all enumerations order end by -1 or end of array.
@@ -465,7 +466,7 @@ class  qtype_correctwriting_enum_analyzer {
                 $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
                 array_splice($for_change_enum_order, 0, $right_border_of_enum - $left_border_of_enum +1);
                 // Copy enumeration in correct answer, token for token.
-                array_splice($stringpair->correctstring()->stream->tokens, $left_border_of_enum, 0, $for_change_enum_order);
+                array_splice($tokens, $left_border_of_enum, 0, $for_change_enum_order);
                 // Change enumeration description.
                 // Find distance between elements of enumeration.
                 $elements_distances = array();
