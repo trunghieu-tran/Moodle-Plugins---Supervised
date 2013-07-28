@@ -435,10 +435,10 @@ class  qtype_correctwriting_enum_analyzer {
                 $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
                 $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
                 $j = 0;
-                foreach ($stringpair->correctstring()->stream->tokens as $key => $token) {
+                foreach ($tokens as $key => $token) {
                     if ($j >= $left_border_of_enum && $j <= $right_border_of_enum) {
                         $for_change_enum_order[] = $token;
-                        unset($stringpair->correctstring()->stream->tokens[$key]);
+                        unset($tokens[$key]);
                     }
                     $j++;
                 }
@@ -558,7 +558,7 @@ class  qtype_correctwriting_enum_analyzer {
             }
         }
         // Change table indexes for tokens in correct answer.
-        foreach ($stringpair->correctstring()->stream->tokens as $token) {
+        foreach ($tokens as $token) {
             $indexesintable[] = $token->token_index();
         }
         $stringpair->set_indexes_in_table($indexesintable);
