@@ -39,6 +39,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->subpatt_start[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition->subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $transition->subexpr_end[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[b-k]';
@@ -51,6 +52,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition = new qtype_preg_nfa_transition($from,$pregleaf, $to);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->subpatt_end[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[c-z]';
@@ -65,6 +67,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->subpatt_start[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition->subpatt_end[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition->subpatt_end[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -99,8 +102,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[abc]';
@@ -108,8 +112,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[01]';
@@ -117,8 +122,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-z]';
@@ -126,8 +132,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[-?,]';
@@ -135,8 +142,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 4);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 4);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a]';
@@ -144,8 +152,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(4,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(4,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -180,8 +189,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[0-9]';
@@ -189,8 +199,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-f]';
@@ -198,8 +209,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[01]';
@@ -207,8 +219,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 4);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 4);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[y]';
@@ -216,8 +229,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(4,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(4,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[bc]';
@@ -225,8 +239,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(1,$pregleaf, 0);
+        $transition = new qtype_preg_nfa_transition(1,$pregleaf, 0);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -263,8 +278,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\$]';
@@ -273,8 +289,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
         $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\[\\]]';
@@ -282,8 +299,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 4);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 4);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\^]';
@@ -292,8 +310,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
         $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
-        $transition = new qtype_preg_fa_transition(4,$pregleaf, 5);
+        $transition = new qtype_preg_nfa_transition(4,$pregleaf, 5);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\"\\/\\.]';
@@ -301,8 +320,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(5,$pregleaf, 6);
+        $transition = new qtype_preg_nfa_transition(5,$pregleaf, 6);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\(\\)]';
@@ -310,8 +330,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(6,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(6,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -348,8 +369,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[0-9]';
@@ -357,8 +379,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(1,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(1,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-f]';
@@ -366,8 +389,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[01]';
@@ -375,8 +399,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 4);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 4);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[y]';
@@ -384,8 +409,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(4,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(4,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[bc]';
@@ -393,8 +419,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 0);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 0);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -425,8 +452,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-jxy]';
@@ -434,8 +462,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[abc-hl-x]';
@@ -443,8 +472,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -477,8 +507,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\\\z]';
@@ -487,8 +518,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
         $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-z]';
@@ -497,8 +529,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
         $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[xy]';
@@ -506,8 +539,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\\\A]';
@@ -515,8 +549,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -545,8 +580,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[\\\\A0-9]';
@@ -554,8 +590,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -585,8 +622,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[0-9]';
@@ -594,8 +632,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2,$pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-z]';
@@ -603,8 +642,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(3,$pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
+        $transition->set_transition_type();
         $transition->consumeschars = false;
         $resultautomata->add_transition($transition);
 
@@ -632,8 +672,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $resultautomata->add_end_state(1);
         // Fill pregleaf.
         $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $transition = new qtype_preg_fa_transition(0,$pregleaf, 2);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[0-9]';
@@ -641,13 +682,15 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(0, $pregleaf, 3);
+        $transition = new qtype_preg_nfa_transition(0, $pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $transition = new qtype_preg_fa_transition(3, $pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(3, $pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
         $chars = '[a-z]';
@@ -655,8 +698,9 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $transition = new qtype_preg_fa_transition(2, $pregleaf, 1);
+        $transition = new qtype_preg_nfa_transition(2, $pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         
         $automata = new qtype_preg_nfa(0, 0, 0, array());
@@ -666,6 +710,56 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
     }
     
     public function test_imposition_transitions() {
-        // TODO
+        $dotdescription = 'digraph example {
+                    0;
+                    3;
+                    0->2[label="[.]"];
+                    0->1[label="[0-9]"];
+                    1->3[label="[.]"];
+                    2->3[label="[a-z]"];
+                    }';
+        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata->add_state('0');
+        $resultautomata->add_state('3');
+        $resultautomata->add_state('2');
+        $resultautomata->add_state('1');
+        $resultautomata->add_start_state(0);
+        $resultautomata->add_end_state(1);
+        // Fill pregleaf.
+        $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition = new qtype_preg_nfa_transition(0,$pregleaf, 2);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $chars = '[0-9]';
+        StringStreamController::createRef('regex', $chars);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $pregleaf = $lexer->nextToken()->value;
+        $transition = new qtype_preg_nfa_transition(0, $pregleaf, 3);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $transition = new qtype_preg_nfa_transition(3, $pregleaf, 1);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
+        $resultautomata->add_transition($transition);
+        // Fill pregleaf.
+        $chars = '[a-z]';
+        StringStreamController::createRef('regex', $chars);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $pregleaf = $lexer->nextToken()->value;
+        $transition = new qtype_preg_nfa_transition(2, $pregleaf, 1);
+        $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+        $transition->set_transition_type();
+        $resultautomata->add_transition($transition);
+        
+        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata->read_fa($dotdescription);
+
+        $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
 }
