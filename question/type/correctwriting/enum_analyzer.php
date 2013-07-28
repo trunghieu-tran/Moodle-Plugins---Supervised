@@ -28,7 +28,7 @@ class  qtype_correctwriting_enum_analyzer {
      */
     private $pairs;
 
-    private $fitness;               // Fitness for response.
+    private $fitness = 0;               // Fitness for response.
 
     /**
      * Function to find order of changing enumeration, and included enumerations to all enumerations
