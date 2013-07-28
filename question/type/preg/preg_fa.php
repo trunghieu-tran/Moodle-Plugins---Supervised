@@ -2347,6 +2347,12 @@ abstract class qtype_preg_finite_automaton {
             foreach ($startstates as $startstate) {
                 $result->remove_start_state($startstate);
             }
+            // Remove flag of coping from state of first automata.
+            $states = $anotherfa->get_states();
+            foreach ($states as $statenum) {
+                $backnumber = trim($numbers[$statenum], '()');
+                $anotherfa->change_real_number($statenum, $backnumber);
+            }
             $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
             $result = $result->remove_fa();
