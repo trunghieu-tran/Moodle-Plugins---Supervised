@@ -637,7 +637,9 @@ class  qtype_correctwriting_enum_analyzer {
             $allfindorders = $this->find_all_enum_orders_in_corrected_string($correcttokens, $correctedtokens, $enumdescription);
             foreach ($allfindorders as $currentorder) {
                 // Change enumeration elements order.
-                $currentstringpair = $this->change_enum_order($string_pair, $enumchangeorder, $includedenums, $currentorder);
+                $currentstringpair = null;
+                $currentstringpair = $string_pair->deep_copy();
+                $this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
                 // Find LCS of correct and corrected answers.
                 $currentcorrectstream = $currentstringpair->correctstring()->stream;
                 $lcsarray = qtype_correctwriting_sequence_analyzer::lcs($currentcorrectstream, $correctedstream, $options);
