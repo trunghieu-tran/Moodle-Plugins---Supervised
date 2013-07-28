@@ -1210,6 +1210,7 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
         }
+        return $issuccessful;
     }
 
     /**
