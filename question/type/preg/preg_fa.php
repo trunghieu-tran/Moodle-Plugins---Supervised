@@ -916,6 +916,7 @@ abstract class qtype_preg_finite_automaton {
             $subexpr_start = array();
             $subexpr_end = array();
             $currentindex = 0;
+            $point = false;
             // Parse a string into components.
             while($currentindex < strlen($arraystrings[2])) {
                 // If subpatt_start.
@@ -984,6 +985,9 @@ abstract class qtype_preg_finite_automaton {
                 }
                 // Current symbol just symbol.
                 else {
+                    if ($arraystrings[2][$currentindex] == '.') {
+                        $point = true;
+                    }
                     $chars = $chars.$arraystrings[2][$currentindex];
                     $currentindex++;
                 }
@@ -992,7 +996,12 @@ abstract class qtype_preg_finite_automaton {
             if(strlen($arraystrings[2]) > 0) {
                 if(strlen($chars) != 0) {
                     $pregleaf = new qtype_preg_leaf_charset();
-                    $chars = '['.$chars.']';
+                    if ($point) {
+                        $chras = '.';
+                    }
+                    else {
+                        $chars = '['.$chars.']';
+                    }
                     StringStreamController::createRef('regex', $chars);
                     $pseudofile = fopen('string://regex', 'r');
                     $lexer = new qtype_preg_lexer($pseudofile);
