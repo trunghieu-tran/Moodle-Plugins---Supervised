@@ -1924,35 +1924,30 @@ abstract class qtype_preg_finite_automaton {
         $anotherfaends = $anotherfa->end_states();
         $fastarts = $fa->start_states();
         $anotherfastarts = $anotherfa->start_states();
-        //Set start states.
-        foreach ($this->startstates)
+        $fastates = $fa->get_state_numbers();
+        $anotherfastates = $anotherfa->get_state_numbers();
+        $states = $this->get_state_numbers();
         // Set right start and end states.
-        if ($direction == 0) {
-            // Cleaning end states.
-            $endstates = $result->end_states();
-            foreach ($endstates as $endstate) {
-                $result->remove_end_state($endstate);
+        foreach ($states as $statenum) {
+            // Get states from first and second automata.
+            $numbers = explode(',', $statenum, 2);
+            if ($numbers[0] !== '') {
+                $workstate1 = array_search($numbers[0], $fastates);
             }
-            foreach ($possibleend as $end) {
-                $result->add_end_state($end);
+            if ($numbers[1] !== '') {
+                $workstate2 = array_search($numbers[1], $anotherfastates);
             }
-        } else {
-            // Cleaning start states.
-            $startstates = $result->start_states();
-            foreach ($startstates as $startstate) {
-                if ($result->is_full_intersect_state($startstate)) {
-                    $result->remove_start_state($startstate);
-                }
+            // Set start states.
+            $isfirststart = ($numbers[0] !== '' && array_search($workstate1, $fastarts) !== false) || $numbers[0] == '';
+            $issecstart = ($numbers[1] !== '' && array_search($workstate2, $anotherfastarts) !== false) || $numbers[1] == '';
+            if ($isfirststart && $issecstart) {
+                $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
-            // Add new start states.
-            $state = $result->get_inter_state(0, 0);
-            $state = array_search($state, $resnumbers);
-            if ($state !== false) {
-                $result->add_start_state($state);
-            } else {
-                foreach ($possibleend as $start) {
-                    $result->add_start_state($start);
-                }
+            // Set end states.
+            $isfirstend = ($numbers[0] !== '' && array_search($workstate1, $faends) !== false) || $numbers[0] == '';
+            $issecend = ($numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false) || $numbers[1] == '';
+            if ($isfirstend && $issecend) {
+                $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
         }
     }
