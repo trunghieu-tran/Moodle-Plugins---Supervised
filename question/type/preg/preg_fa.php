@@ -1772,7 +1772,9 @@ abstract class qtype_preg_finite_automaton {
      * @return real number of state from intersection part.
      */
     public function get_inter_state($firststate, $secondstate) {
-        $state = $firststate . ',' . $secondstate;
+        $first = trim($firststate, '(,)');
+        $second = trim($secondstate, '()');
+        $state = $first . ',' . $second;
         return $state;
     }
 
