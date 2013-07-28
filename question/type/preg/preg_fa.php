@@ -2215,7 +2215,7 @@ abstract class qtype_preg_finite_automaton {
                     // Connect last state of intersection and copied branch.
                     foreach ($transitions as $tran) {
                         // Get number of copied state.
-                        $number = $firstnumbers[$tran->to];
+                        $number = $secondnumbers[$tran->to];
                         $number = trim($number, '()');
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
@@ -2255,7 +2255,7 @@ abstract class qtype_preg_finite_automaton {
                         $number = $number . ',';
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $addtran = new qtype_preg_nfa_transition($copiedstate, $tran->pregleaf, $state);
                         $this->add_transition($addtran);
                     }
                 }
