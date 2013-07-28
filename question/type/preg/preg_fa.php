@@ -1919,7 +1919,8 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    public function set_start_end_states_after_intersect($fa, $anotherfa) {
+    public function set_start_end_states_before_coping($fa, $anotherfa) {
+        // Get nessesary data.
         $faends = $fa->end_states();
         $anotherfaends = $anotherfa->end_states();
         $fastarts = $fa->start_states();
@@ -1935,6 +1936,47 @@ abstract class qtype_preg_finite_automaton {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
             if ($numbers[1] !== '') {
+                $workstate2 = array_search($numbers[1], $anotherfastates);
+            }
+            $state = array_search($statenum, $this->statenumbers);
+            // Set start states.
+            $isfirststart = $numbers[0] !== '' && array_search($workstate1, $fastarts) !== false;
+            $issecstart = $numbers[1] !== '' && array_search($workstate2, $anotherfastarts) !== false;
+            if (($isfirststart || $issecstart) && count($this->get_state_intotransitions($state)) == 0) {
+                $this->add_start_state(array_search($statenum, $this->statenumbers));
+            }
+            // Set end states.
+            $isfirstend = $numbers[0] !== '' && array_search($workstate1, $faends) !== false;
+            $issecend = $numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false;
+            if (($isfirstend || $issecend) && count($this->get_state_outtransitions($state)) == 0) {
+                $this->add_end_state(array_search($statenum, $this->statenumbers));
+            }     
+        }
+    }
+
+    /**
+     * Set right start and end states after inetrsection two automata.
+     *
+     * @param fa object automaton taken part in intersection.
+     * @param anotherfa object automaton second automaton taken part in intersection.
+     */
+    public function set_start_end_states_after_intersect($fa, $anotherfa) {
+        // Get nessesary data.
+        $faends = $fa->end_states();
+        $anotherfaends = $anotherfa->end_states();
+        $fastarts = $fa->start_states();
+        $anotherfastarts = $anotherfa->start_states();
+        $fastates = $fa->get_state_numbers();
+        $anotherfastates = $anotherfa->get_state_numbers();
+        $states = $this->get_state_numbers();
+        // Set right start and end states.
+        foreach ($states as $statenum) {
+            // Get states from first and second automata.
+            $numbers = explode(',', $statenum, 2);
+            if ($numbers[0] != '') {
+                $workstate1 = array_search($numbers[0], $fastates);
+            }
+            if ($numbers[1] != '') {
                 $workstate2 = array_search($numbers[1], $anotherfastates);
             }
             // Set start states.
