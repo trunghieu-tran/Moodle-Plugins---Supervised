@@ -34,12 +34,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -69,12 +69,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -99,10 +99,10 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
-        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_not_empty_direct() {
@@ -138,12 +138,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('4', $numbers);
         $oldfront = array(array_search('2', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -176,12 +176,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('2', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -216,10 +216,10 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
         $oldfront = array(array_search('2', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
-        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
     }
 
     public function test_coping_back() {
@@ -249,12 +249,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
         $oldfront = array(array_search('4', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 1);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 1);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -285,12 +285,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -321,12 +321,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -364,12 +364,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('4', $numbers);
         $oldfront = array(array_search('2', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $resultautomata->write_fa();
+        $result = $direct->write_fa();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
@@ -405,9 +405,9 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
         $oldfront = array(array_search('2', $numbers));
-        $resultautomata = $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
+        $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult, $origin);
-        $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
+        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
     }
 }
