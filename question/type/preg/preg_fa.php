@@ -2182,8 +2182,15 @@ abstract class qtype_preg_finite_automaton {
             $states = $anotherfa->end_states();
         }
         $secforinter = $secondnumbers[$states[0]];
-        $state = $result->get_inter_state($numbers[$stopcoping], $secforinter);
-        $result->change_real_number($stopcoping, $state);
+        $resnumbers = $result->get_state_numbers();
+        $state = $result->get_inter_state($resnumbers[$stop], $secforinter);
+        $result->change_real_number($stop, $state);
+        // Remove flag of coping from state of first automata.
+        $states = $this->get_states();
+        foreach ($states as $statenum) {
+            $backnumber = trim($numbers[$statenum], '()');
+            $this->change_real_number($statenum, $backnumber);
+        }
         // Find intersection part.
         $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         // Set end states.
@@ -2191,8 +2198,10 @@ abstract class qtype_preg_finite_automaton {
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
         } else {
-            $result->remove_fa();
+            $result = $result->remove_fa();
         }
+        // Set end states.
+        // Set start states.
         return $result;
     }
 
