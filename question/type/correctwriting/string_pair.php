@@ -69,4 +69,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
             $this->indexesintable[$token->token_index()] = $token->token_index();
         }
     }
+
+    /**
+    * Set indexes in table  array for correctstring
+    * @param array - array of indexes
+    */
+    public function set_indexes_in_table($newindexes) {
+        $this->indexesintable = $newindexes;
+    }
 }
