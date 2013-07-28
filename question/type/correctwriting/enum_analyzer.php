@@ -601,7 +601,6 @@ class  qtype_correctwriting_enum_analyzer {
             $stringpair->correctstring()->stream = null;
             $stringpair->correctstring()->stream->tokens;
         }
-        return $stringpair;
     }
 
     /**
