@@ -31,6 +31,12 @@ class  qtype_correctwriting_enum_analyzer {
     private $fitness = 0;               // Fitness for response.
 
     /**
+    * Return array of finded pairs wit maximal LCS.
+    */
+    public function pairs() {
+        return $this->pairs;
+    }
+    /**
      * Function to find order of changing enumeration, and included enumerations to all enumerations
      * @param array $enumdescription enumerations description
      */
