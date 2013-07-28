@@ -2335,8 +2335,7 @@ abstract class qtype_preg_finite_automaton {
             foreach ($startstates as $startstate) {
                 $result->remove_start_state($startstate);
             }
-            $result->set_start_end_states_after_intersect($this, $anotherfa);
-            var_dump($result);
+            $result->set_start_end_states_before_coping($this, $anotherfa);
             $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
             // Cleaning end states.
             $endstates = $result->end_states();
