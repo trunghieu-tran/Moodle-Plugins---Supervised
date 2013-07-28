@@ -1250,8 +1250,26 @@ abstract class qtype_preg_finite_automaton {
      * @return boolean true if this FA equal to $another.
      */
     public function compare_fa(&$another, &$differences) {
-        // TODO - streltsov.
-        return false;
+        // Create two groups of begin states.
+        $P = new qtype_preg_fa_group($this);
+        $Q = new qtype_preg_fa_group($another);
+        for ($i = 0; $i < count($this->startstates);$i++) {
+            $P->add_state($this->startstates[$i]);
+        }
+        for ($i = 0; $i < count($another->startstates);$i++) {
+            $Q->add_state($another->startstates[$i]);
+        }
+        // Append pair of groups in fifo ans stack of groups
+        $fifo = array();
+        $fifo[] = $P;
+        $fifo[] = $Q;
+        $stack[0][] = $P;
+        $stack[1][] = $Q;
+        $isequiv = true;
+        while(count($fifo) > 0) {
+            
+        }
+        return $isequiv;
     }
 
     /**
