@@ -445,11 +445,11 @@ class  qtype_correctwriting_enum_analyzer {
                 }
                 // Change current order to new in enumeration.
                 // Copy elements in new order.
+                $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
                 for ($j=0; $j < count($enums_orders[$enum_number]); $j++) {
                     // Copy element, token for token.
                     $left_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->begin;
                     $right_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->end;
-                    $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
                     for ($k = 0; $k < $right_border_of_elem-$left_border_of_elem+1; $k++) {
                         $for_change_enum_order[] = $for_change_enum_order[$left_border_of_elem-$left_border_of_enum+$k];
                     }
