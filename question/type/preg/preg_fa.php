@@ -865,7 +865,7 @@ abstract class qtype_preg_finite_automaton {
      * Removes this fa. Return enpty fa.
      */
     public function remove_fa() {
-        $result = new qtype_preg_finite_automaton();
+        $result = new qtype_preg_nfa(0, 0, 0, array());
         return $result;
     }
 
