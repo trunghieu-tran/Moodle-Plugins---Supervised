@@ -2014,9 +2014,11 @@ abstract class qtype_preg_finite_automaton {
                     }
                     // Change transitions.
                     if ($direction == 0) {
-                        $resulttransitions[$i] = new qtype_preg_fa_transition ($curstate, $resulttransitions[$i]->pregleaf, $newstate, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+                        $resulttransitions[$i]->from = $curstate;
+                        $resulttransitions[$i]->to = $newstate;
                     } else {
-                        $resulttransitions[$i] = new qtype_preg_fa_transition ($newstate, $resulttransitions[$i]->pregleaf, $curstate, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+                        $resulttransitions[$i]->from = $newstate;
+                        $resulttransitions[$i]->to = $curstate;
                     }
                     $result->add_transition($resulttransitions[$i]);
                 }
