@@ -133,11 +133,11 @@ class qtype_preg_fa_transition {
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
             if (($this->is_eps() || $this->is_unmerged_assert()) && (!$other->is_eps() && !$other->is_unmerged_assert())) {
-                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $other->origin);
+                $resulttran = new qtype_preg_nfa_transition(0, $resultleaf, 1, $other->origin, $other->consumeschars);
             } else if (($other->is_eps() || $other->is_unmerged_assert()) && (!$this->is_eps() && !$this->is_unmerged_assert())) {
-                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $this->origin);
+                $resulttran = new qtype_preg_nfa_transition(0, $resultleaf, 1, $this->origin, $this->consumeschars);
             } else {
-                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
+                $resulttran = new qtype_preg_nfa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
             }
         }
         return $resulttran;
@@ -1181,7 +1181,7 @@ abstract class qtype_preg_finite_automaton {
                     $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                 }
                 if(count($subpatt_start) == 0 && count($subexpr_start) == 0 && count($subpatt_end) == 0 && count($subexpr_end) == 0) {
-                    $transition = new qtype_preg_fa_transition($statefrom,$pregleaf, $stateto);
+                    $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
                 }
                 else {
                     $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
@@ -1193,7 +1193,7 @@ abstract class qtype_preg_finite_automaton {
             }
             else {
                 $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-                $transition = new qtype_preg_fa_transition($statefrom, $pregleaf, $stateto);
+                $transition = new qtype_preg_nfa_transition($statefrom, $pregleaf, $stateto);
             }
             // Search color of current transition.
             if ($arraystrings[3] == ',') {
@@ -2155,7 +2155,7 @@ abstract class qtype_preg_finite_automaton {
                         $number = $number . ',';
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
                         $this->add_transition($addtran);
                     }
                 }
@@ -2177,7 +2177,7 @@ abstract class qtype_preg_finite_automaton {
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate);
+                        $addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
                         $this->add_transition($addtran);
                     }
                 }
