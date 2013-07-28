@@ -1697,7 +1697,9 @@ abstract class qtype_preg_finite_automaton {
                 $realnumber = $sourcenumbers[$start];
                 $realnumber = trim($realnumber,'()');
                 $newstart = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
-                $this->add_start_state($newstart);
+                if ($newstart !== false) {
+                    $this->add_start_state($newstart);
+                }
             }
         }
         // Add end states if fa has no one.
