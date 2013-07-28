@@ -356,7 +356,15 @@ class qtype_preg_fa_state {
      * @param state - new state, which include in this group.
      */
     public function add_state($state) {
-        $this->state[] = $state;
+        if(array_search($state, $this->states === false)) {
+            $this->states[] = $state;
+            $column = $this->fa->get_state_outtransitions($state);
+            for ($i = 0; $i < count($column); $i++) {
+                if ($column[$i]->is_eps()) {
+                    $this->add_state($column[$i]->to);
+                }
+            }
+        }
     }
     
     /**
@@ -375,7 +383,6 @@ class qtype_preg_fa_state {
         $this->prev_groups = $prev_groups;
     }
  }
-
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
  */
