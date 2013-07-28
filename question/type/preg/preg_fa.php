@@ -1034,14 +1034,14 @@ abstract class qtype_preg_finite_automaton {
                     $pregleaf = new qtype_preg_leaf_assert($type);
                     for($j = 1; $j < count($asserts); $j++) {
                         switch($asserts[0]) {
-                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_B); break;
-                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_B); break;
-                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_A); break;
-                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_Z); break;
-                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_Z); break;
-                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_ESC_G); break;
-                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_CIRCUMFLEX); break;
-                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(SUBTYPE_DOLLAR); break;
+                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B); break;
+                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B); break;
+                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A); break;
+                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z); break;
+                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z); break;
+                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_G); break;
+                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX); break;
+                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR); break;
                         }
                     }
                 }
