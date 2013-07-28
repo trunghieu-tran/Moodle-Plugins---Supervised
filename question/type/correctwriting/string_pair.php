@@ -59,4 +59,14 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
         return $this->lcs;
     }    
 
+    /**
+     * Return object of class
+     */
+   public function __construct($correct, $compared, $matches) {
+        block_formal_langs_string_pair::__construct($correct, $compared, $matches);
+        $this->indexesintable = array();
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
+    }
 }
