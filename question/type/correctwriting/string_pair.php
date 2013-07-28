@@ -35,6 +35,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     protected $lcs;
 
     /**
+     * Array of real indexes for correct answer in table.
+     * @var array
+     */
+    protected $indexesintable;
+
+    /**
      * Creates a new string as a copy of this with a lcs
      * @param array $lcs LCS
      * @return block_formal_langs_string_pair
