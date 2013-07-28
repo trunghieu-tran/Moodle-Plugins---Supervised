@@ -620,7 +620,7 @@ class  qtype_correctwriting_enum_analyzer {
             $forstd = 0; // Variable for function,which return std Class objects.
             $correcttokens = $string_pair->correctstring()->stream->tokens; // Correct answer tokens array;
             $correctedtokens = $string_pair->correctedstring()->stream->tokens; // Corrected student answer tokens array;
-            $enumdescription = $string_pair->correctstring()->enumeration; // Correct answer enumerations descriptions.
+            $enumdescription = $string_pair->correctstring()->enumerations; // Correct answer enumerations descriptions.
             $currentorder = array(); // Current order of enumerations elements.
             $currentstringpair = 0; // Current string pair with current order of enumeration.
             $currentcorrectstream = $string_pair->correctstring()->stream; // Stream of correct answer with current...
