@@ -1172,12 +1172,12 @@ abstract class qtype_preg_finite_automaton {
         if ($direction == 0) {
             // Analysis if the end state of intersection includes one of end states of given automata.
             $fastates = $fa->end_states();
-            $anotherfastates = $anotherfa->end_state();
+            $anotherfastates = $anotherfa->end_states();
             $states = $this->endstates;
         } else {
             // Analysis if the start state of intersection includes one of start states of given automata.
             $fastates = $fa->start_states();
-            $anotherfastates = $anotherfa->start_state();
+            $anotherfastates = $anotherfa->start_states();
             $states = $this->startstates;
         }
         // Get real numbers.
@@ -1987,8 +1987,8 @@ abstract class qtype_preg_finite_automaton {
      */
     public function complete_non_intersection_branches($fa, $anotherfa, $direction) {
         $front = array();
-        $secondnumbers = $anotherfa->get_state_numbers;
-        $firstnumbers = $fa->get_state_numbers;
+        $secondnumbers = $anotherfa->get_state_numbers();
+        $firstnumbers = $fa->get_state_numbers();
         // Find uncompleted branches.
         if ($direction == 0) {
             $states = $this->endstates;
@@ -2127,22 +2127,22 @@ abstract class qtype_preg_finite_automaton {
         // Copy branches.
         $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
         // Change state first from intersection.
-        $numbers = $result->get_state_numbers();
+        $numbers = $this->get_state_numbers();
         $secondnumbers = $anotherfa->get_state_numbers();
         if ($isstart == 0) {
-            $states = $second->start_states();
+            $states = $anotherfa->start_states();
         } else {
-            $states = $second->end_states();
+            $states = $anotherfa->end_states();
         }
         $secforinter = $secondnumbers[$states[0]];
         $state = $result->get_inter_state($numbers[$stopcoping], $secforinter);
         $result->change_real_number($stopcoping, $state);
         // Find intersection part.
-        $this->get_intersection_part($anotherfa, $result, $stopcoping, $isstart);
+        $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         // Set end states.
         // Set start states.
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
-            $result->completion_non_intersection_branches($this, $anotherfa, $isstart);
+            $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
         } else {
             $result->remove_fa();
         }
