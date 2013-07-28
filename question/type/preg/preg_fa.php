@@ -1286,14 +1286,16 @@ abstract class qtype_preg_finite_automaton {
         // Compare real numbers
         foreach ($realfanumbers as $num1) {
             foreach ($result as $num2) {
-                if (strpos($num2, $num1) !== false) {
+                $pos = strpos($num2, $num1);
+                if ($pos !== false && $pos == 0) {
                     $issuccessful = true;
                 }
             }
         }
         foreach ($realanotherfanumbers as $num1) {
             foreach ($result as $num2) {
-                if (strpos($num2, $num1) !== false) {
+                $pos = strpos($num2, $num1);
+                if ($pos !== false && $pos != 0) {
                     $issuccessful = true;
                 }
             }
