@@ -77,4 +77,32 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     public function set_indexes_in_table($newindexes) {
         $this->indexesintable = $newindexes;
     }
+
+    /**
+    * Create complete copy of current pair without common references
+    * @return object of qtype_correctwriting_string_pair $pair copy of current pair 
+    */
+    public function deep_copy() {
+        // Clone answers.
+        $correctstring = clone($this->correctstring());
+        $correctedstring = clone($this->correctedstring());
+        // Copy enumerations descriptions.
+        $enumerations = array();
+        $j = 0;
+        foreach ($this->correctstring()->enumerations as $enumeration) {
+            $enumerations[] = array();
+            foreach ($enumeration as $element) {
+                $enumerations[$j][] = new enum_element($element->begin,$element->end);
+            }
+            $j++;
+        }
+        // Update descriptions for new pair.
+        $correctstring->enumerations = $enumerations;
+        // Create new pair.
+        $pair = new qtype_correctwriting_string_pair($correctstring, $correctedstring, $this->matches);
+        // Create new stream for correct string.
+        $pair->correctstring()->stream = null;
+        $pair->correctstring()->stream->tokens;
+        return $pair;
+    }
 }
