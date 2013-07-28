@@ -356,12 +356,12 @@ class qtype_preg_fa_state {
      * @param state - new state, which include in this group.
      */
     public function add_state($state) {
-        if(array_search($state, $this->states === false)) {
+        if(array_search($state, $this->states) === false) {
             $this->states[] = $state;
-            $column = $this->fa->get_state_outtransitions($state);
-            for ($i = 0; $i < count($column); $i++) {
-                if ($column[$i]->is_eps()) {
-                    $this->add_state($column[$i]->to);
+            $raw = $this->fa->get_state_outtransitions($state);
+            foreach ($raw as $value) {
+                if ($value->is_eps()) {
+                    $this->add_state($value->to);
                 }
             }
         }
