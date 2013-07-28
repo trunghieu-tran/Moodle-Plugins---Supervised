@@ -333,9 +333,8 @@ class  qtype_correctwriting_enum_analyzer {
      * @param array $enum_change_order - enumeration change order
      * @param array $include_enums - array of included enumerations, for all enumerations
      * @param array $new_enum_order - new orders for all enumeration
-     * @return qtype_correctwriting_string_pai object corrected and new correct answers
      */
-    public function change_enum_order($stringpair, $enum_change_order, $include_enums, $new_enum_order) {
+    public function change_enum_order(&$stringpair, $enum_change_order, $include_enums, $new_enum_order) {
         $enums_orders = array(); // Array to keep enums orders separately.
         $current_order = array(); // Array to keep current order of enum.
         $for_change_enum_order = array(); // Array keep temp information for change enumeration order.
