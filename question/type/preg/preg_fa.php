@@ -1734,7 +1734,9 @@ abstract class qtype_preg_finite_automaton {
                 }
                 $this->add_end_state($newend);
             }
-        //}
+        }
+        // Remove flag of coping from states of source automata.
+        $source->remove_flags_of_coping();
         return $resultstop;
     }
 
