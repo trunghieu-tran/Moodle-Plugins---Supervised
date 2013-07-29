@@ -405,6 +405,22 @@ class qtype_preg_fa_state {
         }
         return true;
     }
+    
+    public function is_empty() {
+        return (count($this->states) == 0);
+    }
+    
+    public function has_end_states() {
+        $endstates = $this->fa->end_states();
+        foreach ($this->states as $thisstate) {
+            foreach ($endstates as $endstate) {
+                if ($thisstate == $endstate) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
  }
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
