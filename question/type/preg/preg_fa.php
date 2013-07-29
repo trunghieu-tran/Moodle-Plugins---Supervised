@@ -1375,7 +1375,73 @@ abstract class qtype_preg_finite_automaton {
             $isequiv = true;
         }
         while(count($fifo) > 0) {
-            
+            $Q = $fifo[count($fifo)-1];
+            unset($fifo[count($fifo)-1]);
+            $P = $fifo[count($fifo)-1];
+            unset($fifo[count($fifo)-1]);
+            // Convert transition.
+            $firsttransitionto = array();
+            $secondtransitionto = array();
+            $states = $P->get_states();
+            foreach ($states as $state) {
+                foreach ($this->adjacencymatrix[$state] as $transit) {
+                    $firsttransitionto[] = $transit->to;
+                    // TODO - convert ranges.
+                }
+            }
+            $states = $Q->get_states();
+            foreach ($states as $state) {
+                foreach ($another->adjacencymatrix[$state] as $transit) {
+                    $firsttransitionto[] = $transit->to;
+                    // TODO - convert ranges.
+                }
+            }
+            // Creates pairs of groups.
+            $allend = true;
+            while($allend == false) {
+                // TODO - Search next pair.
+                $p = new qtype_preg_fa_group($this);
+                $q = new qtype_preg_fa_group($another); 
+                // Check pair.
+                $ismet = false;
+                /* TODO
+                for ($i = 0; $i < count($stack) - 1; $i++) {
+                    if ($p->cmpgroup($stack[$i]) && $q->cmpgroup($stack[$i + 1])) {
+                        $ismet = true;
+                    }
+                }*/
+                if ($ismet == true) {
+                    if ($p->is_empty() != $q->is_empty()) {
+                        $error = $p->way_to_string($q);
+                        if ($p->is_empty()) {
+                            $error .= ' Only first automata has transition.';
+                        }
+                        else {
+                            $error .= ' Only second automata has transition.';
+                        }
+                        $differences[] = $error;
+                        $isequiv = false;
+                    }
+                    else if ($p->has_end_states() != $q->has_end_states()) {
+                        $error = $p->way_to_string($q);
+                        if ($p->has_end_states()) {
+                            $error .= ' Only first automata has endstates.';
+                        }
+                        else {
+                            $error .= ' Only second automata has endstates.';
+                        }
+                        $differences[] = $error;
+                        $isequiv = false;
+                    }
+                    if ((count($differences) == 0) && $isequiv == true) {
+                        // Append pair of groups in fifo and stack of groups
+                        $fifo[] = $P;
+                        $fifo[] = $Q;
+                        $stack[0][] = $P;
+                        $stack[1][] = $Q;
+                    }
+                }
+            }
         }
         return $isequiv;
     }
