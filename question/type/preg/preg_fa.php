@@ -1353,13 +1353,27 @@ abstract class qtype_preg_finite_automaton {
         for ($i = 0; $i < count($another->startstates);$i++) {
             $Q->add_state($another->startstates[$i]);
         }
-        // Append pair of groups in fifo ans stack of groups
-        $fifo = array();
-        $fifo[] = $P;
-        $fifo[] = $Q;
-        $stack[0][] = $P;
-        $stack[1][] = $Q;
-        $isequiv = true;
+        // If startstates are endstate.
+        if ($P->has_end_states() != $Q->has_end_states()) {
+            $P->way_to_string($Q);
+            if ($P->has_end_states()) {
+                $error = $error.' Only first automata has endstate.';
+            }
+            else {
+                $error = $error.' Only second automata has endstate.';
+            }
+            $differences[] = $error;
+            
+        }
+        else {
+            // Append pair of groups in fifo and stack of groups
+            $fifo = array();
+            $fifo[] = $P;
+            $fifo[] = $Q;
+            $stack[0][] = $P;
+            $stack[1][] = $Q;
+            $isequiv = true;
+        }
         while(count($fifo) > 0) {
             
         }
