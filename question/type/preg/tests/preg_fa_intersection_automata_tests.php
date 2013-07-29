@@ -411,8 +411,8 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                                 2->1[label="[ab]"];
                             }';
         $dotresult = 'digraph res {
-                        "0,";"0,0";
-                        "2,";
+                        "0,0";"0,";
+                        "2,";"2,2";
                         "2,"->"0,"[label = "[ab]", color = violet];
                         "1,2"->"2,"[label = "[ab]", color = violet];
                         "1,2"->"2,1"[label = "[ab&&ab]", color = red];
