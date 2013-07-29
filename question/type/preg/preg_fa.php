@@ -421,6 +421,61 @@ class qtype_preg_fa_state {
         }
         return false;
     }
+    
+    /**
+     * Create string with way.
+     *
+     * @param another - group of states from another automata.
+     */
+    public function way_to_string(&$another) {
+        $string = '';
+        for ($i = 0; $i < count($this->prev_groups); $i++) {
+            if($i != 0) {
+                $string .= '-['.$this->prev_groups[$i]->char.']->';
+            }
+            $string .= '[(';
+            for ($j = 0; $j < count($this->prev_groups[$i]->states); $j++) {
+                $string .= $this->fa->statenumbers[$this->prev_groups[$i]->states[$j]];
+                if ($j != count($this->prev_groups[$i]->states) - 1) {
+                    $string .= ',';
+                }
+            }
+            $string .= '),(';
+            for ($j = 0; $j < count($another->prev_groups[$i]->states); $j++) {
+                $string .= $another->fa->statenumbers[$another->prev_groups[$i]->states[$j]];
+                if ($j != count($another->prev_groups[$i]->states) - 1) {
+                    $string .= ',';
+                }
+            }
+            $string .= ')]';
+        }
+        $string .= '-['.$this->char.']->';
+        if (count($this->states) == 0) {
+            $string .= 'no';
+        }
+        else {
+            for ($j = 0; $j < count($this->states); $j++) {
+                $string .= $this->fa->statenumbers[$this->states[$j]];
+                if ($j != count($this->states) - 1) {
+                    $string .= ',';
+                }
+            }
+        }
+        $string .= '),(';
+        if (count($another->states) == 0) {
+            $string .= 'no';
+        }
+        else {
+            for ($j = 0; $j < count($another->prev_groups[$i]->states); $j++) {
+                $string .= $another->fa->statenumbers[$another->prev_groups[$i]->states[$j]];
+                if ($j != count($another->prev_groups[$i]->states) - 1) {
+                    $string .= ',';
+                }
+            }
+        }
+        $string .= ')]';
+        return $string;
+    }
  }
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
