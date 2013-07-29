@@ -1230,14 +1230,17 @@ abstract class qtype_preg_finite_automaton {
                 if(strlen($chars) != 0) {
                     $pregleaf = new qtype_preg_leaf_charset();
                     if ($point) {
-                        $chras = '.';
+                        $chars = '.';
                     }
                     else {
                         $chars = '['.$chars.']';
                     }
+                    $options = new qtype_preg_handling_options();
+                    $options->preserveallnodes = true;
                     StringStreamController::createRef('regex', $chars);
                     $pseudofile = fopen('string://regex', 'r');
                     $lexer = new qtype_preg_lexer($pseudofile);
+                    $lexer->set_options($options);
                     $pregleaf = $lexer->nextToken()->value;
                     for($j = 0; $j < count($asserts); $j++) {
                         switch($asserts[0]) {
