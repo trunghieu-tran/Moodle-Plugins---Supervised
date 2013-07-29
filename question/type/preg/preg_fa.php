@@ -382,6 +382,29 @@ class qtype_preg_fa_state {
     public function fill_prev_groups($prev_groups) {
         $this->prev_groups = $prev_groups;
     }
+    
+    /**
+     * Compare two groups.
+     *
+     * @param another - group of states for compare.
+     */
+    public function cmpgroup(&$another) {
+        if (count($this->states) != count($another->states)) {
+            return false;
+        }
+        foreach ($this->states as $thisstate) {
+            $find = false;
+            foreach ($another->states as $anotherstate) {
+                if ($thisstate == anotherstate) {
+                    $find = true;
+                }
+            }
+            if ($find != true) {
+                return false;
+            }
+        }
+        return true;
+    }
  }
 /**
  * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
