@@ -1721,20 +1721,18 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
         }
-        // Add end states if fa has no one.
-        //if (count($this->endstates) == 0) {
-            $sourceend = $source->end_states();
-            foreach ($sourceend as $end) {
-                $realnumber = $sourcenumbers[$end];
-                $realnumber = trim($realnumber,'()');
-                $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
-                if ($newend !== false) {
-                    // Get last copied state. 
-                    if ($resultstop === null) {
-                        $resultstop = $newend;
-                    }
-                    $this->add_end_state($newend);
+
+        $sourceend = $source->end_states();
+        foreach ($sourceend as $end) {
+            $realnumber = $sourcenumbers[$end];
+            $realnumber = trim($realnumber,'()');
+            $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
+            if ($newend !== false) {
+                // Get last copied state. 
+                if ($resultstop === null) {
+                    $resultstop = $newend;
                 }
+                $this->add_end_state($newend);
             }
         //}
         return $resultstop;
