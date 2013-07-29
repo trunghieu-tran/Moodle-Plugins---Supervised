@@ -1284,16 +1284,12 @@ abstract class qtype_preg_finite_automaton {
                 else {
                     $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                 }
-                if(count($subpatt_start) == 0 && count($subexpr_start) == 0 && count($subpatt_end) == 0 && count($subexpr_end) == 0) {
-                    $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
-                }
-                else {
-                    $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
-                    $transition->subpatt_start = $subpatt_start;
-                    $transition->subpatt_end = $subpatt_end;
-                    $transition->subexpr_start = $subexpr_start;
-                    $transition->subexpr_end = $subexpr_end;
-                }
+                $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
+                $transition->subpatt_start = $subpatt_start;
+                $transition->subpatt_end = $subpatt_end;
+                $transition->subexpr_start = $subexpr_start;
+                $transition->subexpr_end = $subexpr_end;
+
             }
             else {
                 $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
