@@ -1587,9 +1587,9 @@ abstract class qtype_preg_finite_automaton {
                         // Add transition.
                         $memstate = array_search($state, $this->statenumbers);
                         if ($direction == 0) {
-                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate, $tran->origin);
+                            $transition = new qtype_preg_nfa_transition($memstate, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
                         } else {
-                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin);
+                            $transition = new qtype_preg_nfa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin, $tran->consumeschars);
                         }
                         $transition->set_transition_type();
                         $this->add_transition($transition);
@@ -1611,9 +1611,9 @@ abstract class qtype_preg_finite_automaton {
                 if ($sourcenum == $number) {
                     // Add transition.
                     if ($direction == 0) {
-                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate, $tran->origin);
+                        $transition = new qtype_preg_nfa_transition($state, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
                     } else {
-                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin);
+                        $transition = new qtype_preg_nfa_transition($workstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
                     }
                     $transition->set_transition_type();
                     $this->add_transition($transition);
