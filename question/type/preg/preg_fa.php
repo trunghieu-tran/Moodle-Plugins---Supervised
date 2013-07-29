@@ -1648,10 +1648,7 @@ abstract class qtype_preg_finite_automaton {
         // Getting all states which are in automata for coping.
         $stateswere = $this->get_state_numbers();
         // Cleaning end states.
-        $endstates = $this->end_states();
-        foreach ($endstates as $endstate) {
-            $this->remove_end_state($endstate);
-        }
+        $this->clean_end_states();
 
         // Coping.
         while (count ($oldfront) != 0) {
@@ -2099,10 +2096,7 @@ abstract class qtype_preg_finite_automaton {
         // Set right start and end states.
         if ($direction == 0) {
             // Cleaning end states.
-            $endstates = $result->end_states();
-            foreach ($endstates as $endstate) {
-                $result->remove_end_state($endstate);
-            }
+            $result->clean_end_states();
             foreach ($possibleend as $end) {
                 $result->add_end_state($end);
             }
@@ -2348,33 +2342,16 @@ abstract class qtype_preg_finite_automaton {
         $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             // Cleaning end states.
-            $endstates = $result->end_states();
-            foreach ($endstates as $endstate) {
-                $result->remove_end_state($endstate);
-            }
+            $result->clean_end_states();
             // Cleaning start states.
-            $startstates = $result->start_states();
-            foreach ($startstates as $startstate) {
-                $result->remove_start_state($startstate);
-            }
+            $result->clean_start_states();
+            // Set right start and end states for completing branches.
             $result->set_start_end_states_before_coping($this, $anotherfa);
             $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
             // Cleaning end states.
-            $endstates = $result->end_states();
-            foreach ($endstates as $endstate) {
-                $result->remove_end_state($endstate);
-            }
+            $result->clean_end_states();
             // Cleaning start states.
-            $startstates = $result->start_states();
-            foreach ($startstates as $startstate) {
-                $result->remove_start_state($startstate);
-            }
-            // Remove flag of coping from state of first automata.
-            $states = $anotherfa->get_states();
-            foreach ($states as $statenum) {
-                $backnumber = trim($numbers[$statenum], '()');
-                $anotherfa->change_real_number($statenum, $backnumber);
-            }
+            $result->clean_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
             $result = $result->remove_fa();
