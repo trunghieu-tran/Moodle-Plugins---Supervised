@@ -755,6 +755,28 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Remove all end states of the automaton.
+     */
+    public function clean_end_states() {
+        // Cleaning end states.
+        $endstates = $this->end_states();
+        foreach ($endstates as $endstate) {
+            $this->remove_end_state($endstate);
+        }
+    }
+
+    /**
+     * Remove all start states of the automaton.
+     */
+    public function clean_start_states() {
+        // Cleaning end states.
+        $startstates = $this->start_states();
+        foreach ($startstates as $startstate) {
+            $this->remove_start_state($startstate);
+        }
+    }
+
+    /**
      * Set state as copied.
      *
      * @param state - state to be copied.
