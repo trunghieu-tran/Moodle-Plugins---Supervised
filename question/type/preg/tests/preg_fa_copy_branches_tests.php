@@ -16,7 +16,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 0->2[label="[0-9]"];
                                 1->3[label="[abc]"];
                                 2->3[label="[01]"];
-                                3->4[label="[.]"];
+                                3->4[label="[a]"];
                             }';
         $dotresult = 'digraph res {
                         "0,";
@@ -24,7 +24,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                         "0,"->"1,"[label = "[df]", color = violet];
                         "0,"->"2,"[label = "[0123456789]", color = violet];
                         "2,"->"3,"[label = "[01]", color = violet];
-                        "3,"->"4,"[label = "[.]", color = violet];
+                        "3,"->"4,"[label = "[a]", color = violet];
                     }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
@@ -113,7 +113,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 0->2[label="[0-9]"];
                                 1->3[label="[abc]"];
                                 2->3[label="[01]"];
-                                3->4[label="[.]"];
+                                3->4[label="[a]"];
                             }';
         $dotresult = 'digraph res {
                         "0,";
@@ -122,7 +122,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                         "0,"->"2,"[label = "[0123456789]", color = violet];
                         "1,"->"3,"[label = "[abc]", color = violet];
                         "2,"->"3,"[label = "[01]", color = violet];
-                        "3,"->"4,"[label = "[.]", color = violet];
+                        "3,"->"4,"[label = "[a]", color = violet];
                     }';
         $directdescription = 'digraph example {
                                 "0,";
@@ -230,12 +230,12 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 0->2[label="[0-9]"];
                                 1->3[label="[abc]"];
                                 2->3[label="[01]"];
-                                3->4[label="[.]"];
+                                3->4[label="[a]"];
                             }';
         $dotresult = 'digraph res {
                         "0,";
                         "4,";
-                        "3,"->"4,"[label = "[.]", color = violet];
+                        "3,"->"4,"[label = "[a]", color = violet];
                         "1,"->"3,"[label = "[abc]", color = violet];
                         "2,"->"3,"[label = "[01]", color = violet];
                         "0,"->"1,"[label = "[df]", color = violet];
@@ -266,15 +266,15 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 0->2[label="[0-9]"];
                                 1->3[label="[abc]"];
                                 2->3[label="[01]"];
-                                3->4[label="[.]"];
+                                3->4[label="[a]"];
                             }';
         $dotresult = 'digraph res {
                         ",0";
                         ",1";",4";
-                        ",0"->",1"[label = "[df]", color = blue];
-                        ",0"->",2"[label = "[0123456789]", color = blue];
-                        ",2"->",3"[label = "[01]", color = blue];
-                        ",3"->",4"[label = "[.]", color = blue];
+                        ",0"->",1"[label = "[df]", color = blue, style = dotted];
+                        ",0"->",2"[label = "[0123456789]", color = blue, style = dotted];
+                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
+                        ",3"->",4"[label = "[a]", color = blue, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -307,10 +307,10 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                         ",0";
                         ",1";",3";
-                        ",0"->",1"[label = "[ab]", color = blue];
-                        ",0"->",2"[label = "[0123456789]", color = blue];
-                        ",2"->",3"[label = "[01]", color = blue];
-                        ",3"->",0"[label = "[a]", color = blue];
+                        ",0"->",1"[label = "[ab]", color = blue, style = dotted];
+                        ",0"->",2"[label = "[0123456789]", color = blue, style = dotted];
+                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
+                        ",3"->",0"[label = "[a]", color = blue, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -338,16 +338,16 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
                                 0->2[label="[0-9]"];
                                 1->3[label="[abc]"];
                                 2->3[label="[01]"];
-                                3->4[label="[.]"];
+                                3->4[label="[a]"];
                             }';
         $dotresult = 'digraph res {
                         ",0";
                         ",4";
-                        ",0"->",1"[label = "[df]", color = blue];
-                        ",0"->",2"[label = "[0123456789]", color = blue];
-                        ",1"->",3"[label = "[abc]", color = blue];
-                        ",2"->",3"[label = "[01]", color = blue];
-                        ",3"->",4"[label = "[.]", color = blue];
+                        ",0"->",1"[label = "[df]", color = blue, style = dotted];
+                        ",0"->",2"[label = "[0123456789]", color = blue, style = dotted];
+                        ",1"->",3"[label = "[abc]", color = blue, style = dotted];
+                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
+                        ",3"->",4"[label = "[a]", color = blue, style = dotted];
                     }';
         $directdescription = 'digraph example {
                                 ",0";
