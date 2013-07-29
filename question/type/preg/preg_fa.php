@@ -2300,6 +2300,19 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Remove flags that state was copied from all states of the automaton.
+     */
+    public function remove_flags_of_coping() {
+        // Remove flag of coping from states of automata.
+        $states = $this->get_states();
+        $numbers = $this->get_state_numbers();
+        foreach ($states as $statenum) {
+            $backnumber = trim($numbers[$statenum], '()');
+            $this->change_real_number($statenum, $backnumber);
+        }
+    }
+
+    /**
      * Intersect automaton with another one.
      *
      * @param anotherfa object automaton to intersect.
