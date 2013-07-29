@@ -29,7 +29,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[a-z]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[cd]"];
         $rescharset = $leaf1->intersect($leaf2);
-        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -40,7 +40,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
         $resulttran = $transition1->intersect($transition2);
-        $restran = new qtype_preg_fa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_nfa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
 
@@ -88,7 +88,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1->pregleaf->mergedassertions[] = $assert2;
         $rescharset = $leaf1->intersect($leaf2);
         $rescharset->mergedassertions[] = $assert2;
-        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER); //0->1[label="[\\Aa]"];
+        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER); //0->1[label="[\\Aa]"];
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -100,7 +100,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
         $rescharset = $leaf1->intersect($leaf2);
-        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
+        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
         $restran->pregleaf->mergedassertions[] = $assert1;
         $restran->pregleaf->mergedassertions[] = $assert2;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);   //0->1[label="[^a]"];
@@ -139,7 +139,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[a]"];
         $rescharset = $leaf->intersect($leaf);
         $rescharset->mergedassertions[] = $assert;
-        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);        //0->1[label="[^a]"];
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -166,9 +166,9 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf1 = $lexer->nextToken()->value;
         $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         $leaf1->mergedassertions[] = $assert;
-        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^a-c]"];
+        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1);  //0->1[label="[^a-c]"];
         $leaf2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[^]"];
+        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1);  //0->1[label="[^]"];
 
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($transition1, $resulttran, 'Result transition is not equal to expected');
@@ -179,7 +179,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\A]"];
-        $restran = new qtype_preg_fa_transition(0, $leaf2, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_nfa_transition(0, $leaf2, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -189,7 +189,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
-        $restran = new qtype_preg_fa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_nfa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
