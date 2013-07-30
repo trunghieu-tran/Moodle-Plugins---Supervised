@@ -1481,16 +1481,16 @@ abstract class qtype_preg_finite_automaton {
         // Compare real numbers
         foreach ($realfanumbers as $num1) {
             foreach ($result as $num2) {
-                $pos = strpos($num2, $num1);
-                if ($pos !== false && $pos == 0) {
+                $resnumbers = explode(',', $num2, 2);
+                if ($num1 == $resnumbers[0]) {
                     $issuccessful = true;
                 }
             }
         }
         foreach ($realanotherfanumbers as $num1) {
             foreach ($result as $num2) {
-                $pos = strpos($num2, $num1);
-                if ($pos !== false && $pos != 0) {
+                $resnumbers = explode(',', $num2, 2);
+                if ($num1 == $resnumbers[1]) {
                     $issuccessful = true;
                 }
             }
