@@ -1677,9 +1677,9 @@ abstract class qtype_preg_finite_automaton {
                             }
                         } else {
                             $newfront[] = $tran->to;
-                            if (array_search($state, $newfront) === false) {
+                            //if (array_search($state, $newfront) === false) {
                                 $stateschecked[] = $state;
-                            }
+                            //}
                         }
                     }
                 }
