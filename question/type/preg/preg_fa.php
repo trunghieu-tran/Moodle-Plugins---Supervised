@@ -2307,7 +2307,8 @@ abstract class qtype_preg_finite_automaton {
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
             $exendstate = $this->endstates[$i];
-            $epstran = qtype_preg_fa_transition ($exendstate, $newleaf, $to);
+            $transitions = $this->get_state_intotransitions($exendstate);
+            $epstran = new qtype_preg_nfa_transition ($exendstate, $newleaf, $to, current($transitions)->origin, current($transitions)->consumeschars);
             $this->add_transition($epstran);
             $i--;
             $this->remove_end_state($exendstate);
