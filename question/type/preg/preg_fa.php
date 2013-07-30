@@ -2470,7 +2470,7 @@ abstract class qtype_preg_finite_automaton {
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $addtran = new qtype_preg_nfa_transition($copiedstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
                         $this->add_transition($addtran);
                     }
                 }
