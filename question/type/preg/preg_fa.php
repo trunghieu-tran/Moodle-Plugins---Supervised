@@ -2346,6 +2346,7 @@ abstract class qtype_preg_finite_automaton {
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->del_blind_states();
         $result->lead_to_one_end();
+        return $result;
     }
 
     /**
