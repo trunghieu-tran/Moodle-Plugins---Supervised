@@ -2325,7 +2325,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function intersect ($anotherfa, $stateindex, $isstart) {
         // Check right direction.
-        if ($isstart != 0 || $isstart !=1) {
+        if ($isstart != 0 && $isstart !=1) {
             throw new qtype_preg_exception('intersect error: Wrong direction');
         }
         $number = array_search($stateindex, $this->statenumbers);
@@ -2334,7 +2334,7 @@ abstract class qtype_preg_finite_automaton {
         }
         // Prepare automata for intersection.
         $this->del_blind_states();
-        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number);
+        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number);
         if ($isstart == 0) {
             $number2 = $anotherfa->start_states();
         } else {
@@ -2342,7 +2342,7 @@ abstract class qtype_preg_finite_automaton {
         }
         $number2 = $number2[0];
         $anotherfa->del_blind_states();
-        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TRANSITION_TYPE_BOTH, $number2);
+        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number2);
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->del_blind_states();
         $result->lead_to_one_end();
