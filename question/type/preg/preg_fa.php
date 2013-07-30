@@ -2301,7 +2301,9 @@ abstract class qtype_preg_finite_automaton {
     public function lead_to_one_end() {
         $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $i = count($this->endstates) - 1;
-        $to = $this->endstates[0];
+        if ($i > 0) {
+            $to = $this->endstates[0];
+        }
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
             $exendstate = $this->endstates[$i];
