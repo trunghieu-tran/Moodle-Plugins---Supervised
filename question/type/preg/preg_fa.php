@@ -585,11 +585,11 @@ abstract class qtype_preg_finite_automaton {
     public function get_column($array, $key) {
         $result = array();
         foreach ($array as $element) {
-            foreach ($element as $value) {
+            //foreach ($element as $value) {
                 if (array_key_exists($key, $element)) {
                     $result[] = $element[$key];
                 }
-            }
+            //}
         }
         return $result;
     }
