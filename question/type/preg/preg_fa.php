@@ -2178,8 +2178,12 @@ abstract class qtype_preg_finite_automaton {
             if ($numbers[0] !== '') {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
-            if ($numbers[1] !== '') {
-                $workstate2 = array_search($numbers[1], $anotherfastates);
+            if ($numbers[1] != '') {
+                foreach ($anotherfastates as $num) {
+                    if (strpos($numbers[1], $num) === 0) {
+                        $workstate2 = array_search($num, $anotherfastates);
+                    }
+                }
             }
             $state = array_search($statenum, $this->statenumbers);
             // Set start states.
@@ -2219,8 +2223,13 @@ abstract class qtype_preg_finite_automaton {
             if ($numbers[0] != '') {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
+            
             if ($numbers[1] != '') {
-                $workstate2 = array_search($numbers[1], $anotherfastates);
+                foreach ($anotherfastates as $num) {
+                    if (strpos($numbers[1], $num) === 0) {
+                        $workstate2 = array_search($num, $anotherfastates);
+                    }
+                }
             }
             // Set start states.
             $isfirststart = ($numbers[0] !== '' && array_search($workstate1, $fastarts) !== false) || $numbers[0] == '';
@@ -2261,7 +2270,11 @@ abstract class qtype_preg_finite_automaton {
                 $resultnumber = $resnumbers[$curstate];
                 $numbers = explode(',', $resultnumber, 2);
                 $workstate1 = array_search($numbers[0], $this->statenumbers);
-                $workstate2 = array_search($numbers[1], $secondnumbers);
+                foreach ($secondnumbers as $num) {
+                    if (strpos($numbers[1], $num) === 0) {
+                        $workstate2 = array_search($num, $secondnumbers);
+                    }
+                }
                 // Get transitions for ntersection.
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
                 $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);;
