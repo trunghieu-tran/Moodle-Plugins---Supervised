@@ -1490,7 +1490,7 @@ abstract class qtype_preg_finite_automaton {
         foreach ($realanotherfanumbers as $num1) {
             foreach ($result as $num2) {
                 $resnumbers = explode(',', $num2, 2);
-                if ($num1 == $resnumbers[1]) {
+                if (strpos($resnumbers[1], $num1) === 0) {
                     $issuccessful = true;
                 }
             }
