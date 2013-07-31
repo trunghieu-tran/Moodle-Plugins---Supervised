@@ -1937,7 +1937,7 @@ abstract class qtype_preg_finite_automaton {
         $this->haseps = false;
     }
 
-    public function has_same_state($anotherfa, &$transition, $laststate, &$clones, $realnumber, $direction) {
+    public function has_same_state($anotherfa, &$transition, $laststate, &$clones, &$realnumber, $direction) {
         $oldfront = array();
         $isfind = false;
         $aregone = array();
@@ -1947,6 +1947,7 @@ abstract class qtype_preg_finite_automaton {
         $clones[] = $transition;
         $numbers = explode(',', $realnumber, 2);
         $numbertofind = $numbers[0];
+        $addnum = $numbers[1];
         $oldfront[] = $laststate;
         $secnumbers = $anotherfa->get_state_numbers();
 
@@ -1987,6 +1988,7 @@ abstract class qtype_preg_finite_automaton {
                             $hasintersection = true;
                             // Form new transition.
                             $addstate = $this->add_state($addnumber);
+                            $realnumber = $addnumber;
                             if ($direction == 0) {
                                 $tran->to = $addstate;
                             } else {
@@ -1996,6 +1998,7 @@ abstract class qtype_preg_finite_automaton {
                     } else {
                         // Form new transition.
                         $addstate = $this->add_state($addnumber);
+                        $realnumber = $addnumber;
                         if ($direction == 0) {
                             $tran->to = $addstate;
                         } else {
