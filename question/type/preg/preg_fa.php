@@ -2304,6 +2304,7 @@ abstract class qtype_preg_finite_automaton {
                     }
                     // State was found.
                     if ($searchstate !== false) {
+                        $resnumbers = $result->get_state_numbers();
                         $newstate = array_search($resultnumbers[$i], $resnumbers);
                     } else {
                         // State wasn't found.
