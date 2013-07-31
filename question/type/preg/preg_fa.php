@@ -1802,7 +1802,7 @@ abstract class qtype_preg_finite_automaton {
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
      *
      * @param source - automata-source for coping.
-     * @param oldFront - states from which coping starts.
+     * @param oldfront - states from which coping starts.
      * @param stopcoping - state to which automata will be copied.
      * @param direction - direction of coping (0 - forward; 1 - back).
      * @return automata after coping.
@@ -1976,9 +1976,9 @@ abstract class qtype_preg_finite_automaton {
                     $addnumber = $numbers[0] . ',' . $clonesnumbers[1] . '   ' . $numbers[1];
                     $statefromsecond = array_search($numbers[1], $secnumbers);
                     if ($direction == 0) {
-                        $transitions = $anotherfa->get_intotransitions($statefromsecond);
+                        $transitions = $anotherfa->get_state_intotransitions($statefromsecond);
                     } else {
-                        $transitions = $anotherfa->get_outtransitions($statefromsecond);
+                        $transitions = $anotherfa->get_state_outtransitions($statefromsecond);
                     }
                     // There are transitions for analysis.
                     if (count($transitions) != 0) {
@@ -2005,12 +2005,12 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     // Add connected states to new wave front.
                     if ($direction == 0) {
-                        $conectstates = get_connected_states($state, 1);
+                        $conectstates = $this->get_connected_states($state, 1);
                     } else {
-                        $conectstates = get_connected_states($state, 0);
+                        $conectstates = $this->get_connected_states($state, 0);
                     }
                     foreach ($conectstates as $conectstate) {
-                        if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone)) {
+                        if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
                             $newfront[] = $conectstate;
                         }
                     }
@@ -2090,7 +2090,7 @@ abstract class qtype_preg_finite_automaton {
                 }
             } else {
                 // It's impossible to add state.
-                unset($resulttransitions[$i]);
+                unset($resulttransitions[$index]);
                 $wasdel = true;
             }
         } else {
@@ -2236,7 +2236,7 @@ abstract class qtype_preg_finite_automaton {
                 for ($i = 0; $i < count($resulttransitions); $i++) {
                     // Search state with the same number in result automata.
                     if ($withcycle) {
-                        $searchstate = $result->have_add_state_in_cycle($anotherfa, $resulttransitions, $curstate, $clones, $resultnumbers[$i], $i);
+                        $searchstate = $result->have_add_state_in_cycle($anotherfa, $resulttransitions, $curstate, $clones, $resultnumbers[$i], $i, $direction);
                     } else {
                         $searchstate = array_search($resultnumbers[$i], $resnumbers);
                     }
