@@ -1974,9 +1974,13 @@ abstract class qtype_preg_finite_automaton {
                     } else {
                         $clone = $tran->from;
                     }
-                    $clonenumbers = explode(',', $this->statenumbers[$clone], 2);
-                    $addnumber = $numbers[0] . ',' . $clonesnumbers[1] . '   ' . $numbers[1];
-                    $statefromsecond = array_search($numbers[1], $secnumbers);
+                    $addnumber = $numbertofind . ',' . $addnum . '   ' . $numbers[1];
+                    foreach ($secnumbers as $num) {
+                        if (strpos($numbers[1], $num) === 0) {
+                            $statefromsecond = array_search($num, $secnumbers);
+                        }
+                    }
+                    //$statefromsecond = array_search($numbers[1], $secnumbers);
                     if ($direction == 0) {
                         $transitions = $anotherfa->get_state_intotransitions($statefromsecond);
                     } else {
