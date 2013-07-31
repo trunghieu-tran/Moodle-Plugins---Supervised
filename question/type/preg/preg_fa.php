@@ -1940,6 +1940,7 @@ abstract class qtype_preg_finite_automaton {
     public function has_same_state($anotherfa, &$transition, $laststate, &$clones, &$realnumber, $direction) {
         $oldfront = array();
         $isfind = false;
+        $hasintersection = false;
         $aregone = array();
         $newfront = array();
         // Get right clones in case of divarication.
@@ -1997,6 +1998,7 @@ abstract class qtype_preg_finite_automaton {
                         }
                     } else {
                         // Form new transition.
+                        $hasintersection = true;
                         $addstate = $this->add_state($addnumber);
                         $realnumber = $addnumber;
                         if ($direction == 0) {
