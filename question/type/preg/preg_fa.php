@@ -2127,6 +2127,41 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    public function has_cycle() {
+        $newfront = array();
+        $aregone = array();
+        $hascycle = false;
+        $states = $this->get_state_numbers();
+        // Add start states to wave front.
+        $oldfront = $this->start_states();
+
+        // Analysis sattes from wave front.
+        while (count($oldfront) != 0) {
+            foreach ($oldfront as $curstate) {
+                // State hasn't been  already gone.
+                if (array_search($curstate, $aregone) === false) {
+                    // Mark as gone.
+                    $aregone[] = $curstate;
+                    // Get connected states if they are.
+                    $connectedstates = $this->get_connected_states($curstate, 0);
+                    $newfront = array_merge($newfront, $connectedstates);
+                } else {
+                    // Analysis intotransitions.
+                    $transitions = $this->get_state_intotransitions($curstate);
+                    foreach ($transitions as $tran) {
+                        // Transition has come from state which is far in automata.
+                        if ($states[$tran->from] > $states[$curstate]) {
+                            $hascycle = true;
+                        }
+                    }
+                }
+            }
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+        return $hascycle;
+    }
+
     public function set_start_end_states_before_coping($fa, $anotherfa) {
         // Get nessesary data.
         $faends = $fa->end_states();
