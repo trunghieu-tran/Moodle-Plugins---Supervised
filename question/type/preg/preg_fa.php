@@ -2094,8 +2094,13 @@ abstract class qtype_preg_finite_automaton {
             // It's possible to add state in case of having state.
             if ($ispossible) {
                 // Search same state in result automata.
-                if (array_search($realnumber, $resnumbers) !== false) {
-                    $hasalready = true;
+                $searchnumbers = explode(',', $realnumber, 2);
+                $searchnumber = $searchnumbers[0];
+                foreach ($resnumbers as $resnum) {
+                    $pos = strpos($resnum, $searchnumber);
+                    if ($pos !== false && $pos < strpos($resnum, ',') && $searchnumbers[1] == '') {
+                        $hasalready = true;
+                    }
                 }
             } else {
                 // It's impossible to add state.
