@@ -1487,6 +1487,7 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
         }
+
         foreach ($realanotherfanumbers as $num1) {
             foreach ($result as $num2) {
                 $resnumbers = explode(',', $num2, 2);
@@ -1668,8 +1669,9 @@ abstract class qtype_preg_finite_automaton {
                             // Delete cycle of uncapturing transition.
                             $wasdel = false;
                             foreach ($outtransitions as $outtran) {
-                                if ($wasdel) {
+                                if (!$wasdel) {
                                     if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
+                                        $this->del_transition($outtran);
                                         unset($newfront[count($newfront)-1]);
                                         $wasdel = true;
                                     }
