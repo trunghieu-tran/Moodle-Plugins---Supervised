@@ -2357,6 +2357,50 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
         }
+        // Get cycle if it's nessessary.
+        $newfront = array();
+        $resultnumbers = $result->get_state_numbers();
+        foreach ($possibleend as $state) {
+            $aregone = array();
+            $isfind = false;
+            $searchnumbers = explode(',', $resultnumbers[$state], 2);
+            $numbertofind = $searchnumbers[0];
+            $oldfront = $result->get_connected_states($state,!$direction);
+            // Analysis states of automata serching interec=sting state.
+            while (count($oldfront) != 0 && !$isfind) {
+                foreach ($oldfront as $curstate) {
+                    $aregone[] = $curstate;
+                    $numbers = explode(',', $resultnumbers[$curstate], 2);
+                    // State with same number is found.
+                    if ($numbers[0] == $numbertofind && $numbers[1] !== '' && strpos($searchnumbers[1], $numbers[1]) !== false) {
+                        if ($direction == 0) {
+                            $transitions = $result->get_state_outtransitions($curstate);
+                        } else {
+                            $transitions = $result->get_state_intotransitions($curstate);
+                        }
+                        foreach ($transitions as $tran) {
+                            $clonetran = clone($tran);
+                            $clonetran->from = $state;
+                            $result->add_transition($clonetran);
+                        }
+                    } else {
+                        // Add connected states to new wave front.
+                        if ($direction == 0) {
+                            $conectstates = $result->get_connected_states($curstate, 1);
+                        } else {
+                            $conectstates = $result->get_connected_states($curstate, 0);
+                        }
+                        foreach ($conectstates as $conectstate) {
+                            if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
+                                $newfront[] = $conectstate;
+                            }
+                        }
+                    }
+                }
+                $oldfront = $newfront;
+                $newfront = array();
+            }
+        }
         return $result;
     }
 
