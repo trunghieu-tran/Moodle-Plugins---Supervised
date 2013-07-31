@@ -2632,7 +2632,11 @@ abstract class qtype_preg_finite_automaton {
         $state = $result->get_inter_state($resnumbers[$stop], $secforinter);
         $result->change_real_number($stop, $state);
         // Find intersection part.
-        $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
+        if (!$anotherfa->has_cycle() && $this->has_cycle()) {
+            $this->get_intersection_part($anotherfa, $result, $stop, $isstart, true);
+        } else {
+            $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
+        }
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             // Cleaning end states.
             $result->clean_end_states();
