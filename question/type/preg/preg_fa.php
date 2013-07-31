@@ -1958,7 +1958,7 @@ abstract class qtype_preg_finite_automaton {
                 $aregone[] = $state;
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 // State with same number is found.
-                if ($isfind && $numbers[0] == $numbertofind && $numbers[1] !== '') {
+                if ($numbers[0] == $numbertofind && $numbers[1] !== '') {
                     // State with same number was found and there is one more.
                     if ($isfind) {
                         $clones[] = $clones[count($clones) - 1];
