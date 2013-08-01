@@ -2588,11 +2588,11 @@ abstract class qtype_preg_finite_automaton {
                         $this->add_transition($addtran);
                     }
                 }
-                $isend = false;
-                if ($anotherfa->has_endstate($workstate2)) {
-                    $isend = true;
+                $isstart = false;
+                if ($anotherfa->has_startstate($workstate2)) {
+                    $isstart = true;
                 }
-                if (!$isend) {
+                if (!$isstart) {
                     $transitions = $anotherfa->get_state_intotransitions($workstate2);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -2601,7 +2601,7 @@ abstract class qtype_preg_finite_automaton {
                     // Connect last state of intersection and copied branch.
                     foreach ($transitions as $tran) {
                         // Get number of copied state.
-                        $number = $firstnumbers[$tran->from];
+                        $number = $secondnumbers[$tran->from];
                         $number = trim($number, '()');
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
