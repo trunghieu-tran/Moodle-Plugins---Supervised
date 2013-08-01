@@ -2497,7 +2497,13 @@ abstract class qtype_preg_finite_automaton {
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = array_search($numbers[0], $firstnumbers);
-                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($numbers[1] != '') {
+                    foreach ($secondnumbers as $num) {
+                        if (strpos($numbers[1], $num) === 0) {
+                            $workstate2 = array_search($num, $secondnumbers);
+                        }
+                    }
+                }
                 if ($fa->has_endstate($workstate1)) {
                     $isend = true;
                 }
@@ -2554,7 +2560,13 @@ abstract class qtype_preg_finite_automaton {
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = array_search($numbers[0], $firstnumbers);
-                $workstate2 = array_search($numbers[1], $secondnumbers);
+                if ($numbers[1] != '') {
+                    foreach ($secondnumbers as $num) {
+                        if (strpos($numbers[1], $num) === 0) {
+                            $workstate2 = array_search($num, $secondnumbers);
+                        }
+                    }
+                }
                 if ($fa->has_startstate($workstate1)) {
                     $isstart = true;
                 }
