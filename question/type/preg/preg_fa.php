@@ -646,16 +646,14 @@ abstract class qtype_preg_finite_automaton {
         }
 
         $aregone = array();
+        $newfront = array();
         // Working with states from currendt front of wave.
         while (count($oldfront)!=0) {
             // Searching ways from current state.
             foreach ($oldfront as $curstate) {
                 $isendstate = false;
-
                 // State has not been already gone.
                 if (array_search($curstate, $aregone) === false) {
-                    $aregone[] = $curstate;
-
                     // Comparing with end states or start states.
                     if ($direction == 0) {
                         if (array_search($curstate, $this->endstates) !== false) {
@@ -666,20 +664,20 @@ abstract class qtype_preg_finite_automaton {
                             $isendstate = true;
                         }
                     }
-
                     // Analysis outtransitions if go forward and intotransitions if go back.
                     if ($direction == 0) {
                         $transitions = $this->get_state_outtransitions($curstate);
                     } else {
                         $transitions = $this->get_state_intotransitions($curstate);
                     }
+
                     // Current state is not end state.
-                    if (!$isendstate) {
+                    //if (!$isendstate) {
                         // No any interconnecting states.
-                        if (count($transitions) == 0) {
-                            unset($aregone[count($aregone)-1]);
+                        if (count($transitions) != 0 || $isendstate) {
+                            $aregone[] = $curstate;
                         }
-                    }
+                    //}
 
                     // Has interconnecting states.
                     if (count($transitions) != 0) {
@@ -696,6 +694,7 @@ abstract class qtype_preg_finite_automaton {
             }
             // Coping new wavefront to old.
             $oldfront = $newfront;
+
             $newfront = array();
         }
 
