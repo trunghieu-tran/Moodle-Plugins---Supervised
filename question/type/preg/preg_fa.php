@@ -2391,7 +2391,11 @@ abstract class qtype_preg_finite_automaton {
                         }
                         foreach ($transitions as $tran) {
                             $clonetran = clone($tran);
-                            $clonetran->from = $state;
+                            if ($direction == 0) {
+                                $clonetran->from = $state;
+                            } else {
+                                $clonetran->to = $state;
+                            }
                             $result->add_transition($clonetran);
                         }
                     } else {
