@@ -2664,6 +2664,9 @@ abstract class qtype_preg_finite_automaton {
         } else {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         }
+
+        // Set right start and end states for completing branches.
+        $result->set_start_end_states_before_coping($this, $anotherfa);
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             // Cleaning end states.
             $result->clean_end_states();
