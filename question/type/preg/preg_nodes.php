@@ -857,7 +857,15 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $charset = $this->intersect($other);
         foreach ($charset->flags as $flags) {
             foreach ($flags as $flag) {
-                $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                switch ($flag->type) {
+                    case qtype_preg_charset_flag::SET:
+                        $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                        break;
+                    case qtype_preg_charset_flag::FLAG:
+                    case qtype_preg_charset_flag::UPROP:
+                        $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                        break;
+                }
             }
         }
         if (count($ranges) >= 2) {
