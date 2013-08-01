@@ -1995,6 +1995,7 @@ abstract class qtype_preg_finite_automaton {
                         $transitions = $anotherfa->get_state_intotransitions($statefromsecond);
                     } else {
                         $transitions = $anotherfa->get_state_outtransitions($statefromsecond);
+                        $transitions = array_values($transitions);
                     }
                     // There are transitions for analysis.
                     if (count($transitions) != 0) {
@@ -2287,7 +2288,7 @@ abstract class qtype_preg_finite_automaton {
                 }
                 // Get transitions for ntersection.
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
-                $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);;
+                $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);
                 // Intersect all possible transitions.
                 $resulttransitions = array();
                 $resultnumbers = array();
