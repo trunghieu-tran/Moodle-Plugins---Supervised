@@ -357,23 +357,24 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
         $dotdescription2 = 'digraph example {
                                 0;
                                 4;
-                                0->1[label="[c-n]"];
+                                0->1[label="[c-z]"];
                                 1->2[label="[ab]"];
                                 2->3[label="[0-9]"];
                                 3->4[label="[x-z]"];
                             }';
         $dotresult = 'digraph res {
                         "0,";
-                        "4,";"4,4";
+                        "4,";"4,4   1";
                         "0,"->"1,"[label = "[abc]", color = violet];
                         "0,"->"3,"[label = "[01]", color = violet];
                         "1,"->"2,0"[label = "[0123456789]", color = violet];
                         "3,"->"4,"[label = "[y]", color = violet];
-                        "2,0"->"4,1"[label = "[abcdef&&cdefghijklmn]", color = red];
+                        "2,0"->"4,1"[label = "[abcdef&&cdefghijklmnopqrstuvwxyz]", color = red];
                         "4,"->"0,"[label = "[bc]", color = violet];
                         "4,1"->"0,2"[label = "[bc&&ab]", color = red];
                         "0,2"->"3,3"[label = "[01&&0123456789]", color = red];
-                        "3,3"->"4,4"[label = "[y&&xyz]", color = red];
+                        "3,3"->"4,4   1"[label = "[y&&xyz]", color = red];
+                        "4,4   1"->"0,2"[label = "[bc&&ab]", color = red];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
