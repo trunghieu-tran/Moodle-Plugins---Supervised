@@ -881,6 +881,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function unite(qtype_preg_leaf_charset $other) {
+        $result = new qtype_preg_leaf_charset;
         if (count($this->flags) == 1 && count($this->flags[0]) == 1 && count($other->flags) == 1 && count($this->flags[0]) == 1) {
             $resultstring = $this->flags[0][0]->data->string() . $other->flags[0][0]->data->string();
             preg_replace('#(.)\\1{2,}#ius', '\\1', $resultstring);
