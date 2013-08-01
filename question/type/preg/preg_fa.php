@@ -710,7 +710,6 @@ abstract class qtype_preg_finite_automaton {
         $aregoneforward = $this->pass_automata(0);
         // Pass automata forward.
         $aregoneback = $this->pass_automata(1);
-
         // Check for each state of atomata was it gone or not.
         $states = $this->get_states();
         foreach ($states as $curstate) {
@@ -1737,6 +1736,14 @@ abstract class qtype_preg_finite_automaton {
      * @param direction - direction of coping (0 - forward; 1 - back).
      */
     public function copy_transitions($stateswere, $statefromsource, $workstate, $memoryfront, $source, $direction) {
+        // Get origin of source automata.
+        $states = $source->get_states();
+        if (count($states) != 0) {
+            $keys = array_keys($states);
+            $transitions = $source->get_state_outtransitions($states[$keys[0]]);
+            $keys = array_keys($transitions);
+            $origin = $transitions[$keys[0]]->origin;
+        }
         // Get transition for analysis.
         if ($direction == 0) {
             $transitions = $source->get_state_intotransitions($statefromsource);
@@ -1748,7 +1755,11 @@ abstract class qtype_preg_finite_automaton {
         // Search transition among states were.
         foreach ($stateswere as $state) {
             // Get real number of source state.
-            $number = trim($state, ',');
+            if ($origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
+                $number = rtrim($state, ',');
+            } else {
+                $number = ltrim($state, ',');
+            }
             $sourceindex = array_search($number, $numbers);
             if ($sourceindex !== false) {
                 foreach ($transitions as $tran) {
