@@ -384,6 +384,11 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
+    /**
+     * Returns union of leafs.
+     *
+     * @param other another leaf for union.
+     */
     public function unite_leafs($other, $thishastags, $otherhastags) {
         $result = null;
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
@@ -406,6 +411,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
+    /**
+     * Returns label of leaf.
+     
+     */
     public function leaf_tohr() {
         $result = '';
         foreach ($this->mergedassertions as $assert) {
@@ -852,7 +861,13 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $result;
     }
 
+    /**
+     * Intersects this charset with another one using ranges for analysis success of intersection.
+     * @param other charset to intersect with.
+     * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
+     */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
+        
         $ranges = array();
         $charset = $this->intersect($other);
         foreach ($charset->flags as $flags) {
@@ -880,6 +895,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $charset;
     }
 
+    /**
+     * Unite this charset with another one.
+     * @param other charset to intersect with.
+     * @return an object of qtype_preg_leaf_charset which is the union of this and other.
+     */
     public function unite(qtype_preg_leaf_charset $other) {
         $result = new qtype_preg_leaf_charset;
         if (count($this->flags) == 1 && count($this->flags[0]) == 1 && count($other->flags) == 1 && count($this->flags[0]) == 1) {
