@@ -2456,33 +2456,22 @@ abstract class qtype_preg_finite_automaton {
                                 }
                             }
                         } else {
-                            $transitions = $result->get_state_intotransitions($curstate);
-                        }
-                        foreach ($transitions as $tran) {
-                            $clonetran = clone($tran);
+                            // Add connected states to new wave front.
                             if ($direction == 0) {
-                                $clonetran->from = $state;
+                                $conectstates = $result->get_connected_states($curstate, 1);
                             } else {
-                                $clonetran->to = $state;
+                                $conectstates = $result->get_connected_states($curstate, 0);
                             }
-                            $result->add_transition($clonetran);
-                        }
-                    } else {
-                        // Add connected states to new wave front.
-                        if ($direction == 0) {
-                            $conectstates = $result->get_connected_states($curstate, 1);
-                        } else {
-                            $conectstates = $result->get_connected_states($curstate, 0);
-                        }
-                        foreach ($conectstates as $conectstate) {
-                            if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
-                                $newfront[] = $conectstate;
+                            foreach ($conectstates as $conectstate) {
+                                if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
+                                    $newfront[] = $conectstate;
+                                }
                             }
                         }
                     }
+                    $oldfront = $newfront;
+                    $newfront = array();
                 }
-                $oldfront = $newfront;
-                $newfront = array();
             }
         }
         return $result;
@@ -2733,7 +2722,6 @@ abstract class qtype_preg_finite_automaton {
         } else {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         }
-
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
