@@ -1634,7 +1634,6 @@ abstract class qtype_preg_finite_automaton {
             $trantype1 = $transitiontype;
             $trantype2 = $transitiontype;
         }
-
         $oldfront = $this->startstates;
         while (count($oldfront) != 0) {
             $waschanged = false;
@@ -1656,6 +1655,7 @@ abstract class qtype_preg_finite_automaton {
                                     $stateindex = $tran->from;
                                 }
                                 $this->merge_transitions($tran);
+                                $waschanged = true;
                             }
                             // Adding changed state to new wavefront.
                             $newfront[] = $state;
@@ -1677,9 +1677,9 @@ abstract class qtype_preg_finite_automaton {
                             }
                         } else {
                             $newfront[] = $tran->to;
-                            //if (array_search($state, $newfront) === false) {
+                            if (($waschanged && array_search($state, $newfront) === false) || !$waschanged) {
                                 $stateschecked[] = $state;
-                            //}
+                            }
                         }
                     }
                 }
