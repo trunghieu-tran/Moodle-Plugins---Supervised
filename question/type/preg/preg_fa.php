@@ -1947,6 +1947,16 @@ abstract class qtype_preg_finite_automaton {
         $this->haseps = false;
     }
 
+    /**
+     * Check if there is such state in intersection part and add modified version of it.
+     *
+     * @param anotherfa - second automata, which toke part in intersection.
+     * @param transition - transition for checking.
+     * @param laststate - last added state.
+     * @param realnumber - real number of serching state.
+     * @param direction - direction of checking (0 - forward; 1 - back).
+     * @return flag if it was possible to add another version of state.
+     */
     public function has_same_state($anotherfa, &$transition, $laststate, &$clones, &$realnumber, $direction) {
         $oldfront = array();
         $isfind = false;
@@ -2174,6 +2184,12 @@ abstract class qtype_preg_finite_automaton {
         return $hascycle;
     }
 
+    /**
+     * Set right start and end states after before completing branches.
+     *
+     * @param fa object automaton taken part in intersection.
+     * @param anotherfa object automaton second automaton taken part in intersection.
+     */
     public function set_start_end_states_before_coping($fa, $anotherfa) {
         // Get nessesary data.
         $faends = $fa->end_states();
@@ -2258,6 +2274,12 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    /**
+     * Return count of states from second automata which includes state from intersection.
+     *
+     * @param anotherfa object automaton second automaton taken part in intersection.
+     * @param state id of state from intersection for counting.
+     */
     public function get_second_numbers_count($anotherfa, $state) {
         $count = 0;
         $numbers = $this->get_state_numbers();
@@ -2337,6 +2359,7 @@ abstract class qtype_preg_finite_automaton {
                         $newstate = $result->add_state($resultnumbers[$i]);
                         $newfront[] = $newstate;
                     }
+                    $resnumbers = $result->get_state_numbers();
                     // Change transitions.
                     if ($direction == 0) {
                         $resulttransitions[$i]->from = $curstate;
