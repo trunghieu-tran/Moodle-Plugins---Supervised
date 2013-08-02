@@ -229,9 +229,7 @@ abstract class qtype_preg_node {
     /**
      * Sets indexes and userinscription for the node.
      */
-    public function set_user_info($linefirst, $linelast, $indfirst, $indlast, $userinscription = null) {
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
+    public function set_user_info($indfirst, $indlast, $userinscription = null) {
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
@@ -1179,6 +1177,8 @@ class qtype_preg_charset_flag {
             case self::UPROP:
                 $result = 'todo';
                 break;
+            case self::META_DOT:
+                $result = '.';
             default:
                 return '';
         }
