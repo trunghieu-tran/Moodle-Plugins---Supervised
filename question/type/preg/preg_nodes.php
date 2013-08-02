@@ -413,7 +413,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
     /**
      * Returns label of leaf.
-     
+     *
      */
     public function leaf_tohr() {
         $result = '';
@@ -867,7 +867,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
      */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
-        
         $ranges = array();
         $charset = $this->intersect($other);
         foreach ($charset->flags as $flags) {

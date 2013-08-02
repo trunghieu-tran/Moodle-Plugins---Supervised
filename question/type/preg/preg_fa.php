@@ -477,8 +477,6 @@ abstract class qtype_preg_finite_automaton {
 
     /** @var array of qtype_preg_fa_state, indexed by state numbers(will be deleted, do not use). */
     public $states;
-    /** @var matrix of int id of states and their transitions. */
-    //public $adjacencymatrix;
     /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
     public $statenumbers;
     /** @var array of int ids of states - start states. */
@@ -585,11 +583,9 @@ abstract class qtype_preg_finite_automaton {
     public function get_column($array, $key) {
         $result = array();
         foreach ($array as $element) {
-            //foreach ($element as $value) {
-                if (array_key_exists($key, $element)) {
-                    $result[] = $element[$key];
-                }
-            //}
+            if (array_key_exists($key, $element)) {
+                $result[] = $element[$key];
+            }
         }
         return $result;
     }
@@ -670,14 +666,11 @@ abstract class qtype_preg_finite_automaton {
                     } else {
                         $transitions = $this->get_state_intotransitions($curstate);
                     }
-
-                    // Current state is not end state.
-                    //if (!$isendstate) {
-                        // No any interconnecting states.
-                        if (count($transitions) != 0 || $isendstate) {
-                            $aregone[] = $curstate;
-                        }
-                    //}
+                    
+                    // No any interconnecting states.
+                    if (count($transitions) != 0 || $isendstate) {
+                        $aregone[] = $curstate;
+                    }
 
                     // Has interconnecting states.
                     if (count($transitions) != 0) {
@@ -775,7 +768,7 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     $result .= $realnumber;
                 }
-                $result .= ';'; 
+                $result .= ';';
             }
             $result .= "\n    ";
             // Add end states.
@@ -786,7 +779,7 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     $result .= $realnumber;
                 }
-                $result .= ';'; 
+                $result .= ';';
             }
             // Add connected states.
             $states = $this->get_states();
@@ -808,7 +801,7 @@ abstract class qtype_preg_finite_automaton {
      * Add the start state of the automaton to given state.
      */
     public function add_start_state($state) {
-       if (array_key_exists($state, $this->adjacencymatrix)) {
+        if (array_key_exists($state, $this->adjacencymatrix)) {
             if (array_search($state, $this->startstates) === false) {
                 $this->startstates[] = $state;
             }
@@ -1529,7 +1522,7 @@ abstract class qtype_preg_finite_automaton {
      * @param del - uncapturing transition for deleting.
      */
     public function merge_states($del) {
-        //Getting real numbers of new merged state.
+        // Getting real numbers of new merged state.
         $numbers = array();
         // Merging intersection states.
         if ($this->is_intersectionstate($del->from)) {
@@ -1566,10 +1559,10 @@ abstract class qtype_preg_finite_automaton {
             // Possibility of merging with outtransitions.
             if (count($transitions) != 0) {
                 $needredacting = true;
-            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
+            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
+                       && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
                 // Possibility of merging with intotransitions.
                 $transitions = $intotransitions;
-                //$needredacting = true;
             } else if ($this->statecount == 2 && $del->is_eps()) {
                 // Possibility to get automata with one state.
                 $this->merge_states($del);
@@ -1807,7 +1800,6 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    
     /**
      * Copy and modify automata to stopcoping state or to the end of automata, if stopcoping == NULL.
      *
@@ -1899,7 +1891,7 @@ abstract class qtype_preg_finite_automaton {
             $sourcestart = $source->start_states();
             foreach ($sourcestart as $start) {
                 $realnumber = $sourcenumbers[$start];
-                $realnumber = trim($realnumber,'()');
+                $realnumber = trim($realnumber, '()');
                 $newstart = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
                 if ($newstart !== false) {
                     $this->add_start_state($newstart);
@@ -1910,10 +1902,10 @@ abstract class qtype_preg_finite_automaton {
         $sourceend = $source->end_states();
         foreach ($sourceend as $end) {
             $realnumber = $sourcenumbers[$end];
-            $realnumber = trim($realnumber,'()');
+            $realnumber = trim($realnumber, '()');
             $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
             if ($newend !== false) {
-                // Get last copied state. 
+                // Get last copied state.
                 if ($resultstop === null) {
                     $resultstop = $newend;
                 }
@@ -2000,7 +1992,7 @@ abstract class qtype_preg_finite_automaton {
                             $statefromsecond = array_search($num, $secnumbers);
                         }
                     }
-                    //$statefromsecond = array_search($numbers[1], $secnumbers);
+
                     if ($direction == 0) {
                         $transitions = $anotherfa->get_state_intotransitions($statefromsecond);
                     } else {
@@ -2149,6 +2141,11 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    /**
+     * Find cycle in the automata.
+     *
+     * @return flag if automata has cycle or not.
+     */
     public function has_cycle() {
         $newfront = array();
         $aregone = array();
@@ -2225,7 +2222,7 @@ abstract class qtype_preg_finite_automaton {
             $issecend = $numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false;
             if (($isfirstend || $issecend) && count($this->get_state_outtransitions($state)) == 0) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
-            }     
+            }
         }
     }
 
@@ -2251,7 +2248,7 @@ abstract class qtype_preg_finite_automaton {
             if ($numbers[0] != '') {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
-            
+
             if ($numbers[1] != '') {
                 foreach ($anotherfastates as $num) {
                     if (strpos($numbers[1], $num) === 0) {
@@ -2416,7 +2413,7 @@ abstract class qtype_preg_finite_automaton {
                 $divfind = false;
                 $searchnumbers = explode(',', $resultnumbers[$state], 2);
                 $numbertofind = $searchnumbers[0];
-                $oldfront = $result->get_connected_states($state,!$direction);
+                $oldfront = $result->get_connected_states($state, !$direction);
                 $secondnumberscount = $result->get_second_numbers_count($anotherfa, $state);
                 // Analysis states of automata serching interecsting state.
                 while (count($oldfront) != 0 && !$isfind) {
@@ -2447,12 +2444,12 @@ abstract class qtype_preg_finite_automaton {
                                     $lastcopied = false;
                                     $frontstate = $curstate;
                                     $clonestate = null;
-                                    //Coping states to the state which is last in cycle.
+                                    // Coping states to the state which is last in cycle.
                                     while (!$lastcopied) {
                                         $transitions = $result->get_state_intotransitions($frontstate);
                                         // Analasis transitions.
                                         foreach ($transitions as $tran) {
-                                            // Check should we copy this state or not
+                                            // Check should we copy this state or not.
                                             if ($tran->from == $divstate) {
                                                 // No nessesary of coping.
                                                 $fromtran = clone($tran);
@@ -2545,9 +2542,9 @@ abstract class qtype_preg_finite_automaton {
         } else {
             $number2 = $anotherfa->start_states();
         }
-        $number2 = $number2[0];
+        $secnumber = $number2[0];
         $anotherfa->del_blind_states();
-        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number2);
+        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $secnumber);
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->del_blind_states();
         $result->lead_to_one_end();
