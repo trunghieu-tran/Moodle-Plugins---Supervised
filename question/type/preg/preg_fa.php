@@ -2386,21 +2386,75 @@ abstract class qtype_preg_finite_automaton {
         // Get cycle if it's nessessary.
         $newfront = array();
         $resultnumbers = $result->get_state_numbers();
-        foreach ($possibleend as $state) {
-            $aregone = array();
-            $isfind = false;
-            $searchnumbers = explode(',', $resultnumbers[$state], 2);
-            $numbertofind = $searchnumbers[0];
-            $oldfront = $result->get_connected_states($state,!$direction);
-            // Analysis states of automata serching interec=sting state.
-            while (count($oldfront) != 0 && !$isfind) {
-                foreach ($oldfront as $curstate) {
-                    $aregone[] = $curstate;
-                    $numbers = explode(',', $resultnumbers[$curstate], 2);
-                    // State with same number is found.
-                    if ($numbers[0] == $numbertofind && $numbers[1] !== '' && strpos($searchnumbers[1], $numbers[1]) !== false) {
-                        if ($direction == 0) {
-                            $transitions = $result->get_state_outtransitions($curstate);
+        if ($withcycle == true) {
+            foreach ($possibleend as $state) {
+                $aregone = array();
+                $isfind = false;
+                $divfind = false;
+                $searchnumbers = explode(',', $resultnumbers[$state], 2);
+                $numbertofind = $searchnumbers[0];
+                $oldfront = $result->get_connected_states($state,!$direction);
+                $secondnumberscount = $result->get_second_numbers_count($anotherfa, $state);
+                // Analysis states of automata serching interecsting state.
+                while (count($oldfront) != 0 && !$isfind) {
+                    foreach ($oldfront as $curstate) {
+                        $aregone[] = $curstate;
+                        $curnumberscount = $result->get_second_numbers_count($anotherfa, $curstate);
+                        if (!$divfind && $secondnumberscount != $curnumberscount) {
+                            $divfind = true;
+                            $divstate = $curstate;
+                        }
+                        $numbers = explode(',', $resultnumbers[$curstate], 2);
+                        // State with same number is found.
+                        if ($numbers[0] == $numbertofind && $numbers[1] !== '' && strpos($searchnumbers[1], $numbers[1]) !== false) {
+                            if ($direction == 0) {
+                                $transitions = $result->get_state_outtransitions($curstate);
+                                foreach ($transitions as $tran) {
+                                    $clonetran = clone($tran);
+                                    $clonetran->from = $state;
+                                    $result->add_transition($clonetran);
+                                }
+                            } else {
+                                $realdiv = explode(',', $resultnumbers[$divstate], 2);
+                                if ($realdiv[0] == $numbertofind) {
+                                    $newpregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                                    $addtran = new qtype_preg_nfa_transition ($divstate, $newpregleaf, $state, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+                                    $result->add_transition($addtran);
+                                } else {
+                                    $lastcopied = false;
+                                    $frontstate = $curstate;
+                                    $clonestate = null;
+                                    //Coping states to the state which is last in cycle.
+                                    while (!$lastcopied) {
+                                        $transitions = $result->get_state_intotransitions($frontstate);
+                                        // Analasis transitions.
+                                        foreach ($transitions as $tran) {
+                                            // Check should we copy this state or not
+                                            if ($tran->from == $divstate) {
+                                                // No nessesary of coping.
+                                                $fromtran = clone($tran);
+                                                $fromtran->to = $clonestate;
+                                                $result->add_transition($fromtran);
+                                                $lastcopied = true;
+                                            } else {
+                                                // We should copy.
+                                                $newnumber = $resultnumbers[$tran->from];
+                                                $newnumber = '(' . $newnumber . ')';
+                                                $fromtran = clone($tran);
+                                                if ($clonestate === null) {
+                                                    $fromtran->to = $state;
+                                                } else {
+                                                    $fromtran->to = $clonestate;
+                                                }
+                                                $clonestate = $result->add_state($newnumber);
+                                                $fromtran->from = $clonestate;
+                                                $result->add_transition($fromtran);
+                                                $frontstate = $tran->from;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else {
                             $transitions = $result->get_state_intotransitions($curstate);
                         }
