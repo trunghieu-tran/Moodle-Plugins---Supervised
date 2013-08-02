@@ -2258,6 +2258,20 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    public function get_second_numbers_count($anotherfa, $state) {
+        $count = 0;
+        $numbers = $this->get_state_numbers();
+        $anotherfanumbers = $anotherfa->get_state_numbers();
+        $realnum = $numbers[$state];
+        $realsecond = explode(',', $realnum, 2)[1];
+        foreach ($anotherfanumbers as $curnum) {
+            if (strpos($realsecond, $curnum) !== false) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
     /**
      * Find intersection part of automaton in case of intersection it with another one.
      *
