@@ -2131,7 +2131,8 @@ abstract class qtype_preg_finite_automaton {
             // Coping transition copies.
             if (count($clones) > 1) {
                 for ($i = count($clones) - 2; $i >= 0; $i--) {
-                    array_splice($resulttransitions, $index + 1, 0, $clones[$i]);
+                    // TODO - add after index in array.
+                    $resulttransitions[] = $clones[$i];
                 }
             }
             return false;
