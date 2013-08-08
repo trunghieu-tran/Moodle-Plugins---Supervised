@@ -350,7 +350,7 @@ class  qtype_correctwriting_enum_analyzer {
         $place_find = false; // Is place to insert element find?
         $insert_place = 0; // Place to insert element in enumeration.
         $elements_distances = array(); // Array to keep distances between elements of enumerations
-        $distances = array (); // Array to keep for all enumerations numbers of elements in other enumeration, which contains...
+        $distances = array(); // Array to keep for all enumerations numbers of elements in other enumeration, which contains...
                                // ...it, and distance from element begin to enumeration begin.
         $left_border_of_elem = 0; // Left border of current element.
         $left_border_of_elem_new = 0; // New left border of current element.
