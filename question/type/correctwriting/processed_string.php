@@ -60,4 +60,9 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
     protected function set_enums_descriptions($description) {
         $this->enums_description = $description;
     }
+
+    //  Return $enum_description field.
+    public function node_enums_descriptions() {
+        return $this->enums_description;
+    }
 }
