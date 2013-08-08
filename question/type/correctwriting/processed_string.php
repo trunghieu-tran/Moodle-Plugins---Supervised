@@ -14,3 +14,5 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
+
+require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
