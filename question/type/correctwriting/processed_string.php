@@ -65,4 +65,14 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
     public function node_enums_descriptions() {
         return $this->enums_description;
     }
+
+    /**
+     *  Returns a stream of tokens.
+     *  @return stream of tokens
+     */
+    private function get_stream() {
+        if ($this->tokenstream == null)
+            $this->language->scan($this);
+        return $this->tokenstream;
+    }
 }
