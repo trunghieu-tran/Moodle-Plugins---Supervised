@@ -36,4 +36,18 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
             trigger_error($error, E_USER_NOTICE);
         }
     }
+
+    public function __get($name) {
+        $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
+        $gettertable['descriptions'] = 'node_descriptions_list';
+        $gettertable['enumerations'] = 'node_enums_descriptions';
+        if (array_key_exists($name, $gettertable)) {
+            $method = $gettertable[$name];
+            return $this->$method();
+        } else {
+            $trace = debug_backtrace();
+            $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
+            trigger_error($error, E_USER_NOTICE);
+        }
+    }
 }
