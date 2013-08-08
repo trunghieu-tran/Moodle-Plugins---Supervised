@@ -50,4 +50,9 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
             trigger_error($error, E_USER_NOTICE);
         }
     }
+
+    public function __isset($name) {
+        $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'enumeration');
+        return in_array($name, $getters);
+    }
 }
