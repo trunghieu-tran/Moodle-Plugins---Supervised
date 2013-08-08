@@ -21,4 +21,19 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
 
     // Enumerations description in correct answer.
     protected $enums_description = null;
+
+    public function __set($name, $value) {
+        $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
+        $settertable['descriptions'] = 'set_descriptions';
+        $settertable['enumerations'] = 'set_enums_descriptions';
+
+        if (array_key_exists($name, $settertable)) {
+            $method = $settertable[$name];
+            $this->$method($value);
+        } else {
+            $trace = debug_backtrace();
+            $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
+            trigger_error($error, E_USER_NOTICE);
+        }
+    }
 }
