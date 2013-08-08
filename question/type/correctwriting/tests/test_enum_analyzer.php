@@ -20,6 +20,7 @@ require_once($CFG->dirroot.'/question/type/correctwriting/enum_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/string_pair.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/processed_string.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
 
 
 class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase {
