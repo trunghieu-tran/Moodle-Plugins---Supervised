@@ -55,4 +55,9 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
         $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'enumeration');
         return in_array($name, $getters);
     }
+
+    // Assign $enum_description field by $description
+    protected function set_enums_descriptions($description) {
+        $this->enums_description = $description;
+    }
 }
