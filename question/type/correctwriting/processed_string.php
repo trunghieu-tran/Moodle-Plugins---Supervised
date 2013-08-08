@@ -16,3 +16,9 @@
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
+
+class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_string {
+
+    // Enumerations description in correct answer.
+    protected $enums_description = null;
+}
