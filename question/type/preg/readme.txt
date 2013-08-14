@@ -12,7 +12,7 @@ Authors:
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;
 * Tim Hunt - for his polite and useful answers and commentaries that helped writing this question;
-* Bondarenko Vitaly - for conversion of a vast set of PCRE library regular expression matching tests.
+* Bondarenko Vitaly - for conversion of a vast set of regular expression matching tests from PCRE library.
 
 1. Description
 The question was primarily intended to allow the use of php perl-compatible regular expressions in short answer
@@ -20,7 +20,8 @@ questions. It supports full regular expression syntax and can be used with expre
 that php preg extension can handle. Regular expressions can be used to specify wide array of patterns for student
 answer to match. You can find some links to the descriptions of regular expression syntax in the question docs.
 
-Preg question is also able to hint next character or lexem for a specified penalty in adaptive behaviour if the student is stuck.
+Preg question is also able to hint next character or lexem for a specified penalty in adaptive and interactive
+behaviours if the student is stuck, which can be useful in training quizzes.
 
 You could use hinting without the need to know anything about regular expressions. Choosing Moodle Shortanswer
 notation allows you to just copy answers from shortanswer question and have hinting capabilities. '*' wildcard is supported.
@@ -45,6 +46,9 @@ After having files in place login as administrator and go to the notifications p
 Pay heed to the default matching engine setting. Most of you teachers would use it, thought you could choose engine in every question.
 See "Matching engines" section for more information.
 
+In order to have Authoring Tools to work, you should also install Graphviz packet and made it accessible to Moodle, using admin setting
+"Path to Dot". It is necessary for drawing Syntax Tree and Explaining Graph for regular expression. Graphviz packet is well known and
+respected open source packet for drawing graphs and should not cause any trouble to you server.
 
 3. Hinting
 DFA and NFA matching engines support hinting for partial matching. If there is no full match in the response,
