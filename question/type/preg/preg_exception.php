@@ -40,7 +40,7 @@ class qtype_preg_exception extends moodle_exception {
 }
 
 /**
- * A special class, throwed by finite automata, should be catched to 
+ * A special class, throwed by finite automata, should be catched to
  * generate qtype_preg_too_complex_error object by the code building automata.
  *
  * No actual info needed since it would be filled by catching code.
@@ -51,6 +51,24 @@ class qtype_preg_toolargefa_exception extends qtype_preg_exception {
      * @param object $a
      * @param string $debuginfo
      */
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+/**
+ * Class for exceptions caused by empty pathtodot option.
+ */
+class qtype_preg_pathtodot_empty extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+/**
+ * Class for exceptions caused by incorrect pathtodot option.
+ */
+class qtype_preg_pathtodot_incorrect extends qtype_preg_exception {
     public function __construct($errorcode, $a = null, $debuginfo = null) {
         parent::__construct($errorcode, $a, $debuginfo);
     }

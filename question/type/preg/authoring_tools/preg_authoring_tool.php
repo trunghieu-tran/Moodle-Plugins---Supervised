@@ -41,7 +41,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
         parent::__construct($regex, $options);
     }
-    
+
     /**
      * Overloaded since parsing errors are normal for authoring tools.
      */
@@ -157,10 +157,19 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        // TODO
+    // Overloaded for some exceptions handling.
+    public function generate_json(&$json_array, $regex, $id) {
+        try {
+            parent::generate_json($json_array, $regex, $id);
+        } catch (Exception $e) {
+            // Something is wrong with graphviz.
+            if (is_a($e, 'qtype_preg_pathtodot_empty')) {
+                $json_array[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg');
+            } else {
+                $json_array[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a));
+            }
+        }
     }
-
 }
 
 ?>

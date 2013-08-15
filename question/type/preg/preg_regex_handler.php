@@ -431,6 +431,11 @@ class qtype_preg_regex_handler {
      */
     public static function execute_dot($dotscript, $type, $filename = null) {
         global $CFG;
+
+        if (empty($CFG->pathtodot)) {
+            throw new qtype_preg_pathtodot_empty('');
+        }
+
         $dir = !empty($CFG->pathtodot) ? dirname($CFG->pathtodot) : null;
         $cmd = 'dot -T' . $type;
         if ($filename !== null) {
@@ -441,16 +446,20 @@ class qtype_preg_regex_handler {
                                 2 => array('pipe', 'w')); // Stderr is a pipe that the child will write to.
 
         $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
-        $output = null;
-        if (is_resource($process)) {
-            fwrite($pipes[0], $dotscript);
-            fclose($pipes[0]);
-            $output = stream_get_contents($pipes[1]);
-            $err = stream_get_contents($pipes[2]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
+
+        if (!is_resource($process)) {
+            $a = new stdClass;
+            $a->pathtodot = $CFG->pathtodot;
+            throw new qtype_preg_pathtodot_incorrect('', $a);
         }
+
+        fwrite($pipes[0], $dotscript);
+        fclose($pipes[0]);
+        $output = stream_get_contents($pipes[1]);
+        $err = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        proc_close($process);
         return $output;
     }
 

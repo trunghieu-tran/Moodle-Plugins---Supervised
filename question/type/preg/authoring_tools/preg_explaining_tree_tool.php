@@ -49,15 +49,11 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
     }
 
     protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $dotscript = 'digraph { }';
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
+        $json_array[$this->json_key()] = 'Nothing to draw for empty regex';
     }
 
     protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the interactive tree!" [color=white]; }';
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
+        $json_array[$this->json_key()] = 'Your regex contains errors, so I can\'t build the interactive tree!';
     }
 
     /**
