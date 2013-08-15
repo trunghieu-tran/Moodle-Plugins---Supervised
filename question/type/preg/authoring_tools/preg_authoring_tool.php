@@ -164,7 +164,9 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
         } catch (Exception $e) {
             // Something is wrong with graphviz.
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
-                $json_array[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg');
+                $a = new stdClass;
+                $a->name = $this->name();
+                $json_array[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
             } else {
                 $json_array[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a));
             }
