@@ -179,9 +179,11 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
-     * Finds the subtree by given indexes. Updates the indexes to the nearest suitable values.
+     * Finds the nearest suitable subtree by given indexes in the regex string. If the node is N-ary,
+     * expands it to be binary for better precision, thus AST is modified. All passed indexes are updated
+     * to the indexes of the found subtree.
      */
-    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
+    public function node_by_regex_fragment(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
 
