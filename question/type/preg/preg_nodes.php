@@ -181,9 +181,10 @@ abstract class qtype_preg_node {
     /**
      * Finds the subtree by given indexes. Updates the indexes to the nearest suitable values.
      */
-    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast) {
+    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
+
         // Go down the tree.
         while (!$found) {
             $replaced = false;
@@ -201,16 +202,38 @@ abstract class qtype_preg_node {
             }
             $found = !$replaced || is_a($result, 'qtype_preg_leaf');
         }
-        // If the node is found, update the indexes, return NULL otherwise.
-        if (($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
-            ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast))) {
-            $linefirst = $result->linefirst;
-            $linelast = $result->linelast;
-            $indfirst = $result->indfirst;
-            $indlast = $result->indlast;
-        } else {
-            $result = null;
+
+        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
+                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast));
+
+        if (!$found) {
+            return null;
         }
+
+        // Expand N-ary nodes for better precision.
+        if (is_a($result, 'qtype_preg_operator')) {
+            $count = count($result->operands);
+            $from = 0;
+            $to = $count - 1;
+
+            for ($i = 0; $i < $count; $i++) {
+                $operand = $result->operands[$i];
+                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) {
+                    $from = $i;
+                }
+                $operand = $result->operands[$count - $i - 1];
+                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast)) {
+                    $to = $count - $i - 1;
+                }
+            }
+            $result->expand($from, $to, $idcounter);
+        }
+
+        // If the node is found, update the indexes, return NULL otherwise.
+        $linefirst = $result->linefirst;
+        $linelast = $result->linelast;
+        $indfirst = $result->indfirst;
+        $indlast = $result->indlast;
         return $result;
     }
 
@@ -362,7 +385,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     }
 
     public function expand($from, $to, &$idcounter) {
-
         for ($i = $from; $i <= $to; $i++) {
             $this->operands[$i]->expand_all($idcounter);
         }
