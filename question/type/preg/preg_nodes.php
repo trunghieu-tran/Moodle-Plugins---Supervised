@@ -1283,7 +1283,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 }
 
-class qtype_preg_leaf_option extends qtype_preg_leaf {
+class qtype_preg_leaf_options extends qtype_preg_leaf {
     public $posopt;
     public $negopt;
 
@@ -1293,10 +1293,10 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
         $this->negopt = $negopt;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function match for qtype_preg_leaf_options class before use it!');
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function character for qtype_preg_leaf_options class before use it!');
     }
     public function tohr() {
         $result = '(?';
@@ -1307,15 +1307,6 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
             $result .= '-'.$this->negopt;
         }
         return $result.')';
-    }
-
-    //TODO: костыль для теста (?i)lol
-    public function dot_script($context, $rankdirlr = false) {
-        if ($context->isroot) {
-            return "";
-        } else {
-            return array("", "");
-        }
     }
 }
 
