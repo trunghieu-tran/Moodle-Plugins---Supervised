@@ -133,7 +133,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * @param id - identifier of node which will be picked out in image.
      */
     public function generate_json(&$json, $id) {
-        $json['regex'] = $this->regex;
+        $json['regex'] = $this->regex->string();
         $json['id'] = $id;
         if ($this->regex == '') {
             $this->generate_json_for_empty_regex($json, $id);
