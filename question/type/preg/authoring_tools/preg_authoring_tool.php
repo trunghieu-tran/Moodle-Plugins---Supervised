@@ -167,7 +167,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
             }
         }
 
-        $json_array[$this->json_key()] = $result;var_dump($result);
+        $json_array[$this->json_key()] = $result;
     }
 
     protected abstract function json_key();

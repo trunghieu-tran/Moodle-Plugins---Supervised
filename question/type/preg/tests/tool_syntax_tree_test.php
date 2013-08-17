@@ -12,12 +12,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_tool.php');
 
-class qtype_preg_tool_explaining_tree_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
     function test_something() {
-        $tree = new qtype_preg_explaining_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
+        $tree = new qtype_preg_syntax_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
         var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context(true)));
     }
  }
