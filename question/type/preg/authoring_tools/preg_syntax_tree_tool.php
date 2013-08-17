@@ -10,9 +10,9 @@
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_nodes.php');
 
-class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool {
+class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
     public $rankdir = false;
 
@@ -25,14 +25,14 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
      * Overloaded from qtype_preg_regex_handler.
      */
     public function name() {
-        return 'explaining_tree_tool';
+        return 'syntax_tree_tool';
     }
 
     /**
      * Overloaded from qtype_preg_regex_handler.
      */
     protected function node_infix() {
-        return 'explaining_tree';
+        return 'syntax_tree';
     }
 
     /**
@@ -60,6 +60,6 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
 
         // Pass the map and its DOM id via json array.
         $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
-        /*$json_array['map_id'] = '#' . qtype_preg_explaining_tree_node::get_graph_name();*/
+        /*$json_array['map_id'] = '#' . qtype_preg_syntax_tree_node::get_graph_name();*/
     }
 }
