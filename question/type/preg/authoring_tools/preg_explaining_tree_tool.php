@@ -21,37 +21,36 @@ class qtype_preg_explaining_tree_tool extends qtype_preg_dotbased_authoring_tool
         $this->rankdir = $rankdirlr;
     }
 
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
     public function name() {
         return 'explaining_tree_tool';
     }
 
-    protected function is_preg_node_acceptable($pregnode) {
-        // Well, everything that was parsed can be displayed to user.
-        return true;
-    }
-
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
     protected function node_infix() {
-        // Nodes should be named like qtype_preg_explaining_tree_node_concat.
-        // This allows us to use the inherited get_engine_node_name() method.
         return 'explaining_tree';
     }
 
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        return true;
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
     protected function json_key() {
         return 'tree_src';
     }
 
-    protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = 'Nothing to draw for empty regex';
-    }
-
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = 'Your regex contains errors, so I can\'t build the interactive tree!';
-    }
-
     /**
-     * Generate image and map for interative tree
-     *
-     * @param array $json_array contains link on image and text map of interactive tree
+     * Overloaded from qtype_preg_authoring_tool.
      */
     protected function generate_json_for_accepted_regex(&$json_array, $id) {
         $context = new qtype_preg_dot_node_context(true, $id);

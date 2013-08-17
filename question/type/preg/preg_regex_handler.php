@@ -265,6 +265,7 @@ class qtype_preg_regex_handler {
 
     /**
      * Returns class name without 'qtype_preg_' prefix.
+     * Should be overloaded in child classes.
      */
     public function name() {
         return 'regex_handler';
@@ -495,13 +496,14 @@ class qtype_preg_regex_handler {
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
      * Returns true if node is supported or user interface string describing.
      * what properties of node isn't supported.
+     * Should be overloaded in child classes.
      */
     protected function is_preg_node_acceptable($pregnode) {
         // Do not show accepting errors for error nodes.
         if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
             return true;
         }
-        return false;    // Should be overloaded by child classes.
+        return false;
     }
 
     /**
@@ -552,8 +554,7 @@ class qtype_preg_regex_handler {
         fclose($pseudofile);
     }
 
-
-    public function build_dst() {
+    protected function build_dst() {
         if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
         }
