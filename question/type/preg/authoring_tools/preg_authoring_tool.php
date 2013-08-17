@@ -105,7 +105,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
 
         $result = '';
-        for ($i = 0; $i < strlen($stringToEscape); ++$i) {
+        for ($i = 0; $i < textlib::strlen($stringToEscape); ++$i) {
             $result .= self::escape_char($stringToEscape[$i], $codes);
         }
 
@@ -145,11 +145,32 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
     }
 
+    protected function generate_json_for_empty_regex(&$json_array, $id) {
+        $json_array[$this->json_key()] = '';
+    }
+
+    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
+        global $CFG;
+        $maxerrors = 5;
+        if (isset($CFG->qtype_preg_maxerrorsshown)) {
+            $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+        }
+
+        $result = 'Errors while trying to get the ' . textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+        // Show no more than max errors.
+        $count = 0;
+        foreach ($this->get_error_messages() as $error) {
+            $result .= '<br />' . $error;
+            $count++;
+            if ($count == $maxerrors) {
+                break;
+            }
+        }
+
+        $json_array[$this->json_key()] = $result;var_dump($result);
+    }
+
     protected abstract function json_key();
-
-    protected abstract function generate_json_for_empty_regex(&$json_array, $id);
-
-    protected abstract function generate_json_for_unaccepted_regex(&$json_array, $id);
 
     protected abstract function generate_json_for_accepted_regex(&$json_array, $id);
 

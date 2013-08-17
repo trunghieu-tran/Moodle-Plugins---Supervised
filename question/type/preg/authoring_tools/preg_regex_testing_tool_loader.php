@@ -18,7 +18,7 @@ $PAGE->set_context(context_system::instance());
  */
 function qtype_preg_get_json_array() {
     global $CFG;
-    $json_array = array();
+    $json = array();
     $regex = optional_param('regex', '', PARAM_RAW);
     $answers = optional_param('answer', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
@@ -27,10 +27,10 @@ function qtype_preg_get_json_array() {
     $notation = optional_param('notation', '', PARAM_RAW);
 
     $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $answers, $engine, $usecase, $exactmatch, $notation);
-    $regex_testing_tool->generate_json($json_array);
+    $regex_testing_tool->generate_json($json);
 
-    return $json_array;
+    return $json;
 }
 
-$json_array = qtype_preg_get_json_array();
-echo json_encode($json_array);
+$json = qtype_preg_get_json_array();
+echo json_encode($json);

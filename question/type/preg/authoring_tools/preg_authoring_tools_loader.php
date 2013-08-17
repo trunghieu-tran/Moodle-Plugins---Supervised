@@ -22,7 +22,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
  */
 function qtype_preg_get_json_array() {
     global $CFG;
-    $json_array = array();
+    $json = array();
 
     $regex = optional_param('regex', '', PARAM_RAW);
     $id = optional_param('id', '', PARAM_INT);
@@ -41,11 +41,11 @@ function qtype_preg_get_json_array() {
 
     // Fill the json array.
     foreach($tools as $tool) {
-        $tool->generate_json($json_array, $regex, $id);
+        $tool->generate_json($json, $regex, $id);
     }
 
-    return $json_array;
+    return $json;
 }
 
-$json_array = qtype_preg_get_json_array();
-echo json_encode($json_array);
+$json = qtype_preg_get_json_array();
+echo json_encode($json);

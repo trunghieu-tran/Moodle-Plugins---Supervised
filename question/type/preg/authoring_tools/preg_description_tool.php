@@ -133,6 +133,43 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         $this->state = new qtype_preg_description_state();
     }
 
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    public function name() {
+        return 'description_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function node_infix() {
+        return 'description';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        return true;
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    protected function json_key() {
+        return 'description';
+    }
+
+    /**
+     * Generate description
+     *
+     * @param array $json_array contains text of description
+     */
+    protected function generate_json_for_accepted_regex(&$json_array, $id) {
+        $json_array[$this->json_key()] = $this->default_description();
+    }
+
     public function options() {
         return $this->options;
     }
@@ -198,48 +235,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     public function form_description($form) {
         $result = $this->dst_root->description('%s', null, $form);
         return $result;
-    }
-
-    /*public function &get_description_options() {
-        return $this->descriptionoptions;
-    }*/
-
-    /**
-     * Returns the engine-specific node name for the given preg_node name.
-     * Overload in case of sophisticated node name schemes.
-     */
-    protected function node_infix() {
-        return 'description';
-    }
-
-    /**
-     * Is a preg_node_... or a preg_leaf_... supported by the engine?
-     * Returns true if node is supported or user interface string describing
-     * what properties of node isn't supported.
-     */
-    protected function is_preg_node_acceptable($pregnode) {
-        return true;
-    }
-
-    protected function json_key() {
-        return 'description';
-    }
-
-    protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $json_array['description'] = '';
-    }
-
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $json_array['description'] = 'Ooops! Your regex contains errors, so I can\'t build the description!';
-    }
-
-    /**
-     * Generate description
-     *
-     * @param array $json_array contains text of description
-     */
-    protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = $this->default_description();
     }
 }
 

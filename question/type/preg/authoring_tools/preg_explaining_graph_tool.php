@@ -39,6 +39,61 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     }
 
     /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    public function name() {
+        return 'explaining_graph_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function node_infix() {
+        return 'authoring_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function get_engine_node_name($nodetype) {
+        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+            return 'qtype_preg_authoring_tool_node_quant';
+        }
+        return parent::get_engine_node_name($nodetype);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        switch ($pregnode->type) {
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    protected function json_key() {
+        return 'graph_src';
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    protected function generate_json_for_accepted_regex(&$json_array, $id) {
+        $graph = $this->create_graph($id);
+        $dotscript = $graph->create_dot();
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
+        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
+    }
+
+    /**
      * Creates graph which explaining regular expression.
      * @param id - identifier of node which will be picked out in image.
      * @return explainning graph of regular expression.
@@ -62,81 +117,5 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
 
         return $graph;
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    public function name() {
-        return 'explaining_graph_tool';
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function node_infix() {
-        // Nodes should be named like qtype_preg_authoring_tool_node_concat.
-        // This allows us to use the inherited get_engine_node_name() method.
-        return 'authoring_tool';
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function get_engine_node_name($nodetype) {
-
-        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT ||
-            $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
-            return 'qtype_preg_authoring_tool_node_quant';
-        }
-
-        return parent::get_engine_node_name($nodetype);
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function is_preg_node_acceptable($pregnode) {
-        switch ($pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT:
-            case qtype_preg_node::TYPE_LEAF_CONTROL:
-            case qtype_preg_node::TYPE_NODE_ERROR:
-                return false;
-            default:
-                return true;
-        }
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function json_key() {
-        return 'graph_src';
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = 'Nothing to draw for empty regex';
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = 'Your regex contains errors, so I can\'t build the explaining graph!';
-    }
-
-    /**
-     * Generate image for explain graph.
-     *
-     * @param array $json_array contains link on image of explain graph.
-     */
-    protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $graph = $this->create_graph($id);
-        $dotscript = $graph->create_dot();
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
     }
 }
