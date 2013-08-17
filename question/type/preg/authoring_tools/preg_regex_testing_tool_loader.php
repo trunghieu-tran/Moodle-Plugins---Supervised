@@ -26,7 +26,7 @@ function qtype_preg_get_json_array() {
     $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
     $notation = optional_param('notation', '', PARAM_RAW);
 
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $answers, $engine, $usecase, $exactmatch, $notation);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $answers, $usecase, $exactmatch, $engine, $notation);
     $regex_testing_tool->generate_json($json);
 
     return $json;
