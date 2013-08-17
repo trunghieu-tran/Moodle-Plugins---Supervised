@@ -128,28 +128,27 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
     /**
-     * Generates a json-array corresponding to $regex and core of tool.
+     * Generates a json-array corresponding to the regex.
      * @param jsonarray - output array with json
-     * @param regex - our regular expression
      * @param id - identifier of node which will be picked out in image.
      */
-    public function generate_json(&$jsonarray, $regex, $id) {
-        $jsonarray['regex'] = $regex;
-        $jsonarray['id'] = $id;
-        if ($regex == '') {
-            $this->generate_json_for_empty_regex($jsonarray, $id);
+    public function generate_json(&$json, $id) {
+        $json['regex'] = $this->regex;
+        $json['id'] = $id;
+        if ($this->regex == '') {
+            $this->generate_json_for_empty_regex($json, $id);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
-            $this->generate_json_for_unaccepted_regex($jsonarray, $id);
+            $this->generate_json_for_unaccepted_regex($json, $id);
         } else {
-            $this->generate_json_for_accepted_regex($jsonarray, $id);
+            $this->generate_json_for_accepted_regex($json, $id);
         }
     }
 
-    protected function generate_json_for_empty_regex(&$jsonarray, $id) {
-        $jsonarray[$this->json_key()] = '';
+    protected function generate_json_for_empty_regex(&$json, $id) {
+        $json[$this->json_key()] = '';
     }
 
-    protected function generate_json_for_unaccepted_regex(&$jsonarray, $id) {
+    protected function generate_json_for_unaccepted_regex(&$json, $id) {
         global $CFG;
         $maxerrors = 5;
         if (isset($CFG->qtype_preg_maxerrorsshown)) {
@@ -167,29 +166,29 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
             }
         }
 
-        $jsonarray[$this->json_key()] = $result;
+        $json[$this->json_key()] = $result;
     }
 
     protected abstract function json_key();
 
-    protected abstract function generate_json_for_accepted_regex(&$jsonarray, $id);
+    protected abstract function generate_json_for_accepted_regex(&$json, $id);
 
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
     // Overloaded for some exceptions handling.
-    public function generate_json(&$jsonarray, $regex, $id) {
+    public function generate_json(&$json, $id) {
         try {
-            parent::generate_json($jsonarray, $regex, $id);
+            parent::generate_json($json, $id);
         } catch (Exception $e) {
             // Something is wrong with graphviz.
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
                 $a = new stdClass;
-                $a->name = $this->name();
-                $jsonarray[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
+                $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+                $json[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
             } else {
-                $jsonarray[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a);
+                $json[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a);
             }
         }
     }

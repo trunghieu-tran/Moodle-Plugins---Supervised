@@ -41,7 +41,7 @@ function qtype_preg_get_json_array() {
 
     // Fill the json array.
     foreach($tools as $tool) {
-        $tool->generate_json($json, $regex, $id);
+        $tool->generate_json($json, $id);
     }
 
     return $json;

@@ -164,10 +164,10 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     /**
      * Generate description
      *
-     * @param array $json_array contains text of description
+     * @param array $json contains text of description
      */
-    protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $json_array[$this->json_key()] = $this->default_description();
+    protected function generate_json_for_accepted_regex(&$json, $id) {
+        $json[$this->json_key()] = $this->default_description();
     }
 
     public function options() {
