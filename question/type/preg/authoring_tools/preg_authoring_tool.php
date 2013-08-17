@@ -19,6 +19,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
+    protected static $dotescapecodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
+
+    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
+
     public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
         //TODO: move to qtype_preg_regex_handler
         if ($regex === null) {
@@ -62,22 +66,17 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * or string containing escape mode: 'html' or 'dot'.
      * @return string escaped character.
      */
-    public static function escape_char_by_code($code, $codesormode = NULL) {
-        if ($codesormode === NULL) {
-            $codesormode = self::$codes;
+    public static function escape_char_by_code($code, $codesormode = null) {
+        if ($codesormode === 'html') {
+            $codesormode = self::$htmlescapecodes;
+        } else if ($codesormode === 'dot' || $codesormode === null) {
+            $codesormode = self::$dotescapecodes;
         }
-        if (is_string($codesormode)) {
-            if ($codesormode==='html') {
-                $codesormode = self::$htmlescapecodes;
-            } else if ($codesormode==='dot') {
-                $codesormode = self::$dotescapecodes;
-            }
-        }
+
         if (in_array($code, $codesormode)) {
             return '&#' . $code . ';';
-        } else {
-            return textlib::code2utf8($code);
         }
+        return textlib::code2utf8($code);
     }
 
     /**
@@ -96,8 +95,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * @param extracodes - extra codes which should be escaped.
      * @return escaped string.
      */
-    public static function escape_string($stringtoescape, $extracodes = NULL) {
-
+    public static function escape_string($stringtoescape, $extracodes = null) {
         if (is_array($extracodes) && sizeof($extracodes) != 0) {
             $codes = array_intersect(self::$dotescapecodes, $extracodes);
         } else {
@@ -112,20 +110,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         return $result;
     }
 
-    protected static $dotescapecodes = array(34 /*=> '"'*/,
-                                    38 /*=> '&'*/,
-                                    44 /*=> ','*/,
-                                    60 /*=> '<'*/,
-                                    62 /*=> '>'*/,
-                                    91 /*=> '['*/,
-                                    93 /*=> ']'*/,
-                                    123 /*=> '{'*/,
-                                    124 /*=> '|'*/,
-                                    125 /*=> '}'*/,
-                                    92 /*=> '\\'*/
-                                   );
 
-    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
     /**
      * Generates a json-array corresponding to the regex.
