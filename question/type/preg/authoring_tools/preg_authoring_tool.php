@@ -21,23 +21,23 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
     public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
         //TODO: move to qtype_preg_regex_handler
-        if($regex === null){
+        if ($regex === null) {
             return;
         }
-        if($options === null){
+        if ($options === null) {
             $options = new qtype_preg_handling_options();
         }
-        $options->preserveallnodes = TRUE;
+        $options->preserveallnodes = true;
         // Convert to actually used notation if necessary.
-        $engineclass = 'qtype_preg_'.$engine;
-        $queryengine = new $engineclass;
-        $usednotation = $queryengine->used_notation();
-        // Initialise $notationobj so it won't disappear after condition and could be used later.
-        $notationobj = null;
-        if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
-            $notationclass = 'qtype_preg_notation_'.$notation;
-            $notationobj = new $notationclass($regex);
-            $regex = $notationobj->convert_regex($usednotation);
+        if ($engine !== null && $notation !== null) {
+            $engineclass = 'qtype_preg_'.$engine;
+            $queryengine = new $engineclass;
+            $usednotation = $queryengine->used_notation();
+            if ($notation != $usednotation) {
+                $notationclass = 'qtype_preg_notation_'.$notation;
+                $notationobj = new $notationclass($regex);
+                $regex = $notationobj->convert_regex($usednotation);
+            }
         }
         parent::__construct($regex, $options);
     }
@@ -168,7 +168,7 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
                 $a->name = $this->name();
                 $json_array[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
             } else {
-                $json_array[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a));
+                $json_array[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a);
             }
         }
     }

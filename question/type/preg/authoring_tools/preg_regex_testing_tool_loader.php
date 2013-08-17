@@ -19,26 +19,14 @@ $PAGE->set_context(context_system::instance());
 function qtype_preg_get_json_array() {
     global $CFG;
     $json_array = array();
-    $regextext = optional_param('regex', '', PARAM_RAW);
+    $regex = optional_param('regex', '', PARAM_RAW);
     $answers = optional_param('answer', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
-    $usecase = optional_param('usecase', '', PARAM_INT);
-    $exactmatch = optional_param('exactmatch', '', PARAM_INT);
+    $usecase = (bool)optional_param('usecase', '', PARAM_INT);
+    $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
     $notation = optional_param('notation', '', PARAM_RAW);
-    
-    if($usecase == 1){
-        $usecase = true;
-    } else {
-        $usecase = false;
-    }
-    
-    if($exactmatch == 1){
-        $exactmatch = true;
-    } else {
-        $exactmatch = false;
-    }
-    
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regextext, $answers, $engine, $usecase, $exactmatch, $notation);
+
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $answers, $engine, $usecase, $exactmatch, $notation);
     $regex_testing_tool->generate_json($json_array);
 
     return $json_array;

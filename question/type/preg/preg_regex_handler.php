@@ -271,7 +271,7 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns notation, actually used by matcher.
+     * Returns notation, actually used by handler.
      */
     public function used_notation() {
         return 'native';
@@ -512,7 +512,6 @@ class qtype_preg_regex_handler {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher.
         $this->lexer->set_options($this->options);
 
         $this->parser = new qtype_preg_yyParser($this->options);
