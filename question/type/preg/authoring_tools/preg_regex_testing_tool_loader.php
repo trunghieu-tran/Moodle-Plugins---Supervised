@@ -18,14 +18,14 @@ $PAGE->set_context(context_system::instance());
  */
 function qtype_preg_get_json_array() {
     $regex = optional_param('regex', '', PARAM_RAW);
-    $answers = optional_param('answer', '', PARAM_RAW);
+    $strings = optional_param('strings', '', PARAM_RAW);
     $usecase = (bool)optional_param('usecase', '', PARAM_INT);
     $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
     $engine = optional_param('engine', '', PARAM_RAW);
     $notation = optional_param('notation', '', PARAM_RAW);
 
     $json = array();
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $answers, $usecase, $exactmatch, $engine, $notation);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
     $regex_testing_tool->generate_json($json);
 
     return $json;

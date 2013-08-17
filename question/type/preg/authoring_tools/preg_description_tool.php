@@ -157,7 +157,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     /**
      * Overloaded from qtype_preg_authoring_tool.
      */
-    protected function json_key() {
+    public function json_key() {
         return 'description';
     }
 
@@ -166,7 +166,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      *
      * @param array $json contains text of description
      */
-    protected function generate_json_for_accepted_regex(&$json, $id = -1) {
+    public function generate_json_for_accepted_regex(&$json, $id = -1) {
         $json[$this->json_key()] = $this->default_description();
     }
 
