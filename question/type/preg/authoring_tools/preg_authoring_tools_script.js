@@ -153,6 +153,7 @@ M.preg_authoring_tools_script = (function($) {
     btn_update_clicked : function(e) {
         e.preventDefault();
         self.load_content('-1');
+        self.btn_check_strings_clicked();
     },
 
     btn_save_clicked : function(e) {
@@ -162,7 +163,7 @@ M.preg_authoring_tools_script = (function($) {
         self.textbutton_widget.close_and_set_new_data();
     },
 
-    btn_cancel_clicked : function() {
+    btn_cancel_clicked : function(e) {
         self.textbutton_widget.dialog.dialog("close");
         $('#id_test_regex').html('');
     },
@@ -185,12 +186,12 @@ M.preg_authoring_tools_script = (function($) {
         });
     },
 
-    btn_show_selection_clicked : function() {
+    btn_show_selection_clicked : function(e) {
         var range = self.regex_selection_widget.get_selected_text_range(self.main_input[0]);
         self.load_content_by_range(range.start, range.end);
     },
 
-    rbtn_changed : function() {
+    rbtn_changed : function(e) {
         self.load_content(self.node_id);
     },
 
