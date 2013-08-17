@@ -227,11 +227,8 @@ class qtype_preg_explaining_tree_operator extends qtype_preg_explaining_tree_nod
             }
             // Recursive call to subtree.
             $tmp = $operand->dot_script($newcontext, $rankdirlr);
-            //TODO: костыль для qtype_preg_leaf_option
-            if($tmp[0] !== "") {
-                $childscripts[] = $tmp[0];
-                $style .= $tmp[1];
-            }
+            $childscripts[] = $tmp[0];
+            $style .= $tmp[1];
         }
 
         // Form the result.
@@ -309,7 +306,7 @@ class qtype_preg_explaining_tree_leaf_backref extends qtype_preg_explaining_tree
     }
 }
 
-class qtype_preg_explaining_tree_leaf_option extends qtype_preg_explaining_tree_leaf {
+class qtype_preg_explaining_tree_leaf_options extends qtype_preg_explaining_tree_leaf {
 
     protected function label() {
         return '"' . parent::label() . '"';
