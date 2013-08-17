@@ -32,7 +32,7 @@ class qtype_preg_regex_testing_tool {
         $this->answers = $answers;
     }
 
-    public function generate_json(&$json, $id) {
+    public function generate_json(&$json, $id = -1) {
         // Generate colored string showing matched and non-matched parts of response.
         $answer = strtok($this->answers, "\n");
         $json[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
