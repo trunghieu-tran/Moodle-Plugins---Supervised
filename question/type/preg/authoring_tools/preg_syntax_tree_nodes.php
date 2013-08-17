@@ -232,7 +232,7 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
         }
 
         // Form the result.
-        $dotscript = '';
+        $dotscript = $nodename . ';';
         foreach ($childscripts as $childscript) {
             $dotscript .= $nodename . '->' . $childscript;
         }
@@ -302,7 +302,7 @@ class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
-        return str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg'));
+        return '"' . str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) . '"';
     }
 }
 
@@ -316,14 +316,14 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
-        return get_string('leaf_recursion', 'qtype_preg') . ' ' . $this->pregnode->number . '"';
+        return '"' . get_string('leaf_recursion', 'qtype_preg') . ' ' . $this->pregnode->number . '"';
     }
 }
 
 class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
-        return get_string('leaf_control', 'qtype_preg') . ' ' . parent::label() . '"';
+        return '"' . get_string('leaf_control', 'qtype_preg') . ' ' . parent::label() . '"';
     }
 }
 
@@ -389,7 +389,7 @@ class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_op
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {
 
     protected function label() {
-        return get_string('node_error', 'qtype_preg');
+        return '"' . get_string('node_error', 'qtype_preg') . '"';
     }
 
     protected function tooltip() {

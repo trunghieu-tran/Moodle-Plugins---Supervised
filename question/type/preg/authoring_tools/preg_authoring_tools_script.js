@@ -240,20 +240,30 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     // Displays given images and description
-    display_data : function(id, tree, tree_map, graph, description) {
-        if (tree) {
-            $('#id_tree').attr('src', tree);
+    display_data : function(id, t, m, g, d) {
+        var tree_err = $('#tree_err'),
+            tree_img = $('#tree_img'),
+            tree_map = $('#tree_map'),
+            graph_err = $('#graph_err'),
+            graph_img = $('#graph_img');
+
+        if (t) {
+            var err = (t.substring(0, 4) != 'data');
+            tree_err.html(err ? t : '');
+            tree_img.attr('src', err ? '""' : t).css('visibility', err ? 'hidden' : 'visible');
         }
-        if (tree_map) {
-            $('#tree_map').html(tree_map);
-            $('#id_tree').click(self.tree_node_misclicked);
+        if (m) {
+            tree_map.html(m);
+            tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
         }
-        if (graph) {
-            $('#id_graph').attr('src', graph);
+        if (g) {
+            var err = (g.substring(0, 4) != 'data');
+            graph_err.html(err ? g : '');
+            graph_img.attr('src', err ? '""' : g).css('visibility', err ? 'hidden' : 'visible');
         }
-        if (description) {
-            $('#description_handler').html(description);
+        if (d) {
+            $('#description_handler').html(d);
         }
 
         self.highlight_description(id);
@@ -298,7 +308,7 @@ M.preg_authoring_tools_script = (function($) {
         self.displayas = self.get_displayas();
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        $('#id_tree').unbind();
+        $('#tree_img').unbind();
         $(self.TREE_MAP_ID + ' > area').unbind();
 
         var regex = self.main_input.val();

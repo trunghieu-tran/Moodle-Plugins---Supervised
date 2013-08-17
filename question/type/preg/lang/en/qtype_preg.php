@@ -186,7 +186,7 @@ $string['leaf_charset_error']    = 'incorrect character set';
 
 /******* Error messages *******/
 $string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
-$string['error_duringauthoringtool']             = 'There were errors while trying to build {$a} :';
+$string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
@@ -207,20 +207,20 @@ $string['authoring_form_charset_flags'] = 'real meaning (unified format)';
 $string['authoring_form_charset_userinscription'] = 'as written in regular expressions';
 $string['authoring_form_tree_horiz'] = 'horizontal';
 $string['authoring_form_tree_vert'] = 'vertical';
-$string['regex_edit_header_text'] = 'Regex';
-$string['regex_edit_header'] = 'Input regex';
-$string['regex_edit_header_help'] = 'Here you can input regular expression for which you\'ll see syntax tree, explaining graph and description. In the regular expressions field you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and description.';
-$string['regex_text_text'] = 'Enter regular expression there';
-$string['regex_show_selection'] = 'show selection';
+$string['regex_edit_header'] = 'Regex input';
+$string['regex_edit_header_help'] = 'Input your regex here. You\'ll see corresponding syntax tree, explaining graph and description. Click "Update" to commit changes in the regex.';
+$string['regex_edit_header_text'] = 'Regular expression';
+$string['regex_text_text'] = 'Enter your regex here:';
 $string['regex_update_text'] = 'Update';
 $string['regex_save_text'] = 'Save';
 $string['regex_cancel_text'] = 'Cancel';
-$string['regex_tree_build'] = 'Build tree...';
-$string['regex_graph_build'] = 'Build graph...';
+$string['regex_show_selection'] = 'Show selection';
+$string['regex_tree_build'] = 'Building the tree...';
+$string['regex_graph_build'] = 'Building the graph...';
 $string['regex_match_header'] = 'Regular expression testing';
-$string['regex_match_header_help'] = 'Here you can input a strings for testing you regex. In field "Input strings for matching" you can input strings; each string will be matched against you regular expression and you\'ll see results on the right: matched part is green, unmatched parts are red (the same colored strings will see you students).';
+$string['regex_match_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red.';
 $string['regex_match_textarea'] = 'Input strings to match (one per line)';
-$string['regex_check_strings'] = 'Check string(s)';
+$string['regex_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
 
