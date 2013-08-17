@@ -18,7 +18,6 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_tes
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_textarea.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
-//require_once($CFG->dirroot . '/question/type/preg/renderer.php');
 
 class qtype_preg_authoring_tool_form extends moodleform {
 
@@ -63,11 +62,11 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
         $mform->setDefault('authoring_tools_charset_process', 'userinscription');
 
-        // Add generated map.
         // Add tree.
         $mform->addElement('header', 'regex_tree_header', get_string('syntax_tree_tool', 'qtype_preg'));
         $mform->setExpanded('regex_tree_header', 1);
         $mform->addHelpButton('regex_tree_header', 'syntax_tree_tool', 'qtype_preg');
+
         // Add tree orientation radio buttons.
         $radiotreeorientationsarray=array();
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('authoring_form_tree_vert', 'qtype_preg'), 'vertical', null);
@@ -75,53 +74,34 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
-        $mform->addElement('html', '<div id="tree_map" ></div></br>');//Add generated map
+        // Add generated map.
+        $mform->addElement('html', '<div id="tree_map" ></div></br>');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_handler">' .
                                        '<div style="width:10px">' .
                                            '<img src="" id="id_tree" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" />' .
-                                    '</div></div></br>');
+                                       '</div></div></br>');
 
-        // Add graph.
+        // Add explaining graph tool.
         $mform->addElement('header', 'regex_graph_header', get_string('explaining_graph_tool', 'qtype_preg'));
         $mform->setExpanded('regex_graph_header', 1);
         $mform->addHelpButton('regex_graph_header','explaining_graph_tool','qtype_preg');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_handler"><div style="width:10px"><img src="" id="id_graph" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" /></div></div></br>');
 
-        // Add description.
+        // Add description tool.
         $mform->addElement('header', 'regex_description_header', get_string('description_tool', 'qtype_preg'));
         $mform->setExpanded('regex_description_header', 1);
         $mform->addHelpButton('regex_description_header', 'description_tool', 'qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
 
-        /*$answer = array('answer' => 'Di bats eat cats?');
-        $testing_tool = new qtype_preg_regex_testing_tool('33', $answer);
-        $mform->addElement('html', $testing_tool->render_hint());*/
-
-        //Add tool for check regexp match
+        // Add testing tool.
         $mform->addElement('header', 'regex_match_header', get_string('regex_match_header', 'qtype_preg'));
         $mform->setExpanded('regex_match_header', 1);
         $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
-
-        //$mform->addElement('textarea', 'regex_match_text', 'Input string', array('cols' => 100));
-        //$mform->setType('regex_match_text', PARAM_RAW);
-        //$mform->addElement('html', '<div id="test_regex" ></div>');
 
         $mform->addElement('preg_textarea', 'regex_match_text', get_string('regex_match_textarea', 'qtype_preg'), array('cols' => 50));
 
         $mform->registerNoSubmitButton('regex_check_string');
         $mform->addElement('button', 'regex_check_string', get_string('regex_check_strings', 'qtype_preg'));
-
-        //$mform->addElement('text_and_button', 'regex_match_text', 'regex_check_string', 'Input string', array('link_to_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 100));
-
-        /*$mform->registerNoSubmitButton('regex_next_character');
-        $mform->addElement('button', 'regex_next_character', 'Get next character');
-
-        $mform->addElement('textarea', 'must_match', 'Must match', 'wrap="virtual" rows="10" cols="100"');
-        $mform->addElement('button', 'regex_check_match', 'Check match');
-
-        $mform->addElement('textarea', 'must_not_match', 'Must not match', 'wrap="virtual" rows="10" cols="100"');
-        $mform->addElement('button', 'regex_check_not_match', 'Check no match');*/
-
     }
 
     //Custom validation should be added here
@@ -129,4 +109,3 @@ class qtype_preg_authoring_tool_form extends moodleform {
         return array();
     }
 }
-?>
