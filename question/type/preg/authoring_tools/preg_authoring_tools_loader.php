@@ -21,9 +21,6 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
  * Generates json array which stores authoring tools' content.
  */
 function qtype_preg_get_json_array() {
-    global $CFG;
-    $json = array();
-
     $regex = optional_param('regex', '', PARAM_RAW);
     $id = optional_param('id', '', PARAM_INT);
     $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
@@ -40,6 +37,7 @@ function qtype_preg_get_json_array() {
     );
 
     // Fill the json array.
+    $json = array();
     foreach($tools as $tool) {
         $tool->generate_json($json, $id);
     }

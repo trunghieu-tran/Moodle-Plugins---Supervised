@@ -16,7 +16,7 @@ M.preg_authoring_tools_script = (function($) {
     var self = {
 
     /** @var string with www host of moodle (smth like 'http://moodle.site.ru/') */
-    preg_www_root : null,
+    www_root : null,
 
     /** @var {string} name of qtype_preg_textbutton parent object */
     textbutton_widget : null,
@@ -67,13 +67,13 @@ M.preg_authoring_tools_script = (function($) {
     /**
      * setups module
      * @param {Object} Y NOT USED! It need because moodle passes this object as first param anyway...
-     * @param {string} _preg_www_root string with www host of moodle
+     * @param {string} _www_root string with www host of moodle
      * (smth like 'http://moodle.site.ru/')
      * @param {string} poasquestion_text_and_button_objname name of
      *  qtype_preg_textbutton parent object
      */
-    init : function(Y, _preg_www_root, poasquestion_text_and_button_objname) {
-        this.preg_www_root = _preg_www_root;
+    init : function(Y, _www_root, poasquestion_text_and_button_objname) {
+        this.www_root = _www_root;
         this.textbutton_widget = M.poasquestion_text_and_button;
         this.setup_parent_object();
     },
@@ -83,14 +83,6 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     upd_answer_success : function(data, textStatus, jqXHR) {
-        // TODO: delete on release
-        var indexofbracket = data.indexOf('{');
-        if (indexofbracket != 0) {
-            alert(data.substr(0, indexofbracket));
-            data = data.substr(indexofbracket);
-        }
-        // End of TODO
-
         var jsonarray = JSON.parse(data);
         $('#id_test_regex').html(jsonarray.regex_test);
     },
@@ -98,18 +90,18 @@ M.preg_authoring_tools_script = (function($) {
     regex_check_string : function(e) {
         $.ajax({
             type: 'GET',
-            url: self.preg_www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
+            url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
             data: {
                 regex: self.main_input.val(),
                 answer: $('#id_regex_match_text').val(),
-                engine: $('#id_engine :selected').val(),
-                usecase: $('#id_usecase :selected').val(), // TODO matcher and engine are equals ?!
+                usecase: $('#id_usecase :selected').val(),
                 exactmatch: $('#id_exactmatch :selected').val(),
+                engine: $('#id_engine :selected').val(),
                 notation: $('#id_notation :selected').val(),
                 ajax: true
             },
-            success: self.upd_answer_success,    // upd_dialog_Succes(...) will call if request is successful
-            error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
+            success: self.upd_answer_success,
+            error: self.upd_dialog_failure
         });
     },
 
@@ -130,7 +122,7 @@ M.preg_authoring_tools_script = (function($) {
 
             // Function called on the very first form opening.
             onfirstpresscallback : function() {
-                $(self.textbutton_widget.dialog).load(self.preg_www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function() {
+                $(self.textbutton_widget.dialog).load(self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function() {
                     //TODO: set empty src in all field
                     self.check_btn = $('#id_regex_check').click(self.check_regex_clicked);
                     self.main_input =    $('#id_regex_text').change(self.regex_change)
@@ -207,7 +199,6 @@ M.preg_authoring_tools_script = (function($) {
         if (!self.cache[orientation][displayas][regex][id]) {
             self.cache[orientation][displayas][regex][id] = {};
         }
-
         self.cache[orientation][displayas][regex][id][self.TREE_KEY] = t;
         self.cache[orientation][displayas][regex][id][self.TREE_MAP_KEY] = m;
         self.cache[orientation][displayas][regex][id][self.GRAPH_KEY] = g;
@@ -236,15 +227,6 @@ M.preg_authoring_tools_script = (function($) {
 
     // Calls if request for information about new regex is successful
     upd_dialog_success : function(data, textStatus, jqXHR) {
-
-        // TODO: delete on release
-        var indexofbracket = data.indexOf('{');
-        if (indexofbracket != 0) {
-            alert(data.substr(0, indexofbracket));
-            data = data.substr(indexofbracket);
-        }
-        // End of TODO
-
         var jsonarray = JSON.parse(data);
 
         var orientation = self.get_orientation();
@@ -267,30 +249,29 @@ M.preg_authoring_tools_script = (function($) {
 
     // Calls if request for information about new regex fails
     upd_dialog_failure : function(data, textStatus, jqXHR) {
-       alert('ERROR\n'+textStatus+'\n'+jqXHR.responseText);
+       alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
     },
 
     load_content_by_range : function(start, end) {
         var text = self.main_input.val();
         var firstline = 0;
         var lastline = 0;
-        var pos = 0;
-        var lastpos =0;
-        pos=text.indexOf("\n");
-        while ( pos != -1 && pos < start ) {
+        var lastpos = 0;
+        var pos = text.indexOf("\n");
+        while (pos != -1 && pos < start) {
             ++firstline;
             lastpos = pos;
-            pos=text.indexOf("\n", pos+1);
+            pos = text.indexOf("\n", pos + 1);
         }
-        if (firstline>0) {
+        if (firstline > 0) {
             start -= lastpos;
         }
-        while ( pos != -1 && pos < end ) {
+        while (pos != -1 && pos < end) {
             ++lastline;
             lastpos = pos;
-            pos=text.indexOf("\n", pos+1);
+            pos = text.indexOf("\n", pos + 1);
         }
-        if (lastline>0) {
+        if (lastline > 0) {
             end -= lastpos;
         }
         --end;
@@ -337,13 +318,13 @@ M.preg_authoring_tools_script = (function($) {
             displayas: self.displayas,
             ajax: true
         };
-        if(coordinates) {
+        if (coordinates) {
             $.extend(data,coordinates);
             data.rangeselection = true;
         }
         $.ajax({
             type: 'GET',
-            url: self.preg_www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
+            url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
             data: data,
             success: self.upd_dialog_success,    // upd_dialog_Succes(...) will call if request is successful
             error: self.upd_dialog_failure      // upd_dialog_failure(...) will call if request fails
@@ -358,7 +339,7 @@ M.preg_authoring_tools_script = (function($) {
         var highlightedclass = 'description_highlighted';
         var oldhighlighted = $('.' + highlightedclass);
 
-        if(oldhighlighted != null) {
+        if (oldhighlighted != null) {
            oldhighlighted.removeClass(highlightedclass).css('background', 'transparent');
         }
         var targetspan = $('.description_node_' + id);
