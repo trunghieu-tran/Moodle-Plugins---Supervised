@@ -48,10 +48,10 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline=array();
-        $topline[] =& $mform->createElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
+        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('regex_update_text', 'qtype_preg'));
         /*$topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));*/
         if(!$this->isblock){
-            $topline[] =& $mform->createElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
+            $topline[] =& $mform->createElement('button', 'regex_save', get_string('regex_save_text', 'qtype_preg'));
         }
         $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('regex_cancel_text', 'qtype_preg'));
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
@@ -100,8 +100,8 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         $mform->addElement('preg_textarea', 'regex_match_text', get_string('regex_match_textarea', 'qtype_preg'), array('cols' => 50));
 
-        $mform->registerNoSubmitButton('regex_check_string');
-        $mform->addElement('button', 'regex_check_string', get_string('regex_check_strings', 'qtype_preg'));
+        $mform->registerNoSubmitButton('regex_check_strings');
+        $mform->addElement('button', 'regex_check_strings', get_string('regex_check_strings', 'qtype_preg'));
     }
 
     //Custom validation should be added here

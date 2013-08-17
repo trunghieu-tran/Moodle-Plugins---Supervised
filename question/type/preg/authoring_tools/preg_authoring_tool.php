@@ -117,7 +117,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * @param jsonarray - output array with json
      * @param id - identifier of node which will be picked out in image.
      */
-    public function generate_json(&$json, $id) {
+    public function generate_json(&$json, $id = -1) {
         $json['regex'] = $this->regex->string();
         $json['id'] = $id;
         if ($this->regex == '') {
@@ -129,11 +129,11 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
     }
 
-    protected function generate_json_for_empty_regex(&$json, $id) {
+    protected function generate_json_for_empty_regex(&$json, $id = -1) {
         $json[$this->json_key()] = '';
     }
 
-    protected function generate_json_for_unaccepted_regex(&$json, $id) {
+    protected function generate_json_for_unaccepted_regex(&$json, $id = -1) {
         global $CFG;
         $maxerrors = 5;
         if (isset($CFG->qtype_preg_maxerrorsshown)) {
@@ -156,14 +156,14 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
     protected abstract function json_key();
 
-    protected abstract function generate_json_for_accepted_regex(&$json, $id);
+    protected abstract function generate_json_for_accepted_regex(&$json, $id = -1);
 
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
     // Overloaded for some exceptions handling.
-    public function generate_json(&$json, $id) {
+    public function generate_json(&$json, $id = -1) {
         try {
             parent::generate_json($json, $id);
         } catch (Exception $e) {

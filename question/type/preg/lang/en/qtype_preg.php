@@ -211,16 +211,15 @@ $string['regex_edit_header'] = 'Input regex';
 $string['regex_edit_header_help'] = 'Here you can input regular expression for which you\'ll see syntax tree, explaining graph and description. In the regular expressions field you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and description.';
 $string['regex_text_text'] = 'Enter regular expression there';
 $string['regex_show_selection'] = 'show selection';
-$string['regex_check_text'] = 'Update';
+$string['regex_update_text'] = 'Update';
+$string['regex_save_text'] = 'Save';
 $string['regex_cancel_text'] = 'Cancel';
-$string['regex_back_text'] = 'Save';
 $string['regex_tree_build'] = 'Build tree...';
 $string['regex_graph_build'] = 'Build graph...';
 $string['regex_match_header'] = 'Regular expression testing';
 $string['regex_match_header_help'] = 'Here you can input a strings for testing you regex. In field "Input strings for matching" you can input strings; each string will be matched against you regular expression and you\'ll see results on the right: matched part is green, unmatched parts are red (the same colored strings will see you students).';
 $string['regex_match_textarea'] = 'Input strings to match (one per line)';
 $string['regex_check_strings'] = 'Check string(s)';
-
 
 // Strings for node description
 
