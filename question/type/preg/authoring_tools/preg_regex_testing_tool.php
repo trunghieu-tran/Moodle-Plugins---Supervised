@@ -23,11 +23,11 @@ class qtype_preg_regex_testing_tool {
     private $renderer;
     private $answers;
     private $hintmatch;
-    
-    public function __construct($regex, $answers, $mathcer, $usecase, $exactmatch, $notation) {
+
+    public function __construct($regex, $answers, $matcher, $usecase, $exactmatch, $notation) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
-        $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $mathcer, $notation);
+        $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
         $this->hintmatch = $regular->hint_object('hintmatchingpart');
         $this->answers = $answers;
     }

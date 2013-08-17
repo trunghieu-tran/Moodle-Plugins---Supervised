@@ -119,9 +119,6 @@ class qtype_preg_description_options extends qtype_preg_handling_options {
  */
 class qtype_preg_description_tool extends qtype_preg_authoring_tool {
 
-    /** @var qtype_preg_description_options options for description and state of description */
-    public $options;
-
     /** @var qtype_preg_description_state state of description generating */
     public $state;
 
@@ -131,13 +128,13 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param string $regex - regular expression to handle.
      * @param object $options - options to handle regex, i.e. any necessary additional parameters.
      */
-    public function __construct($regex = null, $engine = null, $notation = null, $options = null) {
-        if ($options === null) {
-            $options = new qtype_preg_description_options();
-        }
+    public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
         parent::__construct($regex, $options, $engine, $notation);
-        $this->options = $options;
         $this->state = new qtype_preg_description_state();
+    }
+
+    public function options() {
+        return $this->options;
     }
 
     /**
@@ -536,7 +533,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             } else {
                 $ranges = $this->find_ranges($flag->data);
                 // var_dump($ranges);
-                $rangelengthmax =& $this->handler->options->rangelengthmax;
+                $rangelengthmax =& $this->handler->options()->rangelengthmax;
                 foreach ($ranges as $range) {
                     if (is_int($range)) { // $range is a code of character
                         $characters[] = self::describe_chr($range, true, $form);

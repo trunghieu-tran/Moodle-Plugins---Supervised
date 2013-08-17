@@ -34,6 +34,10 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
  */
 class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_tool {
 
+    public function __construct ($regex = null, $options = null, $engine = null, $notation = null) {
+        parent::__construct($regex, $options, $engine, $notation);
+    }
+
     /**
      * Creates graph which explaining regular expression.
      * @param id - identifier of node which will be picked out in image.
@@ -134,17 +138,5 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         $dotscript = $graph->create_dot();
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
-    }
-
-    public function __construct ($regex = null, $engine = null, $notation = null, $options = null) {
-        // Options should exist at least as a default object.
-        if ($options === null) {
-            $options = new qtype_preg_handling_options();
-        }
-        $options->preserveallnodes = true;
-        parent::__construct($regex, $options, $engine, $notation);
-        if ($regex === null) {
-            return;
-        }
     }
 }

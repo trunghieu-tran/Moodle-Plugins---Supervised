@@ -23,31 +23,25 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 function qtype_preg_get_json_array() {
     global $CFG;
     $json_array = array();
-    $regextext = optional_param('regex', '', PARAM_RAW);
 
+    $regex = optional_param('regex', '', PARAM_RAW);
     $id = optional_param('id', '', PARAM_INT);
     $tree_orientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
-    
-    $rankdirlr = false;
-    if($tree_orientation == 'vertical'){
-        $rankdirlr = false;
-    }
-    else if($tree_orientation == 'horizontal'){
-        $rankdirlr = true;
-    }
-    
+
+    $rankdirlr = $tree_orientation == 'horizontal' ? true : false;
+
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_explaining_tree_tool($regextext, $engine, $notation, $rankdirlr),
-        'graph' => new qtype_preg_explaining_graph_tool($regextext, $engine, $notation),
-        'description' => new qtype_preg_description_tool($regextext, $engine, $notation)
+        'tree' => new qtype_preg_explaining_tree_tool($regex, null, $engine, $notation, $rankdirlr),
+        'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation),
+        'description' => new qtype_preg_description_tool($regex, null, $engine, $notation)
     );
 
-    // Fill json array.
+    // Fill the json array.
     foreach($tools as $tool) {
-        $tool->generate_json($json_array, $regextext, $id);
+        $tool->generate_json($json_array, $regex, $id);
     }
 
     return $json_array;
