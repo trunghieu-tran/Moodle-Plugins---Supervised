@@ -17,7 +17,28 @@ require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
-abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
+interface qtype_preg_i_authoring_tool {
+
+    /**
+     * Returns the key for accessing this tool's data in JSON array.
+     */
+    public function json_key();
+
+    /**
+     * Generates a json array with this tool's data. Should call the methods below.
+     * @param json - output JSON array.
+     * @param id - identifier of the selected syntax tree node.
+     */
+    public function generate_json(&$json, $id = -1);
+
+    public function generate_json_for_accepted_regex(&$json, $id = -1);
+
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1);
+
+    public function generate_json_for_empty_regex(&$json, $id = -1);
+}
+
+abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
 
     protected static $dotescapecodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
 
@@ -110,13 +131,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         return $result;
     }
 
-
-
-    /**
-     * Generates a json-array corresponding to the regex.
-     * @param jsonarray - output array with json
-     * @param id - identifier of node which will be picked out in image.
-     */
     public function generate_json(&$json, $id = -1) {
         $json['regex'] = $this->regex->string();
         $json['id'] = $id;
@@ -129,24 +143,22 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
         }
     }
 
-    protected function generate_json_for_empty_regex(&$json, $id = -1) {
+    public function generate_json_for_empty_regex(&$json, $id = -1) {
         $json[$this->json_key()] = '';
     }
 
-    protected function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
         $a =  textlib::strtolower(get_string($this->name(), 'qtype_preg'));
         $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
-        // Show no more than max errors.
         foreach ($this->get_error_messages(true) as $error) {
             $result .= '<br />' . $error;
         }
         $json[$this->json_key()] = $result;
     }
 
-    protected abstract function json_key();
+    public abstract function generate_json_for_accepted_regex(&$json, $id = -1);
 
-    protected abstract function generate_json_for_accepted_regex(&$json, $id = -1);
-
+    public abstract function json_key();
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {

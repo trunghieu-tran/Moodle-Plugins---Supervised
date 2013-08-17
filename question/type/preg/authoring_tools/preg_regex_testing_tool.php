@@ -7,49 +7,74 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
  */
-require_once(dirname(__FILE__) . '/../../../../config.php');
-global $CFG;
+
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/engine/states.php');
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 
 /*
- * Testing regex on strings
+ * Defines a tool for testing regex against strings.
  */
-class qtype_preg_regex_testing_tool {
+class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
 
     //TODO - PHPDoc comments!
-    private $renderer;
-    private $answers;
-    private $hintmatch;
+    private $regex = '';
+    private $renderer = null;
+    private $strings = null;
+    private $hintmatch = null;
     private $errormsgs = null;
 
-    //TODO - what means $answers?! is it $tests? change name probably...
-    public function __construct($regex, $answers, $usecase, $exactmatch, $matcher, $notation) {
+    public function __construct($regex, $strings, $usecase, $exactmatch, $matcher, $notation) {
         global $PAGE;
+        $this->regex = $regex;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
+        $this->strings = $strings;
         $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
         $matcher = $regular->get_matcher($matcher, $regex, /*'exactmatch'*/false,
-                        $regular->get_modifiers($usecase), (-1), $notation, true);
+                                         $regular->get_modifiers($usecase), (-1), $notation, true);
         if ($matcher->errors_exist()) {
             $this->errormsgs = $matcher->get_error_messages(true);
         } else {
             $this->hintmatch = $regular->hint_object('hintmatchingpart');
-            $this->answers = $answers;
         }
+    }
+
+    public function json_key() {
+        return 'regex_test';
     }
 
     public function generate_json(&$json, $id = -1) {
-        // Generate colored string showing matched and non-matched parts of response.
-        $answers = explode("\n", $this->answers);
-        $json[$this->json_key()] = '';
-        foreach ($answers as $answer) {
-            $json[$this->json_key()] .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
+        if ($this->regex == '') {
+            $this->generate_json_for_empty_regex($json, $id);
+        } else if ($this->errormsgs !== null) {
+            $this->generate_json_for_unaccepted_regex($json, $id);
+        } else {
+            $this->generate_json_for_accepted_regex($json, $id);
         }
     }
 
-    protected function json_key() {
-        return 'regex_test';
+    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+        // Generate colored string showing matched and non-matched parts of response.
+        $strings = explode("\n", $this->strings);
+        $result = '';
+        foreach ($strings as $answer) {
+            $result .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
+        }
+        $json[$this->json_key()] = $result;
+    }
+
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+        $result = '';
+        foreach ($this->errormsgs as $error) {
+            $result .= '<br />' . $error;
+        }
+        $json[$this->json_key()] = $result;
+    }
+
+    public function generate_json_for_empty_regex(&$json, $id = -1) {
+        $json[$this->json_key()] = '';
     }
 }

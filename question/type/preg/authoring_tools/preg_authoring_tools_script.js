@@ -174,7 +174,7 @@ M.preg_authoring_tools_script = (function($) {
             url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
             data: {
                 regex: self.main_input.val(),
-                answer: $('#id_regex_match_text').val(),
+                strings: $('#id_regex_match_text').val(),
                 usecase: $('#id_usecase :selected').val(),
                 exactmatch: $('#id_exactmatch :selected').val(),
                 engine: $('#id_engine :selected').val(),
