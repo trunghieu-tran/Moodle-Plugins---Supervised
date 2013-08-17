@@ -9,7 +9,6 @@
  */
 require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
-global $PAGE;
 require_once($CFG->dirroot . '/question/engine/states.php');
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
@@ -34,9 +33,9 @@ class qtype_preg_regex_testing_tool {
 
     public function generate_json(&$json, $id = -1) {
         // Generate colored string showing matched and non-matched parts of response.
-        $answer = strtok($this->answers, "\n");
-        $json[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
-        while(($answer = strtok("\n")) !== false) {
+        $answers = explode("\n", $this->answers);
+        $json[$this->json_key()] = '';
+        foreach ($answers as $answer) {
             $json[$this->json_key()] .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
         }
     }
