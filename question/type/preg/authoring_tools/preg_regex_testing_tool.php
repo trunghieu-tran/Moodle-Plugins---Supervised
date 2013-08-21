@@ -55,9 +55,9 @@ class qtype_preg_regex_testing_tool {
 
     protected function generate_json_for_accepted_regex(&$json_array){
         $answer = strtok($this->answers, "\n");
-        $json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . "</br>";
+        $json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
         while(($answer = strtok("\n")) !== false) {
-            $json_array[$this->json_key()] .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . "</br>";
+            $json_array[$this->json_key()] .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
         }
     }
 }

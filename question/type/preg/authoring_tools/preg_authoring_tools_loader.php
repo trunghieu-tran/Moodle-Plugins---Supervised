@@ -26,11 +26,11 @@ function qtype_preg_get_json_array() {
 
     $regex = optional_param('regex', '', PARAM_RAW);
     $id = optional_param('id', '', PARAM_INT);
-    $tree_orientation = optional_param('tree_orientation', '', PARAM_TEXT);
+    $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
 
-    $rankdirlr = $tree_orientation == 'horizontal' ? true : false;
+    $rankdirlr = $treeorientation == 'horizontal' ? true : false;
 
     // Array with authoring tools
     $tools = array(
