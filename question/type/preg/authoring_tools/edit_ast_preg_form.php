@@ -22,10 +22,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 class qtype_preg_authoring_tool_form extends moodleform {
 
-    private $isblok;
+    private $isblock;
 
     function __constructor($_isblock = false){
-        $isblok = $_isblock;
+        $isblock = $_isblock;
         parent::moodleform();
     }
 
@@ -51,7 +51,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $topline=array();
         $topline[] =& $mform->createElement('submit', 'regex_check', get_string('regex_check_text', 'qtype_preg'));
         /*$topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));*/
-        if(!$this->isblok){
+        if(!$this->isblock){
             $topline[] =& $mform->createElement('button', 'regex_back', get_string('regex_back_text', 'qtype_preg'));
         }
         $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('regex_cancel_text', 'qtype_preg'));
