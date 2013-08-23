@@ -19,16 +19,25 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
  */
 class qtype_preg_regex_testing_tool {
 
+    //TODO - PHPDoc comments!
     private $renderer;
     private $answers;
     private $hintmatch;
+    private $errormsgs = null;
 
+    //TODO - what means $answers?! is it $tests? change name probably...
     public function __construct($regex, $answers, $usecase, $exactmatch, $matcher, $notation) {
         global $PAGE;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
         $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
-        $this->hintmatch = $regular->hint_object('hintmatchingpart');
-        $this->answers = $answers;
+        $matcher = $regular->get_matcher($matcher, $regex, /*'exactmatch'*/false,
+                        $regular->get_modifiers($usecase), (-1), $notation, true);
+        if ($matcher->errors_exist()) {
+            $this->errormsgs = $matcher->get_error_messages(true);
+        } else {
+            $this->hintmatch = $regular->hint_object('hintmatchingpart');
+            $this->answers = $answers;
+        }
     }
 
     public function generate_json(&$json, $id = -1) {
