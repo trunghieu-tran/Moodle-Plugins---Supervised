@@ -322,12 +322,28 @@ class qtype_preg_regex_handler {
 
     /**
      * Returns error messages for regex.
+     * @param limit bool limit error messages to the admin option
      * @return array of error messages.
      */
-    public function get_error_messages() {
+    public function get_error_messages($limit = false) {
+        global $CFG;
         $res = array();
+        $maxerrors = 5;
+        if ($limit) {
+            // Determine maximum number of errors to show.
+            if (isset($CFG->qtype_preg_maxerrorsshown)) {
+                $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+            }
+        }
+        $i = 0;
         foreach ($this->get_errors() as $error) {
-            $res[] = $error->errormsg;
+            if (!$limit || $i < $maxerrors) {
+                $res[] = $error->errormsg;
+            }
+            $i++;
+        }
+        if ($limit && $i > $maxerrors) {
+            $res[] = get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors);
         }
         return $res;
     }

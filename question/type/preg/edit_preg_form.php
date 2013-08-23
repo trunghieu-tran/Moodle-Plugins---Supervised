@@ -216,12 +216,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
 
-        // Determine maximum number of errors to show.
-        $maxerrors = 5;
-        if (isset($CFG->qtype_preg_maxerrorsshown)) {
-            $maxerrors = $CFG->qtype_preg_maxerrorsshown;
-        }
-
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
@@ -230,18 +224,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false,
                         $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if ($matcher->errors_exist()) {// There were errors in the matching process.
-                    $regexerrors = $matcher->get_error_messages();
+                    $regexerrors = $matcher->get_error_messages(true);// Show no more than max errors.
                     $errors['answer['.$key.']'] = '';
-                    $j=0;
-                    // Show no more than max errors.
                     foreach ($regexerrors as $regexerror) {
-                        if ($j < $maxerrors) {
-                            $errors['answer['.$key.']'] .= $regexerror.'<br />';
-                        }
-                        $j++;
-                    }
-                    if ($j > $maxerrors) {
-                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $j - $maxerrors).'<br />';
+                        $errors['answer['.$key.']'] .= $regexerror.'<br />';
                     }
                 } else if ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {// Correct answer (if supplied) should match at least one 100% grade answer.
                     // We may need another matcher to check correctanswer since first one ignoring "exact match" option.

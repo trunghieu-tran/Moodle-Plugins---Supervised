@@ -185,7 +185,8 @@ $string['leaf_charset_negative'] = 'negative character set';
 $string['leaf_charset_error']    = 'incorrect character set';
 
 /******* Error messages *******/
-$string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_duringauthoringtool']             = 'There were errors while trying to build {$a} :';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
