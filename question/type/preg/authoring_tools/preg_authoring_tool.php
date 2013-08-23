@@ -134,23 +134,12 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
     }
 
     protected function generate_json_for_unaccepted_regex(&$json, $id = -1) {
-        global $CFG;
-        $maxerrors = 5;
-        if (isset($CFG->qtype_preg_maxerrorsshown)) {
-            $maxerrors = $CFG->qtype_preg_maxerrorsshown;
-        }
-
-        $result = 'Errors while trying to get the ' . textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+        $a =  textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+        $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
         // Show no more than max errors.
-        $count = 0;
-        foreach ($this->get_error_messages() as $error) {
+        foreach ($this->get_error_messages(true) as $error) {
             $result .= '<br />' . $error;
-            $count++;
-            if ($count == $maxerrors) {
-                break;
-            }
         }
-
         $json[$this->json_key()] = $result;
     }
 
