@@ -155,10 +155,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         }
         $json[$this->json_key()] = $result;
     }
-
-    public abstract function generate_json_for_accepted_regex(&$json, $id = -1);
-
-    public abstract function json_key();
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
