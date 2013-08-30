@@ -11,7 +11,7 @@
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
  */
-M.preg_authoring_tools_script = (function($) {
+M.preg_authoring_tools_script = (function ($) {
 
     var self = {
 
@@ -64,7 +64,7 @@ M.preg_authoring_tools_script = (function($) {
      * (smth like 'http://moodle.site.ru/')
      * @param {string} poasquestion_text_and_button_objname name of qtype_preg_textbutton parent object
      */
-    init : function(Y, _www_root, poasquestion_text_and_button_objname) {
+    init : function (Y, _www_root, poasquestion_text_and_button_objname) {
         this.www_root = _www_root;
         this.textbutton_widget = M.poasquestion_text_and_button;
         this.setup_parent_object();
@@ -76,12 +76,12 @@ M.preg_authoring_tools_script = (function($) {
      * press on button, right afted dialog generation
      * oneachpresscallback calls on second and following pressings on button
      */
-    setup_parent_object : function() {
+    setup_parent_object : function () {
         var options = {
 
             // Function called on the very first form opening.
-            onfirstpresscallback : function() {
-                $(self.textbutton_widget.dialog).load(self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function() {
+            onfirstpresscallback : function () {
+                $(self.textbutton_widget.dialog).load(self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function () {
                     //TODO: set empty src in all field
 
                     // Add handlers for the buttons.
@@ -103,12 +103,9 @@ M.preg_authoring_tools_script = (function($) {
 
                     // TODO - FIND A GOOD WAY TO HIDE THE "EXPAND ALL" BUTTON!
                     $(".collapsible-actions").hide();
-                    $("#fgroup_id_charset_process_radioset").hide(); // TODO - hidden for beta
-
-
 
                     // get testing data from hidden field and put it into ui
-                    $('#id_regex_match_text').val( $('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
+                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
                                              .keyup(self.textbutton_widget.fix_textarea_rows)
                                              .trigger('keyup');
                     $("#id_regex_input_header").after('<div id="form_properties"></div>');
@@ -120,7 +117,7 @@ M.preg_authoring_tools_script = (function($) {
             },
 
             // Function called on non-first form openings.
-            oneachpresscallback : function() {
+            oneachpresscallback : function () {
                 self.main_input.val(self.textbutton_widget.data).trigger('keyup');
                 // get testing data from hidden field and put it into ui
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
@@ -129,15 +126,15 @@ M.preg_authoring_tools_script = (function($) {
                 self.load_content('-1');
             },
 
-            onsaveclicked : function() {
+            onsaveclicked : function () {
                 $('#id_regex_save').click();
             },
 
-            oncancelclicked : function() {
+            oncancelclicked : function () {
                 $('#id_regex_cancel').click();
             },
 
-            display_question_options : function() {
+            display_question_options : function () {
                 $('#form_properties').html('<div>' +
                                            'engine: '     + $('#id_engine :selected').text() + '<br/>' +
                                            'usecase: '    + $('#id_usecase :selected').text() + '<br/>' +
@@ -150,25 +147,25 @@ M.preg_authoring_tools_script = (function($) {
         self.textbutton_widget.setup(options);
     },
 
-    btn_update_clicked : function(e) {
+    btn_update_clicked : function (e) {
         e.preventDefault();
         self.load_content('-1');
         self.btn_check_strings_clicked();
     },
 
-    btn_save_clicked : function(e) {
+    btn_save_clicked : function (e) {
         e.preventDefault();
         var new_regex = self.main_input.val();
         self.textbutton_widget.data = new_regex;
         self.textbutton_widget.close_and_set_new_data();
     },
 
-    btn_cancel_clicked : function(e) {
+    btn_cancel_clicked : function (e) {
         self.textbutton_widget.dialog.dialog("close");
         $('#id_test_regex').html('');
     },
 
-    btn_check_strings_clicked : function(e) {
+    btn_check_strings_clicked : function (e) {
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
@@ -186,26 +183,25 @@ M.preg_authoring_tools_script = (function($) {
         });
     },
 
-    btn_show_selection_clicked : function(e) {
+    btn_show_selection_clicked : function (e) {
         var range = self.regex_selection_widget.get_selected_text_range(self.main_input[0]);
         self.load_content_by_range(range.start, range.end);
     },
 
-    rbtn_changed : function(e) {
+    rbtn_changed : function (e) {
         self.load_content(self.node_id);
     },
 
-    upd_tools_success : function(data, textStatus, jqXHR) {
-        var jsonarray = JSON.parse(data);
-
-        var orientation = self.get_orientation();
-        var displayas = self.get_displayas();
-        var r = jsonarray[self.REGEX_KEY];
-        var i = jsonarray[self.ID_KEY] + '';
-        var t = jsonarray[self.TREE_KEY];
-        var m = jsonarray[self.TREE_MAP_KEY];
-        var g = jsonarray[self.GRAPH_KEY];
-        var d = jsonarray[self.DESCRIPTION_KEY];
+    upd_tools_success : function (data, textStatus, jqXHR) {
+        var jsonarray = JSON.parse(data),
+            orientation = self.get_orientation(),
+            displayas = self.get_displayas(),
+            r = jsonarray[self.REGEX_KEY],
+            i = jsonarray[self.ID_KEY] + '',
+            t = jsonarray[self.TREE_KEY],
+            m = jsonarray[self.TREE_MAP_KEY],
+            g = jsonarray[self.GRAPH_KEY],
+            d = jsonarray[self.DESCRIPTION_KEY];
 
         // Cache the data.
         if (orientation && displayas && r && i && t && m && g && d) {
@@ -216,17 +212,17 @@ M.preg_authoring_tools_script = (function($) {
         self.display_data(i, t, m, g, d);
     },
 
-    upd_check_strings_success : function(data, textStatus, jqXHR) {
+    upd_check_strings_success : function (data, textStatus, jqXHR) {
         var jsonarray = JSON.parse(data);
         $('#id_test_regex').html(jsonarray.regex_test);
     },
 
-    upd_failure : function(data, textStatus, jqXHR) {
+    upd_failure : function (data, textStatus, jqXHR) {
        alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
     },
 
     // Stores images and description for the given regex and node id in the cache
-    cache_data : function(orientation, displayas, regex, id, t, m, g, d) {
+    cache_data : function (orientation, displayas, regex, id, t, m, g, d) {
         if (!self.cache[orientation][displayas][regex]) {
             self.cache[orientation][displayas][regex] = {};
         }
@@ -240,15 +236,16 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     // Displays given images and description
-    display_data : function(id, t, m, g, d) {
+    display_data : function (id, t, m, g, d) {
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
-            graph_img = $('#graph_img');
+            graph_img = $('#graph_img'),
+            err = null;
 
         if (t) {
-            var err = (t.substring(0, 4) != 'data');
+            err = (t.substring(0, 4) != 'data');
             tree_err.html(err ? t : '');
             tree_img.attr('src', err ? '""' : t).css('visibility', err ? 'hidden' : 'visible');
         }
@@ -258,7 +255,7 @@ M.preg_authoring_tools_script = (function($) {
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
         }
         if (g) {
-            var err = (g.substring(0, 4) != 'data');
+            err = (g.substring(0, 4) != 'data');
             graph_err.html(err ? g : '');
             graph_img.attr('src', err ? '""' : g).css('visibility', err ? 'hidden' : 'visible');
         }
@@ -269,12 +266,12 @@ M.preg_authoring_tools_script = (function($) {
         self.highlight_description(id);
     },
 
-    load_content_by_range : function(start, end) {
-        var text = self.main_input.val();
-        var firstline = 0;
-        var lastline = 0;
-        var lastpos = 0;
-        var pos = text.indexOf("\n");
+    load_content_by_range : function (start, end) {
+        var text = self.main_input.val(),
+            firstline = 0,
+            lastline = 0,
+            lastpos = 0,
+            pos = text.indexOf("\n");
         while (pos != -1 && pos < start) {
             ++firstline;
             lastpos = pos;
@@ -296,7 +293,7 @@ M.preg_authoring_tools_script = (function($) {
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function(id, coordinates, no_cache) {
+    load_content : function (id, coordinates, no_cache) {
         // Deselect the node when clicked for the second time.
         if (self.node_id == id && self.tree_orientation == self.get_orientation() && self.displayas == self.get_displayas()) {
             id = '-1';
@@ -311,12 +308,13 @@ M.preg_authoring_tools_script = (function($) {
         $('#tree_img').unbind();
         $(self.TREE_MAP_ID + ' > area').unbind();
 
-        var regex = self.main_input.val();
+        var regex = self.main_input.val(),
+            cachedregex = null,
+            cachedid = null;
 
         // Check the cache.
-        if(!no_cache) {
-            var cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
-            var cachedid = null;
+        if (!no_cache) {
+            cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
             if (cachedregex) {
                 cachedid = cachedregex[id];
             }
@@ -351,14 +349,13 @@ M.preg_authoring_tools_script = (function($) {
      * Highlights part of text description of regex corresponding to given id.
      * Highlights nothing if '-1' is passed.
      */
-    highlight_description : function(id) {
-        var highlightedclass = 'description_highlighted';
-        var oldhighlighted = $('.' + highlightedclass);
-
+    highlight_description : function (id) {
+        var highlightedclass = 'description_highlighted',
+            oldhighlighted = $('.' + highlightedclass),
+            targetspan = $('.description_node_' + id);
         if (oldhighlighted != null) {
            oldhighlighted.removeClass(highlightedclass).css('background', 'transparent');
         }
-        var targetspan = $('.description_node_' + id);
         if (targetspan != null) {
             targetspan.addClass(highlightedclass);
             targetspan.css('background', '#FFFF00');
@@ -368,7 +365,7 @@ M.preg_authoring_tools_script = (function($) {
     /**
      * Handler of clicking on a node (map area, in fact)
      */
-    tree_node_clicked : function(e) {
+    tree_node_clicked : function (e) {
        var id = $(e.target).attr('id') + '';
        self.load_content(id);
     },
@@ -376,18 +373,18 @@ M.preg_authoring_tools_script = (function($) {
     /**
      * Handler of clicking on area outside all nodes
      */
-    tree_node_misclicked : function(e) {
+    tree_node_misclicked : function (e) {
         self.load_content('-1');
     },
 
     /**
      * Handler of pressing on area of a map on regex tree image
      */
-    regex_change : function(e) {
+    regex_change : function (e) {
        self.textbutton_widget.data = self.main_input.val();
     },
 
-    get_orientation : function() {
+    get_orientation : function () {
         return $("#fgroup_id_tree_orientation_radioset input:checked").val();
     },
 
@@ -401,10 +398,10 @@ M.preg_authoring_tools_script = (function($) {
 
         _init : function () {
             this._fake_selection_el = document.createElement("div");
-            $(this._fake_selection_el)  .css('border','1px dashed red')
-                                        .css('position','absolute')
-                                        .css('z-index','1000')
-                                        .hide();
+            $(this._fake_selection_el).css('border','1px dashed red')
+                                      .css('position','absolute')
+                                      .css('z-index','1000')
+                                      .hide();
             $('#preg_authoring_tools_dialog').append(this._fake_selection_el);
         },
 
@@ -412,11 +409,11 @@ M.preg_authoring_tools_script = (function($) {
             //TODO
         },
 
-        get_selected_text_range : function(el) {
+        get_selected_text_range : function (el) {
             var start = 0, end = 0, normalizedValue, range,
                 textInputRange, len, endRange;
 
-            if (typeof el.selectionStart == "number" && typeof el.selectionEnd == "number") {
+            if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
                 start = el.selectionStart;
                 end = el.selectionEnd;
             } else {
@@ -457,18 +454,18 @@ M.preg_authoring_tools_script = (function($) {
         /**
          * @param object coords coordinates of fake div: {top, bottom, left, right, height, width}
          */
-        draw_fake_selection : function(coords) {
-            $(this._fake_selection_el)  .css('top', coords.top)
-                                        .css('bottom', coords.bottom)
-                                        .css('left', coords.left)
-                                        .css('right', coords.right)
-                                        .css('height', coords.height)
-                                        .css('width', coords.width)
-                                        .show();
+        draw_fake_selection : function (coords) {
+            $(this._fake_selection_el).css('top', coords.top)
+                                      .css('bottom', coords.bottom)
+                                      .css('left', coords.left)
+                                      .css('right', coords.right)
+                                      .css('height', coords.height)
+                                      .css('width', coords.width)
+                                      .show();
             return true;
         },
 
-        hide_fake_selection : function() {
+        hide_fake_selection : function () {
             $(this._fake_selection_el).hide();
         }
     }
