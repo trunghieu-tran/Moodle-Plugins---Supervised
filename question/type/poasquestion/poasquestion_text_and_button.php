@@ -35,32 +35,31 @@ MoodleQuickForm::registerElementType('qtype_poasquestion_text_and_button',
 
 class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
-    protected $idbutton = '';
-    protected $linktopage = '';
-    protected $linktobuttonimage = '';
+    protected $buttonName = '';
+    protected $linkToPage = '';
+    protected $linkToBtnImage = '';
     protected $jsmodule = array('name' => 'poasquestion_text_and_button',
-                              'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
-
-    protected $_dialog_title = 'someone forget to set dialog title :(';
+                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
 
     protected static $_poasquestion_text_and_button_included = false;
 
     /**
      * Constructor
-     * @param string $elementName (optional) name of the text field
-     * @param string $elementButtonName (optional) name of the button
-     * @param string $elementLabel (optional) text field label
-     * @param array $elementLinks (optional) link on button image and link on new page
+     * @param string $textareaName (optional) name of the text field
+     * @param string $textareaLabel (optional) text field label
      * @param array $attributes (optional) Either a typical HTML attribute string or an associative array
+     * @param string $buttonName (optional) name of the button
+     * @param array $elementLinks (optional) link on button image and link on new page
      */
-    public function qtype_poasquestion_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $dialogWidth=null, $attributes=null) {
+    public function qtype_poasquestion_text_and_button($textareaName = null, $textareaLabel = null, $attributes = null,
+                                                       $buttonName = null, $elementLinks = null, $dialogWidth = null) {
         global $PAGE;
 
-        parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
+        parent::MoodleQuickForm_textarea($textareaName, $textareaLabel, $attributes);
 
-        $this->idbutton = $elementButtonName;
-        $this->linktopage = $elementLinks['link_to_page'];
-        $this->linktobuttonimage = $elementLinks['link_to_button_image'];
+        $this->buttonName = $buttonName;
+        $this->linkToPage = $elementLinks['link_to_page'];
+        $this->linkToBtnImage = $elementLinks['link_to_button_image'];
         if ($dialogWidth === null) {
             $dialogWidth = '90%';
         }
@@ -71,14 +70,18 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
         if (!self::$_poasquestion_text_and_button_included) {
             $jsargs = array(
                 $dialogWidth,
-                $this->_dialog_title
+                $this->getDialogTitle()
             );
             $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $this->jsmodule);
             self::$_poasquestion_text_and_button_included = true;
         }
     }
 
-    public function getInputId() {
+    public function getDialogTitle() {
+        return 'someone forgot to set the title :(';
+    }
+
+    public function getTextareaId() {
         return $this->getAttribute('id');
     }
 
@@ -94,13 +97,13 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
         $jsargs = array(
             $this->getButtonId(),
-            $this->getInputId()
+            $this->getTextareaId()
         );
 
         $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->jsmodule);
 
-        return parent::toHtml() . '<a href="#" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() . '" >' .
-                                      '<img src="' . $this->linktobuttonimage . '" />' .
+        return parent::toHtml() . '<a href="#" name="button_'. $this->getTextareaId() . '" id="' . $this->getButtonId() . '" >' .
+                                      '<img src="' . $this->linkToBtnImage . '" />' .
                                   '</a>';
     }
 }
