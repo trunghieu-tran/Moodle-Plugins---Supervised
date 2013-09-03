@@ -6,7 +6,7 @@
  *
  * @package    qtype_preg
  * @copyright  &copy; 2012 Oleg Sychev, Volgograd State Technical University
- * @author     
+ * @author
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,7 +27,7 @@ class MoodleQuickForm_preg_textarea extends MoodleQuickForm_textarea {
     function MoodleQuickForm_preg_textarea($elementName=null, $elementLabel=null, $attributes=null) {
         parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
     }
-    
+
     /**
      * Returns HTML for this form element.
      *
@@ -36,6 +36,6 @@ class MoodleQuickForm_preg_textarea extends MoodleQuickForm_textarea {
     function toHtml() {
         return '<div style="width:100%; display:inline-block">' .
                     parent::toHTML() .
-                '&nbsp;<div style="display:inline-block" id="id_test_regex"></div></div>';
+                '&nbsp;<div style="display:inline-block" id="id_test_regex" class="que"></div></div>';
     }
 }
