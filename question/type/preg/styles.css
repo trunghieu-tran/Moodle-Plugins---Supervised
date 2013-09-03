@@ -42,10 +42,3 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
     border: 1px solid #BBB;
     border-top: 0;
 }
-
-.correct{
-	background:green;
-}
-.incorrect{
-	background:red;
-}
