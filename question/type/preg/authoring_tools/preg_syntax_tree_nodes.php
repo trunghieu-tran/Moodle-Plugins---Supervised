@@ -302,7 +302,9 @@ class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
-        return '"' . str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')) . '"';
+        $a = new stdClass;
+        $a->number = $this->pregnode->number;
+        return '"' . get_string('description_backref', 'qtype_preg', $a) . '"';
     }
 }
 
