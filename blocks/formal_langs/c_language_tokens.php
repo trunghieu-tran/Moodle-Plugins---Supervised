@@ -73,7 +73,45 @@ class block_formal_langs_c_token_identifier extends block_formal_langs_c_token_b
  */ 
 class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
 {
-
+    /**
+     * Returns value of token as a number
+     * @return float
+     */
+    protected function numeric_value() {
+        $v = (string)($this->value());
+        $result = 0;
+        if (textlib::strpos($v, '.')  === false) {
+            if (textlib::strpos($v, 'x') !== false || textlib::strpos($v, 'X') !== false) {
+                $result = hexdec($v);
+            } else {
+                if ($v != '0' && $v[0] == '0') {
+                    $result = octdec($v);
+                } else {
+                    $result = floatval($v);
+                }
+            }
+        } else {
+            $result = floatval($v);
+        }
+        return $result;
+    }
+    /**
+     * Tests, whether other lexeme is the same as this lexeme
+     *
+     * @param block_formal_langs_c_token_base $other other lexeme
+     * @param block_formal_langs_comparing_options $options options for comparing lexmes
+     * @return boolean - if the same lexeme
+     */
+    public function is_same($other, $options ) {
+        if (is_a($other, 'block_formal_langs_c_token_numeric')) {
+            $value1 = $this->numeric_value();
+            $value2 = $other->numeric_value();
+            $result = abs($value1 - $value2) < 1.0E-7;
+        } else {
+            $result = parent::is_same($other, $options);
+        }
+        return $result;
+    }
 }
 
 
