@@ -165,12 +165,13 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
             parent::generate_json($json, $id);
         } catch (Exception $e) {
             // Something is wrong with graphviz.
+            $a = new stdClass;
+            $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
-                $a = new stdClass;
-                $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
                 $json[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
             } else {
-                $json[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $e->a);
+                $a->pathtodot = $e->a;
+                $json[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $a);
             }
         }
     }

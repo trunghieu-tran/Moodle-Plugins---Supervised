@@ -453,8 +453,7 @@ class qtype_preg_regex_handler {
             throw new qtype_preg_pathtodot_empty('');
         }
 
-        $dir = !empty($CFG->pathtodot) ? dirname($CFG->pathtodot) : null;
-        $cmd = 'dot -T' . $type;
+        $cmd = escapeshellarg($CFG->pathtodot) . ' -T' . $type;
         if ($filename !== null) {
             $cmd .= ' -o' . escapeshellarg($filename);
         }
@@ -462,21 +461,23 @@ class qtype_preg_regex_handler {
                                 1 => array('pipe', 'w'),  // Stdout is a pipe that the child will write to.
                                 2 => array('pipe', 'w')); // Stderr is a pipe that the child will write to.
 
-        $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
+        $process = proc_open($cmd, $descriptorspec, $pipes);
+        $output = '';
+        if (is_resource($process)) {
+            fwrite($pipes[0], $dotscript);
+            fclose($pipes[0]);
 
-        if (!is_resource($process)) {
-            $a = new stdClass;
-            $a->pathtodot = $CFG->pathtodot;
-            throw new qtype_preg_pathtodot_incorrect('', $a);
+            $output = stream_get_contents($pipes[1]);
+            $err = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            proc_close($process);
+
+            if (!empty($err)) {
+                throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+            }
         }
-
-        fwrite($pipes[0], $dotscript);
-        fclose($pipes[0]);
-        $output = stream_get_contents($pipes[1]);
-        $err = stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process);
         return $output;
     }
 

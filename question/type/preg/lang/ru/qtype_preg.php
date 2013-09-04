@@ -542,10 +542,6 @@ $string['description_concat_short_g'] = '{$a->g1}{$a->g2}';
 $string['description_alt_g'] = '{$a->g1} или {$a->g2}';
 $string['description_alt_wcomma_g'] = '{$a->g1} или {$a->g2}';
 $string['description_empty_g'] = 'ничего(form g)';
-$string['description_engine'] = 'Движок поиска совпадений';
-$string['description_usecase'] = 'Чувствительность к регистру';
-$string['description_exactmatch'] = 'Точное совпадение';
-$string['description_notation'] = 'Нотация регулярных выражений';
 
 // Strings for explaining graph
 

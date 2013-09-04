@@ -542,10 +542,6 @@ $string['description_concat_short_g'] = '{$a->g1}{$a->g2}';
 $string['description_alt_g'] = '{$a->g1} or {$a->g2}';
 $string['description_alt_wcomma_g'] = '{$a->g1} or {$a->g2}';
 $string['description_empty_g'] = 'nothing(form g)';
-$string['description_engine'] = 'engine';
-$string['description_usecase'] = 'usecase';
-$string['description_exactmatch'] = 'exactmatch';
-$string['description_notation'] = 'notation';
 
 // Strings for explaining graph
 
