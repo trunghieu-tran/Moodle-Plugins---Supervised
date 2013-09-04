@@ -475,9 +475,7 @@ class qtype_preg_regex_handler {
             proc_close($process);
 
             if (!empty($err)) {
-                $a = new stdClass;
-                $a->pathtodot = $CFG->pathtodot;
-                throw new qtype_preg_pathtodot_incorrect('', $a);
+                throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
             }
         }
         return $output;
