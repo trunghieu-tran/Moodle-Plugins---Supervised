@@ -20,8 +20,8 @@ M.poasquestion_text_and_button = (function() {
     /** @var reference to yui dialog object */
     dialog : null,
 
-    /** @var reference to node with user html code of dialog */
-    dialoghtmlnode : null,
+    /** @var width of dialog */
+    dialogwidth: 1000,
 
     dialogtitle : null,
 
@@ -43,8 +43,7 @@ M.poasquestion_text_and_button = (function() {
     /** @var data for module-extender */
     extendeddata : null,
 
-    /** @var width of dialog */
-    dialogwidth: 1000,
+
 
     /** Just creates object */
     init : function(Y, dialogwidth, dialogtitle) {
@@ -66,13 +65,13 @@ M.poasquestion_text_and_button = (function() {
      */
     set_handler : function (Y, button_id, input_id, pagewidth) {
         //this.Y = this.Y || Y;
-        if(button_id==null || input_id==null) {
+        if (button_id == null || input_id == null) {
             return;
         }
-        if(button_id.indexOf('#') != 0) {
+        if (button_id.indexOf('#') != 0) {
             button_id = '#' + button_id;
         }
-        if(input_id.indexOf('#') != 0) {
+        if (input_id.indexOf('#') != 0) {
             input_id = '#' + input_id;
         }
         var testregexbtn = $(button_id);
@@ -90,7 +89,6 @@ M.poasquestion_text_and_button = (function() {
      * @param {targetinput} e.data.input from which data should be readen (should be passed as jquery event data)
      */
     btn_pressed : function(e) {
-
         e.preventDefault();
         var is_first_press = self.dialog === null;
 
@@ -101,11 +99,11 @@ M.poasquestion_text_and_button = (function() {
             self.setup_dialog();
         }
 
-        if(is_first_press && typeof(self.onfirstpresscallback) === "function") {
+        if (is_first_press && typeof(self.onfirstpresscallback) === "function") {
             self.onfirstpresscallback();
         }
 
-        if(!is_first_press && typeof(self.oneachpresscallback) === "function") {
+        if (!is_first_press && typeof(self.oneachpresscallback) === "function") {
             self.oneachpresscallback();
         }
         self.dialog.dialog('open');
@@ -134,16 +132,6 @@ M.poasquestion_text_and_button = (function() {
      * onfirstpresscallback (function that calls at first dialog open)
      * and oneachpresscallback (function that calls at second and others dialog
      * open). Also may add extendeddata object to this module.
-     * Example:
-     *    var options = {
-     *       onfirstpresscallback : function() {
-     *           alert(1);
-     *       },
-     *
-     *       oneachpresscallback : function() {
-     *           alert(1);
-     *       }
-     *   };
      */
     setup : function (options) {
         self.onfirstpresscallback = options.onfirstpresscallback;
@@ -159,7 +147,6 @@ M.poasquestion_text_and_button = (function() {
      * @param {String} _data data to set into current input
      */
     close_and_set_new_data : function(_data) {
-        
         if (typeof(_data) === "string") {
             self.data = _data;
             self.currentlinput.val(_data);
@@ -171,7 +158,6 @@ M.poasquestion_text_and_button = (function() {
         self.dialog.dialog('close');
     }
 };
-
 
 return self;
 
