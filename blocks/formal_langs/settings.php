@@ -13,22 +13,27 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
+defined('MOODLE_INTERNAL') || die;
+
 /**
- * Version information for the formal languages block.
+ * A library of settings classes for the plugins, using languages from block
  *
  * @package    formal_langs
- * @copyright  2012 Sychev Oleg
+ * @copyright  2013 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+global $CFG;
 
-defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 
-$plugin->component = 'block_formal_langs';
-$plugin->version  = 2013071900;
-$plugin->requires = 2013051400;
-$plugin->release = 'Formal languages 2.5';
-$plugin->maturity = MATURITY_STABLE;
+if($ADMIN->fulltree) {
 
-$plugin->dependencies = array(
-    'qtype_poasquestion' => 2013062900
-);
+    $cfgname = 'block_formal_langs_showablelangs';
+    $label =  get_string('visiblelangslabel', 'block_formal_langs');
+    $description = get_string('visiblelangsdescription', 'block_formal_langs');
+    $default = array('1' => '1');
+    /** @var block_formal_langs_admin_setting_showable_languages $setting */
+    $setting  = new block_formal_langs_admin_setting_visible_languages($cfgname, $label, $description, $default, null);
+    $settings->add($setting);
+
+}

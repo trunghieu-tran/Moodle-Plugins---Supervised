@@ -31,26 +31,56 @@ class block_formal_langs extends block_base {
         $this->title = get_string('pluginname', 'block_formal_langs');
     }
 
+    function has_config() {
+        return true;
+    }
+
     /**
      * Returns an array of languages for given context
      *
-     * @param contextid id of context, null means whole site
+     * @param int $contextid id of context, null means whole site
      * @return array where key is language id and value is user interface language name (received throught get_string)
      */
     public static function available_langs($contextid = null) {
-        //TODO: Replace it with actual code
+        global $CFG;
+        $languages = block_formal_langs::all_languages();
+        // TODO - create a table with eye icons and set "visible" DB field for the language accordingly instead of using $CFG->xxx.
+        $showedlanguages = $CFG->block_formal_langs_showablelangs;
+        if (textlib::strlen($showedlanguages) != 0)
+        {
+            $availablelanguages = array();
+            $showedlanguages = explode(',', $showedlanguages);
+            foreach($showedlanguages as $langkey)
+            {
+                // Copy only visible langugages.
+                $availablelanguages[$langkey] = $languages[$langkey];
+            }
+        } else {
+            $availablelanguages = $languages;
+        }
+        return $availablelanguages;
+    }
+
+    /**
+     * This function returns all languages.
+     *
+     * It is used in language configuration only and doesn't respect admin setting for available languages. 
+     * For interaction with user please use function available_langs().
+     * @return array where key is language id and value is user interface language name (received throught get_string)
+     */
+    public static function all_languages() {
         global $DB;
-        
+
         //BUG: When installing moodle 2.5 settings of correctwriting will eventually call this function
         // before table created
         $dbman = $DB->get_manager();
         if ($dbman->table_exists('block_formal_langs') == false) {
             return array();
         }
-        
+
         //Get all visible records
         $records = $DB->get_records('block_formal_langs', array('visible' => '1'));
-        
+
         //Map, that checks amount of unique names in table. Populate it with values
         $counts = array();
         foreach($records as $record) {
@@ -72,7 +102,7 @@ class block_formal_langs extends block_base {
                 $result[$record->id] = $record->ui_name;
             }
         }
-        
+
         return $result;
     }
 

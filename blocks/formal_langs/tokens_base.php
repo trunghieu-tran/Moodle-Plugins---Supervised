@@ -394,13 +394,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * Tests, whether other lexeme is the same as this lexeme
      *  
      * @param block_formal_langs_token_base $other other lexeme
-     * @param bool $casesensitive whether we should care about for case sensitive
+     * @param block_formal_langs_comparing_options $options options for comparing lexmes
      * @return boolean - if the same lexeme
      */
-    public function is_same($other, $casesensitive = true) {
+    public function is_same($other, $options ) {
         $result = false;
         if ($this->type == $other->type) {
-            if ($casesensitive) {
+            if ($options->usecase) {
                 $result = $this->value == $other->value;
             }  else {
                 $left = $this->string_caseinsensitive_value();
@@ -896,9 +896,11 @@ class block_formal_langs_processed_string {
             }
         } else {
             // There is no description, compare the values instead.
+            $options = new block_formal_langs_comparing_options();
+            $options->usecase = true;
             for ($i = 0; $i < $tokencount; $i++) {
                 // Use case-sensitive search, since user could see case in the message.
-                if ($i != $tokenindex && !$this->has_description($i) && $this->tokenstream->tokens[$tokenindex]->is_same($this->tokenstream->tokens[$i], true)) {
+                if ($i != $tokenindex && !$this->has_description($i) && $this->tokenstream->tokens[$tokenindex]->is_same($this->tokenstream->tokens[$i], $options)) {
                     $result = true;
                 }
             }
@@ -1158,6 +1160,15 @@ class block_formal_langs_string_pair {
      */
     public function correctstring() {
         return $this->correctstring;
+    }
+
+    /**
+     *  Returns a compared string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
+    public function comparedstring() {
+        return $this->comparedstring;
     }
 
     /**
