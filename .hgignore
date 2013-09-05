@@ -5,3 +5,4 @@ mod/assignment/
 mod/assign/
 config.php
 .htaccess
+draftfile.php

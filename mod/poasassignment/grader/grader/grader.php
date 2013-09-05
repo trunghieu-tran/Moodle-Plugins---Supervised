@@ -82,6 +82,10 @@ abstract class grader {
 
     public function evaluate_attempt($attemptid) {
     }
+
+    public function get_grader_notes($assigneeid) {
+        return FALSE;
+    }
     
     /* private static $settings = array('feedback' => POASASSIGNMENT_GRADER_SHOW_TESTING_PROGRAM_FEEDBACK,
                                      'testinputdata' => POASASSIGNMENT_GRADER_SHOW_TEST_INPUT_DATA,

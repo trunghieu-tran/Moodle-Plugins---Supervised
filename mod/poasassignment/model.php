@@ -68,6 +68,7 @@ class poasassignment_model {
                                     'taskedit' => 'pages/taskedit.php',
                                     'tasksimport' => 'pages/tasksimport.php',
                                     'auditortasks' => 'pages/auditortasks.php',
+                                    'testresults' => 'pages/testresults.php'
                                     );
     private static $flags = array(
                             'preventlatechoice' => PREVENT_LATE_CHOICE,
@@ -1195,6 +1196,41 @@ class poasassignment_model {
         $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
         return $rec;
     }
+
+    /**
+     * Get HTML for grader's notes on submission page.
+     *
+     * @param $assigneeid
+     * @return HTML for grader's notes on submission page.
+     */
+    public function get_grader_notes($assigneeid) {
+        $strings = array();
+        global $DB;
+        // Get graders list
+        $usedgraders = $DB->get_records('poasassignment_used_graders',
+            array('poasassignmentid' => $this->poasassignment->id));
+        if(count($usedgraders) == 0) {
+            return;
+        }
+        $graderids = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderids[] = $usedgrader->graderid;
+        }
+        $inorequal = $DB->get_in_or_equal($graderids);
+        $sql = "SELECT * FROM {poasassignment_graders} WHERE id" . $inorequal[0]. "";
+        $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
+
+
+        foreach ($graderrecords as $graderrecord) {
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            $grader = new $gradername;
+            $string = $grader->get_grader_notes($assigneeid);
+            if ($string)
+                $strings[] = $string;
+        }
+        return implode('<br>', $strings);
+    }
     public function evaluate_attempt($attemptid) {
         global $DB;
         // Get graders list
@@ -2122,6 +2158,38 @@ class poasassignment_model {
         $groups = $DB->get_records_sql($sql);
         return $groups;
     }
+
+    public function get_users_by_groups($groups) {
+        global $DB;
+        $courseid = $this->poasassignment->course;
+        list($insql, $inparams) = $DB->get_in_or_equal($groups);
+        $sql = "SELECT grmem.userid
+                FROM {groups} gr
+                JOIN {groups_members} grmem
+                ON  grmem.groupid = gr.id
+                WHERE gr.id $insql AND courseid = $courseid";
+        $users = $DB->get_records_sql($sql, $inparams);
+        return $users;
+    }
+
+    /**
+     * Get users groups
+     *
+     * @param $users array of users ids
+     * @return mixed array of used groups
+     */
+    public function get_users_groups($users) {
+        global $DB;
+        $courseid = $this->poasassignment->course;
+        list($insql, $inparams) = $DB->get_in_or_equal($users);
+        $sql = "SELECT DISTINCT(gr.id), gr.name, gr.description
+                FROM {groups} gr
+                JOIN {groups_members} grmem
+                ON  grmem.groupid = gr.id
+                WHERE grmem.userid $insql AND courseid = $courseid";
+        $groups = $DB->get_records_sql($sql, $inparams);
+        return $groups;
+    }
     
     /**
      * Hide or show task by it's id 
@@ -2509,6 +2577,35 @@ class poasassignment_model {
     }
 
     /**
+     * Get extended assignee info (with user's table fields)
+     *
+     * @param $poasassignmentid poasassignment id
+     * @return array of assigneesinfo or boolean false
+     */
+    public function get_assignees_ext($poasassignmentid, $usersids = false) {
+        global $DB;
+        $sql = '
+            SELECT {poasassignment_assignee}.*, firstname, lastname
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            WHERE {poasassignment_assignee}.poasassignmentid = ' . $poasassignmentid . '
+            AND {poasassignment_assignee}.cancelled = 0';
+        $params = array();
+        if ($usersids) {
+            list($insql, $inparams) = $DB->get_in_or_equal($usersids);
+            $sql .= " AND {user}.id $insql";
+            $params = $inparams;
+        }
+        $sql .= ' ORDER BY {user}.lastname';
+
+        $result = $DB->get_records_sql($sql, $params);
+        if ($result)
+            return $result;
+        else
+            return false;
+    }
+
+    /**
      * This function adds plugin pages to the navigation menu
      *
      * @static
@@ -2529,7 +2626,7 @@ class poasassignment_model {
         ksort($pluginsbyname);
         foreach ($pluginsbyname as $pluginname => $plugin) {
             $settings = new admin_settingpage($subtype . '_'.$plugin,
-                $pluginname, 'moodle/site:config', !$module->visible);
+                $pluginname, 'moodle/site:config', !$module->is_enabled());
             if ($admin->fulltree) {
                 include($plugins[$plugin]);
             }
@@ -2582,5 +2679,84 @@ class poasassignment_model {
             $DB->delete_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
         }
         $DB->delete_records('poasassignment_assignee', array('poasassignmentid' => $instanceid));
+    }
+
+    /**
+     * Disable penalty for attempt.
+     *
+     * @param $attemptid attempt ID
+     */
+    public static function disable_attempt_penalty($attemptid) {
+        global $DB;
+        $attempt = $DB->get_record('poasassignment_attempts', array('id'=>$attemptid), 'id, disablepenalty');
+        $attempt->disablepenalty = 1;
+        $DB->update_record('poasassignment_attempts',$attempt);
+    }
+
+    public function assignee_get_by_id($assigneeid) {
+        global $DB;
+        $sql = 'SELECT {poasassignment_assignee}.*, firstname, lastname
+            FROM {poasassignment_assignee}
+            JOIN {user} on {poasassignment_assignee}.userid={user}.id
+            WHERE {poasassignment_assignee}.id='.$assigneeid.'
+            ORDER BY lastname ASC, firstname ASC, {user}.id ASC
+            ';
+        return $DB->get_record_sql($sql);
+    }
+
+    /**
+     * Get used graders
+     *
+     * @return mixed array of used graders
+     */
+    public function get_used_graders() {
+        global $DB;
+        // Get graders list
+        $usedgraders = $DB->get_records('poasassignment_used_graders',
+            array('poasassignmentid' => $this->poasassignment->id));
+        if(count($usedgraders) == 0) {
+            return;
+        }
+        $graderids = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderids[] = $usedgrader->graderid;
+        }
+        $inorequal = $DB->get_in_or_equal($graderids);
+        $sql = "SELECT * FROM {poasassignment_graders} WHERE id" . $inorequal[0]. "";
+        $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
+        return $graderrecords;
+    }
+
+    /**
+     * Get criterions for grader in poasassignment instance
+     *
+     * @param $poasassignmentid
+     * @param $graderid
+     */
+    public function get_criterions($poasassignmentid, $graderid) {
+        global $DB;
+        $sql = 'SELECT cr.*
+        FROM {poasassignment_criterions} cr
+        WHERE cr.graderid=' . $graderid . ' AND cr.poasassignmentid=' . $poasassignmentid;
+        $criterions = $DB->get_records_sql($sql);
+        return $criterions;
+    }
+
+    public function delete_rating_values($criterionids, $attemptid) {
+        global $DB;
+        $inorequal = $DB->get_in_or_equal($criterionids);
+        $sql = 'DELETE FROM {poasassignment_rating_values}
+            WHERE {poasassignment_rating_values}.attemptid=' . $attemptid .'
+            AND {poasassignment_rating_values}.criterionid' . $inorequal[0];
+        $DB->execute($sql, $inorequal[1]);
+    }
+
+    public function get_attempt_assignee($attemptid) {
+        global $DB;
+        $sql = 'SELECT {poasassignment_assignee}.*
+        FROM {poasassignment_attempts}
+        JOIN {poasassignment_assignee} ON {poasassignment_assignee}.id={poasassignment_attempts}.assigneeid
+        WHERE {poasassignment_attempts}.id=' . $attemptid;
+        return $DB->get_record_sql($sql);
     }
 }
