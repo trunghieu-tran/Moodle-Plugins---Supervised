@@ -218,11 +218,12 @@ abstract class qtype_preg_nfa_node {
         $stack[] = $body;
     }
 
-    public static function move_transitions($from, $to) {
-        foreach ($from->outgoing_transitions() as $transition) {
+    public static function move_transitions_and_delete_state($automaton, $from, $to) {
+        $transitions = $from->outgoing_transitions();
+        $automaton->remove_state($from);
+        foreach ($transitions as $transition) {
             $to->add_transition($transition);   // "from" is set automatically.
         }
-        $from->remove_all_transitions();
     }
 }
 
@@ -298,8 +299,7 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
                 $result = $cur;
             } else {
                 $automaton->update_state_references($cur['start'], $result['end']);
-                self::move_transitions($cur['start'], $result['end']);
-                $automaton->remove_state($cur['start']);
+                self::move_transitions_and_delete_state($automaton, $cur['start'], $result['end']);
                 $result = array('start' => $result['start'], 'end' => $cur['end']);
             }
         }
@@ -331,8 +331,7 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
                 // Merge start and end states.
                 $automaton->update_state_references($cur['start'], $result['start']);
                 $automaton->update_state_references($cur['end'], $result['end']);
-                self::move_transitions($cur['start'], $result['start']);
-                $automaton->remove_state($cur['start']);
+                self::move_transitions_and_delete_state($automaton, $cur['start'], $result['start']);
                 $automaton->remove_state($cur['end']);
             }
         }
@@ -425,8 +424,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
                 $automaton->update_state_references($result['end'], $cur['start']);
-                self::move_transitions($result['end'], $cur['start']);
-                $automaton->remove_state($result['end']);
+                self::move_transitions_and_delete_state($automaton, $result['end'], $cur['start']);
                 $result['end'] = $cur['end'];
             }
         }
@@ -507,8 +505,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
                 $automaton->update_state_references($result['end'], $cur['start']);
-                self::move_transitions($result['end'], $cur['start']);
-                $automaton->remove_state($result['end']);
+                self::move_transitions_and_delete_state($automaton, $result['end'], $cur['start']);
                 $result['end'] = $cur['end'];
             }
         }

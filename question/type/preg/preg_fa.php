@@ -145,13 +145,6 @@ class qtype_preg_fa_state {
     }
 
     /**
-     * Removes all transitions from this state.
-     */
-    public function remove_all_transitions() {
-        $this->outtransitions = array();
-    }
-
-    /**
      * Replaces oldref with newref in each transition.
      *
      * @param oldref - a reference to the old state.
