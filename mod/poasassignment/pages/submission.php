@@ -71,7 +71,9 @@ class submission_page extends abstract_page {
     }
     function view() {
         global $OUTPUT;
+        $model = poasassignment_model::get_instance();
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+        echo $model->get_grader_notes($model->assignee->id);
         $this->mform->display();
         echo $OUTPUT->box_end();
     }
