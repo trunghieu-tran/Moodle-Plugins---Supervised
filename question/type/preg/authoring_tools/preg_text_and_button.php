@@ -19,13 +19,13 @@ MoodleQuickForm::registerElementType('preg_text_and_button',
     $CFG->dirroot.'/question/type/preg/authoring_tools/preg_text_and_button.php',
     'MoodleQuickForm_preg_text_and_button');
 
-class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_button {
+class MoodleQuickForm_preg_text_and_button extends qtype_poasquestion_text_and_button {
 
     //private $parentjsobjname = 'M.poasquestion_text_and_button';
 
     private static $_preg_authoring_tools_script_included = false;
 
-    function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null) {
+    public function MoodleQuickForm_preg_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null) {
         global $CFG;
         $this->_dialog_title = get_string('authoring_tool_page_header', 'qtype_preg');
         $elementLinks = array(
@@ -36,15 +36,10 @@ class MoodleQuickForm_preg_text_and_button extends MoodleQuickForm_text_and_butt
         $this->include_preg_authoring_tools_script();
     }
 
-    function toHtml() {
-        $parenthtml = parent::toHtml();
-        return $parenthtml;
-    }
-
     private function include_preg_authoring_tools_script() {
         global $CFG;
         global $PAGE;
-        if(self::$_preg_authoring_tools_script_included===false) {
+        if (self::$_preg_authoring_tools_script_included===false) {
             $jsmodule = array(  'name' => 'preg_authoring_tools_script',
                                 'fullpath' => '/question/type/preg/authoring_tools/preg_authoring_tools_script.js'
             );
