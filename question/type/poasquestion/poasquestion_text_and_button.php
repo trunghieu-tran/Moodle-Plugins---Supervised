@@ -23,32 +23,27 @@
  * @package questions
  */
 
-//defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/form/textarea.php');
 
-MoodleQuickForm::registerElementType('text_and_button',
+MoodleQuickForm::registerElementType('qtype_poasquestion_text_and_button',
     $CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php',
-    'MoodleQuickForm_text_and_button');
+    'qtype_poasquestion_text_and_button');
 
-class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
+class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
-    /** @var string html for help button, if empty then no help */
-    private $helpbutton = '';
-    /** @var bool if true label will be hidden */
-    private $hiddenlabel = false;
-    private $idbutton = '';
-    private $linktopage = '';
-    private $linktobuttonimage = '';
-    private $jsmodule = array('name' => 'poasquestion_text_and_button',
+    protected $idbutton = '';
+    protected $linktopage = '';
+    protected $linktobuttonimage = '';
+    protected $jsmodule = array('name' => 'poasquestion_text_and_button',
                               'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
 
     protected $_dialog_title = 'someone forget to set dialog title :(';
 
-    private static $_poasquestion_text_and_button_included = false;
+    protected static $_poasquestion_text_and_button_included = false;
 
     /**
      * Constructor
@@ -58,7 +53,7 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
      * @param array $elementLinks (optional) link on button image and link on new page
      * @param array $attributes (optional) Either a typical HTML attribute string or an associative array
      */
-    function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $dialogWidth=null, $attributes=null) {
+    public function qtype_poasquestion_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $dialogWidth=null, $attributes=null) {
         global $PAGE;
 
         parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
@@ -83,29 +78,18 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
         }
     }
 
-    function getInputId() {
+    public function getInputId() {
         return $this->getAttribute('id');
     }
 
-    function getButtonId() {
+    public function getButtonId() {
         return $this->getAttribute('id') . '_btn';
     }
 
     /**
-     * Sets label to be hidden
-     *
-     * @param bool $hiddenLabel sets if label should be hidden
-     */
-    function setHiddenLabel($hiddenlabel) {
-        $this->hiddenlabel = $hiddenlabel;
-    }
-
-    /**
      * Returns HTML for this form element.
-     *
-     * @return string
      */
-    function toHtml() {
+    public function toHtml() {
         global $PAGE;
 
         $jsargs = array(
@@ -118,27 +102,5 @@ class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
         return parent::toHtml() . '<a href="#" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() . '" >' .
                                       '<img src="' . $this->linktobuttonimage . '" />' .
                                   '</a>';
-    }
-
-    /**
-     * get html for help button
-     *
-     * @return string html for help button
-     */
-    function getHelpButton() {
-        return $this->helpbutton;
-    }
-
-    /**
-     * get html for help button
-     *
-     * @return string html for help button
-     */
-    function getElementTemplateType() {
-        if ($this->_flagFrozen) {
-            return 'static';
-        } else {
-            return 'default';
-        }
     }
 }
