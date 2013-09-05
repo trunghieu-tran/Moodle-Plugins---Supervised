@@ -8,18 +8,15 @@
  * @package questions
  */
 
-//defined('MOODLE_INTERNAL') || die();
-
 require_once(dirname(__FILE__) . '/../../../../config.php');
-
-global $CFG;
-global $PAGE;
-
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/edit_ast_preg_form.php');
-require_once($CFG->libdir . '/questionlib.php');
 
+$PAGE->set_url('/question/type/preg/authoring_tools/ast_preg_form.php');
 $PAGE->set_context(context_system::instance());
 
-//Instantiate simplehtml_form
+echo $OUTPUT->header();
+
 $mform = new qtype_preg_authoring_tool_form();
 $mform->display();
+
+echo $OUTPUT->footer();
