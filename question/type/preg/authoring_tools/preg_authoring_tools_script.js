@@ -81,7 +81,13 @@ M.preg_authoring_tools_script = (function ($) {
 
             // Function called on the very first form opening.
             onfirstpresscallback : function () {
-                $(self.textbutton_widget.dialog).load(self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php', function () {
+                $.ajax({
+                    url: self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php',
+                    type: "GET",
+                    dataType: "text"
+                }).done(function( responseText, textStatus, jqXHR ) {
+                    $(self.textbutton_widget.dialog).html( $.parseHTML( responseText, document, true ) );
+
                     //TODO: set empty src in all field
 
                     // Add handlers for the buttons.
@@ -102,7 +108,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
 
                     // TODO - FIND A GOOD WAY TO HIDE THE "EXPAND ALL" BUTTON!
-                    $(".collapsible-actions").hide();
+                    //$(".collapsible-actions").hide();
 
                     // get testing data from hidden field and put it into ui
                     $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
@@ -113,6 +119,7 @@ M.preg_authoring_tools_script = (function ($) {
                     options.display_question_options();
                     self.regex_selection_widget._init();
                     self.load_content('-1');
+
                 });
             },
 
