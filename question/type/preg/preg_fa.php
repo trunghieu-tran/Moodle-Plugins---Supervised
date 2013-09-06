@@ -595,18 +595,14 @@ abstract class qtype_preg_finite_automaton {
      * Return outtransitions of state with id $state.
      *
      * @param state - id of state which outtransitions are intresting.
+     * @param isoutcoming - boolean flag which type of transitions to get (true - outtransitions, false - intotransitions).
      */
-    public function get_state_outtransitions($state) {
-        return $this->adjacencymatrix[$state];
-    }
-
-    /**
-     * Return intotransitions of state with id $state.
-     *
-     * @param state - id of state which intotransitions are intresting.
-     */
-    public function get_state_intotransitions($state) {
-        return $this->get_column($this->adjacencymatrix, $state);
+    public function get_adjacent_transitions($state, $isoutcoming) {
+        if ($isoutcoming) {
+            return $this->adjacencymatrix[$state];
+        } else {
+            return $this->get_column($this->adjacencymatrix, $state);
+        }
     }
 
     /**
