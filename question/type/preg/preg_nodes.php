@@ -285,7 +285,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     /** Is this leaf negative? */
     public $negative = false;
     /** Assertions merged into this node (qtype_preg_leaf_assert objects). */
-    public $mergedassertions = array();
+    public $mergedassertions = array();//TODO two fields: assertionsbefore and assertionsafter.
 
     public function __clone() {
         // When clonning a leaf we also want the merged assertions to be cloned.
@@ -1071,17 +1071,17 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
 abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     /** \b and \B */
-    const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
+    const SUBTYPE_ESC_B = 'leaf_assert_esc_b';
     /** \A */
-    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
+    const SUBTYPE_ESC_A = 'leaf_assert_esc_a';
     /** \z and \Z */
-    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
+    const SUBTYPE_ESC_Z = 'leaf_assert_esc_z';
     /** \G */
-    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
+    const SUBTYPE_ESC_G = 'leaf_assert_esc_g';
     /** ^ */
-    const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
+    const SUBTYPE_CIRCUMFLEX = 'leaf_assert_circumflex';
     /** $ */
-    const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
+    const SUBTYPE_DOLLAR = 'leaf_assert_dollar';
 
     public function __construct($negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
