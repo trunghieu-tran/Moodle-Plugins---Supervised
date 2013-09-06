@@ -658,11 +658,7 @@ abstract class qtype_preg_finite_automaton {
                         }
                     }
                     // Analysis outtransitions if go forward and intotransitions if go back.
-                    if ($direction == 0) {
-                        $transitions = $this->get_state_outtransitions($curstate);
-                    } else {
-                        $transitions = $this->get_state_intotransitions($curstate);
-                    }
+                    $transitions = $this->get_adjacent_transitions($curstate, !$direction);
                     
                     // No any interconnecting states.
                     if (count($transitions) != 0 || $isendstate) {
@@ -781,7 +777,7 @@ abstract class qtype_preg_finite_automaton {
             // Add connected states.
             $states = $this->get_states();
             foreach ($states as $curstate) {
-                $outtransitions = $this->get_state_outtransitions($curstate);
+                $outtransitions = $this->get_adjacent_transitions($curstate, true);
                 foreach ($outtransitions as $tran) {
                     $result .= "\n    ";
                     $fromindex = $this->statenumbers[$tran->from];
@@ -959,7 +955,7 @@ abstract class qtype_preg_finite_automaton {
      * @param transition transition for adding.
      */
     public function add_transition(&$transition) {
-        $outtransitions = $this->get_state_outtransitions($transition->from);
+        $outtransitions = $this->get_adjacent_transitions($transition->from, true);
         // Automata  has already such ttransition.
         if (array_key_exists($transition->to, $outtransitions)) {
             // Get transition which it had before.
@@ -975,8 +971,8 @@ abstract class qtype_preg_finite_automaton {
                 if ($newleaf === null) {
                     $clones = array();  // array of clones of coping transitions.
                     // Get coping transitions.
-                    $outtransitions = $this->get_state_outtransitions($tran->to);
-                    $intotransitions = $this->get_state_intotransitions($tran->to);
+                    $outtransitions = $this->get_adjacent_transitions($tran->to, true);
+                    $intotransitions = $this->get_adjacent_transitions($tran->to, false);
                     // Get new number of cloned state.
                     $newnumber = '/' . $this->statenumbers[$transition->to];
                     $newto = $this->add_state($newnumber);
@@ -1494,7 +1490,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function go_round_transitions($del) {
         $clonetransitions = array();
-        $transitions = $this->get_state_outtransitions($del->to);
+        $transitions = $this->get_adjacent_transitions($del->to, true);
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
             $tran = clone($transition);
@@ -1551,8 +1547,8 @@ abstract class qtype_preg_finite_automaton {
         // Transition for merging isn't cycle.
         if ($del->to != $del->from) {
             $needredacting = false;
-            $transitions = $this->get_state_outtransitions($del->to);
-            $intotransitions = $this->get_state_intotransitions($del->from);
+            $transitions = $this->get_adjacent_transitions($del->to, true);
+            $intotransitions = $this->get_adjacent_transitions($del->from, false);
             // Possibility of merging with outtransitions.
             if (count($transitions) != 0) {
                 $needredacting = true;
@@ -1580,7 +1576,7 @@ abstract class qtype_preg_finite_automaton {
             if (count($transitions) !=0) {
                 $this->merge_states($del);
                 // Adding intotransitions from merged state.
-                $intotransitions = $this->get_state_intotransitions($del->to);
+                $intotransitions = $this->get_adjacent_transitions($del->to, false);
                 foreach ($intotransitions as &$tran) {
                     if ($tran != $del) {
                         $tran->to = $del->from;
@@ -1630,13 +1626,13 @@ abstract class qtype_preg_finite_automaton {
             // Analysis transitions of each state.
             foreach ($oldfront as $state) {
                 if (!$waschanged && array_search($state, $stateschecked) === false) {
-                    $transitions = $this->get_state_outtransitions($state);
+                    $transitions = $this->get_adjacent_transitions($state, true);
                     // Searching transition of given type.
                     foreach ($transitions as &$tran) {
                         $tran->set_transition_type();
                         if ($tran->type == $trantype1 || $tran->type == $trantype2) {
                             // Choice of merging way.
-                            $intotransitions = $this->get_state_intotransitions($tran->to);
+                            $intotransitions = $this->get_adjacent_transitions($tran->to, false);
                             if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
                                 $this->go_round_transitions($tran);
                                 $waschanged = true;
@@ -1653,7 +1649,7 @@ abstract class qtype_preg_finite_automaton {
                             if ($addedstate !== false) {
                                 unset($stateschecked[$addedstate]);
                             }
-                            $outtransitions = $this->get_state_outtransitions($state);
+                            $outtransitions = $this->get_adjacent_transitions($state, true);
                             // Delete cycle of uncapturing transition.
                             $wasdel = false;
                             foreach ($outtransitions as $outtran) {
@@ -1687,14 +1683,11 @@ abstract class qtype_preg_finite_automaton {
      */
     public function get_connected_states($state, $direction) {
         $result = array();
-        if ($direction == 0) {
-            $outtransitions = $this->get_state_outtransitions($state);
-            foreach ($outtransitions as $tran) {
+        $transitions = $this->get_adjacent_transitions($state, !$direction);
+        foreach ($transitions as $tran) {
+            if ($direction == 0) {
                 $result[] = $tran->to;
-            }
-        } else {
-            $intotransitions = $this->get_state_intotransitions($state);
-            foreach ($intotransitions as $tran) {
+            } else {
                 $result[] = $tran->from;
             }
         }
@@ -1730,15 +1723,15 @@ abstract class qtype_preg_finite_automaton {
         $states = $source->get_states();
         if (count($states) != 0) {
             $keys = array_keys($states);
-            $transitions = $source->get_state_outtransitions($states[$keys[0]]);
+            $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
             $origin = $transitions[$keys[0]]->origin;
         }
         // Get transition for analysis.
         if ($direction == 0) {
-            $transitions = $source->get_state_intotransitions($statefromsource);
+            $transitions = $source->get_adjacent_transitions($statefromsource, false);
         } else {
-            $transitions = $source->get_state_outtransitions($statefromsource);
+            $transitions = $source->get_adjacent_transitions($statefromsource, true);
         }
         $numbers = $source->get_state_numbers();
 
@@ -1815,7 +1808,7 @@ abstract class qtype_preg_finite_automaton {
         $states = $source->get_states();
         if (count($states) != 0) {
             $keys = array_keys($states);
-            $transitions = $source->get_state_outtransitions($states[$keys[0]]);
+            $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
             $origin = $transitions[$keys[0]]->origin;
         }
@@ -1990,12 +1983,9 @@ abstract class qtype_preg_finite_automaton {
                         }
                     }
 
-                    if ($direction == 0) {
-                        $transitions = $anotherfa->get_state_intotransitions($statefromsecond);
-                    } else {
-                        $transitions = $anotherfa->get_state_outtransitions($statefromsecond);
-                        $transitions = array_values($transitions);
-                    }
+                    $transitions = $anotherfa->get_adjacent_transitions($statefromsecond, $direction);
+                    $transitions = array_values($transitions);
+
                     // There are transitions for analysis.
                     if (count($transitions) != 0) {
                         $intertran = $tran->intersect($transitions[0]);
@@ -2052,13 +2042,7 @@ abstract class qtype_preg_finite_automaton {
      * @return array of transitions for intersection.
      */
     public function get_transitions_for_intersection($workstate, $direction) {
-        if ($direction == 0) {
-            // Add outtransitions.
-            $transitions = $this->get_state_outtransitions($workstate);
-        } else {
-            // Add intotransitions.
-            $transitions = $this->get_state_intotransitions($workstate);
-        }
+        $transitions = $this->get_adjacent_transitions($workstate, !$direction);
         return $transitions;
     }
 
@@ -2163,7 +2147,7 @@ abstract class qtype_preg_finite_automaton {
                     $newfront = array_merge($newfront, $connectedstates);
                 } else {
                     // Analysis intotransitions.
-                    $transitions = $this->get_state_intotransitions($curstate);
+                    $transitions = $this->get_adjacent_transitions($curstate, false);
                     foreach ($transitions as $tran) {
                         // Transition has come from state which is far in automata.
                         if ($states[$tran->from] > $states[$curstate]) {
@@ -2211,13 +2195,13 @@ abstract class qtype_preg_finite_automaton {
             // Set start states.
             $isfirststart = $numbers[0] !== '' && array_search($workstate1, $fastarts) !== false;
             $issecstart = $numbers[1] !== '' && array_search($workstate2, $anotherfastarts) !== false;
-            if (($isfirststart || $issecstart) && count($this->get_state_intotransitions($state)) == 0) {
+            if (($isfirststart || $issecstart) && count($this->get_adjacent_transitions($state, false)) == 0) {
                 $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
             // Set end states.
             $isfirstend = $numbers[0] !== '' && array_search($workstate1, $faends) !== false;
             $issecend = $numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false;
-            if (($isfirstend || $issecend) && count($this->get_state_outtransitions($state)) == 0) {
+            if (($isfirstend || $issecend) && count($this->get_adjacent_transitions($state, true)) == 0) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
         }
@@ -2425,7 +2409,7 @@ abstract class qtype_preg_finite_automaton {
                         // State with same number is found.
                         if ($numbers[0] == $numbertofind && $numbers[1] !== '' && strpos($searchnumbers[1], $numbers[1]) !== false) {
                             if ($direction == 0) {
-                                $transitions = $result->get_state_outtransitions($curstate);
+                                $transitions = $result->get_adjacent_transitions($curstate, true);
                                 foreach ($transitions as $tran) {
                                     $clonetran = clone($tran);
                                     $clonetran->from = $state;
@@ -2443,7 +2427,7 @@ abstract class qtype_preg_finite_automaton {
                                     $clonestate = null;
                                     // Coping states to the state which is last in cycle.
                                     while (!$lastcopied) {
-                                        $transitions = $result->get_state_intotransitions($frontstate);
+                                        $transitions = $result->get_adjacent_transitions($frontstate, false);
                                         // Analasis transitions.
                                         foreach ($transitions as $tran) {
                                             // Check should we copy this state or not.
@@ -2506,7 +2490,7 @@ abstract class qtype_preg_finite_automaton {
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
             $exendstate = $this->endstates[$i];
-            $transitions = $this->get_state_intotransitions($exendstate);
+            $transitions = $this->get_adjacent_transitions($exendstate, false);
             $epstran = new qtype_preg_nfa_transition ($exendstate, $newleaf, $to, current($transitions)->origin, current($transitions)->consumeschars);
             $this->add_transition($epstran);
             $i--;
@@ -2583,7 +2567,7 @@ abstract class qtype_preg_finite_automaton {
                     $isend = true;
                 }
                 if (!$isend) {
-                    $transitions = $fa->get_state_outtransitions($workstate1);
+                    $transitions = $fa->get_adjacent_transitions($workstate1, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
                     }
@@ -2605,7 +2589,7 @@ abstract class qtype_preg_finite_automaton {
                     $isend = true;
                 }
                 if (!$isend) {
-                    $transitions = $anotherfa->get_state_outtransitions($workstate2);
+                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
                     }
@@ -2646,7 +2630,7 @@ abstract class qtype_preg_finite_automaton {
                     $isstart = true;
                 }
                 if (!$isstart) {
-                    $transitions = $fa->get_state_intotransitions($workstate1);
+                    $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
                     }
@@ -2668,7 +2652,7 @@ abstract class qtype_preg_finite_automaton {
                     $isstart = true;
                 }
                 if (!$isstart) {
-                    $transitions = $anotherfa->get_state_intotransitions($workstate2);
+                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
                     }
