@@ -40,18 +40,6 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     const QUANT_GREEDY = 2;
     const QUANT_POSSESSIVE = 4;
 
-    // Array of nodes representing subpatterns starting at this transition.
-    public $subpatt_start;
-
-    // Array of nodes representing subpatterns ending at this transition.
-    public $subpatt_end;
-
-    // Array of nodes representing subexpressions starting at this transition.
-    public $subexpr_start;
-
-    // Array of nodes representing subexpressions ending at this transition.
-    public $subexpr_end;
-
     // Type of the quantifier that this transition belongs to, one of the constants above.
     public $quant;
 
@@ -69,10 +57,6 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     public function __construct(&$from, &$pregleaf, &$to, $consumeschars = true) {
         parent::__construct($from, $pregleaf, $to, $consumeschars);
-        $this->subpatt_start = array();
-        $this->subpatt_end = array();
-        $this->subexpr_start = array();
-        $this->subexpr_end = array();
         $this->quant = self::QUANT_NONE;
         $this->min_subpatt_node = null;
         $this->starts_backrefed_subexprs = false;
@@ -82,33 +66,6 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     public function causes_backtrack() {
         return $this->starts_backrefed_subexprs || $this->starts_quantifier;
-    }
-
-    // Overriden for subpatterns information
-    public function get_label_for_dot() {
-        $lab = $this->pregleaf->tohr() . ',';
-
-        if (count($this->subpatt_start) > 0) {
-            $lab = $lab . 'starts';
-            foreach ($this->subpatt_start as $node) {
-                $lab = $lab . "{$node->subpattern},";
-            }
-        }
-        if (count($this->subpatt_end) > 0) {
-            $lab = $lab . 'ends';
-            foreach ($this->subpatt_end as $node) {
-                $lab = $lab . "{$node->subpattern},";
-            }
-        }
-
-        $lab = substr($lab, 0, strlen($lab) - 1);
-        $lab = '"' . str_replace('"', '\"', $lab) . '"';
-
-        if ($this->consumeschars) {
-            return $this->from->number . '->' . $this->to->number . "[label = $lab];";
-        } else {
-            return $this->from->number . '->' . $this->to->number . "[label = $lab, style = dotted];";  // Dummy transitions are displayed dotted.
-        }
     }
 }
 

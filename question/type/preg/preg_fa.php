@@ -39,9 +39,16 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
-
-    /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
+    /** @var boolean - true if a transition consumes characters. A non-assertion automaton could have such transitions only at start and at end of the automaton. */
     public $consumeschars;
+    /** @var array of qtype_preg_nodes representing subpatterns starting at this transition. */
+    public $subpatt_start;
+    /** @var array of qtype_preg_nodes representing subpatterns ending at this transition. */
+    public $subpatt_end;
+    /** @var array of qtype_preg_nodes representing subexpressions starting at this transition. */
+    public $subexpr_start;
+    /** @var array of qtype_preg_nodes representing subexpressions ending at this transition. */
+    public $subexpr_end;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
@@ -52,19 +59,36 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
         $this->consumeschars = $consumeschars;
+        $this->subpatt_start = array();
+        $this->subpatt_end = array();
+        $this->subexpr_start = array();
+        $this->subexpr_end = array();
     }
 
     public function get_label_for_dot() {
-        $index1 = $this->from->number;
-        $index2 = $this->to->number;
-        $lab = $this->pregleaf->tohr();
+        $lab = $this->pregleaf->tohr() . ',';
+
+        if (count($this->subpatt_start) > 0) {
+            $lab = $lab . 'starts';
+            foreach ($this->subpatt_start as $node) {
+                $lab = $lab . "{$node->subpattern},";
+            }
+        }
+        if (count($this->subpatt_end) > 0) {
+            $lab = $lab . 'ends';
+            foreach ($this->subpatt_end as $node) {
+                $lab = $lab . "{$node->subpattern},";
+            }
+        }
+
+        $lab = substr($lab, 0, strlen($lab) - 1);
         $lab = '"' . str_replace('"', '\"', $lab) . '"';
 
         // Dummy transitions are displayed dotted.
         if ($this->consumeschars) {
-            return "$index1->$index2" . "[label = $lab];";
+            return $this->from->number . '->' . $this->to->number . "[label = $lab];";
         } else {
-            return "$index1->$index2" . "[label = $lab, style = dotted];";
+            return $this->from->number . '->' . $this->to->number . "[label = $lab, style = dotted];";  // Dummy transitions are displayed dotted.
         }
     }
 }
