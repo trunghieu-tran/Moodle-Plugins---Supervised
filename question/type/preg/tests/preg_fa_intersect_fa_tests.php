@@ -701,7 +701,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -734,7 +734,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -767,7 +767,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -800,7 +800,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -837,7 +837,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -873,7 +873,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -904,7 +904,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
@@ -1167,7 +1167,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1194,7 +1194,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('1', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('2', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1221,7 +1221,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('1', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('2', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1247,7 +1247,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('1', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('2', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1281,7 +1281,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('3', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1312,7 +1312,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1343,7 +1343,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1371,7 +1371,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('1', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('2', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1402,7 +1402,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
@@ -1429,7 +1429,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
-        $outtransitions = $input->get_state_outtransitions($number);
+        $outtransitions = $input->get_adjacent_transitions($number, true);
         $number = array_search('0', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
