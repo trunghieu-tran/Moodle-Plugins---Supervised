@@ -2521,7 +2521,7 @@ abstract class qtype_preg_finite_automaton {
         if ($isstart == 0) {
             $number2 = $anotherfa->start_states();
         } else {
-            $number2 = $anotherfa->start_states();
+            $number2 = $anotherfa->end_states();
         }
         $secnumber = $number2[0];
         $anotherfa->del_blind_states();
