@@ -406,7 +406,7 @@ class qtype_preg_regex_handler {
             return $pregnode;   // The node is already converted.
         }
 
-        $enginenodename = $this->get_engine_node_name($pregnode->type);
+        $enginenodename = $this->get_engine_node_name($pregnode->type, $pregnode->subtype);
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
             $acceptresult = $enginenode->accept();
@@ -493,7 +493,7 @@ class qtype_preg_regex_handler {
      * Returns the engine-specific node name for the given preg_node name.
      * Overload in case of sophisticated node name schemes.
      */
-    protected function get_engine_node_name($nodetype) {
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
         return 'qtype_preg_' . $this->node_infix() . '_' . $nodetype;
     }
 

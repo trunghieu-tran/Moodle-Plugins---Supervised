@@ -37,7 +37,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return 'nfa_matcher';
     }
 
-    protected function get_engine_node_name($nodetype) {
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
         switch($nodetype) {
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
@@ -52,7 +52,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 return 'qtype_preg_nfa_leaf';
         }
 
-        return parent::get_engine_node_name($nodetype);
+        return parent::get_engine_node_name($nodetype, $nodesubtype);
     }
 
     /**
