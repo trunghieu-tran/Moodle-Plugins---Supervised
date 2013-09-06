@@ -603,10 +603,17 @@ class qtype_preg_lexer extends JLexBase  {
      * Returns a simple assertion token.
      */
     protected function form_simple_assertion($text, $pos, $length, $subtype, $negative = false) {
-        $node = new qtype_preg_leaf_assert();
+        static $classnames = array(
+            qtype_preg_leaf_assert::SUBTYPE_ESC_B => 'qtype_preg_leaf_assert_esc_b',
+            qtype_preg_leaf_assert::SUBTYPE_ESC_A => 'qtype_preg_leaf_assert_esc_a',
+            qtype_preg_leaf_assert::SUBTYPE_ESC_Z => 'qtype_preg_leaf_assert_esc_z',
+            qtype_preg_leaf_assert::SUBTYPE_ESC_G => 'qtype_preg_leaf_assert_esc_g',
+            qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX => 'qtype_preg_leaf_assert_circumflex',
+            qtype_preg_leaf_assert::SUBTYPE_DOLLAR => 'qtype_preg_leaf_assert_dollar'
+        );
+        $classname = $classnames[$subtype];
+        $node = new $classname($negative);
         $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        $node->subtype = $subtype;
-        $node->negative = $negative;
         $this->set_node_modifiers($node);
         return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
     }
