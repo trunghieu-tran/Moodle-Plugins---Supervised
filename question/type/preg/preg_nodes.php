@@ -1071,17 +1071,17 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
 abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     /** \b and \B */
-    const SUBTYPE_ESC_B = 'leaf_assert_esc_b';
+    const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
     /** \A */
-    const SUBTYPE_ESC_A = 'leaf_assert_esc_a';
+    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
     /** \z and \Z */
-    const SUBTYPE_ESC_Z = 'leaf_assert_esc_z';
+    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
     /** \G */
-    const SUBTYPE_ESC_G = 'leaf_assert_esc_g';
+    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
     /** ^ */
-    const SUBTYPE_CIRCUMFLEX = 'leaf_assert_circumflex';
+    const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
     /** $ */
-    const SUBTYPE_DOLLAR = 'leaf_assert_dollar';
+    const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
 
     public function __construct($negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
@@ -1098,27 +1098,6 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     public function consumes($matcherstateobj = null) {
         return 0;
-    }
-
-    public function tohr() {
-        switch ($this->subtype) {
-            case self::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case self::SUBTYPE_CIRCUMFLEX:
-                $type = '^';
-                break;
-            case self::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case self::SUBTYPE_DOLLAR:
-                $type = '$';
-                break;
-            case self::SUBTYPE_ESC_B:
-                $type = '\\b';
-                break;
-        }
-        if ($this->negative) {
-            return '!assert' . $type;
-        } else {
-            return 'assert' . $type;
-        }
     }
 }
 
@@ -1160,6 +1139,10 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
     }
+
+    public function tohr() {
+        return $this->negative ? 'assert \B' : 'assert \b';
+    }
 }
 
 /**
@@ -1179,6 +1162,10 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert \A';
     }
 }
 
@@ -1205,6 +1192,10 @@ class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
     }
+
+    public function tohr() {
+        return $this->negative ? 'assert \Z' : 'assert \z';
+    }
 }
 
 /**
@@ -1224,6 +1215,10 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert \G';
     }
 }
 
@@ -1246,6 +1241,10 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
     }
+
+    public function tohr() {
+        return 'assert ^';
+    }
 }
 
 /**
@@ -1266,6 +1265,10 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert $';
     }
 }
 
