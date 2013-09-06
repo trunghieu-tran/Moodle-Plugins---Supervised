@@ -13,6 +13,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/edit_ast_preg_
 
 $PAGE->set_url('/question/type/preg/authoring_tools/ast_preg_form.php');
 $PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('popup');
 
 echo $OUTPUT->header();
 
