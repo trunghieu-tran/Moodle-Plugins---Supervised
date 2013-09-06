@@ -316,7 +316,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         return array(
           array('a{9,0}','<span style="color:blue">a</span><span style="color:red"> is repeated from 9 to 0 times (incorrect quantifier borders)</span>','рус - TODO'),
-          array('(a','<span style="color:red">Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>','рус - TODO'),
+          array('(a','<span style="color:red">Syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>','рус - TODO'),
         );
     }
 
