@@ -730,8 +730,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     /**
      * Returns a simple assertion token.
      */
-    protected function form_simple_assertion($text, $pos, $length, $subtype, $negative = false) {
-        $classname = 'qtype_preg_' . $subtype;
+    protected function form_simple_assertion($text, $pos, $length, $classname, $negative = false) {
         $node = new $classname($negative);
         $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $this->set_node_modifiers($node);
@@ -1659,39 +1658,39 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 }
 <YYINITIAL> "\b"|"\B" {
     $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_B, $text === '\B');
+    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_b', $text === '\B');
 }
 <YYINITIAL> "\A" {
-    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_a');
 }
 <YYINITIAL> "\z"|"\Z" {
     $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, $text === '\Z');
+    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', $text === '\Z');
 }
 <YYINITIAL> "\G" {
-    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
+    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_g');
 }
 <YYINITIAL> "^" {
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_circumflex');
     } else {
         // Default case: the same as \A.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_a');
     }
 }
 <YYINITIAL> "$" {
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_dollar');
     } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
         // Not multiline, but dollar endonly; the same as \z.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, false);
+        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', false);
     } else {
         // Default case: the same as \Z.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, true);
+        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', true);
     }
 }
 <YYINITIAL> "\c" {
