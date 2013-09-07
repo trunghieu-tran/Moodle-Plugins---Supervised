@@ -558,7 +558,7 @@ class qtype_preg_regex_handler {
             // There can be a specific accepting error.
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED) {
                 $inscription = $node->addinfo;
-                $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, $node->indfirst, $node->indlast);
+                $this->errors[] = new qtype_preg_accepting_error($regex, $this->name(), $inscription, $node);
             } else {
                 $this->errors[] = new qtype_preg_parsing_error($regex, $node);
             }

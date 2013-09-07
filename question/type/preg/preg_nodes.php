@@ -210,11 +210,11 @@ abstract class qtype_preg_node {
         while (!$found) {
             $replaced = false;
             foreach ($result->operands as $operand) {
-                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->colfirst >= $result->colfirst)) &&
-                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->collast <= $result->collast));
+                $better_than_result = ($operand->position->linefirst > $result->position->linefirst || ($operand->position->linefirst == $result->position->linefirst && $operand->position->colfirst >= $result->position->colfirst)) &&
+                                      ($operand->position->linelast < $result->position->linelast || ($operand->position->linelast == $result->position->linelast && $operand->position->collast <= $result->position->collast));
 
-                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->colfirst <= $colfirst)) &&
-                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->collast >= $collast));
+                $suits_needed = ($operand->position->linefirst < $linefirst || ($operand->position->linefirst == $linefirst && $operand->position->colfirst <= $colfirst)) &&
+                                ($operand->position->linelast > $linelast || ($operand->position->linelast == $linelast && $operand->position->collast >= $collast));
 
                 if ($better_than_result && $suits_needed) {
                     $result = $operand;
@@ -224,8 +224,8 @@ abstract class qtype_preg_node {
             $found = !$replaced || is_a($result, 'qtype_preg_leaf');
         }
 
-        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->colfirst <= $colfirst)) &&
-                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->collast >= $collast));
+        $found = ($result->position->linefirst < $linefirst || ($result->position->linefirst == $linefirst && $result->position->colfirst <= $colfirst)) &&
+                 ($result->position->linelast > $linelast || ($result->position->linelast == $linelast && $result->position->collast >= $collast));
 
         if (!$found) {
             return null;
@@ -239,11 +239,11 @@ abstract class qtype_preg_node {
 
             for ($i = 0; $i < $count; $i++) {
                 $operand = $result->operands[$i];
-                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->colfirst <= $colfirst)) {
+                if ($operand->position->linefirst < $linefirst || ($operand->position->linefirst == $linefirst && $operand->position->colfirst <= $colfirst)) {
                     $from = $i;
                 }
                 $operand = $result->operands[$count - $i - 1];
-                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->collast >= $collast)) {
+                if ($operand->position->linelast > $linelast || ($operand->position->linelast == $linelast && $operand->position->collast >= $collast)) {
                     $to = $count - $i - 1;
                 }
             }
@@ -251,10 +251,10 @@ abstract class qtype_preg_node {
         }
 
         // If the node is found, update the indexes, return NULL otherwise.
-        $linefirst = $result->linefirst;
-        $linelast = $result->linelast;
-        $colfirst = $result->colfirst;
-        $collast = $result->collast;
+        $linefirst = $result->position->linefirst;
+        $linelast = $result->position->linelast;
+        $colfirst = $result->position->colfirst;
+        $collast = $result->position->collast;
         return $result;
     }
 
@@ -1384,10 +1384,10 @@ class qtype_preg_leaf_options extends qtype_preg_leaf {
         $this->negopt = $negopt;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_options class before use it!');
+        die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_options class before use it!');
+        die ('TODO: implement abstract function character for qtype_preg_leaf_options class before use it!');
     }
     public function tohr() {
         $result = '(?';
@@ -1410,10 +1410,10 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
         $this->number = $number;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_recursion class before use it!');
+        die ('TODO: implement abstract function match for qtype_preg_leaf_recursion class before use it!');
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_recursion class before use it!');
+        die ('TODO: implement abstract function character for qtype_preg_leaf_recursion class before use it!');
     }
     public function tohr() {
         return 'recursion';
@@ -1855,9 +1855,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
      */
     public function error_string() {
         $a = new stdClass;
-        // TODO!!!
-        $a->indfirst = $this->indfirst;
-        $a->indlast = $this->indlast;
+        $a->linefirst = $this->position->linefirst;
+        $a->linelast = $this->position->linelast;
+        $a->colfirst = $this->position->colfirst;
+        $a->collast = $this->position->collast;
         $a->addinfo = $this->addinfo;
         return get_string($this->subtype, 'qtype_preg', $a);
     }
