@@ -103,7 +103,9 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
-        $lab = $this->pregleaf->leaf_tohr();
+        $lab = $this->open_tags_tohr();
+        $lab .= $this->pregleaf->leaf_tohr();
+        $lab .= $this->close_tags_tohr();
         $lab = '"[' . str_replace('"', '\"', $lab) . ']"';
 
         // Dummy transitions are displayed dotted.
@@ -150,6 +152,16 @@ class qtype_preg_fa_transition {
                 $resulttran = new qtype_preg_nfa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
             }
         }
+        if ($resulttran !== null) {
+            $resulttran->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
+            $resulttran->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
+            $resulttran->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
+            $resulttran->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
+            $resulttran->remove_same_elements($resulttran->subpatt_start);
+            $resulttran->remove_same_elements($resulttran->subpatt_end);
+            $resulttran->remove_same_elements($resulttran->subexpr_start);
+            $resulttran->remove_same_elements($resulttran->subexpr_end);
+        }
         return $resulttran;
     }
 
@@ -157,7 +169,7 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        return false;
+        return (count($this->subpatt_start) || count($this->subpatt_end) || count($this->subexpr_start) || count($this->subexpr_end));
     }
 
     /**
@@ -193,13 +205,44 @@ class qtype_preg_fa_transition {
 
     /**
      * Save tags from other transition in this transition.
-     * This function has overloaded version in nfa, because it has tags. In this class does nothing.
      *
      * @param other another transition for saving tags.
      * @return result transition.
      */
     public function save_tags($other) {
+        $this->subpatt_start = array_merge($this->subpatt_start, $other->subpatt_start);
+        $this->subpatt_end = array_merge($this->subpatt_end, $other->subpatt_end);
+        $this->subexpr_start = array_merge($this->subexpr_start, $other->subexpr_start);
+        $this->subexpr_end = array_merge($this->subexpr_end, $other->subexpr_end);
         return $this;
+    }
+
+    public function open_tags_tohr() {
+        $result ='';
+        if (count($this->subpatt_start) != 0 || count($this->subexpr_start) != 0) {
+            foreach ($this->subpatt_start as $subpatt) {
+                $result .= '(';
+            }
+            $result .= '/';
+            foreach ($this->subexpr_start as $subpatt) {
+                $result .= '(';
+            }
+            return $result;
+        }
+    }
+
+    public function close_tags_tohr() {
+        $result ='';
+        if (count($this->subpatt_end) != 0 || count($this->subexpr_end) != 0) {
+            foreach ($this->subexpr_end as $subpatt) {
+                $result .= ')';
+            }
+            $result .= '/';
+            foreach ($this->subpatt_end as $subpatt) {
+                $result .= ')';
+            }
+            return $result;
+        }
     }
 }
 
