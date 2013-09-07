@@ -32,14 +32,8 @@ class qtype_preg_error {
 
     /** Human-understandable error message. */
     public $errormsg;
-    /** Index of the line where the erroneous sequence begins. */
-    public $linefirst = -1;
-    /** Index of the line where the erroneous sequence ends. */
-    public $linelast = -1;
-    /** Index of the first character in erroneous sequence. */
-    public $colfirst;
-    /** Index of the last character in erroneous sequence. */
-    public $collast;
+    /** An instance of qtype_preg_position. */
+    public $position;
 
     /**
      * Returns a string with first character in upper case and the rest of the string in lower case.
@@ -50,29 +44,11 @@ class qtype_preg_error {
         return $head . $tail;
     }
 
-    protected function highlight_regex($regex, $colfirst, $collast, $linefirst, $linelast) {
-        $stringcolfirst = -1;// Initialise to -1 since when looking for next line break we must start from previous line break + 1, but first start is 0.
-        $stringcollast = -1;
-        if ($linefirst == 0) {// No string breaks loop, so initialise to 0.
-            $stringcolfirst = 0;
-        }
-        // Look for the line.
-        for($i = 0; $i < $linefirst; $i++) {
-            $stringcolfirst = qtype_poasquestion_string::strpos($regex, "\n", $stringcolfirst + 1);
-        }
-        $stringcolfirst += $colfirst; // And add column.
-        if ($linelast == 0) {// No string breaks loop, so initialise to 0.
-            $stringcollast = 0;
-        }
-        // Look for the line.
-        for($i = 0; $i < $linelast; $i++) {
-            $stringcollast = qtype_poasquestion_string::strpos($regex, "\n", $stringcollast + 1);
-        }
-        $stringcollast += $collast; // And add column.
-        if ($colfirst >= 0 && $collast >= 0) {
-            return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $stringcolfirst)) . '<b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $stringcolfirst, $stringcollast - $stringcolfirst + 1)) . '</b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $stringcollast + 1));
+    protected function highlight_regex($regex, $position) {
+        if ($position->indfirst >= 0 && $position->indlast >= 0) {
+            return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $position->indfirst)) . '<b>' .
+                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indfirst, $position->indlast - $position->indfirst + 1)) . '</b>' .
+                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indfirst + 1));
         } else {
             return htmlspecialchars($regex);
         }
@@ -82,23 +58,17 @@ class qtype_preg_error {
      * Constructs error with given parameters.
      * @param errormsg string error message to show to the user.
      * @param regex string regular expression, containing error.
-     * @param colfirst int column, where error started.
-     * @param collast int column, where error ended.
-     * @param linefirst int line, where error started.
-     * @param linelast int line, where error ended.
+     * @param position qtype_preg_position instance.
      * @param preservemsg bool if true, message contains HTML code and should not be treated by htmlspecialchars function. PHP preg matcher use it to show links to PCRE documentation.
      */
-    public function __construct($errormsg, $regex = '', $colfirst = -1, $collast = -1, $linefirst = -1, $linelast = -1, $preservemsg = false) {
+    public function __construct($errormsg, $regex, $position, $preservemsg = false) {
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
         }
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
-        $this->colfirst = $colfirst;
-        $this->collast = $collast;
-        if ($colfirst != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $colfirst, $collast, $linefirst, $linelast) . '<br/>' . $errormsg;
+        $this->position = $position;
+        if ($position->colfirst != -2) {
+            $this->errormsg = $this->highlight_regex($regex, $position) . '<br/>' . $errormsg;
         } else {
             $this->errormsg = $errormsg;
         }
@@ -109,7 +79,7 @@ class qtype_preg_error {
 class qtype_preg_parsing_error extends qtype_preg_error {
 
     public function __construct($regex, $astnode) {
-        parent::__construct($astnode->error_string(), $regex, $astnode->position->colfirst, $astnode->position->collast, $astnode->position->linefirst, $astnode->position->linelast);
+        parent::__construct($astnode->error_string(), $regex, $astnode->position);
     }
 }
 
@@ -127,7 +97,7 @@ class qtype_preg_accepting_error extends qtype_preg_error {
 
         $errormsg = get_string('unsupported', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $astnode->position->colfirst, $astnode->position->collast, $astnode->position->linefirst, $astnode->position->linelast);
+        parent::__construct($errormsg, $regex, $astnode->position);
     }
 }
 
@@ -148,24 +118,23 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
-    public function __construct($regex, $matcher, $colfirst = -1, $collast = -1, $linefirst = -1, $linelast = -1) {
+    public function __construct($regex, $matcher, $position = null) {
         global $CFG;
 
-        if ($colfirst == -1 || $collast == -1) {
-            $colfirst = 0;
-            $collast = qtype_poasquestion_string::strlen($regex) - 1;
+        if ($position === null) {
+            $position = new qtype_preg_position(0, qtype_poasquestion_string::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
         }
 
         $a = new stdClass;
-        $a->linefirst = $linefirst;
-        $a->linelast = $linelast;
-        $a->colfirst = $colfirst;
-        $a->collast = $collast;
+        $a->linefirst = $position->linefirst;
+        $a->linelast = $position->linelast;
+        $a->colfirst = $position->colfirst;
+        $a->collast = $position->collast;
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $a->link = $CFG->wwwroot . '/' . $CFG->admin . '/settings.php?section=qtypesettingpreg';
 
         $errormsg = get_string('too_large_fa', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $colfirst, $collast, $linefirst, $linelast);
+        parent::__construct($errormsg, $regex, $position);
     }
 }
