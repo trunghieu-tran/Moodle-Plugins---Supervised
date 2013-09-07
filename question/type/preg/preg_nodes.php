@@ -477,7 +477,24 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * Returns a human-readable form of this leaf.
      * @return human-readable string describing this leaf.
      */
-    abstract public function tohr();
+    public function tohr() {
+        $cur = '';
+        foreach ($this->userinscription as $inscrip) {
+            if (is_array($inscrip)) {
+                foreach ($inscrip as $in => $interpart) {
+                    foreach ($interpart as $character) {
+                        $cur .= $character->data;
+                    }
+                    if ($in != count($inscrip) - 1) {
+                        $cur .= ' ∩ ';
+                    }   
+                }
+            } else {
+                $cur .= $inscrip->data;
+            }
+        }
+        return $cur;
+    }
 }
 
 /**
@@ -813,7 +830,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $included;
     }
 
-    public function tohr() {
+    /*public function tohr() {
         $result = '';
         foreach ($this->flags as $ind1 => $extflag) {
             $cur = '';
@@ -829,7 +846,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             }
         }
         return $result;
-    }
+    }*/
 
     public function add_flag_dis(qtype_preg_charset_flag $flag) {
         echo 'implement add_flag before use!';
