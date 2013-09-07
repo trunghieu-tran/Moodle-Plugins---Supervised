@@ -296,7 +296,7 @@ M.preg_authoring_tools_script = (function ($) {
             end -= lastpos;
         }
         --end;
-        self.load_content('-1', {linefirst: firstline, linelast: lastline, indfirst: start, indlast: end}, true);
+        self.load_content('-1', {linefirst: firstline, linelast: lastline, colfirst: start, collast: end}, true);
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
@@ -340,7 +340,7 @@ M.preg_authoring_tools_script = (function ($) {
             ajax: true
         };
         if (coordinates) {
-            $.extend(data,coordinates);
+            $.extend(data, coordinates);
             data.rangeselection = true;
         }
         $.ajax({

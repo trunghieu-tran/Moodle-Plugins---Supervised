@@ -116,18 +116,18 @@ class qtype_preg_parsing_error extends qtype_preg_error {
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    public function __construct($regex, $matchername, $nodename, $pregnode) {
+    public function __construct($regex, $matchername, $nodename, $astnode) {
         $a = new stdClass;
         $a->nodename = $nodename;
-        $a->linefirst = $pregnode->position->linefirst;
-        $a->linelast = $pregnode->position->linelast;
-        $a->colfirst = $pregnode->position->colfirst;
-        $a->collast = $pregnode->position->collast;
+        $a->linefirst = $astnode->position->linefirst;
+        $a->linelast = $astnode->position->linelast;
+        $a->colfirst = $astnode->position->colfirst;
+        $a->collast = $astnode->position->collast;
         $a->engine = get_string($matchername, 'qtype_preg');
 
         $errormsg = get_string('unsupported', 'qtype_preg', $a);
 
-        parent::__construct($errormsg, $regex, $pregnode->position->colfirst, $pregnode->position->collast, $pregnode->position->linefirst, $pregnode->position->linelast);
+        parent::__construct($errormsg, $regex, $astnode->position->colfirst, $astnode->position->collast, $astnode->position->linefirst, $astnode->position->linelast);
     }
 }
 
