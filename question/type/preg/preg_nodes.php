@@ -254,9 +254,7 @@ abstract class qtype_preg_node {
     /**
      * Sets indexes and userinscription for the node.
      */
-    public function set_user_info($linefirst, $linelast, $indfirst, $indlast, $userinscription = null) {
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
+    public function set_user_info($indfirst, $indlast, $userinscription = null) {
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
@@ -303,6 +301,158 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
+    }
+
+    /**
+     * Find intersection of asserts.
+     *
+     * @param other - the second assert for intersection.
+     * @return assert, which is intersection of ginen.
+     */
+    public function intersect_asserts($other) {
+        $esca = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $escz = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
+
+        // Adding assert to array.
+        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            $thisclone = clone($this);
+            array_unshift ($this->mergedassertions, $thisclone);
+        }
+        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            $otherclone = clone($other);
+            array_unshift ($other->mergedassertions, $otherclone);
+        }
+        $result = array_merge($this->mergedassertions, $other->mergedassertions);
+        // Removing same asserts.
+        for ($i = 0; $i < count($result); $i++) {
+            for ($j = ($i+1); $j < count($result); $j++) {
+                if ($result[$i]->subtype == $result[$j]->subtype) {
+                    unset($result[$j]);
+                    $result = array_values($result);
+                    $j--;
+                }
+            }
+        }
+
+        /*foreach ($result as &$assert) {
+            $assert->mergedassertions = array();
+        }*/
+        $result = array_values($result);
+
+        foreach ($result as $assert) {
+            $key = array_search($assert, $result);
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                // Searching compatible asserts.
+                if (array_search($esca, $result) !== false) {
+                    unset($result[$key]);
+                    $result = array_values($result);
+                }
+            } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                // Searching compatible asserts.
+                if (array_search($escz, $result) !== false) {
+                    unset($result[$key]);
+                    $result = array_values($result);
+                }
+            }
+        }
+
+        // Getting result leaf.
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            $assert = $this;
+        } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            $assert = $other;
+        } else {
+            if (count($result) != 0) {
+                $assert = new qtype_preg_leaf_assert($result[0]->subtype);
+                unset($result[0]);
+            } else {
+                $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            }
+        }
+        $assert->mergedassertions = $result;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            unset($this->mergedassertions[0]);
+        }
+        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            unset($other->mergedassertions[0]);
+        }
+        return $assert;
+    }
+
+    /**
+     * Returns intersection of leafs.
+     *
+     * @param other another leaf for intersection.
+     */
+    public function intersect_leafs($other, $thishastags, $otherhastags) {
+        $result = null;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                $result = $this->intersect_with_ranges($other);
+                if ($result != null) {
+                    $result->mergedassertions = $this->mergedassertions;
+                    $result = $result->intersect_asserts($other);
+                    $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
+                }
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this->intersect_asserts($other);
+            } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $otherhastags) {
+                $result = $this;
+            }
+        } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $this->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this->intersect_asserts($other);
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET && $thishastags) {
+                $result = $other;
+            }
+        } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            $result = $this->intersect_asserts($other);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns union of leafs.
+     *
+     * @param other another leaf for union.
+     */
+    public function unite_leafs($other, $thishastags, $otherhastags) {
+        $result = null;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                if ($thishastags || $otherhastags) {
+                    if ($this->has_equal_tags($other)) {
+                        if ($this->mergedassertions == $other->mergedassertions) {
+                            $result = $this->unite($other);
+                            $result->userinscription = array_merge($this->userinscription, $other->userinscription);
+                        }
+                    }
+                } else if ($this->mergedassertions == $other->mergedassertions) {
+                    $result = $this->unite($other);
+                    $result->userinscription = array_merge($this->userinscription, $other->userinscription);
+                }
+            }
+        } else if ($this == $other) {
+            if ((!$thishastags && !$otherhastags) || (($thishastags || $otherhastags) && $this->has_equal_tags($other))) {
+                $result = $this;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns label of leaf.
+     *
+     */
+    public function leaf_tohr() {
+        $result = '';
+        foreach ($this->mergedassertions as $assert) {
+            $result .= $assert->tohr();
+        }
+        $result .= $this->tohr();
+        return $result;
     }
 
     /**
@@ -357,7 +507,24 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * Returns a human-readable form of this leaf.
      * @return human-readable string describing this leaf.
      */
-    abstract public function tohr();
+    public function tohr() {
+        $cur = '';
+        foreach ($this->userinscription as $inscrip) {
+            if (is_array($inscrip)) {
+                foreach ($inscrip as $in => $interpart) {
+                    foreach ($interpart as $character) {
+                        $cur .= $character->data;
+                    }
+                    if ($in != count($inscrip) - 1) {
+                        $cur .= ' ∩ ';
+                    }   
+                }
+            } else {
+                $cur .= $inscrip->data;
+            }
+        }
+        return $cur;
+    }
 }
 
 /**
@@ -692,7 +859,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $included;
     }
 
-    public function tohr() {
+    /*public function tohr() {
         $result = '';
         foreach ($this->flags as $ind1 => $extflag) {
             $cur = '';
@@ -708,7 +875,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             }
         }
         return $result;
-    }
+    }*/
 
     public function add_flag_dis(qtype_preg_charset_flag $flag) {
         echo 'implement add_flag before use!';
@@ -736,6 +903,61 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             }
         }
         $result = new qtype_preg_leaf_charset;
+        $result->flags = $resflags;
+        $result->israngecalculated = false;
+        return $result;
+    }
+
+    /**
+     * Intersects this charset with another one using ranges for analysis success of intersection.
+     * @param other charset to intersect with.
+     * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
+     */
+    public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
+        $ranges = array();
+        $charset = $this->intersect($other);
+        foreach ($charset->flags as $flags) {
+            foreach ($flags as $flag) {
+                switch ($flag->type) {
+                    case qtype_preg_charset_flag::SET:
+                        $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                        break;
+                    case qtype_preg_charset_flag::FLAG:
+                    case qtype_preg_charset_flag::UPROP:
+                        $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                        break;
+                }
+            }
+        }
+        if (count($ranges) >= 2) {
+            $resrange = qtype_preg_unicode::kinda_operator($ranges[0], $ranges[1], true, false, false, false);
+            for ($i = 2; $i < count($ranges); $i++) {
+                $resrange = qtype_preg_unicode::kinda_operator($resrange, $ranges[$i], true, false, false, false);
+            }
+        }
+        if (count($resrange) == 0) {
+            $charset = null;
+        }
+        return $charset;
+    }
+
+    /**
+     * Unite this charset with another one.
+     * @param other charset to intersect with.
+     * @return an object of qtype_preg_leaf_charset which is the union of this and other.
+     */
+    public function unite(qtype_preg_leaf_charset $other) {
+        $result = new qtype_preg_leaf_charset;
+        if (count($this->flags) == 1 && count($this->flags[0]) == 1 && count($other->flags) == 1 && count($this->flags[0]) == 1) {
+            $resultstring = $this->flags[0][0]->data->string() . $other->flags[0][0]->data->string();
+            preg_replace('#(.)\\1{2,}#ius', '\\1', $resultstring);
+            $resflag = new qtype_preg_charset_flag;
+            $resflag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($resultstring));
+            $resflags = array(array($resflag));
+            $result = new qtype_preg_leaf_charset;
+        } else {
+            $resflags = array_merge($this->flags, $other->flags);
+        }
         $result->flags = $resflags;
         $result->israngecalculated = false;
         return $result;
@@ -1004,6 +1226,8 @@ class qtype_preg_charset_flag {
             case self::UPROP:
                 $result = 'todo';
                 break;
+            case self::META_DOT:
+                $result = '.';
             default:
                 return '';
         }
@@ -1058,7 +1282,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
             case self::SUBTYPE_ENDREG:
                 return 'metaENDREG';
             case self::SUBTYPE_EMPTY:
-                return 'metaEPS';
+                return '';
             default:
                 return '';
         }
@@ -1195,11 +1419,17 @@ class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
 
     public function tohr() {
         return $this->negative ? 'assert \Z' : 'assert \z';
+            case self::SUBTYPE_ESC_A:
+                $type = '\\A';
+                break;    // Because there can be only one line is the response.
+            case self::SUBTYPE_ESC_Z:
+                $type = '\\Z';
+                break;    // Because there can be only one line is the response.
     }
 }
-
+            return '!assert' . $type;
 /**
- * Simple assertion \G matches at the first matching position in the string.
+            return 'assert' . $type;
  */
 class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
