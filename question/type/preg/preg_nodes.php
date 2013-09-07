@@ -31,6 +31,34 @@ require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.ph
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
+ * Represents a node or a lexem position in 2 ways: "absolute" (considering the whole string)
+ * and "relative" (considering lines and columns).
+ */
+class qtype_preg_position {
+    /** First index of something (absolute positioning). */
+    public $indfirst = -1;
+    /** Last index of something (absolute positioning). */
+    public $indlast = -1;
+    /** Index of the line where something begins. */
+    public $linefirst = -1;
+    /** Index of the line where something ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line. */
+    public $colfirst = -1;
+    /** Index of the last character on the last line. */
+    public $collast = -1;
+
+    public function __construct($indfirst = -1, $indlast = -1, $linefirst = -1, $linelast = -1, $colfirst = -1, $collast = -1) {
+        $this->indfirst = $indfirst;
+        $this->indlast = $indlast;
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
+        $this->colfirst = $colfirst;
+        $this->collast = $collast;
+    }
+}
+
+/**
  * Representation of nodes and leafs as they were typed in the regex.
  */
 class qtype_preg_userinscription {
@@ -58,22 +86,19 @@ class qtype_preg_userinscription {
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
 class qtype_preg_lexem {
-    /** Index of the line where the node begins. */
-    public $linefirst = -1;
-    /** Index of the line where the node ends. */
-    public $linelast = -1;
-    /** Index of the first character on the first line of this node in the regex. */
-    public $indfirst = -1;
-    /** Index of the last character pn the last line of this node in the regex. */
-    public $indlast = -1;
+    /** An instance of qtype_preg_position. */
+    public $position = null;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
 
-    public function __construct($linefirst, $linelast, $indfirst, $indlast, $userinscription) {
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
-        $this->indfirst = $indfirst;
-        $this->indlast = $indlast;
+    /**
+     * Sets position and userinscription for the node.
+     */
+    public function set_user_info($position, $userinscription = null) {
+        $this->position = $position;
+        if ($userinscription === null) {
+            $userinscription = new qtype_preg_userinscription();
+        }
         $this->userinscription = $userinscription;
     }
 }
@@ -143,14 +168,8 @@ abstract class qtype_preg_node {
     public $subtype;
     /** Errors found for this particular node. */
     public $errors = array();
-    /** Index of the line where the node begins. */
-    public $linefirst = -1;
-    /** Index of the line where the node ends. */
-    public $linelast = -1;
-    /** Index of the first character on the first line of this node in the regex. */
-    public $indfirst = -1;
-    /** Index of the last character pn the last line of this node in the regex. */
-    public $indlast = -1;
+    /** An instance of qtype_preg_position. */
+    public $position = null;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
     /** Identifier of this node. */
@@ -183,7 +202,7 @@ abstract class qtype_preg_node {
      * expands it to be binary for better precision, thus AST is modified. All passed indexes are updated
      * to the indexes of the found subtree.
      */
-    public function node_by_regex_fragment(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
+    public function node_by_regex_fragment(&$linefirst, &$linelast, &$colfirst, &$collast, &$idcounter) {
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
 
@@ -191,11 +210,11 @@ abstract class qtype_preg_node {
         while (!$found) {
             $replaced = false;
             foreach ($result->operands as $operand) {
-                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->indfirst >= $result->indfirst)) &&
-                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->indlast <= $result->indlast));
+                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->colfirst >= $result->colfirst)) &&
+                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->collast <= $result->collast));
 
-                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) &&
-                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast));
+                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->colfirst <= $colfirst)) &&
+                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->collast >= $collast));
 
                 if ($better_than_result && $suits_needed) {
                     $result = $operand;
@@ -205,8 +224,8 @@ abstract class qtype_preg_node {
             $found = !$replaced || is_a($result, 'qtype_preg_leaf');
         }
 
-        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
-                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast));
+        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->colfirst <= $colfirst)) &&
+                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->collast >= $collast));
 
         if (!$found) {
             return null;
@@ -220,11 +239,11 @@ abstract class qtype_preg_node {
 
             for ($i = 0; $i < $count; $i++) {
                 $operand = $result->operands[$i];
-                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) {
+                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->colfirst <= $colfirst)) {
                     $from = $i;
                 }
                 $operand = $result->operands[$count - $i - 1];
-                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast)) {
+                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->collast >= $collast)) {
                     $to = $count - $i - 1;
                 }
             }
@@ -234,8 +253,8 @@ abstract class qtype_preg_node {
         // If the node is found, update the indexes, return NULL otherwise.
         $linefirst = $result->linefirst;
         $linelast = $result->linelast;
-        $indfirst = $result->indfirst;
-        $indlast = $result->indlast;
+        $colfirst = $result->colfirst;
+        $collast = $result->collast;
         return $result;
     }
 
@@ -252,13 +271,13 @@ abstract class qtype_preg_node {
     }
 
     /**
-     * Sets indexes and userinscription for the node.
+     * Sets position and userinscription for the node.
      */
-    public function set_user_info($linefirst, $linelast, $indfirst, $indlast, $userinscription = null) {
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
-        $this->indfirst = $indfirst;
-        $this->indlast = $indlast;
+    public function set_user_info($position, $userinscription = null) {
+        $this->position = $position;
+        if ($userinscription === null) {
+            $userinscription = new qtype_preg_userinscription();
+        }
         $this->userinscription = $userinscription;
     }
 
@@ -1836,6 +1855,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
      */
     public function error_string() {
         $a = new stdClass;
+        // TODO!!!
         $a->indfirst = $this->indfirst;
         $a->indlast = $this->indlast;
         $a->addinfo = $this->addinfo;
