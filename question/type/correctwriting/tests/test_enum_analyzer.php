@@ -354,7 +354,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!Two without including.");
+        $this->assertTrue( $equal, 'Error in all find orders found!Two without including.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other.
@@ -389,7 +389,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!One include in other.");
+        $this->assertTrue( $equal, 'Error in all find orders found!One include in other.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other.
@@ -427,7 +427,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!Two include in other.");
+        $this->assertTrue( $equal, 'Error in all find orders found!Two include in other.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, matrioska.
@@ -469,7 +469,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!Matrioshka.");
+        $this->assertTrue( $equal, 'Error in all find orders found!Matrioshka.');
     }
 
     // Test for find_enum_orders_in_corrected_string, two include in other several orders.
@@ -512,7 +512,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!Two include in other.");
+        $this->assertTrue( $equal, 'Error in find orders found!Two include in other.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, matrioska.
@@ -575,7 +575,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!Matrioshka with several orders.");
+        $this->assertTrue( $equal, 'Error in all find orders found!Matrioshka with several orders.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other, strange elements order.
@@ -613,7 +613,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($expectedorders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in all find orders found!One include in other.");
+        $this->assertTrue( $equal, 'Error in all find orders found!One include in other.');
     }
 
     // Test for change_enum_order, two enumerations without including.
