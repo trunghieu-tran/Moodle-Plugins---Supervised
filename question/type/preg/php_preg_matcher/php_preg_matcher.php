@@ -88,10 +88,13 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
             $for_regexp = implode('\/', explode('/', $for_regexp));
         }
+        if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
+            $for_regexp = qtype_poasquestion_string::replace("\n", '', $for_regexp);
+        }
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp, 'test') === false) {// preg_match returns false when regular expression contains error.
-            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex', 'qtype_preg'), '' , -2, -2, true);// Preserve error message to show the link.
+            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex', 'qtype_preg'), '' , -2, -2, -2, -2, true);// Preserve error message to show the link.
             return false;
         }
 
@@ -112,6 +115,9 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         $for_regexp = $this->regex;
         if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
             $for_regexp = implode('\/', explode('/', $for_regexp));
+        }
+        if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
+            $for_regexp = qtype_poasquestion_string::replace("\n", '', $for_regexp);
         }
         $for_regexp = '/'.$for_regexp.'/u';
         $for_regexp .= $this->options->modifiers_to_string();

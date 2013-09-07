@@ -1,4 +1,19 @@
 <?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Defines explain graph's handler class.
  *
@@ -18,6 +33,65 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
  * Class "handler" for regular expression's graph.
  */
 class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_tool {
+
+    public function __construct ($regex = null, $options = null, $engine = null, $notation = null) {
+        parent::__construct($regex, $options, $engine, $notation);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    public function name() {
+        return 'explaining_graph_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function node_infix() {
+        return 'authoring_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
+        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+            return 'qtype_preg_authoring_tool_node_quant';
+        }
+        return parent::get_engine_node_name($nodetype, $nodesubtype);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        switch ($pregnode->type) {
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    public function json_key() {
+        return 'graph_src';
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+        $graph = $this->create_graph($id);
+        $dotscript = $graph->create_dot();
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
+        $json[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
+    }
 
     /**
      * Creates graph which explaining regular expression.
@@ -44,97 +118,4 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
         return $graph;
     }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    public function name() {
-        return 'explaining_graph_tool';
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function node_infix() {
-        // Nodes should be named like qtype_preg_authoring_tool_node_concat.
-        // This allows us to use the inherited get_engine_node_name() method.
-        return 'authoring_tool';
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function get_engine_node_name($nodetype) {
-
-        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT ||
-            $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT)
-            return 'qtype_preg_authoring_tool_node_quant';
-
-        return parent::get_engine_node_name($nodetype);
-    }
-
-    /**
-     * Overloaded from preg_regex_handler.
-     */
-    protected function is_preg_node_acceptable($pregnode) {
-        switch ($pregnode->type) {
-        case qtype_preg_node::TYPE_ABSTRACT:
-        case qtype_preg_node::TYPE_LEAF_CONTROL:
-        case qtype_preg_node::TYPE_NODE_ERROR:
-            return false;
-        default:
-            return true;
-        }
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function json_key() {
-        return 'graph_src';
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function generate_json_for_empty_regex(&$json_array, $id) {
-        $dotscript = 'digraph { }';
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
-    }
-
-    /**
-     * Overloaded from preg_authoring_tool.
-     */
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        $dotscript = 'digraph { "Ooops! Your regex contains errors, so I can\'t build the explaining graph!" [color=white]; }';
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
-    }
-
-    /**
-     * Generate image for explain graph.
-     *
-     * @param array $json_array contains link on image of explain graph.
-     */
-    protected function generate_json_for_accepted_regex(&$json_array, $id) {
-        $graph = $this->create_graph($id);
-        $dotscript = $graph->create_dot();
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json_array[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
-    }
-
-    public function __construct ($regex = null, $options = null) {
-        // Options should exist at least as a default object.
-        if ($options === null) {
-            $options = new qtype_preg_handling_options();
-        }
-        $options->preserveallnodes = TRUE;
-        parent::__construct($regex, $options);
-        if ($regex === null) {
-            return;
-        }
-    }
 }
-
-?>

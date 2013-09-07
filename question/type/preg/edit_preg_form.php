@@ -47,16 +47,14 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @return array of form fields.
      */
 
-    protected function get_per_answer_fields($mform, $label, $gradeoptions,
-            &$repeatedoptions, &$answersoption) {
+    protected function get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption) {
         $repeated = array();
-        $repeated[] = $mform->createElement('preg_text_and_button', 'answer', 'regex_test',
-                $label);
-        $repeated[] = $mform->createElement('select', 'fraction',
-                get_string('grade'), $gradeoptions);
-        $repeated[] = $mform->createElement('editor', 'feedback',
-                get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+        $repeated[] = $mform->createElement('hidden', 'regextests', '');
+        $repeated[] = $mform->createElement('preg_text_and_button', 'answer', $label, 'regex_test');
+        $repeated[] = $mform->createElement('select', 'fraction', get_string('grade'), $gradeoptions);
+        $repeated[] = $mform->createElement('editor', 'feedback', get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
         $repeatedoptions['answer']['type'] = PARAM_RAW;
+        $repeatedoptions['regextests']['type'] = PARAM_RAW;
         $repeatedoptions['fraction']['default'] = 0;
         $answersoption = 'answers';
         return $repeated;
@@ -214,12 +212,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
 
-        // Determine maximum number of errors to show.
-        $maxerrors = 5;
-        if (isset($CFG->qtype_preg_maxerrorsshown)) {
-            $maxerrors = $CFG->qtype_preg_maxerrorsshown;
-        }
-
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
@@ -228,18 +220,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false,
                         $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if ($matcher->errors_exist()) {// There were errors in the matching process.
-                    $regexerrors = $matcher->get_error_messages();
+                    $regexerrors = $matcher->get_error_messages(true);// Show no more than max errors.
                     $errors['answer['.$key.']'] = '';
-                    $j=0;
-                    // Show no more than max errors.
                     foreach ($regexerrors as $regexerror) {
-                        if ($j < $maxerrors) {
-                            $errors['answer['.$key.']'] .= $regexerror.'<br />';
-                        }
-                        $j++;
-                    }
-                    if ($j > $maxerrors) {
-                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $j - $maxerrors).'<br />';
+                        $errors['answer['.$key.']'] .= $regexerror.'<br />';
                     }
                 } else if ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {// Correct answer (if supplied) should match at least one 100% grade answer.
                     // We may need another matcher to check correctanswer since first one ignoring "exact match" option.

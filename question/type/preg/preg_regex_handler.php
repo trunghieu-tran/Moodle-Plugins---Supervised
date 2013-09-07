@@ -265,13 +265,14 @@ class qtype_preg_regex_handler {
 
     /**
      * Returns class name without 'qtype_preg_' prefix.
+     * Should be overloaded in child classes.
      */
     public function name() {
         return 'regex_handler';
     }
 
     /**
-     * Returns notation, actually used by matcher.
+     * Returns notation, actually used by handler.
      */
     public function used_notation() {
         return 'native';
@@ -321,12 +322,28 @@ class qtype_preg_regex_handler {
 
     /**
      * Returns error messages for regex.
+     * @param limit bool limit error messages to the admin option
      * @return array of error messages.
      */
-    public function get_error_messages() {
+    public function get_error_messages($limit = false) {
+        global $CFG;
         $res = array();
+        $maxerrors = 5;
+        if ($limit) {
+            // Determine maximum number of errors to show.
+            if (isset($CFG->qtype_preg_maxerrorsshown)) {
+                $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+            }
+        }
+        $i = 0;
         foreach ($this->get_errors() as $error) {
-            $res[] = $error->errormsg;
+            if (!$limit || $i < $maxerrors) {
+                $res[] = $error->errormsg;
+            }
+            $i++;
+        }
+        if ($limit && $i > $maxerrors) {
+            $res[] = get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors);
         }
         return $res;
     }
@@ -389,20 +406,20 @@ class qtype_preg_regex_handler {
             return $pregnode;   // The node is already converted.
         }
 
-        $enginenodename = $this->get_engine_node_name($pregnode->type);
+        $enginenodename = $this->get_engine_node_name($pregnode->type, $pregnode->subtype);
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
             $acceptresult = $enginenode->accept();
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast);
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);
             }
         } else {
             $enginenode = $pregnode;
             $acceptresult = $this->is_preg_node_acceptable($pregnode);
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
-                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode->indfirst, $pregnode->indlast);
+                $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);
             }
         }
         return $enginenode;
@@ -431,8 +448,12 @@ class qtype_preg_regex_handler {
      */
     public static function execute_dot($dotscript, $type, $filename = null) {
         global $CFG;
-        $dir = !empty($CFG->pathtodot) ? dirname($CFG->pathtodot) : null;
-        $cmd = 'dot -T' . $type;
+
+        if (empty($CFG->pathtodot)) {
+            throw new qtype_preg_pathtodot_empty('');
+        }
+
+        $cmd = escapeshellarg($CFG->pathtodot) . ' -T' . $type;
         if ($filename !== null) {
             $cmd .= ' -o' . escapeshellarg($filename);
         }
@@ -440,16 +461,22 @@ class qtype_preg_regex_handler {
                                 1 => array('pipe', 'w'),  // Stdout is a pipe that the child will write to.
                                 2 => array('pipe', 'w')); // Stderr is a pipe that the child will write to.
 
-        $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
-        $output = null;
+        $process = proc_open($cmd, $descriptorspec, $pipes);
+        $output = '';
         if (is_resource($process)) {
             fwrite($pipes[0], $dotscript);
             fclose($pipes[0]);
+
             $output = stream_get_contents($pipes[1]);
             $err = stream_get_contents($pipes[2]);
             fclose($pipes[1]);
             fclose($pipes[2]);
+
             proc_close($process);
+
+            if (!empty($err)) {
+                throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+            }
         }
         return $output;
     }
@@ -466,7 +493,7 @@ class qtype_preg_regex_handler {
      * Returns the engine-specific node name for the given preg_node name.
      * Overload in case of sophisticated node name schemes.
      */
-    protected function get_engine_node_name($nodetype) {
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
         return 'qtype_preg_' . $this->node_infix() . '_' . $nodetype;
     }
 
@@ -486,13 +513,14 @@ class qtype_preg_regex_handler {
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
      * Returns true if node is supported or user interface string describing.
      * what properties of node isn't supported.
+     * Should be overloaded in child classes.
      */
     protected function is_preg_node_acceptable($pregnode) {
         // Do not show accepting errors for error nodes.
         if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
             return true;
         }
-        return false;    // Should be overloaded by child classes.
+        return false;
     }
 
     /**
@@ -503,7 +531,6 @@ class qtype_preg_regex_handler {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher.
         $this->lexer->set_options($this->options);
 
         $this->parser = new qtype_preg_yyParser($this->options);
@@ -539,10 +566,14 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $this->ast_root = $this->parser->get_root();
+        $this->build_dst();
+
+        fclose($pseudofile);
+    }
+
+    protected function build_dst() {
         if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
         }
-
-        fclose($pseudofile);
     }
 }

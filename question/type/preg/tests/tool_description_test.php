@@ -220,7 +220,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
 
     public function test_numbering()
     {
-        $handler = new qtype_preg_description_tool('([a|b]|)\W+',null,null);
+        $handler = new qtype_preg_description_tool('([a|b]|)\W+');
         //var_dump($handler);
         $result = $handler->default_description();
         //$expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
@@ -316,7 +316,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         return array(
           array('a{9,0}','<span style="color:blue">a</span><span style="color:red"> is repeated from 9 to 0 times (incorrect quantifier borders)</span>','рус - TODO'),
-          array('(a','<span style="color:red">Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>','рус - TODO'),
+          array('(a','<span style="color:red">Syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>','рус - TODO'),
         );
     }
 
@@ -348,12 +348,10 @@ class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
 class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
     public function test_vardump()
     {
-        $options = new qtype_preg_handling_options();
-        $options->preserveallnodes = true;
         $regex = '(?i)[\xff\x00-\x1fA-B\t\n]';
         $expected = '000';
         //var_dump($options);
-        $handler = new qtype_preg_description_tool($regex,null,$options);
+        $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);

@@ -69,6 +69,7 @@ class qtype_preg_question extends question_graded_automatically
     public $langid;
     /** @var preferred name for a lexem by the teacher. */
     public $lexemusername;
+	public $regextests = array();
 
     // Other fields.
     /** @var cache of matcher objects: key is answer id, value is matcher object. */

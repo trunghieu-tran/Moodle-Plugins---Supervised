@@ -12,8 +12,60 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
-abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
+interface qtype_preg_i_authoring_tool {
+
+    /**
+     * Returns the key for accessing this tool's data in JSON array.
+     */
+    public function json_key();
+
+    /**
+     * Generates a json array with this tool's data. Should call the methods below.
+     * @param json - output JSON array.
+     * @param id - identifier of the selected syntax tree node.
+     */
+    public function generate_json(&$json, $id = -1);
+
+    public function generate_json_for_accepted_regex(&$json, $id = -1);
+
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1);
+
+    public function generate_json_for_empty_regex(&$json, $id = -1);
+}
+
+abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
+
+    protected static $dotescapecodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
+
+    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
+
+    public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
+        //TODO: move to qtype_preg_regex_handler
+        if ($regex === null) {
+            return;
+        }
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+        }
+        $options->preserveallnodes = true;
+        // Convert to actually used notation if necessary.
+        if ($engine !== null && $notation !== null) {
+            $engineclass = 'qtype_preg_'.$engine;
+            $queryengine = new $engineclass;
+            $usednotation = $queryengine->used_notation();
+            if ($notation != $usednotation) {
+                $notationclass = 'qtype_preg_notation_'.$notation;
+                $notationobj = new $notationclass($regex);
+                $regex = $notationobj->convert_regex($usednotation);
+            }
+        }
+        parent::__construct($regex, $options);
+    }
 
     /**
      * Overloaded since parsing errors are normal for authoring tools.
@@ -35,22 +87,17 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
      * or string containing escape mode: 'html' or 'dot'.
      * @return string escaped character.
      */
-    public static function escape_char_by_code($code, $codesormode = NULL) {
-        if ($codesormode === NULL) {
-            $codesormode = self::$codes;
+    public static function escape_char_by_code($code, $codesormode = null) {
+        if ($codesormode === 'html') {
+            $codesormode = self::$htmlescapecodes;
+        } else if ($codesormode === 'dot' || $codesormode === null) {
+            $codesormode = self::$dotescapecodes;
         }
-        if (is_string($codesormode)) {
-            if ($codesormode==='html') {
-                $codesormode = self::$htmlescapecodes;
-            } else if ($codesormode==='dot') {
-                $codesormode = self::$dotescapecodes;
-            }
-        }
+
         if (in_array($code, $codesormode)) {
-            return '&#'.$code.';';
-        } else {
-            return textlib::code2utf8($code);
+            return '&#' . $code . ';';
         }
+        return textlib::code2utf8($code);
     }
 
     /**
@@ -65,75 +112,69 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler {
 
     /**
      * Escaping a string
-     * @param stringToEscape - string to escape.
-     * @param extraCodes - extra codes which should be escaped.
+     * @param stringtoescape - string to escape.
+     * @param extracodes - extra codes which should be escaped.
      * @return escaped string.
      */
-    public static function escape_string($stringToEscape, $extraCodes = NULL) {
-
-        if (is_array($extraCodes) && sizeof($extraCodes) != 0) {
-            $codes = array_intersect(self::$dotescapecodes, $extraCodes);
+    public static function escape_string($stringtoescape, $extracodes = null) {
+        if (is_array($extracodes) && sizeof($extracodes) != 0) {
+            $codes = array_intersect(self::$dotescapecodes, $extracodes);
         } else {
             $codes = self::$dotescapecodes;
         }
 
         $result = '';
-        for ($i = 0; $i < strlen($stringToEscape); ++$i) {
-            $result .= self::escape_char($stringToEscape[$i], $codes);
+        for ($i = 0; $i < textlib::strlen($stringtoescape); ++$i) {
+            $result .= self::escape_char($stringtoescape[$i], $codes);
         }
 
         return $result;
     }
 
-    protected static $dotescapecodes = array(34 /*=> '"'*/,
-                                    38 /*=> '&'*/,
-                                    44 /*=> ','*/,
-                                    60 /*=> '<'*/,
-                                    62 /*=> '>'*/,
-                                    91 /*=> '['*/,
-                                    93 /*=> ']'*/,
-                                    123 /*=> '{'*/,
-                                    124 /*=> '|'*/,
-                                    125 /*=> '}'*/,
-                                    92 /*=> '\\'*/
-                                   );
-
-    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
-
-    /**
-     * Generates a json-array corresponding to $regex and core of tool.
-     * @param json_array - output array with json
-     * @param regex - our regular expression
-     * @param id - identifier of node which will be picked out in image.
-     */
-    public function generate_json(&$json_array, $regex, $id) {
-        $json_array['regex'] = $regex;
-        $json_array['id'] = $id;
-        if ($regex == '') {
-            $this->generate_json_for_empty_regex($json_array, $id);
+    public function generate_json(&$json, $id = -1) {
+        $json['regex'] = $this->regex->string();
+        $json['id'] = $id;
+        if ($this->regex == '') {
+            $this->generate_json_for_empty_regex($json, $id);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
-            $this->generate_json_for_unaccepted_regex($json_array, $id);
+            $this->generate_json_for_unaccepted_regex($json, $id);
         } else {
-            $this->generate_json_for_accepted_regex($json_array, $id);
+            $this->generate_json_for_accepted_regex($json, $id);
         }
     }
 
-    protected abstract function json_key();
+    public function generate_json_for_empty_regex(&$json, $id = -1) {
+        $json[$this->json_key()] = '';
+    }
 
-    protected abstract function generate_json_for_empty_regex(&$json_array, $id);
-
-    protected abstract function generate_json_for_unaccepted_regex(&$json_array, $id);
-
-    protected abstract function generate_json_for_accepted_regex(&$json_array, $id);
-
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+        $a =  textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+        $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
+        foreach ($this->get_error_messages(true) as $error) {
+            $result .= '<br />' . $error;
+        }
+        $json[$this->json_key()] = $result;
+    }
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
-    protected function generate_json_for_unaccepted_regex(&$json_array, $id) {
-        // TODO
+    // Overloaded for some exceptions handling.
+    public function generate_json(&$json, $id = -1) {
+        try {
+            parent::generate_json($json, $id);
+        } catch (Exception $e) {
+            // Something is wrong with graphviz.
+            $a = new stdClass;
+            $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+            if (is_a($e, 'qtype_preg_pathtodot_empty')) {
+                $json[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
+            } else {
+                $a->pathtodot = $e->a;
+                $json[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $a);
+            }
+        }
     }
-
 }
 
 ?>

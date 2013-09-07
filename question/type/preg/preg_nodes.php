@@ -179,11 +179,14 @@ abstract class qtype_preg_node {
     abstract public function calculate_nflf(&$followpos);
 
     /**
-     * Finds the subtree by given indexes. Updates the indexes to the nearest suitable values.
+     * Finds the nearest suitable subtree by given indexes in the regex string. If the node is N-ary,
+     * expands it to be binary for better precision, thus AST is modified. All passed indexes are updated
+     * to the indexes of the found subtree.
      */
-    public function find_node_by_indexes(&$linefirst, &$linelast, &$indfirst, &$indlast) {
+    public function node_by_regex_fragment(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
+
         // Go down the tree.
         while (!$found) {
             $replaced = false;
@@ -201,16 +204,38 @@ abstract class qtype_preg_node {
             }
             $found = !$replaced || is_a($result, 'qtype_preg_leaf');
         }
-        // If the node is found, update the indexes, return NULL otherwise.
-        if (($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
-            ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast))) {
-            $linefirst = $result->linefirst;
-            $linelast = $result->linelast;
-            $indfirst = $result->indfirst;
-            $indlast = $result->indlast;
-        } else {
-            $result = null;
+
+        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
+                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast));
+
+        if (!$found) {
+            return null;
         }
+
+        // Expand N-ary nodes for better precision.
+        if (is_a($result, 'qtype_preg_operator')) {
+            $count = count($result->operands);
+            $from = 0;
+            $to = $count - 1;
+
+            for ($i = 0; $i < $count; $i++) {
+                $operand = $result->operands[$i];
+                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) {
+                    $from = $i;
+                }
+                $operand = $result->operands[$count - $i - 1];
+                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast)) {
+                    $to = $count - $i - 1;
+                }
+            }
+            $result->expand($from, $to, $idcounter);
+        }
+
+        // If the node is found, update the indexes, return NULL otherwise.
+        $linefirst = $result->linefirst;
+        $linelast = $result->linelast;
+        $indfirst = $result->indfirst;
+        $indlast = $result->indlast;
         return $result;
     }
 
@@ -248,12 +273,17 @@ abstract class qtype_preg_node {
  */
 abstract class qtype_preg_leaf extends qtype_preg_node {
 
+    /** Constants that can be returned from next_character for special cases. */
+    const NEXT_CHAR_CANNOT_GENERATE = 0x01;
+    const NEXT_CHAR_NOT_NEEDED      = 0x02;
+    const NEXT_CHAR_END_HERE        = 0x04;
+
     /** Is matching case insensitive? */
     public $caseless = false;
     /** Is this leaf negative? */
     public $negative = false;
     /** Assertions merged into this node (qtype_preg_leaf_assert objects). */
-    public $mergedassertions = array();
+    public $mergedassertions = array();//TODO two fields: assertionsbefore and assertionsafter.
 
     public function __clone() {
         // When clonning a leaf we also want the merged assertions to be cloned.
@@ -529,7 +559,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     }
 
     public function expand($from, $to, &$idcounter) {
-
         for ($i = $from; $i <= $to; $i++) {
             $this->operands[$i]->expand_all($idcounter);
         }
@@ -1261,9 +1290,9 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
 }
 
 /**
- * Defines simple assertions.
+ * Base class for simple assertions.
  */
-class qtype_preg_leaf_assert extends qtype_preg_leaf {
+abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     /** \b and \B */
     const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
@@ -1278,9 +1307,8 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     /** $ */
     const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
 
-    public function __construct($subtype = null, $negative = false) {
+    public function __construct($negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
-        $this->subtype = $subtype;
         $this->negative = $negative;
     }
 
@@ -1295,112 +1323,182 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function consumes($matcherstateobj = null) {
         return 0;
     }
+}
 
-    // TODO - ui_nodename().
+/**
+ * Simple assertion \B (negative == true) matches at not a word boundary.
+ * Simple assertion \b (negative == false) matches at a word boundary.
+ */
+class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_ESC_B;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $alnumrange = qtype_preg_unicode::alnum_ranges();
+        $ch0 = $str[0];
+        $ch1 = $str[$pos - 1];
+
+        $flag0 = $ch0 == '_' || qtype_preg_unicode::is_in_range($ch0, $alnumrange);
+        $flag1 = $ch1 == '_' || qtype_preg_unicode::is_in_range($ch1, $alnumrange);
+
+        $start = $flag0 && $pos == 0;
+        $end = $flag1 && $pos == $str->length();
+        $wnotw = false;
+        $notww = false;
+
+        if ($pos > 0 && $pos < $str->length()) {
+            $ch2 = $str[$pos];
+            $flag2 = $ch2 == '_' || qtype_preg_unicode::is_in_range($ch2, $alnumrange);
+            $wnotw = $flag1 && !$flag2;
+            $notww = !$flag1 && $flag2;
+        }
+
+        $length = 0;
+        return ($start || $end || $wnotw || $notww) xor $this->negative;
+    }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return $this->negative ? 'assert \B' : 'assert \b';
+    }
+}
+
+/**
+ * Simple assertion \A matches at the very start of the string.
+ */
+class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_ESC_A;
+    }
+
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-        $result = false;
-        switch ($this->subtype) {
-            case self::SUBTYPE_ESC_B:
-                // \b (\B) matches at (not) a word boundary.
-                $alnumrange = qtype_preg_unicode::alnum_ranges();
-                $ch0 = $str[0];
-                $ch1 = $str[$pos - 1];
-
-                $flag0 = $ch0 == '_' || qtype_preg_unicode::is_in_range($ch0, $alnumrange);
-                $flag1 = $ch1 == '_' || qtype_preg_unicode::is_in_range($ch1, $alnumrange);
-
-                $start = $flag0 && $pos == 0;
-                $end = $flag1 && $pos == $str->length();
-                $wnotw = false;
-                $notww = false;
-
-                if ($pos > 0 && $pos < $str->length()) {
-                    $ch2 = $str[$pos];
-                    $flag2 = $ch2 == '_' || qtype_preg_unicode::is_in_range($ch2, $alnumrange);
-                    $wnotw = $flag1 && !$flag2;
-                    $notww = !$flag1 && $flag2;
-                }
-                $result = ($start || $end || $wnotw || $notww);
-                $result = ($result xor $this->negative);
-                break;
-            case self::SUBTYPE_ESC_A:
-                // \A matches at the very start of the string.
-                $result = ($pos == 0);
-                break;
-            case self::SUBTYPE_ESC_Z:
-                if ($this->negative) {
-                    // \Z matches at the end of the string, also matches before the very last newline.
-                    $result = ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
-                } else {
-                    // \z matches only at the end of the string.
-                    $result = ($pos == $str->length());
-                }
-                break;
-            case self::SUBTYPE_ESC_G:
-                // TODO matches at the first matching position in the string.
-                break;
-            case self::SUBTYPE_CIRCUMFLEX:
-                // Used only in multiline mode. Matches at the very start of the string or after any \n.
-                $result = ($pos == 0) || ($str[$pos - 1] == "\n");
-                break;
-            case self::SUBTYPE_DOLLAR:
-                // Used only in multiline mode. Matches at the end of the string and before any \n.
-                $result = ($pos == $str->length()) || ($str[$pos] == "\n");
-                break;
-        }
-        return $result;
+        return ($pos == 0);
     }
+
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        switch ($this->subtype) {
-            case self::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case self::SUBTYPE_CIRCUMFLEX:
-                if ($this->negative) {
-                    return 'notstringstart';
-                } else {
-                    return 'stringstart';
-                }
-                break;
-            case self::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case self::SUBTYPE_DOLLAR:
-                if ($this->negative) {
-                    return ' notstringend';
-                } else {
-                    return '';
-                }
-                break;
-            case self::SUBTYPE_ESC_B:
-                if ($this->negative) {
-                    return 'notwordchar';
-                } else {
-                    return 'wordchar';
-                }
-                break;
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert \A';
+    }
+}
+
+/**
+ * Simple assertion \Z (negative == true) matches at the end of the string, also matches before the very last newline.
+ * Simple assertion \z (negative == false) matches only at the end of the string.
+ */
+class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_ESC_Z;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+        if ($this->negative) {
+            return ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
+        } else {
+            return ($pos == $str->length());
         }
     }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
     public function tohr() {
-        switch ($this->subtype) {
+        return $this->negative ? 'assert \Z' : 'assert \z';
             case self::SUBTYPE_ESC_A:
                 $type = '\\A';
                 break;    // Because there can be only one line is the response.
-            case self::SUBTYPE_CIRCUMFLEX:
-                $type = '^';
-                break;
             case self::SUBTYPE_ESC_Z:
                 $type = '\\Z';
                 break;    // Because there can be only one line is the response.
-            case self::SUBTYPE_DOLLAR:
-                $type = '$';
-                break;
-            case self::SUBTYPE_ESC_B:
-                $type = '\\b';
-                break;
-        }
-        if ($this->negative) {
-            return '!' . $type;
-        } else {
-            return $type;
-        }
+    }
+}
+            return '!assert' . $type;
+/**
+            return 'assert' . $type;
+ */
+class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_ESC_G;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+        return false; // TODO
+    }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert \G';
+    }
+}
+
+/**
+ * Simple assertion ^ matches at the very start of the string or after any \n.
+ * Used only in multiline mode.
+ */
+class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_CIRCUMFLEX;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+        return ($pos == 0) || ($str[$pos - 1] == "\n");
+    }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert ^';
+    }
+}
+
+/**
+ * Simple assertion $ matches at the end of the string and before any \n.
+ * Used only in multiline mode.
+ */
+class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_DOLLAR;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+        return ($pos == $str->length()) || ($str[$pos] == "\n");
+    }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return 'assert $';
     }
 }
 
@@ -1487,7 +1585,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 }
 
-class qtype_preg_leaf_option extends qtype_preg_leaf {
+class qtype_preg_leaf_options extends qtype_preg_leaf {
     public $posopt;
     public $negopt;
 
@@ -1497,10 +1595,10 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
         $this->negopt = $negopt;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function match for qtype_preg_leaf_options class before use it!');
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function character for qtype_preg_leaf_options class before use it!');
     }
     public function tohr() {
         $result = '(?';

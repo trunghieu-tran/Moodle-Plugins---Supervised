@@ -23,142 +23,87 @@
  * @package questions
  */
 
-//defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/form/textarea.php');
 
-MoodleQuickForm::registerElementType('text_and_button',
+MoodleQuickForm::registerElementType('qtype_poasquestion_text_and_button',
     $CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php',
-    'MoodleQuickForm_text_and_button');
+    'qtype_poasquestion_text_and_button');
 
-class MoodleQuickForm_text_and_button extends MoodleQuickForm_textarea{
+class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
-    /** @var string html for help button, if empty then no help */
-    var $_helpbutton = '';
+    protected $buttonName = '';
+    protected $linkToPage = '';
+    protected $linkToBtnImage = '';
+    protected $jsmodule = array('name' => 'poasquestion_text_and_button',
+                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
 
-    /** @var bool if true label will be hidden */
-    var $_hiddenLabel = false;
-
-    var $linktopage = '';
-
-    var $linktobuttonimage = '';
-
-    var $idbutton = '';
-
-    private $_btn_id_postfix = '_btn';
-
-    private $_jsmodule = null;
-
-    protected $_dialog_title = 'someone forget to set dialog title :(';
-
-    private static $_poasquestion_text_and_button_included = false;
+    protected static $_poasquestion_text_and_button_included = false;
 
     /**
      * Constructor
-     * @param string $elementName (optional) name of the text field
-     * @param string $elementButtonName (optional) name of the button
-     * @param string $elementLabel (optional) text field label
-     * @param array $elementLinks (optional) link on button image and link on new page
+     * @param string $textareaName (optional) name of the text field
+     * @param string $textareaLabel (optional) text field label
      * @param array $attributes (optional) Either a typical HTML attribute string or an associative array
+     * @param string $buttonName (optional) name of the button
+     * @param array $elementLinks (optional) link on button image and link on new page
      */
-    function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $dialogWidth=null, $attributes=null) {
+    public function qtype_poasquestion_text_and_button($textareaName = null, $textareaLabel = null, $attributes = null,
+                                                       $buttonName = null, $elementLinks = null, $dialogWidth = null) {
         global $PAGE;
-        parent::MoodleQuickForm_textarea($elementName, $elementLabel, $attributes);
-        $this->idbutton = $elementButtonName;
-        $this->linktopage = $elementLinks['link_to_page'];
-        $this->linktobuttonimage = $elementLinks['link_to_button_image'];
-        if($dialogWidth===null) {
+
+        parent::MoodleQuickForm_textarea($textareaName, $textareaLabel, $attributes);
+
+        $this->buttonName = $buttonName;
+        $this->linkToPage = $elementLinks['link_to_page'];
+        $this->linkToBtnImage = $elementLinks['link_to_button_image'];
+        if ($dialogWidth === null) {
             $dialogWidth = '90%';
         }
-        $this->_jsmodule = array('name'     => 'poasquestion_text_and_button',
-                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
-        $jsargs = array(
-            $dialogWidth,
-            $this->_dialog_title
-        );
+
         $PAGE->requires->jquery();
         $PAGE->requires->jquery_plugin('ui');
         $PAGE->requires->jquery_plugin('ui-css');
-        if(self::$_poasquestion_text_and_button_included===false) {
-            $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $this->_jsmodule);
-            self::$_poasquestion_text_and_button_included=true;
+        if (!self::$_poasquestion_text_and_button_included) {
+            $jsargs = array(
+                $dialogWidth,
+                $this->getDialogTitle()
+            );
+            $PAGE->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $this->jsmodule);
+            self::$_poasquestion_text_and_button_included = true;
         }
     }
 
-    function getInputId() {
+    public function getDialogTitle() {
+        return 'someone forgot to set the title :(';
+    }
+
+    public function getTextareaId() {
         return $this->getAttribute('id');
     }
 
-    function getButtonId() {
-        return $this->getAttribute('id') . $this->_btn_id_postfix;
-    }
-
-    /**
-     * Sets label to be hidden
-     *
-     * @param bool $hiddenLabel sets if label should be hidden
-     */
-    function setHiddenLabel($hiddenLabel) {
-        $this->_hiddenLabel = $hiddenLabel;
+    public function getButtonId() {
+        return $this->getAttribute('id') . '_btn';
     }
 
     /**
      * Returns HTML for this form element.
-     *
-     * @return string
      */
-    function toHtml() {
-        global $CFG;
+    public function toHtml() {
         global $PAGE;
-        //var_dump($CFG);
-        $parenthtml = parent::toHtml();
 
         $jsargs = array(
             $this->getButtonId(),
-            $this->getInputId()
+            $this->getTextareaId()
         );
 
-        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->_jsmodule);
-        return $parenthtml . '<a href="#" name="button_'. $this->getInputId() . '" id="' . $this->getButtonId() . '" >' .
-                                 '<img src="' . $this->linktobuttonimage . '" />' .
-                             '</a>';
-    }
+        $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->jsmodule);
 
-    /**
-     * set html for help button
-     *
-     * @param array $helpbuttonargs array of arguments to make a help button
-     * @param string $function function name to call to get html
-     * @deprecated since Moodle 2.0. Please do not call this function any more.
-     * @todo MDL-31047 this api will be removed.
-     * @see MoodleQuickForm::setHelpButton()
-     */
-    function setHelpButton($helpbuttonargs, $function='helpbutton') {
-        debugging('component setHelpButton() is not used any more, please use $mform->setHelpButton() instead');
-    }
-
-    /**
-     * get html for help button
-     *
-     * @return string html for help button
-     */
-    function getHelpButton(){
-        return $this->_helpbutton;
-    }
-
-    /**
-     * get html for help button
-     *
-     * @return string html for help button
-     */
-    function getElementTemplateType(){
-        if ($this->_flagFrozen){
-            return 'static';
-        } else {
-            return 'default';
-        }
+        return parent::toHtml() . '<a href="#" name="button_'. $this->getTextareaId() . '" id="' . $this->getButtonId() . '" >' .
+                                      '<img src="' . $this->linkToBtnImage . '" />' .
+                                  '</a>';
     }
 }

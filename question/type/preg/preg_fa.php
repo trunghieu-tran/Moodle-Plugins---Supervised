@@ -62,9 +62,15 @@ class qtype_preg_fa_transition {
     public $type;
     /** @var origin of the transition - should be equal to a constant defined in this class. */
     public $origin;
-
-    /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
     public $consumeschars;
+    /** @var array of qtype_preg_nodes representing subpatterns starting at this transition. */
+    public $subpatt_start;
+    /** @var array of qtype_preg_nodes representing subpatterns ending at this transition. */
+    public $subpatt_end;
+    /** @var array of qtype_preg_nodes representing subexpressions starting at this transition. */
+    public $subexpr_start;
+    /** @var array of qtype_preg_nodes representing subexpressions ending at this transition. */
+    public $subexpr_end;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
@@ -76,6 +82,10 @@ class qtype_preg_fa_transition {
         $this->to = $to;
         $this->origin = $origin;
         $this->consumeschars = $consumeschars;
+        $this->subpatt_start = array();
+        $this->subpatt_end = array();
+        $this->subexpr_start = array();
+        $this->subexpr_end = array();
     }
 
     public function get_label_for_dot($index1, $index2) {

@@ -23,11 +23,15 @@ $string['defaultlangdescription'] = 'Language selected by default when creating 
 $string['defaultlanglabel'] = 'Default language';
 $string['defaultnotationdescription'] = 'Notation selected by default when creating a new question';
 $string['defaultnotationlabel'] = 'Default notation';
+$string['description_tool'] = 'Description';
+$string['description_tool_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
 $string['dfa_matcher'] = 'Deterministic finite state automata';
 $string['engine'] = 'Matching engine';
-$string['engine_help'] = '<p>There is no \'best\' matching enginge, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP langugage. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p>The <b>NFA matching engine</b> and the <b>DFA matching engine</b> are engines that use custom matching code. They support partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>The NFA engine is probably the best choise if you don\'t use lookaround assertions.</p><p>Avoid using the DFA engine for the Moodle shortanswer notation.</p>';
+$string['engine_help'] = '<p>There is no \'best\' matching enginge, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP langugage. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p>The <b>NFA matching engine</b> and the <b>DFA matching engine</b> are engines that use custom matching code. They support partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>The NFA engine is probably the best choise if you don\'t use lookaround assertions.</p><p>Avoid using the DFA engine for the new questions, as it is deprecated. contains more bugs than other two, and lacking development in the last time. Use it only when you can\'t get what you need using other engines.</p>';
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching returns true if there is at least one match in the given string (answer). Exact matching means that the match must be the entire string.</p><p>Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives you additional flexibility: you can specify an answer with low (or zero) grade to catch common errors and give comments on them. You still can specify exact matches for some of your regular expressions if you start them with ^ and end with $.</p>';
+$string['explaining_graph_tool'] = 'Explaining graph';
+$string['explaining_graph_tool_help'] = 'Here you can see explaining graph. Pressing the node of the tree marks corresponding subgraph with dark green rectangle.';
 $string['hintcolouredstring'] = 'matched part of the response';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with the grade less than the hint grade border won\'t be used in hinting.';
@@ -49,6 +53,9 @@ $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
 $string['notation_pcreextended'] = 'Regular expression (extended)';
 $string['nosubexprcapturing'] = '{$a} engine doesn\'t support subexpression capturing, please remove placeholders (except {$0}) from the feedback or choose another engine';
+$string['objectname'] = 'question';
+$string['pathtodotempty'] = 'Can\'t draw {$a->name}: path to dot of graphviz is empty. Please ask your administrator to install <a href="http://www.graphviz.com">graphviz</a> and specify path to it using the \'pathtodot\' option at Administration > Server > System Paths';
+$string['pathtodotincorrect'] = 'Can\'t draw {$a->name}: path to dot of graphviz is incorrect or dot can not be executed. Please ask your administrator to check if <a href="http://www.graphviz.com">graphviz</a> is installed and \'pathtodot\' option is correct at Administration > Server > System Paths';
 $string['pluginname'] = 'Regular expression';
 $string['pluginname_help'] = '<p>Regular expressions are a form of writing patterns to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match a part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p><p>This question uses the PHP perl-compatible regular expression syntax as the default notation. There are many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression here: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p><p>You can also use this question as the advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions! Just select <b>Moodle shortanswer</b> as notation for your questions.</p>';
 $string['php_preg_matcher'] = 'PHP preg extension';
@@ -59,6 +66,8 @@ $string['pluginnamesummary'] = 'Enter a string response from student that can be
 $string['questioneditingheading'] = 'Question editing settings';
 $string['regex_handler'] = 'Regex handler';
 $string['subexpression'] = 'Subexpression';
+$string['syntax_tree_tool'] = 'Syntax tree';
+$string['syntax_tree_tool_help'] = 'Here you can see syntax tree of you expression. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
 $string['tobecontinued'] = '...';
 $string['toolargequant'] = 'Too large finite quantificator';
 $string['toomanyerrors'] = '.......{$a} more errors';
@@ -66,7 +75,7 @@ $string['lazyquant'] = 'Lazy quantifiers';
 $string['greedyquant'] = 'Greedy quantifiers';
 $string['possessivequant'] = 'Possessive quantifiers';
 $string['ungreedyquant'] = 'Ungreedy quantifiers';
-$string['unsupported'] = '{$a->nodename} in position from {$a->indfirst} to {$a->indlast} is not supported by {$a->engine}.';
+$string['unsupported'] = '{$a->nodename} in position from {$a->linefirst}:{$a->indfirst} to {$a->linelast}:{$a->indlast} is not supported by {$a->engine}.';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by the {$a->classname}.';
 $string['usehint_help'] = 'In behaviours which allow multiple tries (e.g. adaptive or interactive) show students the \'Hint next character\' button that allows to get a one-character hint with applying the \'Hint next character penalty\'. Not all matching engines support hinting.';
 $string['usecharhint'] = 'Allow next character hinting';
@@ -176,7 +185,8 @@ $string['leaf_charset_negative'] = 'negative character set';
 $string['leaf_charset_error']    = 'incorrect character set';
 
 /******* Error messages *******/
-$string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
@@ -191,28 +201,26 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** Strings for authoring tools form**********************/
-$string['authoring_tool_page_header'] = 'Test regular expression';
+$string['authoring_tool_page_header'] = 'Authoring tools';
 $string['authoring_form_charset_mode'] = 'Display mode for complex character classes:';
 $string['authoring_form_charset_flags'] = 'real meaning (unified format)';
 $string['authoring_form_charset_userinscription'] = 'as written in regular expressions';
 $string['authoring_form_tree_horiz'] = 'horizontal';
 $string['authoring_form_tree_vert'] = 'vertical';
-$string['regex_edit_header_text'] = 'Regex';
-$string['regex_edit_header'] = 'Input regex';
-$string['regex_edit_header_help'] = 'Here you can input regular expression for which you\'ll see syntax tree, explaining graph and description. In the regular expressions field you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and description.';
-$string['regex_text_text'] = 'Enter regular expression there';
-$string['regex_check_text'] = 'Check';
-$string['regex_back_text'] = 'Back (and save regex in this field)';
-$string['regex_tree_build'] = 'Build tree...';
-$string['regex_tree_header'] = 'Syntax tree';
-$string['regex_tree_header_help'] = 'Here you can see syntax tree of you expression. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
-$string['regex_graph_build'] = 'Build graph...';
-$string['regex_graph_header'] = 'Explaining graph';
-$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of the tree marks corresponding subgraph with dark green rectangle.';
-$string['regex_description_header'] = 'Description';
-$string['regex_description_header_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
-$string['regex_match_header'] = 'Enter string for testing regular expression';
-$string['regex_match_header_help'] = 'Here you can input a string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+$string['regex_edit_header'] = 'Regex input';
+$string['regex_edit_header_help'] = 'Input your regex here. You\'ll see corresponding syntax tree, explaining graph and description. Click "Update" to commit changes in the regex.';
+$string['regex_edit_header_text'] = 'Regular expression';
+$string['regex_text_text'] = 'Enter your regex here:';
+$string['regex_update_text'] = 'Update';
+$string['regex_save_text'] = 'Save';
+$string['regex_cancel_text'] = 'Cancel';
+$string['regex_show_selection'] = 'Show selection';
+$string['regex_tree_build'] = 'Building the tree...';
+$string['regex_graph_build'] = 'Building the graph...';
+$string['regex_match_header'] = 'Regular expression testing';
+$string['regex_match_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red.';
+$string['regex_match_textarea'] = 'Input strings to match (one per line)';
+$string['regex_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
 

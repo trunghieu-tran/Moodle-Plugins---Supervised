@@ -15,41 +15,35 @@ require_once(dirname(__FILE__) . '/../../../../config.php');
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_description_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_tool.php');
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_tree_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_tool.php');
 
 /**
  * Generates json array which stores authoring tools' content.
  */
 function qtype_preg_get_json_array() {
-    global $CFG;
-    $json_array = array();
-    $regextext = optional_param('regex', '', PARAM_RAW);
-
+    $regex = optional_param('regex', '', PARAM_RAW);
     $id = optional_param('id', '', PARAM_INT);
-    $tree_orientation = optional_param('tree_orientation', '', PARAM_TEXT);
-    
-    $rankdirlr = false;
-    if($tree_orientation == 'vertical'){
-        $rankdirlr = false;
-    }
-    else if($tree_orientation == 'horizontal'){
-        $rankdirlr = true;
-    }
-    
+    $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
+    $notation = optional_param('notation', '', PARAM_RAW);
+    $engine = optional_param('engine', '', PARAM_RAW);
+
+    $rankdirlr = $treeorientation == 'horizontal' ? true : false;
+
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_explaining_tree_tool($regextext, $rankdirlr),
-        'graph' => new qtype_preg_explaining_graph_tool($regextext),
-        'description' => new qtype_preg_description_tool($regextext)
+        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $rankdirlr),
+        'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation),
+        'description' => new qtype_preg_description_tool($regex, null, $engine, $notation)
     );
 
-    // Fill json array.
+    // Fill the json array.
+    $json = array();
     foreach($tools as $tool) {
-        $tool->generate_json($json_array, $regextext, $id);
+        $tool->generate_json($json, $id);
     }
 
-    return $json_array;
+    return $json;
 }
 
-$json_array = qtype_preg_get_json_array();
-echo json_encode($json_array);
+$json = qtype_preg_get_json_array();
+echo json_encode($json);

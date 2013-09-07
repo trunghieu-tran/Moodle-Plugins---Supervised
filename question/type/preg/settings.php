@@ -38,8 +38,9 @@ if ($ADMIN->fulltree) {
     $notations = $qtypeobj->available_notations();
     $settings->add(new admin_setting_configselect('qtype_preg_defaultnotation', get_string('defaultnotationlabel', 'qtype_preg'),
                     get_string('defaultnotationdescription', 'qtype_preg'), 'native', $notations));
+    $a = get_string('objectname', 'qtype_preg');
     $settings->add(new block_formal_langs_admin_setting_language('qtype_preg_defaultlang',
-                    get_string('defaultlanglabel', 'qtype_preg'), get_string('defaultlangdescription', 'qtype_preg'), '1', null));
+                    get_string('defaultlanglabel', 'block_formal_langs'), get_string('defaultlangdescription', 'block_formal_langs', $a), '1', null));
     $settings->add(new admin_setting_configtext('qtype_preg_maxerrorsshown', get_string('maxerrorsshownlabel', 'qtype_preg'),
                     get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
     $settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));

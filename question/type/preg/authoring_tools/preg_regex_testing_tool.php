@@ -7,53 +7,74 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
  */
-require_once(dirname(__FILE__) . '/../../../../config.php');
-global $CFG;
-global $PAGE;
+
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/engine/states.php');
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 
 /*
- * Testing regex on strings
+ * Defines a tool for testing regex against strings.
  */
-class qtype_preg_regex_testing_tool {
+class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
 
-    private $renderer;
-    private $answer;
-    private $hintmatch;
-    
-    public function __construct($regex, $answer) {
+    //TODO - PHPDoc comments!
+    private $regex = '';
+    private $renderer = null;
+    private $strings = null;
+    private $hintmatch = null;
+    private $errormsgs = null;
+
+    public function __construct($regex, $strings, $usecase, $exactmatch, $matcher, $notation) {
         global $PAGE;
+        $this->regex = $regex;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
-        $regular = qtype_preg_question::question_from_regex($regex, false, true, 'nfa_matcher', 'native');
-        $this->hintmatch = $regular->hint_object('hintmatchingpart');
-        $this->answer = $answer;
+        $this->strings = $strings;
+        $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
+        $matcher = $regular->get_matcher($matcher, $regex, /*'exactmatch'*/false,
+                                         $regular->get_modifiers($usecase), (-1), $notation, true);
+        if ($matcher->errors_exist()) {
+            $this->errormsgs = $matcher->get_error_messages(true);
+        } else {
+            $this->hintmatch = $regular->hint_object('hintmatchingpart');
+        }
     }
 
-    /**
-     * Generate colored string showing matched and non-matched parts of response.
-     *
-     * @param array $json_array contains colored string
-     */
-    public function generate_json(&$json_array) {
-        $this->generate_json_for_accepted_regex($json_array);
+    public function json_key() {
+        return 'regex_test';
     }
-	
-    protected function json_key(){
-		return 'regex_test';
-	}
 
-    protected function generate_json_for_empty_regex(&$json_array){
-		$json_array[$this->json_key()] = '';
-	}
+    public function generate_json(&$json, $id = -1) {
+        if ($this->regex == '') {
+            $this->generate_json_for_empty_regex($json, $id);
+        } else if ($this->errormsgs !== null) {
+            $this->generate_json_for_unaccepted_regex($json, $id);
+        } else {
+            $this->generate_json_for_accepted_regex($json, $id);
+        }
+    }
 
-    protected function generate_json_for_unaccepted_regex(&$json_array){
-		$json_array[$this->json_key()] = 'Ooops, i can\'t build text';
-	}
+    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+        // Generate colored string showing matched and non-matched parts of response.
+        $strings = explode("\n", $this->strings);
+        $result = '';
+        foreach ($strings as $answer) {
+            $result .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
+        }
+        $json[$this->json_key()] = $result;
+    }
 
-    protected function generate_json_for_accepted_regex(&$json_array){
-		$json_array[$this->json_key()] = $this->hintmatch->render_hint($this->renderer, null, null, $this->answer);
-	}
+    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+        $result = '';
+        foreach ($this->errormsgs as $error) {
+            $result .= '<br />' . $error;
+        }
+        $json[$this->json_key()] = $result;
+    }
+
+    public function generate_json_for_empty_regex(&$json, $id = -1) {
+        $json[$this->json_key()] = '';
+    }
 }
