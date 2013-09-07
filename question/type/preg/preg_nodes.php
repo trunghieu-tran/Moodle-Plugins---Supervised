@@ -310,8 +310,9 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @return assert, which is intersection of ginen.
      */
     public function intersect_asserts($other) {
-        $esca = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_A);
-        $escz = new qtype_preg_leaf_assert (qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
+        $esca = new qtype_preg_leaf_assert_esc_a;
+        $escbigz = new qtype_preg_leaf_assert_esc_z(true);
+        $escz = new qtype_preg_leaf_assert_esc_z;
 
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
@@ -349,7 +350,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                 }
             } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (array_search($escz, $result) !== false) {
+                if (array_search($escz, $result) !== false || array_search($escbigz, $result) !== false) {
                     unset($result[$key]);
                     $result = array_values($result);
                 }
@@ -363,7 +364,34 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $assert = $other;
         } else {
             if (count($result) != 0) {
-                $assert = new qtype_preg_leaf_assert($result[0]->subtype);
+            	switch($result[0]->subtype) {
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_B: 
+                        if ($result[0]->negative) {
+                            $assert = new qtype_preg_leaf_assert_esc_b(true);
+                        } else {
+                            $assert = new qtype_preg_leaf_assert_esc_b;
+                        }
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_A: 
+                        $assert = new qtype_preg_leaf_assert_esc_a; 
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_Z: 
+                        if ($result[0]->negative) {
+                            $assert = new qtype_preg_leaf_assert_esc_z(true);
+                        } else {
+                            $assert = new qtype_preg_leaf_assert_esc_z;
+                        }
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_G: 
+                        $assert = new qtype_preg_leaf_assert_esc_g; 
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX: 
+                        $assert = new qtype_preg_leaf_assert_circumflex; 
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_DOLLAR: 
+                        $assert = new qtype_preg_leaf_assert_dollar; 
+                        break;
+                }
                 unset($result[0]);
             } else {
                 $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
