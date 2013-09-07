@@ -167,7 +167,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($orders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!Missing tokens.");
+        $this->assertTrue( $equal, 'Error in find orders found!Missing tokens.');
     }
 
     // Test for find_enum_orders_in_corrected_string, several orders are expected.
@@ -203,7 +203,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($orders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!Several orders.");
+        $this->assertTrue( $equal, 'Error in find orders found!Several orders.');
     }
 
     // Test for find_enum_orders_in_corrected_string, several orders are expected.
@@ -238,7 +238,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($orders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!One order.");
+        $this->assertTrue( $equal, 'Error in find orders found!One order.');
     }
 
     // Test for find_enum_orders_in_corrected_string, all orders are expected.
@@ -279,7 +279,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($orders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!All orders.");
+        $this->assertTrue( $equal, 'Error in find orders found!All orders.');
     }
 
     // Test for find_enum_orders_in_corrected_string, two include in other.
@@ -317,7 +317,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         if (count($orders) != count($result)) {
             $equal = false;
         }
-        $this->assertTrue( $equal, "Error in find orders found!Two include in other.");
+        $this->assertTrue( $equal, 'Error in find orders found!Two include in other.');
     }
 
     // Test for find_all_enum_orders_in_corrected_string, two enumerations without including.
