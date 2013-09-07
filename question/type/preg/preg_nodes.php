@@ -362,6 +362,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                 if ($result != null) {
                     $result->mergedassertions = $this->mergedassertions;
                     $result = $result->intersect_asserts($other);
+                    $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
                 }
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                 $result = $this->intersect_asserts($other);
@@ -395,10 +396,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     if ($this->has_equal_tags($other)) {
                         if ($this->mergedassertions == $other->mergedassertions) {
                             $result = $this->unite($other);
+                            $result->userinscription = array_merge($this->userinscription, $other->userinscription);
                         }
                     }
                 } else if ($this->mergedassertions == $other->mergedassertions) {
                     $result = $this->unite($other);
+                    $result->userinscription = array_merge($this->userinscription, $other->userinscription);
                 }
             }
         } else if ($this == $other) {
