@@ -82,7 +82,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     * Create complete copy of current pair without common references
     * @return object of qtype_correctwriting_string_pair $pair copy of current pair 
     */
-    public function deep_copy() {
+    public function __clone() {
         // Clone answers.
         $correctstring = clone($this->correctstring());
         $correctedstring = clone($this->correctedstring());
@@ -106,3 +106,4 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
         return $pair;
     }
 }
+
