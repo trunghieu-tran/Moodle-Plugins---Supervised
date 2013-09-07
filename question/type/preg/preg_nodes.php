@@ -1393,7 +1393,7 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return $this->negative ? 'assert \B' : 'assert \b';
+        return $this->negative ? '\B' : '\b';
     }
 }
 
@@ -1417,7 +1417,7 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return 'assert \A';
+        return '\A';
     }
 }
 
@@ -1446,19 +1446,10 @@ class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return $this->negative ? 'assert \Z' : 'assert \z';
-            case self::SUBTYPE_ESC_A:
-                $type = '\\A';
-                break;    // Because there can be only one line is the response.
-            case self::SUBTYPE_ESC_Z:
-                $type = '\\Z';
-                break;    // Because there can be only one line is the response.
+        return $this->negative ? '\Z' : '\z';
     }
 }
-            return '!assert' . $type;
-/**
-            return 'assert' . $type;
- */
+
 class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
     public function __construct($negative = false) {
@@ -1476,7 +1467,7 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return 'assert \G';
+        return '\G';
     }
 }
 
@@ -1501,7 +1492,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return 'assert ^';
+        return '^';
     }
 }
 
@@ -1526,7 +1517,7 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return 'assert $';
+        return '$';
     }
 }
 
