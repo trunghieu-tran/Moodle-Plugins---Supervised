@@ -39,8 +39,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, "Error in include array found!Without including.");
-        $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Without including.");
+        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Without including.');
+        $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Without including.');
     }
 
     // Test for get_enum_change_order,second enumeration include in first.
@@ -58,8 +58,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, "Error in include array found!Second include in first.");
-        $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Second include in first.");
+        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Second include in first.');
+        $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Second include in first.');
     }
 
     // Test for get_enum_change_order,two enumerations include in other.
@@ -79,8 +79,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, "Error in include array found!Two enums include in other.");
-        $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Two enums include in other.");
+        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Two enums include in other.');
+        $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Two enums include in other.');
     }
 
     // Test for get_enum_change_order, matrioshka with three enumerations.
@@ -100,8 +100,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, "Error in include array found!Matrioshka with three enums.");
-        $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Matrioshka with three enums.");
+        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Matrioshka with three enums.');
+        $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Matrioshka with three enums.');
     }
 
     // Test for get_enum_change_order, six enumeration with difficult include map.
@@ -127,8 +127,8 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, "Error in include array found!Six enums.");
-        $this->assertTrue( $enum_change_order == $result->order, "Error in change order found!Six enums.");
+        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Six enums.');
+        $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Six enums.');
     }
 
     // Test for find_enum_orders_in_corrected_string, enumeration tokens are missed.
