@@ -986,9 +986,9 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
     public function test_intersecion_merged_asserts() {
         $lexer = $this->create_lexer('[a][a-c]');
         $leaf1 = $lexer->nextToken()->value;
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert1 = new qtype_preg_leaf_assert_circumflex;
         $leaf2 = $lexer->nextToken()->value;
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $assert2 = new qtype_preg_leaf_assert_esc_a;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^a]"];
         $transition1->pregleaf->mergedassertions[] = $assert1;
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\Aa-c]"];
@@ -1004,8 +1004,8 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a]');
         $leaf1 = $lexer->nextToken()->value;
         $leaf2 = $leaf1;
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        $assert1 = new qtype_preg_leaf_assert_circumflex;
+        $assert2 = new qtype_preg_leaf_assert_dollar;
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
         $restran->pregleaf->mergedassertions[] = $assert1;
@@ -1022,7 +1022,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a]');
         $leaf = $lexer->nextToken()->value;
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);//0->1[label="[(^a]"];
         $transition1->pregleaf->mergedassertions[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
@@ -1040,7 +1040,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
     public function test_intersecion_assert_and_character() {
         $lexer = $this->create_lexer('[a]');
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[^a]"];
         $transition1->pregleaf->mergedassertions[] = $assert;
         $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[a]"];
@@ -1055,7 +1055,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a]');
         $leaf = $lexer->nextToken()->value;
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);  //0->1[label="[(^a]"];
         $transition1->pregleaf->mergedassertions[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
@@ -1071,10 +1071,10 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
     public function test_intersecion_merged_and_unmerged() {
         $lexer = $this->create_lexer('[a-c]');
         $leaf1 = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1);  //0->1[label="[^a-c]"];
-        $leaf2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $leaf2 = new qtype_preg_leaf_assert_circumflex;
         $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1);  //0->1[label="[^]"];
 
         $resulttran = $transition1->intersect($transition2);
@@ -1082,8 +1082,8 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_intersecion_unmerged_asserts() {
-        $leaf1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $leaf2 = $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $leaf1 = new qtype_preg_leaf_assert_circumflex;
+        $leaf2 = new qtype_preg_leaf_assert_esc_a;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\A]"];
         $restran = new qtype_preg_nfa_transition(0, $leaf2, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
@@ -1092,7 +1092,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_intersecion_eps_and_assert() {
-        $leaf1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $leaf1 = new qtype_preg_leaf_assert_circumflex;
         $leaf2 = $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
@@ -1123,7 +1123,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a][01]');
         $leaf1 = $lexer->nextToken()->value;
         $leaf2 = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
         $leaf2->mergedassertions[] = $assert;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
@@ -1138,7 +1138,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a][01]');
         $leaf1 = $lexer->nextToken()->value;
         $leaf2 = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
         $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[01]"];
@@ -1732,20 +1732,20 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
 class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
 
     public function test_with_and_without_assert() {
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert1 = new qtype_preg_leaf_assert_circumflex;
         $assert2 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $result = $assert1->intersect_asserts($assert2);
-        $resassert = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $resassert = new qtype_preg_leaf_assert_circumflex;
         $this->assertEquals($assert1, $result, 'Result assert is not equal to expected');
     }
 
     public function test_esc_a_and_circumflex() {
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $mergedassert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert1 = new qtype_preg_leaf_assert_circumflex;
+        $mergedassert1 = new qtype_preg_leaf_assert_circumflex;
         //$assert1->mergedassertions = array($mergedassert1);
 
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
-        $mergedassert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $assert2 = new qtype_preg_leaf_assert_esc_a;
+        $mergedassert2 = new qtype_preg_leaf_assert_esc_a;
         //$assert2->mergedassertions = array($assert2);
 
         $result = $assert1->intersect_asserts($assert2);
@@ -1753,12 +1753,12 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_esc_z_and_dollar() {
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
-        $mergedassert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        $assert1 = new qtype_preg_leaf_assert_dollar;
+        $mergedassert1 = new qtype_preg_leaf_assert_dollar;
         //$assert1->mergedassertions = array($mergedassert1);
 
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
-        $mergedassert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
+        $assert2 = new qtype_preg_leaf_assert_esc_z;
+        $mergedassert2 = new qtype_preg_leaf_assert_esc_z;
         
 
         $result = $assert1->intersect_asserts($assert2);
@@ -1768,15 +1768,15 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_circumflex_and_dollar() {
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $mergedassert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assert1 = new qtype_preg_leaf_assert_circumflex;
+        $mergedassert1 = new qtype_preg_leaf_assert_circumflex;
         //$assert1->mergedassertions = array($mergedassert1);
 
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
-        $mergedassert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        $assert2 = new qtype_preg_leaf_assert_dollar;
+        $mergedassert2 = new qtype_preg_leaf_assert_dollar;
         //$assert1->mergedassertions = array($mergedassert2);
 
-        $assertresult = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $assertresult = new qtype_preg_leaf_assert_circumflex;
         $assertresult->mergedassertions = array(1=>$assert2);
 
         $result = $assert1->intersect_asserts($assert2);
@@ -1785,14 +1785,12 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_esc_b_and_esc_a() {
-        $assert1 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B);
-        $assert2 = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
-        $assertresult = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_B); 
+        $assert1 = new qtype_preg_leaf_assert_esc_b;
+        $assert2 = new qtype_preg_leaf_assert_esc_a;
+        $assertresult = new qtype_preg_leaf_assert_esc_b; 
         $assertresult->mergedassertions = array(1=>$assert2);
 
         $result = $assert1->intersect_asserts($assert2);
-        var_dump($assertresult);
-        var_dump($result);
         $this->assertEquals($assertresult, $result, 'Result assert is not equal to expected');
     }
 }
