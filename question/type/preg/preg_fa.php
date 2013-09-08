@@ -2828,6 +2828,7 @@ abstract class qtype_preg_finite_automaton {
      * Generates dot code for drawing FA.
      * @param type image type.
      * @param filename - name of the resulting image file.
+     * @deprecated since 2.5
      */
     public function draw($type, $filename) {
         $result = 'digraph {rankdir = LR;';
