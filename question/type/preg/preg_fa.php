@@ -843,7 +843,7 @@ abstract class qtype_preg_finite_automaton {
         }
         $result .= "\n}";
         if ($type != null) {
-            qtype_preg_regex_handler::execute_dot($result, $type, $filename);
+            $result = qtype_preg_regex_handler::execute_dot($result, $type, $filename);
         }
         return $result;
     }
