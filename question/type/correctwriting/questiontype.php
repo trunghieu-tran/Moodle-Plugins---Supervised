@@ -43,10 +43,10 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         and table
         @return array extra fields
      */
-    public function extra_question_fields() {
-        // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shrtanswer
-        // We unset answers fields, because we do not need them
-        $result = array_diff(parent::extra_question_fields(), array('answers'));
+    public function extra_question_fields() {// TODO - rewrite co call analyzer classes extra_question_fields().
+        // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shortanswer.
+        //$result = array_diff(parent::extra_question_fields(), array('answers'));// We unset answers fields, because we do not need them
+        $result = parent::extra_question_fields();
         // Replace shortanswer table with our table
         $result[0]= 'qtype_correctwriting';
         // Language, which will be used for analysis
@@ -81,6 +81,23 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      */
     public function questionid_column_name() {
         return 'questionid';
+    }
+
+    /**
+     * Returns an array of supported analyzers.
+     * Keys are numerical values, defining the order of execution for analyzers.
+     */
+    public function analyzers() {
+        global $CFG;
+        $analyzers =  array(   /*0x100 => 'lexem_analyzer',
+                        0x200 => 'enum_analyzer',*/
+                        0x300 => 'sequence_analyzer'/*,
+                        0x400 => 'syntax_analyzer'*/
+                    );
+        foreach ($analyzers() as $name) {
+            require_once($CFG->dirroot . '/question/type/correctwriting/' . $name . '.php');
+        }
+        return $analyzers;
     }
 
     /** Loads a question type specific options for  the question

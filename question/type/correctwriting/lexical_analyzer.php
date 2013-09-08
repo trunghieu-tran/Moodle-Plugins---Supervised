@@ -43,9 +43,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 //Other necessary requires
 
-class qtype_correctwriting_lexical_analyzer {
-    protected $question;//A reference to the question object with necessary data (language id, answers, threshold etc)
-    protected $language;//Language object - contains scaner, parser etc
+class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstract_analyzer {
     protected $errors;//Array of error objects - teacher errors when entering answer
 
     protected $mistakes;//Array of mistake objects - student errors (merged from all stages)

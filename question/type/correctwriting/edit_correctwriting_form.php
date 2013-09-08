@@ -59,12 +59,14 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                             'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)       //"Where" picture hint penalty
                             );
 
+    private $analyzers = null;
     /**  Fills an inner definition of form fields
          @param object mform form data
      */
     protected function definition_inner($mform) {
         global $CFG;
 
+        // Create global floating fields before changing array.
         foreach ($this->floatfields as $name => $params) {
             $mform->addElement('text', $name, get_string($name, 'qtype_correctwriting'), array('size' => 6));
             $mform->setType($name, PARAM_FLOAT);
@@ -76,6 +78,20 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
 
+        // Now change floating fields to include ones from analyzers for data preprocessing and validation purposes.
+        question_bank::load_question_definition_classes($this->qtype());
+        $qtypeclass = 'qtype_'.$this->qtype();
+        $qtype = new $qtypeclass;
+        $this->analyzers = $qtype->analyzers();
+        foreach ($this->analyzers as $analyzer) {
+            $fields = $analyzer->float_form_fields();
+            foreach ($fields as $field) {
+                $name = $field['name'];
+                unset($field['name']);
+                $this->floatfields[$name] = $field;
+            }
+        }
+
         $currentlanguages = block_formal_langs::available_langs();
         $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
@@ -84,7 +100,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         //Determine whether this is first time, second time or another time form.
         $name = optional_param('name', '', PARAM_TEXT);
-        if ($name != '') {//Not first time form.
+        if ($name != '') {// Not first time form.
             $confirmed = optional_param('confirmed', false, PARAM_BOOL);
             if (!$confirmed) {
                 $this->secondtimeform = true;
@@ -99,6 +115,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         }
 
         parent::definition_inner($mform);
+        // TODO - add sections for each analyzers after main question section, but before answers one.
+        // Each section should have a checkbox to use analyzer, and call form_section_definition() from analyzer to get other fields defined.
 
         $answersinstruct = $mform->getElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_correctwriting'));
