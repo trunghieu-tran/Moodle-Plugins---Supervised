@@ -360,7 +360,7 @@ class qtype_preg_syntax_tree_node_alt extends qtype_preg_syntax_tree_operator {
 class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator {
 
     protected function label() {
-        return '"' . get_string($this->pregnode->type, 'qtype_preg') . ' ' . parent::label() . '"';
+        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . ' ' . parent::label() . '"';
     }
 }
 
