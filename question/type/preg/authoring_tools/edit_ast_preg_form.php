@@ -38,23 +38,23 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform =& $this->_form;
 
         // Add header.
-        $mform->addElement('html', '<div align="center"><h2>' . get_string('authoring_tool_page_header', 'qtype_preg') . '</h2></div>');
+        $mform->addElement('html', '<div align="center"><h2>' . get_string('authoring_form_page_header', 'qtype_preg') . '</h2></div>');
 
         // Add the editing widgets.
-        $mform->addElement('header', 'regex_input_header', get_string('regex_edit_header_text', 'qtype_preg'));
+        $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header_text', 'qtype_preg'));
         $mform->setExpanded('regex_input_header', 1);
-        $mform->addHelpButton('regex_input_header', 'regex_edit_header', 'qtype_preg');
+        $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
 
-        $mform->addElement('textarea', 'regex_text', get_string('regex_text_text', 'qtype_preg'), array('cols' => 100, 'rows' => 1));
+        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 100, 'rows' => 1));
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();
-        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('regex_update_text', 'qtype_preg'));
+        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('authoring_form_update_text', 'qtype_preg'));
         if (!$this->isblock) {
-            $topline[] =& $mform->createElement('button', 'regex_save', get_string('regex_save_text', 'qtype_preg'));
+            $topline[] =& $mform->createElement('button', 'regex_save', get_string('authoring_form_save_text', 'qtype_preg'));
         }
-        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('regex_cancel_text', 'qtype_preg'));
-        $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('regex_show_selection', 'qtype_preg'));
+        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('authoring_form_cancel_text', 'qtype_preg'));
+        $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('authoring_form_show_selection', 'qtype_preg'));
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
         $radiocharsetprocessarray = array();
@@ -80,7 +80,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                         '<div style="width:10px">' .
-                                            '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('regex_tree_build', 'qtype_preg') . '" />' .
+                                            '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
                                         '</div></div></br>');
 
         // Add explaining graph tool.
@@ -90,7 +90,7 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_hnd">' .
                                         '<div id="graph_err"></div>' .
                                         '<div style="width:10px">' .
-                                            '<img src="" id="graph_img" alt="' . get_string('regex_graph_build', 'qtype_preg') . '" />' .
+                                            '<img src="" id="graph_img" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
                                         '</div></div></br>');
 
         // Add description tool.
@@ -100,14 +100,14 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('html', '<div id="description_handler"></div>');
 
         // Add testing tool.
-        $mform->addElement('header', 'regex_match_header', get_string('regex_match_header', 'qtype_preg'));
+        $mform->addElement('header', 'regex_match_header', get_string('authoring_form_match_header', 'qtype_preg'));
         $mform->setExpanded('regex_match_header', 1);
-        $mform->addHelpButton('regex_match_header', 'regex_match_header', 'qtype_preg');
+        $mform->addHelpButton('regex_match_header', 'authoring_form_match_header', 'qtype_preg');
 
-        $mform->addElement('preg_textarea', 'regex_match_text', get_string('regex_match_textarea', 'qtype_preg'), array('cols' => 50));
+        $mform->addElement('preg_textarea', 'regex_match_text', get_string('authoring_form_match_textarea', 'qtype_preg'), array('cols' => 50));
 
         $mform->registerNoSubmitButton('regex_check_strings');
-        $mform->addElement('button', 'regex_check_strings', get_string('regex_check_strings', 'qtype_preg'));
+        $mform->addElement('button', 'regex_check_strings', get_string('authoring_form_check_strings', 'qtype_preg'));
     }
 
     //Custom validation should be added here
