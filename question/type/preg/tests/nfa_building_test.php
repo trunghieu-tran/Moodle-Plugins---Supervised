@@ -21,7 +21,7 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
     function draw($regex, $filename) {
         $matcher = new qtype_preg_nfa_matcher($regex);
         if (!$matcher->errors_exist()) {
-            $matcher->automaton->draw('svg', $this->dir . $filename);
+            $matcher->automaton->fa_to_dot('svg', $this->dir . $filename);
         } else {
             $this->assertTrue(false, "nfa building failed\n");
         }
