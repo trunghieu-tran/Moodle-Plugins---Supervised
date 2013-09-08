@@ -799,10 +799,12 @@ abstract class qtype_preg_finite_automaton {
 
     /**
      * Write automata as a dot-style string.
-     *
+     * @param type type of the resulting image, should be 'svg', png' or something.
+     * @param filename the absolute path to the resulting image file.
+
      * @return dot_style string with the description of automata.
      */
-    public function write_fa() {
+    public function fa_to_dot($type = null, $filename = null) {
         $addedcharacters = '/(), ';
         $result = "digraph res {\n    ";
         if ($this->statecount != 0) {
@@ -840,6 +842,9 @@ abstract class qtype_preg_finite_automaton {
             }
         }
         $result .= "\n}";
+        if ($type != null) {
+            qtype_preg_regex_handler::execute_dot($result, $type, $filename);
+        }
         return $result;
     }
 
