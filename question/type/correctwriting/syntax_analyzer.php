@@ -37,8 +37,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
 //Other necessary requires
 
-class qtype_correctwriting_syntax_analyzer {//object created for each lcs
-    protected $language;//language object - contains scaner, parser etc
+class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract_analyzer {//object created for each lcs
+
     protected $errors;//array of objects - teacher errors when entering answer
 
     /**

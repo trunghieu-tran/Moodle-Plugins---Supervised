@@ -43,9 +43,7 @@ require_once($CFG->dirroot . '/question/type/correctwriting/sequence_mistakes.ph
 require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
 
 
-class  qtype_correctwriting_sequence_analyzer {
-
-    protected $language;             // Language object - contains scaner, parser etc
+class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstract_analyzer {
     protected $errors;               // Array of error objects - teacher errors when entering answer
 
     /**
@@ -56,12 +54,6 @@ class  qtype_correctwriting_sequence_analyzer {
     protected $mistakes;             // Array of mistake objects - student errors (structural errors)
 
     private   $fitness;              // Fitness for response
-
-    /**
-     * Used question by analyzer
-     * @var qtype_correctwriting_question
-     */
-    private   $question;
 
     /**
      * Do all processing and fill all member variables
