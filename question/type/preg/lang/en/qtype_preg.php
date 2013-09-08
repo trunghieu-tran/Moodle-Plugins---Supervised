@@ -201,26 +201,26 @@ $string['dfa_transition_limit_description'] = 'Maximum number of transitions in 
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** Strings for authoring tools form**********************/
-$string['authoring_tool_page_header'] = 'Authoring tools';
+$string['authoring_form_page_header'] = 'Authoring tools';
 $string['authoring_form_charset_mode'] = 'Display mode for complex character classes:';
 $string['authoring_form_charset_flags'] = 'real meaning (unified format)';
 $string['authoring_form_charset_userinscription'] = 'as written in regular expressions';
 $string['authoring_form_tree_horiz'] = 'horizontal';
 $string['authoring_form_tree_vert'] = 'vertical';
-$string['regex_edit_header'] = 'Regex input';
-$string['regex_edit_header_help'] = 'Input your regex here. You\'ll see corresponding syntax tree, explaining graph and description. Click "Update" to commit changes in the regex.';
-$string['regex_edit_header_text'] = 'Regular expression';
-$string['regex_text_text'] = 'Enter your regex here:';
-$string['regex_update_text'] = 'Update';
-$string['regex_save_text'] = 'Save';
-$string['regex_cancel_text'] = 'Cancel';
-$string['regex_show_selection'] = 'Show selection';
-$string['regex_tree_build'] = 'Building the tree...';
-$string['regex_graph_build'] = 'Building the graph...';
-$string['regex_match_header'] = 'Regular expression testing';
-$string['regex_match_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red.';
-$string['regex_match_textarea'] = 'Input strings to match (one per line)';
-$string['regex_check_strings'] = 'Check the string(s)';
+$string['authoring_form_edit_header'] = 'Regex input';
+$string['authoring_form_edit_header_help'] = 'Input your regex here. You\'ll see corresponding syntax tree, explaining graph and description. Click "Update" to commit changes in the regex.';
+$string['authoring_form_edit_header_text'] = 'Regular expression';
+$string['authoring_form_text'] = 'Enter your regex here:';
+$string['authoring_form_update_text'] = 'Update';
+$string['authoring_form_save_text'] = 'Save';
+$string['authoring_form_cancel_text'] = 'Cancel';
+$string['authoring_form_show_selection'] = 'Show selection';
+$string['authoring_form_tree_build'] = 'Building the tree...';
+$string['authoring_form_graph_build'] = 'Building the graph...';
+$string['authoring_form_match_header'] = 'Regular expression testing';
+$string['authoring_form_match_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red.';
+$string['authoring_form_match_textarea'] = 'Input strings to match (one per line)';
+$string['authoring_form_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
 
