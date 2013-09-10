@@ -348,6 +348,26 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     }
 
     /**
+     * Returns true if this beats other, false if other beats this; for equal states returns false.
+     */
+    public function leftmost_shortest($other) {
+        // Check for full match.
+        if ($this->full && !$other->full) {
+            return true;
+        } else if (!$this->full && $other->full) {
+            return false;
+        }
+
+        if ($this->length < $other->length) {
+            return true;
+        } else if ($other->length < $this->length) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $pos, $matchlen) {
