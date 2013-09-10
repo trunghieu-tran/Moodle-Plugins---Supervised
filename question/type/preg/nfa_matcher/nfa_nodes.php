@@ -178,19 +178,18 @@ abstract class qtype_preg_nfa_node {
 
     /**
      * Creates an automaton corresponding to this node.
-     * @param matcher - a reference to the matcher.
      * @param automaton - a reference to the automaton being built.
      * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2),
      *                start and end states of parts of the resulting automaton.
      */
-    abstract protected function create_automaton_inner($matcher, &$automaton, &$stack);
+    abstract protected function create_automaton_inner(&$automaton, &$stack);
 
     public function __construct($node, $matcher) {
         $this->pregnode = $node;
     }
 
-    public function create_automaton($matcher, &$automaton, &$stack) {
-        $this->create_automaton_inner($matcher, $automaton, $stack);
+    public function create_automaton(&$automaton, &$stack) {
+        $this->create_automaton_inner($automaton, $stack);
 
         // Don't augment transition if the node is not a subpattern.
         if ($this->pregnode->subpattern == -1) {
@@ -239,7 +238,7 @@ class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
         return true;
     }
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
         $start = new qtype_preg_fa_state($automaton);
         $end = new qtype_preg_fa_state($automaton);
@@ -280,16 +279,6 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
             $stack_item['end'] = $end;
         }
     }
-
-    public static function reverse_stack_items(&$stack, $number) {
-        $tmp = array();
-        for ($i = 0; $i < $number; $i++) {
-            $tmp[] = array_pop($stack);
-        }
-        foreach ($tmp as $item) {
-            $stack[] = $item;
-        }
-    }
 }
 
 /**
@@ -297,31 +286,28 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
  */
 class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
-        // Operands create their automatons.
-        foreach ($this->operands as $operand) {
-            $operand->create_automaton($matcher, $automaton, $stack);
-        }
-
+    protected function create_automaton_inner(&$automaton, &$stack) {
         $count = count($this->operands);
+        $result = null;
 
-        // Take automatons and concatenate them.
-        $second = array_pop($stack);
-
-        for ($i = 0; $i < $count - 1; $i++) {
-            $first = array_pop($stack);
-
-            $automaton->update_state_references($second['start'], $first['end']);
-            self::move_transitions($second['start'], $first['end']);
-            $automaton->remove_state($second['start']);
-
-            $second = array('start' => $first['start'], 'end' => $second['end']);
+        // Create automata for operands and concatenate them.
+        for ($i = 0; $i < $count; $i++) {
+            $this->operands[$i]->create_automaton($automaton, $stack);
+            $cur = array_pop($stack);
+            if ($result === null) {
+                $result = $cur;
+            } else {
+                $automaton->update_state_references($cur['start'], $result['end']);
+                self::move_transitions($cur['start'], $result['end']);
+                $automaton->remove_state($cur['start']);
+                $result = array('start' => $result['start'], 'end' => $cur['end']);
+            }
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($second['start']);
-        $automaton->set_end_state($second['end']);
-        $stack[] = $second;
+        $automaton->set_start_state($result['start']);
+        $automaton->set_end_state($result['end']);
+        $stack[] = $result;
     }
 }
 
@@ -330,34 +316,31 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
  */
 class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
-        // Operands create their automatons.
-        foreach (array_reverse($this->operands) as $operand) {
-            $operand->create_automaton($matcher, $automaton, $stack);
-        }
-
+    protected function create_automaton_inner(&$automaton, &$stack) {
         $count = count($this->operands);
+        $result = null;
 
-        // Take automatons and alternate them.
-        $second = array_pop($stack);
-        self::add_ending_eps_transition_if_needed($automaton, $second); // Necessary if there's a quantifier in the end.
-
-        for ($i = 0; $i < $count - 1; $i++) {
-            $first = array_pop($stack);
-            self::add_ending_eps_transition_if_needed($automaton, $first);  // Necessary if there's a quantifier in the end.
-
-            // Merge start and end states.
-            $automaton->update_state_references($first['start'], $second['start']);
-            $automaton->update_state_references($first['end'], $second['end']);
-            self::move_transitions($first['start'], $second['start']);
-            $automaton->remove_state($first['start']);
-            $automaton->remove_state($first['end']);
+        // Create automata for operands and alternate them.
+        for ($i = 0; $i < $count; $i++) {
+            $this->operands[$i]->create_automaton($automaton, $stack);
+            $cur = array_pop($stack);
+            self::add_ending_eps_transition_if_needed($automaton, $cur);  // Necessary if there's a quantifier in the end.
+            if ($result === null) {
+                $result = $cur;
+            } else {
+                // Merge start and end states.
+                $automaton->update_state_references($cur['start'], $result['start']);
+                $automaton->update_state_references($cur['end'], $result['end']);
+                self::move_transitions($cur['start'], $result['start']);
+                $automaton->remove_state($cur['start']);
+                $automaton->remove_state($cur['end']);
+            }
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($second['start']);
-        $automaton->set_end_state($second['end']);
-        $stack[] = $second;
+        $automaton->set_start_state($result['start']);
+        $automaton->set_end_state($result['end']);
+        $stack[] = $result;
     }
 }
 
@@ -388,9 +371,9 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
     /**
      * Creates an automaton for * or {0,} quantifier.
      */
-    private function create_aster($matcher, &$automaton, &$stack) {
+    private function create_aster(&$automaton, &$stack) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack);
         $body = array_pop($stack);
 
         // Now, clone all transitions from the start state to the end state.
@@ -417,18 +400,14 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
     /**
      * Creates an automaton for {m,} quantifier
      */
-    private function create_brace($matcher, &$automaton, &$stack) {
+    private function create_brace(&$automaton, &$stack) {
         // Operand creates its automaton m times.
         $leftborder = $this->pregnode->leftborder;
-        for ($i = 0; $i < $leftborder; $i++) {
-            $this->operands[0]->create_automaton($matcher, $automaton, $stack);
-        }
-        self::reverse_stack_items($stack, $leftborder);
-
-        $res = null;    // The resulting pair of states.
+        $result = null;
 
         // Linking automatons to the resulting one.
         for ($i = 0; $i < $leftborder; $i++) {
+            $this->operands[0]->create_automaton($automaton, $stack);
             $cur = array_pop($stack);
             // The last block is repeated.
             if ($i === $leftborder - 1) {
@@ -440,29 +419,29 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
                     $cur['end']->add_transition($newtransition);    // "from" will be set here.
                 }
             }
-            if ($res === null) {
+            if ($result === null) {
                 // On the first iteration we just remember current automaton as the result.
-                $res = $cur;
+                $result = $cur;
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
-                $automaton->update_state_references($res['end'], $cur['start']);
-                self::move_transitions($res['end'], $cur['start']);
-                $automaton->remove_state($res['end']);
-                $res['end'] = $cur['end'];
+                $automaton->update_state_references($result['end'], $cur['start']);
+                self::move_transitions($result['end'], $cur['start']);
+                $automaton->remove_state($result['end']);
+                $result['end'] = $cur['end'];
             }
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($res['start']);
-        $automaton->set_end_state($res['end']);
-        $stack[] = $res;
+        $automaton->set_start_state($result['start']);
+        $automaton->set_end_state($result['end']);
+        $stack[] = $result;
     }
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack) {
         if ($this->pregnode->leftborder === 0) {
-            $this->create_aster($matcher, $automaton, $stack);
+            $this->create_aster($automaton, $stack);
         } else {
-            $this->create_brace($matcher, $automaton, $stack);
+            $this->create_brace($automaton, $stack);
         }
         $this->mark_transitions($automaton->start_state());
     }
@@ -476,9 +455,9 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
     /**
      * Creates an automaton for ? quantifier.
      */
-    private function create_qu($matcher, &$automaton, &$stack) {
+    private function create_qu(&$automaton, &$stack) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack);
         $body = array_pop($stack);
 
         // Set the greediness.
@@ -502,22 +481,17 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
     /**
      * Creates an automaton for {m, n} quantifier.
      */
-    private function create_brace($matcher, &$automaton, &$stack) {
+    private function create_brace(&$automaton, &$stack) {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
-
-        for ($i = 0; $i < $rightborder; $i++) {
-            $this->operands[0]->create_automaton($matcher, $automaton, $stack);
-        }
-        self::reverse_stack_items($stack, $rightborder);
-
-        $res = null;                // The resulting automaton.
+        $result = null;
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
         $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
         for ($i = 0; $i < $rightborder; $i++) {
+            $this->operands[0]->create_automaton($automaton, $stack);
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
                 self::add_ending_eps_transition_if_needed($automaton, $cur);
@@ -527,32 +501,32 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
                 }
                 $borderstates[] = $cur['start'];
             }
-            if ($res === null) {
+            if ($result === null) {
                 // On the first iteration we just remember current automaton as the result.
-                $res = $cur;
+                $result = $cur;
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
-                $automaton->update_state_references($res['end'], $cur['start']);
-                self::move_transitions($res['end'], $cur['start']);
-                $automaton->remove_state($res['end']);
-                $res['end'] = $cur['end'];
+                $automaton->update_state_references($result['end'], $cur['start']);
+                self::move_transitions($result['end'], $cur['start']);
+                $automaton->remove_state($result['end']);
+                $result['end'] = $cur['end'];
             }
         }
 
         // Adding eps-transitions after first m bodies.
         foreach ($borderstates as $state) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $transition = new qtype_preg_nfa_transition($state, $epsleaf, $res['end']);
+            $transition = new qtype_preg_nfa_transition($state, $epsleaf, $result['end']);
             $state->add_transition($transition);
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($res['start']);
-        $automaton->set_end_state($res['end']);
-        $stack[] = $res;
+        $automaton->set_start_state($result['start']);
+        $automaton->set_end_state($result['end']);
+        $stack[] = $result;
     }
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack) {
         if ($this->pregnode->rightborder === 0) {
             // Repeating 0 times means eps-transition.
             $start = new qtype_preg_fa_state($automaton);
@@ -570,9 +544,9 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
             $automaton->set_end_state($end);
             $stack[] = array('start' => $start, 'end' => $end);
         } else if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
-            $this->create_qu($matcher, $automaton, $stack);
+            $this->create_qu($automaton, $stack);
         } else {
-            $this->create_brace($matcher, $automaton, $stack);
+            $this->create_brace($automaton, $stack);
         }
         $this->mark_transitions($automaton->start_state());
     }
@@ -590,9 +564,9 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
         return true;
     }
 
-    protected function create_automaton_inner($matcher, &$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack);
         if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
             return;
         }
