@@ -253,8 +253,13 @@ M.preg_authoring_tools_script = (function ($) {
 
         if (t) {
             err = (t.substring(0, 4) != 'data');
-            tree_err.html(err ? t : '');
-            tree_img.attr('src', err ? '""' : t).css('visibility', err ? 'hidden' : 'visible');
+            if (err) {
+                tree_err.html(t);
+                tree_img.removeAttr('src').css('visibility', 'hidden');
+            } else {
+                tree_err.html('');
+                tree_img.attr('src', t).css('visibility', 'visible');
+            }
         }
         if (m) {
             tree_map.html(m);
@@ -263,8 +268,13 @@ M.preg_authoring_tools_script = (function ($) {
         }
         if (g) {
             err = (g.substring(0, 4) != 'data');
-            graph_err.html(err ? g : '');
-            graph_img.attr('src', err ? '""' : g).css('visibility', err ? 'hidden' : 'visible');
+            if (err) {
+                graph_err.html(g);
+                graph_img.removeAttr('src').css('visibility', 'hidden');
+            } else {
+                graph_err.html('');
+                graph_img.attr('src', g).css('visibility', 'visible');
+            }
         }
         if (d) {
             $('#description_handler').html(d);
