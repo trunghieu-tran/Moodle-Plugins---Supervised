@@ -39,7 +39,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Without including.');
+        $this->assertTrue( $include_enums == $result->includedenums, 'Error in include array found!Without including.');
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Without including.');
     }
 
@@ -58,7 +58,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Second include in first.');
+        $this->assertTrue( $include_enums == $result->includedenums, 'Error in include array found!Second include in first.');
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Second include in first.');
     }
 
@@ -79,7 +79,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Two enums include in other.');
+        $this->assertTrue( $include_enums == $result->includedenums, 'Error in include array found!Two enums include in other.');
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Two enums include in other.');
     }
 
@@ -100,7 +100,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Matrioshka with three enums.');
+        $this->assertTrue( $include_enums == $result->includedenums, 'Error in include array found!Matrioshka with three enums.');
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Matrioshka with three enums.');
     }
 
@@ -127,7 +127,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         // Test body.
         $temp= new qtype_correctwriting_enum_analyzer();
         $result = $temp->get_enum_change_order($enumdescription);
-        $this->assertTrue( $include_enums == $result->included_enums, 'Error in include array found!Six enums.');
+        $this->assertTrue( $include_enums == $result->includedenums, 'Error in include array found!Six enums.');
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Six enums.');
     }
 
