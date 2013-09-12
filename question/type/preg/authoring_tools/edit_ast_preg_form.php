@@ -34,6 +34,8 @@ class qtype_preg_authoring_tool_form extends moodleform {
         global $CFG;
         global $PAGE;
 
+        $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
+
         // Create the form.
         $mform =& $this->_form;
 

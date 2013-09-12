@@ -21,8 +21,11 @@ M.preg_authoring_tools_script = (function ($) {
     /** @var {string} name of qtype_preg_textbutton parent object */
     textbutton_widget : null,
 
-    /** @var {Object} reference for 'input' on top of dialog */
-    main_input : null,
+    /** @var {Object} reference to the regex textarea */
+    regex_input : null,
+
+    /** @var {Object} contains regex selection borders */
+    selection_borders : null,
 
     /** @var {Integer} id of the currently selected node */
     node_id : '-1',
@@ -101,36 +104,34 @@ M.preg_authoring_tools_script = (function ($) {
                     $("#fgroup_id_tree_orientation_radioset input").change(self.rbtn_changed);
                     $("#fgroup_id_charset_process_radioset input").change(self.rbtn_changed);
 
-                    self.main_input = $('#id_regex_text').change(self.regex_change)
-                                                         //.change(self.textbutton_widget.fix_textarea_rows)
-                                                         .keyup(self.textbutton_widget.fix_textarea_rows);
+                    // Add handlers for the regex textarea.
+                    self.regex_input = $('#id_regex_text');
+                    self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
+                    self.regex_input.bind('updateInfo keyup mousedown mousemove mouseup', function() {
+                        self.selection_borders = $(this).textrange();
+                    });
 
-                    $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
+                    // Add handlers for the regex testing textarea.
+                    $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
 
-                    // TODO - FIND A GOOD WAY TO HIDE THE "EXPAND ALL" BUTTON!
-                    //$(".collapsible-actions").hide();
-
-                    // get testing data from hidden field and put it into ui
-                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
-                                             .keyup(self.textbutton_widget.fix_textarea_rows)
-                                             .trigger('keyup');
+                    // Misc.
                     $("#id_regex_input_header").after('<div id="form_properties"></div>');
 
-                    options.display_question_options();
-                    self.regex_selection_widget._init();
-                    self.load_content('-1');
-
+                    options.oneachpresscallback();
                 });
             },
 
             // Function called on non-first form openings.
             oneachpresscallback : function () {
-                self.main_input.val(self.textbutton_widget.data).trigger('keyup');
-                // get testing data from hidden field and put it into ui
-                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
+
+                // Put the testing data into ui.
+                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
+                                             .trigger('keyup');
 
                 options.display_question_options();
                 self.load_content('-1');
+                self.btn_check_strings_clicked();
             },
 
             onsaveclicked : function () {
@@ -162,7 +163,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_save_clicked : function (e) {
         e.preventDefault();
-        var new_regex = self.main_input.val();
+        var new_regex = self.regex_input.val();
         self.textbutton_widget.data = new_regex;
         self.textbutton_widget.close_and_set_new_data();
     },
@@ -177,7 +178,7 @@ M.preg_authoring_tools_script = (function ($) {
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
             data: {
-                regex: self.main_input.val(),
+                regex: self.regex_input.val(),
                 strings: $('#id_regex_match_text').val(),
                 usecase: $('#id_usecase :selected').val(),
                 exactmatch: $('#id_exactmatch :selected').val(),
@@ -191,8 +192,12 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     btn_show_selection_clicked : function (e) {
-        var range = self.regex_selection_widget.get_selected_text_range(self.main_input[0]);
-        self.load_content_by_range(range.start, range.end);
+        if (self.selection_borders) {
+            var indfirst = self.selection_borders.start,
+                indlast = self.selection_borders.end - 1;
+            alert('selection from ' + indfirst + ' to ' + indlast);
+            self.load_content('-1', indfirst, indlast);
+        }
     },
 
     rbtn_changed : function (e) {
@@ -283,34 +288,8 @@ M.preg_authoring_tools_script = (function ($) {
         self.highlight_description(id);
     },
 
-    load_content_by_range : function (start, end) {
-        var text = self.main_input.val(),
-            firstline = 0,
-            lastline = 0,
-            lastpos = 0,
-            pos = text.indexOf("\n");
-        while (pos != -1 && pos < start) {
-            ++firstline;
-            lastpos = pos;
-            pos = text.indexOf("\n", pos + 1);
-        }
-        if (firstline > 0) {
-            start -= lastpos;
-        }
-        while (pos != -1 && pos < end) {
-            ++lastline;
-            lastpos = pos;
-            pos = text.indexOf("\n", pos + 1);
-        }
-        if (lastline > 0) {
-            end -= lastpos;
-        }
-        --end;
-        self.load_content('-1', {linefirst: firstline, linelast: lastline, colfirst: start, collast: end}, true);
-    },
-
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id, coordinates, no_cache) {
+    load_content : function (id, indfirst, indlast) {
         // Deselect the node when clicked for the second time.
         if (self.node_id == id && self.tree_orientation == self.get_orientation() && self.displayas == self.get_displayas()) {
             id = '-1';
@@ -325,12 +304,13 @@ M.preg_authoring_tools_script = (function ($) {
         $('#tree_img').unbind();
         $(self.TREE_MAP_ID + ' > area').unbind();
 
-        var regex = self.main_input.val(),
+        var regex = self.regex_input.val(),
+            doselect = (typeof indfirst !== 'undefined' && typeof indlast !== 'undefined'),
             cachedregex = null,
             cachedid = null;
 
         // Check the cache.
-        if (!no_cache) {
+        if (!doselect) {
             cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
             if (cachedregex) {
                 cachedid = cachedregex[id];
@@ -349,9 +329,8 @@ M.preg_authoring_tools_script = (function ($) {
             displayas: self.displayas,
             ajax: true
         };
-        if (coordinates) {
-            $.extend(data, coordinates);
-            data.rangeselection = true;
+        if (doselect) {
+            $.extend(indfirst, indlast);
         }
         $.ajax({
             type: 'GET',
@@ -394,97 +373,12 @@ M.preg_authoring_tools_script = (function ($) {
         self.load_content('-1');
     },
 
-    /**
-     * Handler of pressing on area of a map on regex tree image
-     */
-    regex_change : function (e) {
-       self.textbutton_widget.data = self.main_input.val();
-    },
-
     get_orientation : function () {
         return $("#fgroup_id_tree_orientation_radioset input:checked").val();
     },
 
     get_displayas : function () {
         return $("#fgroup_id_charset_process_radioset input:checked").val();
-    },
-
-    regex_selection_widget : {
-
-        _fake_selection_el : null,
-
-        _init : function () {
-            this._fake_selection_el = document.createElement("div");
-            $(this._fake_selection_el).css('border','1px dashed red')
-                                      .css('position','absolute')
-                                      .css('z-index','1000')
-                                      .hide();
-            $('#preg_authoring_tools_dialog').append(this._fake_selection_el);
-        },
-
-        _get_selection_position : function () {
-            //TODO
-        },
-
-        get_selected_text_range : function (el) {
-            var start = 0, end = 0, normalizedValue, range,
-                textInputRange, len, endRange;
-
-            if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
-                start = el.selectionStart;
-                end = el.selectionEnd;
-            } else {
-                range = document.selection.createRange();
-
-                if (range && range.parentElement() == el) {
-                    len = el.value.length;
-                    normalizedValue = el.value.replace(/\r\n/g, "\n");
-
-                    // Create a working TextRange that lives only in the input
-                    textInputRange = el.createTextRange();
-                    textInputRange.moveToBookmark(range.getBookmark());
-
-                    // Check if the start and end of the selection are at the very end
-                    // of the input, since moveStart/moveEnd doesn't return what we want
-                    // in those cases
-                    endRange = el.createTextRange();
-                    endRange.collapse(false);
-
-                    if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
-                        start = end = len;
-                    } else {
-                        start = -textInputRange.moveStart("character", -len);
-                        start += normalizedValue.slice(0, start).split("\n").length - 1;
-
-                        if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
-                            end = len;
-                        } else {
-                            end = -textInputRange.moveEnd("character", -len);
-                            end += normalizedValue.slice(0, end).split("\n").length - 1;
-                        }
-                    }
-                }
-            }
-            return { start: start, end: end };
-        },
-
-        /**
-         * @param object coords coordinates of fake div: {top, bottom, left, right, height, width}
-         */
-        draw_fake_selection : function (coords) {
-            $(this._fake_selection_el).css('top', coords.top)
-                                      .css('bottom', coords.bottom)
-                                      .css('left', coords.left)
-                                      .css('right', coords.right)
-                                      .css('height', coords.height)
-                                      .css('width', coords.width)
-                                      .show();
-            return true;
-        },
-
-        hide_fake_selection : function () {
-            $(this._fake_selection_el).hide();
-        }
     }
 };
 
