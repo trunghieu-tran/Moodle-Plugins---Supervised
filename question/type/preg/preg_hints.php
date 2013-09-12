@@ -112,7 +112,9 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      * Implement in child classes to show to be continued after hint.
      */
     public function to_be_continued($matchresults) {
-        return false;
+        return $matchresults->is_match() && !$matchresults->full && 
+                $matchresults->index_first() + $matchresults->length() == qtype_poasquestion_string::strlen($matchresults->str()) &&
+                $matchresults->length() !== qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
     /**
@@ -126,11 +128,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
             $wronghead = $renderer->render_unmatched($matchresults->match_heading());
             $correctpart = $renderer->render_matched($matchresults->matched_part());
             $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
+            if ($this->to_be_continued($matchresults)) {
+                $wrongtail .= $renderer->render_tobecontinued();
+            }
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
     }
-	
+
     public function could_show_hint($matchresults) {
         $queryengine = $this->question->get_query_matcher($this->question->engine);
         // Correctness should be shown if engine support partial matching or a full match is achieved.
