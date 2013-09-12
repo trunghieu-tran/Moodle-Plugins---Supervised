@@ -293,45 +293,45 @@ class  qtype_correctwriting_enum_analyzer {
      * @return array of find orders
      */
     public function find_all_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription) {
-        $enum_orders = array(); // Array to keep orders of one enumeration.
-        $all_enum_orders = array(); // Array to keep orders of all enumerations.
-        $complete_enum_orders = array(); // Array to keep complete orders of enumerations
-        $current_order = array(); // Array to keep current order of enumeration elements.
-        $count_of_all_enum_orders = 0; // Count of all enumeration orders.
-        $rows_for_one_order = 0; // Count of rows which will be keep same order for all enumerations.
+        $enumorders = array(); // Array to keep orders of one enumeration.
+        $allenumorders = array(); // Array to keep orders of all enumerations.
+        $completeenumorders = array(); // Array to keep complete orders of enumerations
+        $currentorder = array(); // Array to keep current order of enumeration elements.
+        $countofallenumorders = 0; // Count of all enumeration orders.
+        $rowsforoneorder = 0; // Count of rows which will be keep same order for all enumerations.
         // Find orders for all enumerations alternatively.
         for ($i = 0; $i < count($enumdescription); $i++) {
-            $all_enum_orders[]=$this->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $i);
+            $allenumorders[]=$this->find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $i);
         }
         // Find count of complete orders of enumerations.
-        $count_of_all_enum_orders = 1;
+        $countofallenumorders = 1;
         for ($i = 0; $i < count($enumdescription); $i++) {
-            $count_of_all_enum_orders *= count($all_enum_orders[$i]);
+            $countofallenumorders *= count($allenumorders[$i]);
         }
         // Paste together all enum orders.
-        $rows_for_one_order = $count_of_all_enum_orders;
+        $rowsforoneorder = $countofallenumorders;
         for ($i = 0; $i < count($enumdescription); $i++) {
             // Add to all complete orders, orders of enumeration alternatively.
-            $rows_for_one_order /= count($all_enum_orders[$i]);
-            for ($j = 0; $j < $count_of_all_enum_orders; $j) {
-                foreach ($all_enum_orders[$i] as $enum_orders) {
-                    for ($k = 0; $k < $rows_for_one_order; $k++) {
-                        if (!array_key_exists($j, $complete_enum_orders)) {
-                            $complete_enum_orders[$j] = array();
+            $rowsforoneorder /= count($allenumorders[$i]);
+            for ($j = 0; $j < $countofallenumorders; $j) {
+                foreach ($allenumorders[$i] as $enumorders) {
+                    for ($k = 0; $k < $rowsforoneorder; $k++) {
+                        if (!array_key_exists($j, $completeenumorders)) {
+                            $completeenumorders[$j] = array();
                         }
-                        $complete_enum_orders[$j] = array_merge($complete_enum_orders[$j], $enum_orders);
+                        $completeenumorders[$j] = array_merge($completeenumorders[$j], $enumorders);
                         $j++;
                     }
                 }
             }
             // Add space if it needed.
             if ($i!= count($enumdescription)-1) {
-                for ($j=0; $j < $count_of_all_enum_orders; $j++) {
-                    $complete_enum_orders[$j][] = -1;
+                for ($j=0; $j < $countofallenumorders; $j++) {
+                    $completeenumorders[$j][] = -1;
                 }
             }
         }
-        return $complete_enum_orders;
+        return $completeenumorders;
     }
     /**
      * Function to change enumeration order in correct answer and enumeration description,
