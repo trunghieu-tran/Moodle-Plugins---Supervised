@@ -633,7 +633,7 @@ class  qtype_correctwriting_enum_analyzer {
             // Get enumerations change order and include enumeration arrays.
             $forstd = $this->get_enum_change_order($enumdescription);
             $enumchangeorder = $forstd->order;
-            $includedenums = $forstd->included_enums;
+            $includedenums = $forstd->includedenums;
             // Find expected orders for all enumeration.
             $allfindorders = $this->find_all_enum_orders_in_corrected_string($correcttokens, $correctedtokens, $enumdescription);
             foreach ($allfindorders as $currentorder) {
