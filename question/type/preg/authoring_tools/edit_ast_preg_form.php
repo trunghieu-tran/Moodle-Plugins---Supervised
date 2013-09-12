@@ -49,11 +49,11 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();
-        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('authoring_form_update_text', 'qtype_preg'));
+        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('update', 'moodle'));
         if (!$this->isblock) {
-            $topline[] =& $mform->createElement('button', 'regex_save', get_string('authoring_form_save_text', 'qtype_preg'));
+            $topline[] =& $mform->createElement('button', 'regex_save', get_string('savechanges', 'moodle'));
         }
-        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('authoring_form_cancel_text', 'qtype_preg'));
+        $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('cancel', 'moodle'));
         $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('authoring_form_show_selection', 'qtype_preg'));
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
@@ -70,8 +70,8 @@ class qtype_preg_authoring_tool_form extends moodleform {
 
         // Add tree orientation radio buttons.
         $radiotreeorientationsarray = array();
-        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('authoring_form_tree_vert', 'qtype_preg'), 'vertical', null);
-        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('authoring_form_tree_horiz', 'qtype_preg'), 'horizontal', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('vertical', 'editor'), 'vertical', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('horizontal', 'editor'), 'horizontal', null);
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
