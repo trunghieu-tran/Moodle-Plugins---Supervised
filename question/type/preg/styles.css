@@ -42,3 +42,22 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
     border: 1px solid #BBB;
     border-top: 0;
 }
+
+#id_regex_highlighter, #id_regex_text {
+    font-family: 'verdana';
+}
+
+#id_regex_highlighter {
+    position: absolute;
+    color: white;
+}
+
+#id_regex_highlighter span {
+    background: red;
+    color: red;
+}
+
+#id_regex_text {
+    position:relative;
+    background-color: transparent;
+}
