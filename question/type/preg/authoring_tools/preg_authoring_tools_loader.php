@@ -26,6 +26,9 @@ function qtype_preg_get_json_array() {
     $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
+    //$displayas = optional_param('displayas', '', PARAM_RAW);
+    //$indfirst = optional_param('indfirst', null, PARAM_INT);
+    //$indlast = optional_param('indlast', null, PARAM_INT);
 
     $rankdirlr = $treeorientation == 'horizontal' ? true : false;
 
