@@ -587,7 +587,7 @@ class  qtype_correctwriting_enum_analyzer {
             } else {
                 $tempstringend = '';
             }
-            $second_index = end($enumsorders[$i]);
+            $secondindex = end($enumsorders[$i]);
             for ($j = $enumerations[$i][reset($enumsorders[$i])]->begin; $j <= $enumerations[$i][$secondindex]->end; $j++) {
                 $tempstringbegin = $tempstringbegin.$tokens[$j]->value();
                 $tempstringbegin = $tempstringbegin.' ';
