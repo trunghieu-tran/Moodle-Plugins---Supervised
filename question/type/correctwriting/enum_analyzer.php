@@ -120,101 +120,101 @@ class  qtype_correctwriting_enum_analyzer {
      * @return array of find orders
      */
     public function find_enum_orders_in_corrected_string($correctanswer, $correctedanswer, $enumdescription, $number) {
-        $indexes_of_tokens = array();// Array with contains indexes of tokens which are members of enumeration...
+        $indexesoftokens = array();// Array with contains indexes of tokens which are members of enumeration...
                                                      // ... in corrected student answer.
-        $indexes_of_elements = array();// Array with indexes of elements of enumeration in corrected answer.
-        $element_indexes = array(); // Array with indexes of one element of enumeration in corrected answer.
+        $indexesofelements = array();// Array with indexes of elements of enumeration in corrected answer.
+        $elementindexes = array(); // Array with indexes of one element of enumeration in corrected answer.
         $previewelement = null; // Contain preview element value.
         $key = 0; // Current key of some array.
         $ischanged = true; // Is current index changed?
         $isremoved = true; // Is index removed already?
-        $current_index = 0; // Current index value.
-        $remove_index = 0; // Remove index value.
+        $currentindex = 0; // Current index value.
+        $removeindex = 0; // Remove index value.
         $token = 0; // One token from array.
         $duplicates = array(); // Array for help to remove duplicate orders.
-        $elements_in_corrected_answer = array();// Array to keep indexes elements of enumeration in order, which...
+        $elementsincorrectedanswer = array();// Array to keep indexes elements of enumeration in order, which...
                                                 // ... it has in corrected student answer, with included missed elements.
-        $current_order = array();// Array to keep current order of enumeration elements.
-        $token_number = 0;// Number of tokens in enumeration, whose indexes are searched in corrected answer on current iteration.
-        $insert_place = 0;// Place to insert in one of arrays.
-        $have_next_order = false;// Is has in $elements_in_corrected_answer next order.
-        $number_of_element_to_skip = 0;// Element number, which will be skip in elements_in_corrected_answer on current iteration.
-        $enum_orders = array();// Array which contain find orders of enumeration.
+        $currentorder = array();// Array to keep current order of enumeration elements.
+        $tokennumber = 0;// Number of tokens in enumeration, whose indexes are searched in corrected answer on current iteration.
+        $insertplace = 0;// Place to insert in one of arrays.
+        $havenextorder = false;// Is has in $elementsincorrectedanswer next order.
+        $numberofelementtoskip = 0;// Element number, which will be skip in elementsincorrectedanswer on current iteration.
+        $enumorders = array();// Array which contain find orders of enumeration.
         // For all elements of enumeration create array of indexes in corrected answers, which are kept in ascending order.
         for ($i = 0; $i < count($enumdescription[$number]); $i++) {
             // Find tokens which include in current element of enumeration individually.
-            $indexes_of_tokens = array();
-            $token_number = 0;
+            $indexesoftokens = array();
+            $tokennumber = 0;
             // For all tokens of current element of enumeration find indexes of equal tokens in corrected student answer.
             for ($j = $enumdescription[$number][$i]->begin; $j < $enumdescription[$number][$i]->end +1; $j++) {
-                $indexes_of_tokens[] = array();
+                $indexesoftokens[] = array();
                 foreach ($correctedanswer as $key => $token) {
                     if ($token->value() == $correctanswer[$j]->value()) {
-                        $indexes_of_tokens[$token_number][] = $key;
+                        $indexesoftokens[$tokennumber][] = $key;
                     }
                 }
-                $token_number++;
+                $tokennumber++;
             }
             // Create array of indexes tokens of current element enumeration in corrected student answer.
-            $indexes_of_elements[] = array();
-            for ($j = 0; $j < count($indexes_of_tokens); $j++) {
-                // If token number j are find in corrected answer, add it's indexes in $indexes_of_elements_in_corrected_answer[i].
-                if ($indexes_of_tokens[$j] != null) {
+            $indexesofelements[] = array();
+            for ($j = 0; $j < count($indexesoftokens); $j++) {
+                // If token number j are find in corrected answer, add it's indexes in $indexesofelementsincorrectedanswer[i].
+                if ($indexesoftokens[$j] != null) {
                     // For all indexes find place to insert, because array is kept in  ascending order.
-                    for ($k = 0; $k < count($indexes_of_tokens[$j]); $k++) {
+                    for ($k = 0; $k < count($indexesoftokens[$j]); $k++) {
                         // Find place to insert.
-                        $insert_place = 0;
-                        while ($insert_place < count($indexes_of_elements[$i]) &&
-                                   $indexes_of_elements[$i][$insert_place] < $indexes_of_tokens[$j][$k]) {
-                            $insert_place++;
+                        $insertplace = 0;
+                        while ($insertplace < count($indexesofelements[$i]) &&
+                                   $indexesofelements[$i][$insertplace] < $indexesoftokens[$j][$k]) {
+                            $insertplace++;
                         }
                         // Insert current index in array.
-                        array_splice($indexes_of_elements[$i], $insert_place, 0, $indexes_of_tokens[$j][$k]);
+                        array_splice($indexesofelements[$i], $insertplace, 0, $indexesoftokens[$j][$k]);
                     }
                 }
             }
         }
         // Remove duplicates in indexes of elements.
-        foreach ($indexes_of_elements as $key => $element_indexes) {
-            $indexes_of_elements[$key] = array_unique($indexes_of_elements[$key]);
+        foreach ($indexesofelements as $key => $elementindexes) {
+            $indexesofelements[$key] = array_unique($indexesofelements[$key]);
         }
         // Fill array of indexes elements of enumeration in ascending order.
-        foreach ($indexes_of_elements as $element_indexes) {
+        foreach ($indexesofelements as $elementindexes) {
             // Find place to insert in array for all indexes.
-            foreach ($element_indexes as $current_index) {
+            foreach ($elementindexes as $currentindex) {
                 // Find place to insert.
-                $insert_place = 0;
-                while ($insert_place < count($elements_in_corrected_answer) &&
-                           $elements_in_corrected_answer[$insert_place] < $current_index) {
-                    $insert_place++;
+                $insertplace = 0;
+                while ($insertplace < count($elementsincorrectedanswer) &&
+                           $elementsincorrectedanswer[$insertplace] < $currentindex) {
+                    $insertplace++;
                 }
                 // Insert current index in array.
-                array_splice($elements_in_corrected_answer, $insert_place, 0, $current_index);
+                array_splice($elementsincorrectedanswer, $insertplace, 0, $currentindex);
             }
         }
         // Change indexes by numbers of elements enumeration, execute repeat contiguous elements.
         $previewelement = null;
-        foreach ($elements_in_corrected_answer as $key => $i) {
+        foreach ($elementsincorrectedanswer as $key => $i) {
             // Find element by index.
             $j = 0;
-            unset($element_indexes);
+            unset($elementindexes);
             $ischanged = false;
-            foreach ($indexes_of_elements as $k1 => $element_indexes) {
-                if ( in_array($i, $element_indexes) && !$ischanged) {
+            foreach ($indexesofelements as $k1 => $elementindexes) {
+                if ( in_array($i, $elementindexes) && !$ischanged) {
                     // Change index by element number.
                     $ischanged = true;
-                    $elements_in_corrected_answer[$key] = $j;
+                    $elementsincorrectedanswer[$key] = $j;
                     // If element are repeated.
                     if ($previewelement != null && $previewelement == $i) {
-                        unset($elements_in_corrected_answer[$key]);
+                        unset($elementsincorrectedanswer[$key]);
                     } else {
                         $previewelement = $i;
                     }
                     // Remove index from array.
                     $isremoved = false;
-                    foreach ($indexes_of_elements[$k1] as $k => $element) {
+                    foreach ($indexesofelements[$k1] as $k => $element) {
                         if ($element === $i && !$isremoved) {
-                            unset($indexes_of_elements[$k1][$k]);
+                            unset($indexesofelements[$k1][$k]);
                             $isremoved = true;
                         }
                     }
@@ -225,64 +225,64 @@ class  qtype_correctwriting_enum_analyzer {
         // Add to array number of element, which do not contains in corrected student answer.
         for ($i = 0; $i < count($enumdescription[$number]); $i++) {
             // Check that contains current element in order or not.
-            if (!in_array($i, $elements_in_corrected_answer)) {
+            if (!in_array($i, $elementsincorrectedanswer)) {
                 // If element does not contains in order, add it between all elements pairs and to begin and end of order.
-                for ($j = 0; $j < count($elements_in_corrected_answer); $j += 2) {
-                    array_splice($elements_in_corrected_answer, $j, 0, $i);
+                for ($j = 0; $j < count($elementsincorrectedanswer); $j += 2) {
+                    array_splice($elementsincorrectedanswer, $j, 0, $i);
                 }
                 // Add to end of order.
-                if (count($elements_in_corrected_answer)==0 or end($elements_in_corrected_answer) != $i) {
-                    $elements_in_corrected_answer[] = $i;
+                if (count($elementsincorrectedanswer)==0 or end($elementsincorrectedanswer) != $i) {
+                    $elementsincorrectedanswer[] = $i;
                 }
             }
         }
         // Create orders array based on array of elements numbers which are ordered like in corrected student answer.
         do {
-            $number_of_element_to_skip = 0;
+            $numberofelementtoskip = 0;
             do {
-                $current_order = array();// Clear current enumeration order.
-                // Fill current order by $elements_in_corrected_answer.
+                $currentorder = array();// Clear current enumeration order.
+                // Fill current order by $elementsincorrectedanswer.
                 $i = 0;
                 unset($j);
-                foreach ($elements_in_corrected_answer as $j) {
+                foreach ($elementsincorrectedanswer as $j) {
                     // If that element number does not contains in current order and...
                     // ...his index does not equal number to skip or number to skip is zero.
-                    if (!in_array($j, $current_order) &&
-                            ($i != $number_of_element_to_skip || $number_of_element_to_skip == 0)) {
+                    if (!in_array($j, $currentorder) &&
+                            ($i != $numberofelementtoskip || $numberofelementtoskip == 0)) {
                         // Add element to order.
-                        $current_order[] = $j;
+                        $currentorder[] = $j;
                     }
                     $i++;
                 }
-                $number_of_element_to_skip++;// Inc number to skip.
-                $enum_orders[] =$current_order;// Add order to array of enum orders.
-            } while ($number_of_element_to_skip != count($elements_in_corrected_answer));
+                $numberofelementtoskip++;// Inc number to skip.
+                $enumorders[] =$currentorder;// Add order to array of enum orders.
+            } while ($numberofelementtoskip != count($elementsincorrectedanswer));
             // Remove duplicate orders.
-            foreach ($enum_orders as $current_order) {
-                $duplicates = array_keys($enum_orders, $current_order);
+            foreach ($enumorders as $currentorder) {
+                $duplicates = array_keys($enumorders, $currentorder);
                 array_shift($duplicates);
-                foreach ($duplicates as $remove_index) {
-                    unset($enum_orders[$remove_index]);
+                foreach ($duplicates as $removeindex) {
+                    unset($enumorders[$removeindex]);
                 }
 
             }
             // Remove first element from array of elements numbers which are ordered like in corrected student answer.
-            array_shift($elements_in_corrected_answer);
+            array_shift($elementsincorrectedanswer);
             // Check that have next order in array of elements numbers which are ordered like in corrected student answer.
-            $have_next_order = true;
+            $havenextorder = true;
             for ($i = 0; $i < count($enumdescription[$number]); $i++) {
-                if (!in_array($i, $elements_in_corrected_answer)) {
-                    $have_next_order = false;
+                if (!in_array($i, $elementsincorrectedanswer)) {
+                    $havenextorder = false;
                 }
             }
-        } while ($have_next_order);
+        } while ($havenextorder);
         // Remove from array of orders not complete orders.
-        foreach ($enum_orders as $key => $current_order) {
-            if (count($current_order) != count($enumdescription[$number])) {
-                unset($enum_orders[$key]);
+        foreach ($enumorders as $key => $currentorder) {
+            if (count($currentorder) != count($enumdescription[$number])) {
+                unset($enumorders[$key]);
             }
         }
-        return $enum_orders;
+        return $enumorders;
     }
 
     /**
