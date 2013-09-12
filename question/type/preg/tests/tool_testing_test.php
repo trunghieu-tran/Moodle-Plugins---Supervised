@@ -71,4 +71,24 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>?=some day this will be supported)...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
     }
+        function test_empty_regex() {
+        $regex = '';
+        $strings = '';
+        $usecase = false;
+        $exactmatch = false;
+        $engine = 'nfa_matcher';
+        $notation = 'native';
+
+        $json = array();
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool->generate_json($json);
+        //$this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>?=some day this will be supported)...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
+        var_dump($json);
+        
+        $strings = "a|b";
+        $json = array();
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool->generate_json($json);
+        var_dump($json);
+    }
  }
