@@ -32,6 +32,11 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $this->regex = $regex;
         $this->renderer = $PAGE->get_renderer('qtype_preg');
         $this->strings = $strings;
+
+        if ($this->regex == '') {
+            return;
+        }
+
         $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
         $matcher = $regular->get_matcher($matcher, $regex, /*'exactmatch'*/false,
                                          $regular->get_modifiers($usecase), (-1), $notation, true);

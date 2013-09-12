@@ -44,7 +44,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($json['regex_test'] == '</br>');
     }
 
-    function test_empty_syntax_error() {
+    function test_syntax_error() {
         $regex = 'smile! :)';
         $strings = ':/';
         $usecase = false;
@@ -58,7 +58,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($json['regex_test'] == '<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8.');
     }
 
-    function test_empty_accepting_error() {
+    function test_accepting_error() {
         $regex = '(?=some day this will be supported)...';
         $strings = 'wat';
         $usecase = false;
@@ -71,7 +71,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>?=some day this will be supported)...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
     }
-        function test_empty_regex() {
+
+    function test_empty_regex() {
         $regex = '';
         $strings = '';
         $usecase = false;
@@ -82,13 +83,12 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
         $tool->generate_json($json);
-        //$this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>?=some day this will be supported)...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
-        var_dump($json);
-        
+        $this->assertTrue($json['regex_test'] == '');
+
         $strings = "a|b";
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
         $tool->generate_json($json);
-        var_dump($json);
+        $this->assertTrue($json['regex_test'] == '');
     }
  }
