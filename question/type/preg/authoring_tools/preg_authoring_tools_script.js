@@ -24,6 +24,8 @@ M.preg_authoring_tools_script = (function ($) {
     /** @var {Object} reference to the regex textarea */
     regex_input : null,
 
+    mouse_pressed : false,
+
     /** @var {Object} contains regex selection borders */
     selection_borders : null,
 
@@ -107,9 +109,10 @@ M.preg_authoring_tools_script = (function ($) {
                     // Add handlers for the regex textarea.
                     self.regex_input = $('#id_regex_text');
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
-                    self.regex_input.bind('updateInfo keyup mousedown mousemove mouseup', function() {
-                        self.selection_borders = $(this).textrange();
-                    });
+                    self.regex_input.mousedown(self.regex_textarea_mousedown)
+                                    .mouseup(self.regex_textarea_mouseup)
+                                    .mousemove(self.regex_textarea_mousemove)
+                                    .keyup(function (e) {self.regex_selection_changed(e);});
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
@@ -202,6 +205,51 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         self.load_content(self.node_id);
+    },
+
+    regex_textarea_mousedown : function(e) {
+        self.mouse_pressed = true;
+        self.selection_borders.start = 0;
+        self.selection_borders.end = 0;
+        $('#id_regex_highlighter').html('');
+    },
+
+    regex_textarea_mouseup : function(e) {
+        self.mouse_pressed = false;
+    },
+
+    regex_textarea_mousemove : function(e) {
+        if (self.mouse_pressed) {
+            self.regex_selection_changed(e);
+        }
+    },
+
+    regex_selection_changed : function (e) {
+        self.selection_borders = self.regex_input.textrange();
+
+        var escape_html = function (str) {
+                var div = document.createElement('div'),
+                    text = document.createTextNode(str);
+                div.appendChild(text);
+                return div.innerHTML;
+            };
+
+        var indfirst = self.selection_borders.start,
+            indlast = self.selection_borders.end - 1;
+
+        if (indlast < indfirst) {
+            self.selection_borders.start = 0;
+            self.selection_borders.end = 0;
+            $('#id_regex_highlighter').html('');
+            return;
+        }
+
+        var regex = self.regex_input.val(),
+            text1 = escape_html(regex.substring(0, indfirst)),
+            text2 = escape_html(regex.substring(indfirst, indlast + 1)),
+            text3 = escape_html(regex.substring(indlast + 1));
+
+        $('#id_regex_highlighter').html(text1 + '<span>' + text2 + '</span>' + text3);
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
