@@ -335,32 +335,32 @@ class  qtype_correctwriting_enum_analyzer {
     }
     /**
      * Function to change enumeration order in correct answer and enumeration description,
-     * @param qtype_correctwriting_string_pair object $string_pair - correct and corrected answers
-     * @param array $enum_change_order - enumeration change order
-     * @param array $include_enums - array of included enumerations, for all enumerations
-     * @param array $new_enum_order - new orders for all enumeration
+     * @param qtype_correctwriting_string_pair object $stringpair - correct and corrected answers
+     * @param array $enumchangeorder - enumeration change order
+     * @param array $includeenums - array of included enumerations, for all enumerations
+     * @param array $newenumorder - new orders for all enumeration
      */
-    public function change_enum_order(&$stringpair, $enum_change_order, $include_enums, $new_enum_order) {
-        $enums_orders = array(); // Array to keep enums orders separately.
-        $current_order = array(); // Array to keep current order of enum.
-        $for_change_enum_order = array(); // Array keep temp information for change enumeration order.
-        $elem_number = 0; // Element number, which contains current included enumeration.
-        $enum_number = 0; // Enumeration number, whose order are changing in current iteration.
-        $elem_find = false; // Is searched element find?
-        $place_find = false; // Is place to insert element find?
-        $insert_place = 0; // Place to insert element in enumeration.
-        $elements_distances = array(); // Array to keep distances between elements of enumerations
+    public function change_enum_order(&$stringpair, $enumchangeorder, $includeenums, $newenumorder) {
+        $enumsorders = array(); // Array to keep enums orders separately.
+        $currentorder = array(); // Array to keep current order of enum.
+        $forchangeenumorder = array(); // Array keep temp information for change enumeration order.
+        $elemnumber = 0; // Element number, which contains current included enumeration.
+        $enumnumber = 0; // Enumeration number, whose order are changing in current iteration.
+        $elemfind = false; // Is searched element find?
+        $placefind = false; // Is place to insert element find?
+        $insertplace = 0; // Place to insert element in enumeration.
+        $elementsdistances = array(); // Array to keep distances between elements of enumerations
         $distances = array(); // Array to keep for all enumerations numbers of elements in other enumeration, which contains...
                                // ...it, and distance from element begin to enumeration begin.
-        $left_border_of_elem = 0; // Left border of current element.
-        $left_border_of_elem_new = 0; // New left border of current element.
-        $left_border_of_enum = 0; // Left border of current enumeration.
-        $right_border_of_elem = 0; // Right border of current element.
-        $right_border_of_prev_elem = 0; // Right border of previews element.
-        $right_border_of_elem_new = 0; // New right border of current element.
-        $right_border_of_enum = 0; // Right border of current enumeration.
-        $first_index = 0; // Array first index, need to arrays, which indexes are difficult to calculate.
-        $second_index = 0; // Array second index, need to arrays, which indexes are difficult to calculate.
+        $leftborderofelem = 0; // Left border of current element.
+        $leftborderofelemnew = 0; // New left border of current element.
+        $leftborderofenum = 0; // Left border of current enumeration.
+        $rightborderofelem = 0; // Right border of current element.
+        $rightborderofprevelem = 0; // Right border of previews element.
+        $rightborderofelemnew = 0; // New right border of current element.
+        $rightborderofenum = 0; // Right border of current enumeration.
+        $firstindex = 0; // Array first index, need to arrays, which indexes are difficult to calculate.
+        $secondindex = 0; // Array second index, need to arrays, which indexes are difficult to calculate.
         $enumerations = $stringpair->correctstring()->enumerations; // Enumerations descriptions.
         $tempstringbegin = ''; // String to create correct string with correct order, peace before enumeration;
         $tempstringend = ''; // String to create correct string with correct order, peace after enumeration;
@@ -371,173 +371,173 @@ class  qtype_correctwriting_enum_analyzer {
         $indexesintable = array(); // Array of indexes for correct string's tokens.
         $tokens = $stringpair->correctstring()->stream->tokens; // Array of tokens in correctstring.
         // Fill array to keep enums orders separately.
-        for ($i = 0; $i < count($new_enum_order); $i++) {
+        for ($i = 0; $i < count($newenumorder); $i++) {
             // For all enumerations order end by -1 or end of array.
-            if ($new_enum_order[$i] == -1) {
-                $enum_number++;
+            if ($newenumorder[$i] == -1) {
+                $enumnumber++;
             } else {
-                $enums_orders[$enum_number][] = $new_enum_order[$i];
+                $enumsorders[$enumnumber][] = $newenumorder[$i];
             }
         }
         // Change enumerations orders and enumerations descriptions.
         for ($i = 0; $i < count($enumerations); $i++) {
-            $enum_number = $enum_change_order[$i];
+            $enumnumber = $enumchangeorder[$i];
             // For all included enumerations save important information: number of element, which contain it and ...
             // ...distance from element begin to enumeration begin.
             // If current enumeration have included enumerations.
-            if ($include_enums[$enum_number][0] != -1) {
+            if ($includeenums[$enumnumber][0] != -1) {
                 // For all included enumerations...
-                for ($j = 0; $j < count($include_enums[$enum_number]); $j++) {
-                    $elem_find = false;
+                for ($j = 0; $j < count($includeenums[$enumnumber]); $j++) {
+                    $elemfind = false;
                     // ...find element, which contain current included enumeration.
-                    for ($elem_number = 0; $elem_number < count($enumerations[$enum_number]) && !$elem_find; $elem_number++) {
-                        $left_border_of_elem = $enumerations[$enum_number][$elem_number]->begin;
-                        $second_index = reset($enums_orders[$include_enums[$enum_number][$j]]);
-                        $left_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][$second_index]->begin;
-                        $right_border_of_elem = $enumerations[$enum_number][$elem_number]->end;
-                        $second_index = end($enums_orders[$include_enums[$enum_number][$j]]);
-                        $right_border_of_enum = $enumerations[$include_enums[$enum_number][$j]][$second_index]->end;
+                    for ($elemnumber = 0; $elemnumber < count($enumerations[$enumnumber]) && !$elemfind; $elemnumber++) {
+                        $leftborderofelem = $enumerations[$enumnumber][$elemnumber]->begin;
+                        $secondindex = reset($enumsorders[$includeenums[$enumnumber][$j]]);
+                        $leftborderofenum = $enumerations[$includeenums[$enumnumber][$j]][$secondindex]->begin;
+                        $rightborderofelem = $enumerations[$enumnumber][$elemnumber]->end;
+                        $secondindex = end($enumsorders[$includeenums[$enumnumber][$j]]);
+                        $rightborderofenum = $enumerations[$includeenums[$enumnumber][$j]][$secondindex]->end;
                         // If enumeration borders are between element borders, then element find.
-                        if ($left_border_of_elem <= $left_border_of_enum && $right_border_of_elem >= $right_border_of_enum) {
-                            $elem_find = true;
+                        if ($leftborderofelem <= $leftborderofenum && $rightborderofelem >= $rightborderofenum) {
+                            $elemfind = true;
                         }
                     }
-                    if ($elem_number != 0) {
-                        $elem_number--;
+                    if ($elemnumber != 0) {
+                        $elemnumber--;
                     }
-                    $distances[$j*2] = $elem_number;
+                    $distances[$j*2] = $elemnumber;
                     // Find distance between element and enumeration which it contain.
-                    $distances[$j*2+1] = $left_border_of_enum - $left_border_of_elem;
+                    $distances[$j*2+1] = $leftborderofenum - $leftborderofelem;
                 }
             }
             // Find current order of enumeration.
-            $current_order = array();
-            $current_order[] = 0;
-            for ($j = 1; $j < count($enumerations[$enum_number]); $j++) {
-                $place_find = false;
-                for ($insert_place = 0; $insert_place < count($current_order) && !$place_find; $insert_place++) {
-                    $left_border_of_elem = $enumerations[$enum_number][$current_order[$insert_place]]->begin;
-                    $left_border_of_elem_new =$enumerations[$enum_number][$j]->begin;
+            $currentorder = array();
+            $currentorder[] = 0;
+            for ($j = 1; $j < count($enumerations[$enumnumber]); $j++) {
+                $placefind = false;
+                for ($insertplace = 0; $insertplace < count($currentorder) && !$placefind; $insertplace++) {
+                    $leftborderofelem = $enumerations[$enumnumber][$currentorder[$insertplace]]->begin;
+                    $leftborderofelemnew =$enumerations[$enumnumber][$j]->begin;
                     // If left border of new element are less then left border of element in order, insert place are find.
-                    if ($left_border_of_elem > $left_border_of_elem_new) {
-                        $place_find = true;
+                    if ($leftborderofelem > $leftborderofelemnew) {
+                        $placefind = true;
                     }
                 }
-                if ($insert_place != 0 && $place_find) {
-                    $insert_place--;
+                if ($insertplace != 0 && $placefind) {
+                    $insertplace--;
                 }
                 // Add element to order.
-                array_splice($current_order, $insert_place, 0, $j);
+                array_splice($currentorder, $insertplace, 0, $j);
             }
             // If current order not equal order which needed now.
-            if ($current_order != $enums_orders[$enum_number]) {
+            if ($currentorder != $enumsorders[$enumnumber]) {
                 // Copy current enumeration to temp array and remove it from correct answer.
-                $for_change_enum_order = array();
-                $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
-                $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
+                $forchangeenumorder = array();
+                $leftborderofenum = $enumerations[$enumnumber][reset($currentorder)]->begin;
+                $rightborderofenum = $enumerations[$enumnumber][end($currentorder)]->end;
                 $j = 0;
                 foreach ($tokens as $key => $token) {
-                    if ($j >= $left_border_of_enum && $j <= $right_border_of_enum) {
-                        $for_change_enum_order[] = $token;
+                    if ($j >= $leftborderofenum && $j <= $rightborderofenum) {
+                        $forchangeenumorder[] = $token;
                         unset($tokens[$key]);
                     }
                     $j++;
                 }
                 // Change current order to new in enumeration.
                 // Copy elements in new order.
-                $left_border_of_enum = $enumerations[$enum_number][reset($current_order)]->begin;
-                for ($j=0; $j < count($enums_orders[$enum_number]); $j++) {
+                $leftborderofenum = $enumerations[$enumnumber][reset($currentorder)]->begin;
+                for ($j=0; $j < count($enumsorders[$enumnumber]); $j++) {
                     // Copy element, token for token.
-                    $left_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->begin;
-                    $right_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->end;
-                    for ($k = 0; $k < $right_border_of_elem-$left_border_of_elem+1; $k++) {
-                        $for_change_enum_order[] = $for_change_enum_order[$left_border_of_elem-$left_border_of_enum+$k];
+                    $leftborderofelem = $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->begin;
+                    $rightborderofelem = $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->end;
+                    for ($k = 0; $k < $rightborderofelem-$leftborderofelem+1; $k++) {
+                        $forchangeenumorder[] = $forchangeenumorder[$leftborderofelem-$leftborderofenum+$k];
                     }
                     // If we have separates between elements, that copy they to and of temp array.
-                    if ( $j != count($enums_orders[$enum_number])-1) {
-                        $left_border_of_elem_new =$enumerations[$enum_number][$current_order[$j+1]]->begin;
-                        $right_border_of_elem = $enumerations[$enum_number][$current_order[$j]]->end;
-                        for ($z = 0; $z < $left_border_of_elem_new-$right_border_of_elem-1; $z++) {
-                            $for_change_enum_order[] = $for_change_enum_order[$z+$right_border_of_elem-$left_border_of_enum+1];
+                    if ( $j != count($enumsorders[$enumnumber])-1) {
+                        $leftborderofelemnew =$enumerations[$enumnumber][$currentorder[$j+1]]->begin;
+                        $rightborderofelem = $enumerations[$enumnumber][$currentorder[$j]]->end;
+                        for ($z = 0; $z < $leftborderofelemnew-$rightborderofelem-1; $z++) {
+                            $forchangeenumorder[] = $forchangeenumorder[$z+$rightborderofelem-$leftborderofenum+1];
                         }
                     }
                 }
                 // Remove old order from temp array.
-                $right_border_of_enum = $enumerations[$enum_number][end($current_order)]->end;
-                array_splice($for_change_enum_order, 0, $right_border_of_enum - $left_border_of_enum +1);
+                $rightborderofenum = $enumerations[$enumnumber][end($currentorder)]->end;
+                array_splice($forchangeenumorder, 0, $rightborderofenum - $leftborderofenum +1);
                 // Copy enumeration in correct answer, token for token.
-                array_splice($tokens, $left_border_of_enum, 0, $for_change_enum_order);
+                array_splice($tokens, $leftborderofenum, 0, $forchangeenumorder);
                 // Change enumeration description.
                 // Find distance between elements of enumeration.
-                $elements_distances = array();
-                $elements_distances[] = 0;
-                for ($j = 0; $j < count($enumerations[$enum_number])-1; $j++) {
-                    $left_border_of_elem_new = $enumerations[$enum_number][$current_order[$j+1]]->begin;
-                    $right_border_of_elem = $enumerations[$enum_number][$current_order[$j]]->end;
-                    $elements_distances[] = $left_border_of_elem_new-$right_border_of_elem;
+                $elementsdistances = array();
+                $elementsdistances[] = 0;
+                for ($j = 0; $j < count($enumerations[$enumnumber])-1; $j++) {
+                    $leftborderofelemnew = $enumerations[$enumnumber][$currentorder[$j+1]]->begin;
+                    $rightborderofelem = $enumerations[$enumnumber][$currentorder[$j]]->end;
+                    $elementsdistances[] = $leftborderofelemnew-$rightborderofelem;
                 }
                 // Change description of enumeration, element for element.
-                for ($j = 0; $j < count($enumerations[$enum_number]); $j++) {
+                for ($j = 0; $j < count($enumerations[$enumnumber]); $j++) {
                     // Take current element old desription.
-                    $left_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->begin;
-                    $right_border_of_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->end;
+                    $leftborderofelem = $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->begin;
+                    $rightborderofelem = $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->end;
                     // If current element not first...
                     if ($j != 0) {
                         // Calculate new description, use previews element description, and current element old description.
-                        $right_border_of_prev_elem = $enumerations[$enum_number][$enums_orders[$enum_number][$j-1]]->end;
-                        $left_border_of_elem_new = $right_border_of_prev_elem+$elements_distances[$j];
-                        $right_border_of_elem_new = $right_border_of_elem+ $left_border_of_elem_new-$left_border_of_elem;
+                        $rightborderofprevelem = $enumerations[$enumnumber][$enumsorders[$enumnumber][$j-1]]->end;
+                        $leftborderofelemnew = $rightborderofprevelem+$elementsdistances[$j];
+                        $rightborderofelemnew = $rightborderofelem+ $leftborderofelemnew-$leftborderofelem;
                     } else {
                         // ...else.
                         // Calculate new description, use first element description, and current element old description.
-                        $left_border_of_elem_new = $enumerations[$enum_number][$current_order[0]]->begin;
-                        $right_border_of_elem_new = $left_border_of_elem_new+$right_border_of_elem-$left_border_of_elem;
+                        $leftborderofelemnew = $enumerations[$enumnumber][$currentorder[0]]->begin;
+                        $rightborderofelemnew = $leftborderofelemnew+$rightborderofelem-$leftborderofelem;
                     }
                     // Change description of element.
-                    $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->begin = $left_border_of_elem_new;
-                    $enumerations[$enum_number][$enums_orders[$enum_number][$j]]->end = $right_border_of_elem_new;
+                    $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->begin = $leftborderofelemnew;
+                    $enumerations[$enumnumber][$enumsorders[$enumnumber][$j]]->end = $rightborderofelemnew;
                 }
                 // If current enumeration contains included enumerations...
-                if ($include_enums[$enum_number][0] != -1) {
+                if ($includeenums[$enumnumber][0] != -1) {
                     // ...update their descriptions.
-                    for ($j = 0; $j < count($include_enums[$enum_number]); $j++) {
+                    for ($j = 0; $j < count($includeenums[$enumnumber]); $j++) {
                         // Find distance between elements of enumeration.
-                        $elements_distances = array();
-                        $elements_distances[] = $distances[$j*2+1];
-                        for ($k = 0; $k < count($enumerations[$include_enums[$enum_number][$j]])-1; $k++) {
-                            $first_index = $include_enums[$enum_number][$j];
-                            $second_index = $enums_orders[$include_enums[$enum_number][$j]][$k];
-                            $right_border_of_prev_elem = $enumerations[$first_index][$second_index]->end;
-                            $second_index = $enums_orders[$include_enums[$enum_number][$j]][$k+1];
-                            $left_border_of_elem = $enumerations[$first_index][$second_index]->begin;
-                            $elements_distances[] = $left_border_of_elem-$right_border_of_prev_elem;
+                        $elementsdistances = array();
+                        $elementsdistances[] = $distances[$j*2+1];
+                        for ($k = 0; $k < count($enumerations[$includeenums[$enumnumber][$j]])-1; $k++) {
+                            $firstindex = $includeenums[$enumnumber][$j];
+                            $secondindex = $enumsorders[$includeenums[$enumnumber][$j]][$k];
+                            $rightborderofprevelem = $enumerations[$firstindex][$secondindex]->end;
+                            $secondindex = $enumsorders[$includeenums[$enumnumber][$j]][$k+1];
+                            $leftborderofelem = $enumerations[$firstindex][$secondindex]->begin;
+                            $elementsdistances[] = $leftborderofelem-$rightborderofprevelem;
                         }
                         // Update included enumeration description, element for element.
-                        for ($k = 0; $k < count($enumerations[$include_enums[$enum_number][$j]]); $k++) {
+                        for ($k = 0; $k < count($enumerations[$includeenums[$enumnumber][$j]]); $k++) {
                             // Take current element old desription.
-                            $first_index = $include_enums[$enum_number][$j];
-                            $second_index = $enums_orders[$include_enums[$enum_number][$j]][$k];
-                            $right_border_of_elem = $enumerations[$first_index][$second_index]->end;
-                            $left_border_of_elem = $enumerations[$first_index][$second_index]->begin;
+                            $firstindex = $includeenums[$enumnumber][$j];
+                            $secondindex = $enumsorders[$includeenums[$enumnumber][$j]][$k];
+                            $rightborderofelem = $enumerations[$firstindex][$secondindex]->end;
+                            $leftborderofelem = $enumerations[$firstindex][$secondindex]->begin;
                             // If current element not first...
                             if ($k != 0) {
                                 // Calculate new description, use previews element description, and current element old description.
-                                $second_index = $enums_orders[$include_enums[$enum_number][$j]][$k-1];
-                                $right_border_of_prev_elem = $enumerations[$first_index][$second_index]->end;
-                                $second_index = $enums_orders[$include_enums[$enum_number][$j]][$k];
-                                $left_border_of_elem_new = $right_border_of_prev_elem+$elements_distances[$k];
-                                $right_border_of_elem_new = $left_border_of_elem_new+$right_border_of_elem-$left_border_of_elem;
+                                $secondindex = $enumsorders[$includeenums[$enumnumber][$j]][$k-1];
+                                $rightborderofprevelem = $enumerations[$firstindex][$secondindex]->end;
+                                $secondindex = $enumsorders[$includeenums[$enumnumber][$j]][$k];
+                                $leftborderofelemnew = $rightborderofprevelem+$elementsdistances[$k];
+                                $rightborderofelemnew = $leftborderofelemnew+$rightborderofelem-$leftborderofelem;
                             } else {
                                 // ...else.
                                 // Calculate new description, use description of element, which contains current enumeration,...
                                 // ...and current element old description.
-                                $right_border_of_prev_elem = $enumerations[$enum_number][$distances[$j*2]]->begin;
-                                $left_border_of_elem_new = $right_border_of_prev_elem+$elements_distances[$k];
-                                $right_border_of_elem_new = $left_border_of_elem_new+$right_border_of_elem-$left_border_of_elem;
+                                $rightborderofprevelem = $enumerations[$enumnumber][$distances[$j*2]]->begin;
+                                $leftborderofelemnew = $rightborderofprevelem+$elementsdistances[$k];
+                                $rightborderofelemnew = $leftborderofelemnew+$rightborderofelem-$leftborderofelem;
                             }
                             // Update description of element.
-                            $enumerations[$first_index][$second_index]->begin = $left_border_of_elem_new;
-                            $enumerations[$first_index][$second_index]->end = $right_border_of_elem_new;
+                            $enumerations[$firstindex][$secondindex]->begin = $leftborderofelemnew;
+                            $enumerations[$firstindex][$secondindex]->end = $rightborderofelemnew;
                         }
                     }
                 }
@@ -548,7 +548,7 @@ class  qtype_correctwriting_enum_analyzer {
             $enumschangecorrectstring[] = $i;
             $isenumincluded = false;
             // Is current enumeration include in some others.
-            foreach ($include_enums as $includearray) {
+            foreach ($includeenums as $includearray) {
                 if (false !== array_search($i, $includearray)) {
                     $isenumincluded = true;
                 }
@@ -568,7 +568,7 @@ class  qtype_correctwriting_enum_analyzer {
         foreach ($enumschangecorrectstring as $i) {
             $tempstringbegin = '';
             $tempstringend = '';
-            $position = reset($enums_orders[$i]);
+            $position = reset($enumsorders[$i]);
             $position = $enumerations[$i][$position]->begin;
             if ($position !== 0) {
                 $position--;
@@ -578,7 +578,7 @@ class  qtype_correctwriting_enum_analyzer {
             } else {
                 $tempstringbegin = '';
             }
-            $position = end($enums_orders[$i]);
+            $position = end($enumsorders[$i]);
             $position = $enumerations[$i][$position]->end;
             if ($position !== count($tokens) - 1) {
                 $position++;
@@ -587,8 +587,8 @@ class  qtype_correctwriting_enum_analyzer {
             } else {
                 $tempstringend = '';
             }
-            $second_index = end($enums_orders[$i]);
-            for ($j = $enumerations[$i][reset($enums_orders[$i])]->begin; $j <= $enumerations[$i][$second_index]->end; $j++) {
+            $second_index = end($enumsorders[$i]);
+            for ($j = $enumerations[$i][reset($enumsorders[$i])]->begin; $j <= $enumerations[$i][$secondindex]->end; $j++) {
                 $tempstringbegin = $tempstringbegin.$tokens[$j]->value();
                 $tempstringbegin = $tempstringbegin.' ';
             }
