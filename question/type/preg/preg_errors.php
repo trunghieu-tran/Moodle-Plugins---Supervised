@@ -48,7 +48,7 @@ class qtype_preg_error {
         if ($position->indfirst >= 0 && $position->indlast >= 0) {
             return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $position->indfirst)) . '<b>' .
                    htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indfirst, $position->indlast - $position->indfirst + 1)) . '</b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indfirst + 1));
+                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indlast + 1));
         } else {
             return htmlspecialchars($regex);
         }
