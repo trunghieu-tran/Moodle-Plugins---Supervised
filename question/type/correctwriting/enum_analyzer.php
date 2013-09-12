@@ -43,72 +43,72 @@ class  qtype_correctwriting_enum_analyzer {
     public function get_enum_change_order($enumdescription) {
         $enum1; // Description of enumeration-one.
         $enum2; // Description of enumeration-two.
-        $enum1_number; // Number of enumeration-one.
-        $enum2_number; // Number of enumeration-two.
-        $change_order_included_enums = new stdClass();
+        $enum1number; // Number of enumeration-one.
+        $enum2number; // Number of enumeration-two.
+        $changeorderincludedenums = new stdClass();
         // Add fields to stdClass object.
-        $change_order_included_enums->order = array(); // Enumerations change order.
-        $change_order_included_enums->included_enums = array();// Included enumeration numbers to all enumerations.
+        $changeorderincludedenums->order = array(); // Enumerations change order.
+        $changeorderincludedenums->includedenums = array();// Included enumeration numbers to all enumerations.
         // Add empty arrays of included enumerations.
         for ($i = 0; $i < count($enumdescription); $i++) {
-            $change_order_included_enums->included_enums[$i] = array();
+            $changeorderincludedenums->includedenums[$i] = array();
         }
-        $all_included_enums_in_order = true;// Variable show that all, included in current enumeration, enumerations are fill...
+        $allincludedenumsinorder = true;// Variable show that all, included in current enumeration, enumerations are fill...
                                             // ...in enumerations change order.
         // Find included enumerations to all enumerations.
-        $enum1_number = 0;
-        $enum2_number = 0;
+        $enum1number = 0;
+        $enum2number = 0;
         foreach ($enumdescription as $enum1) {
-            $enum2_number = 0;
+            $enum2number = 0;
             foreach ($enumdescription as $enum2) {
                 // If is not same enumerations.
                 if ( $enum1 != $enum2) {
                     // Boolean variables to check including of enumerations.
                     reset($enum1);// Set iterator to first element in first enumeration.
                     reset($enum2);// Set iterator to first element in second enumeration.
-                    $compare_left_borders_of_enums = current($enum2)->begin - current($enum1)->begin;
+                    $compareleftbordersofenums = current($enum2)->begin - current($enum1)->begin;
                     end($enum2);// Set iterator to last element in first enumeration.
                     end($enum1);// Set iterator to last element in second enumeration.
-                    $compare_right_borders_of_enums = current($enum2)->end - current($enum1)->end;
+                    $comparerightbordersofenums = current($enum2)->end - current($enum1)->end;
                     // If left borders of j enum rather than i enum and right borders of i enum rather than j enum and...
                     // ...in included enums array for i enum not contains j.
-                    if ($compare_left_borders_of_enums >= 0 && $compare_right_borders_of_enums <= 0
-                        && !in_array($enum2_number, $change_order_included_enums->included_enums[$enum1_number])) {
+                    if ($compareleftbordersofenums >= 0 && $comparerightbordersofenums <= 0
+                        && !in_array($enum2number, $changeorderincludedenums->includedenums[$enum1number])) {
                         // Add j to included enums array for i enum.
-                        $change_order_included_enums->included_enums[$enum1_number][] = $enum2_number;
+                        $changeorderincludedenums->includedenums[$enum1number][] = $enum2number;
                     }
                 }
-                $enum2_number++;
+                $enum2number++;
             }
-            $enum1_number++;
+            $enum1number++;
             unset($enum2);
         }
         // Create enumerations change order.
-        while ( count($change_order_included_enums->order) != count($enumdescription)) {
-            for ($i = 0; $i < count($change_order_included_enums->included_enums); $i++) {
-                $all_included_enums_in_order = true;
+        while ( count($changeorderincludedenums->order) != count($enumdescription)) {
+            for ($i = 0; $i < count($changeorderincludedenums->includedenums); $i++) {
+                $allincludedenumsinorder = true;
                 // Check that all included enumerations are in order.
-                for ($j = 0; $j < count($change_order_included_enums->included_enums[$i]); $j++) {
-                    if (!in_array($change_order_included_enums->included_enums[$i][$j], $change_order_included_enums->order)) {
-                        $all_included_enums_in_order = false;
+                for ($j = 0; $j < count($changeorderincludedenums->includedenums[$i]); $j++) {
+                    if (!in_array($changeorderincludedenums->includedenums[$i][$j], $changeorderincludedenums->order)) {
+                        $allincludedenumsinorder = false;
                     }
                 }
                 // If all included enumerations are in order and current enumeration aren't in order...
-                if ($all_included_enums_in_order && !in_array($i, $change_order_included_enums->order)) {
+                if ($allincludedenumsinorder && !in_array($i, $changeorderincludedenums->order)) {
                     // ...add current enumeration to order.
-                    $change_order_included_enums->order[] = $i;
+                    $changeorderincludedenums->order[] = $i;
                 }
             }
         }
         // Ending of included arrays to enumeration which don't contains others enumerations.
-        for ($i = 0; $i< count($change_order_included_enums->included_enums); $i++) {
+        for ($i = 0; $i< count($changeorderincludedenums->includedenums); $i++) {
             // If array of included enumeration is empty...
-            if (count($change_order_included_enums->included_enums[$i]) == 0) {
+            if (count($changeorderincludedenums->includedenums[$i]) == 0) {
                 // ...add -1 to array.
-                $change_order_included_enums->included_enums[$i][] = -1;
+                $changeorderincludedenums->includedenums[$i][] = -1;
             }
         }
-        return $change_order_included_enums;
+        return $changeorderincludedenums;
     }
 
     /**
