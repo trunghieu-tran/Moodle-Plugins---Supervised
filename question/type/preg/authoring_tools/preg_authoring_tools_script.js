@@ -250,14 +250,18 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         var regex = self.regex_input.val(),
-            text1 = escape_html(regex.substring(0, indfirst)),
-            text2 = escape_html(regex.substring(indfirst, indlast + 1)),
-            text3 = escape_html(regex.substring(indlast + 1)),
-            text = text1;
-            for (var i = 0; i < text2.length; i++) {
-                text += '<span class="outcome">' + text2.charAt(i) + '</span>';
+            text = '';
+        for (var i = 0; i < regex.length; i++) {
+            var ch = regex.charAt(i),
+                res = escape_html(ch);
+            if (i >= indfirst && i <= indlast) {
+                res = '<span class="outcome">' + res + '</span>';
             }
-            text += text3;
+            if (ch === "\n") {
+                res += '</br>';
+            }
+            text += res;
+        }
         $('#id_regex_highlighter').html(text).hide();
     },
 
