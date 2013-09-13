@@ -45,7 +45,6 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
 
 body#page-question-type-preg #id_regex_highlighter {
     position: absolute;
-    color: white;
     word-break: break-all;
     overflow: hidden;
     color: transparent;
