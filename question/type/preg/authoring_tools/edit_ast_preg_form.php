@@ -46,14 +46,8 @@ class qtype_preg_authoring_tool_form extends moodleform {
         $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header_text', 'qtype_preg'));
         $mform->setExpanded('regex_input_header', 1);
         $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
-
-        // Manually add the regex textarea with label because of the trick with highlighting.
-        $mform->addElement('html', '<label for="id_regex_text">' . get_string('authoring_form_text', 'qtype_preg') . '</label></br>');
-        $mform->addElement('html', '<div id="id_regex_highlighter"></div>');
-        $mform->addElement('html', '<textarea cols="150" rows="1" name="regex_text" id="id_regex_text"></textarea>');
-
-        //$mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 100, 'rows' => 1));
-        //$mform->setType('regex_text', PARAM_RAW);
+        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 150, 'rows' => 1));
+        $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();
         $topline[] =& $mform->createElement('submit', 'regex_update', get_string('update', 'moodle'));

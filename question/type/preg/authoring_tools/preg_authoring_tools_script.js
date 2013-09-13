@@ -24,8 +24,6 @@ M.preg_authoring_tools_script = (function ($) {
     /** @var {Object} reference to the regex textarea */
     regex_input : null,
 
-    mouse_pressed : false,
-
     /** @var {Object} contains regex selection borders */
     selection_borders : null,
 
@@ -91,7 +89,8 @@ M.preg_authoring_tools_script = (function ($) {
                     type: "GET",
                     dataType: "text"
                 }).done(function( responseText, textStatus, jqXHR ) {
-                    $(self.textbutton_widget.dialog).html( $.parseHTML( responseText, document, true ) );
+                    $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
+                    $("#id_regex_text").before('<div id="id_regex_highlighter"></div>');
 
                     //TODO: set empty src in all field
 
@@ -109,10 +108,11 @@ M.preg_authoring_tools_script = (function ($) {
                     // Add handlers for the regex textarea.
                     self.regex_input = $('#id_regex_text');
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
-                    self.regex_input.mousedown(self.regex_textarea_mousedown)
-                                    .mouseup(self.regex_textarea_mouseup)
-                                    .mousemove(self.regex_textarea_mousemove)
-                                    .keyup(function (e) {self.regex_selection_changed(e);});
+                    self.regex_input.focus(self.regex_textarea_focus)
+                                    .blur(self.regex_textarea_blur)
+                                    .mousedown(self.regex_textarea_mousedown)
+                                    .mouseup(self.regex_selection_changed)
+                                    .keyup(self.regex_selection_changed);
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
@@ -207,21 +207,18 @@ M.preg_authoring_tools_script = (function ($) {
         self.load_content(self.node_id);
     },
 
-    regex_textarea_mousedown : function(e) {
-        self.mouse_pressed = true;
+    regex_textarea_focus : function (e) {
+        $('#id_regex_highlighter').hide();
+    },
+
+    regex_textarea_blur : function (e) {
+        $('#id_regex_highlighter').show();
+    },
+
+    regex_textarea_mousedown : function (e) {
         self.selection_borders.start = 0;
         self.selection_borders.end = 0;
         $('#id_regex_highlighter').html('');
-    },
-
-    regex_textarea_mouseup : function(e) {
-        self.mouse_pressed = false;
-    },
-
-    regex_textarea_mousemove : function(e) {
-        if (self.mouse_pressed) {
-            self.regex_selection_changed(e);
-        }
     },
 
     regex_selection_changed : function (e) {
