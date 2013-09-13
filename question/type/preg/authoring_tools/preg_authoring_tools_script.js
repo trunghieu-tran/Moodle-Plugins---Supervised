@@ -90,7 +90,7 @@ M.preg_authoring_tools_script = (function ($) {
                     dataType: "text"
                 }).done(function( responseText, textStatus, jqXHR ) {
                     $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
-                    $("#id_regex_text").before('<div id="id_regex_highlighter"></div>');
+                    $("#id_regex_text").before('<div id="id_regex_highlighter" class="que"></div>');
 
                     //TODO: set empty src in all field
 
@@ -111,7 +111,7 @@ M.preg_authoring_tools_script = (function ($) {
                     self.regex_input.focus(self.regex_textarea_focus)
                                     .blur(self.regex_textarea_blur)
                                     .mousedown(self.regex_textarea_mousedown)
-                                    .mouseup(self.regex_selection_changed)
+                                    .mouseup(self.regex_textarea_mouseup)
                                     .keyup(self.regex_selection_changed);
 
                     // Add handlers for the regex testing textarea.
@@ -198,7 +198,7 @@ M.preg_authoring_tools_script = (function ($) {
         if (self.selection_borders) {
             var indfirst = self.selection_borders.start,
                 indlast = self.selection_borders.end - 1;
-            alert('selection from ' + indfirst + ' to ' + indlast);
+            //alert('selection from ' + indfirst + ' to ' + indlast);
             self.load_content('-1', indfirst, indlast);
         }
     },
@@ -212,6 +212,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     regex_textarea_blur : function (e) {
+        self.regex_input.textrange('set', 0, 0);
         $('#id_regex_highlighter').show();
     },
 
@@ -221,8 +222,15 @@ M.preg_authoring_tools_script = (function ($) {
         $('#id_regex_highlighter').html('');
     },
 
+    regex_textarea_mouseup : function (e) {
+        var w = self.regex_input.width(),
+            h = self.regex_input.height();
+        $('#id_regex_highlighter').width(w).height(h);
+        self.regex_selection_changed(e);
+    },
+
     regex_selection_changed : function (e) {
-        self.selection_borders = self.regex_input.textrange();
+        self.selection_borders = self.regex_input.textrange('get');
 
         var escape_html = function (str) {
                 var div = document.createElement('div'),
@@ -237,16 +245,20 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < indfirst) {
             self.selection_borders.start = 0;
             self.selection_borders.end = 0;
-            $('#id_regex_highlighter').html('');
+            $('#id_regex_highlighter').html('').hide();
             return;
         }
 
         var regex = self.regex_input.val(),
             text1 = escape_html(regex.substring(0, indfirst)),
             text2 = escape_html(regex.substring(indfirst, indlast + 1)),
-            text3 = escape_html(regex.substring(indlast + 1));
-
-        $('#id_regex_highlighter').html(text1 + '<span>' + text2 + '</span>' + text3);
+            text3 = escape_html(regex.substring(indlast + 1)),
+            text = text1;
+            for (var i = 0; i < text2.length; i++) {
+                text += '<span class="outcome">' + text2.charAt(i) + '</span>';
+            }
+            text += text3;
+        $('#id_regex_highlighter').html(text).hide();
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {

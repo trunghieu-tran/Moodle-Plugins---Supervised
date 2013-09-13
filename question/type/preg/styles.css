@@ -43,21 +43,23 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
     border-top: 0;
 }
 
-#id_regex_highlighter, #id_regex_text {
-    font-family: 'verdana';
-}
-
-#id_regex_highlighter {
+body#page-question-type-preg #id_regex_highlighter {
     position: absolute;
     color: white;
+    word-break: break-all;
+    overflow: hidden;
+    color: transparent;
 }
 
-#id_regex_highlighter span {
-    background: red;
-    color: red;
+body#page-question-type-preg #id_regex_highlighter span {
+    margin: 0;
+    padding: 0;
+    word-wrap: normal;
+    display: inline-block;
+    color: transparent;
 }
 
-#id_regex_text {
+body#page-question-type-preg #id_regex_text {
     position:relative;
     background-color: transparent;
 }
