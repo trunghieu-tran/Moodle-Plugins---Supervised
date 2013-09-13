@@ -85,7 +85,7 @@ M.preg_authoring_tools_script = (function ($) {
             // Function called on the very first form opening.
             onfirstpresscallback : function () {
                 $.ajax({
-                    url: self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php',
+                    url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php',
                     type: "GET",
                     dataType: "text"
                 }).done(function( responseText, textStatus, jqXHR ) {

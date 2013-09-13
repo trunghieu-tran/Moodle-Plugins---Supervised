@@ -19,7 +19,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_textarea.
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
-class qtype_preg_authoring_tool_form extends moodleform {
+class qtype_preg_authoring_form extends moodleform {
 
     private $isblock;
 

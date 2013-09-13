@@ -9,15 +9,15 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/edit_ast_preg_form.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_form.php');
 
-$PAGE->set_url('/question/type/preg/authoring_tools/ast_preg_form.php');
+$PAGE->set_url('/question/type/preg/authoring_tools/preg_authoring.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('popup');
 
 echo $OUTPUT->header();
 
-$mform = new qtype_preg_authoring_tool_form();
+$mform = new qtype_preg_authoring_form();
 $mform->display();
 
 echo $OUTPUT->footer();
