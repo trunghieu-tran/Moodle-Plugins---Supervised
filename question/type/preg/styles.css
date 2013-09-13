@@ -46,6 +46,7 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
 body#page-question-type-preg #id_regex_highlighter {
     position: absolute;
     word-break: break-all;
+    white-space: pre-wrap;
     overflow: hidden;
     color: transparent;
 }
@@ -54,6 +55,7 @@ body#page-question-type-preg #id_regex_highlighter span {
     margin: 0;
     padding: 0;
     word-wrap: normal;
+    white-space: pre-wrap;
     display: inline-block;
     color: transparent;
 }
