@@ -258,7 +258,7 @@ M.preg_authoring_tools_script = (function ($) {
                 res = '<span class="outcome">' + res + '</span>';
             }
             if (ch === "\n") {
-                res += '</br>';
+                res = '</br>';
             }
             text += res;
         }
