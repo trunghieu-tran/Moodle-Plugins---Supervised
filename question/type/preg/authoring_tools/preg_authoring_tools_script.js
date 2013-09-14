@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Script for button "Check", "Back" and push in interactive tree
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
@@ -23,9 +23,6 @@ M.preg_authoring_tools_script = (function ($) {
 
     /** @var {Object} reference to the regex textarea */
     regex_input : null,
-
-    /** @var {Object} contains regex selection borders */
-    selection_borders : null,
 
     /** @var {Integer} id of the currently selected node */
     node_id : '-1',
@@ -90,9 +87,35 @@ M.preg_authoring_tools_script = (function ($) {
                     dataType: "text"
                 }).done(function( responseText, textStatus, jqXHR ) {
                     $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
-                    $("#id_regex_text").before('<div id="id_regex_highlighter" class="que"></div>');
 
-                    //TODO: set empty src in all field
+                    // Create a clone of the textarea.
+                    var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:none;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
+                    $('#id_regex_text').each(function() {
+                        $.each(this.attributes, function() {
+                            if (this.specified) {
+                                textarea.attr(this.name, this.value);
+                            }
+                        });
+                    });
+
+                    // Replace the textarea with an iframe. TODO: CSS для ресайзового треугольничка
+                    var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding-right:10px;overflow:hidden;width:50%;height:20px">' +
+                                         '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"/>' +
+                                       '</div>';
+
+                    $('#id_regex_text').replaceWith(iframeMarkup);
+                    $("#id_regex_resizable").resizable();
+
+                    // Deal with iframe.
+                    var iframe = $('#id_regex_text_replacement'),
+                        innerDoc = iframe[0].contentWindow.document,
+                        innerBody = $('body', innerDoc);
+
+
+                    setTimeout(function() {
+                        innerBody.css('margin', '0').css('padding', '0')
+                                 .append(textarea);
+                    }, 1);
 
                     // Add handlers for the buttons.
                     $('#id_regex_update').click(self.btn_update_clicked);
@@ -106,13 +129,8 @@ M.preg_authoring_tools_script = (function ($) {
                     $("#fgroup_id_charset_process_radioset input").change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text');
+                    self.regex_input = textarea;
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
-                    self.regex_input.focus(self.regex_textarea_focus)
-                                    .blur(self.regex_textarea_blur)
-                                    .mousedown(self.regex_textarea_mousedown)
-                                    .mouseup(self.regex_textarea_mouseup)
-                                    .keyup(self.regex_selection_changed);
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
@@ -195,74 +213,15 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     btn_show_selection_clicked : function (e) {
-        if (self.selection_borders) {
-            var indfirst = self.selection_borders.start,
-                indlast = self.selection_borders.end - 1;
-            //alert('selection from ' + indfirst + ' to ' + indlast);
-            self.load_content('-1', indfirst, indlast);
-        }
+        var selection_borders = self.regex_input.textrange('get'),
+            indfirst = selection_borders.start,
+            indlast = selection_borders.end - 1;
+        alert('selection from ' + indfirst + ' to ' + indlast);
+        self.load_content('-1', indfirst, indlast);
     },
 
     rbtn_changed : function (e) {
         self.load_content(self.node_id);
-    },
-
-    regex_textarea_focus : function (e) {
-        $('#id_regex_highlighter').hide();
-    },
-
-    regex_textarea_blur : function (e) {
-        self.regex_input.textrange('set', 0, 0);
-        $('#id_regex_highlighter').show();
-    },
-
-    regex_textarea_mousedown : function (e) {
-        self.selection_borders.start = 0;
-        self.selection_borders.end = 0;
-        $('#id_regex_highlighter').html('');
-    },
-
-    regex_textarea_mouseup : function (e) {
-        var w = self.regex_input.width(),
-            h = self.regex_input.height();
-        $('#id_regex_highlighter').width(w).height(h);
-        self.regex_selection_changed(e);
-    },
-
-    regex_selection_changed : function (e) {
-        self.selection_borders = self.regex_input.textrange('get');
-
-        var escape_html = function (str) {
-                var div = document.createElement('div'),
-                    text = document.createTextNode(str);
-                div.appendChild(text);
-                return div.innerHTML;
-            };
-
-        var indfirst = self.selection_borders.start,
-            indlast = self.selection_borders.end - 1;
-
-        if (indlast < indfirst) {
-            self.selection_borders.start = 0;
-            self.selection_borders.end = 0;
-            $('#id_regex_highlighter').html('').hide();
-            return;
-        }
-
-        var regex = self.regex_input.val(),
-            text = '';
-        for (var i = 0; i < regex.length; i++) {
-            var ch = regex.charAt(i),
-                res = escape_html(ch);
-            if (i >= indfirst && i <= indlast) {
-                res = '<span class="outcome">' + res + '</span>';
-            }
-            if (ch === "\n") {
-                res = '</br>';
-            }
-            text += res;
-        }
-        $('#id_regex_highlighter').html(text).hide();
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
