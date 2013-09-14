@@ -159,7 +159,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $this->generate_json_for_accepted_regex($json, $id);
         }
         // Tell the client to change the selection indexes if needed.
-        if ($this->selection !== null && ($this->newindfirst != $this->selection->indfirst || $this->newindlast != $this->selection->indlast)) {
+        if ($this->selection !== null && $this->newindfirst != -1 && $this->newindlast != -1 &&
+            ($this->newindfirst != $this->selection->indfirst || $this->newindlast != $this->selection->indlast)) {
             $json['newindfirst'] = $this->newindfirst;
             $json['newindlast'] = $this->newindlast;
         }
