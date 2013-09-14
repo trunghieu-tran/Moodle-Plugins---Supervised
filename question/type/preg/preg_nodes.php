@@ -185,6 +185,10 @@ abstract class qtype_preg_node {
         $this->type = self::TYPE_ABSTRACT;
     }
 
+    public function __clone() {
+        $this->position = clone $this->position;
+    }
+
     /**
      * Is this node a subpattern? According to Fowler, a subpattern
      * is a leaf, or a subexpression, or a quantifier.
@@ -302,6 +306,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public $mergedassertions = array();//TODO two fields: assertionsbefore and assertionsafter.
 
     public function __clone() {
+        parent::__clone();
         // When clonning a leaf we also want the merged assertions to be cloned.
         foreach ($this->mergedassertions as $i => $mergedassertion) {
             $this->mergedassertions[$i] = clone $mergedassertion;
@@ -383,6 +388,7 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     public $operands = array();
 
     public function __clone() {
+        parent::__clone();
         // When clonning an operator we also want its subtree to be cloned.
         foreach ($this->operands as $i => $operand) {
             $this->operands[$i] = clone $operand;
@@ -429,6 +435,20 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $newnode->operands[] = $this->operands[$i];
         }
         $operands[] = $newnode;
+
+        // Fix the new node position.
+        if ($from > 0) {
+            $left = $this->operands[$from - 1];
+            $newnode->position->indfirst = $left->position->indlast + 1;
+            $newnode->position->linefirst = $left->position->linefirst;
+            $newnode->position->colfirst = $left->position->colfirst + 1;
+        }
+        if ($to < count($this->operands) - 1) {
+            $right = $this->operands[$to + 1];
+            $newnode->position->indlast = $right->position->indfirst - 1;
+            $newnode->position->linelast = $right->position->linelast;
+            $newnode->position->collast = $right->position->collast - 1;
+        }
 
         // Copy 'right' operands.
         for ($i = $to + 1; $i < count($this->operands); $i++) {

@@ -204,6 +204,19 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[1]->index_first == 10); // Backreference to unexisting subexpression.
         $this->assertTrue($errors[1]->index_last == 11);*/
     }
+
+    function test_expand_concat() {
+        $handler = new qtype_preg_regex_handler("abcd");
+        $idcounter = 1000;
+        $node = $handler->get_ast_root();
+        $node->expand(0, 2, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 3);
+        $node = $node->operands[0];
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 2);
+        $node = $node->operands[0];
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 1);
+    }
+
     function test_node_by_regex_fragment_one_char() {
         $handler = new qtype_preg_regex_handler("a");
         $idcounter = 1000;
