@@ -44,6 +44,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
+    protected $selectednode = null;
+
     public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
         //TODO: move to qtype_preg_regex_handler
         if ($regex === null) {
@@ -65,9 +67,9 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             }
         }
         parent::__construct($regex, $options);
-        if ($selection !== null) {
+        if ($selection !== null && $selection->indlast >= $selection->indfirst) {
             $idcounter = $this->parser->get_max_id() + 1;
-            $this->ast_root = $this->ast_root->node_by_regex_fragment($selection->indfirst, $selection->indlast, $idcounter);
+            $this->selectednode = $this->ast_root->node_by_regex_fragment($selection->indfirst, $selection->indlast, $idcounter);
             $this->build_dst();
         }
     }
