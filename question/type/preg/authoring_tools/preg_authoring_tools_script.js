@@ -43,10 +43,6 @@ M.preg_authoring_tools_script = (function ($) {
 
     displayas : null,
 
-    REGEX_KEY : 'regex',
-
-    ID_KEY : 'id',
-
     TREE_KEY : 'tree_src',
 
     TREE_MAP_KEY : 'map',
@@ -212,11 +208,8 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     btn_show_selection_clicked : function (e) {
-        var selection_borders = self.regex_input.textrange('get'),
-            indfirst = selection_borders.start,
-            indlast = selection_borders.end - 1;
-        alert('selection from ' + indfirst + ' to ' + indlast);
-        self.load_content('-1', indfirst, indlast);
+        var selection = self.regex_input.textrange('get');
+        self.load_content('-1', selection.start, selection.end - 1);
     },
 
     rbtn_changed : function (e) {
@@ -224,15 +217,15 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
-        var jsonarray = JSON.parse(data),
+        var json = JSON.parse(data),
             orientation = self.get_orientation(),
             displayas = self.get_displayas(),
-            r = jsonarray[self.REGEX_KEY],
-            i = jsonarray[self.ID_KEY] + '',
-            t = jsonarray[self.TREE_KEY],
-            m = jsonarray[self.TREE_MAP_KEY],
-            g = jsonarray[self.GRAPH_KEY],
-            d = jsonarray[self.DESCRIPTION_KEY];
+            r = json['regex'],
+            i = json['id'] + '',
+            t = json[self.TREE_KEY],
+            m = json[self.TREE_MAP_KEY],
+            g = json[self.GRAPH_KEY],
+            d = json[self.DESCRIPTION_KEY];
 
         // Cache the data.
         if (orientation && displayas && r && i && t && m && g && d) {
@@ -241,15 +234,20 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Display the data.
         self.display_data(i, t, m, g, d);
+
+        // Update the regex text selection if needed.
+        if (typeof json['newindfirst'] !== 'undefined') {
+            self.regex_input.textrange('set', json['newindfirst'], json['newindlast'] + 1)
+        }
     },
 
     upd_check_strings_success : function (data, textStatus, jqXHR) {
-        var jsonarray = JSON.parse(data);
-        $('#id_test_regex').html(jsonarray.regex_test);
+        var json = JSON.parse(data);
+        $('#id_test_regex').html(json.regex_test);
     },
 
     upd_failure : function (data, textStatus, jqXHR) {
-       alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
+       //alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
     },
 
     // Stores images and description for the given regex and node id in the cache

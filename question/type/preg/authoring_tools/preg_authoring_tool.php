@@ -44,6 +44,13 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
+    // Regex text selection borders, an instance of qtype_preg_position.
+    protected $selection = null;
+    // Updated value of the selection first index.
+    protected $newindfirst = -1;
+    // Updated value of the selection last index.
+    protected $newindlast = -1;
+
     protected $selectednode = null;
 
     public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
@@ -67,9 +74,12 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             }
         }
         parent::__construct($regex, $options);
+        $this->selection = $selection;
         if ($selection !== null && $selection->indlast >= $selection->indfirst) {
             $idcounter = $this->parser->get_max_id() + 1;
-            $this->selectednode = $this->ast_root->node_by_regex_fragment($selection->indfirst, $selection->indlast, $idcounter);
+            $this->newindfirst = $selection->indfirst;
+            $this->newindlast = $selection->indlast;
+            $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
             $this->build_dst();
         }
     }
@@ -147,6 +157,11 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $this->generate_json_for_unaccepted_regex($json, $id);
         } else {
             $this->generate_json_for_accepted_regex($json, $id);
+        }
+        // Tell the client to change the selection indexes if needed.
+        if ($this->selection !== null && ($this->newindfirst != $this->selection->indfirst || $this->newindlast != $this->selection->indlast)) {
+            $json['newindfirst'] = $this->newindfirst;
+            $json['newindlast'] = $this->newindlast;
         }
     }
 
