@@ -245,7 +245,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Update the regex text selection if needed.
         if (typeof json['newindfirst'] !== 'undefined') {
-            self.regex_input.textrange('set', json['newindfirst'], json['newindlast'] + 1)
+            self.regex_input.textrange('set', json['newindfirst'], json['newindlast'] - json['newindfirst'] + 1);
         }
     },
 
