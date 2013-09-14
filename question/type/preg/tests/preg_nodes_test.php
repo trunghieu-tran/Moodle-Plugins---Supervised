@@ -19,14 +19,18 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
-        $anode = new qtype_preg_leaf_charset;
+        $anode = new qtype_preg_leaf_charset();
+        $anode->set_user_info(new qtype_preg_position());
         $anode->charset = 'a';
-        $bnode = new qtype_preg_leaf_charset;
+        $bnode = new qtype_preg_leaf_charset();
+        $bnode->set_user_info(new qtype_preg_position());
         $bnode->charset = 'b';
-        $astnode = new qtype_preg_node_infinite_quant;
+        $astnode = new qtype_preg_node_infinite_quant();
+        $astnode->set_user_info(new qtype_preg_position());
         $astnode->leftborder = 0;
         $astnode->operands[] = $bnode;
-        $altnode = new qtype_preg_node_alt;
+        $altnode = new qtype_preg_node_alt();
+        $altnode->set_user_info(new qtype_preg_position());
         $altnode->operands[] = $anode;
         $altnode->operands[] = $astnode;
 
@@ -232,6 +236,23 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node === null);
     }
 
+    function test_node_by_regex_fragment_concat() {
+        $handler = new qtype_preg_regex_handler("abcd");
+        $idcounter = 1000;
+
+        $indexfirst = 0; $indexlast = 1;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[0]->flags[0][0]->data == 'a' && $node->operands[1]->flags[0][0]->data == 'b');
+
+        $indexfirst = 0; $indexlast = 2;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'c');
+        $node = $node->operands[0];
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[0]->flags[0][0]->data == 'a' && $node->operands[1]->flags[0][0]->data == 'b');
+    }
+
     function test_node_by_regex_fragment_concat_subpatt_quant() {
         $handler = new qtype_preg_regex_handler("(abcd)+");
         $idcounter = 1000;
@@ -264,11 +285,9 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $indexfirst = 2; $indexlast = 3;     // Middle operands to be expanded.
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 3);
-        $this->assertTrue($node->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->operands[0]->flags[0][0]->data == 'a');
-        $this->assertTrue($node->operands[2]->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->operands[2]->flags[0][0]->data == 'd');
-        $this->assertTrue($node->operands[1]->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands[1]->operands) == 2);
-        $this->assertTrue($node->operands[1]->operands[0]->flags[0][0]->data == 'b' && $node->operands[1]->operands[1]->flags[0][0]->data == 'c');
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2);
+        $this->assertTrue($node->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->operands[0]->flags[0][0]->data == 'b');
+        $this->assertTrue($node->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->operands[1]->flags[0][0]->data == 'c');
     }
 
     function test_node_by_regex_fragment_alt() {
@@ -338,7 +357,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $indexfirst = 19; $indexlast = 25;     // Comment selection, should be expanded to the whole alternation.
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
-        $this->assertTrue($node === $root);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT);
 
         $indexfirst = 11; $indexlast = 11;     // Selection '+' to be expanded.
         $root = clone $handler->get_ast_root();
