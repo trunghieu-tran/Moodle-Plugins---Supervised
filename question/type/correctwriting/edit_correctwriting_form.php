@@ -45,21 +45,18 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      * Key is field name, value contains default value and whether field is advanced
      * There should be strings with "key" and "key_help" in the language file.
      */
-     //TODO - uncomment first two fields when integrating Birukova code
-    private $floatfields = array(/*'lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
-                            'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),*/     //Lexical error weight field
-                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),       //Absent token mistake weight field
-                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1),        //Extra token mistake weight field
-                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true, 'min' => 0, 'max' => 1),       //Moved token mistake weight field
-                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           //Hint grade border
-                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      //Max mistake percentage
-                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),        //"What is" hint penalty
-                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),      //"Where" text hint penalty
-                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),   //Absent token mistake hint penalty factor
-                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)       //"Where" picture hint penalty
-                            );
+    private $floatfields = array('hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           // Hint grade border.
+                                 'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      // Max mistake percentage.
+                                );
+
+    private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
+                                     'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" text hint penalty.
+                                     'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),// Absent token mistake hint penalty factor.
+                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)      // "Where" picture hint penalty.
+                                     );
 
     private $analyzers = null;
+
     /**  Fills an inner definition of form fields
          @param object mform form data
      */
@@ -83,7 +80,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $qtypeclass = 'qtype_'.$this->qtype();
         $qtype = new $qtypeclass;
         $this->analyzers = $qtype->analyzers();
-        foreach ($this->analyzers as $analyzer) {
+        foreach ($this->analyzers as $name) {
+            $classname = 'qtype_correctwriting_' . $name;
+            $analyzer = new $classname;
             $fields = $analyzer->float_form_fields();
             foreach ($fields as $field) {
                 $name = $field['name'];
@@ -98,7 +97,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
         $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
 
-        //Determine whether this is first time, second time or another time form.
+        // Determine whether this is first time, second time or another time form.
         $name = optional_param('name', '', PARAM_TEXT);
         if ($name != '') {// Not first time form.
             $confirmed = optional_param('confirmed', false, PARAM_BOOL);
@@ -115,11 +114,56 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         }
 
         parent::definition_inner($mform);
-        // TODO - add sections for each analyzers after main question section, but before answers one.
-        // Each section should have a checkbox to use analyzer, and call form_section_definition() from analyzer to get other fields defined.
 
-        $answersinstruct = $mform->getElement('answersinstruct');
+        // Move answer instructions before answers, as we inserted other sections betweens them and answers fields.
+        $answersinstruct = $mform->removeElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_correctwriting'));
+        $mform->insertElementBefore($answersinstruct, 'answerhdr');
+    }
+
+    // Overload parent function to add other controls before answer fields.
+    protected function add_per_answer_fields(&$mform, $label, $gradeoptions,
+            $minoptions = QUESTION_NUMANS_START, $addoptions = QUESTION_NUMANS_ADD) {
+        // Adding custom sections.
+        $this->definition_additional_sections($mform);
+        // Calling parent to actually add fields.
+        parent::add_per_answer_fields($mform, $label, $gradeoptions, $minoptions, $addoptions);
+    }
+
+    /** Place additional sections on the form: one section for each analyzer and a hinting options section. */
+    protected function definition_additional_sections(&$mform) {
+        // Analyzer sections.
+        foreach ($this->analyzers as $name) {
+            $classname = 'qtype_correctwriting_' . $name;
+            $analyzer = new $classname;
+            // Start section.
+            $uiname = get_string($name, 'qtype_correctwriting');
+            $mform->addElement('header', $name . 'hdr', $uiname);
+            $mform->addHelpButton($name . 'hdr', $name, 'qtype_correctwriting');
+            // Add control whether to use analyzer.
+            $a = textlib::strtolower(textlib::substr($uiname, 0, 1)) . textlib::substr($uiname, 1);// Decapitalise first letter.
+            $mform->addElement('selectyesno', $name . 'use', get_string('usesomething', 'qtype_correctwriting', $a));
+            // TODO - default to admin config setting - use or not.
+            // Add analyzer controls.
+            $analyzer->form_section_definition($mform);
+        }
+
+        //Hinting section.
+        $mform->addElement('header', 'hintinghdr', get_string('hinting', 'qtype_correctwriting'));
+        $mform->addHelpButton('hintinghdr', 'hinting', 'qtype_correctwriting');
+        foreach ($this->hintfloatfields as $name => $params) {
+            $mform->addElement('text', $name, get_string($name, 'qtype_correctwriting'), array('size' => 6));
+            $mform->setType($name, PARAM_FLOAT);
+            $mform->setDefault($name, $params['default']);
+            $mform->addRule($name, null, 'required', null, 'client'); // TODO - should they be really required?
+            $mform->addHelpButton($name, $name, 'qtype_correctwriting');
+            if ($params['advanced']) {
+                $mform->setAdvanced($name);
+            }
+        }
+        $this->floatfields = $this->floatfields + $this->hintfloatfields;
+
+        // TODO - add rules controlling enabling/disabling of hints due to using of analyzers.
     }
 
     /**
@@ -127,7 +171,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      * @param $textdata
      * @return string
      */
-    function get_label($textdata) {
+    protected function get_label($textdata) {
         $rows = count($textdata);
         $cols = 1;
         for ($i = 0; $i < count($textdata); $i++) {

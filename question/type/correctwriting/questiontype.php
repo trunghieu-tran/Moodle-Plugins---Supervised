@@ -94,7 +94,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
                         0x300 => 'sequence_analyzer'/*,
                         0x400 => 'syntax_analyzer'*/
                     );
-        foreach ($analyzers() as $name) {
+        foreach ($analyzers as $name) {
             require_once($CFG->dirroot . '/question/type/correctwriting/' . $name . '.php');
         }
         return $analyzers;
