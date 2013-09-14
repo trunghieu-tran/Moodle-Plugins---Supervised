@@ -861,7 +861,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->errors[0]->position->collast === 18);
         // Correct situation: alternations are nested within two alternations for conditional subexpression.
         $parser = $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))', $errornodes);
-        $this->assertFalse($parser->get_error());
+        $this->assertFalse($parser->errors_exist());
         // Unclosed second parenthesis.
         $parser = $this->run_parser('a(?(?=bc)dd|e*f|hhh', $errornodes);
         $this->assertTrue(count($errornodes) === 1);

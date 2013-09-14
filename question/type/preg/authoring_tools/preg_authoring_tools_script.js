@@ -349,7 +349,8 @@ M.preg_authoring_tools_script = (function ($) {
             ajax: true
         };
         if (doselect) {
-            $.extend(indfirst, indlast);
+            data.indfirst = indfirst;
+            data.indlast = indlast;
         }
         $.ajax({
             type: 'GET',
