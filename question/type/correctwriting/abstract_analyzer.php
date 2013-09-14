@@ -76,13 +76,17 @@ abstract class qtype_correctwriting_abstract_analyzer {
      *
      * You are normally don't want to overload it. Overload analyze() and bypass() instead.
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
+     * When called without params just creates empty object to call analyzer-dependent functions on.
      *
      * @param qtype_correctwriting_question $question
      * @param qtype_correctwriting_string_pair $basepair a pair, passed as input
      * @param block_formal_langs_abstract_language $language a language
      * @param bool $bypass false if analyzer should work, true if it should just allow subsequent analyzers to work.
      */
-    public function __construct($question, $basepair, $language, $bypass) {
+    public function __construct($question = null, $basepair = null, $language = null, $bypass = true) {
+        if ($question === null) {
+            return;
+        }
         $this->question = $question;
         $this->language = $language;
         $this->basestringpair = $basepair;
@@ -102,7 +106,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      *
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      */
-    abstract public function analyze();
+    abstract protected function analyze();
 
     /**
      * Fill resultstringpairs with a string pair, that simulates work of this analyzer allowing subsequent analyzers to work.
@@ -110,7 +114,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * You are normally would overload this, starting overload with parent function call, then add you work.
      * Don't actually analyze something, no mistakes generated: just fill necessary fields in string pair.
      */
-    public function bypass() {
+    protected function bypass() {
         $this->resultmistakes[] = array();// Add an empty mistakes array.
         $this->resultstringpairs[] = clone $this->basestringpair; //Clone string pair for future use.
     }
@@ -168,12 +172,14 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * Called from edit_correctwriting_form::definition_inner() within form section for this analyzer.
      * You will typically call parent, then add other fields.
      */
-    public function form_section_definition($mform) {
+    public function form_section_definition(&$mform) {
         foreach ($this->float_form_fields() as $params) {
             $mform->addElement('text', $params['name'], get_string($params['name'], 'qtype_correctwriting'), array('size' => 6));
             $mform->setType($params['name'], PARAM_FLOAT);
             $mform->setDefault($params['name'], $params['default']);
-            $mform->addRule($params['name'], null, 'required', null, 'client');
+            if ($params['required']) {
+                $mform->addRule($params['name'], null, 'required', null, 'client');
+            }
             $mform->addHelpButton($params['name'], $params['name'], 'qtype_correctwriting');
             if ($params['advanced']) {
                 $mform->setAdvanced($params['name']);
@@ -204,11 +210,11 @@ abstract class qtype_correctwriting_abstract_analyzer {
     }
 
     /**
-     * Returns an array of languages, compatible with this analyzers.
+     * Returns if the language is compatible with this analyzer.
      * I.e. syntax analyzer compatible only with parser containing languages.
-     * @param $langs array of languages as returned from block_formal_lange::available_langs()
+     * @param $lang a language object from block_formal_langs
      */
-    public function compatible_langs($langs) {
-        return $langs; // Accept all by default.
+    public function is_lang_compatible($lang) {
+        return true; // Accept all by default.
     }
 }
