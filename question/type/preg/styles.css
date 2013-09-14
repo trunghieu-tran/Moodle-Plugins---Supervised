@@ -20,6 +20,8 @@ body#page-question-type-preg div[id^=fitem_id_][id*=answer_] {
     padding-top: 5px;
     border: 1px solid #BBB;
     border-bottom: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 body#page-question-type-preg div[id^=fitem_id_][id*=fraction_] {
@@ -41,26 +43,4 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
     padding-top: 5px;
     border: 1px solid #BBB;
     border-top: 0;
-}
-
-body#page-question-type-preg #id_regex_highlighter {
-    position: absolute;
-    word-break: break-all;
-    white-space: pre-wrap;
-    overflow: hidden;
-    color: transparent;
-}
-
-body#page-question-type-preg #id_regex_highlighter span {
-    margin: 0;
-    padding: 0;
-    word-wrap: normal;
-    white-space: pre-wrap;
-    display: inline-block;
-    color: transparent;
-}
-
-body#page-question-type-preg #id_regex_text {
-    position:relative;
-    background-color: transparent;
 }
