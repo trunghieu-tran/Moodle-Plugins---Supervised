@@ -37,9 +37,9 @@ function qtype_preg_get_json_array() {
 
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $rankdirlr, $selection),
-        'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation),
-        'description' => new qtype_preg_description_tool($regex, null, $engine, $notation)
+        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $selection, $rankdirlr),
+        'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation, $selection),
+        'description' => new qtype_preg_description_tool($regex, null, $engine, $notation, $selection)
     );
 
     // Fill the json array.
