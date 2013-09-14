@@ -16,8 +16,13 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
     public $rankdir = false;
 
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $rankdirlr = false) {
+    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $rankdirlr = false, $selection = null) {
         parent::__construct($regex, $options, $engine, $notation);
+        if ($selection !== null) {
+            $idcounter = $this->parser->get_max_id() + 1;
+            $this->ast_root = $this->ast_root->node_by_regex_fragment($selection->indfirst, $selection->indlast, $idcounter);
+            $this->build_dst();
+        }
         $this->rankdir = $rankdirlr;
     }
 

@@ -38,12 +38,16 @@
         return $this->root;
     }
 
-    public function get_error() {
+    public function errors_exist() {
         return (count($this->errornodes) > 0);
     }
 
     public function get_error_nodes() {
         return $this->errornodes;
+    }
+
+    public function get_max_id() {
+        return $this->id_counter;
     }
 
     public function get_max_subpatt() {

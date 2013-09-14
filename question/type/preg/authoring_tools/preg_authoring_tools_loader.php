@@ -26,15 +26,18 @@ function qtype_preg_get_json_array() {
     $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
-    //$displayas = optional_param('displayas', '', PARAM_RAW);
-    //$indfirst = optional_param('indfirst', null, PARAM_INT);
-    //$indlast = optional_param('indlast', null, PARAM_INT);
+    $displayas = optional_param('displayas', '', PARAM_RAW);
+    $indfirst = optional_param('indfirst', null, PARAM_INT);
+    $indlast = optional_param('indlast', null, PARAM_INT);
 
     $rankdirlr = $treeorientation == 'horizontal' ? true : false;
+    $selection = ($indfirst !== null && $indlast !== null)
+               ? new qtype_preg_position($indfirst, $indlast)
+               : null;
 
     // Array with authoring tools
     $tools = array(
-        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $rankdirlr),
+        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $rankdirlr, $selection),
         'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation),
         'description' => new qtype_preg_description_tool($regex, null, $engine, $notation)
     );
