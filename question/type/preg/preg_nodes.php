@@ -186,7 +186,9 @@ abstract class qtype_preg_node {
     }
 
     public function __clone() {
-        $this->position = clone $this->position;
+        if ($this->position !== null) {
+            $this->position = clone $this->position;
+        }
     }
 
     /**
