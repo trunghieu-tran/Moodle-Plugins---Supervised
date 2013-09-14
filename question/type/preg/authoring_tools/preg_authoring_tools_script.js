@@ -107,12 +107,11 @@ M.preg_authoring_tools_script = (function ($) {
                     $("#id_regex_resizable").resizable();
 
                     // Deal with iframe.
-                    var iframe = $('#id_regex_text_replacement'),
-                        innerDoc = iframe[0].contentWindow.document,
-                        innerBody = $('body', innerDoc);
-
+                    var iframe = $('#id_regex_text_replacement');
 
                     setTimeout(function() {
+                        var innerDoc = iframe[0].contentWindow.document,
+                            innerBody = $('body', innerDoc);
                         innerBody.css('margin', '0').css('padding', '0')
                                  .append(textarea);
                     }, 1);
