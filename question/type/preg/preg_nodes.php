@@ -249,6 +249,15 @@ abstract class qtype_preg_node {
                 }
             }
             $result->expand($from, $to, $idcounter);
+
+            // Update the result again.
+            foreach ($result->operands as $operand) {
+                $better_than_result = ($operand->position->indfirst >= $result->position->indfirst) && ($operand->position->indlast <= $result->position->indlast);
+                $suits_needed = ($operand->position->indfirst <= $indexfirst) && ($operand->position->indlast >= $indexlast);
+                if ($better_than_result && $suits_needed) {
+                    $result = $operand;
+                }
+            }
         }
 
         // If the node is found, update the indexes, return NULL otherwise.
