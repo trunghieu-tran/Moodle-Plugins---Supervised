@@ -129,8 +129,8 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param string $regex - regular expression to handle.
      * @param object $options - options to handle regex, i.e. any necessary additional parameters.
      */
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
-        parent::__construct($regex, $options, $engine, $notation);
+    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
+        parent::__construct($regex, $options, $engine, $notation, $selection);
         $this->state = new qtype_preg_description_state();
     }
 
