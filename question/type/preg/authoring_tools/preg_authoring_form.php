@@ -50,12 +50,11 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();
-        $topline[] =& $mform->createElement('submit', 'regex_update', get_string('update', 'moodle'));
+        $topline[] =& $mform->createElement('submit', 'regex_show', get_string('show', 'moodle'));
         if (!$this->isblock) {
             $topline[] =& $mform->createElement('button', 'regex_save', get_string('savechanges', 'moodle'));
         }
         $topline[] =& $mform->createElement('button', 'regex_cancel', get_string('cancel', 'moodle'));
-        $topline[] =& $mform->createElement('button', 'regex_show_selection', get_string('authoring_form_show_selection', 'qtype_preg'));
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
         $radiocharsetprocessarray = array();
