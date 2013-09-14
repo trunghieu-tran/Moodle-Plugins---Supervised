@@ -209,7 +209,6 @@ $string['authoring_form_edit_header'] = 'Regex input';
 $string['authoring_form_edit_header_help'] = 'Input your regex here. You\'ll see corresponding syntax tree, explaining graph and description. Click "Update" to commit changes in the regex.';
 $string['authoring_form_edit_header_text'] = 'Regular expression';
 $string['authoring_form_text'] = 'Enter your regex here:';
-$string['authoring_form_show_selection'] = 'Show selection';
 $string['authoring_form_tree_build'] = 'Building the tree...';
 $string['authoring_form_graph_build'] = 'Building the graph...';
 $string['authoring_form_match_header'] = 'Regular expression testing';

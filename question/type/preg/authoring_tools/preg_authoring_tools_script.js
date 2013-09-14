@@ -113,11 +113,10 @@ M.preg_authoring_tools_script = (function ($) {
                     }, 1);
 
                     // Add handlers for the buttons.
-                    $('#id_regex_update').click(self.btn_update_clicked);
+                    $('#id_regex_show').click(self.btn_show_clicked);
                     $('#id_regex_save').click(self.btn_save_clicked);
                     $("#id_regex_cancel").click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
-                    $('#id_regex_show_selection').click(self.btn_show_selection_clicked);
 
                     // Add handlers for the radiobuttons.
                     $("#fgroup_id_tree_orientation_radioset input").change(self.rbtn_changed);
@@ -143,11 +142,11 @@ M.preg_authoring_tools_script = (function ($) {
 
                 // Put the testing data into ui.
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
-                                             .trigger('keyup');
+                                         .trigger('keyup');
 
                 options.display_question_options();
                 self.load_content('-1');
-                self.btn_check_strings_clicked();
+                $('#id_regex_check_strings').click();
             },
 
             onsaveclicked : function () {
@@ -171,10 +170,11 @@ M.preg_authoring_tools_script = (function ($) {
         self.textbutton_widget.setup(options);
     },
 
-    btn_update_clicked : function (e) {
+    btn_show_clicked : function (e) {
         e.preventDefault();
-        self.load_content('-1');
-        self.btn_check_strings_clicked();
+        var selection = self.regex_input.textrange('get');
+        self.load_content('-1', selection.start, selection.end - 1);
+        $('#id_regex_check_strings').click();
     },
 
     btn_save_clicked : function (e) {
@@ -185,11 +185,13 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     btn_cancel_clicked : function (e) {
+        e.preventDefault();
         self.textbutton_widget.dialog.dialog("close");
         $('#id_test_regex').html('');
     },
 
     btn_check_strings_clicked : function (e) {
+        e.preventDefault();
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
@@ -207,13 +209,19 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
 
-    btn_show_selection_clicked : function (e) {
-        var selection = self.regex_input.textrange('get');
-        self.load_content('-1', selection.start, selection.end - 1);
+    rbtn_changed : function (e) {
+        e.preventDefault();
+        self.load_content(self.node_id);
     },
 
-    rbtn_changed : function (e) {
-        self.load_content(self.node_id);
+    tree_node_clicked : function (e) {
+        e.preventDefault();
+        self.load_content($(e.target).attr('id') + '');
+    },
+
+    tree_node_misclicked : function (e) {
+        e.preventDefault();
+        self.load_content('-1');
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
@@ -374,21 +382,6 @@ M.preg_authoring_tools_script = (function ($) {
             targetspan.addClass(highlightedclass);
             targetspan.css('background', '#FFFF00');
         }
-    },
-
-    /**
-     * Handler of clicking on a node (map area, in fact)
-     */
-    tree_node_clicked : function (e) {
-       var id = $(e.target).attr('id') + '';
-       self.load_content(id);
-    },
-
-    /**
-     * Handler of clicking on area outside all nodes
-     */
-    tree_node_misclicked : function (e) {
-        self.load_content('-1');
     },
 
     get_orientation : function () {

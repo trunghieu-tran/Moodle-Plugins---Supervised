@@ -209,7 +209,6 @@ $string['authoring_form_edit_header'] = 'Регулярное выражение
 $string['authoring_form_edit_header_help'] = 'Введите регулярное выражение здесь. Вы увидете соответствующее синтаксическое дерево, объясняющий граф и и словесное описание. Нажмите "Обновить" чтобы принять изменения в регулярном выражении.';
 $string['authoring_form_edit_header_text'] = 'Регулярное выражение';
 $string['authoring_form_text'] = 'Введите регулярное выражение:';
-$string['authoring_form_show_selection'] = 'Отобразить выделение';
 $string['authoring_form_tree_build'] = 'Построение дерева...';
 $string['authoring_form_graph_build'] = 'Построение графа...';
 $string['authoring_form_match_header'] = 'Тестирование регулярного выражения';
