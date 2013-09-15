@@ -205,7 +205,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        self.load_content($(e.target).attr('id'));
+        self.load_content(e.target.id.split(',')[0]);
     },
 
     tree_node_misclicked : function (e) {

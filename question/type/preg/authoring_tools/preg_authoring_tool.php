@@ -73,11 +73,13 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             }
         }
         parent::__construct($regex, $options);
-        $this->selection = $selection;
-        if ($selection !== null && $selection->indlast >= $selection->indfirst) {
+        $this->selection = $selection !== null
+                         ? $selection
+                         : new qtype_preg_position();
+        if ($this->selection->indlast >= $this->selection->indfirst) {
             $idcounter = $this->parser->get_max_id() + 1;
-            $this->newindfirst = $selection->indfirst;
-            $this->newindlast = $selection->indlast;
+            $this->newindfirst = $this->selection->indfirst;
+            $this->newindlast = $this->selection->indlast;
             $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
             $this->build_dst();
         }
