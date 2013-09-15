@@ -53,10 +53,7 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
      * Overloaded from qtype_preg_authoring_tool.
      */
     public function generate_json_for_accepted_regex(&$json) {
-        $id = $this->selectednode !== null
-            ? $this->selectednode->id
-            : -1;
-        $context = new qtype_preg_dot_node_context(true, $id);
+        $context = new qtype_preg_dot_node_context(true, $this->selection);
         $dotscript = $this->get_dst_root()->dot_script($context, $this->rankdir);
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);

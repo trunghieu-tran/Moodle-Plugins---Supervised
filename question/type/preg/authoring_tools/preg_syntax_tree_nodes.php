@@ -21,12 +21,14 @@ class qtype_preg_dot_node_context {
     // Whether the node is the root or not.
     public $isroot;
 
-    // Id of the ast node to be selected.
-    public $selectid;
+    // Selection coordinates, an instance of qtype_preg_position.
+    public $selection;
 
-    public function __construct($isroot, $selectid = -1) {
+    public function __construct($isroot, $selection = null) {
         $this->isroot = $isroot;
-        $this->selectid = $selectid;
+        $this->selection = $selection !== null
+                         ? $selection
+                         : new qtype_preg_position();
     }
 }
 
@@ -131,15 +133,17 @@ abstract class qtype_preg_syntax_tree_node {
      * @param context an instance of qtype_preg_dot_node_context.
      * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
      */
-    public abstract function dot_script($context);  // TODO: move from preg_nodes.php
+    public abstract function dot_script($context);
 
     protected function get_style($context) {
         $label = $this->label();
         $tooltip = $this->tooltip();
         $shape = $this->shape();
         $color = $this->color();
-        $result = "id = {$this->pregnode->id}, label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
-        if ($context->selectid == $this->pregnode->id) {
+        $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+        $result = "id = \"$id\", label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
+        if ($this->pregnode->position->indfirst >= $context->selection->indfirst &&
+            $this->pregnode->position->indlast <= $context->selection->indlast) {
             $result .= ', style = dotted';
         }
         return '[' . $result . ']';
@@ -222,9 +226,6 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
             // Change the context to select the subtree.
             $newcontext = clone $context;
             $newcontext->isroot = false;
-            if ($newcontext->selectid == $this->pregnode->id) {
-                $newcontext->selectid = $operand->pregnode->id;
-            }
             // Recursive call to subtree.
             $tmp = $operand->dot_script($newcontext, $rankdirlr);
             $childscripts[] = $tmp[0];
