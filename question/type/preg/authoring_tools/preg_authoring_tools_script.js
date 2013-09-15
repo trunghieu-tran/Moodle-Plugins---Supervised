@@ -214,7 +214,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.regex_input.textrange('set', -1, 0);
+        self.regex_input.textrange('set', 0, 0);
         $('#id_regex_show').click();
     },
 
@@ -241,7 +241,7 @@ M.preg_authoring_tools_script = (function ($) {
         var newindfirst = json['newindfirst'],
             newindlast = json['newindlast'] - json['newindfirst'] + 1;
         if (newindfirst < 0 || json['newindlast'] < json['newindfirst']) {
-            newindfirst = -1;
+            newindfirst = 0;
             newindlast = 0;
         }
         self.regex_input.textrange('set', newindfirst, newindlast);
