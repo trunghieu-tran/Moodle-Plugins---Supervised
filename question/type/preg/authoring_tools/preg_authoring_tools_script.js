@@ -205,12 +205,17 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        self.load_content(e.target.id.split(',')[0]);
+        var tmp = e.target.id.split(','),
+            indfirst = tmp[1],
+            indlast = tmp[2];
+        self.regex_input.textrange('set', indfirst, indlast - indfirst + 1);
+        $('#id_regex_show').click();
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.load_content(-1);
+        self.regex_input.textrange('set', -1, 0);
+        $('#id_regex_show').click();
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
@@ -266,7 +271,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Displays given images and description
-    display_data : function (id, t, m, g, d) {
+    display_data : function (id, t, m, g, d) {  // TODO: get rid of id
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
@@ -307,7 +312,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id) {
+    load_content : function (id) {  // TODO: get rid of id
         var selection = self.regex_input.textrange('get'),
             indfirst = selection.start,
             indlast = selection.end - 1;
@@ -362,7 +367,7 @@ M.preg_authoring_tools_script = (function ($) {
      * Highlights part of text description of regex corresponding to given id.
      * Highlights nothing if '-1' is passed.
      */
-    highlight_description : function (id) {
+    highlight_description : function (id) {  // TODO: get rid of id
         var highlightedclass = 'description_highlighted',
             oldhighlighted = $('.' + highlightedclass),
             targetspan = $('.description_node_' + id);
