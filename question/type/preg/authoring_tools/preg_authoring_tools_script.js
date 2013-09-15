@@ -24,10 +24,7 @@ M.preg_authoring_tools_script = (function ($) {
     /** @var {Object} reference to the regex textarea */
     regex_input : null,
 
-    /** @var {Integer} id of the currently selected node */
-    node_id : '-1',
-
-    /** @var {Object} cache of content; first dimension is orientation, second id regex, third is node id */
+    /** @var {Object} cache of content; dimensions are: orientation, display mode, regex, selection borders */
     cache : {
         vertical: {
             userinscription: {},
@@ -38,10 +35,6 @@ M.preg_authoring_tools_script = (function ($) {
             flags: {}
         }
     },
-
-    tree_orientation : null,
-
-    displayas : null,
 
     TREE_KEY : 'tree_src',
 
@@ -142,7 +135,7 @@ M.preg_authoring_tools_script = (function ($) {
                                          .trigger('keyup');
 
                 options.display_question_options();
-                self.load_content('-1');
+                self.load_content(-1);
                 $('#id_regex_check_strings').click();
             },
 
@@ -169,8 +162,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
-        var selection = self.regex_input.textrange('get');
-        self.load_content('-1', selection.start, selection.end - 1);
+        self.load_content(-1);
         $('#id_regex_check_strings').click();
     },
 
@@ -208,42 +200,46 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        self.load_content(self.node_id);
+        self.load_content(-1);
     },
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        self.load_content($(e.target).attr('id') + '');
+        self.load_content($(e.target).attr('id'));
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.load_content('-1');
+        self.load_content(-1);
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
         var json = JSON.parse(data),
-            orientation = self.get_orientation(),
-            displayas = self.get_displayas(),
-            r = json['regex'],
-            i = json['id'] + '',
+            _o = self.get_orientation(),
+            _d = self.get_displayas(),
+            _r = json['regex'],
+            _s = json['newindfirst'] + '' + json['newindlast'],
             t = json[self.TREE_KEY],
             m = json[self.TREE_MAP_KEY],
             g = json[self.GRAPH_KEY],
             d = json[self.DESCRIPTION_KEY];
 
         // Cache the data.
-        if (orientation && displayas && r && i && t && m && g && d) {
-            self.cache_data(orientation, displayas, r, i, t, m, g, d);
+        if (_o && _d && _r && _s && t && m && g && d) {
+            self.cache_data(_o, _d, _r, _s, t, m, g, d);
         }
 
         // Display the data.
-        self.display_data(i, t, m, g, d);
+        self.display_data(json['id'], t, m, g, d);
 
         // Update the regex text selection if needed.
-        if (typeof json['newindfirst'] !== 'undefined') {
-            self.regex_input.textrange('set', json['newindfirst'], json['newindlast'] - json['newindfirst'] + 1);
+        var newindfirst = json['newindfirst'],
+            newindlast = json['newindlast'] - json['newindfirst'] + 1;
+        if (newindfirst < 0 || json['newindlast'] < json['newindfirst']) {
+            newindfirst = -1;
+            newindlast = 0;
         }
+        self.regex_input.textrange('set', newindfirst, newindlast);
     },
 
     upd_check_strings_success : function (data, textStatus, jqXHR) {
@@ -256,17 +252,17 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Stores images and description for the given regex and node id in the cache
-    cache_data : function (orientation, displayas, regex, id, t, m, g, d) {
-        if (!self.cache[orientation][displayas][regex]) {
-            self.cache[orientation][displayas][regex] = {};
+    cache_data : function (_o, _d, _r, _s, t, m, g, d) {
+        if (!self.cache[_o][_d][_r]) {
+            self.cache[_o][_d][_r] = {};
         }
-        if (!self.cache[orientation][displayas][regex][id]) {
-            self.cache[orientation][displayas][regex][id] = {};
+        if (!self.cache[_o][_d][_r][_s]) {
+            self.cache[_o][_d][_r][_s] = {};
         }
-        self.cache[orientation][displayas][regex][id][self.TREE_KEY] = t;
-        self.cache[orientation][displayas][regex][id][self.TREE_MAP_KEY] = m;
-        self.cache[orientation][displayas][regex][id][self.GRAPH_KEY] = g;
-        self.cache[orientation][displayas][regex][id][self.DESCRIPTION_KEY] = d;
+        self.cache[_o][_d][_r][_s][self.TREE_KEY] = t;
+        self.cache[_o][_d][_r][_s][self.TREE_MAP_KEY] = m;
+        self.cache[_o][_d][_r][_s][self.GRAPH_KEY] = g;
+        self.cache[_o][_d][_r][_s][self.DESCRIPTION_KEY] = d;
     },
 
     // Displays given images and description
@@ -311,50 +307,48 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id, indfirst, indlast) {
-        // Deselect the node when clicked for the second time.
-        if (self.node_id == id && self.tree_orientation == self.get_orientation() && self.displayas == self.get_displayas()) {
-            id = '-1';
+    load_content : function (id) {
+        var selection = self.regex_input.textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indlast < indfirst) {
+            indfirst = -1;
+            indlast = -1;
         }
 
         // Update the fields.
-        self.node_id = id;
-        self.tree_orientation = self.get_orientation();
-        self.displayas = self.get_displayas();
+        var tree_orientation = self.get_orientation(),
+            displayas = self.get_displayas(),
+            regex = self.regex_input.val(),
+            selection = indfirst + '' + indlast;
 
         // Unbind tree handlers so nothing is clickable till the response is received.
         $('#tree_img').unbind();
         $(self.TREE_MAP_ID + ' > area').unbind();
 
-        var regex = self.regex_input.val(),
-            doselect = (typeof indfirst !== 'undefined' && typeof indlast !== 'undefined'),
-            cachedregex = null,
-            cachedid = null;
+        var cachedregex = null,
+            cachedsel = null;
 
         // Check the cache.
-        if (!doselect) {
-            cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
-            if (cachedregex) {
-                cachedid = cachedregex[id];
-            }
-            if (cachedid) {
-                self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_KEY], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
-                return;
-            }
+        cachedregex = self.cache[tree_orientation][displayas][regex];
+        if (cachedregex) {
+            cachedsel = cachedregex[selection];
         }
+        if (cachedsel) {
+            self.display_data(id, cachedsel[self.TREE_KEY], cachedsel[self.TREE_MAP_KEY], cachedsel[self.GRAPH_KEY], cachedsel[self.DESCRIPTION_KEY]);
+            return;
+        }
+
         var data = {
             regex: regex,
-            id: id,
-            tree_orientation: self.tree_orientation,
+            indfirst: indfirst,
+            indlast: indlast,
+            tree_orientation: tree_orientation,
             notation: $('#id_notation :selected').val(),
             engine: $('#id_engine :selected').val(),
-            displayas: self.displayas,
+            displayas: displayas,
             ajax: true
         };
-        if (doselect) {
-            data.indfirst = indfirst;
-            data.indlast = indlast;
-        }
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',

@@ -27,15 +27,14 @@ interface qtype_preg_i_authoring_tool {
     /**
      * Generates a json array with this tool's data. Should call the methods below.
      * @param json - output JSON array.
-     * @param id - identifier of the selected syntax tree node.
      */
-    public function generate_json(&$json, $id = -1);
+    public function generate_json(&$json);
 
-    public function generate_json_for_accepted_regex(&$json, $id = -1);
+    public function generate_json_for_accepted_regex(&$json);
 
-    public function generate_json_for_unaccepted_regex(&$json, $id = -1);
+    public function generate_json_for_unaccepted_regex(&$json);
 
-    public function generate_json_for_empty_regex(&$json, $id = -1);
+    public function generate_json_for_empty_regex(&$json);
 }
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
@@ -148,29 +147,26 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         return $result;
     }
 
-    public function generate_json(&$json, $id = -1) {
+    public function generate_json(&$json) {
         $json['regex'] = $this->regex->string();
-        $json['id'] = $id;
+        $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
+        $json['newindfirst'] = $this->newindfirst;
+        $json['newindlast'] = $this->newindlast;
+
         if ($this->regex == '') {
-            $this->generate_json_for_empty_regex($json, $id);
+            $this->generate_json_for_empty_regex($json);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
-            $this->generate_json_for_unaccepted_regex($json, $id);
+            $this->generate_json_for_unaccepted_regex($json);
         } else {
-            $this->generate_json_for_accepted_regex($json, $id);
-        }
-        // Tell the client to change the selection indexes if needed.
-        if ($this->selection !== null && $this->newindfirst != -1 && $this->newindlast != -1 &&
-            ($this->newindfirst != $this->selection->indfirst || $this->newindlast != $this->selection->indlast)) {
-            $json['newindfirst'] = $this->newindfirst;
-            $json['newindlast'] = $this->newindlast;
+            $this->generate_json_for_accepted_regex($json);
         }
     }
 
-    public function generate_json_for_empty_regex(&$json, $id = -1) {
+    public function generate_json_for_empty_regex(&$json) {
         $json[$this->json_key()] = '';
     }
 
-    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+    public function generate_json_for_unaccepted_regex(&$json) {
         $a =  textlib::strtolower(get_string($this->name(), 'qtype_preg'));
         $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
         foreach ($this->get_error_messages(true) as $error) {
@@ -183,9 +179,9 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
     // Overloaded for some exceptions handling.
-    public function generate_json(&$json, $id = -1) {
+    public function generate_json(&$json) {
         try {
-            parent::generate_json($json, $id);
+            parent::generate_json($json);
         } catch (Exception $e) {
             // Something is wrong with graphviz.
             $a = new stdClass;
