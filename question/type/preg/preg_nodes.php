@@ -271,13 +271,13 @@ abstract class qtype_preg_node {
     /**
      * Expands the subtrees of operands at the given indexes.
      */
-    public function expand($from, $to, &$idcounter) {
+    public function expand($from, $to, &$idcounter, $expandsubtree = false) {
     }
 
     /**
      * Expands the subtrees of all operands.
      */
-    public function expand_all(&$idcounter) {
+    public function expand_all(&$idcounter, $expandsubtree = false) {
     }
 
     /**
@@ -422,9 +422,11 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         }
     }
 
-    public function expand($from, $to, &$idcounter) {
-        for ($i = $from; $i <= $to; $i++) {
-            $this->operands[$i]->expand_all($idcounter);
+    public function expand($from, $to, &$idcounter, $expandsubtree = false) {
+        if ($expandsubtree) {
+            for ($i = $from; $i <= $to; $i++) {
+                $this->operands[$i]->expand_all($idcounter, $expandsubtree);
+            }
         }
 
         if (count($this->operands) <= 2) {
@@ -468,15 +470,17 @@ abstract class qtype_preg_operator extends qtype_preg_node {
 
         // Update operands of this node.
         $this->operands = $operands;
-        $newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+        if ($expandsubtree) {
+        	$newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+        }
 
         if (count($operands) == 1) {
             $this->operands = $newnode->operands;
         }
     }
 
-    public function expand_all(&$idcounter) {
-        $this->expand(0, count($this->operands) - 1, $idcounter);
+    public function expand_all(&$idcounter, $expandsubtree = false) {
+        $this->expand(0, count($this->operands) - 1, $idcounter, $expandsubtree);
     }
 }
 
