@@ -129,9 +129,6 @@ M.preg_authoring_tools_script = (function ($) {
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
 
-                    // Misc.
-                    $("#id_regex_input_header").after('<div id="form_properties"></div>');
-
                     options.oneachpresscallback();
                 });
             },
