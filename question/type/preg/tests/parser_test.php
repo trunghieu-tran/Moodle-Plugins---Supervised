@@ -113,10 +113,20 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === 'a');
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_META);
         $this->assertTrue($root->operands[1]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->operands[1]->position->indfirst === 2 && $root->operands[1]->position->indlast === 1);
+        $this->assertTrue($root->position->indfirst === 0 && $root->position->indlast === 1);
         $this->assertTrue($root->nullable === true);
         $this->assertTrue($root->firstpos == array(2));
         $this->assertTrue($root->lastpos == array(2));
         $this->assertTrue($followpos === array());
+        $parser = $this->run_parser('|a', $errornodes);
+        $root = $parser->get_root();
+        $followpos = $parser->get_followpos();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->position->indfirst === 0 && $root->position->indlast === 1);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->operands[0]->position->indfirst === 0 && $root->operands[0]->position->indlast === -1);
     }
     function test_parser_grouping() {
         $parser = $this->run_parser('(?:ab)', $errornodes);

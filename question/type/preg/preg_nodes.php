@@ -56,6 +56,24 @@ class qtype_preg_position {
         $this->colfirst = $colfirst;
         $this->collast = $collast;
     }
+
+    public function compose($with) {
+        return new qtype_preg_position($this->indfirst, $with->indlast,
+                                       $this->linefirst, $with->linelast,
+                                       $this->colfirst, $with->collast);
+    }
+
+    public function add_chars_left($count) {
+        return new qtype_preg_position($this->indfirst + $count, $this->indlast,
+                                       $this->linefirst, $this->linelast,
+                                       $this->colfirst + $count, $this->collast);
+    }
+
+    public function add_chars_right($count) {
+        return new qtype_preg_position($this->indfirst, $this->indlast + $count,
+                                       $this->linefirst, $this->linelast,
+                                       $this->colfirst, $this->collast + $count);
+    }
 }
 
 /**
@@ -449,20 +467,6 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         }
         $operands[] = $newnode;
 
-        // Fix the new node position.
-        if ($from > 0) {
-            $left = $this->operands[$from - 1];
-            $newnode->position->indfirst = $left->position->indlast + 1;
-            $newnode->position->linefirst = $left->position->linefirst;
-            $newnode->position->colfirst = $left->position->colfirst + 1;
-        }
-        if ($to < count($this->operands) - 1) {
-            $right = $this->operands[$to + 1];
-            $newnode->position->indlast = $right->position->indfirst - 1;
-            $newnode->position->linelast = $right->position->linelast;
-            $newnode->position->collast = $right->position->collast - 1;
-        }
-
         // Copy 'right' operands.
         for ($i = $to + 1; $i < count($this->operands); $i++) {
             $operands[] = $this->operands[$i];
@@ -473,6 +477,13 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         if ($expandsubtree) {
         	$newnode->expand(0, count($newnode->operands) - 2, $idcounter);
         }
+
+        // Fix the new node position.
+        $left = $newnode->operands[0];
+        $right = $newnode->operands[count($newnode->operands) - 1];
+        $newnode->position = new qtype_preg_position($left->position->indfirst, $right->position->indlast,
+                                                     $left->position->linefirst, $right->position->linelast,
+                                                     $left->position->colfirst, $right->position->collast);
 
         if (count($operands) == 1) {
             $this->operands = $newnode->operands;
