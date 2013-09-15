@@ -81,10 +81,7 @@
       * @param operand the node for expression inside parenthesis
       */
     protected function create_parens_node($operator, $operand, $closeparen) {
-        $position = new qtype_preg_position($operator->position->indfirst, $closeparen->position->indlast,
-                                            $operator->position->linefirst, $closeparen->position->linelast,
-                                            $operator->position->colfirst, $closeparen->position->collast);
-
+        $position = $operator->position->compose($closeparen->position);
         if ($operator->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
             $result = $operand;
             $result->set_user_info($position, $operand->userinscription);
@@ -97,21 +94,16 @@
     }
 
     protected function create_cond_subexpr_assertion_node($node, $assertnode, $exprnode, $closeparen) {
-        $position = new qtype_preg_position($node->position->indfirst, $node->position->indlast,
-                                            $node->position->linefirst, $node->position->linelast,
-                                            $node->position->colfirst, $node->position->collast);
         if ($assertnode === null) {
             $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $assertnode->set_user_info($position);
+            $assertnode->set_user_info($node->position->add_chars_right(-1));
         }
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $exprnode->set_user_info($position);
+            $exprnode->set_user_info($node->position->add_chars_left(1));
         }
 
-        $position = new qtype_preg_position($node->position->indfirst, $closeparen->position->indlast,
-                                            $node->position->linefirst, $closeparen->position->linelast,
-                                            $node->position->colfirst, $closeparen->position->collast);
+        $position = $node->position->compose($closeparen->position);
 
         if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $node->operands = $exprnode->operands;
@@ -140,17 +132,12 @@
     }
 
     protected function create_cond_subexpr_other_node($node, $exprnode, $closeparen) {
-        $position = new qtype_preg_position($node->position->indfirst, $node->position->indlast,
-                                            $node->position->linefirst, $node->position->linelast,
-                                            $node->position->colfirst, $node->position->collast);
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $exprnode->set_user_info($position, new qtype_preg_userinscription());
+            $exprnode->set_user_info($node->position->add_chars_left(1));
         }
 
-        $position = new qtype_preg_position($node->position->indfirst, $closeparen->position->indlast,
-                                            $node->position->linefirst, $closeparen->position->linelast,
-                                            $node->position->colfirst, $closeparen->position->collast);
+        $position = $node->position->compose($closeparen->position);
 
         if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $node->operands = $exprnode->operands;
@@ -249,8 +236,7 @@
 }
 %parse_failure {
     if (count($this->errornodes) === 0) {
-        $position = new qtype_preg_position(-1, -1, -1, -1);
-        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, null, $position, null);
+        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, null, new qtype_preg_position(), null);
     }
 }
 %nonassoc ERROR_PREC_SHORTEST.
@@ -302,10 +288,7 @@ expr(A) ::= expr(B) expr(C). [CONC] {
         A->operands[] = B;
         A->operands[] = C;
     }
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
-    A->set_user_info($position);
+    A->set_user_info(B->position->compose(C->position));
 }
 
 expr(A) ::= expr(B) ALT expr(C). {
@@ -323,81 +306,63 @@ expr(A) ::= expr(B) ALT expr(C). {
         A->operands[] = B;
         A->operands[] = C;
     }
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
-    A->set_user_info($position, new qtype_preg_userinscription('|'));
+    A->set_user_info(B->position->compose(C->position), new qtype_preg_userinscription('|'));
 }
 
 expr(A) ::= expr(B) ALT(C). [ALT_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
     if (B->type == qtype_preg_node::TYPE_LEAF_META && B->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = B;
     } else if (B->type == qtype_preg_node::TYPE_NODE_ALT) {
         if (!self::is_alt_nullable(B)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $epsleaf->set_user_info($position);
+            $epsleaf->set_user_info(C->position->add_chars_left(1));
             B->operands[] = $epsleaf;
         }
         A = B;
     } else {
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $epsleaf->set_user_info($position);
+        $epsleaf->set_user_info(C->position->add_chars_left(1));
         A = new qtype_preg_node_alt();
         A->operands[] = B;
         A->operands[] = $epsleaf;
     }
-    A->set_user_info($position, new qtype_preg_userinscription('|'));
+    A->set_user_info(B->position->compose(C->position), new qtype_preg_userinscription('|'));
 }
 
 expr(A) ::= ALT(B) expr(C). [ALT_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
     if (C->type == qtype_preg_node::TYPE_LEAF_META && C->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = C;
     } else if (C->type == qtype_preg_node::TYPE_NODE_ALT) {
         if (!self::is_alt_nullable(C)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $epsleaf->set_user_info($position);
+            $epsleaf->set_user_info(B->position->add_chars_right(-1));
             C->operands = array_merge(array($epsleaf), C->operands);
         }
         A = C;
     } else {
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $epsleaf->set_user_info($position);
+        $epsleaf->set_user_info(B->position->add_chars_right(-1));
         A = new qtype_preg_node_alt();
         A->operands[] = $epsleaf;
         A->operands[] = C;
     }
-    A->set_user_info($position, new qtype_preg_userinscription('|'));
+    A->set_user_info(B->position->compose(C->position), new qtype_preg_userinscription('|'));
 }
 
 expr(A) ::= ALT(B). [ALT_SHORTEST] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
     A = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-    A->set_user_info($position, new qtype_preg_userinscription('|'));
+    A->set_user_info(B->position, new qtype_preg_userinscription('|'));
 }
 
 expr(A) ::= expr(B) QUANT(C). {
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
     A = C;
-    A->set_user_info($position, C->userinscription);
+    A->set_user_info(B->position->compose(C->position), C->userinscription);
     A->operands[0] = B;
 }
 
 expr(A) ::= OPENBRACK(B) CLOSEBRACK(C). {
-    $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                        B->position->linefirst, C->position->linelast,
-                                        B->position->colfirst, C->position->collast);
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-    $emptynode->set_user_info($position, new qtype_preg_userinscription(B->userinscription . ')'));
+    $emptynode->set_user_info(C->position->add_chars_right(-1), new qtype_preg_userinscription(B->userinscription . ')'));
     A = $this->create_parens_node(B, $emptynode, C);
 }
 

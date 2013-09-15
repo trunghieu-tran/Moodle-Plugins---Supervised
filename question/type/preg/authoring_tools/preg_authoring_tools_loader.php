@@ -31,9 +31,12 @@ function qtype_preg_get_json_array() {
     $indlast = optional_param('indlast', null, PARAM_INT);
 
     $rankdirlr = $treeorientation == 'horizontal' ? true : false;
-    $selection = ($indfirst !== null && $indlast !== null)
-               ? new qtype_preg_position($indfirst, $indlast)
-               : null;
+    if ($indfirst == -1 && $indlast == -1) {
+        // A hack for situations like |a - the fictive emptiness will be selected otherwise.
+        $indfirst = -2;
+        $indlast = -2;
+    }
+    $selection = new qtype_preg_position($indfirst, $indlast);
 
     // Array with authoring tools
     $tools = array(

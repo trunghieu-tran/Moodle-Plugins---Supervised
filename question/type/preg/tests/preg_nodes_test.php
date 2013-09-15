@@ -213,12 +213,23 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_regex_handler("abcd");
         $idcounter = 1000;
         $node = $handler->get_ast_root();
-        $node->expand(0, 2, $idcounter);
+        $node->expand(0, 2, $idcounter, true);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 3);
         $node = $node->operands[0];
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 2);
         $node = $node->operands[0];
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && $node->position->indfirst == 0 && $node->position->indlast == 1);
+    }
+
+    function test_expand_emptiness() {
+        $handler = new qtype_preg_regex_handler("a|b|");
+        $idcounter = 1000;
+
+        $root = $handler->get_ast_root();
+        $root->expand(1, 2, $idcounter);
+        $this->assertTrue($root->operands[1]->operands[0]->position->indfirst == 2 && $root->operands[1]->operands[0]->position->indlast == 2);
+        $this->assertTrue($root->operands[1]->operands[1]->position->indfirst == 4 && $root->operands[1]->operands[1]->position->indlast == 3);
+        $this->assertTrue($root->operands[1]->position->indfirst == 2 && $root->operands[1]->position->indlast == 3);
     }
 
     function test_node_by_regex_fragment_one_char() {
@@ -248,9 +259,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $indexfirst = 0; $indexlast = 2;
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'c');
-        $node = $node->operands[0];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[0]->flags[0][0]->data == 'a' && $node->operands[1]->flags[0][0]->data == 'b');
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 3 &&
+                          $node->operands[0]->flags[0][0]->data == 'a' && $node->operands[2]->flags[0][0]->data == 'c');
     }
 
     function test_node_by_regex_fragment_concat_subpatt_quant() {
@@ -275,12 +285,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $indexfirst = 1; $indexlast = 4;     // Exact concatenation selection.
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'd');
-        $node = $node->operands[0];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'c');
-        $node = $node->operands[0];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2);
-        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'a' && $node->operands[1]->flags[0][0]->data == 'b');
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 4 &&
+                          $node->operands[0]->flags[0][0]->data == 'a' && $node->operands[3]->flags[0][0]->data == 'd');
 
         $indexfirst = 2; $indexlast = 3;     // Middle operands to be expanded.
         $root = clone $handler->get_ast_root();
@@ -308,21 +314,15 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && count($node->operands) == 2);
-        $node = $node->operands[1];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'e');
-        $node = $node->operands[0];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2);
-        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'c' && $node->operands[1]->flags[0][0]->data == 'd');
+        $this->assertTrue($node->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands[0]->operands) == 2);
+        $this->assertTrue($node->operands[1]->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands[1]->operands) == 3);
 
         $indexfirst = 1; $indexlast = 3;     // Selection to be expanded: 'b|c'.
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && count($node->operands) == 2);
         $node = $node->operands[1];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2 && $node->operands[1]->flags[0][0]->data == 'e');
-        $node = $node->operands[0];
-        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 2);
-        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'c' && $node->operands[1]->flags[0][0]->data == 'd');
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT && count($node->operands) == 3 && $node->operands[2]->flags[0][0]->data == 'e');
     }
 
     function test_node_by_regex_fragment_multiline() {
@@ -368,5 +368,31 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT);
+    }
+
+    function test_node_by_regex_fragment_emptiness() {
+        $handler = new qtype_preg_regex_handler("a|b|");
+        $idcounter = 1000;
+
+        $indexfirst = 3; $indexlast = 3;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && $node->position->indfirst == 2 && $node->position->indlast == 3);
+        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'b');
+        $this->assertTrue($node->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+
+        $indexfirst = 2; $indexlast = 3;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && $node->position->indfirst == 2 && $node->position->indlast == 3);
+        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'b');
+        $this->assertTrue($node->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+
+        $indexfirst = 1; $indexlast = 1;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && $node->position->indfirst == 0 && $node->position->indlast == 2);
+        $this->assertTrue($node->operands[0]->flags[0][0]->data == 'a');
+        $this->assertTrue($node->operands[1]->flags[0][0]->data == 'b');
     }
 }
