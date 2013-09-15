@@ -51,17 +51,17 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         return 'regex_test';
     }
 
-    public function generate_json(&$json, $id = -1) {
+    public function generate_json(&$json) {
         if ($this->regex == '') {
-            $this->generate_json_for_empty_regex($json, $id);
+            $this->generate_json_for_empty_regex($json);
         } else if ($this->errormsgs !== null) {
-            $this->generate_json_for_unaccepted_regex($json, $id);
+            $this->generate_json_for_unaccepted_regex($json);
         } else {
-            $this->generate_json_for_accepted_regex($json, $id);
+            $this->generate_json_for_accepted_regex($json);
         }
     }
 
-    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+    public function generate_json_for_accepted_regex(&$json) {
         // Generate colored string showing matched and non-matched parts of response.
         $strings = explode("\n", $this->strings);
         $result = '';
@@ -71,7 +71,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $json[$this->json_key()] = $result;
     }
 
-    public function generate_json_for_unaccepted_regex(&$json, $id = -1) {
+    public function generate_json_for_unaccepted_regex(&$json) {
         $result = '';
         foreach ($this->errormsgs as $error) {
             $result .= '<br />' . $error;
@@ -79,7 +79,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $json[$this->json_key()] = $result;
     }
 
-    public function generate_json_for_empty_regex(&$json, $id = -1) {
+    public function generate_json_for_empty_regex(&$json) {
         $json[$this->json_key()] = '';
     }
 }

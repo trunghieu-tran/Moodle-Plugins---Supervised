@@ -86,7 +86,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     /**
      * Overloaded from qtype_preg_authoring_tool.
      */
-    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+    public function generate_json_for_accepted_regex(&$json) {
+        $id = $this->selectednode !== null
+            ? $this->selectednode->id
+            : -1;
         $graph = $this->create_graph($id);
         $dotscript = $graph->create_dot();
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
