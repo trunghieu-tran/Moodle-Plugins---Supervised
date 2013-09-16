@@ -162,7 +162,13 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
-        self.load_content(-1);
+        var selection = self.regex_input.textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        self.load_content(-1, indfirst, indlast);
         $('#id_regex_check_strings').click();
     },
 
@@ -200,7 +206,13 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        self.load_content(-1);
+        var selection = self.regex_input.textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        self.load_content(-1, indfirst, indlast);
     },
 
     tree_node_clicked : function (e) {
@@ -209,13 +221,13 @@ M.preg_authoring_tools_script = (function ($) {
             indfirst = tmp[1],
             indlast = tmp[2];
         self.regex_input.textrange('set', indfirst, indlast - indfirst + 1);
-        $('#id_regex_show').click();
+        self.load_content(-1, indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
         self.regex_input.textrange('set', 0, 0);
-        $('#id_regex_show').click();
+        self.load_content(-1);
     },
 
     upd_tools_success : function (data, textStatus, jqXHR) {
@@ -312,13 +324,10 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id) {  // TODO: get rid of id
-        var selection = self.regex_input.textrange('get'),
-            indfirst = selection.start,
-            indlast = selection.end - 1;
-        if (indlast < indfirst) {
-            indfirst = -1;
-            indlast = -1;
+    load_content : function (id, indfirst, indlast) {  // TODO: get rid of id
+        if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
+            // No selection at all.
+            indfirst = indlast = -2;
         }
 
         // Update the fields.
