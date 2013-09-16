@@ -227,6 +227,21 @@ abstract class qtype_preg_node {
      * to the indexes of the found subtree.
      */
     public function node_by_regex_fragment(&$indexfirst, &$indexlast, &$idcounter) {
+        if ($indexfirst - $indexlast == 1) {
+            // Special case: fictive leaves.
+            $current = array($this);
+            while (count($current) > 0) {
+                $tmp = array_pop($current);
+                if ($tmp->position->indfirst == $indexfirst && $tmp->position->indlast == $indexlast) {
+                    return $tmp;
+                }
+                if (is_a($tmp, 'qtype_preg_operator')) {
+                    $current = array_merge($current, $tmp->operands);
+                }
+            }
+            return null;
+        }
+
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
 

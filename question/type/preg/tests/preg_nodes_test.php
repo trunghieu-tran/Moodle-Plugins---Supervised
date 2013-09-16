@@ -394,5 +394,18 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT && $node->position->indfirst == 0 && $node->position->indlast == 2);
         $this->assertTrue($node->operands[0]->flags[0][0]->data == 'a');
         $this->assertTrue($node->operands[1]->flags[0][0]->data == 'b');
+
+        $indexfirst = 4; $indexlast = 3;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY && $node->position->indfirst == 4 && $node->position->indlast == 3);
+
+        $handler = new qtype_preg_regex_handler("|a|b");
+        $idcounter = 1000;
+
+        $indexfirst = 0; $indexlast = -1;
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment($indexfirst, $indexlast, $idcounter);
+        $this->assertTrue($node->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY && $node->position->indfirst == 0 && $node->position->indlast == -1);
     }
 }
