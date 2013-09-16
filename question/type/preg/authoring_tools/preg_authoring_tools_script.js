@@ -75,7 +75,9 @@ M.preg_authoring_tools_script = (function ($) {
                     type: "GET",
                     dataType: "text"
                 }).done(function( responseText, textStatus, jqXHR ) {
+                    var tmpM = M;
                     $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
+                    M = $.extend(M, tmpM);
 
                     // Create a clone of the textarea.
                     var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:none;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
@@ -140,6 +142,7 @@ M.preg_authoring_tools_script = (function ($) {
                         });
                         $('#' + new_id).change(function (e) {
                             $('#' + old_id).val($(this).val());
+                            M.form.updateFormState("mform1");
                         });
                     });
 
