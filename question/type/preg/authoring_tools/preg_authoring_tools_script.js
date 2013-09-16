@@ -218,10 +218,11 @@ M.preg_authoring_tools_script = (function ($) {
     tree_node_clicked : function (e) {
         e.preventDefault();
         var tmp = e.target.id.split(','),
+            id = tmp[0],
             indfirst = tmp[1],
             indlast = tmp[2];
         self.regex_input.textrange('set', indfirst, indlast - indfirst + 1);
-        self.load_content(-1, indfirst, indlast);
+        self.load_content(id, indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
