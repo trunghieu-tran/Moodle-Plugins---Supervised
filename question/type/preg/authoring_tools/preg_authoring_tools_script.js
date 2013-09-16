@@ -93,7 +93,7 @@ M.preg_authoring_tools_script = (function ($) {
                                        '</div>';
 
                     $('#id_regex_text').replaceWith(iframeMarkup);
-                    $("#id_regex_resizable").resizable();
+                    $('#id_regex_resizable').resizable();
 
                     // Deal with iframe.
                     var iframe = $('#id_regex_text_replacement');
@@ -108,12 +108,12 @@ M.preg_authoring_tools_script = (function ($) {
                     // Add handlers for the buttons.
                     $('#id_regex_show').click(self.btn_show_clicked);
                     $('#id_regex_save').click(self.btn_save_clicked);
-                    $("#id_regex_cancel").click(self.btn_cancel_clicked);
+                    $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
                     // Add handlers for the radiobuttons.
-                    $("#fgroup_id_tree_orientation_radioset input").change(self.rbtn_changed);
-                    $("#fgroup_id_charset_process_radioset input").change(self.rbtn_changed);
+                    $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
+                    $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
                     self.regex_input = textarea;
@@ -121,6 +121,27 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
+
+                    // Add some question options.
+                    $.each(['engine', 'notation', 'exactmatch', 'usecase'], function(i, option) {
+                        var fitem_id = 'fitem_id_' + option,
+                            old_id = 'id_' + option,
+                            new_id = old_id + '_auth',
+                            clone = $('#' + fitem_id).clone();
+
+                        // Change id and append to the DOM.
+                        clone.find('#' + old_id).attr('id', new_id);
+                        $('#id_regex_tree_header').before(clone);
+                        $('#' + new_id).val($('#' + old_id).val());
+
+                        // Add event handlers.
+                        $('#' + old_id).change(function (e) {
+                            $('#' + new_id).val($(this).val());
+                        });
+                        $('#' + new_id).change(function (e) {
+                            $('#' + old_id).val($(this).val());
+                        });
+                    });
 
                     options.oneachpresscallback();
                 });
@@ -133,8 +154,6 @@ M.preg_authoring_tools_script = (function ($) {
                 // Put the testing data into ui.
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
-
-                options.display_question_options();
                 self.load_content(-1);
                 $('#id_regex_check_strings').click();
             },
@@ -145,15 +164,6 @@ M.preg_authoring_tools_script = (function ($) {
 
             oncancelclicked : function () {
                 $('#id_regex_cancel').click();
-            },
-
-            display_question_options : function () {
-                $('#form_properties').html('<div>' +
-                                           'engine: '     + $('#id_engine :selected').text() + '<br/>' +
-                                           'usecase: '    + $('#id_usecase :selected').text() + '<br/>' +
-                                           'exactmatch: ' + $('#id_exactmatch :selected').text() + '<br/>' +
-                                           'notation: '   + $('#id_notation :selected').text() +
-                                           '</div>');
             }
         };
 
@@ -391,11 +401,11 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     get_orientation : function () {
-        return $("#fgroup_id_tree_orientation_radioset input:checked").val();
+        return $('#fgroup_id_tree_orientation_radioset input:checked').val();
     },
 
     get_displayas : function () {
-        return $("#fgroup_id_charset_process_radioset input:checked").val();
+        return $('#fgroup_id_charset_process_radioset input:checked').val();
     }
 };
 
