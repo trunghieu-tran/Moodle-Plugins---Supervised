@@ -125,6 +125,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
 
                     // Add some question options.
+                    var header = $('#id_regex_matching_options_header').find('.fcontainer');
                     $.each(['engine', 'notation', 'exactmatch', 'usecase'], function(i, option) {
                         var fitem_id = 'fitem_id_' + option,
                             old_id = 'id_' + option,
@@ -133,7 +134,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                         // Change id and append to the DOM.
                         clone.find('#' + old_id).attr('id', new_id);
-                        $('#id_regex_tree_header').before(clone);
+                        header.append(clone);
                         $('#' + new_id).val($('#' + old_id).val());
 
                         // Add event handlers.
