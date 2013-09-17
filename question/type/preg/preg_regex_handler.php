@@ -223,6 +223,11 @@ class qtype_preg_regex_handler {
     /** Regex parser. */
     protected $parser = null;
 
+    /** @var int Number of characters, added at the start of regular expression by internal code.*/
+    protected addedatstart = 0;
+    /** @var int Number of characters, added at the end of regular expression by internal code.*/
+    protected addedatend = 0;
+
     /** The root of the regex abstract syntax tree, consists of qtype_preg_node childs. */
     protected $ast_root = null;
     /** The root of the regex definite syntax tree, consists of xxx_preg_node childs where xxx is engine name. */
@@ -260,6 +265,8 @@ class qtype_preg_regex_handler {
             // Add line break before last bracket since regex may end in the comment in extended notation.
             // Line breaks will be ignored in other notations, so it's ok to add it anyway.
             $regex = '^(?:'.$regex."\n)$";
+            $this->addedatstart = 4;
+            $this->addedatend = 4;
         }
 
         // Look for unsupported modifiers.
