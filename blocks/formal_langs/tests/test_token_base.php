@@ -26,6 +26,7 @@
 
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
 
  /**
   * This class contains the test cases for the is_same() function of token_base.
@@ -64,3 +65,25 @@ class block_formal_langs_token_base_is_same extends PHPUnit_Framework_TestCase {
         $this->assertFalse($answer->is_same($response, $options), 'Tokens with inequal types are detected as equal');
     }
 }
+
+/**
+ * This class is used for testing token stream
+ */
+class block_formal_langs_token_stream_test extends PHPUnit_Framework_TestCase {
+
+    // Test cloning facilities (see issue 227 for explanations)
+    public function test_clone() {
+        $lang = new block_formal_langs_language_c_language();
+        $stream = $lang->create_from_string('id1 id2');
+        $tokenstream1  = $stream->stream;
+        $tokenstream2  = clone $tokenstream1;
+        // Trying to change first stream, second stream should become different
+        /** @var block_formal_langs_token_base $token1 */
+        /** @var block_formal_langs_token_base $token2 */
+        $token1 = $tokenstream1->tokens[1];
+        $token2 = $tokenstream2->tokens[1];
+        $token1->set_token_index(22);
+        $this->assertFalse($token1->token_index() == $token2->token_index());
+    }
+}
+
