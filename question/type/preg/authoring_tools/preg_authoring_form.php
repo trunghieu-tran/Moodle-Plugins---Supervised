@@ -43,7 +43,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div align="center"><h2>' . get_string('authoring_form_page_header', 'qtype_preg') . '</h2></div>');
 
         // Add the editing widgets.
-        $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header_text', 'qtype_preg'));
+        $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header', 'qtype_preg'));
         $mform->setExpanded('regex_input_header', 1);
         $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
         $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 150, 'rows' => 1));
@@ -62,6 +62,11 @@ class qtype_preg_authoring_form extends moodleform {
         $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_flags', 'qtype_preg'), 'flags', null);
         $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
         $mform->setDefault('authoring_tools_charset_process', 'userinscription');
+
+        // Add matching options.
+        $mform->addElement('header', 'regex_matching_options_header', get_string('authoring_form_options_header', 'qtype_preg'));
+        $mform->setExpanded('regex_matching_options_header', 1);
+        $mform->addHelpButton('regex_matching_options_header', 'authoring_form_options_header', 'qtype_preg');
 
         // Add syntax tree tool.
         $mform->addElement('header', 'regex_tree_header', get_string('syntax_tree_tool', 'qtype_preg'));
