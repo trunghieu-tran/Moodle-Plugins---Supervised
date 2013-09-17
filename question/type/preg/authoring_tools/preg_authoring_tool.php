@@ -39,7 +39,6 @@ interface qtype_preg_i_authoring_tool {
 
 class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
-    public $notation = null;
     // Regex text selection borders, an instance of qtype_preg_position.
     public $selection = null;
 }
@@ -66,17 +65,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $options = new qtype_preg_authoring_tools_options();
         }
         $options->preserveallnodes = true;
-        // Convert to actually used notation if necessary.
-        if ($options->engine !== null && $options->notation !== null) {
-            $engineclass = 'qtype_preg_' . $options->engine;
-            $queryengine = new $engineclass;
-            $usednotation = $queryengine->used_notation();
-            if ($options->notation != $usednotation) {
-                $notationclass = 'qtype_preg_notation_' . $options->notation;
-                $notationobj = new $notationclass($regex);
-                $regex = $notationobj->convert_regex($usednotation);
-            }
-        }
 
         parent::__construct($regex, $options);
 
