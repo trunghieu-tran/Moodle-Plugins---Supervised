@@ -37,44 +37,43 @@
 defined('MOODLE_INTERNAL') || die();
 
 //Other necessary requires
+require_once($CFG->dirroot . '/question/type/correctwriting/abstract_analyzer.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/syntax_analyzer.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/sequence_mistakes.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
 
 
-class  qtype_correctwriting_sequence_analyzer {
+class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstract_analyzer {
 
-    protected $language;             // Language object - contains scaner, parser etc
-    protected $errors;               // Array of error objects - teacher errors when entering answer
+
+    protected $errors;               // Array of error objects - teacher errors when entering answer.
 
     /**
-     * A string pair with best matches, which can be passed to sequence analyzer
+     * A string pair with best matches, which can be passed to sequence analyzer.
      * @var qtype_correctwriting_string_pair
      */
     protected $bestmatchpair;
-    protected $mistakes;             // Array of mistake objects - student errors (structural errors)
+    protected $mistakes;             // Array of mistake objects - student errors (structural errors).
 
-    private   $fitness;              // Fitness for response
+    private   $fitness;              // Fitness for response.
 
-    /**
-     * Used question by analyzer
-     * @var qtype_correctwriting_question
-     */
-    private   $question;
+    public function name() {
+        return 'sequence_analyzer';
+    }
 
     /**
-     * Do all processing and fill all member variables
+     * Do all processing and fill all member variables.
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
     public function __construct($question, $bestmatchpair, $language) {
         $this->bestmatchpair =  $bestmatchpair;
-        // If question is set null we suppose this is a unit-test mode and don't do stuff
+        // If question is set null we suppose this is a unit-test mode and don't do stuff.
         if ($question != null) {
             $this->language = $language;
             $this->question = $question;
             if ($this->bestmatchpair->correctedstring() == null) {
-                // Scan errors by syntax_analyzer
+                // Scan errors by syntax_analyzer.
                 if ($language->could_parse()) {
                     $pair = $bestmatchpair->copy_with_lcs(null);
                     $analyzer = new qtype_correctwriting_syntax_analyzer($question, $pair, $language);
@@ -102,6 +101,11 @@ class  qtype_correctwriting_sequence_analyzer {
         //NOTE: if response is null just check for errors using syntax analyzer- Mamontov (Done)
         //NOTE: if some stage create errors, stop processing right there (done?)
     }
+
+    protected function analyze() {
+        // TODO - replace this stub with actual code converting this class for refactoring.
+    }
+
     /**
      * Scans for a mistakes in response, computing lcs and
      * performing syntax analysis
@@ -468,8 +472,8 @@ class  qtype_correctwriting_sequence_analyzer {
     * Fitness is negative or zero (no errors, full match)
     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
     */
-    public function fitness() {
-        return $this->fitness;
+    public function fitness($mistakes) {
+        return $this->fitness; //TODO - change to work under new interface.
     }
 
     public function mistakes() {
@@ -484,6 +488,15 @@ class  qtype_correctwriting_sequence_analyzer {
         return $this->errors;
     }
 
-    //Other necessary access methods
+    public function supported_hints() {
+        return array('whatis', 'wheretxt', 'wherepic');
+    }
+    // Form and DB related functions.
+    public function float_form_fields() {
+        return array(array ('name' => 'absentmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
+                     array ('name' =>'addedmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
+                     array ('name' =>'movedmistakeweight', 'default' => 0.05, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true)    //Moved token mistake weight field
+                    );
+    }
 }
 ?>
