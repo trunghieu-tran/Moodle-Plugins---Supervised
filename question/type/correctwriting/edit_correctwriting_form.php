@@ -207,8 +207,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         // A replace for standard get_per_answer_fields, extending a fields for
         // answer and moving fraction to a next line
         $repeated = array();
-        $repeated[] = $mform->createElement('text', 'answer',
-            $label, array('size' => 80));
+        $repeated[] = $mform->createElement('textarea', 'answer',
+            $label, array('rows' => 1, 'cols' => 80));
         $repeated[] = $mform->createElement('select', 'fraction',
             get_string('grade'), $gradeoptions);
         /**
