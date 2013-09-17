@@ -407,6 +407,7 @@ INC = "#include"
 <YYINITIAL> '                            { $this->enterbufferedstate(self::CHARACTER); break; }
 <YYINITIAL> L\"                          { $this->enterbufferedstate(self::STRING); break; }
 <YYINITIAL> \"                           { $this->enterbufferedstate(self::STRING); break; }
+<YYINITIAL> [\n\r]                       { }
 <YYINITIAL> .                            { if (!$this->is_white_space($this->yytext())) { $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext()); } break; }
 <MULTILINE_COMMENT>   \*/                { return $this->leavebufferedstate('multiline_comment');  }
 <MULTILINE_COMMENT>   .                  { $this->append($this->yytext()); break;  }
