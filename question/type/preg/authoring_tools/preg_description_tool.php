@@ -102,7 +102,7 @@ class qtype_preg_description_state {
 /**
  * Options, for generating description - affects scanning, parsing, description genetating.
  */
-class qtype_preg_description_options extends qtype_preg_handling_options {
+class qtype_preg_description_options extends qtype_preg_authoring_tools_options {
 
     /** @var bool use userinscription for charset description instead of flags */
     public $charsetuserinscription = false;
@@ -129,8 +129,11 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param string $regex - regular expression to handle.
      * @param object $options - options to handle regex, i.e. any necessary additional parameters.
      */
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
-        parent::__construct($regex, $options, $engine, $notation, $selection);
+    public function __construct($regex = null, $options = null) {
+        if ($options === null) {
+            $options = new qtype_preg_description_options();
+        }
+        parent::__construct($regex, $options);
         $this->state = new qtype_preg_description_state();
     }
 

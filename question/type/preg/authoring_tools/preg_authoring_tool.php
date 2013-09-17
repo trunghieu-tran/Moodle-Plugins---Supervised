@@ -37,14 +37,19 @@ interface qtype_preg_i_authoring_tool {
     public function generate_json_for_empty_regex(&$json);
 }
 
+class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
+    public $engine = null;
+    public $notation = null;
+    // Regex text selection borders, an instance of qtype_preg_position.
+    public $selection = null;
+}
+
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
 
     protected static $dotescapecodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
 
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
-    // Regex text selection borders, an instance of qtype_preg_position.
-    protected $selection = null;
     // Updated value of the selection first index.
     protected $newindfirst = -1;
     // Updated value of the selection last index.
@@ -52,22 +57,22 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected $selectednode = null;
 
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
+    public function __construct($regex = null, $options = null) {
         //TODO: move to qtype_preg_regex_handler
         if ($regex === null) {
             return;
         }
         if ($options === null) {
-            $options = new qtype_preg_handling_options();
+            $options = new qtype_preg_authoring_tools_options();
         }
         $options->preserveallnodes = true;
         // Convert to actually used notation if necessary.
-        if ($engine !== null && $notation !== null) {
-            $engineclass = 'qtype_preg_'.$engine;
+        if ($options->engine !== null && $options->notation !== null) {
+            $engineclass = 'qtype_preg_' . $options->engine;
             $queryengine = new $engineclass;
             $usednotation = $queryengine->used_notation();
-            if ($notation != $usednotation) {
-                $notationclass = 'qtype_preg_notation_'.$notation;
+            if ($options->notation != $usednotation) {
+                $notationclass = 'qtype_preg_notation_' . $options->notation;
                 $notationobj = new $notationclass($regex);
                 $regex = $notationobj->convert_regex($usednotation);
             }
@@ -75,13 +80,13 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
         parent::__construct($regex, $options);
 
-        $this->selection = $selection !== null
-                         ? $selection
-                         : new qtype_preg_position();
+        if ($this->options->selection === null) {
+            $this->options->selection = new qtype_preg_position();
+        }
 
         $idcounter = $this->parser->get_max_id() + 1;
-        $this->newindfirst = $this->selection->indfirst;
-        $this->newindlast = $this->selection->indlast;
+        $this->newindfirst = $this->options->selection->indfirst;
+        $this->newindlast = $this->options->selection->indlast;
         $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
         $this->build_dst();
     }
