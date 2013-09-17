@@ -30,7 +30,6 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 /**
@@ -287,37 +286,18 @@ class qtype_preg_question extends question_graded_automatically
                 }
             }
 
-            // Convert to actually used notation if necessary.
+            $matchingoptions->notation = $notation;
+            $matchingoptions->exactmatch = $exact;
+
             $engineclass = 'qtype_preg_'.$engine;
-            $queryengine = new $engineclass;
-            $usednotation = $queryengine->used_notation();
-            // Initialise $notationobj so it won't disappear after condition and could be used later.
-            $notationobj = null;
-            if ($notation !== null && $notation != $usednotation) {// Conversion is necessary.
-                $notationclass = 'qtype_preg_notation_'.$notation;
-                $notationobj = new $notationclass($regex, $matchingoptions);
-                $regex = $notationobj->convert_regex($usednotation);
-                $matchingoptions = $notationobj->convert_options($usednotation);
-            }
-
-            // Modify regex according with question properties.
-            $for_regexp=$regex;
-            if ($exact) {
-                // Grouping is needed in case regexp contains top-level alternations.
-                // Use non-capturing grouping to not mess-up with user subexpression capturing.
-                // Add line break before last bracket since regex may end in the comment in extended notation.
-                // Line breaks will be ignored in other notations, so it's ok to add it anyway.
-                $for_regexp = '^(?:'.$for_regexp."\n)$";
-            }
-
-            $matcher = new $engineclass($for_regexp, $matchingoptions);
+            $matcher = new $engineclass($regex, $matchingoptions);
 
             if ($matcher->errors_exist() && !$hintpossible && $engine != 'php_preg_matcher') {
                 // Custom engine can't handle regex and hints not needed, let's try preg_match instead.
                 $engine = 'php_preg_matcher';
                 require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
                 $engineclass = 'qtype_preg_'.$engine;
-                $newmatcher = new $engineclass($for_regexp, $matchingoptions);
+                $newmatcher = new $engineclass($regex, $matchingoptions);
                 if (!$newmatcher->errors_exist()) {// We still prefer to show error messages from custom engine, since they are much more detailed.
                     $matcher = $newmatcher;
                 }

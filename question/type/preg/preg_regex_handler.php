@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
@@ -71,7 +72,7 @@ class qtype_preg_handling_options {
     public $modifiers = 0;
     /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
-    /** @var boolean TODO. */
+    /** @var boolean Should regex match the entire string (true) or any part of it (false). */
     public $exactmatch = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
@@ -79,6 +80,8 @@ class qtype_preg_handling_options {
     public $expandquantifiers = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
+    /** @var string Notation, in which regex was passed*/
+    public $notation = 'native';
 
     public static function get_all_modifiers() {
         return array(self::MODIFIER_ANCHORED,
@@ -240,6 +243,23 @@ class qtype_preg_regex_handler {
         // Options should exist at least as a default object.
         if ($options === null) {
             $options = new qtype_preg_handling_options();
+        }
+
+        // Convert to actually used notation if necessary.
+        $usednotation = $this->used_notation();
+        if ($options->notation != $usednotation) {
+            $notationclass = 'qtype_preg_notation_' . $options->notation;
+            $notationobj = new $notationclass($regex, $options);
+            $regex = $notationobj->convert_regex($usednotation);
+            $options = $notationobj->convert_options($usednotation);
+        }
+
+        if ($options->exactmatch) {
+            // Grouping is needed in case regexp contains top-level alternations.
+            // Use non-capturing grouping to not mess-up with user subexpression capturing.
+            // Add line break before last bracket since regex may end in the comment in extended notation.
+            // Line breaks will be ignored in other notations, so it's ok to add it anyway.
+            $regex = '^(?:'.$regex."\n)$";
         }
 
         // Look for unsupported modifiers.
