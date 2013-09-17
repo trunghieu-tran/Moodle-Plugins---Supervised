@@ -16,8 +16,8 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
     public $rankdir = false;
 
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null, $selection = null, $rankdirlr = false) {
-        parent::__construct($regex, $options, $engine, $notation, $selection);
+    public function __construct($regex = null, $options = null, $rankdirlr = false) {
+        parent::__construct($regex, $options);
         $this->rankdir = $rankdirlr;
     }
 

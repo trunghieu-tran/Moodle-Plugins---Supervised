@@ -34,8 +34,8 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
  */
 class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_tool {
 
-    public function __construct ($regex = null, $options = null, $engine = null, $notation = null, $selection = null) {
-        parent::__construct($regex, $options, $engine, $notation, $selection);
+    public function __construct ($regex = null, $options = null) {
+        parent::__construct($regex, $options);
     }
 
     /**

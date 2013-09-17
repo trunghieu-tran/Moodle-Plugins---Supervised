@@ -22,7 +22,6 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
  */
 function qtype_preg_get_json_array() {
     $regex = optional_param('regex', '', PARAM_RAW);
-    $id = optional_param('id', '', PARAM_INT);
     $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
@@ -30,25 +29,29 @@ function qtype_preg_get_json_array() {
     $indfirst = optional_param('indfirst', null, PARAM_INT);
     $indlast = optional_param('indlast', null, PARAM_INT);
 
-    $rankdirlr = $treeorientation == 'horizontal' ? true : false;
     if ($indfirst == -1 && $indlast == -1) {
         // A hack for situations like |a - the fictive emptiness will be selected otherwise.
         $indfirst = -2;
         $indlast = -2;
     }
-    $selection = new qtype_preg_position($indfirst, $indlast);
 
     // Array with authoring tools
+    $options = new qtype_preg_authoring_tools_options();
+    $options->engine = $engine;
+    $options->notation = $notation;
+    $options->selection = new qtype_preg_position($indfirst, $indlast);
+
+
     $tools = array(
-        'tree' => new qtype_preg_syntax_tree_tool($regex, null, $engine, $notation, $selection, $rankdirlr),
-        'graph' => new qtype_preg_explaining_graph_tool($regex, null, $engine, $notation, $selection),
-        'description' => new qtype_preg_description_tool($regex, null, $engine, $notation, $selection)
+        'tree' => new qtype_preg_syntax_tree_tool($regex, $options, $treeorientation == 'horizontal'),
+        'graph' => new qtype_preg_explaining_graph_tool($regex, $options),
+        'description' => new qtype_preg_description_tool($regex, $options)
     );
 
     // Fill the json array.
     $json = array();
     foreach($tools as $tool) {
-        $tool->generate_json($json, $id);
+        $tool->generate_json($json);
     }
 
     return $json;
