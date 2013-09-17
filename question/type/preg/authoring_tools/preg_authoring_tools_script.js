@@ -137,6 +137,12 @@ M.preg_authoring_tools_script = (function ($) {
                         // Change id and append to the DOM.
                         clone.find('#' + old_id).attr('id', new_id);
                         header.append(clone);
+
+                        // When an option is changed, update all the tools.
+                        $('#' + new_id).change(function() {
+                            $('#id_regex_show').click();
+                            $('#id_regex_check_strings').click();
+                        });
                     });
 
                     options.oneachpresscallback();
