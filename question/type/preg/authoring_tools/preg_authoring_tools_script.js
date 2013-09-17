@@ -36,6 +36,8 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
+    matching_options : ['engine', 'notation', 'exactmatch', 'usecase'],
+
     TREE_KEY : 'tree_src',
 
     TREE_MAP_KEY : 'map',
@@ -126,7 +128,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add some question options.
                     var header = $('#id_regex_matching_options_header').find('.fcontainer');
-                    $.each(['engine', 'notation', 'exactmatch', 'usecase'], function(i, option) {
+                    $.each(self.matching_options, function(i, option) {
                         var fitem_id = 'fitem_id_' + option,
                             old_id = 'id_' + option,
                             new_id = old_id + '_auth',
@@ -135,16 +137,6 @@ M.preg_authoring_tools_script = (function ($) {
                         // Change id and append to the DOM.
                         clone.find('#' + old_id).attr('id', new_id);
                         header.append(clone);
-                        $('#' + new_id).val($('#' + old_id).val());
-
-                        // Add event handlers.
-                        $('#' + old_id).change(function (e) {
-                            $('#' + new_id).val($(this).val());
-                        });
-                        $('#' + new_id).change(function (e) {
-                            $('#' + old_id).val($(this).val());
-                            M.form.updateFormState("mform1");
-                        });
                     });
 
                     options.oneachpresscallback();
@@ -158,6 +150,11 @@ M.preg_authoring_tools_script = (function ($) {
                 // Put the testing data into ui.
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
+                $.each(self.matching_options, function(i, option) {
+                    var old_id = '#id_' + option,
+                        new_id = old_id + '_auth';
+                    $(new_id).val($(old_id).val());
+                });
                 self.load_content(-1);
                 $('#id_regex_check_strings').click();
             },
@@ -188,9 +185,14 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_save_clicked : function (e) {
         e.preventDefault();
-        var new_regex = self.regex_input.val();
-        self.textbutton_widget.data = new_regex;
+        self.textbutton_widget.data = self.regex_input.val();
+        $.each(self.matching_options, function(i, option) {
+            var old_id = '#id_' + option,
+                new_id = old_id + '_auth';
+            $(old_id).val($(new_id).val());
+        });
         self.textbutton_widget.close_and_set_new_data();
+        M.form.updateFormState("mform1");
     },
 
     btn_cancel_clicked : function (e) {
@@ -206,11 +208,11 @@ M.preg_authoring_tools_script = (function ($) {
             url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
             data: {
                 regex: self.regex_input.val(),
+                engine: $('#id_engine_auth :selected').val(),
+                notation: $('#id_notation_auth :selected').val(),
+                exactmatch: $('#id_exactmatch_auth :selected').val(),
+                usecase: $('#id_usecase_auth :selected').val(),
                 strings: $('#id_regex_match_text').val(),
-                usecase: $('#id_usecase :selected').val(),
-                exactmatch: $('#id_exactmatch :selected').val(),
-                engine: $('#id_engine :selected').val(),
-                notation: $('#id_notation :selected').val(),
                 ajax: true
             },
             success: self.upd_check_strings_success,
