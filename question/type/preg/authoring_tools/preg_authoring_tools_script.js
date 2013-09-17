@@ -251,8 +251,7 @@ M.preg_authoring_tools_script = (function ($) {
         };
     },
 
-    cache_key_for_explaining_tools : function () {
-        var sel = self.selection_indexes();
+    cache_key_for_explaining_tools : function (indfirst, indlast) {
         return '' +
                self.regex_input.val() +
                $('#id_notation_auth').val() +
@@ -261,7 +260,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                self.get_orientation() +
                self.get_displayas() +
-               sel.indfirst + ',' + sel.indlast;
+               indfirst + ',' + indlast;
     },
 
     cache_key_for_testing_tool : function () {
@@ -374,7 +373,7 @@ M.preg_authoring_tools_script = (function ($) {
         $(self.TREE_MAP_ID + ' > area').unbind();
 
         // Check the cache.
-        var k = self.cache_key_for_explaining_tools();
+        var k = self.cache_key_for_explaining_tools(indfirst, indlast);
         cached = self.cache[self.TREE_KEY][k];
         if (cached) {
             self.display_data(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k]);
