@@ -556,8 +556,20 @@ class block_formal_langs_token_stream {
     public $errors;
 
     public function __clone() {
-        $this->tokens = clone $this->tokens;
-        $this->errors = clone $this->errors;
+        // PHP 5.3.3, which is required by Moodle 2.5, supports anonymous functions
+        // so we go for that
+        $clonearray = function($array) {
+            $clone = function($o) {
+                return clone $o;
+            };
+            $result = array();
+            if (is_array($array)) {
+                $result = array_map($clone, $array);
+            }
+            return $result;
+        };
+        $this->tokens = $clonearray($this->tokens);
+        $this->errors = $clonearray($this->errors);
     }
 
     /**
