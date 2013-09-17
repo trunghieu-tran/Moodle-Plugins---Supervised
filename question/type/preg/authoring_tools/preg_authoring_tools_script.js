@@ -296,13 +296,13 @@ M.preg_authoring_tools_script = (function ($) {
         self.display_data(json['id'], t, g, d);
 
         // Update the regex text selection if needed.
-        var newindfirst = json['newindfirst'],
-            newindlast = json['newindlast'] - json['newindfirst'] + 1;
-        if (newindfirst < 0 || json['newindlast'] < json['newindfirst']) {
-            newindfirst = 0;
-            newindlast = 0;
+        indfirst = json['indfirst'];
+        indlast = json['indlast'] - json['indfirst'] + 1;
+        if (indfirst < 0 || json['indlast'] < json['indfirst']) {
+            indfirst = 0;
+            indlast = 0;
         }
-        self.regex_input.textrange('set', newindfirst, newindlast);
+        self.regex_input.textrange('set', indfirst, indlast);
     },
 
     upd_check_strings_success : function (data, textStatus, jqXHR) {
