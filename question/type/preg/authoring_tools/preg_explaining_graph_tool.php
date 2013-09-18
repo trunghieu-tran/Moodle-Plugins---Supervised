@@ -80,7 +80,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * Overloaded from qtype_preg_authoring_tool.
      */
     public function json_key() {
-        return 'graph_src';
+        return 'graph';
     }
 
     /**

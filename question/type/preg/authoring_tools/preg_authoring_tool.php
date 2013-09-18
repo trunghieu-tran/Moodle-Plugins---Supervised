@@ -39,6 +39,8 @@ interface qtype_preg_i_authoring_tool {
 
 class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
+    public $treeorientation = null;
+    public $displayas = null;
     // Regex text selection borders, an instance of qtype_preg_position.
     public $selection = null;
 }
@@ -145,9 +147,16 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     public function generate_json(&$json) {
         $json['regex'] = $this->regex->string();
+        $json['engine'] = $this->options->engine;
+        $json['notation'] = $this->options->notation;
+        $json['exactmatch'] = (int)$this->options->exactmatch;
+        $json['usecase'] = (int)!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
+        $json['treeorientation'] = $this->options->treeorientation;
+        $json['displayas'] = $this->options->displayas;
+        $json['indfirst'] = $this->newindfirst;
+        $json['indlast'] = $this->newindlast;
+
         $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
-        $json['newindfirst'] = $this->newindfirst;
-        $json['newindlast'] = $this->newindlast;
 
         if ($this->regex == '') {
             $this->generate_json_for_empty_regex($json);
