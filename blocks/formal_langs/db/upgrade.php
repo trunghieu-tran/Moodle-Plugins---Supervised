@@ -57,5 +57,32 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $dbman->rename_field($bfl, $uinamefield, 'uiname');
     }
 
+    if ($oldversion < 2013091817) {
+        $dbman = $DB->get_manager();
+        $perms = new xmldb_table('block_formal_langs_perms');
+
+        $field = new xmldb_field('id');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('languageid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('contextid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('visible');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $idpk = new xmldb_key('primary');
+        $idpk->set_attributes(XMLDB_KEY_PRIMARY, array('id'), null, null);
+        $perms->addKey($idpk);
+
+        $dbman->create_table($perms);
+    }
+
     return true;
 }
