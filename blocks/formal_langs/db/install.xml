@@ -20,17 +20,28 @@
             <KEY NAME="primary" TYPE="primary" FIELDS="id" />
         </KEYS>
     </TABLE>
-    <TABLE NAME="block_formal_langs_node_dscr" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="block_formal_langs">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="tablename"/>
-        <FIELD NAME="tablename" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
-        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="tablename" NEXT="number"/>
-        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
-      </KEYS>
-    </TABLE>
+      <TABLE NAME="block_formal_langs_node_dscr" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="block_formal_langs" NEXT="block_formal_langs_perms">
+          <FIELDS>
+              <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="tablename"/>
+              <FIELD NAME="tablename" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
+              <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="tablename" NEXT="number"/>
+              <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
+              <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
+          </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+          </KEYS>
+      </TABLE>
+      <TABLE NAME="block_formal_langs_perms" COMMENT="A permisiions for courses and categories to see languages in list" PREVIOUS="block_formal_langs_node_dscr">
+          <FIELDS>
+              <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="languageid"/>
+              <FIELD NAME="languageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" NEXT="contextid" PREVIOUS="id"/>
+              <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="languageid" NEXT="visible"/>
+              <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="contextid"/>
+          </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+          </KEYS>
+      </TABLE>
   </TABLES>
 </XMLDB>
