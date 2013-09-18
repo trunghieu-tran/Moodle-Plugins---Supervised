@@ -378,12 +378,14 @@ M.preg_authoring_tools_script = (function ($) {
 
         var data = {
             regex: regex,
+            engine: $('#id_engine_auth :selected').val(),
+            notation: $('#id_notation_auth :selected').val(),
+            exactmatch: $('#id_exactmatch_auth :selected').val(),
+            usecase: $('#id_usecase_auth :selected').val(),
+            tree_orientation: tree_orientation,
+            displayas: displayas,
             indfirst: indfirst,
             indlast: indlast,
-            tree_orientation: tree_orientation,
-            notation: $('#id_notation :selected').val(),
-            engine: $('#id_engine :selected').val(),
-            displayas: displayas,
             ajax: true
         };
         $.ajax({

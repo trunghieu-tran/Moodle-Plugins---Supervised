@@ -71,6 +71,8 @@ class qtype_preg_handling_options {
     public $modifiers = 0;
     /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
+    /** @var boolean TODO. */
+    public $exactmatch = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
     /** @var boolean Should parser expand nodes x{m,n} to sequences like xxxx?x?x?x?. */
