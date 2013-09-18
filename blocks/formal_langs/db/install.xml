@@ -6,9 +6,9 @@
   <TABLES>
     <TABLE NAME="block_formal_langs" COMMENT="An language descriptions" NEXT="block_formal_langs_node_dscr">
         <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="ui_name"/>
-            <FIELD NAME="ui_name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="UI name for language" PREVIOUS="id" NEXT="description" />
-            <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Description of language" PREVIOUS="ui_name" NEXT="name" />
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="uiname"/>
+            <FIELD NAME="uiname" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="UI name for language" PREVIOUS="id" NEXT="description" />
+            <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Description of language" PREVIOUS="uiname" NEXT="name" />
             <FIELD NAME="name" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Name for predefined language" PREVIOUS="description" NEXT="scanrules" />
             <FIELD NAME="scanrules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Scan rules for user-defined language" PREVIOUS="name" NEXT="parserules" />
             <FIELD NAME="parserules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Parse rules for user-defined language" PREVIOUS="scanrules" NEXT="version" />
