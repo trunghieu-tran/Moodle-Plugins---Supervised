@@ -22,9 +22,11 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
  */
 function qtype_preg_get_json_array() {
     $regex = optional_param('regex', '', PARAM_RAW);
-    $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
-    $notation = optional_param('notation', '', PARAM_RAW);
     $engine = optional_param('engine', '', PARAM_RAW);
+    $notation = optional_param('notation', '', PARAM_RAW);
+    $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
+    $usecase = (bool)optional_param('usecase', '', PARAM_INT);
+    $treeorientation = optional_param('tree_orientation', '', PARAM_TEXT);
     $displayas = optional_param('displayas', '', PARAM_RAW);
     $indfirst = optional_param('indfirst', null, PARAM_INT);
     $indlast = optional_param('indlast', null, PARAM_INT);
@@ -39,8 +41,11 @@ function qtype_preg_get_json_array() {
     $options = new qtype_preg_authoring_tools_options();
     $options->engine = $engine;
     $options->notation = $notation;
+    $options->exactmatch = $exactmatch;
+    if (!$usecase) {
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_CASELESS);
+    }
     $options->selection = new qtype_preg_position($indfirst, $indlast);
-
 
     $tools = array(
         'tree' => new qtype_preg_syntax_tree_tool($regex, $options, $treeorientation == 'horizontal'),
