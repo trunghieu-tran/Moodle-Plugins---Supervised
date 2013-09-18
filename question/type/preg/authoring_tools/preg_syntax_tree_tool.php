@@ -50,7 +50,7 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
      * Overloaded from qtype_preg_authoring_tool.
      */
     public function generate_json_for_accepted_regex(&$json) {
-        $context = new qtype_preg_dot_node_context(true, new qtype_preg_position($this->newindfirst, $this->newindlast));
+        $context = new qtype_preg_dot_node_context(true, new qtype_preg_position($this->newindfirst, $this->newindlast), $this->addedatstart, $this->addedatend);
         $dotscript = $this->get_dst_root()->dot_script($context, $this->options->treeorientation == 'horizontal');
         $json[$this->json_key()] = array(
             'img' => 'data:image/svg+xml;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'svg')),
