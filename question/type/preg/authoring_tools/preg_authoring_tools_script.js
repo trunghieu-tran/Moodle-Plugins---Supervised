@@ -76,6 +76,9 @@ M.preg_authoring_tools_script = (function ($) {
                     $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
                     M = $.extend(M, tmpM);
 
+                    // Remove the "skip to main content" link.
+                    $(self.textbutton_widget.dialog).find('.skiplinks').remove();
+
                     // Create a clone of the textarea.
                     var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:none;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
                     $('#id_regex_text').each(function() {
