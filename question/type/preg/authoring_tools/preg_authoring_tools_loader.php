@@ -31,12 +31,6 @@ function qtype_preg_get_json_array() {
     $indfirst = optional_param('indfirst', null, PARAM_INT);
     $indlast = optional_param('indlast', null, PARAM_INT);
 
-    if ($indfirst == -1 && $indlast == -1) {
-        // A hack for situations like |a - the fictive emptiness will be selected otherwise.
-        $indfirst = -2;
-        $indlast = -2;
-    }
-
     // Array with authoring tools
     $options = new qtype_preg_authoring_tools_options();
     $options->engine = $engine;

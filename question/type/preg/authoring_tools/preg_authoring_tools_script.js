@@ -228,13 +228,11 @@ M.preg_authoring_tools_script = (function ($) {
             id = tmp[0],
             indfirst = tmp[1],
             indlast = tmp[2];
-        self.regex_input.textrange('set', indfirst, indlast - indfirst + 1);
         self.load_content(id, indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.regex_input.textrange('set', 0, 0);
         self.load_content(-1);
     },
 
@@ -292,16 +290,7 @@ M.preg_authoring_tools_script = (function ($) {
         self.cache_data(k, t, g, d);
 
         // Display the data.
-        self.display_data(json['id'], t, g, d);
-
-        // Update the regex text selection if needed.
-        indfirst = json['indfirst'];
-        indlast = json['indlast'] - json['indfirst'] + 1;
-        if (indfirst < 0 || json['indlast'] < json['indfirst']) {
-            indfirst = 0;
-            indlast = 0;
-        }
-        self.regex_input.textrange('set', indfirst, indlast);
+        self.display_data(json['id'], t, g, d, indfirst, indlast);
     },
 
     upd_check_strings_success : function (data, textStatus, jqXHR) {
@@ -321,7 +310,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Displays given images and description
-    display_data : function (id, t, g, d) {  // TODO: get rid of id
+    display_data : function (id, t, g, d, indfirst, indlast) {  // TODO: get rid of id
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
@@ -358,6 +347,12 @@ M.preg_authoring_tools_script = (function ($) {
             $('#description_handler').html(d);
         }
 
+        var length =  indlast - indfirst + 1;
+        if (indfirst < 0 || indlast < indfirst) {
+            indfirst = Math.max(indfirst, 0);
+            length = 0;
+        }
+        self.regex_input.textrange('set', indfirst, length);
         self.highlight_description(id);
     },
 
@@ -376,7 +371,7 @@ M.preg_authoring_tools_script = (function ($) {
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
         cached = self.cache[self.TREE_KEY][k];
         if (cached) {
-            self.display_data(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k]);
+            self.display_data(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
             return;
         }
 

@@ -41,7 +41,7 @@ class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
     public $treeorientation = null;
     public $displayas = null;
-    // Regex text selection borders, an instance of qtype_preg_position.
+    // Regex text selection borders, an instance of qtype_preg_position. (-2, -2) means no selection.
     public $selection = null;
 }
 
@@ -51,10 +51,12 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
+    protected $originalregex = null;
+
     // Updated value of the selection first index.
-    protected $newindfirst = -1;
+    protected $newindfirst = -2;
     // Updated value of the selection last index.
-    protected $newindlast = -1;
+    protected $newindlast = -2;
 
     protected $selectednode = null;
 
@@ -70,14 +72,22 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
         parent::__construct($regex, $options);
 
+        $this->originalregex = $regex;
+
+        // Deal with the selection.
         if ($this->options->selection === null) {
             $this->options->selection = new qtype_preg_position();
+            $this->options->selection->indfirst = -2;
+            $this->options->selection->indlast = -2;
         }
-
-        $idcounter = $this->parser->get_max_id() + 1;
-        $this->newindfirst = $this->options->selection->indfirst;
-        $this->newindlast = $this->options->selection->indlast;
-        $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
+        if ($this->options->selection->indfirst != -2) {
+            $idcounter = $this->parser->get_max_id() + 1;
+            $this->newindfirst = $this->options->selection->indfirst + $this->addedatstart;
+            $this->newindlast = $this->options->selection->indlast + $this->addedatstart;
+            $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
+            $this->newindfirst -= $this->addedatstart;
+            $this->newindlast -= $this->addedatstart;
+        }
         $this->build_dst();
     }
 
@@ -146,7 +156,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
     }
 
     public function generate_json(&$json) {
-        $json['regex'] = $this->regex->string();
+        $json['regex'] = $this->originalregex;
         $json['engine'] = $this->options->engine;
         $json['notation'] = $this->options->notation;
         $json['exactmatch'] = (int)$this->options->exactmatch;
@@ -158,7 +168,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
         $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
 
-        if ($this->regex == '') {
+        if ($this->originalregex == '') {
             $this->generate_json_for_empty_regex($json);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
             $this->generate_json_for_unaccepted_regex($json);
