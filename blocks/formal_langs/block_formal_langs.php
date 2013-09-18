@@ -84,22 +84,22 @@ class block_formal_langs extends block_base {
         //Map, that checks amount of unique names in table. Populate it with values
         $counts = array();
         foreach($records as $record) {
-            if ($record->name !== null) {//Predefined language, ui_name is actually a language string, so replace it with actual name.
-                $record->ui_name = get_string('lang_' . $record->name , 'block_formal_langs');
+            if ($record->name !== null) {//Predefined language, uiname is actually a language string, so replace it with actual name.
+                $record->uiname = get_string('lang_' . $record->name , 'block_formal_langs');
             }
-            if (array_key_exists($record->ui_name, $counts)) {
-                $counts[$record->ui_name] = $counts[$record->ui_name] + 1;
+            if (array_key_exists($record->uiname, $counts)) {
+                $counts[$record->uiname] = $counts[$record->uiname] + 1;
             } else {
-                $counts[$record->ui_name] = 1;
+                $counts[$record->uiname] = 1;
             }
         }
         //Populate result array
         $result = array();
         foreach($records as $record) {
-            if ($counts[$record->ui_name] > 1) {
-                $result[$record->id] = $record->ui_name . ' ' . $record->version;
+            if ($counts[$record->uiname] > 1) {
+                $result[$record->id] = $record->uiname . ' ' . $record->version;
             } else {
-                $result[$record->id] = $record->ui_name;
+                $result[$record->id] = $record->uiname;
             }
         }
 
@@ -128,7 +128,7 @@ class block_formal_langs extends block_base {
     }
 
     /**
-     * Finds or insers language definition.
+     * Finds or inserts language definition.
      * All fields must be set
      * @param array $language as tuple <ui_name, description, name, scanrules, parserules, version visible>.
      * @return int id of inserted language
