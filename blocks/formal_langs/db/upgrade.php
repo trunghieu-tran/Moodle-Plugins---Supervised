@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+
 
 function xmldb_block_formal_langs_upgrade($oldversion = 0) {
     global $CFG, $DB;
@@ -82,6 +84,10 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $perms->addKey($idpk);
 
         $dbman->create_table($perms);
+    }
+
+    if ($oldversion < 2013091818) {
+        block_formal_langs::sync_contexts_with_config();
     }
 
     return true;
