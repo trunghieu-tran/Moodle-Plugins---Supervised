@@ -14,11 +14,8 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
 
 class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
-    public $rankdir = false;
-
-    public function __construct($regex = null, $options = null, $rankdirlr = false) {
+    public function __construct($regex = null, $options = null) {
         parent::__construct($regex, $options);
-        $this->rankdir = $rankdirlr;
     }
 
     /**
@@ -46,7 +43,7 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
      * Overloaded from qtype_preg_authoring_tool.
      */
     public function json_key() {
-        return 'tree_src';
+        return 'tree';
     }
 
     /**
@@ -54,12 +51,10 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
      */
     public function generate_json_for_accepted_regex(&$json) {
         $context = new qtype_preg_dot_node_context(true, new qtype_preg_position($this->newindfirst, $this->newindlast));
-        $dotscript = $this->get_dst_root()->dot_script($context, $this->rankdir);
-        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
-
-        // Pass the map and its DOM id via json array.
-        $json['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
-        /*$json['map_id'] = '#' . qtype_preg_syntax_tree_node::get_graph_name();*/
+        $dotscript = $this->get_dst_root()->dot_script($context, $this->options->treeorientation == 'horizontal');
+        $json[$this->json_key()] = array(
+            'img' => 'data:image/svg+xml;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'svg')),
+            'map' => qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx')
+        );
     }
 }
