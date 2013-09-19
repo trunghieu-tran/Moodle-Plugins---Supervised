@@ -22,28 +22,42 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
 
     //TODO - PHPDoc comments!
     private $regex = '';
-    private $renderer = null;
     private $strings = null;
-    private $hintmatch = null;
+    private $question = null;
+    private $engine = null;
     private $errormsgs = null;
 
-    public function __construct($regex, $strings, $usecase, $exactmatch, $matcher, $notation) {
-        global $PAGE;
+    public function __construct($regex, $strings, $usecase, $exactmatch, $engine, $notation) {
         $this->regex = $regex;
-        $this->renderer = $PAGE->get_renderer('qtype_preg');
         $this->strings = $strings;
 
         if ($this->regex == '') {
             return;
         }
 
-        $regular = qtype_preg_question::question_from_regex($regex, $usecase, $exactmatch, $matcher, $notation);
-        $matcher = $regular->get_matcher($matcher, $regex, /*'exactmatch'*/false,
+        $regular = new qtype_preg_question;
+        // Fill engine field that is used by the hint to determine whether colored string should be shown.
+        $regular->engine = $engine;
+        // Get matcher to see, if there are errors in the regular expression.
+        $matcher = $regular->get_matcher($engine, $regex, /*'exactmatch'*/false,
                                          $regular->get_modifiers($usecase), (-1), $notation, true);
+
         if ($matcher->errors_exist()) {
             $this->errormsgs = $matcher->get_error_messages(true);
         } else {
-            $this->hintmatch = $regular->hint_object('hintmatchingpart');
+            // Correct regex, so create a real matcher.
+            // Do not use qtype_preg_question::get_matcher to pass selection to the options.
+            // Engine script file would be required by get_matcher call above, so no reason to worry about it.
+            $this->question = $regular;
+            $matchingoptions = new qtype_preg_matching_options();
+            $matchingoptions->modifiers = $regular->get_modifiers($usecase);
+            $matchingoptions->extensionneeded = false; // No need to generate next characters there.
+            $matchingoptions->capturesubexpressions = true; // Capture selection - or should this be false? TODO...
+            $matchingoptions->notation = $notation;
+            $matchingoptions->exactmatch = $exactmatch;
+            // $this->matchingoptions->selection = $selection; // TODO - pass selection to the testing tool.
+            $engineclass = 'qtype_preg_' . $engine;
+            $this->engine = new $engineclass($regex, $matchingoptions);
         }
     }
 
@@ -62,11 +76,16 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
     }
 
     public function generate_json_for_accepted_regex(&$json) {
+        global $PAGE;
         // Generate colored string showing matched and non-matched parts of response.
+        $renderer = $PAGE->get_renderer('qtype_preg');
+        $hintmatch = $this->question->hint_object('hintmatchingpart');
         $strings = explode("\n", $this->strings);
         $result = '';
-        foreach ($strings as $answer) {
-            $result .= $this->hintmatch->render_hint($this->renderer, null, null, array('answer' => $answer)) . '</br>';
+        
+        foreach ($strings as $string) {
+            $matchresults = $this->engine->match($string);
+            $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults) . '<br />';
         }
         $json[$this->json_key()] = $result;
     }
