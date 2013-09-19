@@ -388,6 +388,8 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
     public $preferredalphabet = null;
     /** @var string Unicode property name for preferred characters for dot meta-character when generating extension.*/
     public $preferfordot = null;
+    /** @var TODO Selection to be added as special subexpression match.*/
+    public $selection = null;
 
     /** @var boolean Should matcher look for subexpression captures or the whole match only? */
     // TODO - does we need to specify subexpressions we are looking for or there is no sense in it?
