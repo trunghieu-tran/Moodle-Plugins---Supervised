@@ -1301,14 +1301,14 @@ abstract class qtype_preg_finite_automaton {
                     $pregleaf = $lexer->nextToken()->value;
                     for($j = 0; $j < count($asserts); $j++) {
                         switch($asserts[0]) {
-                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_b; break;
-                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_b(true); break;
-                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_a; break;
-                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_z; break;
-                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_z(true); break;
-                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_g; break;
-                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_circumflex; break;
-                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_dollar; break;
+                            case '\\b': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b; break;
+                            case '\\B': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b(true); break;
+                            case '\\A': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_a; break;
+                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z; break;
+                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z(true); break;
+                            case '\\G': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_g; break;
+                            case '^': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_circumflex; break;
+                            case '$': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_dollar; break;
                         }
                     }
                 }
@@ -1327,14 +1327,14 @@ abstract class qtype_preg_finite_automaton {
 
                     for($j = 1; $j < count($asserts); $j++) {
                         switch($asserts[0]) {
-                            case '\\b': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_b; break;
-                            case '\\B': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_b(true); break;
-                            case '\\A': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_a; break;
-                            case '\\z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_z; break;
-                            case '\\Z': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_z(true); break;
-                            case '\\G': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_g; break;
-                            case '^': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_circumflex; break;
-                            case '$': $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_dollar; break;
+                            case '\\b': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b; break;
+                            case '\\B': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b(true); break;
+                            case '\\A': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_a; break;
+                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z; break;
+                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z(true); break;
+                            case '\\G': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_g; break;
+                            case '^': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_circumflex; break;
+                            case '$': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_dollar; break;
                         }
                     }
                 }
