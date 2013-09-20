@@ -1616,15 +1616,19 @@ abstract class qtype_preg_finite_automaton {
         // Transition for merging isn't cycle.
         if ($del->to != $del->from) {
             $needredacting = false;
+            $needredactinginto = false;
             $transitions = $this->get_adjacent_transitions($del->to, true);
             $intotransitions = $this->get_adjacent_transitions($del->from, false);
-            // Possibility of merging with outtransitions.
-            if (count($transitions) != 0) {
-                $needredacting = true;
-            } else if (count($intotransitions) !=0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
-                       && count($del->pregleaf->mergedassertions) == 0 && !$del->has_tags()) {
+            
+            if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || (count($intotransitions) != 0 && 
+                count($del->pregleaf->assertionsbefore) == 0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
+                && !$del->has_tags())) {
                 // Possibility of merging with intotransitions.
                 $transitions = $intotransitions;
+                $needredactinginto = true;
+            } else if (count($transitions) != 0 && $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                // Possibility of merging with outtransitions.
+                $needredacting = true;
             } else if ($this->statecount == 2 && $del->is_eps()) {
                 // Possibility to get automata with one state.
                 $this->merge_states($del);
@@ -1661,6 +1665,14 @@ abstract class qtype_preg_finite_automaton {
                         }
                         $tran->from = $del->from;
                         $this->add_transition($tran);
+                    }
+                }
+                // Adding intotransitions from merged state if we merge back.
+                if ($needredactinginto) {
+                    $outtransitions = $this->get_adjacent_transitions($del->to, true);
+                    foreach ($outtransitions as &$outtran) {  
+                        $outtran->from = $del->from;
+                        $this->add_transition($outtran);
                     }
                 }
                 // Checking if start state was merged.
