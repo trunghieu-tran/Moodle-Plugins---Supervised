@@ -1680,6 +1680,9 @@ abstract class qtype_preg_finite_automaton {
                     $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
                 }
                 $this->remove_state($del->to);
+                return true;
+            } else {
+                return false;
             }
         }
     }
