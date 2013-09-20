@@ -327,42 +327,62 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $thisclone = clone($this);
-            array_unshift ($this->mergedassertions, $thisclone);
+            if ($this->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                array_unshift ($this->assertionsafter, $thisclone);
+            } else {
+                array_unshift ($this->assertionsbefore, $thisclone);
+            }
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $otherclone = clone($other);
-            array_unshift ($other->mergedassertions, $otherclone);
+            if ($other->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                array_unshift ($other->assertionsafter, $otherclone);
+            } else {
+                array_unshift ($other->assertionsbefore, $otherclone);
+            }
         }
-        $result = array_merge($this->mergedassertions, $other->mergedassertions);
+        $resultbefore = array_merge($this->assertionsbefore, $other->assertionsbefore);
+        $resultafter = array_merge($this->assertionsafter, $other->assertionsafter);
         // Removing same asserts.
-        for ($i = 0; $i < count($result); $i++) {
-            for ($j = ($i+1); $j < count($result); $j++) {
-                if ($result[$i]->subtype == $result[$j]->subtype) {
-                    unset($result[$j]);
-                    $result = array_values($result);
+        for ($i = 0; $i < count($resultbefore); $i++) {
+            for ($j = ($i+1); $j < count($resultbefore); $j++) {
+                if ($resultbefore[$i]->subtype == $resultbefore[$j]->subtype) {
+                    unset($resultbefore[$j]);
+                    $resultbefore = array_values($resultbefore);
                     $j--;
                 }
             }
         }
 
-        /*foreach ($result as &$assert) {
-            $assert->mergedassertions = array();
-        }*/
-        $result = array_values($result);
-
-        foreach ($result as $assert) {
-            $key = array_search($assert, $result);
-            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-                // Searching compatible asserts.
-                if (array_search($esca, $result) !== false) {
-                    unset($result[$key]);
-                    $result = array_values($result);
+        for ($i = 0; $i < count($resultafter); $i++) {
+            for ($j = ($i+1); $j < count($resultafter); $j++) {
+                if ($resultafter[$i]->subtype == $resultafter[$j]->subtype) {
+                    unset($resultafter[$j]);
+                    $resultafter = array_values($resultafter);
+                    $j--;
                 }
-            } else if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+            }
+        }
+        
+        $resultbefore = array_values($resultbefore);
+        $resultafter = array_values($resultafter);
+
+        foreach ($resultafter as $assert) {
+            $key = array_search($assert, $resultafter);
+            // Searching compatible asserts.
+            if (array_search($esca, $resultbefore) !== false) {
+                unset($resultafter[$key]);
+                $resultafter = array_values($resultafter);
+            }
+        }
+
+        foreach ($resultbefore as $assert) {
+            $key = array_search($assert, $resultbefore);
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (array_search($escz, $result) !== false || array_search($escbigz, $result) !== false) {
-                    unset($result[$key]);
-                    $result = array_values($result);
+                if (array_search($escz, $resultbefore) !== false || array_search($escbigz, $resultbefore) !== false) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
                 }
             }
         }
@@ -373,10 +393,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             $assert = $other;
         } else {
-            if (count($result) != 0) {
-            	switch($result[0]->subtype) {
+            if (count($resultbefore) != 0) {
+            	switch($resultbefore[0]->subtype) {
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_B: 
-                        if ($result[0]->negative) {
+                        if ($resultbefore[0]->negative) {
                             $assert = new qtype_preg_leaf_assert_esc_b(true);
                         } else {
                             $assert = new qtype_preg_leaf_assert_esc_b;
@@ -386,7 +406,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                         $assert = new qtype_preg_leaf_assert_esc_a; 
                         break;
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_Z: 
-                        if ($result[0]->negative) {
+                        if ($resultbefore[0]->negative) {
                             $assert = new qtype_preg_leaf_assert_esc_z(true);
                         } else {
                             $assert = new qtype_preg_leaf_assert_esc_z;
@@ -394,25 +414,34 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                         break;
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_G: 
                         $assert = new qtype_preg_leaf_assert_esc_g; 
-                        break;
-                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX: 
-                        $assert = new qtype_preg_leaf_assert_circumflex; 
-                        break;
+                        break; 
                     case qtype_preg_leaf_assert::SUBTYPE_DOLLAR: 
                         $assert = new qtype_preg_leaf_assert_dollar; 
                         break;
                 }
-                unset($result[0]);
+                unset($resultbefore[0]);
+            } else if (count($resultafter) != 0) {
+                $assert = new qtype_preg_leaf_assert_circumflex; 
+                unset($resultafter[0]);
             } else {
                 $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             }
         }
-        $assert->mergedassertions = $result;
+        $assert->assertionsbefore = $resultbefore;
+        $assert->assertionsafter = $resultafter;
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            unset($this->mergedassertions[0]);
+            if ($this->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                unset($this->assertionsafter[0]);
+            } else {
+                unset($this->assertionsbefore[0]);
+            }
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            unset($other->mergedassertions[0]);
+            if ($other->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                unset($other->assertionsafter[0]);
+            } else {
+                unset($other->assertionsbefore[0]);
+            }
         }
         return $assert;
     }
