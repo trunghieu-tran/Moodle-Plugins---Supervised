@@ -283,7 +283,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     /** Is this leaf negative? */
     public $negative = false;
     /** Assertions merged into this node (qtype_preg_leaf_assert objects). */
-    public $mergedassertions = array();//TODO two fields: assertionsbefore and assertionsafter.
+    // public $mergedassertions = array();//TODO two fields: assertionsbefore and assertionsafter.
+
+    /** Assertions merged into this node and working before(qtype_preg_leaf_assert objects). */
+    public $assertionsbefore = array();
+
+    /** Assertions merged into this node and working after(qtype_preg_leaf_assert objects). */
+    public $assertionsafter = array();
 
     public function __clone() {
         // When clonning a leaf we also want the merged assertions to be cloned.
