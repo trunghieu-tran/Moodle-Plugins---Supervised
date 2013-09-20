@@ -24,6 +24,7 @@
 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
+require_once($CFG->dirroot.'/lib/accesslib.php');
 
 class block_formal_langs extends block_base {
     //TODO: Implement this
@@ -84,22 +85,22 @@ class block_formal_langs extends block_base {
         //Map, that checks amount of unique names in table. Populate it with values
         $counts = array();
         foreach($records as $record) {
-            if ($record->name !== null) {//Predefined language, ui_name is actually a language string, so replace it with actual name.
-                $record->ui_name = get_string('lang_' . $record->name , 'block_formal_langs');
+            if ($record->name !== null) {//Predefined language, uiname is actually a language string, so replace it with actual name.
+                $record->uiname = get_string('lang_' . $record->name , 'block_formal_langs');
             }
-            if (array_key_exists($record->ui_name, $counts)) {
-                $counts[$record->ui_name] = $counts[$record->ui_name] + 1;
+            if (array_key_exists($record->uiname, $counts)) {
+                $counts[$record->uiname] = $counts[$record->uiname] + 1;
             } else {
-                $counts[$record->ui_name] = 1;
+                $counts[$record->uiname] = 1;
             }
         }
         //Populate result array
         $result = array();
         foreach($records as $record) {
-            if ($counts[$record->ui_name] > 1) {
-                $result[$record->id] = $record->ui_name . ' ' . $record->version;
+            if ($counts[$record->uiname] > 1) {
+                $result[$record->id] = $record->uiname . ' ' . $record->version;
             } else {
-                $result[$record->id] = $record->ui_name;
+                $result[$record->id] = $record->uiname;
             }
         }
 
@@ -128,7 +129,7 @@ class block_formal_langs extends block_base {
     }
 
     /**
-     * Finds or insers language definition.
+     * Finds or inserts language definition.
      * All fields must be set
      * @param array $language as tuple <ui_name, description, name, scanrules, parserules, version visible>.
      * @return int id of inserted language
@@ -164,5 +165,73 @@ class block_formal_langs extends block_base {
             $result = $record->id;
         }
         return $result;
+    }
+
+
+    /**
+     * Synchronizes context informations with config
+     */
+    public static function sync_contexts_with_config($result = null) {
+        global $CFG, $DB;
+        $systemcontextid = context_system::instance()->id;
+        $showedlanguages = $CFG->block_formal_langs_showablelangs;
+        if ($result !== null)
+            $showedlanguages = $result;
+        $showedarray = array();
+        $showall = true;
+        //  Fetch languages
+        $languagerecords = $DB->get_records('block_formal_langs', array());
+        //  Fetch global permissions
+        if (textlib::strlen($showedlanguages) != 0)
+        {
+            $showedarray = explode(',', $showedlanguages);
+            $showall = false;
+        }
+        // Fetch and build hash-table of permissions
+        $globalpermrecords = $DB->get_records('block_formal_langs_perms', array('contextid' => $systemcontextid));
+        $globalpermissions = array();
+        foreach($globalpermrecords as $record) {
+            $globalpermissions[$record->languageid] = $record;
+        }
+
+        foreach($languagerecords as $record) {
+            // Compute visible flags
+            if ($showall) {
+                $visible = 1;
+            } else {
+                $visible = in_array($record->id, $showedarray);
+                $visible = ($visible) ? 1 : 0;
+            }
+            // Select action, based on permissions
+            $shouldinsert = false;
+            $shouldupdate = false;
+            $updateid = -1;
+            if (is_array($globalpermissions)) {
+                if (array_key_exists($record->id, $globalpermissions)) {
+                    $permission =  $globalpermissions[$record->id];
+                    $shouldupdate = $permission->visible != $visible;
+                    $updateid =  $permission->id;
+                } else {
+                    $shouldinsert = true;
+                }
+            }  else {
+                $shouldinsert = true;
+            }
+            $dataobject = new stdClass();
+            $dataobject->languageid = $record->id;
+            $dataobject->contextid = $systemcontextid;
+            $dataobject->visible = $visible;
+            if ($updateid > -1) {
+                $dataobject->id = $updateid;
+            }
+            if ($shouldinsert) {
+                $DB->insert_record('block_formal_langs_perms', $dataobject, false, true);
+            }
+
+            if ($shouldupdate) {
+                $DB->update_record('block_formal_langs_perms', $dataobject, true);
+            }
+
+        }
     }
 }
