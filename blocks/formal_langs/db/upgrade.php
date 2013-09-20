@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+
 
 function xmldb_block_formal_langs_upgrade($oldversion = 0) {
     global $CFG, $DB;
@@ -48,7 +50,44 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $bfl = new xmldb_table('block_formal_langs');
         $lexemenamefield = new xmldb_field('lexemename', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'visible');
         $dbman->add_field($bfl, $lexemenamefield);
+    }
 
+    if ($oldversion < 2013091800) {
+        $dbman = $DB->get_manager();
+        $bfl = new xmldb_table('block_formal_langs');
+        $uinamefield = new xmldb_field('ui_name', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'id');
+        $dbman->rename_field($bfl, $uinamefield, 'uiname');
+    }
+
+    if ($oldversion < 2013091817) {
+        $dbman = $DB->get_manager();
+        $perms = new xmldb_table('block_formal_langs_perms');
+
+        $field = new xmldb_field('id');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('languageid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('contextid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $field = new xmldb_field('visible');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null);
+        $perms->addField($field);
+
+        $idpk = new xmldb_key('primary');
+        $idpk->set_attributes(XMLDB_KEY_PRIMARY, array('id'), null, null);
+        $perms->addKey($idpk);
+
+        $dbman->create_table($perms);
+    }
+
+    if ($oldversion < 2013091818) {
+        block_formal_langs::sync_contexts_with_config();
     }
 
     return true;
