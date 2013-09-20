@@ -457,7 +457,8 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
                 if ($result != null) {
-                    $result->mergedassertions = $this->mergedassertions;
+                    $result->assertionsbefore = $this->assertionsbefore;
+                    $result->assertionsafter = $this->assertionsafter;
                     $result = $result->intersect_asserts($other);
                     $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
                 }
@@ -491,12 +492,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 if ($thishastags || $otherhastags) {
                     if ($this->has_equal_tags($other)) {
-                        if ($this->mergedassertions == $other->mergedassertions) {
+                        if ($this->assertionsbefore == $other->assertionsbefore && $this->assertionsafter == $other->assertionsafter) {
                             $result = $this->unite($other);
                             $result->userinscription = array_merge($this->userinscription, $other->userinscription);
                         }
                     }
-                } else if ($this->mergedassertions == $other->mergedassertions) {
+                } else if ($this->assertionsbefore == $other->assertionsbefore && $this->assertionsafter == $other->assertionsafter) {
                     $result = $this->unite($other);
                     $result->userinscription = array_merge($this->userinscription, $other->userinscription);
                 }
