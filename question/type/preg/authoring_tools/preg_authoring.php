@@ -20,4 +20,8 @@ echo $OUTPUT->header();
 $mform = new qtype_preg_authoring_form();
 $mform->display();
 
-echo $OUTPUT->footer();
+/**
+ * @badcode We don't want M.core.init_popuphelp() executed once more. TODO: any better way to achieve it?
+ */
+$footer = preg_replace('/M\.core\.init_popuphelp\(\);/u', '', $OUTPUT->footer());
+echo $footer;
