@@ -82,6 +82,8 @@ class qtype_preg_handling_options {
     public $debugmode = false;
     /** @var string Notation, in which regex was passed*/
     public $notation = 'native';
+    /** @var object Regex text selection borders, an instance of qtype_preg_position. (-2, -2) means no selection. */
+    public $selection = null;
 
     public static function get_all_modifiers() {
         return array(self::MODIFIER_ANCHORED,
@@ -218,6 +220,8 @@ class qtype_preg_regex_handler {
     protected $regex;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
+    /** Node selected by the user. */
+    protected $selectednode = null;
     /** Regex lexer. */
     protected $lexer = null;
     /** Regex parser. */
@@ -259,6 +263,11 @@ class qtype_preg_regex_handler {
             $options = $notationobj->convert_options($usednotation);
         }
 
+        // Deal with the selection.
+        if ($options->selection === null) {
+            $options->selection = new qtype_preg_position(-2, -2);
+        }
+
         if ($options->exactmatch) {
             // Grouping is needed in case regexp contains top-level alternations.
             // Use non-capturing grouping to not mess-up with user subexpression capturing.
@@ -287,6 +296,15 @@ class qtype_preg_regex_handler {
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
         }
+
+        // Find and expand a node by selection.
+        if ($this->options->selection->indfirst != -2) {
+            $indfirst = $this->options->selection->indfirst + $this->addedatstart;
+            $indlast = $this->options->selection->indlast + $this->addedatstart;
+            $idcounter = $this->parser->get_max_id() + 1;
+            $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+        }
+
         // Sometimes engine that use accept_regex still need parsing to count subexpressions.
         // In case with no parsing we should stick to accepting whole regex, not nodes.
         $this->accept_regex();
@@ -595,14 +613,10 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $this->ast_root = $this->parser->get_root();
-        $this->build_dst();
-
-        fclose($pseudofile);
-    }
-
-    protected function build_dst() {
         if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
         }
+
+        fclose($pseudofile);
     }
 }

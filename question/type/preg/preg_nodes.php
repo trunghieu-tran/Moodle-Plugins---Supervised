@@ -226,7 +226,7 @@ abstract class qtype_preg_node {
      * expands it to be binary for better precision, thus AST is modified. All passed indexes are updated
      * to the indexes of the found subtree.
      */
-    public function node_by_regex_fragment(&$indexfirst, &$indexlast, &$idcounter) {
+    public function node_by_regex_fragment($indexfirst, $indexlast, &$idcounter) {
         if ($indexfirst - $indexlast == 1) {
             // Special case: fictive leaves.
             $current = array($this);
@@ -295,9 +295,6 @@ abstract class qtype_preg_node {
             }
         }
 
-        // If the node is found, update the indexes, return NULL otherwise.
-        $indexfirst = $result->position->indfirst;
-        $indexlast = $result->position->indlast;
         return $result;
     }
 

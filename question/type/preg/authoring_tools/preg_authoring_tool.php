@@ -41,8 +41,6 @@ class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
     public $treeorientation = null;
     public $displayas = null;
-    // Regex text selection borders, an instance of qtype_preg_position. (-2, -2) means no selection.
-    public $selection = null;
 }
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
@@ -53,18 +51,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected $originalregex = null;
 
-    // Updated value of the selection first index.
-    protected $newindfirst = -2;
-    // Updated value of the selection last index.
-    protected $newindlast = -2;
-
-    protected $selectednode = null;
-
     public function __construct($regex = null, $options = null) {
-        //TODO: move to qtype_preg_regex_handler
-        if ($regex === null) {
-            return;
-        }
         if ($options === null) {
             $options = new qtype_preg_authoring_tools_options();
         }
@@ -73,22 +60,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         parent::__construct($regex, $options);
 
         $this->originalregex = $regex;
-
-        // Deal with the selection.
-        if ($this->options->selection === null) {
-            $this->options->selection = new qtype_preg_position();
-            $this->options->selection->indfirst = -2;
-            $this->options->selection->indlast = -2;
-        }
-        if ($this->options->selection->indfirst != -2) {
-            $idcounter = $this->parser->get_max_id() + 1;
-            $this->newindfirst = $this->options->selection->indfirst + $this->addedatstart;
-            $this->newindlast = $this->options->selection->indlast + $this->addedatstart;
-            $this->selectednode = $this->ast_root->node_by_regex_fragment($this->newindfirst, $this->newindlast, $idcounter);
-            $this->newindfirst -= $this->addedatstart;
-            $this->newindlast -= $this->addedatstart;
-        }
-        $this->build_dst();
     }
 
     /**
@@ -163,9 +134,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['usecase'] = (int)!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         $json['treeorientation'] = $this->options->treeorientation;
         $json['displayas'] = $this->options->displayas;
-        $json['indfirst'] = $this->newindfirst;
-        $json['indlast'] = $this->newindlast;
-
+        $json['indfirst'] = $this->selectednode !== null ? $this->selectednode->position->indfirst : -2;
+        $json['indlast'] = $this->selectednode !== null ? $this->selectednode->position->indlast : -2;
         $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
 
         if ($this->originalregex == '') {
