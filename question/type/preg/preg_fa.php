@@ -1548,7 +1548,11 @@ abstract class qtype_preg_finite_automaton {
      */
     public function go_round_transitions($del) {
         $clonetransitions = array();
-        $transitions = $this->get_adjacent_transitions($del->to, true);
+        if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+            $transitions = $this->get_adjacent_transitions($del->from, false);
+        } else {
+            $transitions = $this->get_adjacent_transitions($del->to, true);
+        }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
             $tran = clone($transition);
@@ -1559,9 +1563,16 @@ abstract class qtype_preg_finite_automaton {
         }
         // Has deleting or changing transitions.
         if (count($transitions) !=0) {
-            foreach ($clonetransitions as &$tran) {
-                $tran->from = $del->from;
-                $this->add_transition($tran);
+            if ($del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                foreach ($clonetransitions as &$tran) {
+                    $tran->from = $del->from;
+                    $this->add_transition($tran);
+                }
+            } else {
+                foreach ($clonetransitions as &$tran) {
+                    $tran->to = $del->to;
+                    $this->add_transition($tran);
+                }
             }
             $this->del_transition($del);
         }
