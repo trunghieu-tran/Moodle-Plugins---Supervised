@@ -31,7 +31,9 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_exec_state.php
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
-    public $automaton;    // An NFA corresponding to the given regex.
+    public $automaton = null;          // An NFA corresponding to the given regex.
+
+    protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
 
     public function name() {
         return 'nfa_matcher';
@@ -645,13 +647,38 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result->to_matching_results();
     }
 
+    public function get_nested_nodes($subpatt) {
+        return array_key_exists($subpatt, $this->nestingmap) ? $this->nestingmap[$subpatt] : array();
+    }
+
+    protected function calculate_nesting_map($node, $currentkeys = array()) {
+        if (is_a($node, 'qtype_preg_leaf')) {
+            return;
+        }
+        foreach ($node->operands as $operand) {
+            $newkeys = $operand->subpattern === -1
+                     ? $currentkeys
+                     : array_merge($currentkeys, array($operand->subpattern));
+
+            $this->calculate_nesting_map($operand, $newkeys);
+
+            if ($operand->subpattern === -1) {
+                continue;
+            }
+
+            foreach ($currentkeys as $subpatt) {
+                $this->nestingmap[$subpatt][] = $operand;
+            }
+        }
+    }
+
     /**
      * Constructs an NFA corresponding to the given node.
      * @param $ast_node - object of qtype_preg_node child class.
      * @param $dst_node - object of qtype_preg_nfa_node child class.
      * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
-    public function build_nfa($ast_node, $dst_node) {
+    protected function build_nfa($ast_node, $dst_node) {
         $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_backrefs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
@@ -675,6 +702,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $nfa = self::build_nfa($this->ast_root, $this->dst_root);
         if ($nfa !== false) {
             $this->automaton = $nfa;
+            $this->nestingmap = array();
+            $this->calculate_nesting_map($this->ast_root, array($this->ast_root->subpattern));
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
             // $this->automaton->on_subexpr_added($this->ast_root);
