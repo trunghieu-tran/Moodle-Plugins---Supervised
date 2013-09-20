@@ -516,10 +516,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      */
     public function leaf_tohr() {
         $result = '';
-        foreach ($this->mergedassertions as $assert) {
+        foreach ($this->assertionsbefore as $assert) {
             $result .= $assert->tohr();
         }
         $result .= $this->tohr();
+        foreach ($this->assertionsafter as $assert) {
+            $result .= $assert->tohr();
+        }
         return $result;
     }
 
