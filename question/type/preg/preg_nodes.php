@@ -293,8 +293,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
     public function __clone() {
         // When clonning a leaf we also want the merged assertions to be cloned.
-        foreach ($this->mergedassertions as $i => $mergedassertion) {
-            $this->mergedassertions[$i] = clone $mergedassertion;
+        foreach ($this->assertionsbefore as $i => $assertionbefore) {
+            $this->assertionsbefore[$i] = clone $assertionbefore;
+        }
+
+        foreach ($this->assertionsafter as $i => $assertionafter) {
+            $this->assertionsafter[$i] = clone $assertionafter;
         }
     }
 
