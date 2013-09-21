@@ -318,26 +318,21 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
-            graph_img = $('#graph_img'),
-            err = null;
+            graph_img = $('#graph_img');
 
-        if (t && t.img) {
-            err = (t.img.substring(0, 4) != 'data');
-            if (err) {
-                tree_err.html(t.img);
-                tree_img.removeAttr('src').css('visibility', 'hidden');
-            } else {
-                tree_err.html('');
-                tree_img.attr('src', t.img).css('visibility', 'visible');
-            }
-        }
-        if (t && t.map) {
+        if (t && t.img && t.map) {
+            tree_err.html('');
+            tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
             tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
+        } else {
+            tree_err.html(t);
+            tree_img.removeAttr('src').css('visibility', 'hidden');
+            tree_map.html('');
         }
         if (g) {
-            err = (g.substring(0, 4) != 'data');
+            var err = (g.substring(0, 4) != 'data');
             if (err) {
                 graph_err.html(g);
                 graph_img.removeAttr('src').css('visibility', 'hidden');
