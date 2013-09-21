@@ -135,7 +135,21 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     public function render_colored_string_by_matchresults($renderer, $matchresults) {
         if ($this->could_show_hint($matchresults)) {
             $wronghead = $renderer->render_unmatched($matchresults->match_heading());
-            $correctpart = $renderer->render_matched($matchresults->matched_part());
+            $correctpart = '';
+            if (!isset($matchresults->length[-2]) || $matchresults->length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                // No selection or no match with selection.
+                $correctpart = $renderer->render_matched($matchresults->matched_part());
+            } else {
+                // We need to substract index_first of the match from all indexes when cuttring from matched part.
+                $correctstr = $matchresults->matched_part();
+                $substract = $matchresults->index_first();
+                // Before selection.
+                $correctpart = $renderer->render_matched(textlib::substr($correctstr, 0, $matchresults->index_first(-2) - $substract));
+                // Selection.
+                $correctpart .= $renderer->render_hinted(textlib::substr($correctstr, $matchresults->index_first(-2) - $substract, $matchresults->length(-2)));
+                // After selection.
+                $correctpart .= $renderer->render_matched(textlib::substr($correctstr, $matchresults->index_first(-2) - $substract + $matchresults->length(-2)));
+            }
             $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
             if ($this->to_be_continued($matchresults)) {
                 $wrongtail .= $renderer->render_tobecontinued();
