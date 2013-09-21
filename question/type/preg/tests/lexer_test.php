@@ -2507,4 +2507,26 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->position->linefirst === 4);
         $this->assertTrue($token->value->position->linelast === 4);
     }
+    function test_added_at_start() {
+        // Non-extended mode.
+        $lexer = $this->create_lexer("^(?:a\nb");
+        $lexer->set_added_at_start(4);
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->flags[0][0]->data->string() === 'a');
+        $this->assertTrue($token->value->position->indfirst === 0);
+        $this->assertTrue($token->value->position->indlast === 0);
+        $this->assertTrue($token->value->position->colfirst === 0);
+        $this->assertTrue($token->value->position->collast === 0);
+        $this->assertTrue($token->value->position->linefirst === 0);
+        $this->assertTrue($token->value->position->linelast === 0);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->position->indfirst === 2);
+        $this->assertTrue($token->value->position->indlast === 2);
+        $this->assertTrue($token->value->position->colfirst === 0);
+        $this->assertTrue($token->value->position->collast === 0);
+        $this->assertTrue($token->value->position->linefirst === 1);
+        $this->assertTrue($token->value->position->linelast === 1);
+    }
 }

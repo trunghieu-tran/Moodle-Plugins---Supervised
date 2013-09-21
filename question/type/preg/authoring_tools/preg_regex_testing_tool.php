@@ -75,15 +75,14 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
 
     public function generate_json(&$json) {
         $selectednode = $this->matcher !== null ? $this->matcher->get_selected_node() : null;
-        $addedatstart = $this->matcher !== null ? $this->matcher->added_at_start() : 0;
 
         $json['regex'] = $this->regex;
         $json['engine'] = $this->engine;
         $json['notation'] = $this->notation;
         $json['exactmatch'] = (int)$this->exactmatch;
         $json['usecase'] = (int)$this->usecase;
-        $json['indfirst'] = $selectednode !== null ? $selectednode->position->indfirst - $addedatstart : -2;
-        $json['indlast'] = $selectednode !== null ? $selectednode->position->indlast - $addedatstart : -2;
+        $json['indfirst'] = $selectednode !== null ? $selectednode->position->indfirst : -2;
+        $json['indlast'] = $selectednode !== null ? $selectednode->position->indlast : -2;
         $json['strings'] = $this->strings;
 
         if ($this->regex == '') {

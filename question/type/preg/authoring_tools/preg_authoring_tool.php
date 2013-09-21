@@ -132,8 +132,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['notation'] = $this->options->notation;
         $json['exactmatch'] = (int)$this->options->exactmatch;
         $json['usecase'] = (int)!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
-        $json['indfirst'] = $this->selectednode !== null ? $this->selectednode->position->indfirst - $this->addedatstart : -2;
-        $json['indlast'] = $this->selectednode !== null ? $this->selectednode->position->indlast - $this->addedatstart : -2;
+        $json['indfirst'] = $this->selectednode !== null ? $this->selectednode->position->indfirst : -2;
+        $json['indlast'] = $this->selectednode !== null ? $this->selectednode->position->indlast : -2;
         $json['treeorientation'] = $this->options->treeorientation;
         $json['displayas'] = $this->options->displayas;
         $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
