@@ -253,7 +253,8 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         if ($this->pregnode->negative) {
             $result = '^' . $result;
         }
-        if (is_array($this->pregnode->userinscription)) {
+
+        if (is_array($this->pregnode->userinscription) && count($this->pregnode->userinscription) > 1) {
             $result = '&#91;' . $result . '&#93;';
         }
         return '<' . $result . '>';
