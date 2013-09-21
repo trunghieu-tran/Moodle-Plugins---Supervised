@@ -23,6 +23,8 @@ M.preg_authoring_tools_script = (function ($) {
 
     DESCRIPTION_KEY : 'description',
 
+    STRINGS_KEY : 'regex_test',
+
     TREE_MAP_ID : '#qtype_preg_graph',
 
     /** @var string with moodle root url (smth like 'http://moodle.site.ru/') */
@@ -40,7 +42,8 @@ M.preg_authoring_tools_script = (function ($) {
     cache : {
         tree : {},
         graph : {},
-        description : {}
+        description : {},
+        regex_test : {}
     },
 
     /**
@@ -159,8 +162,7 @@ M.preg_authoring_tools_script = (function ($) {
                         new_id = old_id + '_auth';
                     $(new_id).val($(old_id).val());
                 });
-                self.load_content(-1);
-                $('#id_regex_check_strings').click();
+                $('#id_regex_show').click();
             },
 
             onsaveclicked : function () {
@@ -177,9 +179,9 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
-        var sel = self.selection_indexes();
+        var sel = self.get_selection_indexes();
         self.load_content(-1, sel.indfirst, sel.indlast);
-        $('#id_regex_check_strings').click();
+        self.load_strings(sel.indfirst, sel.indlast);
     },
 
     btn_save_clicked : function (e) {
@@ -202,26 +204,13 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_check_strings_clicked : function (e) {
         e.preventDefault();
-        $.ajax({
-            type: 'GET',
-            url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
-            data: {
-                regex: self.regex_input.val(),
-                engine: $('#id_engine_auth :selected').val(),
-                notation: $('#id_notation_auth :selected').val(),
-                exactmatch: $('#id_exactmatch_auth :selected').val(),
-                usecase: $('#id_usecase_auth :selected').val(),
-                strings: $('#id_regex_match_text').val(),
-                ajax: true
-            },
-            success: self.upd_check_strings_success,
-            error: self.upd_failure
-        });
+        var sel = self.get_selection_indexes();
+        self.load_strings(sel.indfirst, sel.indlast);
     },
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        var sel = self.selection_indexes();
+        var sel = self.get_selection_indexes();
         self.load_content(-1, sel.indfirst, sel.indlast);
     },
 
@@ -232,24 +221,13 @@ M.preg_authoring_tools_script = (function ($) {
             indfirst = tmp[1],
             indlast = tmp[2];
         self.load_content(id, indfirst, indlast);
+        self.load_strings(indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
         self.load_content(-1);
-    },
-
-    selection_indexes : function () {
-        var selection = self.regex_input.textrange('get'),
-            indfirst = selection.start,
-            indlast = selection.end - 1;
-        if (indfirst > indlast) {
-            indfirst = indlast = -2;
-        }
-        return {
-            indfirst : indfirst,
-            indlast : indlast
-        };
+        self.load_strings();
     },
 
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -258,22 +236,23 @@ M.preg_authoring_tools_script = (function ($) {
                $('#id_notation_auth').val() +
                $('#id_exactmatch_auth').val() +
                $('#id_usecase_auth').val() +
-
                self.get_orientation() +
                self.get_displayas() +
                indfirst + ',' + indlast;
     },
 
-    cache_key_for_testing_tool : function () {
+    cache_key_for_testing_tool : function (indfirst, indlast) {
         return '' +
+               self.regex_input.val() +
                $('#id_engine_auth').val() +
                $('#id_notation_auth').val() +
                $('#id_exactmatch_auth').val() +
                $('#id_usecase_auth').val() +
-               self.regex_input.val();
+               $('#id_regex_match_text').val() +
+               indfirst + ',' + indlast;
     },
 
-    upd_tools_success : function (data, textStatus, jqXHR) {
+    upd_content_success : function (data, textStatus, jqXHR) {
         var json = JSON.parse(data),
             regex = json['regex'],
             //engine = json['engine'],
@@ -289,31 +268,39 @@ M.preg_authoring_tools_script = (function ($) {
             d = json[self.DESCRIPTION_KEY],
             k = '' + regex + notation + exactmatch + usecase + treeorientation + displayas + indfirst + ',' + indlast;
 
-        // Cache the data.
-        self.cache_data(k, t, g, d);
-
-        // Display the data.
-        self.display_data(json['id'], t, g, d, indfirst, indlast);
-    },
-
-    upd_check_strings_success : function (data, textStatus, jqXHR) {
-        var json = JSON.parse(data);
-        $('#id_test_regex').html(json.regex_test);
-    },
-
-    upd_failure : function (data, textStatus, jqXHR) {
-       //alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
-    },
-
-    // Stores images and description for the given regex and node id in the cache
-    cache_data : function (k, t, g, d) {
+        // Cache the content.
         self.cache[self.TREE_KEY][k] = t;
         self.cache[self.GRAPH_KEY][k] = g;
         self.cache[self.DESCRIPTION_KEY][k] = d;
+
+        // Display the content.
+        self.display_content(json['id'], t, g, d, indfirst, indlast);
+    },
+
+    upd_strings_success : function (data, textStatus, jqXHR) {
+        var json = JSON.parse(data),
+            regex = json['regex'],
+            engine = json['engine'],
+            notation = json['notation'],
+            exactmatch = json['exactmatch'],
+            usecase = json['usecase'],
+            treeorientation = json['treeorientation'],
+            displayas = json['displayas'],
+            indfirst = json['indfirst'],
+            indlast = json['indlast'],
+            strings = json['strings'],
+            s = json[self.STRINGS_KEY],
+            k = '' + regex + engine + notation + exactmatch + usecase + strings + indfirst + ',' + indlast;
+
+        // Cache the strings.
+        self.cache[self.STRINGS_KEY][k] = s;
+
+        // Display the strings.
+        self.display_strings(s);
     },
 
     // Displays given images and description
-    display_data : function (id, t, g, d, indfirst, indlast) {  // TODO: get rid of id
+    display_content : function (id, t, g, d, indfirst, indlast) {  // TODO: get rid of id
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
@@ -354,10 +341,13 @@ M.preg_authoring_tools_script = (function ($) {
         self.highlight_description(id);
     },
 
+    display_strings : function (s) {
+        $('#id_test_regex').html(s);
+    },
+
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
     load_content : function (id, indfirst, indlast) {  // TODO: get rid of id
         if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
-            // No selection at all.
             indfirst = indlast = -2;
         }
 
@@ -369,28 +359,57 @@ M.preg_authoring_tools_script = (function ($) {
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
         cached = self.cache[self.TREE_KEY][k];
         if (cached) {
-            self.display_data(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
+            self.display_content(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
             return;
         }
 
-        var data = {
-            regex: self.regex_input.val(),
-            engine: $('#id_engine_auth :selected').val(),
-            notation: $('#id_notation_auth :selected').val(),
-            exactmatch: $('#id_exactmatch_auth :selected').val(),
-            usecase: $('#id_usecase_auth :selected').val(),
-            treeorientation: self.get_orientation(),
-            displayas: self.get_displayas(),
-            indfirst: indfirst,
-            indlast: indlast,
-            ajax: true
-        };
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
-            data: data,
-            success: self.upd_tools_success,
-            error: self.upd_failure
+            data: {
+                regex: self.regex_input.val(),
+                engine: $('#id_engine_auth :selected').val(),
+                notation: $('#id_notation_auth :selected').val(),
+                exactmatch: $('#id_exactmatch_auth :selected').val(),
+                usecase: $('#id_usecase_auth :selected').val(),
+                indfirst: indfirst,
+                indlast: indlast,
+                treeorientation: self.get_orientation(),
+                displayas: self.get_displayas(),
+                ajax: true
+            },
+            success: self.upd_content_success
+        });
+    },
+
+    load_strings : function (indfirst, indlast) {
+        if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
+            indfirst = indlast = -2;
+        }
+
+        // Check the cache.
+        var k = self.cache_key_for_testing_tool(indfirst, indlast);
+        cached = self.cache[self.STRINGS_KEY][k];
+        if (cached) {
+            self.display_strings(cached);
+            return;
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
+            data: {
+                regex: self.regex_input.val(),
+                engine: $('#id_engine_auth :selected').val(),
+                notation: $('#id_notation_auth :selected').val(),
+                exactmatch: $('#id_exactmatch_auth :selected').val(),
+                usecase: $('#id_usecase_auth :selected').val(),
+                indfirst: indfirst,
+                indlast: indlast,
+                strings: $('#id_regex_match_text').val(),
+                ajax: true
+            },
+            success: self.upd_strings_success
         });
     },
 
@@ -409,6 +428,19 @@ M.preg_authoring_tools_script = (function ($) {
             targetspan.addClass(highlightedclass);
             targetspan.css('background', '#FFFF00');
         }
+    },
+
+    get_selection_indexes : function () {
+        var selection = self.regex_input.textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        return {
+            indfirst : indfirst,
+            indlast : indlast
+        };
     },
 
     get_orientation : function () {

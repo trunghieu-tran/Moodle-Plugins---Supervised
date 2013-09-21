@@ -25,9 +25,9 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $notation = 'native';
 
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span></br><span class="correct">b</span></br>');
+        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><br /><span class="correct">b</span><br />');
     }
 
     function test_empty_strings() {
@@ -39,9 +39,9 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $notation = 'native';
 
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '</br>');
+        $this->assertTrue($json['regex_test'] == '<br />');
     }
 
     function test_syntax_error() {
@@ -53,7 +53,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $notation = 'native';
 
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8.');
     }
@@ -67,7 +67,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $notation = 'native';
 
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
     }
@@ -81,13 +81,13 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $notation = 'native';
 
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '');
 
         $strings = "a|b";
         $json = array();
-        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '');
     }

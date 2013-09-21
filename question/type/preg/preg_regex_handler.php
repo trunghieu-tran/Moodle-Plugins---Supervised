@@ -351,6 +351,18 @@ class qtype_preg_regex_handler {
         return $this->options;
     }
 
+    public function get_selected_node() {
+        return $this->selectednode;
+    }
+
+    public function added_at_start() {
+        return $this->addedatstart;
+    }
+
+    public function added_at_end() {
+        return $this->addedatend;
+    }
+
     /**
      * Was there an error in regex?
      * @return bool  errors exists.

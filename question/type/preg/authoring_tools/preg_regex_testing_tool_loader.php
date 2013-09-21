@@ -22,7 +22,11 @@ function qtype_preg_get_json_array() {
     $notation = optional_param('notation', '', PARAM_RAW);
     $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
     $usecase = (bool)optional_param('usecase', '', PARAM_INT);
+    $indfirst = optional_param('indfirst', null, PARAM_INT);
+    $indlast = optional_param('indlast', null, PARAM_INT);
     $strings = optional_param('strings', '', PARAM_RAW);
+
+    $selection = new qtype_preg_position($indfirst, $indlast);
 
     $json = array();
     $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
