@@ -24,17 +24,11 @@ class qtype_preg_dot_node_context {
     // Selection coordinates, an instance of qtype_preg_position.
     public $selection;
 
-    public $addedatstart;
-
-    public $addedatend;
-
-    public function __construct($isroot, $selection = null, $addedatstart = 0, $addedatend = 0) {
+    public function __construct($isroot, $selection = null) {
         $this->isroot = $isroot;
         $this->selection = $selection !== null
                          ? $selection
                          : new qtype_preg_position();
-        $this->addedatstart = $addedatstart;
-        $this->addedatend = $addedatend;
     }
 }
 
@@ -146,7 +140,7 @@ abstract class qtype_preg_syntax_tree_node {
         $tooltip = $this->tooltip();
         $shape = $this->shape();
         $color = $this->color();
-        $id = $this->pregnode->id . ',' . ($this->pregnode->position->indfirst - $context->addedatstart) . ',' . ($this->pregnode->position->indlast - $context->addedatstart);
+        $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
         $result = "id = \"$id\", label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
         if ($this->pregnode->position->indfirst >= $context->selection->indfirst &&
             $this->pregnode->position->indlast <= $context->selection->indlast) {

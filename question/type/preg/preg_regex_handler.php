@@ -299,8 +299,8 @@ class qtype_preg_regex_handler {
 
         // Find and expand a node by selection.
         if ($this->options->selection->indfirst != -2) {
-            $indfirst = $this->options->selection->indfirst + $this->addedatstart;
-            $indlast = $this->options->selection->indlast + $this->addedatstart;
+            $indfirst = $this->options->selection->indfirst;
+            $indlast = $this->options->selection->indlast;
             $idcounter = $this->parser->get_max_id() + 1;
             $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
         }
@@ -353,14 +353,6 @@ class qtype_preg_regex_handler {
 
     public function get_selected_node() {
         return $this->selectednode;
-    }
-
-    public function added_at_start() {
-        return $this->addedatstart;
-    }
-
-    public function added_at_end() {
-        return $this->addedatend;
     }
 
     /**
@@ -591,6 +583,7 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->set_options($this->options);
+        $this->lexer->set_added_at_start($this->addedatstart);
 
         $this->parser = new qtype_preg_yyParser($this->options);
 
