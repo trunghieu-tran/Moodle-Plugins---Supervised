@@ -26,10 +26,10 @@ function qtype_preg_get_json_array() {
     $notation = optional_param('notation', '', PARAM_RAW);
     $exactmatch = (bool)optional_param('exactmatch', '', PARAM_INT);
     $usecase = (bool)optional_param('usecase', '', PARAM_INT);
-    $treeorientation = optional_param('treeorientation', '', PARAM_TEXT);
-    $displayas = optional_param('displayas', '', PARAM_RAW);
     $indfirst = optional_param('indfirst', null, PARAM_INT);
     $indlast = optional_param('indlast', null, PARAM_INT);
+    $treeorientation = optional_param('treeorientation', '', PARAM_TEXT);
+    $displayas = optional_param('displayas', '', PARAM_RAW);
 
     // Array with authoring tools
     $options = new qtype_preg_authoring_tools_options();

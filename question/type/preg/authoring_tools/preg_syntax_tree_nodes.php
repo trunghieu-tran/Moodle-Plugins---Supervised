@@ -148,8 +148,8 @@ abstract class qtype_preg_syntax_tree_node {
         $color = $this->color();
         $id = $this->pregnode->id . ',' . ($this->pregnode->position->indfirst - $context->addedatstart) . ',' . ($this->pregnode->position->indlast - $context->addedatstart);
         $result = "id = \"$id\", label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
-        if ($this->pregnode->position->indfirst - $context->addedatstart >= $context->selection->indfirst &&
-            $this->pregnode->position->indlast - $context->addedatstart <= $context->selection->indlast) {
+        if ($this->pregnode->position->indfirst >= $context->selection->indfirst &&
+            $this->pregnode->position->indlast <= $context->selection->indlast) {
             $result .= ', style = dotted';
         }
         return '[' . $result . ']';
