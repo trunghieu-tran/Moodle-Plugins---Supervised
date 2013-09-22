@@ -86,6 +86,7 @@ $string['uselexemhint_help'] = '<p>In behaviours which allow multiple tries (e.g
 /******* Abstract syntax tree nodes descriptions *******/
 // Types.
 $string['leaf_charset']                = 'character set';
+$string['leaf_charset_one']            = 'character';
 $string['leaf_meta']                   = 'meta-character or escape-sequence';
 $string['leaf_assert']                 = 'simple assertion';
 $string['leaf_backref']                = 'backreference';
