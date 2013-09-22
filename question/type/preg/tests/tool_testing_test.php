@@ -91,4 +91,18 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '');
     }
+
+    function test_selection() {
+        $regex = 'a';
+        $strings = 'a';
+        $usecase = false;
+        $exactmatch = false;
+        $engine = 'nfa_matcher';
+        $notation = 'native';
+
+        $json = array();
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 0));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<span class="partiallycorrect">a</span><br />');
+    }
  }

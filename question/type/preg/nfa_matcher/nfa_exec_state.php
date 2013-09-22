@@ -190,7 +190,11 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function to_matching_results() {
         $index = array();
         $length = array();
+        $subexprs = array(-2);
         for ($subexpr = 0; $subexpr <= $this->matcher->automaton->max_subexpr(); $subexpr++) {
+            $subexprs[] = $subexpr;
+        }
+        foreach ($subexprs as $subexpr) {
             if (!isset($this->subexpr_to_subpatt[$subexpr])) {
                 // Can get here when {0} occurs in the regex.
                 $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
