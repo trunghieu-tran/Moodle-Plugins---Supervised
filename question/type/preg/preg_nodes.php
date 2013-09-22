@@ -112,11 +112,8 @@ class qtype_preg_lexem {
     /**
      * Sets position and userinscription for the node.
      */
-    public function set_user_info($position, $userinscription = null) {
+    public function set_user_info($position, $userinscription = array()) {
         $this->position = $position;
-        if ($userinscription === null) {
-            $userinscription = new qtype_preg_userinscription();
-        }
         $this->userinscription = $userinscription;
     }
 }
@@ -313,11 +310,8 @@ abstract class qtype_preg_node {
     /**
      * Sets position and userinscription for the node.
      */
-    public function set_user_info($position, $userinscription = null) {
+    public function set_user_info($position, $userinscription = array()) {
         $this->position = $position;
-        if ($userinscription === null) {
-            $userinscription = new qtype_preg_userinscription();
-        }
         $this->userinscription = $userinscription;
     }
 

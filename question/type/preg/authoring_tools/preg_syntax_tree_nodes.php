@@ -150,11 +150,6 @@ abstract class qtype_preg_syntax_tree_node {
     }
 
     protected function label() {
-        // Is userinscription an object?
-        if (is_object($this->pregnode->userinscription)) {
-            return shorten_text(self::userinscription_to_string($this->pregnode->userinscription, true));
-        }
-        // Userinscription is an array, iterate over all objects.
         $label = '';
         foreach ($this->pregnode->userinscription as $userinscription) {
             $label .= shorten_text(self::userinscription_to_string($userinscription, true)) . '&#10;';
@@ -253,9 +248,6 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         if ($this->pregnode->negative) {
             $result = '^' . $result;
         }
-        if (is_array($this->pregnode->userinscription)) {
-            $result = '&#91;' . $result . '&#93;';
-        }
         return '<' . $result . '>';
     }
 
@@ -266,10 +258,6 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg');
         } else {
             $tooltip = get_string($this->pregnode->type, 'qtype_preg');
-        }
-
-        if (is_object($this->pregnode->userinscription)) {
-            return $tooltip . '&#10;' . self::userinscription_to_string($this->pregnode->userinscription, false);
         }
         foreach ($this->pregnode->userinscription as $userinscription) {
             $tooltip .= '&#10;' . self::userinscription_to_string($userinscription, false);
