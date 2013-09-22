@@ -86,6 +86,7 @@ $string['uselexemhint_help'] = '<p>В поведениях, разрешающи
 /******* Abstract syntax tree nodes descriptions *******/
 // Types.
 $string['leaf_charset']                = 'символьный класс';
+$string['leaf_charset_one']            = 'символ';
 $string['leaf_meta']                   = 'мета-символ или escape-последовательность';
 $string['leaf_assert']                 = 'простой ассерт';
 $string['leaf_backref']                = 'обратная ссылка';

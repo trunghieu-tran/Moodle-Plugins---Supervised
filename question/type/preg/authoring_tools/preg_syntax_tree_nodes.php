@@ -85,9 +85,20 @@ abstract class qtype_preg_syntax_tree_node {
      * Replaces non-printable and special characters in the given string.
      * Highlights them if needed.
      */
-    protected static function userinscription_to_string($userinscription, $usecolor) {
+    protected static function userinscription_to_string($userinscription, $fortooltip) {
         if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
-            return $usecolor ? '<font color="blue">' . $userinscription->data . '</font>' : $userinscription->data;
+            if (!$fortooltip) {
+                return '<font color="blue">' .
+                            ($userinscription->data != '.'
+                            ? $userinscription->data
+                            : get_string('description_charflag_dot', 'qtype_preg')) .
+                       '</font>';
+                //return '<font color="blue">' . $userinscription->data . '</font>';
+            } else if ($userinscription->data != '.') {
+                return get_string('description_charflag_slash' . $userinscription->data[1], 'qtype_preg');
+            } else {
+                return get_string('description_charflag_dot', 'qtype_preg');
+            }
         }
 
         $special = array('"' => '&#34;',
@@ -105,14 +116,14 @@ abstract class qtype_preg_syntax_tree_node {
 
         for ($code = 1; $code <= 0x20; $code++) {
             $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
-            if ($usecolor) {
+            if (!$fortooltip) {
                 $replacement = '<font color="blue">' . $replacement . '</font>';
             }
             $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
         }
         foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
             $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
-            if ($usecolor) {
+            if (!$fortooltip) {
                 $replacement = '<font color="blue">' . $replacement . '</font>';
             }
             $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
@@ -152,7 +163,7 @@ abstract class qtype_preg_syntax_tree_node {
     protected function label() {
         $label = '';
         foreach ($this->pregnode->userinscription as $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, true)) . '&#10;';
+            $label .= shorten_text(self::userinscription_to_string($userinscription, false)) . '&#10;';
         }
         return $label;
     }
@@ -252,15 +263,28 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
     }
 
     protected function tooltip() {
+        $start = 0;
+        $end = count($this->pregnode->userinscription);
         if (count($this->pregnode->errors) > 0) {
             $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg');
         } else if ($this->pregnode->negative) {
             $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg');
+        } else if ($end == 1) {
+            $tooltip = get_string($this->pregnode->type . '_one', 'qtype_preg');
         } else {
             $tooltip = get_string($this->pregnode->type, 'qtype_preg');
         }
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $tooltip .= '&#10;' . self::userinscription_to_string($userinscription, false);
+        if ($end > 2 && $this->pregnode->userinscription[$end - 1] == ']' ) {
+            $start++;
+            $end--;
+        } else if ($end == 1 && $this->pregnode->userinscription[0]->type == qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
+            $tooltip = '';
+        }
+        for ($i = $start; $i < $end; ++$i) {
+            if ($tooltip != '') {
+                $tooltip .= ($start > 0) ? '&#10;' : ' ';
+            }
+            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], true);
         }
         return $tooltip;
     }
