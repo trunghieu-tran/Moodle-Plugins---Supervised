@@ -29,7 +29,7 @@ function qtype_preg_get_json_array() {
     $selection = new qtype_preg_position($indfirst, $indlast);
 
     $json = array();
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection);
     $regex_testing_tool->generate_json($json);
 
     return $json;

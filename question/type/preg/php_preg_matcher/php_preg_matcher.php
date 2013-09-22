@@ -139,7 +139,15 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
                     $matchresults->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
                 }
             }
+            // Show selection if it is equivalent to some capturing subexpression.
+            // TODO: find a way to show selection when it's not equivalent to capturing subexpression, without interfering with subpattern numbering.
+            if ($this->selectednode !== null && is_a($this->selectednode, 'qtype_preg_node_subexpr') && $this->selectednode->number > -1) {
+                // There is selection and it is capturing subexpression.
+                $matchresults->index_first[-2] = $matchresults->index_first[$this->selectednode->number];
+                $matchresults->length[-2] = $matchresults->length[$this->selectednode->number];
+            }
         }
+
         return $matchresults;
     }
 }
