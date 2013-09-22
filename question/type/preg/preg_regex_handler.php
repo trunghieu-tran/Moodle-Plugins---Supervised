@@ -618,10 +618,34 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $this->ast_root = $this->parser->get_root();
+        $this->build_dst();
+
+        fclose($pseudofile);
+    }
+
+    protected function build_dst() {
         if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
         }
+    }
 
-        fclose($pseudofile);
+    protected function find_parent_node($node) {
+        if ($this->ast_root === null || $this->ast_root === $node) {
+            return null;
+        }
+        $cur = array($this->ast_root);
+        while (count($cur) > 0) {
+            $tmp = array_pop($cur);
+            if (is_a($tmp, 'qtype_preg_leaf')) {
+                continue;
+            }
+            foreach ($tmp->operands as $operand) {
+                if ($operand === $node) {
+                    return $tmp;
+                }
+                $cur[] = $operand;
+            }
+        }
+        return null;
     }
 }

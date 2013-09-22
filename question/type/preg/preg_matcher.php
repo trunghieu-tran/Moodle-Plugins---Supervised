@@ -388,8 +388,6 @@ class qtype_preg_matching_options extends qtype_preg_handling_options {
     public $preferredalphabet = null;
     /** @var string Unicode property name for preferred characters for dot meta-character when generating extension.*/
     public $preferfordot = null;
-    /** @var TODO Selection to be added as special subexpression match.*/
-    public $selection = null;
 
     /** @var boolean Should matcher look for subexpression captures or the whole match only? */
     // TODO - does we need to specify subexpressions we are looking for or there is no sense in it?
@@ -477,6 +475,29 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         // If there were backreferences in regex, subexpression capturing should be forced.
         if ($this->lexer !== null && !$this->options->capturesubexpressions) {
             $this->options->capturesubexpressions = (count($this->lexer->get_backrefs()) > 0);
+        }
+
+        // Add a selection subexpression if needed.
+        if ($this->selectednode !== null) {
+            $parent = $this->find_parent_node($this->selectednode);
+            $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
+            $subexpression->subpattern = -2;
+            $subexpression->set_user_info($this->selectednode->position);
+            if ($parent === null) {
+                // Replace the AST root.
+                $subexpression->operands[] = $this->ast_root;
+                $this->ast_root = $subexpression;
+            } else {
+                // Just insert a subexpression.
+                $subexpression->operands[] = $this->selectednode;
+                foreach ($parent->operands as $key => $operand) {
+                    if ($operand === $this->selectednode) {
+                        $parent->operands[$key] = $subexpression;
+                        break;
+                    }
+                }
+            }
+            $this->build_dst();
         }
 
         // Invalidate match called later to allow parser to count subexpression.
