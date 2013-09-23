@@ -82,14 +82,9 @@
       */
     protected function create_parens_node($operator, $operand, $closeparen) {
         $position = $operator->position->compose($closeparen->position);
-        if ($operator->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
-            $result = $operand;
-            $result->set_user_info($position, $operand->userinscription);
-        } else {
-            $result = $operator;
-            $result->operands[0] = $operand;
-            $result->set_user_info($position, array(new qtype_preg_userinscription($operator->userinscription[0] . '...)')));
-        }
+        $result = $operator;
+        $result->operands[0] = $operand;
+        $result->set_user_info($position, array(new qtype_preg_userinscription($operator->userinscription[0] . '...)')));
         return $result;
     }
 

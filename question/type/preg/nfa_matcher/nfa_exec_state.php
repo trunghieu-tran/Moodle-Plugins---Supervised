@@ -92,6 +92,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function count_captured_subpatters() {
         $result = 0;
         foreach ($this->matches as $subpatt => $repetitions) {
+            if ($subpatt == -2) {
+                continue;
+            }
             foreach ($repetitions as $repetition) {
                 if ($repetition[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                     $result++;

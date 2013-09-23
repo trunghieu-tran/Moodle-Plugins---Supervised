@@ -92,7 +92,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($json['regex_test'] == '');
     }
 
-    function test_selection() {
+    function test_selection_1() {
         $regex = 'a';
         $strings = 'a';
         $usecase = false;
@@ -104,5 +104,19 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 0));
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<span class="partiallycorrect">a</span><br />');
+    }
+
+    function test_selection_2() {
+        $regex = 'a(?:bc)d';
+        $strings = 'abcd';
+        $usecase = false;
+        $exactmatch = false;
+        $engine = 'nfa_matcher';
+        $notation = 'native';
+
+        $json = array();
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 6));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
     }
  }

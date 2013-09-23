@@ -201,6 +201,9 @@ abstract class qtype_preg_nfa_node {
         // Copy this node to the starting transitions.
         foreach ($body['start']->outgoing_transitions() as $transition) {
             $transition->subpatt_start[$this->pregnode->subpattern] = $this->pregnode;
+            if ($this->pregnode->subpattern < 0) {
+                continue;
+            }
             if ($transition->min_subpatt_node == null || $transition->min_subpatt_node->subpattern > $this->pregnode->subpattern) {
                 $transition->min_subpatt_node = $this->pregnode;
             }
