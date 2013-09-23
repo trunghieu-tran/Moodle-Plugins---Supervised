@@ -245,13 +245,18 @@ class qtype_preg_regex_handler {
      * @param object options - options to handle regex, i.e. any necessary additional parameters.
      */
     public function __construct($regex = null, $options = null) {
-        if ($regex == '' || $regex === null) {
-            return;
-        }
-
         // Options should exist at least as a default object.
         if ($options === null) {
             $options = new qtype_preg_handling_options();
+        }
+        if ($options->selection === null) {
+            $options->selection = new qtype_preg_position(-2, -2);
+        }
+
+        if ($regex == '' || $regex === null) {
+            $this->regex = new qtype_poasquestion_string('');
+            $this->options = $options;
+            return;
         }
 
         // Convert to actually used notation if necessary.
@@ -261,11 +266,6 @@ class qtype_preg_regex_handler {
             $notationobj = new $notationclass($regex, $options);
             $regex = $notationobj->convert_regex($usednotation);
             $options = $notationobj->convert_options($usednotation);
-        }
-
-        // Deal with the selection.
-        if ($options->selection === null) {
-            $options->selection = new qtype_preg_position(-2, -2);
         }
 
         if ($options->exactmatch) {
