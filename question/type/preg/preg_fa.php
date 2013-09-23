@@ -1303,10 +1303,10 @@ abstract class qtype_preg_finite_automaton {
                         switch($asserts[0]) {
                             case '\\b': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b; break;
                             case '\\B': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b(true); break;
-                            case '\\A': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_a; break;
-                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z; break;
-                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z(true); break;
-                            case '\\G': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_g; break;
+                            case '\\A': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_esc_a; break;
+                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_small_esc_z; break;
+                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_capital_esc_z; break;
+                            case '\\G': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_esc_g; break;
                             case '^': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_circumflex; break;
                             case '$': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_dollar; break;
                         }
@@ -1318,8 +1318,8 @@ abstract class qtype_preg_finite_automaton {
                         case '\\b': $pregleaf = new qtype_preg_leaf_assert_esc_b; break;
                         case '\\B': $pregleaf = new qtype_preg_leaf_assert_esc_b(true); break;
                         case '\\A': $pregleaf = new qtype_preg_leaf_assert_esc_a; break;
-                        case '\\z': $pregleaf = new qtype_preg_leaf_assert_esc_z; break;
-                        case '\\Z': $pregleaf = new qtype_preg_leaf_assert_esc_z(true); break;
+                        case '\\z': $pregleaf = new qtype_preg_leaf_assert_small_esc_z; break;
+                        case '\\Z': $pregleaf = new qtype_preg_leaf_assert_capital_esc_z; break;
                         case '\\G': $pregleaf = new qtype_preg_leaf_assert_esc_g; break;
                         case '^': $pregleaf = new qtype_preg_leaf_assert_circumflex; break;
                         case '$': $pregleaf = new qtype_preg_leaf_assert_dollar; break;
@@ -1329,10 +1329,10 @@ abstract class qtype_preg_finite_automaton {
                         switch($asserts[0]) {
                             case '\\b': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b; break;
                             case '\\B': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_b(true); break;
-                            case '\\A': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_a; break;
-                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z; break;
-                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_z(true); break;
-                            case '\\G': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_esc_g; break;
+                            case '\\A': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_esc_a; break;
+                            case '\\z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_small_esc_z; break;
+                            case '\\Z': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_capital_esc_z; break;
+                            case '\\G': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_esc_g; break;
                             case '^': $pregleaf->assertionsafter[] = new qtype_preg_leaf_assert_circumflex; break;
                             case '$': $pregleaf->assertionsbefore[] = new qtype_preg_leaf_assert_dollar; break;
                         }
