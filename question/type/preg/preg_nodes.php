@@ -321,13 +321,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      */
     public function intersect_asserts($other) {
         $esca = new qtype_preg_leaf_assert_esc_a;
-        $escbigz = new qtype_preg_leaf_assert_esc_z(true);
-        $escz = new qtype_preg_leaf_assert_esc_z;
+        $escbigz = new qtype_preg_leaf_assert_capital_esc_z;
+        $escz = new qtype_preg_leaf_assert_small_esc_z;
 
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $thisclone = clone($this);
-            if ($this->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+            if ($this->is_afterassertion()) {
                 array_unshift ($this->assertionsafter, $thisclone);
             } else {
                 array_unshift ($this->assertionsbefore, $thisclone);
@@ -335,7 +335,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $otherclone = clone($other);
-            if ($other->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+            if ($other->is_afterassertion()) {
                 array_unshift ($other->assertionsafter, $otherclone);
             } else {
                 array_unshift ($other->assertionsbefore, $otherclone);
@@ -369,10 +369,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
         foreach ($resultafter as $assert) {
             $key = array_search($assert, $resultafter);
-            // Searching compatible asserts.
-            if (array_search($esca, $resultbefore) !== false) {
-                unset($resultafter[$key]);
-                $resultafter = array_values($resultafter);
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                // Searching compatible asserts.
+                if (array_search($esca, $resultafter) !== false) {
+                    unset($resultafter[$key]);
+                    $resultafter = array_values($resultafter);
+                }
             }
         }
 
@@ -395,6 +397,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else {
             if (count($resultbefore) != 0) {
             	switch($resultbefore[0]->subtype) {
+                    // TODO delete esc_b from there when it would be made in 4 ways.
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_B: 
                         if ($resultbefore[0]->negative) {
                             $assert = new qtype_preg_leaf_assert_esc_b(true);
@@ -402,26 +405,29 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                             $assert = new qtype_preg_leaf_assert_esc_b;
                         }
                         break;
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_A: 
-                        $assert = new qtype_preg_leaf_assert_esc_a; 
+                    case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z: 
+                        $assert = new qtype_preg_leaf_assert_capital_esc_z;
                         break;
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_Z: 
-                        if ($resultbefore[0]->negative) {
-                            $assert = new qtype_preg_leaf_assert_esc_z(true);
-                        } else {
-                            $assert = new qtype_preg_leaf_assert_esc_z;
-                        }
+                    case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z: 
+                        $assert = new qtype_preg_leaf_assert_small_esc_z;
                         break;
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_G: 
-                        $assert = new qtype_preg_leaf_assert_esc_g; 
-                        break; 
                     case qtype_preg_leaf_assert::SUBTYPE_DOLLAR: 
                         $assert = new qtype_preg_leaf_assert_dollar; 
                         break;
                 }
                 unset($resultbefore[0]);
             } else if (count($resultafter) != 0) {
-                $assert = new qtype_preg_leaf_assert_circumflex; 
+                switch($resultafter[0]->subtype) {
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_A: 
+                        $assert = new qtype_preg_leaf_assert_esc_a; 
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_G: 
+                        $assert = new qtype_preg_leaf_assert_esc_g; 
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:       
+                        $assert = new qtype_preg_leaf_assert_circumflex;
+                        break;
+                } 
                 unset($resultafter[0]);
             } else {
                 $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
@@ -430,14 +436,14 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $assert->assertionsbefore = $resultbefore;
         $assert->assertionsafter = $resultafter;
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            if ($this->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+            if ($this->is_afterassertion()) {
                 unset($this->assertionsafter[0]);
             } else {
                 unset($this->assertionsbefore[0]);
             }
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            if ($other->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+            if ($other->is_afterassertion()) {
                 unset($other->assertionsafter[0]);
             } else {
                 unset($other->assertionsbefore[0]);
