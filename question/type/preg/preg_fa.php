@@ -1608,6 +1608,7 @@ abstract class qtype_preg_finite_automaton {
      * @param del - uncapturing transition for deleting.
      */
     public function merge_transitions($del) {
+        $waschanged = false;
         // Cycle with empty transition
         if ($del->to == $del->from && $del->is_eps()) {
             $this->del_transition($del);
@@ -1637,6 +1638,7 @@ abstract class qtype_preg_finite_automaton {
                     $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
                 }
                 $this->remove_state($del->to);
+                $waschanged = true;
             }
 
             // Changing leafs in case of merging.
@@ -1680,11 +1682,10 @@ abstract class qtype_preg_finite_automaton {
                     $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
                 }
                 $this->remove_state($del->to);
-                return true;
-            } else {
-                return false;
+                $waschanged = true;
             }
         }
+        return $waschanged;
     }
 
     /**
@@ -1724,14 +1725,18 @@ abstract class qtype_preg_finite_automaton {
                                 if ($tran->to == $stateindex) {
                                     $stateindex = $tran->from;
                                 }
-                                $this->merge_transitions($tran);
-                                $waschanged = true;
+                                $waschanged = $this->merge_transitions($tran);
                             }
                             // Adding changed state to new wavefront.
                             $newfront[] = $state;
                             $addedstate = array_search($state, $stateschecked);
                             if ($addedstate !== false) {
                                 unset($stateschecked[$addedstate]);
+                            }
+                            // If nothing changes in automata state is checked.
+                            if (!$waschanged) {
+                                $stateschecked[] = $state;
+                                $newfront[] = $tran->to;
                             }
                             $outtransitions = $this->get_adjacent_transitions($state, true);
                             // Delete cycle of uncapturing transition.
