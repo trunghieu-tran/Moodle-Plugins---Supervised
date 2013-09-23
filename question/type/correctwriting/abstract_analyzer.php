@@ -50,6 +50,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      */
     protected $basestringpair;
 
+
     /**
      * Best (judging by fitness) string pairs generated as result of analyzer's work.
      *
@@ -77,7 +78,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * You are normally don't want to overload it. Overload analyze() and bypass() instead.
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      * When called without params just creates empty object to call analyzer-dependent functions on.
-     *
+     * @throws moodle_exception if invalid number of string pairs
      * @param qtype_correctwriting_question $question
      * @param qtype_correctwriting_string_pair $basepair a pair, passed as input
      * @param block_formal_langs_abstract_language $language a language
@@ -139,7 +140,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * Fitness is negative or zero (no errors, full match).
      * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight.
      * Each analyzer will calculate fitness only for it's own mistakes, ignoring mistakes from other analyzers.
-     * @param array of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
+     * @param array $mistakes of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
      */
     abstract public function fitness($mistakes);
 
@@ -171,6 +172,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
     /**
      * Called from edit_correctwriting_form::definition_inner() within form section for this analyzer.
      * You will typically call parent, then add other fields.
+     * @param MoodleQuickForm $mform
      */
     public function form_section_definition(&$mform) {
         foreach ($this->float_form_fields() as $params) {
@@ -212,7 +214,8 @@ abstract class qtype_correctwriting_abstract_analyzer {
     /**
      * Returns if the language is compatible with this analyzer.
      * I.e. syntax analyzer compatible only with parser containing languages.
-     * @param $lang a language object from block_formal_langs
+     * @param block_formal_langs_abstract_language $lang a language object from block_formal_langs
+     * @return boolean
      */
     public function is_lang_compatible($lang) {
         return true; // Accept all by default.
