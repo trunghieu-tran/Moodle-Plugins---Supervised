@@ -308,8 +308,12 @@ class qtype_preg_regex_handler {
                 if ($indlast >= $skipped->indfirst && $indlast <= $skipped->indlast) {
                     $indlast = $skipped->indfirst - 1;
                 }
+                if ($indlast < $indfirst) {
+                    $indfirst = -2;
+                    $indlast = -2;
+                }
             }
-            if ($indlast >= $indfirst) {
+            if ($indfirst != -2) {
                 $idcounter = $this->parser->get_max_id() + 1;
                 $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
             }
