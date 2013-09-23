@@ -87,6 +87,7 @@ $string['uselexemhint_help'] = '<p>В поведениях, разрешающи
 // Types.
 $string['leaf_charset']                = 'символьный класс';
 $string['leaf_charset_one']            = 'символ';
+$string['leaf_charset_except']         = 'любой символ кроме';
 $string['leaf_meta']                   = 'мета-символ или escape-последовательность';
 $string['leaf_assert']                 = 'простой ассерт';
 $string['leaf_backref']                = 'обратная ссылка';
@@ -105,11 +106,11 @@ $string['node_error']                  = 'синтаксическая ошиб�
 // Subtypes.
 $string['empty_leaf_meta']             = 'ничего';
 $string['esc_b_leaf_assert']           = 'граничные ассерты слова';
-$string['esc_a_leaf_assert']           = 'начало объекта ассерта';
-$string['esc_z_leaf_assert']           = 'конец объекта ассерта';
+$string['esc_a_leaf_assert']           = 'начало строки';
+$string['esc_z_leaf_assert']           = 'конец строки';
 $string['esc_g_leaf_assert']           = '';
-$string['circumflex_leaf_assert']      = 'начало объекта ассерта';
-$string['dollar_leaf_assert']          = 'конец объекта ассерта';
+$string['circumflex_leaf_assert']      = 'начало строки';
+$string['dollar_leaf_assert']          = 'конец строки';
 $string['accept_leaf_control']         = '';   // TODO
 $string['fail_leaf_control']           = '';
 $string['mark_name_leaf_control']      = '';
