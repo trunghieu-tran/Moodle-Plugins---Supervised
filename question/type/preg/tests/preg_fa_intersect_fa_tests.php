@@ -990,11 +990,11 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $lexer->nextToken()->value;
         $assert2 = new qtype_preg_leaf_assert_esc_a;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^a]"];
-        $transition1->pregleaf->mergedassertions[] = $assert1;
+        $transition1->pregleaf->assertionsafter[] = $assert1;
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\Aa-c]"];
-        $transition1->pregleaf->mergedassertions[] = $assert2;
+        $transition1->pregleaf->assertionsafter[] = $assert2;
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
-        $rescharset->mergedassertions[] = $assert2;
+        $rescharset->assertionsafter[] = $assert2;
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER); //0->1[label="[\\Aa]"];
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
@@ -1008,12 +1008,12 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $assert2 = new qtype_preg_leaf_assert_dollar;
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
-        $restran->pregleaf->mergedassertions[] = $assert1;
-        $restran->pregleaf->mergedassertions[] = $assert2;
+        $restran->pregleaf->assertionsafter[] = $assert1;
+        $restran->pregleaf->assertionsbefore[] = $assert2;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);   //0->1[label="[^a]"];
-        $transition1->pregleaf->mergedassertions[] = $assert1;
+        $transition1->pregleaf->assertionsafter[] = $assert1;
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);   //0->1[label="[$a]"];
-        $transition2->pregleaf->mergedassertions[] = $assert2;
+        $transition2->pregleaf->assertionsbefore[] = $assert2;
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -1024,13 +1024,13 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);//0->1[label="[(^a]"];
-        $transition1->pregleaf->mergedassertions[] = $assert;
+        $transition1->pregleaf->assertionsafter[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
         $transition2 = new qtype_preg_nfa_transition(0, $leaf, 1);      //0->1[label="[(^a]"];
-        $transition2->pregleaf->mergedassertions[] = $assert;
+        $transition2->pregleaf->assertionsafter[] = $assert;
         $transition2->subpatt_start[] = $subpatt;
         $rescharset = $leaf->intersect_leafs($leaf, true, true);
-        $rescharset->mergedassertions[] = $assert;
+        $rescharset->assertionsafter[] = $assert;
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);   //0->1[label="[(^a]"];
         $restran->subpatt_start[] = $subpatt;
         $resulttran = $transition1->intersect($transition2);
@@ -1042,10 +1042,10 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf = $lexer->nextToken()->value;
         $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[^a]"];
-        $transition1->pregleaf->mergedassertions[] = $assert;
+        $transition1->pregleaf->assertionsafter[] = $assert;
         $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[a]"];
         $rescharset = $leaf->intersect_leafs($leaf, false, false);
-        $rescharset->mergedassertions[] = $assert;
+        $rescharset->assertionsafter[] = $assert;
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);        //0->1[label="[^a]"];
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
@@ -1057,11 +1057,11 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $assert = new qtype_preg_leaf_assert_circumflex;
         $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);  //0->1[label="[(^a]"];
-        $transition1->pregleaf->mergedassertions[] = $assert;
+        $transition1->pregleaf->assertionsafter[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
         $transition2 = new qtype_preg_nfa_transition(0, $leaf, 1);  //0->1[label="[a]"];
         $rescharset = $leaf->intersect_leafs($leaf, true, false);
-        $rescharset->mergedassertions[] = $assert;
+        $rescharset->assertionsafter[] = $assert;
         $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $restran->subpatt_start[] = $subpatt;                       //0->1[label="[(^a]"];
         $resulttran = $transition1->intersect($transition2);
@@ -1305,10 +1305,11 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 1->3[label="[a-c]"];
                             }';
         $dotresult = 'digraph res {
-                        "0   1";
-                        3;
-                        "0   1"->2[label = "[\\A01]", color = violet];
-                        "0   1"->3[label = "[\\Aa-c]", color = violet];
+                                0;
+                                3;
+                                0->1[label="[\\A]"];
+                                1->2[label="[01]"];
+                                1->3[label="[a-c]"];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1319,12 +1320,9 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
-        $search = '
-                    ';
-        $replace = "\n";
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $input->fa_to_dot();
-        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merging_start_of_cycle() {
@@ -1411,6 +1409,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $input->merge_transitions($del);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
+        var_dump($input->fa_to_dot());
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
@@ -1502,11 +1501,11 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 0->1[label="[^]"];
                             }';
         $dotresult = 'digraph res {
-                        "0   1";
-                        2;
-                        "0   1"->"/1"[label = "[^]", color = violet];
-                        "0   1"->2[label = "[\A0-9]", color = violet];
-                        "/1"->2[label = "[0-9]", color = violet];
+                                0;
+                                2;
+                                0->1[label="[\\A]"];
+                                1->2[label="[0-9]"];
+                                0->1[label="[^]"];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1515,12 +1514,9 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
-        $search = '
-                    ';
-        $replace = "\n";
-        $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $input->fa_to_dot();
-        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result->read_fa($dotresult);
+        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merging_two_asserts() {
@@ -1549,7 +1545,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
-    /*public function test_merging_one_state_several_times() {
+    public function test_merging_one_state_several_times() {
         $dotdescription = 'digraph example {
                                 0;
                                 3;
@@ -1573,7 +1569,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
-    }*/
+    }
 
     public function test_only_eps_transitions() {
         $dotdescription = 'digraph example {
@@ -1633,7 +1629,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
-    /*public function test_different_ways_of_merging() {
+    public function test_different_ways_of_merging() {
         $dotdescription = 'digraph example {
                                 0;
                                 5;
@@ -1649,10 +1645,11 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                         5;
                         "0   1"->3[label = "[xy]", color = violet];
                         "0   1"->2[label = "[$0-9]", color = violet];
-                        2->4[label = "[^a-c]", color = violet];
-                        2->5[label = "[^01]", color = violet];
+                        "0   1"->"/3"[label = "[$0-9^]", color = violet];
                         3->4[label = "[a-c]", color = violet];
                         3->5[label = "[01]", color = violet];
+                        "/3"->4[label = "[a-c]", color = violet];
+                        "/3"->5[label = "[01]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1667,7 +1664,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $dotresult = str_replace($search, $replace, $dotresult);
         $result = $input->fa_to_dot();
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
-    }*/
+    }
 
     public function test_merging_state_for_intersection() {
         $dotdescription = 'digraph example {
@@ -1681,7 +1678,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                         0;
                         3;
                         0->"1   2"[label = "[0-9^]", color = violet];
-                        "1   2"->3[label = "[\\A0-9]", color = violet];
+                        "1   2"->3[label = "[0-9\\A]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1698,7 +1695,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    /*public function test_merging_with_cycle() {
+    public function test_merging_with_cycle() {
         $dotdescription = 'digraph example {
                                 0;
                                 3;
@@ -1725,7 +1722,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
-    }*/
+    }
 }
 
 class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
@@ -1756,8 +1753,8 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
         $mergedassert1 = new qtype_preg_leaf_assert_dollar;
         //$assert1->mergedassertions = array($mergedassert1);
 
-        $assert2 = new qtype_preg_leaf_assert_esc_z;
-        $mergedassert2 = new qtype_preg_leaf_assert_esc_z;
+        $assert2 = new qtype_preg_leaf_assert_small_esc_z;
+        $mergedassert2 = new qtype_preg_leaf_assert_small_esc_z;
         
 
         $result = $assert1->intersect_asserts($assert2);
@@ -1787,7 +1784,7 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
         $assert1 = new qtype_preg_leaf_assert_esc_b;
         $assert2 = new qtype_preg_leaf_assert_esc_a;
         $assertresult = new qtype_preg_leaf_assert_esc_b; 
-        $assertresult->assertionsbefore = array(1=>$assert2);
+        $assertresult->assertionsafter = array($assert2);
 
         $result = $assert1->intersect_asserts($assert2);
         $this->assertEquals($assertresult, $result, 'Result assert is not equal to expected');
@@ -2071,7 +2068,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
                         "0,0";
                         "2,2";
                         "1,1"->"2,2"[label = "[$b ∩ b]", color = red];
-                        "0,0"->"1,1"[label = "[^a ∩ a]", color = red];
+                        "0,0"->"1,1"[label = "[a ∩ a^]", color = red];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -2115,7 +2112,7 @@ class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCas
                         "0,0";
                         "2,2";
                         "1,1"->"2,2"[label = "[(/$b/)]", color = blue, style = dotted];
-                        "0,0"->"1,1"[label = "[^a]", color = blue, style = dotted];
+                        "0,0"->"1,1"[label = "[a^]", color = blue, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -2906,17 +2903,17 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                         "0,";
                         "5,5";
-                        "0,"->"1   3,0"[label = "[a]", color = violet];
-                        "0,"->"1   3,"[label = "[a]", color = violet];
+                        "0,"->"1   3,0"[label = "[a^]", color = violet];
+                        "0,"->"1   3,"[label = "[a^]", color = violet];
                         "1   3,0"->"2,2"[label = "[a ∩ a]", color = red];
                         "1   3,0"->"2,3"[label = "[a ∩ a]", color = red];
-                        "1   3,0"->"4,2"[label = "[^a ∩ a]", color = red];
-                        "1   3,0"->"4,3"[label = "[^a ∩ a]", color = red];
-                        "2,2"->"1   3,4"[label = "[a ∩ a]", color = red];
-                        "2,2"->"1   3,3"[label = "[a ∩ a]", color = red];
+                        "1   3,0"->"4,2"[label = "[a ∩ a]", color = red];
+                        "1   3,0"->"4,3"[label = "[a ∩ a]", color = red];
+                        "2,2"->"1   3,4"[label = "[a ∩ a^]", color = red];
+                        "2,2"->"1   3,3"[label = "[a ∩ a^]", color = red];
                         "2,2"->"4,4"[label = "[a ∩ a]", color = red];
                         "2,2"->"4,3"[label = "[a ∩ a]", color = red];
-                        "2,3"->"1   3,5"[label = "[a ∩ a]", color = red];
+                        "2,3"->"1   3,5"[label = "[a ∩ a^]", color = red];
                         "2,3"->"4,5"[label = "[a ∩ a]", color = red];
                         "4,2"->"5,4"[label = "[a ∩ a]", color = red];
                         "4,2"->"5,3"[label = "[a ∩ a]", color = red];
@@ -2926,16 +2923,16 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "4,3"->"6,5"[label = "[a ∩ a]", color = red];
                         "1   3,4"->"2,3"[label = "[a ∩ a]", color = red];
                         "1   3,4"->"2,5"[label = "[a ∩ a]", color = red];
-                        "1   3,4"->"4,3"[label = "[^a ∩ a]", color = red];
-                        "1   3,4"->"4,5"[label = "[^a ∩ a]", color = red];
+                        "1   3,4"->"4,3"[label = "[a ∩ a]", color = red];
+                        "1   3,4"->"4,5"[label = "[a ∩ a]", color = red];
                         "1   3,3"->"2,5"[label = "[a ∩ a]", color = red];
-                        "1   3,3"->"4,5"[label = "[^a ∩ a]", color = red];
+                        "1   3,3"->"4,5"[label = "[a ∩ a]", color = red];
                         "4,4"->"5,3"[label = "[a ∩ a]", color = red];
                         "4,4"->"5,5"[label = "[a ∩ a]", color = red];
                         "4,4"->"6,3"[label = "[a ∩ a]", color = red];
                         "4,4"->"6,5"[label = "[a ∩ a]", color = red];
                         "1   3,5"->"2,"[label = "[a]", color = violet];
-                        "1   3,5"->"4,"[label = "[^a]", color = violet];
+                        "1   3,5"->"4,"[label = "[a]", color = violet];
                         "4,5"->"5,"[label = "[a]", color = violet];
                         "4,5"->"6,"[label = "[a]", color = violet];
                         "5,4"->"5,3"[label = "[a ∩ a]", color = red];
@@ -2948,14 +2945,14 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "6,4"->"6,5"[label = "[a ∩ a]", color = red];
                         "6,3"->"6,5"[label = "[a ∩ a]", color = red];
                         "6,5"->"5,5"[label = "[]", color = red];
-                        "2,5"->"1   3,"[label = "[a]", color = violet];
+                        "2,5"->"1   3,"[label = "[a^]", color = violet];
                         "2,5"->"4,"[label = "[a]", color = violet];
-                        "2,"->"1   3,"[label = "[a]", color = violet];
+                        "2,"->"1   3,"[label = "[a^]", color = violet];
                         "2,"->"4,"[label = "[a]", color = violet];
                         "4,"->"5,"[label = "[a]", color = violet];
                         "4,"->"6,"[label = "[a]", color = violet];
                         "1   3,"->"2,"[label = "[a]", color = violet];
-                        "1   3,"->"4,"[label = "[^a]", color = violet];
+                        "1   3,"->"4,"[label = "[a]", color = violet];
                         "5,"->"5,"[label = "[a]", color = violet];
                         "5,"->"6,"[label = "[a]", color = violet];
                         "5,"->"5,5"[label = "[]", color = violet];
@@ -3120,8 +3117,8 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                         "0,0";
                         "3,2";
-                        "0,0"->"1   2,1"[label = "[b ∩ ab]", color = red];
-                        "1   2,1"->"3,2"[label = "[^a ∩ ab]", color = red];
+                        "0,0"->"1   2,1"[label = "[b ∩ ab^]", color = red];
+                        "1   2,1"->"3,2"[label = "[a ∩ ab]", color = red];
                     }';
 
         $search = '
@@ -3651,15 +3648,16 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "1,"->"3,"[label = "[a-z]", color = violet];
                         "1,"->"2,0"[label = "[0-9]", color = violet];
                         "1,"->"3,0"[label = "[a-z]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "6,"->"2,"[label = "[^0-9]", color = violet];
-                        "6,"->"3,"[label = "[^a-z]", color = violet];
-                        "6,"->"2,0"[label = "[^0-9]", color = violet];
-                        "6,"->"3,0"[label = "[^a-z]", color = violet];
+                        "/1,"->"2,"[label = "[0-9]", color = violet];
+                        "/1,"->"3,"[label = "[a-z]", color = violet];
+                        "/1,"->"2,0"[label = "[0-9]", color = violet];
+                        "/1,"->"3,0"[label = "[a-z]", color = violet];
                         "0,"->"1,"[label = "[a-c]", color = violet];
+                        "0,"->"/1,"[label = "[a-c]", color = violet];
                         "4,"->"1,"[label = "[m]", color = violet];
-                        "4,"->"6,"[label = "[0]", color = violet];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
+                        "4,"->"/1,"[label = "[0^]", color = violet];
+                        "5,"->"1,"[label = "[0-9^]", color = violet];
+                        "5,"->"/1,"[label = "[0-9^]", color = violet];
                         "2,"->"4,"[label = "[a]", color = violet];
                         "3,"->"5,"[label = "[a-z]", color = violet];
                     }';
@@ -4068,7 +4066,7 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "7,";
                         "6,2"->"7,"[label = "[a-c]", color = violet];
                         "4,1"->"6,2"[label = "[ab ∩ ab]", color = red];
-                        "5,1"->"6,2"[label = "[^a ∩ ab]", color = red];
+                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
                         "2,0"->"4,1"[label = "[0 ∩ 01]", color = red];
                         "3,0"->"5,1"[label = "[012 ∩ 01]", color = red];
                         "1,2"->"2,0"[label = "[0-9 ∩ .]", color = red];
@@ -4855,7 +4853,7 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "1,"->"5,"[label = "[a-z]", color = violet];
                         "2,"->"8,"[label = "[as]", color = violet];
                         "3,"->"4,"[label = "[a-c]", color = violet];
-                        "5,0"->"6,1"[label = "[^a ∩ a-z]", color = red];
+                        "5,0"->"6,1"[label = "[a ∩ a-z^]", color = red];
                         "8,"->"9,"[label = "[ab]", color = violet];
                         "8,"->"1,"[label = "[ab]", color = violet];
                         "4,"->"8,"[label = "[ab]", color = violet];
@@ -4896,18 +4894,18 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "2,1"->"8,3"[label = "[as ∩ as]", color = red];
                         "3,9"->"4,9"[label = "[a-c ∩ b-n]", color = red];
                         "3,2"->"4,6"[label = "[a-c ∩ a-c]", color = red];
-                        "5,9"->"6,"[label = "[^a]", color = violet];
-                        "5,2"->"6,6"[label = "[^a ∩ a-c]", color = red];
+                        "5,9"->"6,"[label = "[a^]", color = violet];
+                        "5,2"->"6,6"[label = "[a ∩ a-c^]", color = red];
                         "3,1"->"4,2"[label = "[a-c ∩ ab]", color = red];
                         "3,1"->"4,3"[label = "[a-c ∩ as]", color = red];
-                        "5,1"->"6,2"[label = "[^a ∩ ab]", color = red];
-                        "5,1"->"6,3"[label = "[^a ∩ as]", color = red];
+                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
+                        "5,1"->"6,3"[label = "[a ∩ as^]", color = red];
                         "2,6"->"8,7"[label = "[as ∩ axy]", color = red];
                         "2,6"->"8,8"[label = "[as ∩ .]", color = red];
                         "3,6"->"4,7"[label = "[a-c ∩ axy]", color = red];
                         "3,6"->"4,8"[label = "[a-c ∩ .]", color = red];
-                        "5,6"->"6,7"[label = "[^a ∩ axy]", color = red];
-                        "5,6"->"6,8"[label = "[^a ∩ .]", color = red];
+                        "5,6"->"6,7"[label = "[a ∩ axy^]", color = red];
+                        "5,6"->"6,8"[label = "[a ∩ .^]", color = red];
                         "8,2"->"9,6"[label = "[ab ∩ a-c]", color = red];
                         "8,2"->"1,6"[label = "[ab ∩ a-c]", color = red];
                         "8,3"->"9,4"[label = "[ab ∩ .]", color = red];
@@ -4990,18 +4988,18 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "3,7"->"4,2"[label = "[a-c ∩ a-z]", color = red];
                         "3,8"->"4,9"[label = "[a-c ∩ a-c]", color = red];
                         "3,8"->"4,1"[label = "[a-c ∩ a-f]", color = red];
-                        "5,7"->"6,9"[label = "[^a ∩ a]", color = red];
-                        "5,7"->"6,2"[label = "[^a ∩ a-z]", color = red];
-                        "5,8"->"6,9"[label = "[^a ∩ a-c]", color = red];
-                        "5,8"->"6,1"[label = "[^a ∩ a-f]", color = red];
+                        "5,7"->"6,9"[label = "[a ∩ a^]", color = red];
+                        "5,7"->"6,2"[label = "[a ∩ a-z^]", color = red];
+                        "5,8"->"6,9"[label = "[a ∩ a-c^]", color = red];
+                        "5,8"->"6,1"[label = "[a ∩ a-f^]", color = red];
                         "2,5"->"8,6"[label = "[as ∩ as01]", color = red];
                         "3,5"->"4,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,5"->"6,6"[label = "[^a ∩ as01]", color = red];
+                        "5,5"->"6,6"[label = "[a ∩ as01^]", color = red];
                         "8,5"->"9,6"[label = "[ab ∩ as01]", color = red];
                         "8,5"->"1,6"[label = "[ab ∩ as01]", color = red];
                         "2,3"->"8,4"[label = "[as ∩ .]", color = red];
                         "3,3"->"4,4"[label = "[a-c ∩ .]", color = red];
-                        "5,3"->"6,4"[label = "[^a ∩ .]", color = red];
+                        "5,3"->"6,4"[label = "[a ∩ .^]", color = red];
                         "9,3"->"2,4"[label = "[ab ∩ .]", color = red];
                         "1,3"->"2,4"[label = "[ab ∩ .]", color = red];
                         "1,3"->"3,4"[label = "[ab ∩ .]", color = red];
@@ -5013,11 +5011,11 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "6,4"->"7,5"[label = "[a-c ∩ a-d]", color = red];
                         "2,4"->"8,5"[label = "[as ∩ a-d]", color = red];
                         "3,4"->"4,5"[label = "[a-c ∩ a-d]", color = red];
-                        "5,4"->"6,5"[label = "[^a ∩ a-d]", color = red];
+                        "5,4"->"6,5"[label = "[a ∩ a-d^]", color = red];
                         "7,5"->"8,6"[label = "[a-c ∩ as01]", color = red];
                         "4,5"->"8,6"[label = "[ab ∩ as01]", color = red];
                         "6,5"->"7,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,"->"6,"[label = "[^a]", color = violet];
+                        "5,"->"6,"[label = "[a^]", color = violet];
                         "6,"->"7,"[label = "[a-c]", color = violet];
                         "7,"->"8,"[label = "[a-c]", color = violet];
                     }';
@@ -5102,7 +5100,7 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "6,"->"7,0"[label = "[a-c]", color = violet];
                         "0,"->"1,"[label = "[a-c]", color = violet];
                         "0,"->"1,0"[label = "[a-c]", color = violet];
-                        "5,9"->"6,"[label = "[^a]", color = violet];
+                        "5,9"->"6,"[label = "[a^]", color = violet];
                         "1,9"->"5,9"[label = "[a-z ∩ b-n]", color = red];
                         "1,9"->"3,9"[label = "[ab ∩ b-n]", color = red];
                         "1,7"->"5,9"[label = "[a-z ∩ a]", color = red];
@@ -5218,14 +5216,14 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "8,5"->"1,6"[label = "[ab ∩ as01]", color = red];
                         "0,2"->"1,6"[label = "[a-c ∩ a-c]", color = red];
                         "0,5"->"1,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,7"->"6,9"[label = "[^a ∩ a]", color = red];
-                        "5,7"->"6,2"[label = "[^a ∩ a-z]", color = red];
-                        "5,8"->"6,9"[label = "[^a ∩ a-c]", color = red];
-                        "5,8"->"6,1"[label = "[^a ∩ a-f]", color = red];
-                        "5,6"->"6,7"[label = "[^a ∩ axy]", color = red];
-                        "5,6"->"6,8"[label = "[^a ∩ .]", color = red];
-                        "5,2"->"6,6"[label = "[^a ∩ a-c]", color = red];
-                        "5,5"->"6,6"[label = "[^a ∩ as01]", color = red];
+                        "5,7"->"6,9"[label = "[a ∩ a^]", color = red];
+                        "5,7"->"6,2"[label = "[a ∩ a-z^]", color = red];
+                        "5,8"->"6,9"[label = "[a ∩ a-c^]", color = red];
+                        "5,8"->"6,1"[label = "[a ∩ a-f^]", color = red];
+                        "5,6"->"6,7"[label = "[a ∩ axy^]", color = red];
+                        "5,6"->"6,8"[label = "[a ∩ .^]", color = red];
+                        "5,2"->"6,6"[label = "[a ∩ a-c^]", color = red];
+                        "5,5"->"6,6"[label = "[a ∩ as01^]", color = red];
                         "8,1"->"9,2"[label = "[ab ∩ ab]", color = red];
                         "8,1"->"1,2"[label = "[ab ∩ ab]", color = red];
                         "8,1"->"1,3"[label = "[ab ∩ as]", color = red];
@@ -5235,9 +5233,9 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "0,1"->"1,2"[label = "[a-c ∩ ab]", color = red];
                         "0,1"->"1,3"[label = "[a-c ∩ as]", color = red];
                         "0,4"->"1,5"[label = "[a-c ∩ a-d]", color = red];
-                        "5,1"->"6,2"[label = "[^a ∩ ab]", color = red];
-                        "5,1"->"6,3"[label = "[^a ∩ as]", color = red];
-                        "5,4"->"6,5"[label = "[^a ∩ a-d]", color = red];
+                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
+                        "5,1"->"6,3"[label = "[a ∩ as^]", color = red];
+                        "5,4"->"6,5"[label = "[a ∩ a-d^]", color = red];
                         "8,0"->"9,1"[label = "[ab ∩ a-z]", color = red];
                         "8,0"->"1,1"[label = "[ab ∩ a-z]", color = red];
                         "0,0"->"1,1"[label = "[a-c ∩ a-z]", color = red];
@@ -5250,8 +5248,8 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         "1,3"->"3,4"[label = "[ab ∩ .]", color = red];
                         "1,3"->"5,4"[label = "[a-z ∩ .]", color = red];
                         "1,3"->"2,4"[label = "[ab ∩ .]", color = red];
-                        "5,0"->"6,1"[label = "[^a ∩ a-z]", color = red];
-                        "5,3"->"6,4"[label = "[^a ∩ .]", color = red];
+                        "5,0"->"6,1"[label = "[a ∩ a-z^]", color = red];
+                        "5,3"->"6,4"[label = "[a ∩ .^]", color = red];
                         "2,1"->"8,2"[label = "[as ∩ ab]", color = red];
                         "2,1"->"8,3"[label = "[as ∩ as]", color = red];
                         "4,1"->"8,2"[label = "[ab ∩ ab]", color = red];
@@ -5303,8 +5301,8 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
                         ",0"->"0,1"[label = "[a-z]", color = blue, style = dotted];
                         ",3"->",4"[label = "[.]", color = blue, style = dotted];
                         ",3"->"0,4"[label = "[.]", color = blue, style = dotted];
-                        "5,"->"6,"[label = "[^a]", color = violet];
-                        "5,"->"6,0"[label = "[^a]", color = violet];
+                        "5,"->"6,"[label = "[a^]", color = violet];
+                        "5,"->"6,0"[label = "[a^]", color = violet];
                     }';
 
         $search = '
