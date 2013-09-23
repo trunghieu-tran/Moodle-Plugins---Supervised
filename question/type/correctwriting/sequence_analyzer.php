@@ -398,22 +398,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
         return $result;
     }
 
-    /**
-    * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
-    * Used to choose best matched answer
-    * Fitness is negative or zero (no errors, full match)
-    * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
-    */
-    public function fitness($mistakes) {
-        $result = 0;
-        if (count($mistakes)) {
-            /** qtype_correctwriting_response_mistake $mistake */
-            foreach($mistakes as $mistake) {
-                $result += $mistake->weight;
-            }
-        }
-        return $result;
-    }
+
 
 
     public function has_errors() {

@@ -35,39 +35,37 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
-//Other necessary requires
-
-class qtype_correctwriting_syntax_analyzer /*extends qtype_correctwriting_abstract_analyzer*/ {//object created for each lcs
-
-    protected $question;// TODO - delete when inheriting from abstract_analyzer.
-    protected $language;// TODO - delete when inheriting from abstract_analyzer.
 
 
-    protected $errors;//array of objects - teacher errors when entering answer
+class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract_analyzer {
 
-    /**
-     * A pair of strings with data
-     * @var block_formal_langs_string_pair
-     */
-    protected $pair;
-    protected $lcs;//longest common subsequence - array with indexes in answer as keys and indexes in response as values
     protected $ast;//abstract syntax tree of answer (with labels)
     protected $subtrees;//array - trees created by parsing parts of response don't covered by LCS
     protected $mistakes;//array of objects - student errors (merged from all stages)
 
     /**
-     * Do all processing and fill all member variables
-     * Passed response could be null, than object used just to find errors in the answers, token count etc...
+     * Do all processing and fill resultstringpairs and resultmistakes fields.
+     *
+     * You are normally don't want to overload it. Overload analyze() and bypass() instead.
+     * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
+     * When called without params just creates empty object to call analyzer-dependent functions on.
+     * @throws moodle_exception if invalid number of string pairs
      * @param qtype_correctwriting_question $question
-     * @param block_formal_langs_string_pair $bestmatchpair a pair
+     * @param qtype_correctwriting_string_pair $basepair a pair, passed as input
      * @param block_formal_langs_abstract_language $language a language
+     * @param bool $bypass false if analyzer should work, true if it should just allow subsequent analyzers to work.
      */
-    public function __construct($question, $bestmatchpair, $language) {
-        $this->pair = $bestmatchpair;
-        $this->errors = array();
-        $this->mistakes  = array();
+    public function __construct($question = null, $basepair = null, $language = null, $bypass = true) {
+        parent::__construct($question, $basepair, $language, $bypass);
 
+    }
+
+    /**
+     * Ignore everything
+     */
+    protected function analyze() {
         //TODO:
+        // -1. This list should be edited
         // 0. Throw exception if language doesn't support parsing or syntax analyzer isnt' written yet
         //1. Create Abstract Syntax Tree for answer - Pashaev
         //  - call language object to do it
@@ -81,31 +79,24 @@ class qtype_correctwriting_syntax_analyzer /*extends qtype_correctwriting_abstra
         //  - special function
         //NOTE: if response is null just check for errors - Pashaev
         //NOTE: if some stage create errors, stop processing right there
+        parent::bypass();
     }
+
 
     /**
-    * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
-    * Used to choose best matched answer
-    * Fitness is negative or zero (no errors, full match)
-    * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
-    */
-    public function fitness() {
-        return 0;
+     * Lexical analyzer does not have any hints, currently
+     * @return array
+     */
+    public function supported_hints() {
+        return array();
     }
 
-    public function mistakes() {
-        return $this->mistakes;
+    public function name() {
+        return 'syntax_analyzer';
     }
 
-    public function has_errors() {
-        return !empty($this->errors);
-    }
-
-    public function errors() {
-        return $this->errors;
-    }
-
-    //Other necessary access methods
+    // Other necessary access methods
+    // Other reimplemented methods
 
     /**
      * Returns array of objects describing nodes from answer for which teacher-supplied sematic names required
@@ -120,5 +111,17 @@ class qtype_correctwriting_syntax_analyzer /*extends qtype_correctwriting_abstra
      */
     public function token_name($index) {
     }
+
+    /**
+     * Allows analyzer to replace mistakes from other analyzer.
+     * For example syntax_analyzer can replace mistakes from sequence_analyzer.
+     *
+     * Types of mistakes should be matched against other with replaces_mistake_types.
+     * @return array
+     */
+    public function replaces_mistake_types() {
+        return array('sequence_mistake');
+    }
+
 }
 ?>
