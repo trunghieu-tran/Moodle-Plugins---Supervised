@@ -52,15 +52,17 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         // Language, which will be used for analysis
         $result[] = 'langid';
         // Penalty for absent lexeme mistake
-        $result[] = 'absentmistakeweight';
-        // Penalty for odd lexeme mistake
-        $result[] = 'addedmistakeweight';
-        // Penalty for moved lexeme mistake
-        $result[] = 'movedmistakeweight';
-        // A threshold for lexical error as fraction to it's length
-        //$result[] = 'lexicalerrorthreshold';
-        // A penalty for error in symbol
-        //$result[] = 'lexicalerrorweight';
+        foreach($this->analyzers() as $value) {
+            $classname = 'qtype_correctwriting_' . $value;
+            /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+            $analyzer = new $classname();
+            $fields = $analyzer->extra_question_fields();
+            if (count($fields)) {
+                foreach($fields as $field) {
+                    $result[] = $field;
+                }
+            }
+        }
         // Minimal grade for  answer to be approximately matched with student response
         $result[] = 'hintgradeborder';
         // Maximum fraction of mistakes to length of teacher answer in lexemes
@@ -73,6 +75,8 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $result[] = 'absenthintpenaltyfactor';
         //Penalty for "where" picture hint.
         $result[] = 'wherepichintpenalty';
+
+        // TODO: Place here "is enabled" fields
 
         return $result;
     }
@@ -89,10 +93,10 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      */
     public function analyzers() {
         global $CFG;
-        $analyzers =  array(   /*0x100 => 'lexem_analyzer',
-                        0x200 => 'enum_analyzer',*/
-                        0x300 => 'sequence_analyzer'/*,
-                        0x400 => 'syntax_analyzer'*/
+        $analyzers =  array(   0x100 => 'lexical_analyzer',
+                        /*0x200 => 'enum_analyzer',*/
+                        0x300 => 'sequence_analyzer',
+                        0x400 => 'syntax_analyzer'
                     );
         foreach ($analyzers as $name) {
             require_once($CFG->dirroot . '/question/type/correctwriting/' . $name . '.php');
