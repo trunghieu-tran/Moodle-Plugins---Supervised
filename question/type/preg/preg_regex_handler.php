@@ -301,8 +301,18 @@ class qtype_preg_regex_handler {
         if ($this->options->selection->indfirst != -2) {
             $indfirst = $this->options->selection->indfirst;
             $indlast = $this->options->selection->indlast;
-            $idcounter = $this->parser->get_max_id() + 1;
-            $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+            foreach ($this->lexer->get_skipped_positions() as $skipped) {
+                if ($indfirst >= $skipped->indfirst && $indfirst <= $skipped->indlast) {
+                    $indfirst = $skipped->indlast + 1;
+                }
+                if ($indlast >= $skipped->indfirst && $indlast <= $skipped->indlast) {
+                    $indlast = $skipped->indfirst - 1;
+                }
+            }
+            if ($indlast >= $indfirst) {
+                $idcounter = $this->parser->get_max_id() + 1;
+                $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+            }
         }
 
         // Sometimes engine that use accept_regex still need parsing to count subexpressions.

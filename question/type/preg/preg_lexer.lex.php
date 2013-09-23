@@ -59,7 +59,10 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
+    // Number of characters added at start by regex handler.
     protected $addedatstart = 0;
+    // Positions skipped because preserveallnodes option was set to false.
+    protected $skipped_positions = array();
     // Array of lexical errors found.
     protected $errors = array();
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
@@ -228,6 +231,9 @@ class qtype_preg_lexer extends JLexBase  {
                                          'Vai'                    => qtype_preg_charset_flag::VAI,
                                          'Yi'                     => qtype_preg_charset_flag::YI
                                   );
+    public function get_skipped_positions() {
+        return $this->skipped_positions;
+    }
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -6877,7 +6883,7 @@ array(
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
     } else {
-        // Do nothing in YYINITIAL state.
+        $this->skipped_positions[] = $this->current_position_for_node();
     }
 }
 						case -61:
