@@ -58,7 +58,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     private $analyzers = null;
 
     /**  Fills an inner definition of form fields
-         @param object mform form data
+         @param MoodleQuickForm mform form data
      */
     protected function definition_inner($mform) {
         global $CFG;
@@ -78,10 +78,12 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         // Now change floating fields to include ones from analyzers for data preprocessing and validation purposes.
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
+        /** @var qtype_correctwriting $qtype */
         $qtype = new $qtypeclass;
         $this->analyzers = $qtype->analyzers();
         foreach ($this->analyzers as $name) {
             $classname = 'qtype_correctwriting_' . $name;
+            /** @var qtype_correctwriting_abstract_analyzer $analyzer */
             $analyzer = new $classname;
             $fields = $analyzer->float_form_fields();
             foreach ($fields as $field) {
@@ -103,7 +105,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $confirmed = optional_param('confirmed', false, PARAM_BOOL);
             if (!$confirmed) {
                 $this->secondtimeform = true;
-                if (array_key_exists('options', $this->question)) {
+                if (array_key_exists('options', (array)($this->question))) {
                     $this->secondtimeform = !array_key_exists('answers', $this->question->options);
                 }
             }
@@ -116,12 +118,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         parent::definition_inner($mform);
 
         // Move answer instructions before answers, as we inserted other sections betweens them and answers fields.
+        /** @var HTML_QuickForm_static $answersinstruct */
         $answersinstruct = $mform->removeElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_correctwriting'));
         $mform->insertElementBefore($answersinstruct, 'answerhdr');
     }
 
-    // Overload parent function to add other controls before answer fields.
+    /** Overload parent function to add other controls before answer fields.
+     *  @param MoodleQuickForm $mform
+     *  @param $label
+     *  @param $gradeoptions
+     *  @param $minoptions
+     *  @param $addoptions
+     */
     protected function add_per_answer_fields(&$mform, $label, $gradeoptions,
             $minoptions = QUESTION_NUMANS_START, $addoptions = QUESTION_NUMANS_ADD) {
         // Adding custom sections.
@@ -130,11 +139,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         parent::add_per_answer_fields($mform, $label, $gradeoptions, $minoptions, $addoptions);
     }
 
-    /** Place additional sections on the form: one section for each analyzer and a hinting options section. */
+    /** Place additional sections on the form:
+     * one section for each analyzer and a hinting options section.
+     * @var MoodleQuickForm $mform
+     */
     protected function definition_additional_sections(&$mform) {
         // Analyzer sections.
         foreach ($this->analyzers as $name) {
             $classname = 'qtype_correctwriting_' . $name;
+            /** @var qtype_correctwriting_abstract_analyzer $analyzer */
             $analyzer = new $classname;
             // Start section.
             $uiname = get_string($name, 'qtype_correctwriting');
@@ -236,6 +249,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     if (count($tokens) > 0 && ($fraction >= $data['hintgradeborder'])) {//Answer needs token descriptions.
                         $textdata = array();
                         foreach($tokens as $token) {
+                            /** @var block_formal_langs_token_base $token */
                             $textdata[] = htmlspecialchars($token->value());
                         }
                         $newtext = $this->get_label($textdata);
@@ -309,6 +323,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     /**
      * Perform setting data for lexemes
      * @param object $question the data being passed to the form.
+     * @param  boolean $withanswerfiles
      * @return object $question the modified data.
      */
     protected function data_preprocessing_answers($question, $withanswerfiles = false) {
@@ -316,9 +331,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
         $key = 0;
 
+        $aquestion = (array)$question;
 
-        if (array_key_exists('options',$question) && array_key_exists('answers',$question->options)) {
-            $lang = block_formal_langs::lang_object($question->options->langid);
+        if (array_key_exists('options',$aquestion) && array_key_exists('answers',$question->options)) {
+            //$lang = block_formal_langs::lang_object($question->options->langid);
 
             $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
             $descriptions = array();
@@ -362,6 +378,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     /**
      * Perform the necessary preprocessing for the hint fields.
      * @param object $question the data being passed to the form.
+     * @param boolean $withclearwrong
+     * @param boolean $withshownumpartscorrect
      * @return object $question the modified data.
      */
     protected function data_preprocessing_hints($question, $withclearwrong = false,
@@ -406,7 +424,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             if (count($stream->errors) != 0) {
                 $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
                 foreach($stream->errors as $error) {
+                    /** @var block_formal_langs_token_base $token */
                     $token = $stream->tokens[$error->tokenindex];
+                    /** @var block_formal_langs_node_position $tokenpos */
                     $tokenpos = $token->position();
                     $emesg = $error->errormessage . $br;
                     $left = $tokenpos->colstart();

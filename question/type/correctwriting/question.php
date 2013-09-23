@@ -612,5 +612,19 @@ class qtype_correctwriting_question extends question_graded_automatically
         return $options;
     }
 
+    //  TODO: Check if analyzer is enabled. I mean, really check
+    /**
+     * Checks whether specified analyzer is enabled
+     * @param string $name
+     * @return bool
+     */
+    public function is_analyzer_enabled($name) {
+        $enabled = true;
+        if ($name == 'syntax_analyzer') {
+            $enabled = $enabled && $this->get_used_language()->could_parse();
+        }
+        return $enabled;
+    }
+
 }
  ?>
