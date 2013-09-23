@@ -140,9 +140,21 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * Fitness is negative or zero (no errors, full match).
      * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight.
      * Each analyzer will calculate fitness only for it's own mistakes, ignoring mistakes from other analyzers.
+     * Dev. comment: since all mistakes have weight, we can have common algorithm as reduction operation
+     * on this mistakes. It can be replaced, by do anyone care?
      * @param array $mistakes of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
+     * @return double
      */
-    abstract public function fitness($mistakes);
+    public function fitness($mistakes) {
+        $result = 0;
+        if (count($mistakes)) {
+            /** qtype_correctwriting_response_mistake $mistake */
+            foreach($mistakes as $mistake) {
+                $result += $mistake->weight;
+            }
+        }
+        return $result * -1;
+    }
 
     /**
      * Returns an array of hint keys, supported by mistakes from this analyzer.
@@ -220,4 +232,16 @@ abstract class qtype_correctwriting_abstract_analyzer {
     public function is_lang_compatible($lang) {
         return true; // Accept all by default.
     }
+
+    /**
+     * Allows analyzer to replace mistakes from other analyzer.
+     * For example syntax_analyzer can replace mistakes from sequence_analyzer.
+     *
+     * Types of mistakes should be matched against other with replaces_mistake_types.
+     * @return array
+     */
+    public function replaces_mistake_types() {
+        return array();
+    }
+
 }
