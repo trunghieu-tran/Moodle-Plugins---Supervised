@@ -481,14 +481,15 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         if ($this->selectednode !== null) {
             $parent = $this->find_parent_node($this->selectednode);
             $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
-            $subexpression->subpattern = -2;
-            $subexpression->set_user_info($this->selectednode->position);
             if ($parent === null) {
                 // Replace the AST root.
+                $subexpression->subpattern = 0;
+                $this->ast_root->subpattern = -1;
                 $subexpression->operands[] = $this->ast_root;
                 $this->ast_root = $subexpression;
             } else {
                 // Just insert a subexpression.
+                $subexpression->subpattern = -2;
                 $subexpression->operands[] = $this->selectednode;
                 foreach ($parent->operands as $key => $operand) {
                     if ($operand === $this->selectednode) {

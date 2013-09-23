@@ -132,16 +132,17 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?:ab)', $errornodes);
         $root = $parser->get_root();
         $followpos = $parser->get_followpos();
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->userinscription === array());
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === 'a');
-        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === 'b');
-        $this->assertTrue($root->nullable === false);
-        $this->assertTrue($root->firstpos == array(2));
-        $this->assertTrue($root->lastpos == array(3));
-        $this->assertTrue($followpos == array(2 => array(3)));
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->userinscription === array());
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data->string() === 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
+        $this->assertTrue($root->operands[0]->nullable === false);
+        $this->assertTrue($root->operands[0]->firstpos == array(3));
+        $this->assertTrue($root->operands[0]->lastpos == array(4));
+        $this->assertTrue($followpos == array(3 => array(4)));
     }
     function test_parser_subexpr() {
         $parser = $this->run_parser('(ab)', $errornodes);
@@ -167,16 +168,16 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($root->userinscription[0]->data === '??');
         $this->assertTrue($root->lazy);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->userinscription === array());
-        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data->string() === 'a');
-        $this->assertTrue($root->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription === array());
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->flags[0][0]->data->string() === 'a');
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
         $this->assertTrue($root->nullable === true);
-        $this->assertTrue($root->firstpos == array(3));
-        $this->assertTrue($root->lastpos == array(4));
-        $this->assertTrue($followpos == array(3 => array(4)));
+        $this->assertTrue($root->firstpos == array(4));
+        $this->assertTrue($root->lastpos == array(5));
+        $this->assertTrue($followpos == array(4 => array(5)));
     }
     function test_parser_aster() {
         $parser = $this->run_parser('(?:[a-z\w]b)*', $errornodes);
@@ -185,18 +186,18 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription[0]->data === '*');
         $this->assertTrue($root->greedy);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->userinscription === array());
-        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->data === 'a-z');
-        $this->assertTrue($root->operands[0]->operands[0]->userinscription[2]->data === '\w');
-        $this->assertTrue($root->operands[0]->operands[0]->userinscription[2]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
-        $this->assertTrue($root->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription === array());
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[1]->data === 'a-z');
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[2]->data === '\w');
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[2]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
         $this->assertTrue($root->nullable === true);
-        $this->assertTrue($root->firstpos == array(3));
-        $this->assertTrue($root->lastpos == array(4));
-        $this->assertTrue($followpos == array(3 => array(4), 4 => array(3)));
+        $this->assertTrue($root->firstpos == array(4));
+        $this->assertTrue($root->lastpos == array(5));
+        $this->assertTrue($followpos == array(4 => array(5), 5 => array(4)));
     }
     function test_parser_plus() {
         $parser = $this->run_parser('(?:[\wab-yz\d])++', $errornodes);
@@ -209,20 +210,20 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->position->colfirst === 0);
         $this->assertTrue($root->position->collast === 16);
         $this->assertTrue($root->possessive);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->userinscription[1]->data === '\w');
-        $this->assertTrue($root->operands[0]->userinscription[1]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
-        $this->assertTrue($root->operands[0]->userinscription[2]->data === 'a');
-        $this->assertTrue($root->operands[0]->userinscription[3]->data === 'b-y');
-        $this->assertTrue($root->operands[0]->userinscription[4]->data === 'z');
-        $this->assertTrue($root->operands[0]->userinscription[5]->data === '\d');
-        $this->assertTrue($root->operands[0]->userinscription[5]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
-        $this->assertTrue($root->operands[0]->position->colfirst === 0);
-        $this->assertTrue($root->operands[0]->position->collast === 14);
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->data === '\w');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[2]->data === 'a');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[3]->data === 'b-y');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[4]->data === 'z');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[5]->data === '\d');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[5]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->position->colfirst === 3);
+        $this->assertTrue($root->operands[0]->operands[0]->position->collast === 13);
         $this->assertTrue($root->nullable === false);
-        $this->assertTrue($root->firstpos == array(2));
-        $this->assertTrue($root->lastpos == array(2));
-        $this->assertTrue($followpos == array(2 => array(2)));
+        $this->assertTrue($root->firstpos == array(3));
+        $this->assertTrue($root->lastpos == array(3));
+        $this->assertTrue($followpos == array(3 => array(3)));
     }
     function test_parser_brace() {
         $parser = $this->run_parser('[^\p{Egyptian_Hieroglyphs}]{8,}', $errornodes);
@@ -385,9 +386,9 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->nullable === false);
         $this->assertTrue($root->operands[0]->nullable === true);
         $this->assertTrue($root->operands[1]->nullable === false);
-        $this->assertTrue($root->firstpos == array(4, 5, 6));
-        $this->assertTrue($root->lastpos == array(8));
-        $this->assertTrue($followpos == array(4 => array(4, 5, 6), 5 => array(4, 5, 6), 6 => array(7), 7 => array(8)));
+        $this->assertTrue($root->firstpos == array(5, 6, 7));
+        $this->assertTrue($root->lastpos == array(9));
+        $this->assertTrue($followpos == array(5 => array(5, 6, 7), 6 => array(5, 6, 7), 7 => array(8), 8 => array(9)));
     }
     function test_parser_two_anchors() {
         $parser = $this->run_parser('^a$', $errornodes);
@@ -590,11 +591,11 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?:|)', $errornodes);
         $root = $parser->get_root();
         $followpos = $parser->get_followpos();
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_META);
-        $this->assertTrue($root->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $this->assertTrue($root->nullable === true);
-        $this->assertTrue($root->firstpos == array());
-        $this->assertTrue($root->lastpos == array());
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->operands[0]->nullable === true);
+        $this->assertTrue($root->operands[0]->firstpos == array());
+        $this->assertTrue($root->operands[0]->lastpos == array());
         $this->assertTrue($followpos == array());
         $parser = $this->run_parser('(|||||)', $errornodes);    // баян
         $root = $parser->get_root();
@@ -629,20 +630,21 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('((?:(?(?=a)(?>b)|a)))', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->operands[0]->operands[0]->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
     }
     function test_parser_duplicate_subexpression_numbers() {
         $parser = $this->run_parser('(?|a|b|c)', $errornodes);
         $root = $parser->get_root();
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === 'a');
-        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === 'b');
-        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[2]->flags[0][0]->data->string() === 'c');
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data->string() === 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
+        $this->assertTrue($root->operands[0]->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[2]->flags[0][0]->data->string() === 'c');
     }
     function test_parser_index() {
         $parser = $this->run_parser('abcdefgh|(abcd)*', $errornodes);
@@ -672,9 +674,9 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $root = $parser->get_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
-        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
     }
     function test_preserve_all_nodes() {
         $options = new qtype_preg_handling_options;
