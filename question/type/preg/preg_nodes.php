@@ -1396,6 +1396,16 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function consumes($matcherstateobj = null) {
         return 0;
     }
+
+    public function is_afterassertion() {
+        return ($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
+                $this->subtype == self::SUBTYPE_ESC_G);
+    }
+
+    public function is_beforeassertion() {
+        return ($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
+                $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
+    }
 }
 
 /**
