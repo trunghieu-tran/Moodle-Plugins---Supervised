@@ -1620,7 +1620,7 @@ abstract class qtype_preg_finite_automaton {
             $transitions = $this->get_adjacent_transitions($del->to, true);
             $intotransitions = $this->get_adjacent_transitions($del->from, false);
             
-            if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || (count($intotransitions) != 0 && 
+            if (($del->is_unmerged_assert() && $del->pregleaf->is_afterassertion()) || (count($intotransitions) != 0 && 
                 count($del->pregleaf->assertionsbefore) == 0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
                 && !$del->has_tags())) {
                 // Possibility of merging with intotransitions.
