@@ -1369,8 +1369,10 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
     /** \A */
     const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
-    /** \z and \Z */
-    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
+    /** \z */
+    const SUBTYPE_SMALL_ESC_Z = 'small_esc_z_leaf_assert';
+    /** \Z */
+    const SUBTYPE_CAPITAL_ESC_Z = 'capital_esc_z_leaf_assert';
     /** \G */
     const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
     /** ^ */
@@ -1465,23 +1467,18 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
 }
 
 /**
- * Simple assertion \Z (negative == true) matches at the end of the string, also matches before the very last newline.
- * Simple assertion \z (negative == false) matches only at the end of the string.
+ * Simple assertion \z matches only at the end of the string.
  */
-class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
+class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
 
     public function __construct($negative = false) {
         parent::__construct($negative);
-        $this->subtype = self::SUBTYPE_ESC_Z;
+        $this->subtype = self::SUBTYPE_SMALL_ESC_Z;
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-        if ($this->negative) {
-            return ($pos == $str->length()) || ($pos == $str->length() - 1 && $str[$pos] == "\n");
-        } else {
-            return ($pos == $str->length());
-        }
+        return ($pos == $str->length());
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
@@ -1489,7 +1486,30 @@ class qtype_preg_leaf_assert_esc_z extends qtype_preg_leaf_assert {
     }
 
     public function tohr() {
-        return $this->negative ? '\Z' : '\z';
+        return '\z';
+    }
+}
+
+/**
+ * Simple assertion \Z matches at the end of the string, also matches before the very last newline.
+ */
+class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_esc_z {
+
+    public function __construct($negative = false) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_CAPITAL_ESC_Z;
+    }
+
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($pos == $str->length() - 1 && $str[$pos] == "\n"));
+    }
+
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        return '';  // TODO
+    }
+
+    public function tohr() {
+        return '\Z';
     }
 }
 
@@ -1518,7 +1538,7 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
  * Simple assertion ^ matches at the very start of the string or after any \n.
  * Used only in multiline mode.
  */
-class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
+class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
 
     public function __construct($negative = false) {
         parent::__construct($negative);
@@ -1526,8 +1546,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        $length = 0;
-        return ($pos == 0) || ($str[$pos - 1] == "\n");
+        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos - 1] == "\n"));
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
@@ -1543,7 +1562,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert {
  * Simple assertion $ matches at the end of the string and before any \n.
  * Used only in multiline mode.
  */
-class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert {
+class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z {
 
     public function __construct($negative = false) {
         parent::__construct($negative);
@@ -1551,8 +1570,7 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        $length = 0;
-        return ($pos == $str->length()) || ($str[$pos] == "\n");
+        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos] == "\n"));
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
