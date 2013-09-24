@@ -104,8 +104,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     public function create_graph($id = -1) {
         $graph = $this->dst_root->create_graph($id);
 
-        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $graph, -1);
-        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $graph, -1);
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
 
         if (count($graph->nodes) == 2 && count($graph->subgraphs) == 0) {
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1], $graph);
