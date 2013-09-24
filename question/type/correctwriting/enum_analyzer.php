@@ -683,4 +683,12 @@ class enum_element {
         $this->begin = $first;
         $this->end = $last;
     }
+
+    /**
+    *  Function return number of first element's token  
+    * @return integer - number of first element's token
+    */
+    public function begin() {
+        return $this->begin;
+    }
 }
