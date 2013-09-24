@@ -111,6 +111,31 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $absenthintpenaltyfactor = 1;
 
+    /**
+     * Whether lexical analyzer is enabled
+     * @var int
+     */
+    public $islexicalanalyzerenabled = 1;
+
+    /**
+     * Whether enum analyzer is enabled
+     * @var int
+     */
+    public $isenumanalyzerenabled = 1;
+
+    /**
+     * Whether sequence analyzer is enabled
+     * @var int
+     */
+    public $issequenceanalyzerenabled = 1;
+
+    /**
+     * Whether syntax analyzer is enabled
+     * @var int
+     */
+    public $issyntaxanalyzerenabled = 1;
+
+
     /** Whether cache is valid
      *  @var boolean
      */
