@@ -214,6 +214,13 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 }
             }
         }
+        if ($length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $cur = $this->current_match(-2);
+            if ($cur !== null && $cur[0] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $index[-2] = $cur[0];
+                $length[-2] = $this->length - $cur[0];
+            }
+        }
         $index[0] = $this->startpos;
         $length[0] = $this->length;
         $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
