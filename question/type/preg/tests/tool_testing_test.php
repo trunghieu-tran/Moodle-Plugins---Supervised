@@ -149,4 +149,33 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">b</span><br />');
     }
+
+    function test_selection_partial_match() {
+        $regex = '^a(bc)def';
+        $strings = 'abc';
+        $usecase = false;
+        $exactmatch = false;
+        $engine = 'nfa_matcher';
+        $notation = 'native';
+
+        $json = array();
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span>...<br />');
+
+        $strings = 'ab';
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">b</span>...<br />');
+
+        $strings = 'a';
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span>...<br />');
+
+        $strings = '';
+        $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
+        $tool->generate_json($json);
+        $this->assertTrue($json['regex_test'] == '<br />');
+    }
  }
