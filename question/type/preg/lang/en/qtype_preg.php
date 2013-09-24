@@ -87,6 +87,7 @@ $string['uselexemhint_help'] = '<p>In behaviours which allow multiple tries (e.g
 // Types.
 $string['leaf_charset']                = 'character set';
 $string['leaf_charset_one']            = 'character';
+$string['leaf_charset_except']         = 'any character except';
 $string['leaf_meta']                   = 'meta-character or escape-sequence';
 $string['leaf_assert']                 = 'simple assertion';
 $string['leaf_backref']                = 'backreference';
@@ -555,3 +556,8 @@ $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
 $string['explain_to'] = ' to ';
 $string['explain_from'] = 'from ';
+$string['explain_time'] = ' time';
+$string['explain_times'] = ' times';
+$string['explain_any'] = 'any';
+$string['explain_begin'] = 'begin';
+$string['explain_end'] = 'end';
