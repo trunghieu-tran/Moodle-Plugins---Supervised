@@ -691,4 +691,12 @@ class enum_element {
     public function begin() {
         return $this->begin;
     }
+
+    /**
+    *  Function return number of last element's token  
+    * @return integer - number of last element's token
+    */
+    public function end() {
+        return $this->end;
+    }
 }
