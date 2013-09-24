@@ -176,8 +176,8 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
 
     // Form and DB related functions.
     public function float_form_fields() {
-        return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false), //Lexical error threshold field
-                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false)      //Lexical error weight field
+        return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
+                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1)      //Lexical error weight field
                     );
     }
 }

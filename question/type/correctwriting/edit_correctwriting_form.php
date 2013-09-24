@@ -58,7 +58,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     private $analyzers = null;
 
     /**  Fills an inner definition of form fields
-         @param MoodleQuickForm mform form data
+     *    @param MoodleQuickForm $mform form data
      */
     protected function definition_inner($mform) {
         global $CFG;
@@ -74,6 +74,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $mform->setAdvanced($name);
             }
         }
+
 
         // Now change floating fields to include ones from analyzers for data preprocessing and validation purposes.
         question_bank::load_question_definition_classes($this->qtype());
@@ -115,6 +116,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->setType('confirmed', PARAM_BOOL);
         }
 
+
+
+
+
         parent::definition_inner($mform);
 
         // Move answer instructions before answers, as we inserted other sections betweens them and answers fields.
@@ -155,7 +160,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->addHelpButton($name . 'hdr', $name, 'qtype_correctwriting');
             // Add control whether to use analyzer.
             $a = textlib::strtolower(textlib::substr($uiname, 0, 1)) . textlib::substr($uiname, 1);// Decapitalise first letter.
-            $mform->addElement('selectyesno', $name . 'use', get_string('usesomething', 'qtype_correctwriting', $a));
+            $formname = 'is' . str_replace('_', '', $name) . 'enabled';
+            $mform->addElement('selectyesno', $formname, get_string('usesomething', 'qtype_correctwriting', $a));
+            $mform->setType($formname, PARAM_BOOL);
+            $mform->setDefault($formname, 1);
             // TODO - default to admin config setting - use or not.
             // Add analyzer controls.
             $analyzer->form_section_definition($mform);

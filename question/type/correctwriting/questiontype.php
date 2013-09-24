@@ -43,7 +43,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         and table
         @return array extra fields
      */
-    public function extra_question_fields() {// TODO - rewrite co call analyzer classes extra_question_fields().
+    public function extra_question_fields() {
         // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shortanswer.
         //$result = array_diff(parent::extra_question_fields(), array('answers'));// We unset answers fields, because we do not need them
         $result = parent::extra_question_fields();
@@ -76,7 +76,12 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         //Penalty for "where" picture hint.
         $result[] = 'wherepichintpenalty';
 
-        // TODO: Place here "is enabled" fields
+        //Is enabled fields
+        $result[] = 'islexicalanalyzerenabled';
+        $result[] = 'isenumanalyzerenabled';
+        $result[] = 'issequenceanalyzerenabled';
+        $result[] = 'issyntaxanalyzerenabled';
+
 
         return $result;
     }
