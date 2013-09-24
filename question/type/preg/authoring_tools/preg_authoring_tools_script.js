@@ -179,7 +179,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
-        var sel = self.get_selection_indexes();
+        var sel = self.get_selection();
         self.load_content(-1, sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
     },
@@ -204,13 +204,13 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_check_strings_clicked : function (e) {
         e.preventDefault();
-        var sel = self.get_selection_indexes();
+        var sel = self.get_selection();
         self.load_strings(sel.indfirst, sel.indlast);
     },
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        var sel = self.get_selection_indexes();
+        var sel = self.get_selection();
         self.load_content(-1, sel.indfirst, sel.indlast);
     },
 
@@ -301,7 +301,8 @@ M.preg_authoring_tools_script = (function ($) {
 
     // Displays given images and description
     display_content : function (id, t, g, d, indfirst, indlast) {  // TODO: get rid of id
-        var tree_err = $('#tree_err'),
+        var scroll = $(window).scrollTop(),
+            tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
@@ -339,6 +340,7 @@ M.preg_authoring_tools_script = (function ($) {
         }
         self.regex_input.textrange('set', indfirst, length);
         self.highlight_description(id);
+        $(window).scrollTop(scroll);
     },
 
     display_strings : function (s) {
@@ -430,13 +432,15 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    get_selection_indexes : function () {
-        var selection = self.regex_input.textrange('get'),
+    get_selection : function () {
+        var scroll = $(window).scrollTop(),
+            selection = self.regex_input.textrange('get'),
             indfirst = selection.start,
             indlast = selection.end - 1;
         if (indfirst > indlast) {
             indfirst = indlast = -2;
         }
+        $(window).scrollTop(scroll);
         return {
             indfirst : indfirst,
             indlast : indlast
