@@ -68,7 +68,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     public static function cmp_graphs(&$g1, &$g2) {
         if ($g1->label != $g2->label) {
             print(chr(10));
-            print('Labels of subgraphs failed!');
+            print('Labels of subgraphs failed!' . $g1->label . '!=' . $g2->label);
             return false;
         }
         if ($g1->style != $g2->style) {
@@ -258,7 +258,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $tree = new qtype_preg_explaining_graph_tool('x+');
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 1 to infinity times', 'dotted; color=black');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 1 to any time', 'dotted; color=black');
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
@@ -274,7 +274,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $tree = new qtype_preg_explaining_graph_tool('x*');
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
-        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to infinity times', 'dotted; color=black');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('from 0 to any time', 'dotted; color=black');
         $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('x'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
         $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);

@@ -171,6 +171,8 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
     public function process_charset() {
 
         $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
+        array_shift($info);
+        array_pop($info);
         $result = array();                          // This will store a result.
 
         $result[] = '';                             // Create a first empty element.
@@ -542,14 +544,16 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
         $operand = $this->operands[0]->create_graph($id);
 
         if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
-            $label = 'from ' . $this->pregnode->leftborder . ' to ';
-            if ($this->pregnode->rightborder == 1) {
-                $label .= $this->pregnode->rightborder . ' time';
+            if ($this->pregnode->rightborder != $this->pregnode->leftborder) {
+                $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg');
+
+                $label .= $this->pregnode->rightborder . qtype_preg_authoring_tool_node_quant::getEnding($this->pregnode->rightborder);
             } else {
-                $label .= $this->pregnode->rightborder .' times';
+                $label = $this->pregnode->leftborder . qtype_preg_authoring_tool_node_quant::getEnding($this->pregnode->rightborder);
             }
         } else {
-            $label = 'from ' . $this->pregnode->leftborder . ' to infinity times';
+            $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg') 
+                    . get_string('explain_any', 'qtype_preg') . get_string('explain_time', 'qtype_preg');
         }
 
         $quant = new qtype_preg_explaining_graph_tool_subgraph($label, 'dotted; color=black', $this->pregnode->id);
@@ -558,6 +562,16 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
         $graph->subgraphs[] = $quant;
         $graph->entries[] = end($operand->entries);
         $graph->exits[] = end($operand->exits);
+    }
+
+    /**
+     * Returns "time" or "times" within sending number.
+     * @param int $end just number
+     * @return string right form of "time(s)"
+     */
+    private function getEnding($end) {
+        return ($this->pregnode->rightborder == 1 || $this->pregnode->rightborder == 0)
+            ? get_string('explain_time', 'qtype_preg') : get_string('explain_times', 'qtype_preg');
     }
 }
 
@@ -587,7 +601,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
                         $label,
-                        ($this->pregnode->userinscription->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey',
+                        ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey',
                         $this->pregnode->id
                     );
         $subexpr->assume_subgraph($operand);
@@ -601,7 +615,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 /**
  * Class for tree's conditional subexpression operator.
  */
-class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_tool_operator {
+class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_tool_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -697,10 +711,10 @@ class qtype_preg_authoring_tool_node_condsubexpr extends qtype_preg_authoring_to
 
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $point, $graph->subgraphs[0]->nodes[1], $condsubexpr);
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $graph->subgraphs[0]->nodes[1], $condsubexpr->subgraphs[1]->entries[0], $condsubexpr);
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[1]->exits[0], $point, $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[1]->exits[0], $graph->exits[0], $condsubexpr);
 
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('false', $graph->subgraphs[0]->nodes[1], $condsubexpr->subgraphs[2]->entries[0], $condsubexpr);
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[2]->exits[0], $point, $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[2]->exits[0], $graph->exits[0], $condsubexpr);
         } else {
             $graph->exits[] = $condsubexpr->subgraphs[1]->exits[0];
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $point, $condsubexpr->subgraphs[1]->entries[0], $condsubexpr);
