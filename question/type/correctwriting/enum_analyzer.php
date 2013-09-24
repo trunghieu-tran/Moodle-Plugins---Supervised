@@ -639,7 +639,7 @@ class  qtype_correctwriting_enum_analyzer {
             foreach ($allfindorders as $currentorder) {
                 // Change enumeration elements order.
                 $currentstringpair = null;
-                $currentstringpair = $stringpair->deep_copy();
+                $currentstringpair = clone $stringpair;
                 $this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
                 // Find LCS of correct and corrected answers.
                 $currentcorrectstream = $currentstringpair->correctstring()->stream;
