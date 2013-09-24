@@ -18,13 +18,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class qtype_preg_dot_node_context {
 
+    // Reference to the handler.
+    public $handler;
+
     // Whether the node is the root or not.
     public $isroot;
 
     // Selection coordinates, an instance of qtype_preg_position.
     public $selection;
 
-    public function __construct($isroot, $selection = null) {
+    public function __construct($handler, $isroot, $selection = null) {
+        $this->handler = $handler;
         $this->isroot = $isroot;
         $this->selection = $selection !== null
                          ? $selection
@@ -161,11 +165,13 @@ abstract class qtype_preg_syntax_tree_node {
         if ($this->pregnode->position->indfirst >= $context->selection->indfirst &&
             $this->pregnode->position->indlast <= $context->selection->indlast) {
             self::$clasterscript .= $this->pregnode->id . ';';
-            $result .= ', style = ' . $style;
-            //$result .= ', style = bold, color = darkgreen';
-        } else {
-            $result .= ', style = ' . $style;
         }
+        if ($context->handler->is_node_generated($this->pregnode)) {
+            $style .= ', filled';
+            $result .= ', fillcolor = lightgrey';
+        }
+        $result .= ", style = \"$style\"";
+
 
         //var_dump($result);
         return '[' . $result . ']';
