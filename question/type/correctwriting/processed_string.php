@@ -75,4 +75,15 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
             $this->language->scan($this);
         return $this->tokenstream;
     }
+    public function __clone() {	
+        $this->tokenstream = clone $this->tokenstream;
+        if($this->enums_description!=null) {
+            foreach ($this->enums_description as $i=>$enumeration) {
+                foreach ($enumeration as $j=>$element) {
+                    $this->enums_description[$i][$j] = clone $this->enums_description[$i][$j];
+                }
+                $j++;
+            }
+        }
+    }
 }
