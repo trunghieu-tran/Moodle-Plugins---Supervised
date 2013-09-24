@@ -461,6 +461,10 @@ class qtype_preg_regex_handler {
         }
     }
 
+    public function is_node_generated($pregnode) {
+        return $pregnode->position->indfirst < 0 || $pregnode->position->indfirst >= $this->regex->length() - $this->addedatstart - $this->addedatend;
+    }
+
     /**
      * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree.
      * @param pregnode qtype_preg_node child class instance.
