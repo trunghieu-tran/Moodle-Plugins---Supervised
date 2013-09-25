@@ -1548,7 +1548,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function go_round_transitions($del) {
         $clonetransitions = array();
-        if ($del->is_unmerged_assert() && $del->pregleaf->is_afterassertion()) {
+        if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
             $transitions = $this->get_adjacent_transitions($del->to, true);
@@ -1563,7 +1563,7 @@ abstract class qtype_preg_finite_automaton {
         }
         // Has deleting or changing transitions.
         if (count($transitions) !=0) {
-            if (!($del->is_unmerged_assert() && $del->pregleaf->is_afterassertion())) {
+            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor())) {
                 foreach ($clonetransitions as &$tran) {
                     $tran->from = $del->from;
                     $this->add_transition($tran);
@@ -1621,7 +1621,7 @@ abstract class qtype_preg_finite_automaton {
             $transitions = $this->get_adjacent_transitions($del->to, true);
             $intotransitions = $this->get_adjacent_transitions($del->from, false);
             
-            if (($del->is_unmerged_assert() && $del->pregleaf->is_afterassertion()) || (count($intotransitions) != 0 && 
+            if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || (count($intotransitions) != 0 && 
                 count($del->pregleaf->assertionsbefore) == 0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
                 && !$del->has_tags())) {
                 // Possibility of merging with intotransitions.

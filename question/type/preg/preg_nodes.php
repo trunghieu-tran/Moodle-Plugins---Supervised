@@ -327,7 +327,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $thisclone = clone($this);
-            if ($this->is_afterassertion()) {
+            if ($this->is_start_anchor()) {
                 array_unshift ($this->assertionsafter, $thisclone);
             } else {
                 array_unshift ($this->assertionsbefore, $thisclone);
@@ -335,7 +335,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $otherclone = clone($other);
-            if ($other->is_afterassertion()) {
+            if ($other->is_start_anchor()) {
                 array_unshift ($other->assertionsafter, $otherclone);
             } else {
                 array_unshift ($other->assertionsbefore, $otherclone);
@@ -436,14 +436,14 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $assert->assertionsbefore = $resultbefore;
         $assert->assertionsafter = $resultafter;
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            if ($this->is_afterassertion()) {
+            if ($this->is_start_anchor()) {
                 unset($this->assertionsafter[0]);
             } else {
                 unset($this->assertionsbefore[0]);
             }
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            if ($other->is_afterassertion()) {
+            if ($other->is_start_anchor()) {
                 unset($other->assertionsafter[0]);
             } else {
                 unset($other->assertionsbefore[0]);
