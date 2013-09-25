@@ -171,7 +171,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
     public function process_charset() {
 
         $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
-        if (sizeof($this->pregnode->userinscription) > 1) {
+        if (count($this->pregnode->userinscription) > 1) {
             array_shift($info);
             array_pop($info);
         }
@@ -554,7 +554,7 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
                 $label = $this->pregnode->leftborder . qtype_preg_authoring_tool_node_quant::getEnding($this->pregnode->rightborder);
             }
         } else {
-            $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg') 
+            $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg')
                     . get_string('explain_any', 'qtype_preg') . get_string('explain_time', 'qtype_preg');
         }
 
@@ -621,11 +621,8 @@ class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_t
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
-
-        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $this->pregnode->condbranch !== null) {
-            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
-            $this->operands = array_merge($this->operands, array($condbranch));
-            $condid = $condbranch->pregnode->id;
+        if (count($this->operands) == 3) {
+            $this->condid = $this->operands[0]->pregnode->id;
         }
     }
 

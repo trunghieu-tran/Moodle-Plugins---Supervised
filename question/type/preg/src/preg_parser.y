@@ -89,27 +89,6 @@
     }
 
     protected function create_cond_subexpr_assertion_node($node, $assertnode, $exprnode, $closeparen) {
-        if ($assertnode === null) {
-            $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $assertnode->set_user_info($node->position->add_chars_right(-1));
-        }
-        if ($exprnode === null) {
-            $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $exprnode->set_user_info($node->position->add_chars_left(1));
-        }
-
-        $position = $node->position->compose($closeparen->position);
-
-        if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
-            $node->operands = $exprnode->operands;
-            if (count($exprnode->operands) > 2) {
-                // Error: only one or two top-level alternations allowed in a conditional subexpression.
-                $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $position, null, array($exprnode));
-            }
-        } else {
-            $node->operands[0] = $exprnode;
-        }
-
         if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
         } else if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB) {
@@ -119,9 +98,32 @@
         } else {
             $subtype = qtype_preg_node_assert::SUBTYPE_NLB;
         }
-        $node->condbranch = new qtype_preg_node_assert($subtype);
-        $node->condbranch->operands[0] = $assertnode;
-        $node->condbranch->userinscription = array(new qtype_preg_userinscription(textlib::substr($node->userinscription[0], 2) . '...)'));
+
+        if ($assertnode === null) {
+            $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $assertnode->set_user_info($node->position->add_chars_right(-1));
+        }
+        $condbranch = new qtype_preg_node_assert($subtype);
+        $condbranch->operands = array($assertnode);
+        $condbranch->userinscription = array(new qtype_preg_userinscription(textlib::substr($node->userinscription[0], 2) . '...)'));
+        $node->operands = array($condbranch);
+
+        $position = $node->position->compose($closeparen->position);
+
+        if ($exprnode === null) {
+            $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $exprnode->set_user_info($node->position->add_chars_left(1));
+        }
+        if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
+            $node->operands = array_merge($node->operands, $exprnode->operands);
+            if (count($exprnode->operands) > 2) {
+                // Error: only one or two top-level alternations allowed in a conditional subexpression.
+                $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $position, null, array($exprnode));
+            }
+        } else {
+            $node->operands[] = $exprnode;
+        }
+
         $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...)...|...)')));
         return $node;
     }
@@ -153,9 +155,6 @@
             $node->subpattern = $this->subpatt_counter++;
         }
         if (is_a($node, 'qtype_preg_operator')) {
-            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
-                $this->assign_subpatts($node->condbranch);
-            }
             foreach ($node->operands as $operand) {
                 $this->assign_subpatts($operand);
             }
@@ -165,9 +164,6 @@
     protected function assign_ids($node) {
         $node->id = ++$this->id_counter;
         if (is_a($node, 'qtype_preg_operator')) {
-            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
-                $this->assign_ids($node->condbranch);
-            }
             foreach ($node->operands as $operand) {
                 $this->assign_ids($operand);
             }
@@ -176,9 +172,6 @@
 
     protected function expand_quantifiers($node) {
         if (is_a($node, 'qtype_preg_operator')) {
-            if ($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->condbranch !== null) {
-                $node->condbranch = $this->expand_quantifiers($node->condbranch);
-            }
             foreach ($node->operands as $key => $operand) {
                 $node->operands[$key] = $this->expand_quantifiers($operand);
             }

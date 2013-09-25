@@ -1819,14 +1819,16 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
     /** Subexpression number. */
     public $number = -1;
-    /** Is condition satisfied?. */
-    public $condbranch = null;
 
     public function __construct($subtype = null, $number = -1, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
-        $this->condbranch = $condbranch;
+        $this->operands = $condbranch === null ? array() : array($condbranch);   // Assertion condition is the first operand.
+    }
+
+    public function is_condition_assertion() {
+        return $this->subtype == self::SUBTYPE_PLA || $this->subtype == self::SUBTYPE_NLA || $this->subtype == self::SUBTYPE_PLB || $this->subtype == self::SUBTYPE_NLB;
     }
 
     public function is_subpattern() {
