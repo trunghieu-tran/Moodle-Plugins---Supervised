@@ -171,8 +171,10 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
     public function process_charset() {
 
         $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
-        array_shift($info);
-        array_pop($info);
+        if (sizeof($this->pregnode->userinscription) > 1) {
+            array_shift($info);
+            array_pop($info);
+        }
         $result = array();                          // This will store a result.
 
         $result[] = '';                             // Create a first empty element.
