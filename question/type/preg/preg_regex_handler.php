@@ -462,6 +462,9 @@ class qtype_preg_regex_handler {
     }
 
     public function is_node_generated($pregnode) {
+        if ($pregnode->position->indlast < $pregnode->position->indfirst) {
+            return false;
+        }
         return $pregnode->position->indfirst < 0 || $pregnode->position->indfirst >= $this->regex->length() - $this->addedatstart - $this->addedatend;
     }
 
