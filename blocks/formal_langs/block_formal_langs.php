@@ -173,6 +173,14 @@ class block_formal_langs extends block_base {
      */
     public static function sync_contexts_with_config($result = null) {
         global $CFG, $DB;
+        // Sometimes this is called during install, so we need to check tables for
+        // existence, otherwise it would inevitably fail with dml_exception
+        $dbman = $DB->get_manager();
+        $langsdoesnotexists = $dbman->table_exists('block_formal_langs') == false;
+        $permsdoesnotexists = $dbman->table_exists('block_formal_langs_perms') == false;
+        if ($langsdoesnotexists || $permsdoesnotexists)
+            return;
+
         $systemcontextid = context_system::instance()->id;
         $showedlanguages = $CFG->block_formal_langs_showablelangs;
         if ($result !== null)
