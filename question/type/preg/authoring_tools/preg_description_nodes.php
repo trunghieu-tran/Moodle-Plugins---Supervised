@@ -975,7 +975,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      */
     public function __construct(&$node, &$matcher) {
         parent::__construct($node, $matcher);
-        $this->condbranch = $matcher->from_preg_node($node->condbranch);
+        $this->condbranch = array_shift($this->operands);
     }
 
     /*private function description_of_condition($form) {

@@ -112,7 +112,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
      * @return escaped string.
      */
     public static function escape_string($stringtoescape, $extracodes = null) {
-        if (is_array($extracodes) && sizeof($extracodes) != 0) {
+        if (is_array($extracodes) && count($extracodes) != 0) {
             $codes = array_intersect(self::$dotescapecodes, $extracodes);
         } else {
             $codes = self::$dotescapecodes;

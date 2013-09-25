@@ -318,7 +318,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         } else {
             $tooltip = get_string($this->pregnode->type, 'qtype_preg');
         }
-        if ($end > 2 && $this->pregnode->userinscription[$end - 1] == ']' ) {
+        if (count($this->pregnode->userinscription) > 1) {
             $start++;
             $end--;
         } else if ($end == 1 && $this->pregnode->userinscription[0]->type == qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
@@ -441,16 +441,6 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
 }
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
-
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-        // Add the condbranch as the first operand.
-        // It simplifies the drawing process.
-        if ($this->pregnode->condbranch !== null) {
-            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
-            $this->operands = array_merge(array($condbranch), $this->operands);
-        }
-    }
 
     protected function label() {
         return '"' . parent::label() . '"';
