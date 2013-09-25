@@ -1455,8 +1455,8 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
  */
 class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_ESC_A;
     }
 
@@ -1479,8 +1479,8 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
  */
 class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_SMALL_ESC_Z;
     }
 
@@ -1503,8 +1503,8 @@ class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
  */
 class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_esc_z {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_CAPITAL_ESC_Z;
     }
 
@@ -1523,8 +1523,8 @@ class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_
 
 class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_ESC_G;
     }
 
@@ -1548,8 +1548,8 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
  */
 class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_CIRCUMFLEX;
     }
 
@@ -1572,8 +1572,8 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
  */
 class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z {
 
-    public function __construct($negative = false) {
-        parent::__construct($negative);
+    public function __construct() {
+        parent::__construct();
         $this->subtype = self::SUBTYPE_DOLLAR;
     }
 
