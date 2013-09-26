@@ -306,31 +306,32 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
-            graph_img = $('#graph_img');
+            graph_img = $('#graph_img'),
+            desc_hnd = $('#description_handler');
 
-        if (t && t.img && t.map) {
-            tree_err.html('');
+        tree_err.html('');
+        tree_map.html('');
+        tree_img.removeAttr('src').css('visibility', 'hidden');
+        if (typeof t != 'undefined' && t.img && t.map) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
             tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
-        } else {
+        } else if (typeof t != 'undefined') {
             tree_err.html(t);
-            tree_img.removeAttr('src').css('visibility', 'hidden');
-            tree_map.html('');
         }
-        if (g) {
-            var err = (g.substring(0, 4) != 'data');
-            if (err) {
-                graph_err.html(g);
-                graph_img.removeAttr('src').css('visibility', 'hidden');
-            } else {
-                graph_err.html('');
-                graph_img.attr('src', g).css('visibility', 'visible');
-            }
+
+        graph_err.html('');
+        graph_img.removeAttr('src').css('visibility', 'hidden');
+        if (typeof g != 'undefined' && g.substring(0, 4) == 'data') {
+            graph_img.attr('src', g).css('visibility', 'visible');
+        } else if (typeof g != 'undefined') {
+            graph_err.html(g);
         }
-        if (d) {
-            $('#description_handler').html(d);
+
+        desc_hnd.html('');
+        if (typeof d != 'undefined') {
+            desc_hnd.html(d);
         }
 
         var length =  indlast - indfirst + 1;
