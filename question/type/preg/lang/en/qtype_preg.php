@@ -250,6 +250,7 @@ $string['description_option_U'] = 'quantifiers ungreedy by default:';
 $string['description_unsetoption_U'] = 'quantifiers greedy by default:';
 $string['description_option_J'] = 'allow duplicate names:';
 $string['description_unsetoption_J'] = 'disallow duplicate names:';
+$string['description_wrapper'] = '{a->option}:';
 // TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '{$a->firstoperand} is repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
 $string['description_finite_quant_strict'] = '{$a->firstoperand} is repeated {$a->count} times{$a->greedy}';
