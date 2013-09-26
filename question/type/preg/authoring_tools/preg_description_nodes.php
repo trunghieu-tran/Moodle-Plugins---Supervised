@@ -526,6 +526,9 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
                 $resultpattern .= self::get_form_string('description_unsetoption_J', $form) . ' ';
                 $mduplicate = false;
             }
+            $a = new stdClass();
+            $a->option = $resultpattern;
+            $resultpattern = self::get_form_string('description_wrapper', $a, $form);
             $node->handler->state->forceunsetmodifiers = false;
             $node_pattern = $resultpattern . $node_pattern;
         }
