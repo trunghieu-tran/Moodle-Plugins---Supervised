@@ -90,10 +90,11 @@ abstract class qtype_preg_description_node {
      */
     protected static function get_form_string($s, $a, $form=null) {
 
-        if (!is_object($a)) {
+        if (is_string($a)) {
             $form = $a;
-            $a = null;
-        }
+            $a = null; 
+            $usea = false;
+        } 
         if (isset($form) && $form !== '') {
             $s.='_'.$form;
         }
@@ -474,6 +475,9 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
             $this->handler->state->set_modifier($negopt[0], false);
             $resultpattern = self::get_form_string('description_unsetoption_'.$negopt[0], $form);
         }
+        $a = new stdClass();
+        $a->option = $resultpattern;
+        $resultpattern = self::get_form_string('description_option_wrapper', $a, $form);
         return $resultpattern;
     }
 
@@ -503,32 +507,34 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
 
             // TODO - generate 'caseless, singleline:' instead of 'caseless: singleline:'
             if ($mcaseless === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_i', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_i', $form);
                 $mcaseless = false;
             }
             if ($msingleline === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_s', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_s', $form);
                 $msingleline = false;
             }
             if ($mmultilineline === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_m', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_m', $form);
                 $mmultilineline = false;
             }
             if ($mextended === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_x', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_x', $form);
                 $mextended = false;
             }
             if ($mungreedy === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_U', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_U', $form);
                 $mungreedy = false;
             }
             if ($mduplicate === true) {
-                $resultpattern .= self::get_form_string('description_unsetoption_J', $form) . ' ';
+                $resultpattern .= self::get_form_string('description_unsetoption_J', $form);
                 $mduplicate = false;
             }
-            $a = new stdClass();
-            $a->option = $resultpattern;
-            $resultpattern = self::get_form_string('description_wrapper', $a, $form);
+            if ($resultpattern !== '') { 
+                $a = new stdClass();
+                $a->option = $resultpattern;
+                $resultpattern = self::get_form_string('description_option_wrapper', $a, $form).' ';
+            }
             $node->handler->state->forceunsetmodifiers = false;
             $node_pattern = $resultpattern . $node_pattern;
         }

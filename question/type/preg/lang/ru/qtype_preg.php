@@ -250,7 +250,7 @@ $string['description_option_U'] = 'квантификаторы не жадны�
 $string['description_unsetoption_U'] = 'квантификаторы жадные';
 $string['description_option_J'] = 'повторение имен разрешено';
 $string['description_unsetoption_J'] = 'повторение имен запрещено';
-$string['description_wrapper'] = '{a->option}:';
+$string['description_option_wrapper'] = '{$a->option}:';
 // TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '{$a->firstoperand} повторяется от {$a->leftborder} до {$a->rightborder} раз(а){$a->greedy}';
 $string['description_finite_quant_strict'] = '{$a->firstoperand} повторяется {$a->count} раз(а){$a->greedy}';
