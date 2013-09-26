@@ -651,14 +651,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
 
         $this->pattern = $this->pattern($node_parent, $form);
         $description = $this->numbering_pattern($numbering_pattern, $this->pattern);
-
-        /*$find = '/%(\w+)?(\d)/';
-        while(preg_match($find, $description, $matches) !== 0) {
-            $form = $matches[1];
-            $i = (int)$matches[2];
-            $child_description = $this->operands[$i-1]->description($numbering_pattern, $this, $form);
-            $description = str_replace($matches[0], $child_description, $description);
-        }*/
+        
         $replaces = $this->what_to_replace($description);
         foreach ($replaces as $num => $data) {
             // var_dump($num);
@@ -984,7 +977,14 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      */
     public function __construct(&$node, &$matcher) {
         parent::__construct($node, $matcher);
-        $this->condbranch = array_shift($this->operands);
+        $needgetcondbranch = $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA ||
+                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB ||
+                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB;
+        if ($needgetcondbranch) {
+            $this->condbranch = array_shift($this->operands);
+        }
+        //var_dump($this->operands);
     }
 
     /*private function description_of_condition($form) {
@@ -1045,7 +1045,6 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
             $resultpattern = self::get_form_string('description_node_cond_subexpr', $form);
             // $resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands), $resultpattern);
         }
-
         $elsereplase = isset($this->pregnode->operands[1])?self::get_form_string('description_node_cond_subexpr_else', $form):'';
         $resultpattern = str_replace('%else', $elsereplase, $resultpattern);
         return $resultpattern;
