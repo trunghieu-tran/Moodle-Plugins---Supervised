@@ -149,9 +149,9 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $matchedanswerid = null;
     /** A cached matched analyzer
-     *  @var qtype_correctwriting_lexical_analyzer
+     *  @var qtype_correctwriting_analysis_results
      */
-    public $matchedanalyzer = null;
+    public $matchedresults = null;
     /** A cached resulting graded state
      *  @var array
      */
@@ -176,9 +176,9 @@ class qtype_correctwriting_question extends question_graded_automatically
     }
 
     /** Checks, whether two responses are the same
-        @param array prevresponse previous response
-        @param array newresponse  new response
-        @return bool new user response
+     *  @param array prevresponse previous response
+     *  @param array newresponse  new response
+     *  @return bool new user response
      */
     public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_same_at_key_missing_is_blank(
@@ -276,46 +276,44 @@ class qtype_correctwriting_question extends question_graded_automatically
 
     /**
      * Performs exact matching  for answer
-     * @param stdClass $answer answer object
-     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
-     * @param block_formal_langs $stream stream data
+     * @param qtype_correctwriting_analysis_results $results
+     * @param block_formal_langs $stream answer stream data
      * @return bool whether it matches
      */
-    public function matches_exact($answer, $analyzer,  $stream) {
-        return count($analyzer->mistakes()) == 0;
+    public function matches_exact($results,  $stream) {
+        return count($results->mistakes()) == 0;
     }
 
     /**
      * Performs exact matching  for answer
-     * @param stdClass $answer answer object
-     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
-     * @param block_formal_langs $stream stream data
+     * @param qtype_correctwriting_analysis_results $results
+     * @param block_formal_langs_token_stream $stream stream data
      * @return bool whether it matches
      */
-    public function matches_non_exact($answer, $analyzer, $stream) {
+    public function matches_non_exact($results, $stream) {
         $answertokencount = count($stream->tokens);
-        $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
+        $partiallycorrect = (count($results->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
         return $partiallycorrect;
     }
 
     /**
      * Computes fraction for exact match. Used as callback in check match
      * @param stdClass $answer answer type
-     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @param qtype_correctwriting_analysis_results $results results for analysis for two answers
      * @return float resulting fraction
      */
-    public function compute_exact_match_fraction($answer, $analyzer) {
+    public function compute_exact_match_fraction($answer, $results) {
         return $answer->fraction;
     }
 
     /**
      * Computes fraction for non-exact match. Used as callback in check match
      * @param stdClass $answer answer type
-     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @param qtype_correctwriting_analysis_results $results results for analysis for two answers
      * @return float resulting fraction
      */
-    public function compute_nonexact_match_fraction($answer, $analyzer) {
-        return $this->compute_fraction($answer->fraction, $analyzer);
+    public function compute_nonexact_match_fraction($answer, $results) {
+        return $this->compute_fraction($answer->fraction, $results);
     }
 
     /** Checks, whether student answer matches non-exact match answer and if matches, grades it
@@ -332,14 +330,14 @@ class qtype_correctwriting_question extends question_graded_automatically
         // Scan answers
         $matched = false;
         $matchedid = null;
-        $matchedanalyzer = null;
+        $matchedresults = null;
         $foundexactmatch = false;
         $fraction = -1;
         // Get language
         $language = $this->get_used_language();
         // Scan answers for match
         foreach($answers as $id => $answer) {
-            $analyzer = $this->make_analyzer($answer, $response);
+            $results = $this->compare($answer, $response);
             //Get lexeme count from answer
             $answerstring = $language->create_from_string($answer->answer);
             $answerstream= $answerstring->stream;
@@ -354,13 +352,13 @@ class qtype_correctwriting_question extends question_graded_automatically
                 $fractionmethod = 'compute_nonexact_match_fraction';
             }
             // Check, whether answer is partially correct
-            $currentmatched = $this->$checkmethod($answer, $analyzer, $answerstream);
+            $currentmatched = $this->$checkmethod($results, $answerstream);
             if (($currentmatched == true) && (!$nonexact || !$foundexactmatch)) {
-                $answerfraction = $this->$fractionmethod($answer, $analyzer);
+                $answerfraction = $this->$fractionmethod($answer, $results);
                 $firstexact =  (!$foundexactmatch && !$nonexact);
                 if (($fraction <= $answerfraction) || ($matched == false) || $firstexact) {
                     $fraction = $answerfraction;
-                    $matchedanalyzer = $analyzer;
+                    $matchedresults = $results;
                     $matchedid = $id;
 
                     if (!$nonexact) {
@@ -382,7 +380,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         if ($matched) {
             // Copy matched data
             $this->matchedanswerid = $matchedid;
-            $this->matchedanalyzer = $matchedanalyzer;
+            $this->matchedresults = $matchedresults;
             $state = question_state::graded_state_for_fraction($fraction);
             $this->matchedgradestate = array($fraction, $state);
         }
@@ -405,16 +403,16 @@ class qtype_correctwriting_question extends question_graded_automatically
 
         $this->matchedanswerid = $fid;
         $answer = $this->answers[$fid];
-        $this->matchedanalyzer = $this->make_analyzer($answer, $response);
+        $this->matchedresults = $this->compare($answer, $response);
         $this->matchedgradestate = array(0, question_state::$gradedwrong);
     }
 
-    protected function make_analyzer($answer, $response) {
+    protected function compare($answer, $response) {
         $language = $this->get_used_language();
         $responsestring = $language->create_from_string($response);
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
         $string = new qtype_correctwriting_string_pair($answerstring, $responsestring, null);
-        $analyzer = new qtype_correctwriting_lexical_analyzer($this, $string, $language);
+        $analyzer = new qtype_correctwriting_analysis_results($this, $string, $language);
         return $analyzer;
     }
 
@@ -453,9 +451,10 @@ class qtype_correctwriting_question extends question_graded_automatically
 
    /**
     * Creates all information about mistakes, passed into mistakes
-    * @var qtype_correctwriting_lexical_analyzer $analyzer analuzer, which mistakes are taken
+    * @var qtype_correctwriting_analysis_results $results results of analysis
+    * @return string
     */
-   public function create_image_information($analyzer) {
+   public function create_image_information($results) {
        $question = $this;
        $keys = array_keys($question->answers);
        $answer  = $question->answers[$keys[0]]->answer;
@@ -470,13 +469,14 @@ class qtype_correctwriting_question extends question_graded_automatically
        //Create answer section
        $answertokenvalues = array();
        $answertokens = $language->create_from_string($answer);
+       /** @var block_formal_langs_token_base $token */
        foreach($answertokens->stream->tokens as $token) {
            $answertokenvalues[] = base64_encode($token->value());
        }
        $resultsections[] = implode(',,,',$answertokenvalues);
        //Create response section
        $responsetokenvalues = array();
-       $responsetokens = $analyzer->get_corrected_response()->stream->tokens;
+       $responsetokens = $results->get_corrected_response()->stream->tokens;
        foreach($responsetokens as $token) {
            $responsetokenvalues[] = base64_encode($token->value());
        }
@@ -487,7 +487,7 @@ class qtype_correctwriting_question extends question_graded_automatically
        $addedlexemes  = array();
        $movedlexemes = array();
 
-       foreach($analyzer->mistakes() as $mistake) {
+       foreach($results->mistakes() as $mistake) {
            // If this is lexical mistake, we should mark some lexeme as fixed
            if (is_a($mistake,'qtype_correctwriting_lexical_mistake')) {
                // A lexical mistakes are not supported in image, so this is commented part
@@ -522,8 +522,12 @@ class qtype_correctwriting_question extends question_graded_automatically
 
     //////////Specific hints implementation part
 
-    //We need adaptive (TODO interactive) behaviour to use hints
-     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
+     /** We need adaptive or behaviour to use hints
+      * @param question_attempt $qa
+      * @param string $preferredbehaviour
+      * @return qbehaviour|behaviour_with_hints
+      */
+    public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         global $CFG;
 
         if ($preferredbehaviour == 'adaptive' && file_exists($CFG->dirroot.'/question/behaviour/adaptivehints/')) {
@@ -545,8 +549,10 @@ class qtype_correctwriting_question extends question_graded_automatically
      }
 
     /**
-    * Returns an array of available specific hint types
-    */
+     * Returns an array of available specific hint types
+     * @param block_formal_langs_token_stream|null $response
+     * @return array of hints
+     */
     public function available_specific_hints($response = null) {
         $hints = array();
         if (count($this->hints) > 0) {
@@ -554,12 +560,14 @@ class qtype_correctwriting_question extends question_graded_automatically
         }
         if ($response !== null) {
             $this->get_best_fit_answer($response);//Be sure to have correct cached values.
-            if (is_object($this->matchedanalyzer)) {
-                $mistakes = $this->matchedanalyzer->mistakes();
+            if (is_object($this->matchedresults)) {
+                $mistakes = $this->matchedresults->mistakes();
                 foreach ($mistakes as $mistake) {
+                    /** @var qtype_correctwriting_response_mistake $mistake */
                     foreach($mistake->supported_hints() as $hintname) {
                         $classname =  'qtype_correctwriting_hint' . $hintname;
                         $key = $hintname . '_' . $mistake->mistake_key();
+                        /** @var qtype_specific_hint  $hintobj */
                         $hintobj = new $classname($this, $key, $mistake);
                         if ($hintobj->hint_available()) {
                             $hints[] = $key;
@@ -588,9 +596,11 @@ class qtype_correctwriting_question extends question_graded_automatically
         $hintclass = 'qtype_correctwriting_hint' . $classname;
         if ($response !== null) {
             $this->get_best_fit_answer($response);//Be sure to have correct cached values.
-            if (is_object($this->matchedanalyzer)) {
-                $mistakes = $this->matchedanalyzer->mistakes();
+            if (is_object($this->matchedresults)) {
+                $mistakes = $this->matchedresults->mistakes();
+                $hintmistake = null;
                 foreach($mistakes as $mistake) {
+                    /** @var qtype_correctwriting_response_mistake $mistake */
                     if ($mistake->mistake_key() == $mistakekey) {
                         $hintmistake = $mistake;
                         break;
@@ -653,4 +663,3 @@ class qtype_correctwriting_question extends question_graded_automatically
     }
 
 }
- ?>

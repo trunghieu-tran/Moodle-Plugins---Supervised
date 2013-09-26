@@ -60,10 +60,11 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
 
     protected function specific_feedback_with_options(question_attempt $qa, question_display_options $options) {
         global $PAGE;
+        /** @var qtype_correctwriting_question $question */
         $question = $qa->get_question();
         $shortanswerfeedback = parent::specific_feedback($qa);
         $myfeedback = '';
-        $analyzer = $question->matchedanalyzer;
+        $results = $question->matchedresults;
         $br = html_writer::empty_tag('br');
 
         $currentanswer = $qa->get_last_qt_var('answer');
@@ -72,12 +73,13 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         }
         $hints = $question->available_specific_hints(array('answer' => $currentanswer));
         $behaviour = $qa->get_behaviour();
+        /** @var qtype_ad $behaviourrenderer */
         $behaviourrenderer =$behaviour->get_renderer($PAGE);
         $step = $qa->get_last_step();
-        if ($analyzer!=null && $options->feedback) {//Show feedback message only witho $options->feedback set, but Moodle hints - anyway
+        if ($results!=null && $options->feedback) {//Show feedback message only witho $options->feedback set, but Moodle hints - anyway
             //Output mistakes messages
-            if (count($analyzer->mistakes()) > 0) {
-                $mistakescnt = count($analyzer->mistakes());
+            if (count($results->mistakes()) > 0) {
+                $mistakescnt = count($results->mistakes());
                 if ($mistakescnt == 1) {
                     $myfeedback = get_string('foundmistake', 'qtype_correctwriting');
                 } else {
@@ -86,7 +88,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                 $myfeedback .= $br;
 
                 $i = 1;
-                foreach($analyzer->mistakes() as $mistake) {
+                /** @var qtype_correctwriting_response_mistake $mistake */
+                foreach($results->mistakes() as $mistake) {
                     //Render mistake message.
                     $msg = $i.') '.$mistake->get_mistake_message();
                     if ($i < $mistakescnt) {
@@ -95,12 +98,16 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                         $msg .= '.';
                     }
                     //Render hint buttons and/or hints.
-                    if (is_a($behaviour, 'behaviour_with_hints')) {
+                    if (is_a($behaviour, 'behaviour_with_hints'))
+                    {
+                        /** @var behaviour_with_hints $behaviour */
+                        /** @var qbehaviour_adaptivehints_renderer|qbehaviour_adaptivehintsnopenalties_renderer|qbehaviour_interactivehints_renderer $behaviourrenderer */
                         foreach ($mistake->supported_hints() as $hintname) {
                             $hintkey = $hintname . '_' . $mistake->mistake_key();
                             if (in_array($hintkey, $hints)) {//There is hint for that mistake.
                                 $hints = array_diff($hints, array($hintkey));
                                 $classname =  'qtype_correctwriting_hint' . $hintname;
+                                /** @var qtype_specific_hint $hintobj */
                                 $hintobj = new $classname($question, $hintkey, $mistake);
                                 if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
                                     if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
@@ -120,6 +127,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         }
         //Render non-mistake hints if requested.
         if (is_a($behaviour, 'behaviour_with_hints')) {
+            /** @var behaviour_with_hints $behaviour */
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
                 if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
@@ -135,13 +143,14 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
    //This wil be shown only if show right answer is setup
    public function correct_response(question_attempt $qa) {
        global $CFG;
+       /** @var qtype_correctwriting_question $question */
        $question = $qa->get_question();
        $resulttext  = html_writer::empty_tag('br');
        // This data should contain base64_encoded data about user mistakes
-       $analyzer = $question->matchedanalyzer;
-       if ($analyzer!=null) {
-           if (count($analyzer->mistakes()) != 0) {
-               $mistakecodeddata = $question->create_image_information($analyzer);
+       $results = $question->matchedresults;
+       if ($results!=null) {
+           if (count($results->mistakes()) != 0) {
+               $mistakecodeddata = $question->create_image_information($results);
                $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
                $imagesrc = html_writer::empty_tag('image', array('src' => $url));
                $resulttext = $imagesrc . $resulttext;
