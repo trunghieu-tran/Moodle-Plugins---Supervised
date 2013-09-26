@@ -244,4 +244,89 @@ abstract class qtype_correctwriting_abstract_analyzer {
         return array();
     }
 
+    /**
+     * Whether we should filter mistake from list of mistakes.
+     * Called if replaces_mistake_types returns one mistake
+     * @param qtype_correctwriting_response_mistake  $mistake
+     * @return boolean
+     */
+    public function should_mistake_be_removed($mistake) {
+        return false;
+    }
+
+}
+
+/**
+ * Class qtype_correctwriting_analysis_results
+ * A main class, that purpose is to wrap all of analyzers and build complex report for
+ * other analyzer. This is simple proxy to simplify refactoring for a question.
+ */
+class qtype_correctwriting_analysis_results {
+
+    /**
+     * Defines a handled processed
+     * @var block_formal_langs_string_pair
+     */
+    protected $stringpair = null;
+    /**
+     * Defines a question
+     * @var qtype_correctwriting_question
+     */
+    protected $question = null;
+    /**
+     * A language, used in results
+     * @var block_formal_langs_abstract_language
+     */
+    protected $language = null;
+    /**
+     * Set to true, when two answers are equal
+     * @var bool
+     */
+    protected $equal = false;
+    /**
+     * Creates new results
+     * @param qtype_correctwriting_question $question  a question
+     * @param block_formal_langs_string_pair $pair a pair of strings
+     * @param block_formal_langs_abstract_language $language  a language
+     */
+    public function __construct($question, $pair, $language) {
+        $this->question = $question;
+        $this->stringpair = $pair;
+        $this->language = $language;
+        $this->equal = $this->question->are_lexeme_sequences_equal($pair);
+        if ($this->equal == false) {
+            $this->perform_deep_analysis();
+        }
+    }
+
+    /**
+     * Returns a mistakes array for all of analyzers
+     * @return array mistakes
+     */
+    public function mistakes() {
+        $result = array();
+        if ($this->equal == false) {
+             // TODO: Handle this case
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a corrected response from last of analyzers
+     * @return block_formal_langs_processed_string
+     */
+    public function get_corrected_response() {
+        if ($this->equal)
+            return $this->stringpair->correctedstring();
+        // TODO: Implement
+        return null;
+    }
+
+    /**
+     * Peforms deep analysis using DFS for all possible combinations of allowed analysers
+     */
+    protected function perform_deep_analysis() {
+        // TODO: Implement
+    }
+
 }
