@@ -50,6 +50,10 @@
         return $this->id_counter;
     }
 
+    public function set_max_id($value) {
+        $this->id_counter = $value;
+    }
+
     public function get_max_subpatt() {
         return $this->subpatt_counter;
     }
