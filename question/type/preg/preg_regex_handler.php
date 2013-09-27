@@ -268,7 +268,7 @@ class qtype_preg_regex_handler {
             $options = $notationobj->convert_options($usednotation);
         }
 
-        if ($options->exactmatch) {
+        /*if ($options->exactmatch) {
             // Grouping is needed in case regexp contains top-level alternations.
             // Use non-capturing grouping to not mess-up with user subexpression capturing.
             // Add line break before last bracket since regex may end in the comment in extended notation.
@@ -276,7 +276,7 @@ class qtype_preg_regex_handler {
             $regex = '^(?:'.$regex."\n)$";
             $this->addedatstart = 4;
             $this->addedatend = 3;
-        }
+        }*/
 
         // Look for unsupported modifiers.
         $allmodifiers = qtype_preg_handling_options::get_all_modifiers();
@@ -639,10 +639,30 @@ class qtype_preg_regex_handler {
         }
 
         // Set AST and DST roots.
-        $this->ast_root = $this->parser->get_root();
+        $root = $this->parser->get_root();
+        if ($this->options->exactmatch) { // Add necessary nodes.
+            $root = $this->add_exact_match_nodes($root);
+        }
+        $this->ast_root = $root;
         $this->build_dst();
 
         fclose($pseudofile);
+    }
+
+    /**
+     * Adds necessary preg nodes for exact matching.
+     */
+    protected function add_exact_match_nodes($oldroot) {
+        $newroot = new qtype_preg_node_concat;
+        $newroot->set_user_info(new qtype_preg_position());
+        $newroot->operands[0] = new qtype_preg_leaf_assert_circumflex;
+        $newroot->operands[0]->set_user_info(new qtype_preg_position());
+        $newroot->operands[1] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $newroot->operands[1]->operands[0] = $oldroot;
+        $newroot->operands[1]->set_user_info(new qtype_preg_position());
+        $newroot->operands[2] = new qtype_preg_leaf_assert_dollar;
+        $newroot->operands[2]->set_user_info(new qtype_preg_position());
+        return $newroot;
     }
 
     protected function build_dst() {
