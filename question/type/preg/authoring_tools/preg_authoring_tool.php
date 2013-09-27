@@ -119,7 +119,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         }
 
         $result = '';
-        for ($i = 0; $i < textlib::strlen($stringtoescape); ++$i) {
+        $stringtoescape = new qtype_poasquestion_string($stringtoescape);
+        for ($i = 0; $i < $stringtoescape->length(); ++$i) {
             $result .= self::escape_char($stringtoescape[$i], $codes);
         }
 

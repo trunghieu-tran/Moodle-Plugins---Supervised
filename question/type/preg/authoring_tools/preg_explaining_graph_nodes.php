@@ -169,33 +169,30 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
      * @return array Charset values for node of graph.
      */
     public function process_charset() {
-
         $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
         if (count($this->pregnode->userinscription) > 1) {
             array_shift($info);
             array_pop($info);
         }
-        $result = array();                          // This will store a result.
-
-        $result[] = '';                             // Create a first empty element.
+        $result = array('');                          // This will store the result, first element is empty.
 
         // Now, iterate over userinscription elements.
         foreach ($info as $iter) {
-
+            $data = new qtype_poasquestion_string($iter->data);
             // First, we need to define: is it range?
             // So, check this pattern: <something>-<something>.
-            $mpos = strpos($iter->data, '-'); // find a position of '-'
+            $mpos = textlib::strpos($data, '-');
             // If position is not in beginning and not in end...
-            if ($mpos != 0 && $mpos != strlen($iter->data) - 1) {
+            if ($mpos != 0 && $mpos != $data->length() - 1) {
                 if ($mpos == 1) { // If <something>'s length is 1 then our range hasn't hex code.
-                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . substr($iter->data, 0, $mpos) .
-                                          get_string('explain_to', 'qtype_preg') . substr($iter->data, $mpos + 1);
+                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . $data->substring(0, $mpos) .
+                                          get_string('explain_to', 'qtype_preg') . $data->substring($mpos + 1);
                 } else {            // ...else we deal with hex code in <something>.
                     $a = new stdClass();
-                    $a->code = substr($iter->data, 2, $mpos-2);
+                    $a->code = $data->substring(2, $mpos - 2)->string();
                     $tmp = chr(10) . get_string('explain_from', 'qtype_preg') .
                                      get_string('description_char_16value', 'qtype_preg', $a) . get_string('explain_to', 'qtype_preg');
-                    $a->code = substr($iter->data, $mpos + 3);
+                    $a->code = $data->substring($mpos + 3)->string();
                     $result[] = $tmp . get_string('description_char_16value', 'qtype_preg', $a);
                 }
 
@@ -204,15 +201,15 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
 
             // Now we know that this $iter hasn't a range.
             // So, iterate over all characters in $iter.
-            for ($i = 0; $i < strlen($iter->data); $i++) {
+            for ($i = 0; $i < $data->length(); $i++) {
 
                 // Check this pattern: [:<something>:] (it is POSIX class).
                 // First char should be '['.
-                if ($i == 0 && $iter->data[$i] == '[') {
+                if ($i == 0 && $data[$i] == '[') {
                     $i += 2;
                     $tmp = '';  // Third char should be ':'.
-                    while ($iter->data[$i] != ':') { // iterate to next ':'
-                        $tmp .= $iter->data[$i]; // Accumulate <something>'s characters.
+                    while ($data[$i] != ':') { // iterate to next ':'
+                        $tmp .= $data[$i]; // Accumulate <something>'s characters.
                         $i++;
                     }
                     $i++; // Move to last ']'.
@@ -220,39 +217,39 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                     // Extract POSIX class from lang-file.
                     $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
 
-                } else if ($iter->data[$i] == '\\') { // Here we check another pattern: \<something>.
+                } else if ($data[$i] == '\\') { // Here we check another pattern: \<something>.
                     $i++; // Move to next character.
 
                     // Now we're just checking all possible <something> variants.
-                    if ($iter->data[$i] == '\\') {    // Here is \-escaping.
+                    if ($data[$i] == '\\') {    // Here is \-escaping.
                         $result[count($result) - 1] .= '\\';
                     }
-                    if ($iter->data[$i] == 'p') {  // Unicode property.
+                    if ($data[$i] == 'p') {  // Unicode property.
                         $i++;
-                        if ($iter->data[$i] == '{') { // It may be like this - \p{<something>}.
+                        if ($data[$i] == '{') { // It may be like this - \p{<something>}.
                             $tmp = '';
                             $i++;
-                            while ($iter->data[$i] != '}') {
-                                $tmp .= $iter->data[$i];
+                            while ($data[$i] != '}') {
+                                $tmp .= $data[$i];
                                 $i++;
                             }
                             $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
                         } else { // Or just like this \p<something>.
-                            $result[] = chr(10) . get_string('description_charflag_' . $iter->data[$i], 'qtype_preg');
+                            $result[] = chr(10) . get_string('description_charflag_' . $data[$i], 'qtype_preg');
                         }
-                    } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') { // It may be like this - \x<somthing> or \X<something>, where <something> is hex number.
+                    } else if ($data[$i] == 'x' || $data[$i] == 'X') { // It may be like this - \x<somthing> or \X<something>, where <something> is hex number.
                         $i++;
                         $tmp = '';
-                        if (ctype_xdigit($iter->data[$i])) {
-                            $tmp = $iter->data[$i];
+                        if (ctype_xdigit($data[$i])) {
+                            $tmp = $data[$i];
                             $i++;
-                            if (ctype_xdigit($iter->data[$i])) {
-                                $tmp .= $iter->data[$i];
+                            if (ctype_xdigit($data[$i])) {
+                                $tmp .= $data[$i];
                             }
-                        } else if ($iter->data[$i] == '{') { // It also may looks like \x{<something>}.
+                        } else if ($data[$i] == '{') { // It also may looks like \x{<something>}.
                             $i++;
-                            while ($iter->data[$i] != '}') {
-                                $tmp .= $iter->data[$i];
+                            while ($data[$i] != '}') {
+                                $tmp .= $data[$i];
                                 $i++;
                             }
                         } else {
@@ -264,47 +261,47 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
                         $a = new stdClass();
                         $a->code = $tmp;
                         $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', $a);
-                    } else if ($iter->data[$i] == 'n') {
+                    } else if ($data[$i] == 'n') {
                         $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'r') {
+                    } else if ($data[$i] == 'r') {
                         $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'd') {
+                    } else if ($data[$i] == 'd') {
                         $result[] = chr(10) . get_string('description_charflag_digit', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'D') {
+                    } else if ($data[$i] == 'D') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_digit', 'qtype_preg');
-                    } else if ($iter->data[$i] == 's') {
+                    } else if ($data[$i] == 's') {
                         $result[] = chr(10) . get_string('description_charflag_space', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'S') {
+                    } else if ($data[$i] == 'S') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_space', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'w') {
+                    } else if ($data[$i] == 'w') {
                         $result[] = chr(10) . get_string('description_charflag_word', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'W') {
+                    } else if ($data[$i] == 'W') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_word', 'qtype_preg');
-                    } else if ($iter->data[$i] == 't') {
+                    } else if ($data[$i] == 't') {
                         $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'h') {
+                    } else if ($data[$i] == 'h') {
                         $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'v') {
+                    } else if ($data[$i] == 'v') {
                         $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'H') {
+                    } else if ($data[$i] == 'H') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg')  . get_string('description_charflag_hspace', 'qtype_preg');
-                    } else if ($iter->data[$i] == 'V') {
+                    } else if ($data[$i] == 'V') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg')  . get_string('description_charflag_vspace', 'qtype_preg');
-                    } else if ($iter->data[$i] == ' ') {
+                    } else if ($data[$i] == ' ') {
                         $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                    } else if ($iter->data[$i] == "\t") {
+                    } else if ($data[$i] == "\t") {
                         $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                     } else {
-                        $result[0] .= $iter->data[$i];
+                        $result[0] .= $data[$i];
                     }
-                } else if ($iter->data[$i] == ' ') {
+                } else if ($data[$i] == ' ') {
                     $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                } else if ($iter->data[$i] == "\t") {
+                } else if ($data[$i] == "\t") {
                     $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                } else if ($iter->data[$i] == '.') {    // Here is .-escaping.
+                } else if ($data[$i] == '.') {    // Here is .-escaping.
                         $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
                 } else {
-                    $result[0] .= $iter->data[$i]; // All another characters are not special.
+                    $result[0] .= $data[$i]; // All another characters are not special.
                 }
             }
         }
