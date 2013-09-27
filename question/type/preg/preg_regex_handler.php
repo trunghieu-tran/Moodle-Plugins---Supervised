@@ -316,6 +316,7 @@ class qtype_preg_regex_handler {
             if ($indfirst != -2) {
                 $idcounter = $this->parser->get_max_id() + 1;
                 $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+                $this->build_dst();
             }
         }
 
