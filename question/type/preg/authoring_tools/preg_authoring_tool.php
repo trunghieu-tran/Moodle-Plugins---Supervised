@@ -49,17 +49,12 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
     protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
 
-    protected $originalregex = null;
-
     public function __construct($regex = null, $options = null) {
         if ($options === null) {
             $options = new qtype_preg_authoring_tools_options();
         }
         $options->preserveallnodes = true;
-
         parent::__construct($regex, $options);
-
-        $this->originalregex = $regex;
     }
 
     /**
@@ -128,7 +123,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
     }
 
     public function generate_json(&$json) {
-        $json['regex'] = $this->originalregex;
+        $json['regex'] = $this->regex->string();
         $json['engine'] = $this->options->engine;
         $json['notation'] = $this->options->notation;
         $json['exactmatch'] = (int)$this->options->exactmatch;
@@ -139,7 +134,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['displayas'] = $this->options->displayas;
         $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
 
-        if ($this->originalregex == '') {
+        if ($this->regex->string() == '') {
             $this->generate_json_for_empty_regex($json);
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
             $this->generate_json_for_unaccepted_regex($json);

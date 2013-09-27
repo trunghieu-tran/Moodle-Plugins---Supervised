@@ -226,12 +226,6 @@ class qtype_preg_regex_handler {
     protected $lexer = null;
     /** Regex parser. */
     protected $parser = null;
-
-    /** @var int Number of characters, added at the start of regular expression by internal code.*/
-    protected $addedatstart = 0;
-    /** @var int Number of characters, added at the end of regular expression by internal code.*/
-    protected $addedatend = 0;
-
     /** The root of the regex abstract syntax tree, consists of qtype_preg_node childs. */
     protected $ast_root = null;
     /** The root of the regex definite syntax tree, consists of xxx_preg_node childs where xxx is engine name. */
@@ -267,16 +261,6 @@ class qtype_preg_regex_handler {
             $regex = $notationobj->convert_regex($usednotation);
             $options = $notationobj->convert_options($usednotation);
         }
-
-        /*if ($options->exactmatch) {
-            // Grouping is needed in case regexp contains top-level alternations.
-            // Use non-capturing grouping to not mess-up with user subexpression capturing.
-            // Add line break before last bracket since regex may end in the comment in extended notation.
-            // Line breaks will be ignored in other notations, so it's ok to add it anyway.
-            $regex = '^(?:'.$regex."\n)$";
-            $this->addedatstart = 4;
-            $this->addedatend = 3;
-        }*/
 
         // Look for unsupported modifiers.
         $allmodifiers = qtype_preg_handling_options::get_all_modifiers();
@@ -314,8 +298,9 @@ class qtype_preg_regex_handler {
                 }
             }
             if ($indfirst != -2) {
-                $idcounter = $this->parser->get_max_id() + 1;
+                $idcounter = $this->parser->get_max_id();
                 $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+                $this->parser->set_max_id($idcounter);
                 $this->build_dst();
             }
         }
@@ -463,10 +448,20 @@ class qtype_preg_regex_handler {
     }
 
     public function is_node_generated($pregnode) {
-        if ($pregnode->position->indlast < $pregnode->position->indfirst) {
+        if (!$this->options->exactmatch) {
             return false;
         }
-        return $pregnode->position->indfirst < 0 || $pregnode->position->indfirst >= $this->regex->length() - $this->addedatstart - $this->addedatend;
+        if ($pregnode->id == $this->ast_root->id) {
+            return true;
+        }
+        if (is_a($this->ast_root, 'qtype_preg_operator')) {
+            foreach ($this->ast_root->operands as $operand) {
+                if ($pregnode->id == $operand->id) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -605,7 +600,6 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->set_options($this->options);
-        $this->lexer->set_added_at_start($this->addedatstart);
 
         $this->parser = new qtype_preg_yyParser($this->options);
 
@@ -640,7 +634,7 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $root = $this->parser->get_root();
-        if ($this->options->exactmatch) { // Add necessary nodes.
+        if (!$this->errors_exist() && $this->options->exactmatch) { // Add necessary nodes.
             $root = $this->add_exact_match_nodes($root);
         }
         $this->ast_root = $root;
@@ -653,15 +647,21 @@ class qtype_preg_regex_handler {
      * Adds necessary preg nodes for exact matching.
      */
     protected function add_exact_match_nodes($oldroot) {
-        $newroot = new qtype_preg_node_concat;
-        $newroot->set_user_info(new qtype_preg_position());
-        $newroot->operands[0] = new qtype_preg_leaf_assert_circumflex;
-        $newroot->operands[0]->set_user_info(new qtype_preg_position());
+        $idcounter = $this->parser->get_max_id();
+        $newroot = new qtype_preg_node_concat();
+        $newroot->id = ++$idcounter;
+        $newroot->set_user_info($oldroot->position->add_chars_left(-4)->add_chars_right(2), new qtype_preg_userinscription(''));
+        $newroot->operands[0] = new qtype_preg_leaf_assert_circumflex();
+        $newroot->operands[0]->id = ++$idcounter;
+        $newroot->operands[0]->set_user_info(new qtype_preg_position($newroot->position->indfirst, $newroot->position->indfirst), array(new qtype_preg_userinscription('^')));
         $newroot->operands[1] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $newroot->operands[1]->id = ++$idcounter;
+        $newroot->operands[1]->set_user_info($oldroot->position->add_chars_left(-3)->add_chars_right(1), array(new qtype_preg_userinscription('(?:...)')));
         $newroot->operands[1]->operands[0] = $oldroot;
-        $newroot->operands[1]->set_user_info(new qtype_preg_position());
-        $newroot->operands[2] = new qtype_preg_leaf_assert_dollar;
-        $newroot->operands[2]->set_user_info(new qtype_preg_position());
+        $newroot->operands[2] = new qtype_preg_leaf_assert_dollar();
+        $newroot->operands[2]->id = ++$idcounter;
+        $newroot->operands[2]->set_user_info(new qtype_preg_position($newroot->position->indlast, $newroot->position->indlast), array(new qtype_preg_userinscription('$')));
+        $this->parser->set_max_id($idcounter);
         return $newroot;
     }
 

@@ -59,8 +59,6 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
-    // Number of characters added at start by regex handler.
-    protected $addedatstart = 0;
     // Positions skipped because preserveallnodes option was set to false.
     protected $skipped_positions = array();
     // Array of lexical errors found.
@@ -250,9 +248,6 @@ class qtype_preg_lexer extends JLexBase  {
         $this->options = $options;
         $this->modify_top_options_stack_item($options->modifiers, 0);
     }
-    public function set_added_at_start($count) {
-        $this->addedatstart = $count;
-    }
     protected function modify_top_options_stack_item($set, $unset) {
         $errors = array();
         // Setting and unsetting modifier at the same time is error.
@@ -313,18 +308,7 @@ class qtype_preg_lexer extends JLexBase  {
         $position = new qtype_preg_position($this->yychar, $this->yychar + $this->yylength() - 1,
                                        $this->yyline, $this->yyline,
                                        $this->yycol, $this->yycol + $this->yylength() - 1);
-        $this->shift_position($position);
         return $position;
-    }
-    protected function shift_position(&$position) {
-        $position->indfirst -= $this->addedatstart;
-        $position->indlast -= $this->addedatstart;
-        if ($position->linefirst == 0) {
-            $position->colfirst -= $this->addedatstart;
-        }
-        if ($position->linelast == 0) {
-            $position->collast -= $this->addedatstart;
-        }
     }
     protected function form_error($subtype, $addinfo, $addtonode = null) {
         // Create the error node itself.
@@ -826,7 +810,6 @@ class qtype_preg_lexer extends JLexBase  {
         $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
                                             $this->state_begin_position->linefirst, $this->yyline,
                                             $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
-        $this->shift_position($position);
         $error->set_user_info($position);
     }
     // End of the regex inside a comment.
@@ -835,7 +818,6 @@ class qtype_preg_lexer extends JLexBase  {
         $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
                                             $this->state_begin_position->linefirst, $this->yyline,
                                             $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
-        $this->shift_position($position);
         $error->set_user_info($position);
     }
     // Check for references to unexisting subexpressions.
@@ -7378,7 +7360,6 @@ array(
     $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
                                         $this->state_begin_position->linefirst, $this->yyline,
                                         $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
-    $this->shift_position($position);
     $this->charset->userinscription[] = new qtype_preg_userinscription(']');
     $this->charset->set_user_info($position, $this->charset->userinscription);
     $this->charset->israngecalculated = false;
