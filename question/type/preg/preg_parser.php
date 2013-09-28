@@ -1087,7 +1087,7 @@ static public $yy_action = array(
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + -1]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     } else if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if (!self::is_alt_nullable($this->yystack[$this->yyidx + -1]->minor)) {
+        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable($this->yystack[$this->yyidx + -1]->minor)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info($this->yystack[$this->yyidx + 0]->minor->position->add_chars_left(1));
             $this->yystack[$this->yyidx + -1]->minor->operands[] = $epsleaf;
@@ -1108,7 +1108,7 @@ static public $yy_action = array(
     if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + 0]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     } else if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if (!self::is_alt_nullable($this->yystack[$this->yyidx + 0]->minor)) {
+        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable($this->yystack[$this->yyidx + 0]->minor)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->add_chars_right(-1));
             $this->yystack[$this->yyidx + 0]->minor->operands = array_merge(array($epsleaf), $this->yystack[$this->yyidx + 0]->minor->operands);

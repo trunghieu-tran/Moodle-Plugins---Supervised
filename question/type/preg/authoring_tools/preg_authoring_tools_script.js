@@ -335,8 +335,10 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         var length =  indlast - indfirst + 1;
-        if (indfirst < 0 || indlast < indfirst) {
-            indfirst = Math.max(indfirst, 0);
+        if (indfirst < 0) {
+            indfirst = 0;
+        }
+        if (indlast < 0) {
             length = 0;
         }
         self.regex_input.textrange('set', indfirst, length);

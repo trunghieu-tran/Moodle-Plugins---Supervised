@@ -305,7 +305,7 @@ expr(A) ::= expr(B) ALT(C). [ALT_SHORT] {
     if (B->type == qtype_preg_node::TYPE_LEAF_META && B->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = B;
     } else if (B->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if (!self::is_alt_nullable(B)) {
+        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(B)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(C->position->add_chars_left(1));
             B->operands[] = $epsleaf;
@@ -325,7 +325,7 @@ expr(A) ::= ALT(B) expr(C). [ALT_SHORT] {
     if (C->type == qtype_preg_node::TYPE_LEAF_META && C->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = C;
     } else if (C->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if (!self::is_alt_nullable(C)) {
+        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(C)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(B->position->add_chars_right(-1));
             C->operands = array_merge(array($epsleaf), C->operands);
