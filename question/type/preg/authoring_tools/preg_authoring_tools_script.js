@@ -83,7 +83,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
 
                     // Create a clone of the textarea.
-                    var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:none;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
+                    var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:both;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
                     $('#id_regex_text').each(function() {
                         $.each(this.attributes, function() {
                             if (this.specified) {
@@ -93,7 +93,7 @@ M.preg_authoring_tools_script = (function ($) {
                     });
 
                     // Replace the textarea with an iframe. TODO: CSS для ресайзового треугольничка
-                    var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding-right:10px;overflow:hidden;width:50%;height:20px">' +
+                    var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
                                          '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"/>' +
                                        '</div>';
 
