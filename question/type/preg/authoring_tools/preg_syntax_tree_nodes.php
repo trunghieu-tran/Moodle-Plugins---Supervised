@@ -107,8 +107,8 @@ abstract class qtype_preg_syntax_tree_node {
             }
         }
 
-        $special = array('"' => '&#34;',
-                         '&' => '&#38;',
+        $special = array('&' => '&#38;',
+                         '"' => '&#34;',
                          ',' => '&#44;',
                          '<' => '&#60;',
                          '>' => '&#62;',
@@ -172,8 +172,6 @@ abstract class qtype_preg_syntax_tree_node {
         }
         $result .= ", style = \"$style\"";
 
-
-        //var_dump($result);
         return '[' . $result . ']';
     }
 
@@ -223,10 +221,6 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
                 $dotscript1 .= parent::get_claster_head() .  parent::$clasterscript . self::get_dot_tail();
             }
             $dotscript1 .= $dotscript . self::get_dot_tail();
-/*
-            var_dump($dotscript1);
-            var_dump(parent::$clasterscript);
-*/
             return $dotscript1;
         } else {
             return array($dotscript, $style);
@@ -282,10 +276,6 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
                 $dotscript1 .= parent::get_claster_head() .  parent::$clasterscript . self::get_dot_tail();
             }
             $dotscript1 .= $dotscript . self::get_dot_tail();
-/*
-            var_dump($dotscript1);
-            var_dump(parent::$clasterscript);
-*/
             return $dotscript1;
         } else {
             return array($dotscript, $style);
@@ -352,7 +342,7 @@ class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
     }
 
     protected function label() {
-        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
+        return '"' . parent::label() . '"';
     }
 
     protected function tooltip() {
@@ -367,9 +357,13 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     }
 
     protected function label() {
+        return '"&#92;&#92;' . $this->pregnode->number . '"';
+    }
+    
+    protected function tooltip() {
         $a = new stdClass;
         $a->number = $this->pregnode->number;
-        return '"' . get_string('description_backref', 'qtype_preg', $a) . '"';
+        return get_string('description_backref', 'qtype_preg', $a);
     }
 }
 
@@ -381,6 +375,13 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
         return '"' . parent::label() . '"';
+    }
+
+    protected function tooltip() {
+        return get_string($this->pregnode->type, 'qtype_preg') 
+                . ' \\"' 
+                . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg')
+                . '\\"';
     }
 }
 
@@ -436,7 +437,17 @@ class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator
 class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operator {
 
     protected function label() {
+        if ($this->pregnode->number > 0) {
+            return '"' . parent::label() . " #" . $this->pregnode->number . '"';
+        }
         return '"' . parent::label() . '"';
+    }
+    
+    protected function tooltip() {
+        if ($this->pregnode->number > 0) {
+            return parent::tooltip() . " #" . $this->pregnode->number;
+        }
+        return parent::tooltip();
     }
 }
 
