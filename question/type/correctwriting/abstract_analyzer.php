@@ -99,6 +99,10 @@ abstract class qtype_correctwriting_abstract_analyzer {
                 throw new moodle_exception('Invalid number of string pairs or mistake from CorrectWriting question analyzer '// TODO - make a language string and normal exception.
                                             . get_string($this->name(), 'qtype_correctwriting'));
             }
+            if (count($this->resultstringpairs) == 0) {
+                throw new moodle_exception('There must be at least one output pair in '
+                                           . get_string($this->name(), 'qtype_correctwriting'));
+            }
         }
     }
 
@@ -257,32 +261,43 @@ abstract class qtype_correctwriting_abstract_analyzer {
 }
 
 /**
- * Class qtype_correctwriting_analysis_results
- * A main class, that purpose is to wrap all of analyzers and build complex report for
- * other analyzer. This is simple proxy to simplify refactoring for a question.
+ * @class qtype_correctwriting_analysis_results
+ *
+ * This class encapsulates all results of analyzer, providing possibility to work with mistakes,
+ * and ending corrected response.
+ *
+ * Also this class encapsulates algorithm for comparing two pairs of strings, building set of mistakes
+ * by full-scan of tree of all possible analyzer combinations.
  */
 class qtype_correctwriting_analysis_results {
-
     /**
-     * Defines a handled processed
-     * @var block_formal_langs_string_pair
-     */
-    protected $stringpair = null;
-    /**
-     * Defines a question
+     * A question. All analyzers should work with this question
      * @var qtype_correctwriting_question
      */
     protected $question = null;
     /**
-     * A language, used in results
+     * Language for working with pairs
      * @var block_formal_langs_abstract_language
      */
     protected $language = null;
     /**
      * Set to true, when two answers are equal
+     *
+     * If two answers are equal, we should not care about results - because a student response is
+     * correct
+     *
      * @var bool
      */
     protected $equal = false;
+    /**
+     * Set of results from collected from each
+     * analyzer, defined as array of stdClass with following fields
+     * int index - index of string pair with best fitness for analyzer
+     * qtype_correctwriting_abstract_analyzer analyzer - analyzer of this part
+     * array set - mistake set, chosen from analyzer and cleaned from replaced mistakes
+     * @var bool|array
+     */
+    protected $results = false;
     /**
      * Creates new results
      * @param qtype_correctwriting_question $question  a question
@@ -295,38 +310,209 @@ class qtype_correctwriting_analysis_results {
         $this->language = $language;
         $this->equal = $this->question->are_lexeme_sequences_equal($pair);
         if ($this->equal == false) {
-            $this->perform_deep_analysis();
+            $this->perform_deep_analysis($pair);
         }
     }
 
     /**
-     * Returns a mistakes array for all of analyzers
+     * Returns a mistake set, collecting it from all of analyzers
      * @return array mistakes
      */
     public function mistakes() {
         $result = array();
         if ($this->equal == false) {
-             // TODO: Handle this case
+            foreach($this->results as $analysisresult) {
+                $mistakeset = $analysisresult->set;
+                if (count($result) == 0)  {
+                    $result = $mistakeset;
+                }  else {
+                    if (count($mistakeset) != 0) {
+                        $result = array_merge($result, $mistakeset);
+                    }
+                }
+            }
         }
         return $result;
     }
 
     /**
-     * Returns a corrected response from last of analyzers
+     * Returns a corrected response string pair, taking it from last analyzer, since last analyzer should contain
+     * all fixed results
      * @return block_formal_langs_processed_string
      */
     public function get_corrected_response() {
         if ($this->equal)
             return $this->stringpair->correctedstring();
-        // TODO: Implement
-        return null;
+
+        // We take last result, because first string can be fixed multiple times by other
+        // analyzers, and only last analyzer has this string.
+
+        /** @var stdClass $lastresult */
+        $lastresult = $this->results[count($this->results) - 1];
+        /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+        $analyzer = $lastresult->analyzer;
+        $pairs = $analyzer->result_pairs();
+        // An index contains a needed index of row
+        /** @var qtype_correctwriting_string_pair $pair */
+        $pair = $pairs[$lastresult->index];
+        return $pair->correctedstring();
     }
 
     /**
-     * Peforms deep analysis using DFS for all possible combinations of allowed analysers
+     * Peforms deep analysis using depth-first scanning
+     * for all possible combinations of allowed analysers
+     * @param qtype_correctwriting_string_pair $pair a results will be built for this pair
      */
-    protected function perform_deep_analysis() {
-        // TODO: Implement
+    protected function perform_deep_analysis($pair) {
+        $this->results = $this->perform_depth_first_scan(0, $pair);
+    }
+
+    /**
+     * Performs recursive depth first scan, working with analyzer tree and trying to hold this tree
+     * as small as possible. This function should build a result set, which can be saved into results field
+     * @throws moodle_exception No mistake sets! - if analyzer, which is implemented is not valid and does not have
+     * at least one mistake sets
+     * @param $index
+     * @param $stringpair
+     * @return array of stdClass pairs < analyzer, index -  index of most efficient string, set - set of mistakes>
+     */
+    private function perform_depth_first_scan($index, $stringpair) {
+        $result = new stdClass();
+        $childresults = array();
+        /** @var qtype_correctwriting $qtype */
+        $qtype = $this->question->qtype;
+        $analyzers = array_values($qtype->analyzers());
+        $analyzername = $analyzers[$index];
+        $createdanalyzername = 'qtype_correctwriting_' . $analyzername;
+        $bypass  = $this->question->is_analyzer_enabled($analyzername) == false;
+        /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+        $analyzer = new $createdanalyzername($this->question, $stringpair, $this->language, $bypass);
+
+        if (count($analyzer->result_mistakes()) == 0)
+            throw new moodle_exception('No mistake sets!');
+
+
+        //  Scan pair with max fitness
+        $foundmaxfitness = false;
+        $maxfitness = -1;
+        $maxfitnessindex = -1;
+        $maxfitnessset = array();
+
+        // If this is last analyzer, pick string with largest fitness
+        if ($index == count($analyzers) - 1) {
+            foreach($analyzer->result_mistakes() as $index => $mistakeset) {
+                $fitness = $analyzer->fitness($mistakeset);
+                if ($foundmaxfitness == false || $fitness > $maxfitness) {
+                    $maxfitness = $fitness;
+                    $maxfitnessindex = $index;
+                    $maxfitnessset = $mistakeset;
+                }
+            }
+        } else {
+            $mymistakesets = $analyzer->result_mistakes();
+
+            foreach($analyzer->result_pairs() as $pairindex => $pair) {
+                $childanalyzerresults =  $this->perform_depth_first_scan($index + 1, $pair);
+                // Compute fitness, based on results
+                $mymistakeset = $mymistakesets[$pairindex];
+                $mymistakeset = $this->cleanup_mistake_set($mymistakeset, $childanalyzerresults);
+                $fitness = $analyzer->fitness($mymistakeset);
+
+                // Add children fitnesses to have fitness as whole
+                /** @var stdClass $childanalyzerresult */
+                foreach($childanalyzerresults as $childanalyzerresult) {
+                    $fitness += $childanalyzerresult->analyzer->fitness($childanalyzerresult->set);
+                }
+
+                if ($foundmaxfitness == false || $fitness > $maxfitness) {
+                    $maxfitness = $fitness;
+                    $maxfitnessindex = $index;
+                    $maxfitnessset = $mymistakeset;
+                    $childresults = $childanalyzerresults;
+                }
+            }
+
+        }
+
+        // Write result
+        $result->index = $maxfitnessindex;
+        $result->analyzer = $analyzer;
+        $result->set = $maxfitnessset;
+
+        $result = array( $result );
+        if (count($childresults)) {
+            $result = array_merge($result, $childresults);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Cleanups a mistake set of array out of mistakes, replaced by other analyzers.
+     * For instance, syntax_analyzer can replace a set of mistakes from sequence_analyzer,
+     * but not all. So we need this function to compute fitness properly, without erased mistake - since
+     * they will be in mistakes of child analyzer
+     *
+     * @param array $mymistakeset set of mistakes
+     * @param array $childanalyzerresults array of stdClass with other analyzers
+     * @return array of mistake, cleaned from other mistakes
+     */
+    public function cleanup_mistake_set($mymistakeset, $childanalyzerresults) {
+        $result = array();
+        // Build a map from type to analyzer to filter mistakes
+        $filteredtypes = array();
+        if (count($childanalyzerresults)) {
+            foreach($childanalyzerresults as $childanalyzerresult) {
+                /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+                $analyzer = $childanalyzerresult->analyzer;
+                $analyzertinyname = str_replace('qtype_correctwriting_', '', get_class($analyzer));
+                // We don't care for abount non-enabled analyzers, since they don't change
+                // mistake set
+                if ($this->question->is_analyzer_enabled($analyzertinyname)) {
+                    $types = $analyzer->replaces_mistake_types();
+                    if (count($types)) {
+                        foreach($types as $type) {
+                            $filteredtypes[$type] = $analyzer;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if (count($filteredtypes) == 0) {
+            $result = $mymistakeset;
+        } else {
+            if (count($mymistakeset)) {
+                // Scan through set and filter mistakes
+                foreach($mymistakeset as $mistake) {
+
+                    // Get set of analyzers, that could filter mistake
+                    $filteredanalyzers = array();
+                    foreach($filteredtypes as $type => $analyzer) {
+                        if (is_a($mistake, $type)) {
+                            $filteredanalyzers[] = $analyzer;
+                        }
+                    }
+
+                    if (count($filteredanalyzers)) {
+                        // Check if mistake should be removed
+                        $shouldberemoved = false;
+                        foreach($filteredanalyzers as $analyzer) {
+                            $shouldberemoved = $shouldberemoved || $analyzer->should_mistake_be_removed($mistake);
+                        }
+
+                        if (!$shouldberemoved) {
+                            $result[] = $mistake;
+                        }
+                    } else {
+                        $result[] = $mistake;
+                    }
+
+                }
+            }
+        }
+        return $result;
     }
 
 }
