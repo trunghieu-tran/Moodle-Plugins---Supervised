@@ -1492,7 +1492,7 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return '';  // TODO
+        return qtype_preg_leaf::NEXT_CHAR_NOT_NEEDED;
     }
 
     public function tohr() {
@@ -1516,7 +1516,7 @@ class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return '';  // TODO
+        return qtype_preg_leaf::NEXT_CHAR_END_HERE;
     }
 
     public function tohr() {
@@ -1539,7 +1539,7 @@ class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return '';  // TODO
+        return qtype_preg_leaf::NEXT_CHAR_END_HERE;
     }
 
     public function tohr() {
@@ -1584,7 +1584,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return '';  // TODO
+        return qtype_preg_leaf::NEXT_CHAR_NOT_NEEDED;
     }
 
     public function tohr() {
@@ -1608,7 +1608,7 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return '';  // TODO
+        return qtype_preg_leaf::NEXT_CHAR_END_HERE;
     }
 
     public function tohr() {
