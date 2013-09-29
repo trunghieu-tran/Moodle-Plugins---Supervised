@@ -92,7 +92,7 @@ M.preg_authoring_tools_script = (function ($) {
                         });
                     });
 
-                    // Replace the textarea with an iframe. TODO: CSS для ресайзового треугольничка
+                    // Replace the textarea with an iframe.
                     var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
                                          '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"/>' +
                                        '</div>';
@@ -180,7 +180,7 @@ M.preg_authoring_tools_script = (function ($) {
     btn_show_clicked : function (e) {
         e.preventDefault();
         var sel = self.get_selection();
-        self.load_content(-1, sel.indfirst, sel.indlast);
+        self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
     },
 
@@ -211,22 +211,21 @@ M.preg_authoring_tools_script = (function ($) {
     rbtn_changed : function (e) {
         e.preventDefault();
         var sel = self.get_selection();
-        self.load_content(-1, sel.indfirst, sel.indlast);
+        self.load_content(sel.indfirst, sel.indlast);
     },
 
     tree_node_clicked : function (e) {
         e.preventDefault();
         var tmp = e.target.id.split(','),
-            id = tmp[0],
             indfirst = tmp[1],
             indlast = tmp[2];
-        self.load_content(id, indfirst, indlast);
+        self.load_content(indfirst, indlast);
         self.load_strings(indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.load_content(-1);
+        self.load_content();
         self.load_strings();
     },
 
@@ -268,13 +267,18 @@ M.preg_authoring_tools_script = (function ($) {
             d = json[self.DESCRIPTION_KEY],
             k = '' + regex + notation + exactmatch + usecase + treeorientation + displayas + indfirst + ',' + indlast;
 
+        // Highlight description.
+        var desc = $($.parseHTML(d));
+        desc.find('.description_node_' + json['id']).css('background', '#FFFF00');
+        d = desc.html();
+
         // Cache the content.
         self.cache[self.TREE_KEY][k] = t;
         self.cache[self.GRAPH_KEY][k] = g;
         self.cache[self.DESCRIPTION_KEY][k] = d;
 
         // Display the content.
-        self.display_content(json['id'], t, g, d, indfirst, indlast);
+        self.display_content(t, g, d, indfirst, indlast);
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
@@ -300,7 +304,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Displays given images and description
-    display_content : function (id, t, g, d, indfirst, indlast) {  // TODO: get rid of id
+    display_content : function (t, g, d, indfirst, indlast) {
         var scroll = $(window).scrollTop(),
             tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
@@ -342,7 +346,6 @@ M.preg_authoring_tools_script = (function ($) {
             length = 0;
         }
         self.regex_input.textrange('set', indfirst, length);
-        self.highlight_description(id);
         $(window).scrollTop(scroll);
     },
 
@@ -351,7 +354,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id, indfirst, indlast) {  // TODO: get rid of id
+    load_content : function (indfirst, indlast) {
         if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
             indfirst = indlast = -2;
         }
@@ -364,7 +367,7 @@ M.preg_authoring_tools_script = (function ($) {
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
         cached = self.cache[self.TREE_KEY][k];
         if (cached) {
-            self.display_content(id, self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
+            self.display_content(self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
             return;
         }
 
@@ -416,23 +419,6 @@ M.preg_authoring_tools_script = (function ($) {
             },
             success: self.upd_strings_success
         });
-    },
-
-    /**
-     * Highlights part of text description of regex corresponding to given id.
-     * Highlights nothing if '-1' is passed.
-     */
-    highlight_description : function (id) {  // TODO: get rid of id
-        var highlightedclass = 'description_highlighted',
-            oldhighlighted = $('.' + highlightedclass),
-            targetspan = $('.description_node_' + id);
-        if (oldhighlighted != null) {
-           oldhighlighted.removeClass(highlightedclass).css('background', 'transparent');
-        }
-        if (targetspan != null) {
-            targetspan.addClass(highlightedclass);
-            targetspan.css('background', '#FFFF00');
-        }
     },
 
     get_selection : function () {
