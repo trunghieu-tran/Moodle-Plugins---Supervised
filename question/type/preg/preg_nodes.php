@@ -1557,7 +1557,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos - 1] == "\n"));
+        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos] == "\n"));
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
