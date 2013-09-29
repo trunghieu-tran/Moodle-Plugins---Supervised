@@ -553,8 +553,11 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         $result = true;
         // Check merged assertions first.
-        foreach ($this->mergedassertions as $assert) {
-            $result = $result && $assert->match($str, $pos, $length, $matcherstateobj);
+        foreach ($this->assertionsbefore as $beforeassert) {
+            $result = $result && $beforeassert->match($str, $pos, $length, $matcherstateobj) && $pos != $str->length() - 1;
+        }
+        foreach ($this->assertionsafter as $afterassert) {
+            $result = $result && $afterassert->match($str, $pos, $length, $matcherstateobj) && $pos != 0;
         }
         // Now check this leaf.
         $result = $result && $this->match_inner($str, $pos, $length, $matcherstateobj);
