@@ -748,6 +748,9 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
+        $circumflex = new qtype_preg_leaf_assert_circumflex;
+        $dollar = new qtype_preg_leaf_assert_dollar;
+        $bigz = new qtype_preg_leaf_assert_capital_esc_z;
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
@@ -769,9 +772,29 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($ranges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
-                    // if ($this->match($c, 0, $l)) {
-                    return $c;
-                    // }
+                    // There is no merge assertions.
+                    if (count($this->assertionsbefore) == 0 && count($this->assertionsafter)== 0) {
+                        return $c;
+                    } else {
+                        // There are end string assertions.
+                        if (array_search($dollar, $this->assertionsbefore) !== false || 
+                            array_search($bigz, $this->assertionsbefore) !== false) {
+                            if ($c == "\n") {
+                                return $c;
+                            } else {
+                                return qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE;
+                            }
+                        // There are start string assertions.    
+                        } else if (array_search($circumflex, $this->assertionsafter) !== false) {
+                            if ($c == "\n") {
+                                return $c;
+                            } else {
+                                return qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE;
+                            }
+                        } else {
+                            return qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE;
+                        }
+                    }
                 }
             }
         }
