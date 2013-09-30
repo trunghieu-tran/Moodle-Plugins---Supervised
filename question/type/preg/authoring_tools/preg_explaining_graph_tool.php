@@ -102,7 +102,12 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * @return explainning graph of regular expression.
      */
     public function create_graph($id = -1) {
+        $this->set_flag($this->dst_root);
         $graph = $this->dst_root->create_graph($id);
+
+        if ($this->options->exactmatch) {
+            $graph->isexact = true;
+        }
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
@@ -120,5 +125,14 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
 
         return $graph;
+    }
+
+    protected function set_flag($node) {
+        $node->isexact = $this->is_preg_node_acceptable($node->pregnode);
+        if (isset($node->operands)) {
+            foreach ($node->operands as $operand) {
+                $this->set_flag($operand);
+            }
+        }
     }
 }

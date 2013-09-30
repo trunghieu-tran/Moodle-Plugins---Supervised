@@ -195,6 +195,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public $entries     = array();      // Array if nodes "entries".
     public $exits       = array();      // Array of nodes "exits".
     public $id          = -1;           // Identifier of subgraph.
+    public $isexact     = false;
 
     public function __construct($lbl, $stl, $id = -1) {
         $this->label = $lbl;
@@ -659,7 +660,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      */
     public function create_dot() {
         $this->regenerate_id();
-        $instr = 'digraph { compound=true; rankdir = LR;';
+        $instr = 'digraph { compound=true; rankdir = LR;' . ($this->isexact ?  'graph [bgcolor=lightgray];' : '');
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {

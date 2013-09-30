@@ -36,6 +36,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 abstract class qtype_preg_authoring_tool_node_abstract {
 
     public $pregnode; // A reference to the corresponding preg_node.
+    public $isexact = false;
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
@@ -448,7 +449,7 @@ class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_l
 abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node_abstract {
 
     public $operands = array(); // An array of operands.
-    private $condid = -1;      // A number of conditional branch of conditional subexpression.
+    protected $condid = -1;      // A number of conditional branch of conditional subexpression.
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -600,7 +601,9 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
                         $label,
-                        ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid; color=black' : 'filled;color=lightgrey',
+                        ($this->pregnode->userinscription[0]->data != '(?i:...)') ? (
+                            $this->isexact ? 'solid; bgcolor=white' : 'solid; color=black'
+                            ) : 'filled;color=lightgrey',
                         $this->pregnode->id
                     );
         $subexpr->assume_subgraph($operand);
