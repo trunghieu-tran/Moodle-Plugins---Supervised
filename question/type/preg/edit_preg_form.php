@@ -216,8 +216,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
-                // Not using exactmatch option to not confuse user in error messages by things it adds to regex.
-                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false,
+                // Create matcher to check regex for errors and try to match correct answer.
+                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, $data['exactmatch'],
                         $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if ($matcher->errors_exist()) {// There were errors in the matching process.
                     $regexerrors = $matcher->get_error_messages(true);// Show no more than max errors.
@@ -225,12 +225,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                     foreach ($regexerrors as $regexerror) {
                         $errors['answer['.$key.']'] .= $regexerror.'<br />';
                     }
-                } else if ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {// Correct answer (if supplied) should match at least one 100% grade answer.
-                    // We may need another matcher to check correctanswer since first one ignoring "exact match" option.
-                    if ($data['exactmatch']) {
-                        $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, $data['exactmatch'],
-                                $questionobj->get_modifiers($data['usecase']), (-1)*($i+count($answers)), $data['notation'], $hintused);
-                    }
+                } else if ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {
+                    // Correct answer (if supplied) should match at least one 100% grade answer.
                     if ($matcher->match($trimmedcorrectanswer)->full) {
                         $correctanswermatch=true;
                     }
@@ -243,11 +239,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         if ($correctanswermatch == false) {
-            $errors['correctanswer']=get_string('nocorrectanswermatch', 'qtype_preg');
+            $errors['correctanswer'] = get_string('nocorrectanswermatch', 'qtype_preg');
         }
 
-        if ($passhintgradeborder == false && $data['usecharhint']) {// No asnwer pass hint grade border.
-            $errors['hintgradeborder']=get_string('nohintgradeborderpass', 'qtype_preg');
+        if ($passhintgradeborder == false && $data['usecharhint']) {// No answer pass hint grade border.
+            $errors['hintgradeborder'] = get_string('nohintgradeborderpass', 'qtype_preg');
         }
 
         $querymatcher = $questionobj->get_query_matcher($data['engine']);
