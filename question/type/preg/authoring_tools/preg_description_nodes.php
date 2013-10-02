@@ -121,7 +121,11 @@ abstract class qtype_preg_description_node {
      * @param type $s this string will be placed instead of %s
      */
     protected function numbering_pattern($numbering_pattern, $s) {
-        return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
+        //return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
+        $classes = array();
+        if ($this->handler->is_node_generated($this->pregnode)) {
+
+        }
     }
 }
 
@@ -977,11 +981,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      */
     public function __construct(&$node, &$matcher) {
         parent::__construct($node, $matcher);
-        $needgetcondbranch = $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB;
-        if ($needgetcondbranch) {
+        if ($this->pregnode->is_condition_assertion()) {
             $this->condbranch = array_shift($this->operands);
         }
         //var_dump($this->operands);
