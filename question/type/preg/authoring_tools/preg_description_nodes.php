@@ -121,11 +121,7 @@ abstract class qtype_preg_description_node {
      * @param type $s this string will be placed instead of %s
      */
     protected function numbering_pattern($numbering_pattern, $s) {
-        //return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
-        $classes = array();
-        if ($this->handler->is_node_generated($this->pregnode)) {
-
-        }
+        return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
     }
 }
 
