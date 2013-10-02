@@ -25,15 +25,11 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 if($ADMIN->fulltree) {
 
-    $cfgname = 'block_formal_langs_showablelangs';
-    $label =  get_string('visiblelangslabel', 'block_formal_langs');
-    $description = get_string('visiblelangsdescription', 'block_formal_langs');
-    $default = array('1' => '1');
-    /** @var block_formal_langs_admin_setting_showable_languages $setting */
-    $setting  = new block_formal_langs_admin_setting_visible_languages($cfgname, $label, $description, $default, null);
+    $setting = block_formal_langs::get_visible_language_setting();
     $settings->add($setting);
 
 }
