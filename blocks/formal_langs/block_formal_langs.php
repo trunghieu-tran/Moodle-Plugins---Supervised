@@ -135,7 +135,7 @@ class block_formal_langs extends block_base {
      * @return int id of inserted language
      */
     public static function find_or_insert_language($language) {
-        global $DB;
+        global $DB, $CFG;
         // Seek for language and insert it if not found, handling some error stuff
         // Also cannot compare strings in some common case.
         $sql = 'SELECT id
@@ -161,12 +161,35 @@ class block_formal_langs extends block_base {
         $record = $DB->get_record_sql($sql, $filtervalues);
         if ($record == false) {
             $result = $DB->insert_record('block_formal_langs', $language);
+            $setting = block_formal_langs::get_visible_language_setting();
+            $showedlanguages = $CFG->block_formal_langs_showablelangs;
+            $showedarray = explode(',', $showedlanguages);
+            $showedarray[] = $result;
+            $realshowedarray = array();
+            foreach($showedarray as $id) {
+                $realshowedarray[$id] = 1;
+            }
+            $setting->write_setting($realshowedarray);
+            block_formal_langs::sync_contexts_with_config();
         } else {
             $result = $record->id;
         }
         return $result;
     }
 
+    /**
+     * Gets showable language setting
+     * @return block_formal_langs_admin_setting_visible_languages
+     */
+    public static function get_visible_language_setting() {
+        $cfgname = 'block_formal_langs_showablelangs';
+        $label =  get_string('visiblelangslabel', 'block_formal_langs');
+        $description = get_string('visiblelangsdescription', 'block_formal_langs');
+        $default = array('1' => '1');
+        $setting  = new block_formal_langs_admin_setting_visible_languages($cfgname, $label, $description, $default, null);
+        $setting->load_choices();
+        return $setting;
+    }
 
     /**
      * Synchronizes context informations with config
