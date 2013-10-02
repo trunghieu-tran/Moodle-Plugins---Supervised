@@ -24,12 +24,19 @@ class qtype_preg_dot_node_context {
     // Whether the node is the root or not.
     public $isroot;
 
+    // Direction of the tree.
+    public $rankdirlr;
+
     // Selection coordinates, an instance of qtype_preg_position.
     public $selection;
 
-    public function __construct($handler, $isroot, $selection = null) {
+    public $insideusercluster = false;
+    public $insideselectioncluster = false;
+
+    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null) {
         $this->handler = $handler;
         $this->isroot = $isroot;
+        $this->rankdirlr = $rankdirlr;
         $this->selection = $selection !== null
                          ? $selection
                          : new qtype_preg_position();
@@ -43,11 +50,9 @@ abstract class qtype_preg_syntax_tree_node {
 
     // A reference to the corresponding preg_node.
     public $pregnode;
-    public static $clasterscript = '';
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
-        //self::clasterscript = '';
     }
 
     /**
@@ -66,24 +71,31 @@ abstract class qtype_preg_syntax_tree_node {
 
     /**
      * Returns heading of a dot script which is usually looks like "digraph {".
-     * @param string $rankdirlr if true, also adds "rankdir = LR".
-     * @return string the heading of a dot script.
      */
-    public static function get_dot_head($rankdirlr = false) {
-        // TODO protected
-        $result = 'digraph ' . self::get_graph_name() . ' {';
-        if ($rankdirlr) {
+    protected static function get_dot_head($context) {
+        $result = 'digraph ' . self::get_graph_name() . " {\n";
+        if ($context->handler->is_node_generated($context->handler->get_ast_root())) {
+            $result .= "bgcolor=lightgrey;\n";
+        }
+        if ($context->rankdirlr) {
             $result .= 'rankdir = LR;';
         }
         return $result;
+    }
+
+    protected static function get_user_cluster_head() {
+        return "subgraph cluster_user { color=invis; bgcolor=white;\n";
+    }
+
+    protected static function get_sel_cluster_head() {
+        return "subgraph cluster_sel { style=solid; color=darkgreen;\n";
     }
 
     /**
      * Returns tail of a dot script which is usually looks like "}".
      * @return string the tail of a dot script.
      */
-    public static function get_dot_tail() {
-        // TODO protected
+    protected static function get_dot_tail() {
         return '}';
     }
 
@@ -152,7 +164,45 @@ abstract class qtype_preg_syntax_tree_node {
      * @param context an instance of qtype_preg_dot_node_context.
      * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
      */
-    public abstract function dot_script($context);
+    public function dot_script($context) {
+        $nodename = $this->pregnode->id;
+        $dotscript = $nodename . ";\n";
+
+        $startusercluster = !$context->insideusercluster && !$context->handler->is_node_generated($this->pregnode);
+        $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);
+        $context->insideusercluster = $context->insideusercluster || $startusercluster;
+        $context->insideselectioncluster = $context->insideselectioncluster || $startselectioncluster;
+        if ($startusercluster) {
+            $dotscript .= self::get_user_cluster_head();
+        }
+        if ($startselectioncluster) {
+            $dotscript .= self::get_sel_cluster_head();
+        }
+
+        $innerresult = $this->dot_script_inner($context);
+        $dotscript .= $innerresult[0];
+        $style = $innerresult[1];
+
+        if ($startusercluster) {
+            $dotscript .= self::get_dot_tail();
+        }
+        if ($startselectioncluster) {
+            $dotscript .= self::get_dot_tail();
+        }
+
+        if ($context->isroot) {
+            return self::get_dot_head($context) . $style . $dotscript . self::get_dot_tail();
+        } else {
+            return array($dotscript, $style);
+        }
+    }
+
+    public abstract function dot_script_inner($context);
+
+    protected function is_selected($context) {
+        return $this->pregnode->position->indfirst >= $context->selection->indfirst &&
+               $this->pregnode->position->indlast <= $context->selection->indlast;
+    }
 
     protected function get_style($context) {
         $label = $this->label();
@@ -162,10 +212,6 @@ abstract class qtype_preg_syntax_tree_node {
         $style = $this->style();
         $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
         $result = "id = \"$id\", label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
-        if ($this->pregnode->position->indfirst >= $context->selection->indfirst &&
-            $this->pregnode->position->indlast <= $context->selection->indlast) {
-            self::$clasterscript .= $this->pregnode->id . ';';
-        }
         if ($context->handler->is_node_generated($this->pregnode)) {
             $style .= ', filled';
             $result .= ', fillcolor = lightgrey';
@@ -199,10 +245,6 @@ abstract class qtype_preg_syntax_tree_node {
     protected function style() {
         return 'solid';
     }
-
-    protected function get_claster_head() {
-        return ' subgraph cluster_1 { style=solid; color=darkgreen; ';
-    }
 }
 
 /**
@@ -210,27 +252,17 @@ abstract class qtype_preg_syntax_tree_node {
  */
 class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
 
-    public function dot_script($context, $rankdirlr = false) {
+    public function dot_script_inner($context) {
         // Calculate the node name, style and the result.
         $nodename = $this->pregnode->id;
-        $style = $nodename . self::get_style($context) . ';';
-        $dotscript = $nodename . ';';
-        if ($context->isroot) {
-            $dotscript1 = self::get_dot_head($rankdirlr) . $style;
-            if (parent::$clasterscript !== '') {
-                $dotscript1 .= parent::get_claster_head() .  parent::$clasterscript . self::get_dot_tail();
-            }
-            $dotscript1 .= $dotscript . self::get_dot_tail();
-            return $dotscript1;
-        } else {
-            return array($dotscript, $style);
-        }
+        $style = $nodename . self::get_style($context) . ";\n";
+        $dotscript = $nodename . ";\n";
+        return array($dotscript, $style);
     }
 
     protected function shape() {
         return 'rectangle';
     }
-    // TODO: тут может быть еще что-то полезное
 }
 
 /**
@@ -247,39 +279,19 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
         }
     }
 
-    public function dot_script($context, $rankdirlr = false) {
+    public function dot_script_inner($context) {
         // Calculate the node name and style.
         $nodename = $this->pregnode->id;
-        $style = $nodename . self::get_style($context) . ';';
-
-        // Get child dot scripts and styles.
-        $childscripts = array();
-
+        $style = $nodename . self::get_style($context) . ";\n";
+        $dotscript = $nodename . ";\n";
         foreach ($this->operands as $operand) {
-            // Change the context to select the subtree.
             $newcontext = clone $context;
             $newcontext->isroot = false;
-            // Recursive call to subtree.
-            $tmp = $operand->dot_script($newcontext, $rankdirlr);
-            $childscripts[] = $tmp[0];
+            $tmp = $operand->dot_script($newcontext);
+            $dotscript .= $nodename . '->' . $tmp[0];
             $style .= $tmp[1];
         }
-
-        // Form the result.
-        $dotscript = $nodename . ';';
-        foreach ($childscripts as $childscript) {
-            $dotscript .= $nodename . '->' . $childscript;
-        }
-        if ($context->isroot) {
-            $dotscript1 = self::get_dot_head($rankdirlr) . $style;
-            if (parent::$clasterscript !== '') {
-                $dotscript1 .= parent::get_claster_head() .  parent::$clasterscript . self::get_dot_tail();
-            }
-            $dotscript1 .= $dotscript . self::get_dot_tail();
-            return $dotscript1;
-        } else {
-            return array($dotscript, $style);
-        }
+        return array($dotscript, $style);
     }
 }
 
@@ -359,7 +371,7 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     protected function label() {
         return '"&#92;&#92;' . $this->pregnode->number . '"';
     }
-    
+
     protected function tooltip() {
         $a = new stdClass;
         $a->number = $this->pregnode->number;
@@ -378,8 +390,8 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 
     protected function tooltip() {
-        return get_string($this->pregnode->type, 'qtype_preg') 
-                . ' \\"' 
+        return get_string($this->pregnode->type, 'qtype_preg')
+                . ' \\"'
                 . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg')
                 . '\\"';
     }
@@ -442,7 +454,7 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
         }
         return '"' . parent::label() . '"';
     }
-    
+
     protected function tooltip() {
         if ($this->pregnode->number > 0) {
             return parent::tooltip() . " #" . $this->pregnode->number;
