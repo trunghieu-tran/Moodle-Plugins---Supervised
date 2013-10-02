@@ -254,24 +254,25 @@ class block_formal_langs extends block_base {
         if (count($contexttree) == 0) {
             $contexttree = array( context_system::instance()->id );
         }
-        // Fetch associated context data
+        // Fetch associated context data.
+        list($insql, $params) = $DB->get_in_or_equal($contexttree);
         $sql = 'SELECT *
                 FROM {block_formal_langs_perms}
-                WHERE contextid IN (' . implode(',', $contexttree) . ')';
-        $contextspermissions = $DB->get_records_sql($sql);
+                WHERE contextid ' . $insql;
+        $contextspermissions = $DB->get_records_sql($sql, $params);
         $sql = 'SELECT id, depth
                 FROM {context}
-                WHERE id IN (' . implode(',', $contexttree) . ')';
-        $contexts = $DB->get_records_sql($sql);
+                WHERE id ' . $insql;
+        $contexts = $DB->get_records_sql($sql, $params);
         foreach($languages as $language) {
-            // Fetch permissions for language
+            // Fetch permissions for language.
             $permissionsforlanguage = array();
             foreach($contextspermissions as $permission) {
                 if ($permission->languageid == $language->id) {
                     $permissionsforlanguage[$permission->contextid] = $permission->visible;
                 }
             }
-
+            // Compute permission for context with max depth
             $maxdepth = -1;
             $maxdepthid = -1;
             if (count($permissionsforlanguage)) {
@@ -293,32 +294,57 @@ class block_formal_langs extends block_base {
     }
 
     /**
-     * Updates language visibility for language list
-     * @param array $languages as id of language => visibility value
+     * Updates language visibility for language list.
+     * @param int $languageid id of language
+     * @param int $visibility visibility of data
      * @param int $contextid id of context for items
      */
-    public function update_language_visibility($languages, $contextid) {
+    public function update_language_visibility($languageid, $visibility, $contextid) {
         global $DB;
-        $contextpermissions = $DB->get_records('block_formal_langs_perms', array('contextid' => $contextid));
-        foreach($languages as $languageid => $visible) {
-            $existentobject = null;
-            if (count($contextpermissions)) {
-                foreach($contextpermissions as $contextpermission) {
-                    if ($languageid == $contextpermission->languageid) {
-                        $existentobject = $contextpermission;
+        $contexttree = context::instance_by_id($contextid)->get_parent_context_ids(true);
+        list($insql, $params) = $DB->get_in_or_equal($contexttree);
+        array_unshift($params, $languageid);
+        $sql = 'SELECT perms.*, ctx.depth
+                FROM {block_formal_langs_perms} perms,
+                {context} ctx WHERE perms.languageid = ? AND perms.contextid '
+               . $insql
+               . ' AND  ctx.id = perms.contextid ORDER BY depth DESC LIMIT 2';
+        $contextpermissions = $DB->get_records_sql($sql, $params);
+        $visibility = ($visibility > 0) ? 1 : 0;
+        $existentobject = new stdClass();
+        $existentobject->languageid = $languageid;
+        $existentobject->contextid = $contextid;
+        $existentobject->visible = $visibility;
+        if (count($contextpermissions) == 0) {
+            $DB->insert_record('block_formal_langs_perms', $existentobject);
+        } else {
+            $currentpermission =  array_shift($contextpermissions);
+            /* If settings exists for current context,
+               we could either update or delete setting.
+               Otherwise we could either insert new setting or do nothing.
+             */
+            if ($currentpermission->contextid == $contextid) {
+                $parentvisibilitymatches = false;
+                if (count($contextpermissions) > 0) {
+                    $parentpermission = array_shift($contextpermissions);
+                    $parentvisibilitymatches = $parentpermission->visible == $visibility;
+                }
+                // If current permission matches visibility - we won't change anything.
+                // Otherwise, we could delete data.
+                if ($parentvisibilitymatches  && $currentpermission->visible != $visibility) {
+                    $DB->delete_records('block_formal_langs_perms', array('id' => $currentpermission->id));
+                } else {
+                    if ($currentpermission->visible != $visibility) {
+                        $existentobject->id = $currentpermission->id;
+                        $DB->update_record('block_formal_langs_perms', $existentobject);
                     }
                 }
-            }
-
-            if ($existentobject == null) {
-                $existentobject = new stdClass();
-                $existentobject->languageid = $languageid;
-                $existentobject->contextid = $contextid;
-                $existentobject->visible = ($visible > 0) ? 1 : 0;
-                $DB->insert_record('block_formal_langs_perms', $existentobject, false, true);
             } else {
-                $existentobject->visible = ($visible > 0) ? 1 : 0;
-                $DB->update_record('block_formal_langs_perms', $existentobject);
+                // First permission will be parent.
+                $parentpermission = $currentpermission;
+                if ($parentpermission->visible != $visibility) {
+                    $DB->insert_record('block_formal_langs_perms', $existentobject);
+                }
             }
         }
     }
@@ -326,7 +352,7 @@ class block_formal_langs extends block_base {
     /**
      * @deprecated
      * DO NOT ADD THIS BLOCK! This code is for testing only!
-     * @return null|stdObject
+     * @return null|stdClass
      */
     public function deprecated_get_content() {
         global $CFG, $USER, $DB;
@@ -339,7 +365,7 @@ class block_formal_langs extends block_base {
         $this->content->text = '';
         $this->content->footer = '';
 
-        // Insert language
+        // Insert language.
         $language = new stdClass();
         $language->name = 'Test language';
         $language->uiname = 'Test';
@@ -357,7 +383,7 @@ class block_formal_langs extends block_base {
         }
         $language->scanrules = 'b';
 
-        // Update language
+        // Update language.
         $DB->update_record('block_formal_langs', $language);
         $testlanguage  = $DB->get_record('block_formal_langs', array('id' => $language->id));
         if ($testlanguage->scanrules != $language->scanrules) {
@@ -365,7 +391,7 @@ class block_formal_langs extends block_base {
         } else {
             $this->content->text .= 'Successfully updated language<br />';
         }
-        // Delete language
+        // Delete language.
         $DB->delete_records('block_formal_langs', array('id' => $language->id));
         $testlanguage  = $DB->get_record('block_formal_langs', array('id' => $language->id));
         if ($testlanguage != false) {
@@ -375,20 +401,18 @@ class block_formal_langs extends block_base {
         }
 
         $tree = array_keys( $this->page->context->get_parent_contexts(true) );
-        // Somehow inner context id differs from outer context id, So we add it
+        // Somehow inner context id differs from outer context id, So we add it.
         $tree[] = $this->context->id;
 
         $this->content->text .= '<pre>';
         $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
         $this->content->text .= '</pre>';
 
-        $beforeupdate = array('1' => 0, '2' => 1);
-        $afterupdate =  array('1' => 1, '2' => 0);
-        $this->update_language_visibility($beforeupdate, $this->context->id);
+        $this->update_language_visibility(1, 0, $this->context->id);
         $this->content->text .= 'After first update <br /><pre>';
         $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
         $this->content->text .= '</pre>';
-        $this->update_language_visibility($afterupdate, $this->context->id);
+        $this->update_language_visibility(1, 1, $this->context->id);
         $this->content->text .= 'After second update <br /><pre>';
         $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
         $this->content->text .= '</pre>';
