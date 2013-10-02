@@ -4,14 +4,13 @@
       <TABLE NAME="quizaccess_supervisedcheck" COMMENT="Stores the additional setting required by this accessrule">
         <FIELDS>
             <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="quizid"/>
-            <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Foreign key to quiz.id." PREVIOUS="id" NEXT="sessionid"/>
-            <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Foreign key to block_supervised_session.id." PREVIOUS="quizid" NEXT="checkrequired"/>
-            <FIELD NAME="checkrequired" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Boolean, if true, the check is required." PREVIOUS="sessionid"/>
+            <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Foreign key to quiz.id." PREVIOUS="id" NEXT="lessontypeid"/>
+            <FIELD NAME="lessontypeid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Foreign key to block_supervised_lessontype.id." PREVIOUS="quizid"/>
         </FIELDS>
         <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="sessionid"/>
-            <KEY NAME="sessionid" TYPE="foreign-unique" FIELDS="sessionid" REFTABLE="block_supervised_session" REFFIELDS="id" PREVIOUS="primary" NEXT="quizid"/>
-            <KEY NAME="quizid" TYPE="foreign-unique" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id" PREVIOUS="sessionid"/>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="lessontypeid"/>
+            <KEY NAME="lessontypeid" TYPE="foreign-unique" FIELDS="lessontypeid" REFTABLE="block_supervised_lessontype" REFFIELDS="id" PREVIOUS="primary" NEXT="quizid"/>
+            <KEY NAME="quizid" TYPE="foreign-unique" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id" PREVIOUS="lessontypeid"/>
         </KEYS>
       </TABLE>
     </TABLES>
