@@ -53,15 +53,17 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
         // Line breaks should be ignored.
         $options = clone $this->options;
         $options->notation = 'native';
-        $matcher = new qtype_preg_php_preg_matcher("1\n23\n", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1\naA\n", $options);
         // Simple match.
-        $results = $matcher->match('123');
+        $results = $matcher->match('1aA');
         $this->assertTrue($results->full);
         // Match inside string - no exact by default.
-        $results = $matcher->match('01234'); 
+        $results = $matcher->match('01aA4'); 
         $this->assertTrue($results->full);
         // No match.
-        $results = $matcher->match('124');
+        $results = $matcher->match('1AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1aa');
         $this->assertFalse($results->full);
 
         // Extended notation.
@@ -70,41 +72,48 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
         $options = clone $this->options;
         $options->notation = 'pcreextended';
         // Regex ends not in the comment.
-        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\n2  3", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\na  A", $options);
         // Simple match.
-        $results = $matcher->match('1 23');
+        $results = $matcher->match('1 aA');
         $this->assertTrue($results->full);
         // Match inside string - no exact by default.
-        $results = $matcher->match('01 234'); 
+        $results = $matcher->match('01 aA4'); 
         $this->assertTrue($results->full);
         // No match.
-        $results = $matcher->match('1 24');
+        $results = $matcher->match('1 AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1 aa');
         $this->assertFalse($results->full);
         // Regex ends in the comment.
-        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\n2  3#comment2", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\na  A#comment2", $options);
         // Simple match.
-        $results = $matcher->match('1 23');
+        $results = $matcher->match('1 aA');
         $this->assertTrue($results->full);
         // Match inside string - no exact by default.
-        $results = $matcher->match('01 234'); 
+        $results = $matcher->match('01 aA4'); 
         $this->assertTrue($results->full);
         // No match.
-        $results = $matcher->match('1 24');
+        $results = $matcher->match('1 AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1 aa');
         $this->assertFalse($results->full);
 
         // Moodle shortanswer notation.
         // Just string with * wildcard matching any number of any characters.
+        // Line breaks should be ignored.
         $options = clone $this->options;
         $options->notation = 'mdlshortanswer';
-        $matcher = new qtype_preg_php_preg_matcher('1+*23', $options);
+        $matcher = new qtype_preg_php_preg_matcher("1+*a\nA", $options);
         // Simple match.
-        $results = $matcher->match('1+ 23');
+        $results = $matcher->match('1+ aA');
         $this->assertTrue($results->full);
         // Match inside string - no exact by default.
-        $results = $matcher->match('01+    234'); 
+        $results = $matcher->match('01+    aA4'); 
         $this->assertTrue($results->full);
         // No match.
-        $results = $matcher->match('1+??24');
+        $results = $matcher->match('1+??AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1+??aa');
         $this->assertFalse($results->full);
     }
 
@@ -114,19 +123,21 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
         $options = clone $this->options;
         $options->exactmatch = true;
         $options->notation = 'native';
-        $matcher = new qtype_preg_php_preg_matcher("1\n23\n", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1\naA\n", $options);
         // Simple match.
-        $results = $matcher->match('123');
+        $results = $matcher->match('1aA');
         $this->assertTrue($results->full);
         // Match inside string - not on exact.
-        $results = $matcher->match('01234'); 
+        $results = $matcher->match('01aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('1234'); 
+        $results = $matcher->match('1aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('0123'); 
+        $results = $matcher->match('0aA3'); 
         $this->assertFalse($results->full);
         // No match.
-        $results = $matcher->match('124');
+        $results = $matcher->match('1AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1aa');
         $this->assertFalse($results->full);
 
         // Extended notation.
@@ -136,54 +147,61 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
         $options->exactmatch = true;
         $options->notation = 'pcreextended';
         // Regex ends not in the comment.
-        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\n2  3", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\na  A", $options);
         // Simple match.
-        $results = $matcher->match('1 23');
+        $results = $matcher->match('1 aA');
         $this->assertTrue($results->full);
         // Match inside string - not on exact.
-        $results = $matcher->match('01 234'); 
+        $results = $matcher->match('01 aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('1 234'); 
+        $results = $matcher->match('1 aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('01 23'); 
+        $results = $matcher->match('01 aA'); 
         $this->assertFalse($results->full);
         // No match.
-        $results = $matcher->match('1 24');
+        $results = $matcher->match('1 AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1 aa');
         $this->assertFalse($results->full);
         // Regex ends in the comment.
-        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\n2  3#comment2", $options);
+        $matcher = new qtype_preg_php_preg_matcher("1[ ] #comment\na  A#comment2", $options);
         // Simple match.
-        $results = $matcher->match('1 23');
+        $results = $matcher->match('1 aA');
         $this->assertTrue($results->full);
         // Match inside string - not on exact.
-        $results = $matcher->match('01 234'); 
+        $results = $matcher->match('01 aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('1 234'); 
+        $results = $matcher->match('1 aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('01 23'); 
+        $results = $matcher->match('01 aA'); 
         $this->assertFalse($results->full);
         // No match.
-        $results = $matcher->match('1 24');
+        $results = $matcher->match('1 AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1 aa');
         $this->assertFalse($results->full);
 
         // Moodle shortanswer notation.
         // Just string with * wildcard matching any number of any characters.
+        // Line breaks should be ignored.
         $options = clone $this->options;
         $options->exactmatch = true;
         $options->notation = 'mdlshortanswer';
-        $matcher = new qtype_preg_php_preg_matcher('1+*23', $options);
+        $matcher = new qtype_preg_php_preg_matcher("1+*a\nA", $options);
         // Simple match.
-        $results = $matcher->match('1+ 23');
+        $results = $matcher->match('1+ aA');
         $this->assertTrue($results->full);
         // Match inside string - not on exact.
-        $results = $matcher->match('01+    234'); 
+        $results = $matcher->match('01+    aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('1+    234'); 
+        $results = $matcher->match('1+    aA4'); 
         $this->assertFalse($results->full);
-        $results = $matcher->match('01+    23'); 
+        $results = $matcher->match('01+    aA'); 
         $this->assertFalse($results->full);
         // No match.
-        $results = $matcher->match('1+??24');
+        $results = $matcher->match('1+??AA');
+        $this->assertFalse($results->full);
+        $results = $matcher->match('1+??aa');
         $this->assertFalse($results->full);
     }
 
@@ -235,10 +253,11 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
 
         // Moodle shortanswer notation.
         // Just string with * wildcard matching any number of any characters.
+        // Line breaks should be ignored.
         $options = clone $this->options;
         $options->modifiers = $this->question->get_modifiers(false);
         $options->notation = 'mdlshortanswer';
-        $matcher = new qtype_preg_php_preg_matcher('a+*bc', $options);
+        $matcher = new qtype_preg_php_preg_matcher("a+*b\nc", $options);
         // Simple match.
         $results = $matcher->match('A+ bC');
         $this->assertTrue($results->full);
