@@ -169,9 +169,9 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
             $results = $matcher->match('01 aA');
             $this->assertFalse($results->full, $failmsg);
             // No match.
-            $results = $matcher->match('1 AA', $failmsg);
+            $results = $matcher->match('1 AA');
             $this->assertFalse($results->full, $failmsg);
-            $results = $matcher->match('1 aa', $failmsg);
+            $results = $matcher->match('1 aa');
             $this->assertFalse($results->full, $failmsg);
             // Regex ends in the comment.
             $matcher = new $classname("1[ ] #comment\na  A#comment2", $options);
@@ -181,7 +181,7 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
             // Match inside string - not on exact.
             $results = $matcher->match('01 aA4');
             $this->assertFalse($results->full, $failmsg);
-            $results = $matcher->match('1 aA4', $failmsg);
+            $results = $matcher->match('1 aA4');
             $this->assertFalse($results->full);
             $results = $matcher->match('01 aA');
             $this->assertFalse($results->full, $failmsg);
@@ -205,7 +205,7 @@ class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
             $results = $matcher->match('01+    aA4');
             $this->assertFalse($results->full, $failmsg);
             $results = $matcher->match('1+    aA4');
-            $this->assertFalse($results->full, $failmsg, $failmsg);
+            $this->assertFalse($results->full, $failmsg);
             $results = $matcher->match('01+    aA');
             $this->assertFalse($results->full);
             // No match.
