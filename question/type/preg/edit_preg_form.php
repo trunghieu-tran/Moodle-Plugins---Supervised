@@ -267,4 +267,23 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return 'preg';
     }
 
+	protected function data_preprocessing_answers($question, $withanswerfiles = false) {
+        $question = parent::data_preprocessing_answers($question, $withanswerfiles);
+
+        if (isset($question->id)) {
+            global $DB;
+
+            $query = 'SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
+                'tablename = ? AND tableid IN (SELECT id FROM {question_answers} WHERE question = ?)';
+            $regextests = $DB->get_records_sql(
+                $query,
+                array('question_answers', $question->id)
+            );
+            foreach ($regextests as $tests) {
+                $question->regextests[] = $tests->regextests;
+            }
+        }
+
+        return $question;
+    }
 }
