@@ -92,9 +92,9 @@ abstract class qtype_preg_description_node {
 
         if (is_string($a)) {
             $form = $a;
-            $a = null; 
+            $a = null;
             $usea = false;
-        } 
+        }
         if (isset($form) && $form !== '') {
             $s.='_'.$form;
         }
@@ -530,7 +530,7 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
                 $resultpattern .= self::get_form_string('description_unsetoption_J', $form);
                 $mduplicate = false;
             }
-            if ($resultpattern !== '') { 
+            if ($resultpattern !== '') {
                 $a = new stdClass();
                 $a->option = $resultpattern;
                 $resultpattern = self::get_form_string('description_option_wrapper', $a, $form).' ';
@@ -651,7 +651,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
 
         $this->pattern = $this->pattern($node_parent, $form);
         $description = $this->numbering_pattern($numbering_pattern, $this->pattern);
-        
+
         $replaces = $this->what_to_replace($description);
         foreach ($replaces as $num => $data) {
             // var_dump($num);
@@ -977,14 +977,9 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      */
     public function __construct(&$node, &$matcher) {
         parent::__construct($node, $matcher);
-        $needgetcondbranch = $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB ||
-                $this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB;
-        if ($needgetcondbranch) {
+        if ($this->pregnode->is_condition_assertion()) {
             $this->condbranch = array_shift($this->operands);
         }
-        //var_dump($this->operands);
     }
 
     /*private function description_of_condition($form) {
