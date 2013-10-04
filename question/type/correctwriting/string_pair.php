@@ -32,15 +32,69 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * LCS for sequence analyzer
      * @var array
      */
-    protected $lcs;
+    protected $lcs = array();
+    /**
+     * Set to true, when two answers are equal
+     *
+     * If two answers are equal, we should not care about results - because a student response is
+     * correct
+     *
+     * @var bool
+     */
+    protected $aretokensequencesequal = false;
+
+    /**
+     * A mistake set for arrays
+     *
+     * @var array
+     */
+    protected $mistakes = array();
+
+
+    public function __clone() {
+        parent::__clone();
+        $oldmistakes = $this->mistakes;
+        if (is_array($oldmistakes)) {
+            $this->mistakes = array();
+            foreach($oldmistakes as $mistake) {
+                $this->mistakes[] = clone $mistake;
+            }
+        }
+    }
+
+    public function are_strings_equal() {
+        return $this->aretokensequencesequal;
+    }
+
+    public function assert_that_strings_are_equal() {
+        $this->aretokensequencesequal = true;
+    }
+
+    public function mistakes() {
+        return $this->mistakes;
+    }
+
+    public function set_mistakes($mistakes) {
+        $this->mistakes = $mistakes;
+    }
+
+    public function append_mistakes($mistakes) {
+        if (count($mistakes) != 0) {
+            if (count($this->mistakes) == 0) {
+                $this->mistakes = $mistakes;
+            } else {
+                $this->mistakes = array_merge($mistakes, $this->mistakes);
+            }
+        }
+    }
 
     /**
      * Creates a new string as a copy of this with a lcs
      * @param array $lcs LCS
-     * @return block_formal_langs_string_pair
+     * @return qtype_correctwriting_string_pair
      */
     public function copy_with_lcs($lcs) {
-        $pair = new qtype_correctwriting_string_pair($this->correctstring, $this->comparedstring, $this->matches);
+        $pair = clone $this;
         $pair->lcs = $lcs;
         return $pair;
     }

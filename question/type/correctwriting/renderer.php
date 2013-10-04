@@ -73,7 +73,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         }
         $hints = $question->available_specific_hints(array('answer' => $currentanswer));
         $behaviour = $qa->get_behaviour();
-        /** @var qtype_ad $behaviourrenderer */
+        /** @var qbehaviour_adaptivehints_renderer|qbehaviour_adaptivehintsnopenalties_renderer|qbehaviour_interactivehints_renderer $behaviourrenderer */
         $behaviourrenderer =$behaviour->get_renderer($PAGE);
         $step = $qa->get_last_step();
         if ($results!=null && $options->feedback) {//Show feedback message only witho $options->feedback set, but Moodle hints - anyway

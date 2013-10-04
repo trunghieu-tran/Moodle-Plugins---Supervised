@@ -80,15 +80,22 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             foreach ($alllcs as $lcs) {
                 $pair = $this->basestringpair->copy_with_lcs($lcs);
                 $this->resultstringpairs[] = $pair;
-                $this->resultmistakes[] = $this->matches_to_mistakes($pair, $weights);
+                $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
             }
         } else {
             $pair = $this->basestringpair->copy_with_lcs(array());
             $this->resultstringpairs[] = $pair;
-            $this->resultmistakes[] = $this->matches_to_mistakes($pair, $weights);
+            $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
         }
     }
 
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_sequence_mistake';
+    }
 
     /**
      * Compute and return longest common subsequence (tokenwise) of answer and corrected response.

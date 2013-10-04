@@ -149,7 +149,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $matchedanswerid = null;
     /** A cached matched analyzer
-     *  @var qtype_correctwriting_analysis_results
+     *  @var qtype_correctwriting_string_pair
      */
     public $matchedresults = null;
     /** A cached resulting graded state
@@ -176,8 +176,8 @@ class qtype_correctwriting_question extends question_graded_automatically
     }
 
     /** Checks, whether two responses are the same
-     *  @param array prevresponse previous response
-     *  @param array newresponse  new response
+     *  @param array $prevresponse previous response
+     *  @param array $newresponse  new response
      *  @return bool new user response
      */
     public function is_same_response(array $prevresponse, array $newresponse) {
@@ -276,7 +276,7 @@ class qtype_correctwriting_question extends question_graded_automatically
 
     /**
      * Performs exact matching  for answer
-     * @param qtype_correctwriting_analysis_results $results
+     * @param qtype_correctwriting_string_pair $results
      * @param block_formal_langs $stream answer stream data
      * @return bool whether it matches
      */
@@ -286,7 +286,7 @@ class qtype_correctwriting_question extends question_graded_automatically
 
     /**
      * Performs exact matching  for answer
-     * @param qtype_correctwriting_analysis_results $results
+     * @param qtype_correctwriting_string_pair $results
      * @param block_formal_langs_token_stream $stream stream data
      * @return bool whether it matches
      */
@@ -299,7 +299,7 @@ class qtype_correctwriting_question extends question_graded_automatically
     /**
      * Computes fraction for exact match. Used as callback in check match
      * @param stdClass $answer answer type
-     * @param qtype_correctwriting_analysis_results $results results for analysis for two answers
+     * @param qtype_correctwriting_string_pair $results results for analysis for two answers
      * @return float resulting fraction
      */
     public function compute_exact_match_fraction($answer, $results) {
@@ -309,7 +309,7 @@ class qtype_correctwriting_question extends question_graded_automatically
     /**
      * Computes fraction for non-exact match. Used as callback in check match
      * @param stdClass $answer answer type
-     * @param qtype_correctwriting_analysis_results $results results for analysis for two answers
+     * @param qtype_correctwriting_string_pair $results results for analysis for two answers
      * @return float resulting fraction
      */
     public function compute_nonexact_match_fraction($answer, $results) {
@@ -412,8 +412,72 @@ class qtype_correctwriting_question extends question_graded_automatically
         $responsestring = $language->create_from_string($response);
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
         $string = new qtype_correctwriting_string_pair($answerstring, $responsestring, null);
-        $analyzer = new qtype_correctwriting_analysis_results($this, $string, $language);
-        return $analyzer;
+        if ($this->are_lexeme_sequences_equal($string)) {
+            $string->assert_that_strings_are_equal();
+        } else {
+            $string = $this->perform_analysis_with_analyzer(0, $string);
+        }
+        return $string;
+    }
+
+    /**
+     * Performs recursive depth first scan, working with analyzer tree and trying to hold this tree
+     * as small as possible. This function should build a result set, which can be saved into results field
+     * @throws moodle_exception No mistake sets! - if analyzer, which is implemented is not valid and does not have
+     * at least one mistake sets
+     * @param int $index index of analyzer in qtype_correctwriting::analyzers
+     * @param qtype_correctwriting_string_pair $string string pair
+     * @return qtype_correctwriting_string_pair a pair of string
+     */
+    protected function perform_analysis_with_analyzer($index, $string) {
+        /** @var qtype_correctwriting $qtype */
+        $qtype = $this->qtype;
+        $analyzers = array_values($qtype->analyzers());
+        $analyzername = $analyzers[$index];
+        $createdanalyzername = 'qtype_correctwriting_' . $analyzername;
+        $bypass  = $this->is_analyzer_enabled($analyzername) == false;
+        /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+        $analyzer = new $createdanalyzername($this, $string, $this->get_used_language(), $bypass);
+
+        if (count($analyzer->result_pairs()) == 0)
+            throw new moodle_exception('No pairs!');
+
+
+        //  Scan pair with max fitness
+        $foundmaxfitness = false;
+        $maxfitness = -1;
+        $maxpair = null;
+
+        // If this is last analyzer, pick string with largest fitness
+        if ($index == count($analyzers) - 1) {
+            foreach($analyzer->result_pairs() as $index => $pair) {
+                /** @var qtype_correctwriting_string_pair $pair */
+                $fitness = $analyzer->fitness($pair->mistakes());
+                if ($foundmaxfitness == false || $fitness > $maxfitness) {
+                    $maxfitness = $fitness;
+                    $maxpair = $pair;
+                }
+            }
+        } else {
+            $childanalyzername = $analyzers[$index + 1];
+            $createdchildanalyzername = 'qtype_correctwriting_' . $childanalyzername;
+            /** @var qtype_correctwriting_abstract_analyzer $childanalyzer */
+            $childanalyzer =  new $createdchildanalyzername();
+            foreach($analyzer->result_pairs() as $pairindex => $pair) {
+                $childpair =  $this->perform_analysis_with_analyzer($index + 1, $pair);
+                // Compute fitness, based on results
+                $fitness = $analyzer->fitness($childpair->mistakes());
+                $fitness += $childanalyzer->fitness($childpair->mistakes());
+
+                if ($foundmaxfitness == false || $fitness > $maxfitness) {
+                    $maxfitness = $fitness;
+                    $maxpair = $childpair;
+                }
+            }
+
+        }
+
+        return $maxpair;
     }
 
     /**  Returns matching answer. Must return matching answer found when response was being graded.
@@ -451,7 +515,7 @@ class qtype_correctwriting_question extends question_graded_automatically
 
    /**
     * Creates all information about mistakes, passed into mistakes
-    * @var qtype_correctwriting_analysis_results $results results of analysis
+    * @var qtype_correctwriting_string_pair $results results of analysis
     * @return string
     */
    public function create_image_information($results) {
@@ -476,7 +540,7 @@ class qtype_correctwriting_question extends question_graded_automatically
        $resultsections[] = implode(',,,',$answertokenvalues);
        //Create response section
        $responsetokenvalues = array();
-       $responsetokens = $results->get_corrected_response()->stream->tokens;
+       $responsetokens = $results->correctedstring()->stream->tokens;
        foreach($responsetokens as $token) {
            $responsetokenvalues[] = base64_encode($token->value());
        }

@@ -84,21 +84,20 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // 2. Merge mistakes into one
         $this->resultstringpairs = $result;
         $this->resultmistakes = $mistakes;
-        foreach($this->resultmistakes as $key => $resultmistake) {
-            $currentmistakes = $resultmistake;
-            if (count($currentmistakes)) {
-                $currentmistakes = array_merge($currentmistakes, $lexicalmistakes);
-            } else {
-                $currentmistakes = $lexicalmistakes;
-            }
-            $this->resultmistakes[$key] = $currentmistakes;
+        /** @var qtype_correctwriting_string_pair $pair */
+        foreach($this->resultstringpairs as $key => $pair) {
+            $currentmistakes = $pair->mistakes();
+            $pair->append_mistakes($currentmistakes) ;
         }
     }
 
 
     protected function bypass() {
         parent::bypass();
-        $this->resultmistakes = array( $this->convert_lexer_errors_to_mistakes() );
+        $pairs = $this->result_pairs();
+        $string = $pairs[0];
+        /** @var qtype_correctwriting_string_pair $string */
+        $string->set_mistakes($this->convert_lexer_errors_to_mistakes());
     }
 
     /**
@@ -155,6 +154,13 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         return $mistakes;
     }
 
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_lexical_mistake';
+    }
 
     /**
      * Returns an array of mistakes objects for given matches_group object

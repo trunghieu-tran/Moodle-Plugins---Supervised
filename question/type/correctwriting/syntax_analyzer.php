@@ -120,7 +120,7 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
      * @return array
      */
     public function replaces_mistake_types() {
-        return array('sequence_mistake');
+        return array('qtype_correctwriting_sequence_mistake');
     }
 
 }
