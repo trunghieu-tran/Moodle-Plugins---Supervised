@@ -107,7 +107,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
 
         foreach ($strings as $string) {
             $matchresults = $this->matcher->match($string);
-            $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults) . '<br />';
+            $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true) . '<br />';
         }
         $json[$this->json_key()] = $result;
     }
