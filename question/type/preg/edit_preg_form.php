@@ -267,7 +267,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return 'preg';
     }
 
-	protected function data_preprocessing_answers($question, $withanswerfiles = false) {
+    protected function data_preprocessing_answers($question, $withanswerfiles = false) {
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
 
         if (isset($question->id)) {
