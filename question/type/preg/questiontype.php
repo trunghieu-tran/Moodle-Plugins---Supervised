@@ -67,8 +67,7 @@ class qtype_preg extends qtype_shortanswer {
     }
 
     public function save_question_options($question) {
-		global $DB;
-	
+
         // Fill in some data that could be absent due to disabling form controls.
         if (!isset($question->usecharhint)) {
             $question->usecharhint = false;
@@ -99,66 +98,17 @@ class qtype_preg extends qtype_shortanswer {
             $question->usecharhint = false;
             $question->uselexemhint = false;
         }
-	
+
         parent::save_question_options($question);
-		
-		// regextests[0..n]  "qtype_preg_regex_tests"
-		// tablename = question_answers
-		// tableid = это id ансвера
-		
-		// Get old versions of the objects.
-        /*$oldanswers = $DB->get_records('question_answers',
-                array('question' => $question->id), 'id ASC');
-		
-		$oldid = array();
-		foreach ($oldanswers as $oldanswer) {
-			$oldid[] = $oldanswer->id;
-		}								// SELECT * FROM qtype_preg_regex_tests WHERE tableid IN $oldid
-		$oldregextests = $DB->get_records_list('qtype_preg_regex_tests',
-				'tableid', $oldid, null, 'id ASC');
 
-        foreach ($question->regextests as $key => $regextest) {
-            // Check for, and ingore, completely blank answer from the form.
-            if (trim($regextest) == '') {
-                continue;
-            }
-
-            // Update an existing answer if possible.
-            $oldregexttest = array_shift($oldregextests);
-            if (!$oldregexttest) {
-                $oldregexttest = new stdClass();
-                $oldregexttest->tablename = 'question_answers';
-                $oldregexttest->tableid = array_shift($oldid);
-				$oldregexttest->regextests = $regextest;
-                $DB->insert_record('qtype_preg_regex_tests', $oldregexttest);
-            } else {
-				$oldregexttest = new stdClass();
-                $oldregexttest->tablename = 'question_answers';
-                $oldregexttest->tableid = array_shift($oldid);
-				$oldregexttest->regextests = $regextest;
-				$oldregexttest->id = $oldregexttest->id;
-				$DB->update_record('qtype_preg_regex_tests', $oldregexttest);
-			}
-        }*/
+        if (isset($question->regextests)) {
+            $this->save_question_tests($question->id, $question->regextests);
+        }
     }
-	
-	public function get_question_options($question) {
-        global $DB;
 
-		parent::get_question_options($question);
-		
-		/*$answersid = array();
-		foreach ($question->answers as $answer) {
-			$answersid[] = $answer->id;
-		}
-		
-		$regextests = $DB->get_records_list('qtype_preg_regex_tests',
-				'tableid', $answersid, null, 'id ASC');
-				
-		foreach ($regextests as $regextest) {
-			$question->regextests[] = $regextest->regextests;
-		}*/
-	}
+    /*public function get_question_options($question) {
+        parent::get_question_options($question);
+    }*/
 
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
@@ -251,5 +201,55 @@ class qtype_preg extends qtype_shortanswer {
     protected function save_hint_options($formdata, $number, $withparts) {
         $options = $formdata->interactivehint[$number];
         return $options;
+    }
+
+    public function save_question_tests($questionid, $regextests) {
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
+
+        $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
+            'tablename = ? AND tableid IN (SELECT question FROM {question_answers} WHERE question = ' . $questionid . ')',
+            array('question_answers')
+        );
+
+        $temp = $DB->get_records('question_answers', array('question'=>$questionid));
+
+        $answers = array();
+        foreach($temp as $item) {
+            $answers[] = $item;
+        }
+
+        for ($i = 0; $i < count($answers); ++$i) {
+            // Update an existing test if possible.
+            $test = array_shift($oldtests);
+            if (!$test) {
+                $test = new stdClass();
+                $test->tablename = 'question_answers';
+                $test->tableid = $answers[$i]->id;
+                $test->regextests = $regextests[$i];
+                $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
+            } else {
+                $test->regextests = $regextests[$i];
+                $DB->update_record('qtype_preg_regex_tests', $test);
+            }
+        }
+
+        foreach ($oldtests as $oldtest) {
+            $DB->delete_records('qtype_preg_regex_tests', array('id' => $oldtest->id));
+        }
+
+        $transaction->allow_commit();
+    }
+
+    public function delete_question($questionid, $contextid) {
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
+
+        $DB->delete_records_select('qtype_preg_regex_tests',
+            'tablename = \'question_answers\' AND tableid IN (SELECT question FROM {question_answers} WHERE question = ' . $questionid . ')');
+
+        $transaction->allow_commit();
+
+        parent::delete_question($questionid, $contextid);
     }
 }
