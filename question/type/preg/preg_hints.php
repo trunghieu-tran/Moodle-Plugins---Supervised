@@ -132,9 +132,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      * Placed outside render_hint to be able to get colored string without real question.
      * You still need a dummy one with 'engine' field set.
      */
-    public function render_colored_string_by_matchresults($renderer, $matchresults) {
+    public function render_colored_string_by_matchresults($renderer, $matchresults, $withpic = false) {
+
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+            $wronghead = '';
+            if ($withpic) { // Add icon, showing whether match is full or no.
+               $wronghead .= $renderer->render_match_icon($matchresults);
+            }
+            $wronghead .= $renderer->render_unmatched($matchresults->match_heading());
             $correctpart = '';
             if (!isset($matchresults->length[-2]) || $matchresults->length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
                 // No selection or no match with selection.
