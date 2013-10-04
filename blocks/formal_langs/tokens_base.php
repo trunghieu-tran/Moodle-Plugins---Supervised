@@ -1153,6 +1153,19 @@ class block_formal_langs_string_pair {
     protected $correctedstring;
 
 
+    public function __clone() {
+        $this->correctstring = clone $this->correctstring;
+        if (is_object($this->correctedstring)) {
+             $this->correctedstring = clone $this->correctedstring;
+        }
+        if (is_object($this->comparedstring)) {
+            $this->comparedstring = clone $this->comparedstring;
+        }
+        if (is_object($this->matches)) {
+            $this->matches = clone $this->matches;
+        }
+    }
+
     //TODO - anyone -  access functions
     //TODO - functions for the lexical and sequence analyzers, and mistake classes.
 
