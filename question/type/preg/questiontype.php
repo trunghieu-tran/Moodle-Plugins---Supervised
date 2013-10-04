@@ -102,7 +102,7 @@ class qtype_preg extends qtype_shortanswer {
         parent::save_question_options($question);
 
         if (isset($question->regextests)) {
-            $this->save_question_tests($question->id, $question->regextests);
+            $this->save_question_tests($question->id, $question->regextests, $question->answers);
         }
     }
 
@@ -203,12 +203,12 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
-    public function save_question_tests($questionid, $regextests) {
+    public function save_question_tests($questionid, $regextests, $preanswers) {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
         $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-            'tablename = ? AND tableid IN (SELECT question FROM {question_answers} WHERE question = ' . $questionid . ')',
+            'tablename = ? AND tableid IN (SELECT id FROM {question_answers} WHERE question = ' . $questionid . ')',
             array('question_answers')
         );
 
@@ -219,6 +219,11 @@ class qtype_preg extends qtype_shortanswer {
             $answers[] = $item;
         }
 
+        $textanswers = array();
+        foreach($preanswers as $item) {
+            $textanswers[] = $item;
+        }
+
         for ($i = 0; $i < count($answers); ++$i) {
             // Update an existing test if possible.
             $test = array_shift($oldtests);
@@ -226,7 +231,7 @@ class qtype_preg extends qtype_shortanswer {
                 $test = new stdClass();
                 $test->tablename = 'question_answers';
                 $test->tableid = $answers[$i]->id;
-                $test->regextests = $regextests[$i];
+                $test->regextests = $regextests[array_search($answers[$i]->answer, $textanswers)];
                 $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
             } else {
                 $test->regextests = $regextests[$i];
