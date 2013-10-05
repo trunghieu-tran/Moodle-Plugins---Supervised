@@ -66,10 +66,9 @@ class qtype_preg extends qtype_shortanswer {
         return $extraquestionfields;
     }
 
-    // Uncomment if going to use extra_answer_fields (depends on Tim).
-    /*public function extra_answer_fields() {
-        return array ('qtype_preg_regex_tests', 'tablename', 'tableid', 'regextests');
-    }*/
+    public function extra_answer_fields() {
+        return array ('qtype_preg_regex_tests', 'regextests');
+    }
 
     public function save_question_options($question) {
 
@@ -112,10 +111,16 @@ class qtype_preg extends qtype_shortanswer {
         $oldanswers = $DB->get_records('question_answers',
                 array('question' => $question->id), 'id ASC');
 
-        $oldtests = array();
-        if (!empty($oldanswers)) {
-            $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-                'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
+        // We need separate arrays for answers and extra answer data, so no JOINS there.
+        $extraansfields = $this->extra_answer_fields();
+        $isextraansfields = is_array($extraansfields);
+        $extraanstable = '';
+        $oldextras = array();
+        if ($isextraansfields) {
+            $extraanstable = array_shift($extraansfields);
+            if (!empty($oldanswers)) {
+                $oldextras = $DB->get_records_sql("SELECT * FROM {{$extraanstable}} WHERE " .
+                    'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
         }
 
         $maxfraction = -1;
@@ -144,24 +149,30 @@ class qtype_preg extends qtype_shortanswer {
                 $maxfraction = $question->fraction[$key];
             }
 
-            $thistest = '';
-            // Now check, if this answer contains some tests.
-            if ($this->is_extra_answer_fields_empty($question, $key)) {
-                // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
-            } else {
-                $thistest = $question->regextests[$key];
-            }
+            if ($isextraansfields) {
+                /*$thistest = '';
+                // Now check, if this answer contains some tests.
+                if ($this->is_extra_answer_fields_empty($question, $key)) {
+                    // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
+                } else {
+                    $thistest = trim($question->regextests[$key]);
+                }*/
 
-            $test = array_shift($oldtests);
-            if (!$test) {
-                $test = new stdClass();
-                $test->answerid = $answer->id;
-                $test->regextests = '';
-                $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
-            }
+                $extra = array_shift($oldextras);
+                if (!$extra) {
+                    $extra = new stdClass();
+                    $extra->answerid = $answer->id;
+                    foreach ($extraansfields as $field) {
+                        $extra->$field = ''; // TODO find a good default for any extra field.
+                    }
+                    $extra->id = $DB->insert_record($extraanstable, $extra);
+                }
 
-            $test->regextests  = trim($thistest);
-            $DB->update_record('qtype_preg_regex_tests', $test);
+                foreach ($extraansfields as $field) {
+                    $extra->$field  = $question->$field[$key];
+                }
+                $DB->update_record($extraanstable, $extra);
+            }
 
         }
 
@@ -173,12 +184,12 @@ class qtype_preg extends qtype_shortanswer {
             return $parentresult;
         }
 
-        // Delete any left over old test records.
-        $oldtestids = array();
-        foreach ($oldtests as $oldtest) {
-            $oldtestids[] = $oldtest->id;
+        // Delete any left over extra answer fields records.
+        $oldextraids = array();
+        foreach ($oldextras as $oldextra) {
+            $oldextraids[] = $oldextra->id;
         }
-        $DB->delete_records_list('qtype_preg_regex_tests', 'id', $oldtestids);
+        $DB->delete_records_list($extraanstable, 'id', $oldextraids);
 
 
         // Delete any left over old answer records.
@@ -338,7 +349,7 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
-    public function delete_question($questionid, $contextid) {
+    /*public function delete_question($questionid, $contextid) {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
@@ -348,5 +359,5 @@ class qtype_preg extends qtype_shortanswer {
         $transaction->allow_commit();
 
         parent::delete_question($questionid, $contextid);
-    }
+    }*/
 }
