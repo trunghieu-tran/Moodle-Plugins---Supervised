@@ -60,6 +60,111 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return $repeated;
     }
 
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    protected function data_preprocessing_answers($question, $withanswerfiles = false) {
+        if (empty($question->options->answers)) {
+            return $question;
+        }
+
+        $extraansfields = $this->extra_answer_fields();
+        $isextraansfields = is_array($extraansfields);
+        if ($isextraansfields) { // Omit table name.
+            array_shift($extraansfields);
+        }
+
+        $key = 0;
+        foreach ($question->options->answers as $answer) {
+            if ($withanswerfiles) {
+                // Prepare the feedback editor to display files in draft area.
+                $draftitemid = file_get_submitted_draft_itemid('answer['.$key.']');
+                $question->answer[$key]['text'] = file_prepare_draft_area(
+                    $draftitemid,          // Draftid
+                    $this->context->id,    // context
+                    'question',            // component
+                    'answer',              // filarea
+                    !empty($answer->id) ? (int) $answer->id : null, // itemid
+                    $this->fileoptions,    // options
+                    $answer->answer        // text.
+                );
+                $question->answer[$key]['itemid'] = $draftitemid;
+                $question->answer[$key]['format'] = $answer->answerformat;
+            } else {
+                $question->answer[$key] = $answer->answer;
+            }
+
+            $question->fraction[$key] = 0 + $answer->fraction;
+            $question->feedback[$key] = array();
+
+            // Evil hack alert. Formslib can store defaults in two ways for
+            // repeat elements:
+            //   ->_defaultValues['fraction[0]'] and
+            //   ->_defaultValues['fraction'][0].
+            // The $repeatedoptions['fraction']['default'] = 0 bit above means
+            // that ->_defaultValues['fraction[0]'] has already been set, but we
+            // are using object notation here, so we will be setting
+            // ->_defaultValues['fraction'][0]. That does not work, so we have
+            // to unset ->_defaultValues['fraction[0]'].
+            unset($this->_form->_defaultValues["fraction[$key]"]);
+
+            // Prepare the feedback editor to display files in draft area.
+            $draftitemid = file_get_submitted_draft_itemid('feedback['.$key.']');
+            $question->feedback[$key]['text'] = file_prepare_draft_area(
+                $draftitemid,          // Draftid
+                $this->context->id,    // context
+                'question',            // component
+                'answerfeedback',      // filarea
+                !empty($answer->id) ? (int) $answer->id : null, // itemid
+                $this->fileoptions,    // options
+                $answer->feedback      // text.
+            );
+            $question->feedback[$key]['itemid'] = $draftitemid;
+            $question->feedback[$key]['format'] = $answer->feedbackformat;
+            $key++;
+
+        }
+
+        // Now process extra answer fields.
+        if ($isextraansfields) {
+            $question = $this->data_preprocessing_extra_answer_fields($question, $extrafields, $withanswerfiles);
+        }
+
+        return $question;
+    }
+
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    /**
+     * Perform the necessary preprocessing for the extra answer fields.
+     *
+     * Questions that do something not trivial when editing extra answer fields
+     * will want to override this.
+     * @param object $question the data being passed to the form.
+     * @param array $extrafields extra answer fields (without table name).
+     * @return object $question the modified data.
+     */
+    protected function data_preprocessing_extra_answer_fields($question, $extrafields, $withanswerfiles = false) {
+        $key = 0;
+        // Setting $question->$field[$key] won't work, so we need set an array to $question->$field.
+        $extrafieldsdata = array();
+        foreach ($extrafields as $field) {
+            $extrafieldsdata[$field] = array();
+        }
+
+        foreach ($question->options->answers as $answer) {
+            foreach ($extrafields as $field) {
+                // See hack comment in data_preprocessing_answers.
+                unset($this->_form->_defaultValues["$field[$key]"];
+                $extrafieldsdata[$field][$key] = $answer->$field;
+            }
+            $key++;
+        }
+
+        foreach ($extrafields as $field) {
+            $question->$field = $extrafieldsdata[$field];
+        }
+
+        return $question;
+    }
+
     protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
         $mform = $this->_form;
         list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
@@ -107,11 +212,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
         $qtype = new $qtypeclass;
-
-        //$PAGE->requires->js('/question/type/preg/preg_authoring_tools_script.js');
-
-        //$mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
-        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authoring_tools/regex_test_push.js"></script></div>');
 
         $engines = $qtype->available_engines();
         $mform->addElement('select', 'engine', get_string('engine', 'qtype_preg'), $engines);
@@ -267,7 +367,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return 'preg';
     }
 
-    protected function data_preprocessing_answers($question, $withanswerfiles = false) {
+    /*protected function data_preprocessing_answers($question, $withanswerfiles = false) {
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
 
         if (isset($question->id)) {
@@ -285,5 +385,5 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         return $question;
-    }
+    }*/
 }

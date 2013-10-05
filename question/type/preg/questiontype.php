@@ -70,6 +70,7 @@ class qtype_preg extends qtype_shortanswer {
         return array ('qtype_preg_regex_tests', 'regextests');
     }
 
+    // TODO - clean up when this will be in the core (hopefully 2.6).
     public function save_question_options($question) {
 
         global $DB;
@@ -151,13 +152,10 @@ class qtype_preg extends qtype_shortanswer {
             }
 
             if ($isextraansfields) {
-                /*$thistest = '';
                 // Now check, if this answer contains some tests.
                 if ($this->is_extra_answer_fields_empty($question, $key)) {
-                    // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
-                } else {
-                    $thistest = trim($question->regextests[$key]);
-                }*/
+                    continue;
+                }
 
                 $extra = array_shift($oldextras);
                 if (!$extra) {
@@ -254,9 +252,58 @@ class qtype_preg extends qtype_shortanswer {
         return !isset($questionform->regextests) || trim($questionform->regextests[$key]) == '';
     }
 
-    /*public function get_question_options($question) {
-        parent::get_question_options($question);
-    }*/
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    public function get_question_options($question) {
+        global $CFG, $DB, $OUTPUT;
+
+        if (!isset($question->options)) {
+            $question->options = new stdClass();
+        }
+
+        $extraquestionfields = $this->extra_question_fields();
+        if (is_array($extraquestionfields)) {
+            $question_extension_table = array_shift($extraquestionfields);
+            $extra_data = $DB->get_record($question_extension_table,
+                    array($this->questionid_column_name() => $question->id),
+                    implode(', ', $extraquestionfields));
+            if ($extra_data) {
+                foreach ($extraquestionfields as $field) {
+                    $question->options->$field = $extra_data->$field;
+                }
+            } else {
+                echo $OUTPUT->notification('Failed to load question options from the table ' .
+                        $question_extension_table . ' for questionid ' . $question->id);
+                return false;
+            }
+        }
+
+        $extraanswerfields = $this->extra_answer_fields();
+        if (is_array($extraanswerfields)) {
+            $answer_extension_table = array_shift($extraanswerfields);
+            // Use LEFT JOIN in case not every answer has extra data.
+            $question->options->answers = $DB->get_records_sql("
+                    SELECT qa.*, qax." . implode(', qax.', $extraanswerfields) . '
+                    FROM {question_answers} qa ' . "
+                    LEFT JOIN {{$answer_extension_table}} qax ON qa.id = qax.answerid
+                    WHERE qa.question = ?
+                    ORDER BY qa.id", array($question->id));
+            if (!$question->options->answers) {
+                echo $OUTPUT->notification('Failed to load question answers from the table ' .
+                        $answer_extension_table . 'for questionid ' . $question->id);
+                return false;
+            }
+        } else {
+            // Don't check for success or failure because some question types do
+            // not use the answers table.
+            $question->options->answers = $DB->get_records('question_answers',
+                    array('question' => $question->id), 'id ASC');
+        }
+
+        $question->hints = $DB->get_records('question_hints',
+                array('questionid' => $question->id), 'id ASC');
+
+        return true;
+    }
 
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
@@ -276,7 +323,7 @@ class qtype_preg extends qtype_shortanswer {
         return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
     }
 
-    public function save_hints($formdata, $withparts = false) {// TODO - remove, when Tim will add make_hint_options.
+    public function save_hints($formdata, $withparts = false) {// TODO - remove in 2.6
         global $DB;
         $context = $formdata->context;
 
@@ -351,15 +398,4 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
-    /*public function delete_question($questionid, $contextid) {
-        global $DB;
-        $transaction = $DB->start_delegated_transaction();
-
-        $DB->delete_records_select('qtype_preg_regex_tests',
-            'answerid IN (SELECT question FROM {question_answers} WHERE question = ? )', array($questionid));
-
-        $transaction->allow_commit();
-
-        parent::delete_question($questionid, $contextid);
-    }*/
 }
