@@ -117,7 +117,6 @@ class qtype_preg extends qtype_shortanswer {
             list ($sql, $params) = $DB->get_in_or_equal($oldanswers);
             $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
                 'answerid ' . $sql, $params);
-                //'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $questionid . ')' );
         }
 
         $maxfraction = -1;
@@ -125,8 +124,7 @@ class qtype_preg extends qtype_shortanswer {
         // Insert all the new answers.
         foreach ($question->answer as $key => $answerdata) {
             // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-                    html_is_blank($question->feedback[$key]['text'])) {
+            if ($this->is_answer_empty($question, $key)) {
                 continue;
             }
 
@@ -140,11 +138,7 @@ class qtype_preg extends qtype_shortanswer {
                 $answer->id = $DB->insert_record('question_answers', $answer);
             }
 
-            $answer->answer   = trim($answerdata);
-            $answer->fraction = $question->fraction[$key];
-            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
-                    $context, 'question', 'answerfeedback', $answer->id);
-            $answer->feedbackformat = $question->feedback[$key]['format'];
+            $this->fill_answer_fields($question, $key);
             $DB->update_record('question_answers', $answer);
 
             if ($question->fraction[$key] > $maxfraction) {
@@ -153,7 +147,7 @@ class qtype_preg extends qtype_shortanswer {
 
             $thistest = '';
             // Now check, if this answer contains some tests.
-            if (!isset($question->regextests) || trim($question->regextests[$key]) == '') {
+            if ($this->is_extra_answer_fields_empty($question, $key)) {
                 // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
             } else {
                 $thistest = $question->regextests[$key];
@@ -203,6 +197,49 @@ class qtype_preg extends qtype_shortanswer {
             return $result;
         }
 
+    }
+
+    /**
+     * Returns true is answer with the $key is empty in the question data and should not be saved in DB.
+     *
+     * The questions with non-standard uses for question_answers table will want to overload this.
+     * @param object $questionform This holds the information from the question editing form.
+     * @param int $key A key of the answer in question.
+     * @return bool True if answer shouldn't be saved in DB.
+     */
+    protected function is_answer_empty($questionform, $key) {
+        return trim($questionform->answer[$key]) == '' && $questionform->fraction[$key] == 0 &&
+                    html_is_blank($questionform->feedback[$key]['text']);
+    }
+
+    
+    /**
+     * Change $answer, filling necessary fields for the question_answers table.
+     *
+     * The questions with non-standard uses for question_answers table will want to overload this.
+     * @param stdClass $answer Object to save data.
+     * @param object $questionform This holds the information from the question editing form.
+     * @param int $key A key of the answer in question.
+     */
+    protected function fill_answer_fields($answer, $questionform, $key) {
+        $answer->answer   = $questionform->answer[$key];
+        $answer->fraction = $questionform->fraction[$key];
+        $answer->feedback = $this->import_or_save_files($questionform->feedback[$key],
+                $context, 'question', 'answerfeedback', $answer->id);
+        $answer->feedbackformat = $questionform->feedback[$key]['format'];
+    }
+
+    /**
+     * Returns true if extra answer fields for answerwith the $key is empty 
+     * in the question data and should not be saved in DB.
+     *
+     * Questions where extra answer fields are optional will want to overload this.
+     * @param object $questionform This holds the information from the question editing form.
+     * @param int $key A key of the answer in question.
+     * @return bool True if answer shouldn't be saved in DB.
+     */
+    protected function is_extra_answer_fields_empty($questionform, $key) {
+        return !isset($questionform->regextests) || trim($questionform->regextests[$key]) == '';
     }
 
     /*public function get_question_options($question) {
