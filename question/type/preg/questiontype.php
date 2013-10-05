@@ -66,7 +66,15 @@ class qtype_preg extends qtype_shortanswer {
         return $extraquestionfields;
     }
 
+    // Uncomment if going to use extra_answer_fields (depends on Tim).
+    /*public function extra_answer_fields() {
+        return array ('qtype_preg_regex_tests', 'tablename', 'tableid', 'regextests');
+    }*/
+
     public function save_question_options($question) {
+
+        global $DB;
+        $result = new stdClass();
 
         // Fill in some data that could be absent due to disabling form controls.
         if (!isset($question->usecharhint)) {
@@ -99,11 +107,102 @@ class qtype_preg extends qtype_shortanswer {
             $question->uselexemhint = false;
         }
 
-        parent::save_question_options($question);
+        $context = $question->context;
 
-        if (isset($question->regextests)) {
-            $this->save_question_tests($question->id, $question->regextests, $question->answers);
+        $oldanswers = $DB->get_records('question_answers',
+                array('question' => $question->id), 'id ASC');
+
+        $oldtests = array();
+        if (!empty($oldanswers)) {
+            list ($sql, $params) = $DB->get_in_or_equal($oldanswers);
+            $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
+                'answerid ' . $sql, $params);
+                //'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $questionid . ')' );
         }
+
+        $maxfraction = -1;
+
+        // Insert all the new answers.
+        foreach ($question->answer as $key => $answerdata) {
+            // Check for, and ignore, completely blank answer from the form.
+            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
+                    html_is_blank($question->feedback[$key]['text'])) {
+                continue;
+            }
+
+            // Update an existing answer if possible.
+            $answer = array_shift($oldanswers);
+            if (!$answer) {
+                $answer = new stdClass();
+                $answer->question = $question->id;
+                $answer->answer = '';
+                $answer->feedback = '';
+                $answer->id = $DB->insert_record('question_answers', $answer);
+            }
+
+            $answer->answer   = trim($answerdata);
+            $answer->fraction = $question->fraction[$key];
+            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
+                    $context, 'question', 'answerfeedback', $answer->id);
+            $answer->feedbackformat = $question->feedback[$key]['format'];
+            $DB->update_record('question_answers', $answer);
+
+            if ($question->fraction[$key] > $maxfraction) {
+                $maxfraction = $question->fraction[$key];
+            }
+
+            $thistest = '';
+            // Now check, if this answer contains some tests.
+            if (!isset($question->regextests) || trim($question->regextests[$key]) == '') {
+                // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
+            } else {
+                $thistest = $question->regextests[$key];
+            }
+
+            $test = array_shift($oldtests);
+            if (!$test) {
+                $test = new stdClass();
+                $test->answerid = $answer->id;
+                $test->regextests = '';
+                $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
+            }
+
+            $test->regextests  = trim($thistest);
+            $DB->update_record('qtype_preg_regex_tests', $test);
+
+        }
+
+        // We don't want to call shortanswer question function, since it will repeat the steps to save answers.
+        $parentresult = question_type::save_question_options($question);
+        
+        if ($parentresult !== null) {
+            // Parent function returns null if all is OK.
+            return $parentresult;
+        }
+
+        // Delete any left over old test records.
+        $oldtestids = array();
+        foreach ($oldtests as $oldtest) {
+            $oldtestids[] = $oldtest->id;
+        }
+        $DB->delete_records_list('qtype_preg_regex_tests', 'id', $oldtestids);
+
+
+        // Delete any left over old answer records.
+        $fs = get_file_storage();
+        foreach ($oldanswers as $oldanswer) {
+            $fs->delete_area_files($context->id, 'question', 'answerfeedback', $oldanswer->id);
+            $DB->delete_records('question_answers', array('id' => $oldanswer->id));
+        }
+
+        $this->save_hints($question);
+
+        // Perform sanity checks on fractional grades.
+        if ($maxfraction != 1) {
+            $result->noticeyesno = get_string('fractionsnomax', 'question', $maxfraction * 100);
+            return $result;
+        }
+
     }
 
     /*public function get_question_options($question) {
@@ -203,55 +302,12 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
-    public function save_question_tests($questionid, $regextests, $preanswers) {
-        global $DB;
-        $transaction = $DB->start_delegated_transaction();
-
-        $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-            'tablename = ? AND tableid IN (SELECT id FROM {question_answers} WHERE question = ' . $questionid . ')',
-            array('question_answers')
-        );
-
-        $temp = $DB->get_records('question_answers', array('question'=>$questionid));
-
-        $answers = array();
-        foreach($temp as $item) {
-            $answers[] = $item;
-        }
-
-        $textanswers = array();
-        foreach($preanswers as $item) {
-            $textanswers[] = $item;
-        }
-
-        for ($i = 0; $i < count($answers); ++$i) {
-            // Update an existing test if possible.
-            $test = array_shift($oldtests);
-            if (!$test) {
-                $test = new stdClass();
-                $test->tablename = 'question_answers';
-                $test->tableid = $answers[$i]->id;
-                $test->regextests = $regextests[array_search($answers[$i]->answer, $textanswers)];
-                $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
-            } else {
-                $test->regextests = $regextests[$i];
-                $DB->update_record('qtype_preg_regex_tests', $test);
-            }
-        }
-
-        foreach ($oldtests as $oldtest) {
-            $DB->delete_records('qtype_preg_regex_tests', array('id' => $oldtest->id));
-        }
-
-        $transaction->allow_commit();
-    }
-
     public function delete_question($questionid, $contextid) {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
 
         $DB->delete_records_select('qtype_preg_regex_tests',
-            'tablename = \'question_answers\' AND tableid IN (SELECT question FROM {question_answers} WHERE question = ' . $questionid . ')');
+            'answerid IN (SELECT question FROM {question_answers} WHERE question = ? )', array($questionid));
 
         $transaction->allow_commit();
 
