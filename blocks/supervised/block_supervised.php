@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
-function supervisedblock_get_logs($timefrom, $timeto, $ip) {
+function supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid) {
     global $DB;
     
-    $select = "time >= " . $timefrom . " AND time <= " . $timeto . " AND ip = '" . $ip ."'";
+    $select = "time >= " . $timefrom . " AND time <= " . $timeto . " AND ip = '" . $ip ."'" . " AND course=" . $courseid;
     $logs = $DB->get_records_select('log', $select);
-    return $logs
+    return $logs;
 }
 
 function save_rules($quizid, $lessontypes) {
@@ -88,7 +88,8 @@ class block_supervised extends block_base {
         $timeto->setTime(18,00,00);
         $timeto = $timeto->getTimestamp();
         $ip  = '127.0.0.1';
-        $logs = supervisedblock_get_logs($timefrom, $timeto, $ip);
+        $courseid = 1;
+        $logs = supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid);
         
         
         
