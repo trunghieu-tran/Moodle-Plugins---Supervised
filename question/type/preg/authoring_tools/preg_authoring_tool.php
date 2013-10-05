@@ -132,7 +132,6 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['indlast'] = $this->selectednode !== null ? $this->selectednode->position->indlast : -2;
         $json['treeorientation'] = $this->options->treeorientation;
         $json['displayas'] = $this->options->displayas;
-        $json['id'] = $this->selectednode !== null ? $this->selectednode->id : -1;  // TODO: remove
 
         if ($this->regex->string() == '') {
             $this->generate_json_for_empty_regex($json);
