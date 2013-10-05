@@ -2,11 +2,11 @@ Perl-compatible regular expression question
 -------------------------------------------
 
 Authors:
-1. Idea, design, question type and behaviours code, hinting and error reporting - Oleg Sychev.
-2. Regex parsing, NFA regex matching engine, testing of the matchers, backup&restore and unicode support - Valeriy Streltsov.
+1. Idea, design, question type and behaviours code, hinting, error reporting, regular expression testing (authoring tool) - Oleg Sychev.
+2. Regex parsing, NFA regex matching engine, matchers testing, backup&restore, unicode support, selection in regex text (in authoring tools) - Valeriy Streltsov.
 3. DFA regex matching engine (deprecated for now) - Dmitriy Kolesov.
 4. Explaining graph (authoring tool) - Vladimir Ivanov.
-5. Explaining tree, regular expression testing (authoring tools) - Grigory Terekhov.
+5. Explaining tree (authoring tool) - Grigory Terekhov.
 6. Regex description (authoring tool) - Dmitriy Pahomov.
 
 Thanks going to:
@@ -90,11 +90,11 @@ simple assertions are shown by edges, while rectangles show you repetition and s
 
 Description is a natural language sentence, generated from regular expression, which explains you how your expression will work.
 
-For better understanding of how regex parts affect the entire picture, you can select a regex part to be highlighted in the syntax tree,
-explaining graph and description tools.
-
 Testing tool allows you to see how you regexes match different strings. It expected to be much more convenient than question previewing.
 Entered test strings will be saved in database with the question for future use.
+
+For better understanding of how regex parts affect the entire picture, you can select a regex part to be highlighted in the syntax tree,
+explaining graph and description tools. Testing tool will show you parts of strings, matched with given selection.
 
 ====================================
 6. Bugs, suggestions and giving back
