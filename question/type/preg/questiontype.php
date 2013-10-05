@@ -121,6 +121,7 @@ class qtype_preg extends qtype_shortanswer {
             if (!empty($oldanswers)) {
                 $oldextras = $DB->get_records_sql("SELECT * FROM {{$extraanstable}} WHERE " .
                     'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
+            }
         }
 
         $maxfraction = -1;
