@@ -66,7 +66,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             return $question;
         }
 
-        $extraansfields = $this->extra_answer_fields();
+        $extraansfields = $question_bank::get_qtype($question->qtype)->extra_answer_fields();
         $isextraansfields = is_array($extraansfields);
         if ($isextraansfields) { // Omit table name.
             array_shift($extraansfields);
@@ -152,7 +152,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($question->options->answers as $answer) {
             foreach ($extrafields as $field) {
                 // See hack comment in data_preprocessing_answers.
-                unset($this->_form->_defaultValues["$field[$key]"];
+                unset($this->_form->_defaultValues["$field[$key]"]);
                 $extrafieldsdata[$field][$key] = $answer->$field;
             }
             $key++;
