@@ -120,8 +120,39 @@ abstract class qtype_preg_description_node {
      *
      * @param type $s this string will be placed instead of %s
      */
-    protected function numbering_pattern($numbering_pattern, $s) {
-        return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
+    protected function numbering_pattern($numbering_pattern, $s) { // TODO - rename
+        //return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
+        $result = $s;
+        $classes = array();
+        $color = '';
+
+        // highlight generated nodes
+        if ($this->handler->is_node_generated($this->pregnode)) {
+            $color = 'grey';
+        }
+        
+        if ($classes !== array() || $color !== '') {
+            $classesstr = ' class="'.implode(' ', $classes).'"';
+            $stylestr = ' style="background: '.$color.'"';
+            $result = '<span' . 
+                    $classesstr . 
+                    $stylestr . 
+                    '>' .
+                    $result .
+                    '</span>';
+        }
+
+        // highlight selected node
+        if( $this->pregnode->position === null) {var_dump('33');}
+        if (!$this->handler->state->startofselectionfinded && $this->handler->get_options()->selection->indfirst >= $this->pregnode->position->indfirst) {
+            $this->handler->state->startofselectionfinded = true;
+            $result = '<span style="background:yellow">' . $result;
+        }
+        if (!$this->handler->state->endofselectionfinded && $this->handler->get_options()->selection->indlast >= $this->pregnode->position->indlast) {
+            $this->handler->state->endofselectionfinded = true;
+            $result = '</span>' . $result;
+        }
+        return $result;
     }
 }
 
@@ -320,7 +351,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             } else {
                 $ranges = $this->find_ranges($flag->data);
                 // var_dump($ranges);
-                $rangelengthmax =& $this->handler->options()->rangelengthmax;
+                $rangelengthmax =& $this->handler->get_options()->rangelengthmax;
                 foreach ($ranges as $range) {
                     if (is_int($range)) { // $range is a code of character
                         $characters[] = self::describe_chr($range, true, $form);

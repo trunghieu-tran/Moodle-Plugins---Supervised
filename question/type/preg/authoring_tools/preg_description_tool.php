@@ -57,6 +57,10 @@ class qtype_preg_description_state {
 
     public $forceunsetmodifiers = false;
 
+    public $startofselectionfinded = false;
+
+    public $endofselectionfinded = false;
+
     /**
      * set default values to all state variables
      */
@@ -68,6 +72,8 @@ class qtype_preg_description_state {
         $this->ungreedy        = false;
         $this->duplicate       = false;
         $this->forceunsetmodifiers = false;
+        $this->startofselectionfinded = false;
+        $this->endofselectionfinded = false;
     }
 
     /**
