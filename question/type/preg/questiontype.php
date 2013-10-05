@@ -144,7 +144,7 @@ class qtype_preg extends qtype_shortanswer {
                 $answer->id = $DB->insert_record('question_answers', $answer);
             }
 
-            $this->fill_answer_fields($answer, $question, $key);
+            $this->fill_answer_fields($answer, $question, $key, $context);
             $DB->update_record('question_answers', $answer);
 
             if ($question->fraction[$key] > $maxfraction) {
@@ -230,8 +230,9 @@ class qtype_preg extends qtype_shortanswer {
      * @param stdClass $answer Object to save data.
      * @param object $questionform This holds the information from the question editing form.
      * @param int $key A key of the answer in question.
+     * @param $context needed for working with files.
      */
-    protected function fill_answer_fields($answer, $questionform, $key) {
+    protected function fill_answer_fields($answer, $questionform, $key, $context) {
         $answer->answer   = $questionform->answer[$key];
         $answer->fraction = $questionform->fraction[$key];
         $answer->feedback = $this->import_or_save_files($questionform->feedback[$key],

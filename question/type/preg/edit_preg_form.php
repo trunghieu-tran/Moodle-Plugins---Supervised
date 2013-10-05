@@ -66,12 +66,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             return $question;
         }
 
-        $extraansfields = $question_bank::get_qtype($question->qtype)->extra_answer_fields();
-        $isextraansfields = is_array($extraansfields);
-        if ($isextraansfields) { // Omit table name.
-            array_shift($extraansfields);
-        }
-
         $key = 0;
         foreach ($question->options->answers as $answer) {
             if ($withanswerfiles) {
@@ -124,8 +118,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         // Now process extra answer fields.
-        if ($isextraansfields) {
-            $question = $this->data_preprocessing_extra_answer_fields($question, $extrafields, $withanswerfiles);
+        $extraansfields = question_bank::get_qtype($question->qtype)->extra_answer_fields();
+        if (is_array($extraansfields)) {
+            // Omit table name.
+            array_shift($extraansfields);
+            $question = $this->data_preprocessing_extra_answer_fields($question, $extraansfields, $withanswerfiles);
         }
 
         return $question;
