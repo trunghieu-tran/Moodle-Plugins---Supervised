@@ -268,9 +268,9 @@ M.preg_authoring_tools_script = (function ($) {
             k = '' + regex + notation + exactmatch + usecase + treeorientation + displayas + indfirst + ',' + indlast;
 
         // Highlight description.
-        var desc = $($.parseHTML(d));
+        /*var desc = $($.parseHTML(d));
         desc.find('.description_node_' + json['id']).css('background', '#FFFF00');
-        d = desc.html();
+        d = desc.html();*/
 
         // Cache the content.
         self.cache[self.TREE_KEY][k] = t;
