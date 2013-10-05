@@ -170,7 +170,8 @@ class qtype_preg extends qtype_shortanswer {
                 }
 
                 foreach ($extraansfields as $field) {
-                    $extra->$field  = $question->$field[$key];
+                    $fieldarray = $question->$field;
+                    $extra->$field = $fieldarray[$key];
                 }
                 $DB->update_record($extraanstable, $extra);
             }
