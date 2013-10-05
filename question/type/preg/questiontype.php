@@ -160,12 +160,13 @@ class qtype_preg extends qtype_shortanswer {
                 $extra = array_shift($oldextras);
                 if (!$extra) {
                     $extra = new stdClass();
-                    $extra->answerid = $answer->id;
                     foreach ($extraansfields as $field) {
                         $extra->$field = ''; // TODO find a good default for any extra field.
                     }
                     $extra->id = $DB->insert_record($extraanstable, $extra);
                 }
+                // Update answerid anyway, as record may be reused from another answer.
+                $extra->answerid = $answer->id;
 
                 foreach ($extraansfields as $field) {
                     $fieldarray = $question->$field;
