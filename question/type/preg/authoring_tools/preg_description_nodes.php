@@ -684,7 +684,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
 
         $replaces = $this->what_to_replace($description);
         foreach ($replaces as $num => $data) {
-            // var_dump($num);
+            //var_dump($num);
             $child_description = $this->operands[$num-1]->description($numbering_pattern, $this, $data['form']);
             $description = str_replace($data['toreplace'], $child_description, $description);
         }
@@ -702,16 +702,16 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $pos = strpos($str, '%');
         $len = strlen($str);
         $wasnum = false;
-        while ($pos!==false) {
+        while ($pos !== false) {
             // echo($pos);
             $pos++;
             $form = '';
-            while ($len>$pos && ctype_alpha($str[$pos])) {
+            while ($len > $pos && ctype_alpha($str[$pos])) {
                 $form += $str[$pos];
                 $pos++;
             }
             $numstr = '';
-            while ($len>$pos && ctype_digit($str[$pos])) {
+            while ($len > $pos && ctype_digit($str[$pos])) {
                 $numstr += $str[$pos];
                 $pos++;
                 $wasnum = true;
@@ -1071,7 +1071,9 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
             $resultpattern = self::get_form_string('description_node_cond_subexpr', $form);
             // $resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands), $resultpattern);
         }
-        $elsereplase = isset($this->pregnode->operands[1])?self::get_form_string('description_node_cond_subexpr_else', $form):'';
+        $elsereplase = count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()
+                     ? self::get_form_string('description_node_cond_subexpr_else', $form)
+                     : '';
         $resultpattern = str_replace('%else', $elsereplase, $resultpattern);
         return $resultpattern;
     }
