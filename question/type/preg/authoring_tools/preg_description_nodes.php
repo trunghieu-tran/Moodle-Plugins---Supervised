@@ -92,9 +92,9 @@ abstract class qtype_preg_description_node {
 
         if (is_string($a)) {
             $form = $a;
-            $a = null; 
+            $a = null;
             $usea = false;
-        } 
+        }
         if (isset($form) && $form !== '') {
             $s.='_'.$form;
         }
@@ -130,20 +130,19 @@ abstract class qtype_preg_description_node {
         if ($this->handler->is_node_generated($this->pregnode)) {
             $color = 'grey';
         }
-        
+
         if ($classes !== array() || $color !== '') {
             $classesstr = ' class="'.implode(' ', $classes).'"';
             $stylestr = ' style="background: '.$color.'"';
-            $result = '<span' . 
-                    $classesstr . 
-                    $stylestr . 
+            $result = '<span' .
+                    $classesstr .
+                    $stylestr .
                     '>' .
                     $result .
                     '</span>';
         }
 
         // highlight selected node
-        if( $this->pregnode->position === null) {var_dump('33');}
         if (!$this->handler->state->startofselectionfinded && $this->handler->get_options()->selection->indfirst >= $this->pregnode->position->indfirst) {
             $this->handler->state->startofselectionfinded = true;
             $result = '<span style="background:yellow">' . $result;
@@ -561,7 +560,7 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
                 $resultpattern .= self::get_form_string('description_unsetoption_J', $form);
                 $mduplicate = false;
             }
-            if ($resultpattern !== '') { 
+            if ($resultpattern !== '') {
                 $a = new stdClass();
                 $a->option = $resultpattern;
                 $resultpattern = self::get_form_string('description_option_wrapper', $a, $form).' ';
@@ -682,7 +681,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
 
         $this->pattern = $this->pattern($node_parent, $form);
         $description = $this->numbering_pattern($numbering_pattern, $this->pattern);
-        
+
         $replaces = $this->what_to_replace($description);
         foreach ($replaces as $num => $data) {
             // var_dump($num);

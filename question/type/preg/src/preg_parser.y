@@ -92,7 +92,7 @@
         return $result;
     }
 
-    protected function create_cond_subexpr_assertion_node($node, $assertnode, $exprnode, $closeparen) {
+    protected function create_cond_subexpr_assertion_node($node, $assertbody, $exprnode, $closeparen) {
         if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
         } else if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB) {
@@ -103,13 +103,16 @@
             $subtype = qtype_preg_node_assert::SUBTYPE_NLB;
         }
 
-        if ($assertnode === null) {
-            $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $assertnode->set_user_info($node->position->add_chars_right(-1));
+        if ($assertbody === null) {
+            $assertbody = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $startpos = $node->position->indlast;
+            $assertbody->set_user_info(new qtype_preg_position($startpos + 1, $startpos));
         }
         $condbranch = new qtype_preg_node_assert($subtype);
-        $condbranch->operands = array($assertnode);
-        $condbranch->userinscription = array(new qtype_preg_userinscription(textlib::substr($node->userinscription[0], 2) . '...)'));
+        $condbranch->operands = array($assertbody);
+        $condbranch->set_user_info($node->position->compose($assertbody->position)->add_chars_left(2)->add_chars_right(1),
+                                   array(new qtype_preg_userinscription(textlib::substr($node->userinscription[0], 2) . '...)')));
+
         $node->operands = array($condbranch);
 
         $position = $node->position->compose($closeparen->position);
