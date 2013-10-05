@@ -114,9 +114,8 @@ class qtype_preg extends qtype_shortanswer {
 
         $oldtests = array();
         if (!empty($oldanswers)) {
-            list ($sql, $params) = $DB->get_in_or_equal($oldanswers);
             $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-                'answerid ' . $sql, $params);
+                'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
         }
 
         $maxfraction = -1;
