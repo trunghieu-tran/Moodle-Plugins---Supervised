@@ -138,7 +138,7 @@ class qtype_preg extends qtype_shortanswer {
                 $answer->id = $DB->insert_record('question_answers', $answer);
             }
 
-            $this->fill_answer_fields($question, $key);
+            $this->fill_answer_fields($answer, $question, $key);
             $DB->update_record('question_answers', $answer);
 
             if ($question->fraction[$key] > $maxfraction) {
