@@ -6,7 +6,7 @@ Authors:
 2. Regex parsing, NFA regex matching engine, matchers testing, backup&restore, unicode support, selection in regex text (in authoring tools) - Valeriy Streltsov.
 3. DFA regex matching engine (deprecated for now) - Dmitriy Kolesov.
 4. Explaining graph (authoring tool) - Vladimir Ivanov.
-5. Explaining tree (authoring tool) - Grigory Terekhov.
+5. Syntax tree (authoring tool) - Grigory Terekhov.
 6. Regex description (authoring tool) - Dmitriy Pahomov.
 
 Thanks going to:
