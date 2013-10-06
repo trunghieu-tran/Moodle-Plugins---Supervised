@@ -1,0 +1,138 @@
+<?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Defines explain graph's handler class.
+ *
+ * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
+ * @author Vladimir Ivanov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_misc.php');
+
+/**
+ * Class "handler" for regular expression's graph.
+ */
+class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_tool {
+
+    public function __construct ($regex = null, $options = null) {
+        parent::__construct($regex, $options);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    public function name() {
+        return 'explaining_graph_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function node_infix() {
+        return 'authoring_tool';
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
+        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+            return 'qtype_preg_authoring_tool_node_quant';
+        }
+        return parent::get_engine_node_name($nodetype, $nodesubtype);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        switch ($pregnode->type) {
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    public function json_key() {
+        return 'graph';
+    }
+
+    /**
+     * Overloaded from qtype_preg_authoring_tool.
+     */
+    public function generate_json_for_accepted_regex(&$json) {
+        $id = $this->selectednode !== null
+            ? $this->selectednode->id
+            : -1;
+        $graph = $this->create_graph($id);
+        $dotscript = $graph->create_dot();
+        $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
+        $json[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
+    }
+
+    /**
+     * Creates graph which explaining regular expression.
+     * @param id - identifier of node which will be picked out in image.
+     * @return explainning graph of regular expression.
+     */
+    public function create_graph($id = -1) {
+        $this->set_flag($this->dst_root);
+        $graph = $this->dst_root->create_graph($id);
+
+        if ($this->options->exactmatch) {
+            $graph->isexact = true;
+        }
+
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
+
+        if (count($graph->nodes) == 2 && count($graph->subgraphs) == 0) {
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1], $graph);
+        } else {
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 2], $graph->entries[count($graph->entries) - 1], $graph);
+
+            $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->exits[count($graph->exits) - 1], $graph->nodes[count($graph->nodes) - 1], $graph);
+            $graph->entries = array();
+            $graph->exits = array();
+
+            $graph->optimize_graph($graph, $graph);
+        }
+
+        return $graph;
+    }
+
+    protected function set_flag($node) {
+        $node->isexact = $this->is_preg_node_acceptable($node->pregnode);
+        if (isset($node->operands)) {
+            foreach ($node->operands as $operand) {
+                $this->set_flag($operand);
+            }
+        }
+    }
+}
