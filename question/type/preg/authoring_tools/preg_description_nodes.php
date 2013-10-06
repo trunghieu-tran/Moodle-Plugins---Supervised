@@ -127,7 +127,7 @@ abstract class qtype_preg_description_node {
         $color = '';
 
         // highlight generated nodes
-        if ($this->handler->is_node_generated($this->pregnode)) {
+        if ($this->handler->is_node_generated($this->pregnode) && !($this instanceof qtype_preg_description_operator)) {
             $color = 'grey';
         }
 
@@ -147,7 +147,7 @@ abstract class qtype_preg_description_node {
             $this->handler->state->startofselectionfinded = true;
             $result = '<span style="background:yellow">' . $result;
         }
-        if (!$this->handler->state->endofselectionfinded && $this->handler->get_options()->selection->indlast >= $this->pregnode->position->indlast) {
+        if (!$this->handler->state->endofselectionfinded && $this->handler->get_options()->selection->indlast <= $this->pregnode->position->indlast) {
             $this->handler->state->endofselectionfinded = true;
             $result = '</span>' . $result;
         }
@@ -605,7 +605,7 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_MARK_NAME ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_NO_START_OPT ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF8 ||
-                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF1 ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF16 ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UCP) {
 
             $resultpattern = self::get_form_string('description_'.$this->pregnode->subtype, $form);
