@@ -189,12 +189,14 @@ class qtype_preg extends qtype_shortanswer {
             return $parentresult;
         }
 
-        // Delete any left over extra answer fields records.
-        $oldextraids = array();
-        foreach ($oldextras as $oldextra) {
-            $oldextraids[] = $oldextra->id;
+        if ($isextraansfields) {
+            // Delete any left over extra answer fields records.
+            $oldextraids = array();
+            foreach ($oldextras as $oldextra) {
+                $oldextraids[] = $oldextra->id;
+            }
+            $DB->delete_records_list($extraanstable, 'id', $oldextraids);
         }
-        $DB->delete_records_list($extraanstable, 'id', $oldextraids);
 
 
         // Delete any left over old answer records.
