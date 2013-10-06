@@ -121,11 +121,13 @@ abstract class qtype_preg_syntax_tree_node {
 
         $special = array('&' => '&#38;',
                          '"' => '&#34;',
+                         '[' => '&#91;',
+                         ']' => '&#93;',
                          ',' => '&#44;',
                          '<' => '&#60;',
                          '>' => '&#62;',
-                         '[' => '&#91;',
-                         ']' => '&#93;',
+                         //'[' => '&#91;',
+                         //']' => '&#93;',
                          '{' => '&#123;',
                          '|' => '&#124;',
                          '}' => '&#125;',
@@ -305,6 +307,9 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         if ($this->pregnode->negative) {
             $label = '<font color="blue">' . get_string('leaf_charset_except', 'qtype_preg') . '</font> ' . $label;
         }
+        /*[&lt;]
+        &#91;&#10;&#38;&#10;l&#10;t&#10;;&#10;&#93;&#10;
+        var_dump($label);*/
         return '<' . $label . '>';
     }
 
@@ -407,7 +412,11 @@ class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf 
 class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
 
     protected function label() {
-        return '"' . get_string('leaf_control', 'qtype_preg') . ' ' . parent::label() . '"';
+        return '"' . parent::label() . '"';
+    }
+    
+    protected function tooltip() {
+        return get_string('leaf_control', 'qtype_preg') . ' ' . parent::label();
     }
 }
 
@@ -442,7 +451,7 @@ class qtype_preg_syntax_tree_node_alt extends qtype_preg_syntax_tree_operator {
 class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator {
 
     protected function label() {
-        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . ' ' . parent::label() . '"';
+        return '"' . parent::label() . '"';
     }
 }
 
