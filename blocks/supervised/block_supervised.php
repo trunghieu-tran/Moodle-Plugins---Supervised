@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-function supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid) {
-    global $DB;
-    
-    $select = "time >= " . $timefrom . " AND time <= " . $timeto . " AND ip = '" . $ip ."'" . " AND course=" . $courseid;
-    $logs = $DB->get_records_select('log', $select);
-    return $logs;
-}
-
 function save_rules($quizid, $lessontypes) {
     global $DB;
     
@@ -73,25 +64,7 @@ class block_supervised extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
-        
-        
-        
-        
-        
-        $timefrom = new DateTime();
-        $timefrom->setDate(2013,10,5);
-        $timefrom->setTime(17,40,00);
-        $timefrom = $timefrom->getTimestamp();
-        
-        $timeto = new DateTime();
-        $timeto->setDate(2013,10,5);
-        $timeto->setTime(18,00,00);
-        $timeto = $timeto->getTimestamp();
-        $ip  = '127.0.0.1';
-        $courseid = 1;
-        $logs = supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid);
-        
-        
+
         
         $this->content         =  new stdClass;
         $this->content->text   = 'The content of supervised block!';
