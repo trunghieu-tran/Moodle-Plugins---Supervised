@@ -26,9 +26,41 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_plugin.class.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');
 
 class restore_qtype_preg_plugin extends restore_qtype_poasquestion_plugin {
+
+    // Current answer being processed.
+    protected $currentanswer;
+
+    /**
+      * Returns the paths to be handled by the plugin at question level.
+      */
+    protected function define_question_plugin_structure() {
+        $paths = parent::define_question_plugin_structure();
+
+        $qtypeobj = question_bank::get_qtype($this->pluginname);
+        $this->qtype = $qtypeobj;
+
+        // Add in-depth paths
+        $elepath = $this->get_pathfor('/answers/answer/regextests');
+        $paths[] = new restore_path_element('regextests', $elepath);
+
+        return $paths;
+    }
+
+    public function process_regextests($data) {
+        global $DB;
+
+        $data['answerid'] = $this->currentanswer['newid'];
+        /*$newtestid =*/ $DB->insert_record('qtype_preg_regex_tests', $data);
+    }
+
+    public function process_question_answer($data) {
+        parent::process_question_answer($data);
+        $this->currentanswer = $data;
+        $this->currentanswer['newid'] = $this->get_mappingid('question_answer', $data['id']);
+    }
 
     public function process_preg($data) {
         $this->process_poasquestion($data);
