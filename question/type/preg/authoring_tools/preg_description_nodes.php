@@ -231,8 +231,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             ||$code==8194||$code==8195||$code==8201||$code==8204||$code==8205) {
             $result = self::get_form_string('description_char'.$hexcode, $form);
         } else {
-            $result = str_replace('%code', $hexcode,
-                                  self::get_form_string('description_char_16value' , $form));
+            $result = str_replace('%code', $hexcode, self::get_form_string('description_char_16value', $form));
         }
         return $result;
     }
@@ -257,7 +256,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             } else {
                 $result = $iscode ? textlib::code2utf8($utf8chr) : $utf8chr;
             }
-            $result = str_replace('%char', $result, self::get_form_string('description_char' , $form));
+            $result = str_replace('%char', $result, self::get_form_string('description_char', $form));
         }
         return $result;
     }
@@ -361,7 +360,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
                                 $characters[] = self::describe_chr($i, true, $form);
                             }
                         } else { // otherwise it will be displayed
-                            $temp_str = self::get_form_string('description_charset_range' , $form);
+                            $temp_str = self::get_form_string('description_charset_range', $form);
                             $temp_str = str_replace('%start', self::describe_chr($range[0], true, $form), $temp_str);
                             $temp_str = str_replace('%end', self::describe_chr($range[1], true, $form), $temp_str);
                             $characters[] = $temp_str;
@@ -605,7 +604,7 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_MARK_NAME ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_NO_START_OPT ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF8 ||
-                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF1 ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF16 ||
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UCP) {
 
             $resultpattern = self::get_form_string('description_'.$this->pregnode->subtype, $form);
@@ -616,12 +615,12 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_THEN ) {
 
             $resultpattern = self::get_form_string('description_control_backtrack', $form);
-            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype), $resultpattern, $form);
+            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype, $form), $resultpattern);
 
         } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP_NAME) {
 
             $resultpattern = self::get_form_string('description_control_backtrack', $form);
-            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype), $resultpattern, $form);
+            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype, $form), $resultpattern);
             $resultpattern = str_replace('%name', $this->pregnode->name, $resultpattern);
 
         } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CR ||
@@ -631,11 +630,11 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
                 $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANY) {
 
             $resultpattern = self::get_form_string('description_control_newline', $form);
-            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype), $resultpattern, $form);
+            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype, $form), $resultpattern);
 
         } else {
             $resultpattern = self::get_form_string('description_control_r', $form);
-            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype), $resultpattern, $form);
+            $resultpattern = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype, $form), $resultpattern);
         }
         return $resultpattern;
     }
@@ -1082,7 +1081,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         $resultpattern = parent::description($numbering_pattern, $this, $form);
         if (strpos($resultpattern, '%cond')!==false) {
             $conddescription = $this->condbranch->description($numbering_pattern, $this, $form);
-            $resultpattern = str_replace('%cond', $conddescription , $resultpattern);
+            $resultpattern = str_replace('%cond', $conddescription, $resultpattern);
         }
         return $resultpattern;
     }
