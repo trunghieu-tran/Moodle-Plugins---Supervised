@@ -30,20 +30,4 @@ require_once($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/backup_
 
 class backup_qtype_preg_plugin extends backup_qtype_poasquestion_plugin {
 
-    protected function define_question_plugin_structure() {
-        $plugin = parent::define_question_plugin_structure();
-        $pluginwrapper = $plugin->get_child($this->get_recommended_name());
-        $answers = $pluginwrapper->get_child('answers');
-        $answer = $answers->get_child('answer');
-        $qtypeobj = question_bank::get_qtype($this->pluginname);
-
-        // Extra answer fields.
-        $extraanswerfields = $qtypeobj->extra_answer_fields();
-        $tablename = array_shift($extraanswerfields);
-        $child = new backup_nested_element('regextests', array('id'), $extraanswerfields);
-        $answer->add_child($child);
-        $child->set_source_table($tablename, array('answerid' => backup::VAR_PARENTID));
-
-        return $plugin;
-    }
 }
