@@ -154,6 +154,8 @@ M.preg_authoring_tools_script = (function ($) {
             oneachpresscallback : function () {
                 self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
 
+                self.invalidate_content();
+
                 // Put the testing data into ui.
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
@@ -298,6 +300,24 @@ M.preg_authoring_tools_script = (function ($) {
         self.display_strings(s);
     },
 
+    invalidate_content : function() {
+        var tree_err = $('#tree_err'),
+            tree_img = $('#tree_img'),
+            tree_map = $('#tree_map'),
+            graph_err = $('#graph_err'),
+            graph_img = $('#graph_img'),
+            desc_hnd = $('#description_handler');
+
+        tree_err.html('');
+        tree_img.removeAttr('src').css('visibility', 'hidden');
+        tree_map.html('');
+
+        graph_err.html('');
+        graph_img.removeAttr('src').css('visibility', 'hidden');
+
+        desc_hnd.html('');
+    },
+
     // Displays given images and description
     display_content : function (t, g, d, indfirst, indlast) {
         var scroll = $(window).scrollTop(),
@@ -308,9 +328,8 @@ M.preg_authoring_tools_script = (function ($) {
             graph_img = $('#graph_img'),
             desc_hnd = $('#description_handler');
 
-        tree_err.html('');
-        tree_map.html('');
-        tree_img.removeAttr('src').css('visibility', 'hidden');
+        self.invalidate_content();
+
         if (typeof t != 'undefined' && t.img && t.map) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
@@ -320,15 +339,12 @@ M.preg_authoring_tools_script = (function ($) {
             tree_err.html(t);
         }
 
-        graph_err.html('');
-        graph_img.removeAttr('src').css('visibility', 'hidden');
         if (typeof g != 'undefined' && g.substring(0, 4) == 'data') {
             graph_img.attr('src', g).css('visibility', 'visible');
         } else if (typeof g != 'undefined') {
             graph_err.html(g);
         }
 
-        desc_hnd.html('');
         if (typeof d != 'undefined') {
             desc_hnd.html(d);
         }
