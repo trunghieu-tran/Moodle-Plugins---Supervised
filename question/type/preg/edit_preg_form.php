@@ -118,11 +118,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         // Now process extra answer fields.
-        $extraansfields = question_bank::get_qtype($question->qtype)->extra_answer_fields();
-        if (is_array($extraansfields)) {
+        $extraanswerfields = question_bank::get_qtype($question->qtype)->extra_answer_fields();
+        if (is_array($extraanswerfields)) {
             // Omit table name.
-            array_shift($extraansfields);
-            $question = $this->data_preprocessing_extra_answer_fields($question, $extraansfields, $withanswerfiles);
+            array_shift($extraanswerfields);
+            $question = $this->data_preprocessing_extra_answer_fields($question, $extraanswerfields, $withanswerfiles);
         }
 
         return $question;
