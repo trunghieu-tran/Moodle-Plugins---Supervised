@@ -37,6 +37,8 @@ class qtype_preg_questiontype_test extends advanced_testcase {
     protected $qtype;
     // Id of the saved question.
     protected $questionid;
+    // Original question data.
+    protected $questiondata;
 
     /**
      * Not using setUp for now to avoid looking for
@@ -44,7 +46,7 @@ class qtype_preg_questiontype_test extends advanced_testcase {
      */
     protected function setup_db_question() {
 
-        $questiondata = test_question_maker::get_question_data('preg', 'five_regexes_two_tests');
+        $this->questiondata = test_question_maker::get_question_data('preg', 'five_regexes_two_tests');
         $formdata = test_question_maker::get_question_form_data('preg', 'five_regexes_two_tests');
 
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
@@ -53,15 +55,27 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $formdata->category = "{$cat->id},{$cat->contextid}";
         qtype_preg_edit_form::mock_submit((array)$formdata);
 
-        $form = qtype_preg_test_helper::get_question_editing_form($cat, $questiondata);
+        $form = qtype_preg_test_helper::get_question_editing_form($cat, $this->questiondata);
 
         $this->assertTrue($form->is_validated());
 
         $fromform = $form->get_data();
 
-        $returnedfromsave = $this->qtype->save_question($questiondata, $fromform);
         $this->qtype = question_bank::get_qtype('preg');
+        $returnedfromsave = $this->qtype->save_question($this->questiondata, $fromform);
         $this->questionid = $returnedfromsave->id;
+    }
+
+    protected function compare_answers($loadedquestion) {
+        foreach ($this->questiondata->options->answers as $answer) {
+            $actualanswer = array_shift($loadedquestion->options->answers);
+            foreach ($answer as $ansproperty => $ansvalue) {
+                // This question does not use 'answerformat', will ignore it.
+                if (!in_array($ansproperty, array('id', 'question', 'answerformat'))) {
+                    $this->assertAttributeEquals($ansvalue, $ansproperty, $actualanswer);
+                }
+            }
+        }
     }
 
     // Test creating new question.
@@ -73,17 +87,6 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $actualquestionsdata = question_load_questions(array($this->questionid));
         $actualquestiondata = end($actualquestionsdata);
 
-        $this->assertTrue(count($question->options->answers) == 5);
-        $this->assertTrue($question->options->answers[0]->answer == '000');
-        $this->assertTrue($question->options->answers[1]->answer == '111');
-        $this->assertTrue($question->options->answers[2]->answer == '222');
-        $this->assertTrue($question->options->answers[3]->answer == '333');
-        $this->assertTrue($question->options->answers[4]->answer == '444');
-
-        $this->assertTrue($question->options->answers[1]->regextests == '111');
-        $this->assertTrue($question->options->answers[3]->regextests == '333');
-        $this->assertTrue(empty($question->options->answers[0]->regextests));
-        $this->assertTrue(empty($question->options->answers[2]->regextests));
-        $this->assertTrue(empty($question->options->answers[4]->regextests));
+        $this->compare_answers($actualquestiondata);
     }
 }
