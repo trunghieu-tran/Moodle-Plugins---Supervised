@@ -36,10 +36,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 abstract class qtype_preg_authoring_tool_node_abstract {
 
     public $pregnode; // A reference to the corresponding preg_node.
-    public $isexact = false;
+    public $handler;
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
+        $this->handler = $handler;
     }
 
     /**
@@ -57,7 +58,7 @@ abstract class qtype_preg_authoring_tool_node_abstract {
             case qtype_preg_node::TYPE_ABSTRACT:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
             case qtype_preg_node::TYPE_NODE_ERROR:
-                return false;
+                return get_string($this->pregnode->type, 'qtype_preg');
             default:
                 return true;
         }
@@ -599,11 +600,13 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $label = ($this->pregnode->number != -1 ? get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number : '');
 
+        $generated = $this->handler->is_node_generated($this->pregnode);
+
         $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
                         $label,
-                        ($this->pregnode->userinscription[0]->data != '(?i:...)') ? (
-                            $this->isexact ? 'solid; bgcolor=white' : 'solid; color=black'
-                            ) : 'filled;color=lightgrey',
+                        ($this->pregnode->userinscription[0]->data != '(?i:...)')
+                            ? ($generated ? 'solid; bgcolor=white' : 'solid; color=black')
+                            : 'filled;color=lightgrey',
                         $this->pregnode->id
                     );
         $subexpr->assume_subgraph($operand);
