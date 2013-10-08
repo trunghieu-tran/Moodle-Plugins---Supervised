@@ -39,6 +39,8 @@ class qtype_preg_questiontype_test extends advanced_testcase {
     protected $questionid;
     // Original question data.
     protected $questiondata;
+    // Category
+    protected $cat;
 
     /**
      * Not using setUp for now to avoid looking for
@@ -50,12 +52,12 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $formdata = test_question_maker::get_question_form_data('preg', 'five_regexes_two_tests');
 
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $cat = $generator->create_question_category(array());
+        $this->cat = $generator->create_question_category(array());
 
-        $formdata->category = "{$cat->id},{$cat->contextid}";
+        $formdata->category = "{$this->cat->id},{$this->cat->contextid}";
         qtype_preg_edit_form::mock_submit((array)$formdata);
 
-        $form = qtype_preg_test_helper::get_question_editing_form($cat, $this->questiondata);
+        $form = qtype_preg_test_helper::get_question_editing_form($this->cat, $this->questiondata);
 
         $this->assertTrue($form->is_validated());
 
@@ -66,8 +68,8 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $this->questionid = $returnedfromsave->id;
     }
 
-    protected function compare_answers($loadedquestion) {
-        foreach ($this->questiondata->options->answers as $answer) {
+    protected function compare_answers($questiondata, $loadedquestion) {
+        foreach ($questiondata->options->answers as $answer) {
             $actualanswer = array_shift($loadedquestion->options->answers);
             foreach ($answer as $ansproperty => $ansvalue) {
                 // This question does not use 'answerformat', will ignore it.
@@ -87,6 +89,35 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $actualquestionsdata = question_load_questions(array($this->questionid));
         $actualquestiondata = end($actualquestionsdata);
 
-        $this->compare_answers($actualquestiondata);
+        $this->compare_answers($this->questiondata, $actualquestiondata);
+    }
+
+    // User add one answer but deleted one piece of extra data
+    public function test_add_answers_delete_extra_data() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $this->setup_db_question();
+
+        $questiondata = test_question_maker::get_question_data('preg', 'six_regexes_one_test');
+        $formdata = test_question_maker::get_question_form_data('preg', 'six_regexes_one_test');
+
+        $formdata->category = "{$this->cat->id},{$this->cat->contextid}";
+        qtype_preg_edit_form::mock_submit((array)$formdata);
+
+        $form = qtype_preg_test_helper::get_question_editing_form($this->cat, $questiondata);
+
+        $this->assertTrue($form->is_validated());
+
+        $fromform = $form->get_data();
+        var_dump($formdata);
+        echo "\n\n\n\n\n\n";
+        var_dump($fromform);
+        $this->qtype = question_bank::get_qtype('preg');
+        $questiondata->id = $this->questionid;
+        $returnedfromsave = $this->qtype->save_question($questiondata, $fromform);
+
+        $actualquestionsdata = question_load_questions(array($this->questionid));
+        $actualquestiondata = end($actualquestionsdata);
+        $this->compare_answers($questiondata, $actualquestiondata);
     }
 }
