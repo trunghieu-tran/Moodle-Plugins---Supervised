@@ -70,7 +70,7 @@ class qtype_preg_test_helper extends question_test_helper {
                 'id' => 13,
                 'answer' => '000',
                 'answerformat' => FORMAT_PLAIN,
-                'fraction' => '1',
+                'fraction' => '0.5',
                 'feedback' => 'No tests.',
                 'feedbackformat' => FORMAT_HTML,
                 'regextests' => null
@@ -106,7 +106,7 @@ class qtype_preg_test_helper extends question_test_helper {
                 'id' => 17,
                 'answer' => '444',
                 'answerformat' => FORMAT_PLAIN,
-                'fraction' => '0.0',
+                'fraction' => '1.0',
                 'feedback' => 'No tests.',
                 'feedbackformat' => FORMAT_HTML,
                 'regextests' => null
@@ -147,13 +147,13 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->numhints = 2;
         $qdata->penalty = 0.3333333;
 
-        $qdata->usecase = false;
+        $qdata->usecase = 1;
         $qdata->correctanswer = '';
-        $qdata->exactmatch = true;
+        $qdata->exactmatch = 1;
         $qdata->notation = 'native';
         $qdata->engine = 'nfa_matcher';
 
-        $qdata->fraction = array( 0 => '1', 1 => '0.9', 2 => '0.8', 3 => '0.5', 4 => '0.0', 5 => '0.0');
+        $qdata->fraction = array( 0 => '0.5', 1 => '0.9', 2 => '0.8', 3 => '0.5', 4 => '1.0', 5 => '0.0');
         $qdata->answer = array(
             0 => '000',
             1 => '111',
