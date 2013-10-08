@@ -323,6 +323,42 @@ class qtype_preg extends qtype_shortanswer {
         return true;
     }
 
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    /**
+     * Initialise question_definition::answers field.
+     * @param question_definition $question the question_definition we are creating.
+     * @param object $questiondata the question data loaded from the database.
+     * @param bool $forceplaintextanswers most qtypes assume that answers are
+     *      FORMAT_PLAIN, and dont use the answerformat DB column (it contains
+     *      the default 0 = FORMAT_MOODLE). Therefore, by default this method
+     *      ingores answerformat. Pass false here to use answerformat. For example
+     *      multichoice does this.
+     */
+    protected function initialise_question_answers(question_definition $question,
+            $questiondata, $forceplaintextanswers = true) {
+        $question->answers = array();
+        if (empty($questiondata->options->answers)) {
+            return;
+        }
+        foreach ($questiondata->options->answers as $a) {
+            $question->answers[$a->id] = $this->make_answer($a);
+            if (!$forceplaintextanswers) {
+                $question->answers[$a->id]->answerformat = $a->answerformat;
+            }
+        }
+    }
+
+    /**
+     * Create a question_answer, or an appropriate subclass for this question,
+     * from a row loaded from the database.
+     * @param object $answer the DB row from the question_answers table plus extra answer fields.
+     * @return question_answer
+     */
+    protected function make_answer($answer) {
+        return new question_answer($answer->id, $answer->answer,
+                    $answer->fraction, $answer->feedback, $answer->feedbackformat);
+    }
+
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
         $qo = parent::import_from_xml($data, $question, $format, $extra);
