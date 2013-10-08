@@ -113,14 +113,14 @@ class qtype_preg extends qtype_shortanswer {
                 array('question' => $question->id), 'id ASC');
 
         // We need separate arrays for answers and extra answer data, so no JOINS there.
-        $extraansfields = $this->extra_answer_fields();
-        $isextraansfields = is_array($extraansfields);
-        $extraanstable = '';
-        $oldextras = array();
-        if ($isextraansfields) {
-            $extraanstable = array_shift($extraansfields);
+        $extraanswerfields = $this->extra_answer_fields();
+        $isextraanswerfields = is_array($extraanswerfields);
+        $extraanswertable = '';
+        $oldanswerextras = array();
+        if ($isextraanswerfields) {
+            $extraanswertable = array_shift($extraanswerfields);
             if (!empty($oldanswers)) {
-                $oldextras = $DB->get_records_sql("SELECT * FROM {{$extraanstable}} WHERE " .
+                $oldanswerextras = $DB->get_records_sql("SELECT * FROM {{$extraanswertable}} WHERE " .
                     'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
             }
         }
@@ -151,31 +151,31 @@ class qtype_preg extends qtype_shortanswer {
                 $maxfraction = $question->fraction[$key];
             }
 
-            if ($isextraansfields) {
+            if ($isextraanswerfields) {
                 // Now check, if this answer contains some tests.
                 if ($this->is_extra_answer_fields_empty($question, $key)) {
                     continue;
                 }
 
-                $extra = array_shift($oldextras);
-                if (!$extra) {
-                    $extra = new stdClass();
-                    $extra->answerid = $answer->id;
+                $answerextra = array_shift($oldanswerextras);
+                if (!$answerextra) {
+                    $answerextra = new stdClass();
+                    $answerextra->answerid = $answer->id;
                     // This slightly duplicates code, but save us looking for
                     // correct default for any possible DB field type.
-                    foreach ($extraansfields as $field) {
+                    foreach ($extraanswerfields as $field) {
                         $fieldarray = $question->$field;
-                        $extra->$field = $fieldarray[$key];
+                        $answerextra->$field = $fieldarray[$key];
                     }
-                    $extra->id = $DB->insert_record($extraanstable, $extra);
+                    $answerextra->id = $DB->insert_record($extraanswertable, $answerextra);
                 } else {
                     // Update answerid anyway, as record may be reused from another answer.
-                    $extra->answerid = $answer->id;
-                    foreach ($extraansfields as $field) {
+                    $answerextra->answerid = $answer->id;
+                    foreach ($extraanswerfields as $field) {
                         $fieldarray = $question->$field;
-                        $extra->$field = $fieldarray[$key];
+                        $answerextra->$field = $fieldarray[$key];
                     }
-                    $DB->update_record($extraanstable, $extra);
+                    $DB->update_record($extraanswertable, $answerextra);
                 }
             }
 
@@ -189,13 +189,13 @@ class qtype_preg extends qtype_shortanswer {
             return $parentresult;
         }
 
-        if ($isextraansfields) {
+        if ($isextraanswerfields) {
             // Delete any left over extra answer fields records.
-            $oldextraids = array();
-            foreach ($oldextras as $oldextra) {
-                $oldextraids[] = $oldextra->id;
+            $oldanswerextraids = array();
+            foreach ($oldanswerextras as $oldextra) {
+                $oldanswerextraids[] = $oldextra->id;
             }
-            $DB->delete_records_list($extraanstable, 'id', $oldextraids);
+            $DB->delete_records_list($extraanswertable, 'id', $oldanswerextraids);
         }
 
 
@@ -287,17 +287,17 @@ class qtype_preg extends qtype_shortanswer {
 
         $extraanswerfields = $this->extra_answer_fields();
         if (is_array($extraanswerfields)) {
-            $answer_extension_table = array_shift($extraanswerfields);
+            $answerextensiontable = array_shift($extraanswerfields);
             // Use LEFT JOIN in case not every answer has extra data.
             $question->options->answers = $DB->get_records_sql("
                     SELECT qa.*, qax." . implode(', qax.', $extraanswerfields) . '
                     FROM {question_answers} qa ' . "
-                    LEFT JOIN {{$answer_extension_table}} qax ON qa.id = qax.answerid
+                    LEFT JOIN {{$answerextensiontable}} qax ON qa.id = qax.answerid
                     WHERE qa.question = ?
                     ORDER BY qa.id", array($question->id));
             if (!$question->options->answers) {
                 echo $OUTPUT->notification('Failed to load question answers from the table ' .
-                        $answer_extension_table . 'for questionid ' . $question->id);
+                        $answerextensiontable . 'for questionid ' . $question->id);
                 return false;
             }
         } else {
