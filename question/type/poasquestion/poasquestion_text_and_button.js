@@ -40,6 +40,12 @@ M.poasquestion_text_and_button = (function() {
      */
     oneachpresscallback : null,
 
+    onclosecallback : null,
+
+    oncancelclicked : null,
+
+    onsaveclicked : null,
+
     /** @var data for module-extender */
     extendeddata : null,
 
@@ -117,8 +123,14 @@ M.poasquestion_text_and_button = (function() {
         self.dialog = $('<div id="preg_authoring_tools_dialog"><p>Loading...</p></div>');
         self.dialog.dialog({
             modal: true,
+            closeOnEscape: true,
             width: self.dialogwidth,
             title: self.dialogtitle,
+            close: function() {
+                if (typeof(self.onclosecallback) === "function") {
+                    self.onclosecallback();
+                }
+            },
             buttons: [
                 {text: "Save", click: self.onsaveclicked},
                 {text: "Cancel", click: self.oncancelclicked}
@@ -136,6 +148,7 @@ M.poasquestion_text_and_button = (function() {
     setup : function (options) {
         self.onfirstpresscallback = options.onfirstpresscallback;
         self.oneachpresscallback = options.oneachpresscallback;
+        self.onclosecallback = options.onclosecallback;
         self.oncancelclicked = options.oncancelclicked;
         self.onsaveclicked = options.onsaveclicked;
         self.extendeddata = options.extendeddata;
