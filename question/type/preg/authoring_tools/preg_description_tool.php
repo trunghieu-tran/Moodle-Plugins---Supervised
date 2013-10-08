@@ -154,27 +154,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     /**
      * Overloaded from qtype_preg_regex_handler.
      */
-    protected function get_engine_node_name($nodetype, $nodesubtype) {
-        switch ($nodesubtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
-                return 'qtype_preg_description_leaf_assert_esc_b';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                return 'qtype_preg_description_leaf_assert_esc_a';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:
-                return 'qtype_preg_description_leaf_assert_esc_z';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-                return 'qtype_preg_description_leaf_assert_esc_g';
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                return 'qtype_preg_description_leaf_assert_circumflex';
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                return 'qtype_preg_description_leaf_assert_dollar';
-        }
-        return parent::get_engine_node_name($nodetype, $nodesubtype);
-    }
-
-    /**
-     * Overloaded from qtype_preg_regex_handler.
-     */
     protected function is_preg_node_acceptable($pregnode) {
         return true;
     }

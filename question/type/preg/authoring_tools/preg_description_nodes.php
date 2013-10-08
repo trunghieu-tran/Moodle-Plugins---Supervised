@@ -417,41 +417,13 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf {
     }
 }
 
-class qtype_preg_description_leaf_assert_esc_b extends qtype_preg_description_leaf {
+class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf {
     public function pattern($node_parent = null, $form = null) {
-        return $this->pregnode->negative
-               ? self::get_form_string('description_wordbreak_neg', $form)
-               : self::get_form_string('description_wordbreak', $form);
-    }
-}
-
-class qtype_preg_description_leaf_assert_esc_a extends qtype_preg_description_leaf {
-    public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string('description_esc_a', $form);
-    }
-}
-
-class qtype_preg_description_leaf_assert_esc_z extends qtype_preg_description_leaf {
-    public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string('description_esc_z', $form);   // TODO: $this->pregnode->negative?
-    }
-}
-
-class qtype_preg_description_leaf_assert_esc_g extends qtype_preg_description_leaf {
-    public function pattern($node_parent = null, $form = null) {
-        return '';  // TODO
-    }
-}
-
-class qtype_preg_description_leaf_assert_circumflex extends qtype_preg_description_leaf {
-    public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string('description_circumflex', $form);
-    }
-}
-
-class qtype_preg_description_leaf_assert_dollar extends qtype_preg_description_leaf {
-    public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string('description_dollar', $form);
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->negative) {
+            $key .= '_neg';
+        }
+        return self::get_form_string($key, $form);
     }
 }
 

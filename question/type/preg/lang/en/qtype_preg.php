@@ -225,12 +225,13 @@ $string['authoring_form_check_strings'] = 'Check the string(s)';
 // TYPE_LEAF_META
 $string['description_empty'] = 'nothing';
 // TYPE_LEAF_ASSERT
-$string['description_circumflex'] = 'beginning of the string';
-$string['description_dollar'] = 'end of the string';
-$string['description_wordbreak'] = 'at a word boundary';
-$string['description_wordbreak_neg'] = 'not at a word boundary';
+$string['description_esc_b_leaf_assert'] = 'a word boundary';
+$string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
+$string['description_esc_g'] = 'TODO';
+$string['description_circumflex_leaf_assert'] = 'beginning of the string';
+$string['description_dollar_leaf_assert'] = 'end of the string';
 // TYPE_LEAF_BACKREF
 $string['description_backref'] = 'back reference to subexpression #{$a->number}';
 $string['description_backref_name'] = 'back reference to subexpression "{$a->name}"';
@@ -543,15 +544,11 @@ $string['description_alt_wcomma_g'] = '{$a->g1} or {$a->g2}';
 $string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
-
-$string['authoring_tool_explain_graph'] = 'explain graph';
-
 $string['explain_subexpression'] = 'subexpression #';
 $string['explain_backref'] = 'the result of subexpression #';
 $string['explain_recursion'] = 'recursion';
 $string['explain_unknow_node'] = 'unknow node';
 $string['explain_unknow_meta'] = 'unknow meta';
-$string['explain_unknow_assert'] = 'unknow assert';
 $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';

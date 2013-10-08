@@ -26,10 +26,43 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         return $lexer->nextToken()->value;
     }
 
-    function test_labels() {
+    function test_charset() {
         $tree = new qtype_preg_syntax_tree_tool();
-        $node = $tree->from_preg_node($this->get_pregnode('\\b'));
-        var_dump($node->label());
+
+        // Single character.
+        $node = $tree->from_preg_node($this->get_pregnode('α'));
+        $this->assertEquals($node->label(), 'α');
+        $this->assertEquals($node->tooltip(), 'character α');
+
+        // Single character in brackets.
+        $node = $tree->from_preg_node($this->get_pregnode('α'));
+        $this->assertEquals($node->label(), 'α');
+        $this->assertEquals($node->tooltip(), 'character α');
+
+        // Some characters in brackets.
+        $node = $tree->from_preg_node($this->get_pregnode('[αя]'));
+        $this->assertEquals($node->label(), '&#91;&#10;α&#10;я&#10;&#93;');
+        $this->assertEquals($node->tooltip(), 'character set&#10;α&#10;я');
+
+        // Negative character set of one character.
+        $node = $tree->from_preg_node($this->get_pregnode('[^α]'));
+        $this->assertEquals($node->label(), '&#91;^&#10;α&#10;&#93;');
+        $this->assertEquals($node->tooltip(), 'negative character set&#10;α');
+
+         // Negative character set of multiple characters.
+        $node = $tree->from_preg_node($this->get_pregnode('[^ab]'));
+        $this->assertEquals($node->label(), '&#91;^&#10;a&#10;b&#10;&#93;');
+        $this->assertEquals($node->tooltip(), 'negative character set&#10;a&#10;b');
+
+        // Single flag.
+        $node = $tree->from_preg_node($this->get_pregnode('\w'));
+        $this->assertEquals($node->label(), '\w');
+        $this->assertEquals($node->tooltip(), 'a word character');
+
+        // Single negative flag.
+        $node = $tree->from_preg_node($this->get_pregnode('\W'));
+        $this->assertEquals($node->label(), '\W');
+        $this->assertEquals($node->tooltip(), 'not a word character');
     }
 
     function test_something() {

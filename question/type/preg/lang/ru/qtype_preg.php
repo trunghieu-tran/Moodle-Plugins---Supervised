@@ -225,12 +225,13 @@ $string['authoring_form_check_strings'] = 'Проверить строку (ст
 // TYPE_LEAF_META
 $string['description_empty'] = 'ничего';
 // TYPE_LEAF_ASSERT
-$string['description_circumflex'] = 'начало строки';
-$string['description_dollar'] = 'конец строки';
-$string['description_wordbreak'] = 'на границе слова';
-$string['description_wordbreak_neg'] = 'не на границе слова';
-$string['description_esc_a'] = 'в начале текста';
-$string['description_esc_z'] = 'в конце текста';
+$string['description_esc_b_leaf_assert'] = 'граница слова';
+$string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
+$string['description_esc_a'] = 'начало текста';
+$string['description_esc_z'] = 'конец текста';
+$string['description_esc_g'] = 'TODO';
+$string['description_circumflex_leaf_assert'] = 'начало строки';
+$string['description_dollar_leaf_assert'] = 'конец строки';
 // TYPE_LEAF_BACKREF
 $string['description_backref'] = 'обратная ссылка на подвыражение #{$a->number}';
 $string['description_backref_name'] = 'обратная ссылка на подвыражение "{$a->name}"';
@@ -543,15 +544,11 @@ $string['description_alt_wcomma_g'] = '{$a->g1} или {$a->g2}';
 $string['description_empty_g'] = 'ничего(form g)';
 
 // Strings for explaining graph
-
-$string['authoring_tool_explain_graph'] = 'объясняющий граф';
-
 $string['explain_subexpression'] = 'подвыражение №';
 $string['explain_backref'] = 'результат подвыражения №';
 $string['explain_recursion'] = 'рекурсия';
 $string['explain_unknow_node'] = 'неизвестный узел';
 $string['explain_unknow_meta'] = 'неизвестный мета-узел';
-$string['explain_unknow_assert'] = 'неизвестное утверждение';
 $string['explain_unknow_charset_flag'] = 'неизвестный флаг набора символов';
 $string['explain_not'] = 'не ';
 $string['explain_any_char'] = 'Любой символ из';
