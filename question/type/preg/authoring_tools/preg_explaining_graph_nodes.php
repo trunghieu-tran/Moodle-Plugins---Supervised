@@ -346,19 +346,11 @@ class qtype_preg_authoring_tool_leaf_meta extends qtype_preg_authoring_tool_leaf
 class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-            return array(get_string('description_circumflex', 'qtype_preg'));
-        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
-            return array(get_string('description_dollar', 'qtype_preg'));
-        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B) {
-            return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
-        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
-            return array(get_string('description_esc_a', 'qtype_preg'));
-        } else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
-            return array(get_string('description_esc_z', 'qtype_preg'));
-        } else {
-            return array(get_string('explain_unknow_assert', 'qtype_preg'));
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->negative) {
+            $key .= '_neg';
         }
+        return array(get_string($key, 'qtype_preg'));
     }
 
     public function get_color() {

@@ -306,14 +306,6 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
 
 class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
-    public function label() {
-        $label = parent::label();
-        if ($this->pregnode->negative) {
-            $label = '<font color="blue">' . get_string('leaf_charset_except', 'qtype_preg') . '</font> ' . $label;
-        }
-        return $label;
-    }
-
     public function tooltip() {
         $start = 0;
         $end = count($this->pregnode->userinscription);
