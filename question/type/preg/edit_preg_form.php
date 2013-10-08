@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-//global $app;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_text_and_button.php');
@@ -52,7 +51,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $repeated[] = $mform->createElement('hidden', 'regextests', '');
         $repeated[] = $mform->createElement('preg_text_and_button', 'answer', $label, 'regex_test');
         $repeated[] = $mform->createElement('select', 'fraction', get_string('grade'), $gradeoptions);
-        $repeated[] = $mform->createElement('editor', 'feedback', get_string('feedback', 'question'), array('rows' => 5), $this->editoroptions);
+        $repeated[] = $mform->createElement('editor', 'feedback', get_string('feedback', 'question'),
+            array('rows' => 5), $this->editoroptions);
         $repeatedoptions['answer']['type'] = PARAM_RAW;
         $repeatedoptions['regextests']['type'] = PARAM_RAW;
         $repeatedoptions['fraction']['default'] = 0;
@@ -179,12 +179,14 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $langselect = $mform->getElement('langid');
         $langs = $langselect->getSelected();
         $langobj = block_formal_langs::lang_object($langs[0]);
-        $hintoptions = array('hintmatchingpart' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintcolouredstring', 'qtype_preg')),
+        $hintoptions = array(
+            'hintmatchingpart' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintcolouredstring', 'qtype_preg')),
             'hintnextchar' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextchar', 'qtype_preg')),
             'hintnextlexem' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()))
         );
 
-        $repeated[] = $mform->createElement('select', 'interactivehint', get_string('hintbtn', 'qbehaviour_adaptivehints', ''), $hintoptions);
+        $repeated[] = $mform->createElement('select', 'interactivehint',
+            get_string('hintbtn', 'qbehaviour_adaptivehints', ''), $hintoptions);
         return array($repeated, $repeatedoptions);
     }
 
@@ -297,7 +299,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
-        // If no correct answer is entered, we should think it is correct to not force techer; otherwise we must check that it match with at least one 100% grade answer.
+        // If no correct answer is entered, we should think it is correct to not force teacher;
+        // otherwise we must check that it match with at least one 100% grade answer.
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $passhintgradeborder = false;
         $fractions = $data['fraction'];
@@ -374,23 +377,4 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return 'preg';
     }
 
-    /*protected function data_preprocessing_answers($question, $withanswerfiles = false) {
-        $question = parent::data_preprocessing_answers($question, $withanswerfiles);
-
-        if (isset($question->id)) {
-            global $DB;
-
-            $query = 'SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-                'answerid IN (SELECT id FROM {question_answers} WHERE question = ?)';
-            $regextests = $DB->get_records_sql(
-                $query,
-                array($question->id)
-            );
-            foreach ($regextests as $tests) {
-                $question->regextests[] = $tests->regextests;
-            }
-        }
-
-        return $question;
-    }*/
 }
