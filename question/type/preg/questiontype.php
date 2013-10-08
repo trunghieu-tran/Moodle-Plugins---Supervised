@@ -107,6 +107,18 @@ class qtype_preg extends qtype_shortanswer {
             $question->uselexemhint = false;
         }
 
+        // Perform sanity checks on fractional grades.
+        $maxfraction = -1;
+        foreach ($question->answer as $key => $answerdata) {
+            if ($question->fraction[$key] > $maxfraction) {
+                $maxfraction = $question->fraction[$key];
+            }
+        }
+        if ($maxfraction != 1) {
+            $result->error = get_string('fractionsnomax', 'question', $maxfraction * 100);
+            return $result;
+        }
+
         $context = $question->context;
 
         $oldanswers = $DB->get_records('question_answers',
@@ -124,8 +136,6 @@ class qtype_preg extends qtype_shortanswer {
                     'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
             }
         }
-
-        $maxfraction = -1;
 
         // Insert all the new answers.
         foreach ($question->answer as $key => $answerdata) {
@@ -146,10 +156,6 @@ class qtype_preg extends qtype_shortanswer {
 
             $this->fill_answer_fields($answer, $question, $key, $context);
             $DB->update_record('question_answers', $answer);
-
-            if ($question->fraction[$key] > $maxfraction) {
-                $maxfraction = $question->fraction[$key];
-            }
 
             if ($isextraanswerfields) {
                 // Check, if this answer contains some extra field data.
@@ -201,12 +207,6 @@ class qtype_preg extends qtype_shortanswer {
         }
 
         $this->save_hints($question);
-
-        // Perform sanity checks on fractional grades.
-        if ($maxfraction != 1) {
-            $result->error = get_string('fractionsnomax', 'question', $maxfraction * 100);
-            return $result;
-        }
 
     }
 
