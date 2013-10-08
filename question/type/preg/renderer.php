@@ -146,10 +146,10 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return get_string('tobecontinued', 'qtype_preg', null);
     }
 
-    /** Renders correct icon for full match, incorrect - for not full.*/
-    public function render_match_icon($matchresults) {
+    /** Renders correct icon if $correct = true, incorrect otherwise.*/
+    public function render_match_icon($correct) {
         $fraction = 0;
-        if ($matchresults->full) {
+        if ($correct) {
             $fraction = 1;
         }
         return $this->feedback_image($fraction);
