@@ -31,11 +31,18 @@ require_once($CFG->dirroot . '/question/engine/bank.php');
 class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
 
     protected $qtypeobj;
+    protected $oldquestionid;
+    protected $newquestionid;
+    protected $questioncreated;
     protected $currentanswer;
 
     public function __construct($plugintype, $pluginname, $step) {
         parent::__construct($plugintype, $pluginname, $step);
         $this->qtypeobj = question_bank::get_qtype($this->pluginname);
+        $this->oldquestionid = -1;
+        $this->newquestionid = -1;
+        $this->questioncreated = false;
+        $this->currentanswer = null;
     }
 
     /**
@@ -69,8 +76,12 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
         $extra = $this->qtypeobj->extra_answer_fields();
         $tablename = array_shift($extra);
 
-        $data['answerid'] = $this->currentanswer['newid'];
-        /*$newid =*/ $DB->insert_record($tablename, $data);
+        if ($this->questioncreated) {
+            $data['answerid'] = $this->currentanswer['newid'];
+            /*$newid =*/ $DB->insert_record($tablename, $data);
+        } else {
+            $DB->update_record($tablename, $data);
+        }
     }
 
     /**
@@ -82,18 +93,18 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
         $oldid = $data['id'];
 
         // Detect if the question is created or mapped.
-        $oldquestionid   = $this->get_old_parentid('question');
-        $newquestionid   = $this->get_new_parentid('question');
-        $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
+        $this->oldquestionid   = $this->get_old_parentid('question');
+        $this->newquestionid   = $this->get_new_parentid('question');
+        $this->questioncreated = $this->get_mappingid('question_created', $this->oldquestionid) ? true : false;
 
         // If the question has been created by restore, we need to create its qtype_... too.
-        if ($questioncreated) {
+        if ($this->questioncreated) {
             $extraquestionfields = $this->qtypeobj->extra_question_fields();
             $tablename = array_shift($extraquestionfields);
 
             // Adjust some columns.
             $qtfield = $this->qtypeobj->questionid_column_name();
-            $data[$qtfield] = $newquestionid;
+            $data[$qtfield] = $this->newquestionid;
 
             // Insert record.
             $newitemid = $DB->insert_record($tablename, $data);
