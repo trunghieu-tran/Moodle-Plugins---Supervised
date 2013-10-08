@@ -148,9 +148,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         foreach ($question->options->answers as $answer) {
             foreach ($extrafields as $field) {
-                // See hack comment in data_preprocessing_answers.
-                unset($this->_form->_defaultValues["$field[$key]"]);
-                $extrafieldsdata[$field][$key] = $answer->$field;
+                $this->data_preprocessing_extra_answer_field($extrafieldsdata, $answer, $field, $key);
             }
             $key++;
         }
@@ -160,6 +158,18 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         return $question;
+    }
+
+    /**
+     * Perfmorm preprocessing for particular extra answer field.
+     *
+     * Questions with non-trivial DB - form element relationship will
+     * want to override this.
+     */
+    protected function data_preprocessing_extra_answer_field(&$extrafieldsdata, $answer, $field, $key) {
+        // See hack comment in data_preprocessing_answers.
+        unset($this->_form->_defaultValues["$field[$key]"]);
+        $extrafieldsdata[$field][$key] = $answer->$field;
     }
 
     protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
