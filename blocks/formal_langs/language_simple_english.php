@@ -1,10 +1,24 @@
-<?php 
+<?php
+// This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Formal Languages block is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Formal Languages block is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Defines a simple  english language lexer for correctwriting question type.
  *
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Dmitriy Mamontov, Sergey Pashaev Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -25,10 +39,12 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
      */
     protected function preprocess_for_scan($string) {
         return $string;
-        //return str_replace('’', "'", $string);
     }
     public function name() {
         return 'simple_english';
+    }
+    public function lexem_name() {
+        return get_string('word', 'block_formal_langs');
     }
 }
 

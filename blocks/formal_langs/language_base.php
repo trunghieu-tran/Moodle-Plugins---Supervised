@@ -1,4 +1,18 @@
 <?php
+// This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Formal Languages block is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Formal Languages block is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Defines base language class.
  *
@@ -64,6 +78,11 @@ abstract class block_formal_langs_abstract_language {
     abstract public function description();
 
     /**
+     * User-visible default lexem name for the language.
+     */
+    abstract public function lexem_name();
+
+    /**
      * Returns true if this language has parser enabled.
      *
      * @return boolean
@@ -102,8 +121,8 @@ abstract class block_formal_langs_abstract_language {
      *  @param string $string string
      *  @return block_formal_langs_processed_string string
      */
-     public function create_from_string($string) {
-        $result = new block_formal_langs_processed_string($this);
+     public function create_from_string($string, $classname = 'block_formal_langs_processed_string') {
+        $result = new $classname($this);
         $result->string = $string;
         return $result;
      }
@@ -115,8 +134,8 @@ abstract class block_formal_langs_abstract_language {
       *  @param string|null $string string data
       *  @return block_formal_langs_processed_string processed string
       */
-    public function create_from_db($tablename, $tableid, $string = null) {
-        $result = new block_formal_langs_processed_string($this);
+    public function create_from_db($tablename, $tableid, $string = null, $classname = 'block_formal_langs_processed_string') {
+        $result = new $classname($this);
         $result->set_table_params($tablename,$tableid);
         $result->string  = $string;
         return $result;
@@ -175,7 +194,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         $stream = new block_formal_langs_token_stream();
         $stream->tokens = array();
         $stream->errors = array();
-        if ($string !== '') {
+        if (textlib::strlen(trim($string)) != 0) {
             StringStreamController::createRef('str', $string);
             $pseudofile = fopen('string://str', 'r');
             $this->scaner = new $scanerclass($pseudofile);
@@ -247,7 +266,11 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
      * @var string
      */
     private $description;
-
+    /**
+     * Names for lexemes, serialized in base
+     * @var string names
+     */
+    private $lexemenames;
     /**
      * True if parser enabled, false otherwise.
      * @var boolean.
@@ -257,7 +280,7 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
     public function __construct($id, $version=1, $langdbrecord = NULL) {
 
         $this->id = $id;
-
+        $this->lexemenames = $langdbrecord->lexemename;
         if ($langdbrecord) {
             // get all info from it            
         } else {
@@ -308,6 +331,12 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
      */
     public function description() {
         return $this->description;
+    }
+
+    public function lexem_name() {
+        $lang  = current_language();
+        $names  = (array)json_decode($this->lexemenames);
+        return  $names[$lang];
     }
 
 }
