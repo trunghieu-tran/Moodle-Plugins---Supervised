@@ -183,7 +183,7 @@ class qtype_preg extends qtype_shortanswer {
 
         // We don't want to call shortanswer question function, since it will repeat the steps to save answers.
         $parentresult = question_type::save_question_options($question);
-        
+
         if ($parentresult !== null) {
             // Parent function returns null if all is OK.
             return $parentresult;
@@ -197,7 +197,6 @@ class qtype_preg extends qtype_shortanswer {
             }
             $DB->delete_records_list($extraanswertable, 'id', $oldanswerextraids);
         }
-
 
         // Delete any left over old answer records.
         $fs = get_file_storage();
@@ -377,7 +376,7 @@ class qtype_preg extends qtype_shortanswer {
         return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
     }
 
-    public function save_hints($formdata, $withparts = false) {// TODO - remove in 2.6
+    public function save_hints($formdata, $withparts = false) {// TODO - remove in 2.6.
         global $DB;
         $context = $formdata->context;
 
