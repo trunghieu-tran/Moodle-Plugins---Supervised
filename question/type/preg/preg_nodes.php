@@ -83,7 +83,7 @@ class qtype_preg_userinscription {
     /** General case, contains the same string as typed by user. */
     const TYPE_GENERAL = 'userinscription_general';
     /** Flag that needs an additional description that must be stored in the lang file (unicode properties names etc). */
-    const TYPE_CHARSET_FLAG = 'userinscription_charset_flag';
+    const TYPE_FLAG = 'userinscription_flag';
 
     /** String with the leaf itself. */
     public $data = '';

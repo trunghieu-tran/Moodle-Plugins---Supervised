@@ -2440,7 +2440,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue(count($token->value->userinscription) == 1);
         $this->assertTrue($token->value->userinscription[0]->data === '\p{L}');
-        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_FLAG);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -2452,7 +2452,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue(count($token->value->userinscription) == 8);
         $this->assertTrue($token->value->userinscription[1]->data === '\pC');
-        $this->assertTrue($token->value->userinscription[1]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($token->value->userinscription[1]->type === qtype_preg_userinscription::TYPE_FLAG);
         $this->assertTrue($token->value->userinscription[2]->data === 'a');
         $this->assertTrue($token->value->userinscription[2]->type === qtype_preg_userinscription::TYPE_GENERAL);
         $this->assertTrue($token->value->userinscription[3]->data === 'b-d');
@@ -2460,7 +2460,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->userinscription[4]->type === qtype_preg_userinscription::TYPE_GENERAL);
         $this->assertTrue($token->value->userinscription[5]->data === '\x00-\xff');
         $this->assertTrue($token->value->userinscription[6]->data === '[:alpha:]');
-        $this->assertTrue($token->value->userinscription[6]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->assertTrue($token->value->userinscription[6]->type === qtype_preg_userinscription::TYPE_FLAG);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_ERROR);

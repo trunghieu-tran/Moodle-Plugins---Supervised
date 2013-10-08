@@ -136,6 +136,7 @@ $string['plb_node_assert']             = 'положительный назад 
 $string['nlb_node_assert']             = 'отрицательный назад смотрящий ассерт';
 $string['subexpr_node_subexpr']        = 'подвыражение';
 $string['onceonly_node_subexpr']       = 'подвыражение захватываемое единажды';
+$string['grouping_node_supbatt']       = 'группировка';
 $string['subexpr_node_cond_subexpr']   = '"условное"-подвыражение с проверкой захвата подвыражения';
 $string['recursion_node_cond_subexpr'] = 'рекурсивное условное подвыражение';
 $string['define_node_cond_subexpr']    = '"определение"-условного подвыражения';

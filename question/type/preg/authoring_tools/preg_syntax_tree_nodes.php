@@ -104,16 +104,13 @@ abstract class qtype_preg_syntax_tree_node {
      * Highlights them if needed.
      */
     protected static function userinscription_to_string($userinscription, $fortooltip) {
-        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
+        if ($userinscription->type === qtype_preg_userinscription::TYPE_FLAG) {
             if (!$fortooltip) {
-                return '<font color="blue">' .
-                            ($userinscription->data != '.'
-                            ? $userinscription->data
-                            : get_string('description_charflag_dot', 'qtype_preg')) .
-                       '</font>';
-                //return '<font color="blue">' . $userinscription->data . '</font>';
+                return $userinscription->data != '.'
+                           ? $userinscription->data
+                           : get_string('description_charflag_dot', 'qtype_preg');
             } else if ($userinscription->data != '.') {
-                return get_string('description_charflag_slash' . $userinscription->data[1], 'qtype_preg');
+                return get_string('description_charflag_slash' . textlib::strtolower($userinscription->data[1]), 'qtype_preg');
             } else {
                 return get_string('description_charflag_dot', 'qtype_preg');
             }
@@ -135,14 +132,14 @@ abstract class qtype_preg_syntax_tree_node {
                          );
 
         for ($code = 1; $code <= 0x20; $code++) {
-            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
+            $replacement = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
             if (!$fortooltip) {
                 $replacement = '<font color="blue">' . $replacement . '</font>';
             }
             $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
         }
         foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
-            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
+            $replacement = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
             if (!$fortooltip) {
                 $replacement = '<font color="blue">' . $replacement . '</font>';
             }
@@ -155,8 +152,8 @@ abstract class qtype_preg_syntax_tree_node {
             $result = str_replace($key, $value, $result);
         }
 
-        if (strpos($result, '\x') === false) {
-            $result = str_replace('\\', '', $result);
+        if (textlib::strpos($result, '\x') === false) {
+            $result = qtype_poasquestion_string::replace('\\', '', $result);
         }
         return $result;
     }
@@ -206,14 +203,14 @@ abstract class qtype_preg_syntax_tree_node {
                $this->pregnode->position->indlast <= $context->selection->indlast;
     }
 
-    protected function get_style($context) {
+    public function get_style($context) {
         $label = $this->label();
         $tooltip = $this->tooltip();
         $shape = $this->shape();
         $color = $this->color();
         $style = $this->style();
         $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
-        $result = "id = \"$id\", label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
+        $result = "id = \"$id\", label = <$label>, tooltip = \"$tooltip\", shape = $shape, color = $color";
         if ($context->handler->is_node_generated($this->pregnode)) {
             $style .= ', filled';
             $result .= ', fillcolor = lightgrey';
@@ -223,28 +220,38 @@ abstract class qtype_preg_syntax_tree_node {
         return '[' . $result . ']';
     }
 
-    protected function label() {
+    public function label() {
         $label = '';
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, false)) . '&#10;';
+        $count = count($this->pregnode->userinscription);
+        foreach ($this->pregnode->userinscription as $i => $userinscription) {
+            $label .= shorten_text(self::userinscription_to_string($userinscription, false));
+            if ($i != $count - 1) {
+                $label .= '&#10;';
+            }
         }
         return $label;
     }
 
-    protected function tooltip() {
-        // Almost all nodes use its type as string key.
-        return get_string($this->pregnode->type, 'qtype_preg');
+    public function tooltip() {
+        $result = '';
+        if ($this->pregnode->subtype != '') {
+            $result = get_string($this->pregnode->subtype, 'qtype_preg');
+        }
+        if ($result == '') {
+            $result = get_string($this->pregnode->type, 'qtype_preg');
+        }
+        return $result;
     }
 
-    protected function shape() {
+    public function shape() {
       return 'ellipse';
     }
 
-    protected function color() {
+    public function color() {
         return count($this->pregnode->errors) > 0 ? 'red' : 'black';
     }
 
-    protected function style() {
+    public function style() {
         return 'solid';
     }
 }
@@ -262,7 +269,7 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
         return array($dotscript, $style);
     }
 
-    protected function shape() {
+    public function shape() {
         return 'rectangle';
     }
 }
@@ -299,21 +306,15 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
 
 class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        $label = '';
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, false)) . '&#10;';
-        }
+    public function label() {
+        $label = parent::label();
         if ($this->pregnode->negative) {
             $label = '<font color="blue">' . get_string('leaf_charset_except', 'qtype_preg') . '</font> ' . $label;
         }
-        /*[&lt;]
-        &#91;&#10;&#38;&#10;l&#10;t&#10;;&#10;&#93;&#10;
-        var_dump($label);*/
-        return '<' . $label . '>';
+        return $label;
     }
 
-    protected function tooltip() {
+    public function tooltip() {
         $start = 0;
         $end = count($this->pregnode->userinscription);
         if (count($this->pregnode->errors) > 0) {
@@ -328,7 +329,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         if (count($this->pregnode->userinscription) > 1) {
             $start++;
             $end--;
-        } else if ($end == 1 && $this->pregnode->userinscription[0]->type == qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
+        } else if ($end == 1 && $this->pregnode->userinscription[0]->type == qtype_preg_userinscription::TYPE_FLAG) {
             $tooltip = '';
         }
         for ($i = $start; $i < $end; ++$i) {
@@ -343,41 +344,29 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
 class qtype_preg_syntax_tree_leaf_meta extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
-    }
-
-    protected function tooltip() {
+    public function label() {
         return get_string($this->pregnode->subtype, 'qtype_preg');
     }
 }
 
 class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
 
-    protected function style() {
+    public function style() {
         return 'dashed';
-    }
-
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string($this->pregnode->subtype, 'qtype_preg');
     }
 }
 
 class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
 
-    protected function style() {
+    public function style() {
         return 'rounded';
     }
 
-    protected function label() {
-        return '"&#92;&#92;' . $this->pregnode->number . '"';
+    public function label() {
+        return '&#92;&#92; ' . $this->pregnode->number;
     }
 
-    protected function tooltip() {
+    public function tooltip() {
         $a = new stdClass;
         $a->number = $this->pregnode->number;
         return get_string('description_backref', 'qtype_preg', $a);
@@ -386,85 +375,59 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
 
 class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 
-    protected function style() {
+    public function style() {
         return 'diagonals';
     }
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
-
-    protected function tooltip() {
-        return get_string($this->pregnode->type, 'qtype_preg')
-                . ' \\"'
-                . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg')
-                . '\\"';
+    public function tooltip() {
+        return parent::tooltip() . ' \\"' . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg') . '\\"';
     }
 }
 
 class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string('leaf_recursion', 'qtype_preg') . ' ' . $this->pregnode->number . '"';
+    public function label() {
+        return get_string($this->pregnode->type, 'qtype_preg') . ' ' . $this->pregnode->number;
     }
 }
 
 class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
-    
-    protected function tooltip() {
-        return get_string('leaf_control', 'qtype_preg') . ' ' . parent::label();
-    }
 }
 
 class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_infinite_quant extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_concat extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"&#8226;"';
+    public function label() {
+        return '&#8226;';
     }
 }
 
 class qtype_preg_syntax_tree_node_alt extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
+    public function label() {
         if ($this->pregnode->number > 0) {
-            return '"' . parent::label() . " #" . $this->pregnode->number . '"';
+            return parent::label() . " #" . $this->pregnode->number;
         }
-        return '"' . parent::label() . '"';
+        return parent::label();
     }
 
-    protected function tooltip() {
+    public function tooltip() {
         if ($this->pregnode->number > 0) {
             return parent::tooltip() . " #" . $this->pregnode->number;
         }
@@ -474,22 +437,19 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . get_string('node_error', 'qtype_preg') . '"';
+    public function label() {
+        return get_string($this->pregnode->type, 'qtype_preg');
     }
 
-    protected function tooltip() {
+    public function tooltip() {
         return $this->pregnode->error_string();
     }
 
-    protected function color() {
+    public function color() {
         return 'red';
     }
 }
