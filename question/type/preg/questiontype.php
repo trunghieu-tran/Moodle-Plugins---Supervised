@@ -152,7 +152,7 @@ class qtype_preg extends qtype_shortanswer {
             }
 
             if ($isextraanswerfields) {
-                // Now check, if this answer contains some tests.
+                // Check, if this answer contains some extra field data.
                 if ($this->is_extra_answer_fields_empty($question, $key)) {
                     continue;
                 }
@@ -161,20 +161,14 @@ class qtype_preg extends qtype_shortanswer {
                 if (!$answerextra) {
                     $answerextra = new stdClass();
                     $answerextra->answerid = $answer->id;
-                    // This slightly duplicates code, but save us looking for
-                    // correct default for any possible DB field type.
-                    foreach ($extraanswerfields as $field) {
-                        $fieldarray = $question->$field;
-                        $answerextra->$field = $fieldarray[$key];
-                    }
+                    // Avoid looking for correct default for any possible DB field type
+                    // by setting real values.
+                    $this->fill_extra_answer_fields($answerextra, $question, $key, $context, $extraanswerfields);
                     $answerextra->id = $DB->insert_record($extraanswertable, $answerextra);
                 } else {
-                    // Update answerid anyway, as record may be reused from another answer.
+                    // Update answerid, as record may be reused from another answer.
                     $answerextra->answerid = $answer->id;
-                    foreach ($extraanswerfields as $field) {
-                        $fieldarray = $question->$field;
-                        $answerextra->$field = $fieldarray[$key];
-                    }
+                    $this->fill_extra_answer_fields($answerextra, $question, $key, $context, $extraanswerfields);
                     $DB->update_record($extraanswertable, $answerextra);
                 }
             }
@@ -220,44 +214,60 @@ class qtype_preg extends qtype_shortanswer {
      * Returns true is answer with the $key is empty in the question data and should not be saved in DB.
      *
      * The questions with non-standard uses for question_answers table will want to overload this.
-     * @param object $questionform This holds the information from the question editing form.
+     * @param object $questiondata This holds the information from the question editing form or import.
      * @param int $key A key of the answer in question.
      * @return bool True if answer shouldn't be saved in DB.
      */
-    protected function is_answer_empty($questionform, $key) {
-        return trim($questionform->answer[$key]) == '' && $questionform->fraction[$key] == 0 &&
-                    html_is_blank($questionform->feedback[$key]['text']);
+    protected function is_answer_empty($questiondata, $key) {
+        return trim($questiondata->answer[$key]) == '' && $questiondata->fraction[$key] == 0 &&
+                    html_is_blank($questiondata->feedback[$key]['text']);
     }
 
-    
     /**
      * Change $answer, filling necessary fields for the question_answers table.
      *
      * The questions with non-standard uses for question_answers table will want to overload this.
      * @param stdClass $answer Object to save data.
-     * @param object $questionform This holds the information from the question editing form.
+     * @param object $questiondata This holds the information from the question editing form or import.
      * @param int $key A key of the answer in question.
      * @param $context needed for working with files.
      */
-    protected function fill_answer_fields($answer, $questionform, $key, $context) {
-        $answer->answer   = $questionform->answer[$key];
-        $answer->fraction = $questionform->fraction[$key];
-        $answer->feedback = $this->import_or_save_files($questionform->feedback[$key],
+    protected function fill_answer_fields($answer, $questiondata, $key, $context) {
+        $answer->answer   = $questiondata->answer[$key];
+        $answer->fraction = $questiondata->fraction[$key];
+        $answer->feedback = $this->import_or_save_files($questiondata->feedback[$key],
                 $context, 'question', 'answerfeedback', $answer->id);
-        $answer->feedbackformat = $questionform->feedback[$key]['format'];
+        $answer->feedbackformat = $questiondata->feedback[$key]['format'];
     }
 
     /**
-     * Returns true if extra answer fields for answerwith the $key is empty 
+     * Returns true if extra answer fields for answer with the $key is empty 
      * in the question data and should not be saved in DB.
      *
      * Questions where extra answer fields are optional will want to overload this.
-     * @param object $questionform This holds the information from the question editing form.
+     * @param object $questiondata This holds the information from the question editing form or import.
      * @param int $key A key of the answer in question.
-     * @return bool True if answer shouldn't be saved in DB.
+     * @return bool True if extra answer data shouldn't be saved in DB.
      */
-    protected function is_extra_answer_fields_empty($questionform, $key) {
-        return !isset($questionform->regextests) || trim($questionform->regextests[$key]) == '';
+    protected function is_extra_answer_fields_empty($questiondata, $key) {
+        return !isset($questiondata->regextests) || trim($questiondata->regextests[$key]) == '';
+    }
+
+    /**
+     * Change $answerextra, filling necessary fields for the extra answer fields table.
+     *
+     * The questions may want to overload it to save files or do other data processing.
+     * @param stdClass $answerextra Object to save data.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @param $context needed for working with files.
+     */
+    protected function fill_extra_answer_fields($answerextra, $questiondata, $key, $context, $extraanswerfields) {
+        foreach ($extraanswerfields as $field) {
+            // The $questiondata->$field[$key] won't work in PHP.
+            $fieldarray = $questiondata->$field;
+            $answerextra->$field = $fieldarray[$key];
+        }
     }
 
     // TODO - delete when this will be in the core (hopefully 2.6).
