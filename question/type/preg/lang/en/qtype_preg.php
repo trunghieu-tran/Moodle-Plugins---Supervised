@@ -136,6 +136,7 @@ $string['plb_node_assert']             = 'positive lookbehind assert';
 $string['nlb_node_assert']             = 'negative lookbehind assert';
 $string['subexpr_node_subexpr']        = 'subexpression';
 $string['onceonly_node_subexpr']       = 'once-only subexpression';
+$string['grouping_node_supbatt']       = 'grouping';
 $string['subexpr_node_cond_subexpr']   = '"subexpression"-conditional subexpression';
 $string['recursion_node_cond_subexpr'] = 'recursive conditional subexpression';
 $string['define_node_cond_subexpr']    = '"define"-conditional subexpression';

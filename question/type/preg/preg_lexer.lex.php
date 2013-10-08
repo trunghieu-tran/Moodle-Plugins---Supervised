@@ -602,7 +602,7 @@ class qtype_preg_lexer extends JLexBase  {
      */
     protected function form_simple_assertion($text, $classname, $negative = false) {
         $node = new $classname($negative);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_FLAG)));
         $this->set_node_modifiers($node);
         return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
     }
@@ -613,7 +613,7 @@ class qtype_preg_lexer extends JLexBase  {
         $node = new qtype_preg_leaf_charset();
         $uitype = $subtype === qtype_preg_charset_flag::SET
                 ? qtype_preg_userinscription::TYPE_GENERAL
-                : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
+                : qtype_preg_userinscription::TYPE_FLAG;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text, $uitype)));
         $node->subtype = $subtype;
         $node->israngecalculated = false;
@@ -766,7 +766,7 @@ class qtype_preg_lexer extends JLexBase  {
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_FLAG);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
@@ -7543,7 +7543,7 @@ array(
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_FLAG);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -7579,7 +7579,7 @@ array(
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_FLAG);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -8138,7 +8138,7 @@ array(
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_FLAG);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
