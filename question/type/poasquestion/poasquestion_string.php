@@ -98,9 +98,9 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
      * @param str substring.
      * @return mixed the position of the substring if found, false otherwise.
      */
-    public function contains($str) {
+    public function contains($str, $offset = 0) {
         $str = (string)$str;
-        return self::strpos($this->fstring, $str);
+        return self::strpos($this->fstring, $str, $offset);
     }
 
     /**

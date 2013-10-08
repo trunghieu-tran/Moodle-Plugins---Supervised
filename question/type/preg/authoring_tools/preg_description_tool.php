@@ -217,29 +217,23 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param int $rangelengthmax limit for charset ranges in which it is displayed as a enum of characters
      * @return string description.
      */
-    public function description($numbering_pattern, $wholepattern=null, $charsetuserinscr=false, $rangelengthmax=5) {
+    public function description($numbering_pattern, $wholepattern = null, $charsetuserinscr = false, $rangelengthmax = 5) {
         $this->state->reset();// restore default state
         $backupoptions = $this->options;// save original options
-        $this->options->charsetuserinscription  = (bool)$charsetuserinscr;
-        $this->options->rangelengthmax          = (int)$rangelengthmax;
-        // make description
+        $this->options->charsetuserinscription = (bool)$charsetuserinscr;
+        $this->options->rangelengthmax = (int)$rangelengthmax;
+
+        $string = '';
         if (isset($this->dst_root)) {
             $string = $this->dst_root->description($numbering_pattern, null, null);
-            $string = $this->postprocessing($string);
-        } else {
-            $string = 'tree was not built';
+            $string = preg_replace('%;((?:</span>)?)]%u', '\1]', $string);   // Postprocessing
         }
         // put string into $wholepattern
-        if ($wholepattern !== null && $wholepattern !== '') {
-            $string = str_replace('%s', $string, $wholepattern);
+        if (!empty($wholepattern)) {
+            $string = qtype_poasquestion_string::replace('%s', $string, $wholepattern);
         }
         $this->options = $backupoptions; // restore original options
         return $string;
-    }
-
-    private function postprocessing($s) {
-        $result = preg_replace('%;((?:</span>)?)]%', '\1]', $s);
-        return $result;
     }
 
     /**
