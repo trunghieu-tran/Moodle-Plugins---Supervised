@@ -43,14 +43,17 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 //Other necessary requires
 
-class qtype_correctwriting_lexical_analyzer {
-    protected $question;//A reference to the question object with necessary data (language id, answers, threshold etc)
-    protected $language;//Language object - contains scaner, parser etc
-    protected $errors;//Array of error objects - teacher errors when entering answer
+class qtype_correctwriting_lexical_analyzer /*extends qtype_correctwriting_abstract_analyzer*/ {
 
-    protected $mistakes;//Array of mistake objects - student errors (merged from all stages)
+    protected $question;// TODO - delete when inheriting from abstract_analyzer.
+    protected $language;// TODO - delete when inheriting from abstract_analyzer.
+    
 
-    protected $fitness;//Fitness, used to choose appropriate analyzer
+    protected $errors;// Array of error objects - teacher errors when entering answer.
+
+    protected $mistakes;// Array of mistake objects - student errors (merged from all stages).
+
+    protected $fitness;// Fitness, used to choose appropriate analyzer.
     /**
      * A string pair with best matches, which can be passed to sequence analyzer
      * @var qtype_correctwriting_string_pair
@@ -163,7 +166,12 @@ class qtype_correctwriting_lexical_analyzer {
         return $this->errors;
     }
 
-    //Other necessary access methods
+    // Form and DB related functions.
+    public function float_form_fields() {
+        return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false), //Lexical error threshold field
+                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false)      //Lexical error weight field
+                    );
+    }
 }
 
 ?>

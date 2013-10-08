@@ -47,6 +47,17 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         return $output;
     }
 
+    /**
+     * All work is done is  qtype_correctwriting_renderer::specific_feedback_with_options,
+     * so we don't need to return anythong from this functions, also it leads to duplicating
+     * of output
+     * @param question_attempt $qa
+     * @return string
+     */
+    public function specific_feedback(question_attempt $qa) {
+        return '';
+    }
+
     protected function specific_feedback_with_options(question_attempt $qa, question_display_options $options) {
         global $PAGE;
         $question = $qa->get_question();
