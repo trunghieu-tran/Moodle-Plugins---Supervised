@@ -124,33 +124,24 @@ abstract class qtype_preg_description_node {
         //return str_replace('%s', $s, str_replace('%n', $this->pregnode->id, $numbering_pattern));
         $result = $s;
         $classes = array();
-        $color = '';
+        $color = 'white';
+        $selected = $this->pregnode->position->indfirst >= $this->handler->get_options()->selection->indfirst &&
+                    $this->pregnode->position->indlast <= $this->handler->get_options()->selection->indlast;
 
-        // highlight generated nodes
+        // Highlight generated and selected nodes.
         if ($this->handler->is_node_generated($this->pregnode)) {
-            $color = 'grey';
+            $color = 'lightgrey';
+        }
+        if ($selected) {
+            $color = 'yellow';
         }
 
         if ($classes !== array() || $color !== '') {
             $classesstr = ' class="'.implode(' ', $classes).'"';
             $stylestr = ' style="background: '.$color.'"';
-            $result = '<span' .
-                    $classesstr .
-                    $stylestr .
-                    '>' .
-                    $result .
-                    '</span>';
+            $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
         }
 
-        // highlight selected node
-        if (!$this->handler->state->startofselectionfinded && $this->handler->get_options()->selection->indfirst >= $this->pregnode->position->indfirst) {
-            $this->handler->state->startofselectionfinded = true;
-            $result = '<span style="background:yellow">' . $result;
-        }
-        if (!$this->handler->state->endofselectionfinded && $this->handler->get_options()->selection->indlast >= $this->pregnode->position->indlast) {
-            $this->handler->state->endofselectionfinded = true;
-            $result = '</span>' . $result;
-        }
         return $result;
     }
 }
