@@ -218,15 +218,12 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @return string description.
      */
     public function description($numbering_pattern, $wholepattern=null, $charsetuserinscr=false, $rangelengthmax=5) {
-
-        // set up options
         $this->state->reset();// restore default state
         $backupoptions = $this->options;// save original options
         $this->options->charsetuserinscription  = (bool)$charsetuserinscr;
         $this->options->rangelengthmax          = (int)$rangelengthmax;
         // make description
         if (isset($this->dst_root)) {
-            // var_dump(123);
             $string = $this->dst_root->description($numbering_pattern, null, null);
             $string = $this->postprocessing($string);
         } else {
@@ -241,7 +238,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     }
 
     private function postprocessing($s) {
-
         $result = preg_replace('%;((?:</span>)?)]%', '\1]', $s);
         return $result;
     }
@@ -250,7 +246,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * Calling default description() with default params
      */
     public function default_description() {
-
         return $this->description('<span class="description_node_%n">%s</span>');
     }
 
