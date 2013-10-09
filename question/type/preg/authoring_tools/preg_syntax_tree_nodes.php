@@ -233,14 +233,7 @@ abstract class qtype_preg_syntax_tree_node {
     }
 
     public function tooltip() {
-        $result = '';
-        if ($this->pregnode->subtype != '') {
-            $result = get_string($this->pregnode->subtype, 'qtype_preg');
-        }
-        if ($result == '') {
-            $result = get_string($this->pregnode->type, 'qtype_preg');
-        }
-        return $result;
+        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg');
     }
 
     public function shape() {
@@ -430,10 +423,6 @@ class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_op
 }
 
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {
-
-    public function label() {
-        return get_string($this->pregnode->type, 'qtype_preg');
-    }
 
     public function tooltip() {
         return $this->pregnode->error_string();

@@ -136,7 +136,7 @@ $string['plb_node_assert']             = 'positive lookbehind assert';
 $string['nlb_node_assert']             = 'negative lookbehind assert';
 $string['subexpr_node_subexpr']        = 'subexpression';
 $string['onceonly_node_subexpr']       = 'once-only subexpression';
-$string['grouping_node_supbatt']       = 'grouping';
+$string['grouping_node_subexpr']       = 'grouping';
 $string['subexpr_node_cond_subexpr']   = '"subexpression"-conditional subexpression';
 $string['recursion_node_cond_subexpr'] = 'recursive conditional subexpression';
 $string['define_node_cond_subexpr']    = '"define"-conditional subexpression';
@@ -253,29 +253,29 @@ $string['description_option_J'] = 'allow duplicate names';
 $string['description_unsetoption_J'] = 'disallow duplicate names';
 $string['description_option_wrapper'] = '{$a->option}:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '{$a->firstoperand} is repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
-$string['description_finite_quant_strict'] = '{$a->firstoperand} is repeated {$a->count} times{$a->greedy}';
-$string['description_finite_quant_0'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times or missing{$a->greedy}';
-$string['description_finite_quant_1'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times{$a->greedy}';
-$string['description_finite_quant_01'] = '{$a->firstoperand} may be missing{$a->greedy}';
-$string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
+$string['description_node_finite_quant'] = '{$a->firstoperand} is repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
+$string['description_node_finite_quant_strict'] = '{$a->firstoperand} is repeated {$a->leftborder} times{$a->greedy}';
+$string['description_node_finite_quant_0'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times or missing{$a->greedy}';
+$string['description_node_finite_quant_1'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times{$a->greedy}';
+$string['description_node_finite_quant_01'] = '{$a->firstoperand} may be missing{$a->greedy}';
+$string['description_node_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '{$a->firstoperand} is repeated at least {$a->leftborder} times{$a->greedy}';
-$string['description_infinite_quant_0'] = '{$a->firstoperand} is repeated any number of times or missing{$a->greedy}';
-$string['description_infinite_quant_1'] = '{$a->firstoperand} is repeated any number of times{$a->greedy}';
+$string['description_node_infinite_quant'] = '{$a->firstoperand} is repeated at least {$a->leftborder} times{$a->greedy}';
+$string['description_node_infinite_quant_0'] = '{$a->firstoperand} is repeated any number of times or missing{$a->greedy}';
+$string['description_node_infinite_quant_1'] = '{$a->firstoperand} is repeated any number of times{$a->greedy}';
 // {$a->greedy}
 $string['description_quant_lazy'] = ' (lazy quantifier)';
 $string['description_quant_greedy'] = '';
 $string['description_quant_possessive'] = ' (possessive quantifier)';
 // TYPE_NODE_CONCAT
-$string['description_concat'] = '{$a->firstoperand} then {$a->secondoperand}';
-$string['description_concat_wcomma'] = '{$a->firstoperand} then {$a->secondoperand}';
-$string['description_concat_space'] = '{$a->firstoperand} {$a->secondoperand}';
-$string['description_concat_and'] = '{$a->firstoperand} and {$a->secondoperand}';
-$string['description_concat_short'] = '{$a->firstoperand}{$a->secondoperand}';
+$string['description_node_concat'] = '{$a->firstoperand} then {$a->secondoperand}';
+$string['description_node_concat_wcomma'] = '{$a->firstoperand} then {$a->secondoperand}';
+$string['description_node_concat_space'] = '{$a->firstoperand} {$a->secondoperand}';
+$string['description_node_concat_and'] = '{$a->firstoperand} and {$a->secondoperand}';
+$string['description_node_concat_short'] = '{$a->firstoperand}{$a->secondoperand}';
 // TYPE_NODE_ALT
-$string['description_alt'] = '{$a->firstoperand} or {$a->secondoperand}';
-$string['description_alt_wcomma'] = '{$a->firstoperand} or {$a->secondoperand}';
+$string['description_node_alt'] = '{$a->firstoperand} or {$a->secondoperand}';
+$string['description_node_alt_wcomma'] = '{$a->firstoperand} or {$a->secondoperand}';
 // TYPE_NODE_ASSERT
 $string['description_pla_node_assert'] = 'further text should match: [{$a->firstoperand}]';
 $string['description_nla_node_assert'] = 'further text should not match: [{$a->firstoperand}]';
@@ -286,12 +286,12 @@ $string['description_nla_node_assert_cond'] = 'further text does not match: [{$a
 $string['description_plb_node_assert_cond'] = 'preceding text matches: [{$a->firstoperand}]';
 $string['description_nlb_node_assert_cond'] = 'preceding text does not match: [{$a->firstoperand}]';
 // TYPE_NODE_SUBEXPR
-$string['description_subexpression'] = 'subexpression #{$a->number}: [{$a->firstoperand}]';
-$string['description_subexpression_once'] = 'once checked subexpression #{$a->number}: [{$a->firstoperand}]';
-$string['description_subexpression_name'] = 'subexpression "{$a->name}": [{$a->firstoperand}]';
-$string['description_subexpression_once_name'] = 'once checked subexpression "{$a->name}": [{$a->firstoperand}]';
-$string['description_grouping'] = 'grouping: [{$a->firstoperand}]';
-$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternation): [{$a->firstoperand}]';
+$string['description_subexpr_node_subexpr'] = 'subexpression #{$a->number}: [{$a->firstoperand}]';
+$string['description_subexpr_node_subexpr_name'] = 'subexpression "{$a->name}": [{$a->firstoperand}]';
+$string['description_onceonly_node_subexpr'] = 'once checked subexpression #{$a->number}: [{$a->firstoperand}]';
+$string['description_onceonly_node_subexpr_name'] = 'once checked subexpression "{$a->name}": [{$a->firstoperand}]';
+$string['description_grouping_node_subexpr'] = 'grouping: [{$a->firstoperand}]';
+$string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers for capturing groups in each alternation): [{$a->firstoperand}]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
@@ -536,13 +536,8 @@ $string['description_errorafter'] = '</span>';
 $string['description_charflag_word_g'] = 'word character(form g)';//for testing only
 $string['description_char_g'] = '<span style="color:blue">{$a->char}</span>(form g)';//for testing only
 $string['description_dollar_g'] = 'end of the string(form g)';//for testing
-$string['description_concat_g'] = '{$a->g1} then {$a->g2}';
-$string['description_concat_short_g'] = '{$a->g1}{$a->g2}';
-$string['description_alt_g'] = '{$a->g1} or {$a->g2}';
-$string['description_alt_wcomma_g'] = '{$a->g1} or {$a->g2}';
 
 // Strings for explaining graph
-$string['explain_subexpression'] = 'subexpression #';
 $string['explain_backref'] = 'the result of subexpression #';
 $string['explain_recursion'] = 'recursion';
 $string['explain_unknow_node'] = 'unknow node';

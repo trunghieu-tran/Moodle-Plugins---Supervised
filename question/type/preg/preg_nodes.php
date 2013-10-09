@@ -1782,17 +1782,20 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     /** Once-only subexpression. */
     const SUBTYPE_ONCEONLY = 'onceonly_node_subexpr';
     /** Grouping node. For author's tools only.*/
-    const SUBTYPE_GROUPING = 'grouping_node_supbatt';
+    const SUBTYPE_GROUPING = 'grouping_node_subexpr';
     /** Duplicate subexpressions. For authoring tools only.*/
     const SUBTYPE_DUPLICATE_SUBEXPRESSIONS = 'duplicate_node_subexpr';
 
     /** Subexpression number. */
     public $number = -1;
+    /** Subexpression name. */
+    public $name = null;
 
-    public function __construct($subtype, $number = -1) {
+    public function __construct($subtype, $number = -1, $name = null) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
+        $this->name = $name;
     }
 
     public function is_subpattern() {
