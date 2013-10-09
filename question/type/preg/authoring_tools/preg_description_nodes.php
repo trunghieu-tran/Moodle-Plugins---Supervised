@@ -186,7 +186,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     public function is_one_char() {
         $flag = $this->pregnode->flags[0][0];
         return count($this->pregnode->flags) === 1
-            && $flag->type===qtype_preg_charset_flag::SET
+            && $flag->type===qtype_preg_charset_flag::TYPE_SET
             && $flag->data->length() === 1
             && self::is_chr_printable(textlib::utf8ord($flag->data[0]));
     }
@@ -317,7 +317,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
         $rangelength = null;
         $rangelengthmax = null;
 
-        if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
+        if ($flag->type === qtype_preg_charset_flag::TYPE_FLAG) {
             // current flag is something like \w or \pL
             if ($flag->negative == true) {
                 // using charset pattern 'description_charset_one_neg' because char pattern 'description_char_neg' has a <span> tag,
@@ -327,7 +327,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             } else {
                 $characters[] = self::get_form_string('description_charflag_' . $flag->data, $form);
             }
-        } else if ($flag->type === qtype_preg_charset_flag::SET) {
+        } else if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
             // flag is a simple enumeration of characters
             if ($flag->data->length() == 1) {
                 $characters[] = self::describe_chr($flag->data[0], true, $form);

@@ -51,8 +51,29 @@ abstract class qtype_preg_syntax_tree_node {
     // A reference to the corresponding preg_node.
     public $pregnode;
 
+    protected $specialchars = array('&' => '&#38;',
+                                    '"' => '&#34;',
+                                    ',' => '&#44;',
+                                    '<' => '&#60;',
+                                    '>' => '&#62;',
+                                    //'[' => '&#91;',
+                                    //']' => '&#93;',
+                                    '{' => '&#123;',
+                                    '|' => '&#124;',
+                                    '}' => '&#125;',
+                                    '\\\\'=> '&#92;'
+                                    );
+
     public function __construct($node, $handler) {
         $this->pregnode = $node;
+
+        // Add some special characters.
+        for ($code = 1; $code <= 0x20; $code++) {
+            $this->specialchars[textlib::code2utf8($code)] = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
+        }
+        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
+            $this->specialchars[textlib::code2utf8($code)] = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
+        }
     }
 
     /**
@@ -100,71 +121,6 @@ abstract class qtype_preg_syntax_tree_node {
     }
 
     /**
-     * Replaces non-printable and special characters in the given string.
-     * Highlights them if needed.
-     */
-    protected static function userinscription_to_string($userinscription, $fortooltip) {
-        if ($userinscription->type === qtype_preg_userinscription::TYPE_FLAG) {
-            if ($userinscription->data == '.') {
-                return get_string('description_charflag_dot', 'qtype_preg');
-            }
-            if (!$fortooltip) {
-                // For label.
-                return $userinscription->data;
-            }
-            // For tooltip.
-            $tmp = textlib::strtolower($userinscription->data[1]);
-            $negative = ($tmp != $userinscription->data[1]);
-            $result = get_string('description_charflag_slash' . $tmp, 'qtype_preg');
-            if ($negative) {
-                $result = get_string('description_not', 'qtype_preg', $result);
-            }
-            return $result;
-        }
-
-        $special = array('&' => '&#38;',
-                         '"' => '&#34;',
-                         '[' => '&#91;',
-                         ']' => '&#93;',
-                         ',' => '&#44;',
-                         '<' => '&#60;',
-                         '>' => '&#62;',
-                         //'[' => '&#91;',
-                         //']' => '&#93;',
-                         '{' => '&#123;',
-                         '|' => '&#124;',
-                         '}' => '&#125;',
-                         '\\\\'=> '&#92;'
-                         );
-
-        for ($code = 1; $code <= 0x20; $code++) {
-            $replacement = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
-            if (!$fortooltip) {
-                $replacement = '<font color="blue">' . $replacement . '</font>';
-            }
-            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
-        }
-        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
-            $replacement = get_string('description_char' . textlib::strtoupper(dechex($code)), 'qtype_preg');
-            if (!$fortooltip) {
-                $replacement = '<font color="blue">' . $replacement . '</font>';
-            }
-            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
-        }
-
-        $result = $userinscription->data;
-
-        foreach ($special as $key => $value) {
-            $result = str_replace($key, $value, $result);
-        }
-
-        if (textlib::strpos($result, '\x') === false) {
-            $result = qtype_poasquestion_string::replace('\\', '', $result);
-        }
-        return $result;
-    }
-
-    /**
      * Returns the dot script corresponding to this node.
      * @param context an instance of qtype_preg_dot_node_context.
      * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
@@ -209,16 +165,9 @@ abstract class qtype_preg_syntax_tree_node {
 
     public abstract function dot_script_inner($context);
 
+    public abstract function label();
+
     public abstract function tooltip();
-
-    public function label() {
-        $strings = array();
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $strings[] = shorten_text(self::userinscription_to_string($userinscription, false));
-        }
-        return implode('&#10;', $strings);
-    }
-
 
     public function shape() {
       return 'ellipse';
@@ -261,6 +210,23 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
         $style = $nodename . self::get_style($context) . ";\n";
         $dotscript = $nodename . ";\n";
         return array($dotscript, $style);
+    }
+
+    public function label() {
+        // Concatenate userinscriptions.
+        $result = '';
+        foreach ($this->pregnode->userinscription as $userinscription) {
+            if ($userinscription->isflag == qtype_preg_charset_flag::META_DOT) {
+                $result .= get_string('description_charflag_dot', 'qtype_preg');
+            } else {
+                $result .= $userinscription->data;
+            }
+        }
+        // Replace special characters.
+        foreach ($this->specialchars as $key => $value) {
+            $result = qtype_poasquestion_string::replace($key, $value, $result);
+        }
+        return $result;
     }
 
     public function tooltip() {
@@ -306,6 +272,15 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
         return array($dotscript, $style);
     }
 
+    public function label() {
+        $result = $this->pregnode->userinscription[0]->data;
+        // Replace special characters.
+        foreach ($this->specialchars as $key => $value) {
+            $result = qtype_poasquestion_string::replace($key, $value, $result);
+        }
+        return $result;
+    }
+
     public function tooltip() {
         // Operators use subtype strings instead of description_ by default.
         return get_string($this->pregnode->lang_key(false), 'qtype_preg');
@@ -318,25 +293,39 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         $start = 0;
         $end = count($this->pregnode->userinscription);
         if (count($this->pregnode->errors) > 0) {
-            $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg') . '&#10;';
         } else if ($this->pregnode->negative) {
-            $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg') . '&#10;';
         } else if ($end == 1) {
-            $tooltip = get_string($this->pregnode->type . '_one', 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type . '_one', 'qtype_preg') . ' ';
         } else {
-            $tooltip = get_string($this->pregnode->type, 'qtype_preg');
+            $tooltip = get_string($this->pregnode->type, 'qtype_preg') . '&#10;';
         }
         if (count($this->pregnode->userinscription) > 1) {
             $start++;
             $end--;
-        } else if ($end == 1 && $this->pregnode->userinscription[0]->type == qtype_preg_userinscription::TYPE_FLAG) {
+        } else if ($end == 1 && $this->pregnode->userinscription[0]->isflag) {
             $tooltip = '';
         }
-        for ($i = $start; $i < $end; ++$i) {
-            if ($tooltip != '') {
+        // Concatenate userinscriptions.
+        for ($i = $start; $i < $end; $i++) {
+            $userinscription = $this->pregnode->userinscription[$i];
+            if ($userinscription->isflag) {
+                $tmp = get_string('description_charflag_' . $userinscription->isflag, 'qtype_preg');
+                if ($userinscription->is_flag_negative()) {
+                    $tmp = get_string('description_not', 'qtype_preg', $tmp);
+                }
+            } else {
+                $tmp = $userinscription->data;
+                // Replace special characters.
+                foreach ($this->specialchars as $key => $value) {
+                    $tmp = qtype_poasquestion_string::replace($key, $value, $tmp);
+                }
+            }
+            $tooltip .= $tmp;
+            if ($i != $end - 1) {
                 $tooltip .= ($start > 0) ? '&#10;' : ' ';
             }
-            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], true);
         }
         return $tooltip;
     }

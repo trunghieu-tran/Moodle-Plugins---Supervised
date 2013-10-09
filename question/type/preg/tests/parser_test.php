@@ -191,7 +191,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[1]->data === 'a-z');
         $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[2]->data === '\w');
-        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[2]->type === qtype_preg_userinscription::TYPE_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->userinscription[2]->isflag === qtype_preg_charset_flag::SLASH_W);
         $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->operands[1]->flags[0][0]->data->string() === 'b');
         $this->assertTrue($root->nullable === true);
@@ -212,12 +212,12 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->possessive);
         $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->data === '\w');
-        $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->type === qtype_preg_userinscription::TYPE_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[1]->isflag === qtype_preg_charset_flag::SLASH_W);
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[2]->data === 'a');
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[3]->data === 'b-y');
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[4]->data === 'z');
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[5]->data === '\d');
-        $this->assertTrue($root->operands[0]->operands[0]->userinscription[5]->type === qtype_preg_userinscription::TYPE_FLAG);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription[5]->isflag === qtype_preg_charset_flag::SLASH_D);
         $this->assertTrue($root->operands[0]->operands[0]->position->colfirst === 3);
         $this->assertTrue($root->operands[0]->operands[0]->position->collast === 13);
         $this->assertTrue($root->nullable === false);

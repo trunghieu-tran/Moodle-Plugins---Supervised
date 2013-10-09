@@ -80,23 +80,31 @@ class qtype_preg_position {
  * Representation of nodes and leafs as they were typed in the regex.
  */
 class qtype_preg_userinscription {
-    /** General case, contains the same string as typed by user. */
-    const TYPE_GENERAL = 'userinscription_general';
-    /** Flag that needs an additional description that must be stored in the lang file (unicode properties names etc). */
-    const TYPE_FLAG = 'userinscription_flag';
-
     /** String with the leaf itself. */
     public $data = '';
-    /** Type of the user inscription. */
-    public $type = null;
+    /** Subype of the flag in case of \w, \d, [:alnum:] or something. See charset_flag constants. */
+    public $isflag = null;
 
-    public function __construct($data = '', $type = self::TYPE_GENERAL) {
+    public function __construct($data = '', $isflag = null) {
         $this->data = $data;
-        $this->type = $type;
+        $this->isflag = $isflag;
     }
 
     public function __toString() {
         return $this->data;
+    }
+
+    public function is_flag_negative() {
+        if (!$this->isflag) {
+            return false;
+        }
+        if ($this->data[0] == '\\') {
+            return ctype_upper($this->data[1]); // Fortunately, this works both for \W and, for example, \PL
+        }
+        if ($this->data[0] == '[') {
+            return $this->data[2] == '^';
+        }
+        return false;
     }
 }
 
@@ -578,7 +586,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
             foreach ($flags as $flag) {
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -621,7 +629,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -643,7 +651,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -699,7 +707,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -721,7 +729,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -833,11 +841,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
 class qtype_preg_charset_flag {
 
     // Charset types.
-    const SET                    = 'enumerable_characters';
-    const FLAG                   = 'functionally_calculated_characters';
-    const UPROP                  = 'unicode_property';
-    const CIRCUMFLEX             = 'circumflex';
-    const DOLLAR                 = 'dollar';
+    const TYPE_SET               = 'enumerable_characters';
+    const TYPE_FLAG              = 'functionally_calculated_characters';
 
     const META_DOT               = 'dot';
 
@@ -853,7 +858,7 @@ class qtype_preg_charset_flag {
     const POSIX_ALPHA            = 'alpha';      // [:alpha:]
     const POSIX_ASCII            = 'ascii';      // [:ascii:]
     const POSIX_BLANK            = 'blank';      // [:blank:]
-    const POSIX_CNTRL            = 'cntrl';      // [:ctrl:]
+    const POSIX_CNTRL            = 'cntrl';      // [:cntrl:]
     const POSIX_DIGIT            = 'digit';      // [:digit:]
     const POSIX_GRAPH            = 'graph';      // [:graph:]
     const POSIX_LOWER            = 'lower';      // [:lower:]
@@ -1000,9 +1005,9 @@ class qtype_preg_charset_flag {
 
     /** Is this flag negative? */
     public $negative = false;
-    /** Type of this flag, can be either TYPE_SET or TYPE_FLAG or TYPE_UPROP or TYPE_CIRCUMFLEX or TYPE_DOLLAR. */
+    /** Type of this flag, can be either TYPE_SET or TYPE_FLAG. */
     public $type;
-    /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG or TYPE_UPROP correspondingly. */
+    /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG correspondingly. */
     public $data;
 
 
@@ -1022,10 +1027,6 @@ class qtype_preg_charset_flag {
         $this->data = $data;
     }
 
-    public function is_null_length() {
-        return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
-    }
-
     public function match($str, $pos, $caseless) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
@@ -1038,15 +1039,10 @@ class qtype_preg_charset_flag {
         }
 
         switch ($this->type) {
-            case self::CIRCUMFLEX:
-                return (($pos === 0) xor $this->negative);
-            case self::DOLLAR:
-                return (($pos === $str->length() - 1) xor $this->negative);
-            case self::SET:
+            case self::TYPE_SET:
                 $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data);
                 break;
-            case self::FLAG:
-            case self::UPROP:
+            case self::TYPE_FLAG:
                 $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
                 break;
         }
@@ -1062,20 +1058,11 @@ class qtype_preg_charset_flag {
     public function tohr() {
         $result = '';
         switch ($this->type) {
-            case self::CIRCUMFLEX:
-                $result = '^';
-                break;
-            case self::DOLLAR:
-                $result = '$';
-                break;
-            case self::SET:
+            case self::TYPE_SET:
                 $result = $this->data;
                 break;
-            case self::FLAG:
+            case self::TYPE_FLAG:
                 $result = $this->data;
-                break;
-            case self::UPROP:
-                $result = 'todo';
                 break;
             default:
                 return '';
