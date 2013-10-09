@@ -784,7 +784,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
             for ($i = 0; $i != count($elements); ++$i) {
                 if ($elements[$i][0] == chr(10)) {
-                    $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
+                    $result .= '<TD>' . substr($elements[$i], 1) . '</TD>';
                 } else {
                     $elements[$i] = qtype_preg_authoring_tool::escape_string($elements[$i]);
                     $result .= '<TD>' . $elements[$i] . '</TD>';
