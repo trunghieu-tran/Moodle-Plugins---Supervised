@@ -202,11 +202,34 @@ abstract class qtype_preg_syntax_tree_node {
         }
     }
 
-    public abstract function dot_script_inner($context);
-
     protected function is_selected($context) {
         return $this->pregnode->position->indfirst >= $context->selection->indfirst &&
                $this->pregnode->position->indlast <= $context->selection->indlast;
+    }
+
+    public abstract function dot_script_inner($context);
+
+    public abstract function tooltip();
+
+    public function label() {
+        $strings = array();
+        foreach ($this->pregnode->userinscription as $userinscription) {
+            $strings[] = shorten_text(self::userinscription_to_string($userinscription, false));
+        }
+        return implode('&#10;', $strings);
+    }
+
+
+    public function shape() {
+      return 'ellipse';
+    }
+
+    public function color() {
+        return count($this->pregnode->errors) > 0 ? 'red' : 'black';
+    }
+
+    public function style() {
+        return 'solid';
     }
 
     public function get_style($context) {
@@ -225,34 +248,6 @@ abstract class qtype_preg_syntax_tree_node {
 
         return '[' . $result . ']';
     }
-
-    public function label() {
-        $label = '';
-        $count = count($this->pregnode->userinscription);
-        foreach ($this->pregnode->userinscription as $i => $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, false));
-            if ($i != $count - 1) {
-                $label .= '&#10;';
-            }
-        }
-        return $label;
-    }
-
-    public function tooltip() {
-        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg');
-    }
-
-    public function shape() {
-      return 'ellipse';
-    }
-
-    public function color() {
-        return count($this->pregnode->errors) > 0 ? 'red' : 'black';
-    }
-
-    public function style() {
-        return 'solid';
-    }
 }
 
 /**
@@ -268,16 +263,17 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
         return array($dotscript, $style);
     }
 
-    public function shape() {
-        return 'rectangle';
-    }
-
     public function tooltip() {
-        $result = parent::tooltip();
+        // Leaves use description_ strings by default.
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg');
         if ($this->pregnode->negative) {
-                $result = get_string('description_not', 'qtype_preg', $result);
+            $result = get_string('description_not', 'qtype_preg', $result);
         }
         return $result;
+    }
+
+    public function shape() {
+        return 'rectangle';
     }
 }
 
@@ -308,6 +304,11 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
             $style .= $tmp[1];
         }
         return array($dotscript, $style);
+    }
+
+    public function tooltip() {
+        // Operators use subtype strings instead of description_ by default.
+        return get_string($this->pregnode->lang_key(false), 'qtype_preg');
     }
 }
 
@@ -366,14 +367,14 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     }
 
     public function tooltip() {
-        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg', $this->pregnode->number);
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
     }
 }
 
 class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
 
     public function label() {
-        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg', $this->pregnode->number);
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
     }
 }
 
@@ -388,16 +389,36 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 
     public function tooltip() {
-        return parent::tooltip() . ' \\"' . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg') . '\\"';
+        return parent::tooltip();// . ' \\"' . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg') . '\\"';
     }
 }
 
 class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {
 
+    public function tooltip() {
+        $result = parent::tooltip();
+        $key = 'description_quant_greedy';
+        if ($this->pregnode->lazy) {
+            $key = 'description_quant_lazy';
+        } else if ($this->pregnode->possessive) {
+            $key = 'description_quant_possessive';
+        }
+        return $result . get_string($key, 'qtype_preg');
+    }
 }
 
 class qtype_preg_syntax_tree_node_infinite_quant extends qtype_preg_syntax_tree_operator {
 
+    public function tooltip() {
+        $result = parent::tooltip();
+        $key = 'description_quant_greedy';
+        if ($this->pregnode->lazy) {
+            $key = 'description_quant_lazy';
+        } else if ($this->pregnode->possessive) {
+            $key = 'description_quant_possessive';
+        }
+        return $result . get_string($key, 'qtype_preg');
+    }
 }
 
 class qtype_preg_syntax_tree_node_concat extends qtype_preg_syntax_tree_operator {

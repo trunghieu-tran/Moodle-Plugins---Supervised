@@ -368,11 +368,7 @@ class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_le
 class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        $key = 'description_' . $this->pregnode->subtype;
-        if (is_string($this->pregnode->number)) {
-            $key .= '_name';
-        }
-        return array(get_string($key, 'qtype_preg', $this->pregnode->number));
+        return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
@@ -390,13 +386,7 @@ class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_l
 class qtype_preg_authoring_tool_leaf_recursion extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        $key = 'description_' . $this->pregnode->subtype;
-        if ($this->pregnode->number === 0) {
-            $key .= '_all';
-        } else if (is_string($this->pregnode->number)) {
-            $key .= '_name';
-        }
-        return array(get_string($key, 'qtype_preg', $this->pregnode->number));
+        return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
@@ -582,11 +572,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $label = '';
         if ($this->pregnode->number != -1) {
-            $key = 'description_' . $this->pregnode->subtype;
-            if ($this->pregnode->name !== null) {
-                $key .= '_name';
-            }
-            $label = get_string($key, 'qtype_preg');
+            $label = get_string($this->pregnode->lang_key(true), 'qtype_preg');
             //subexpression "{$a->name}": [{$a->firstoperand}]"
             $label = qtype_poasquestion_string::replace(': [{$a->firstoperand}]', '', $label);
             $label = qtype_poasquestion_string::replace('{$a->number}', $this->pregnode->number, $label);
@@ -630,6 +616,7 @@ class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_t
         $tmp = null;
 
         if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+            // TODO: refactor this and below
             $key = 'description_leaf_backref';
             if (is_string($this->pregnode->number)) {
                 $key .= '_name';
