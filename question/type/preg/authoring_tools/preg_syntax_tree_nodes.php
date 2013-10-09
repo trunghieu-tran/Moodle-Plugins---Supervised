@@ -419,7 +419,9 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
 }
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
-
+    public function tooltip() {
+        return get_string($this->pregnode->subtype, 'qtype_preg');
+    }
 }
 
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {

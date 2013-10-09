@@ -293,14 +293,14 @@ $string['description_onceonly_node_subexpr_once_name'] = 'однократная
 $string['description_grouping_node_subexpr'] = 'группировка: [{$a->firstoperand}]';
 $string['description_duplicate_node_subexpr'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [{$a->firstoperand}]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
+$string['description_subexpr_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr_all'] = 'если весь шаблон был рекурсивно сопоставлен тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_define_node_cond_subexpr'] = 'описание {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'если {$a->cond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' иначе проверить: [{$a->secondoperand}]';
-$string['description_backref_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_backref_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr_all'] = 'если весь шаблон был рекурсивно сопоставлен тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно рекурсивно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_define_node_cond_subexpr'] = 'описание {$a->firstoperand}';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';
@@ -539,6 +539,7 @@ $string['description_dollar_g'] = 'конец строки(form g)';//for testin
 
 // Strings for explaining graph
 $string['explain_backref'] = 'результат подвыражения #';
+$string['explain_define'] = 'TODO';
 $string['explain_recursion'] = 'рекурсия';
 $string['explain_unknow_node'] = 'неизвестный узел';
 $string['explain_unknow_meta'] = 'неизвестный мета-узел';

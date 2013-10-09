@@ -948,36 +948,28 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-        if ($this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
-            if (is_string($this->pregnode->number)) {
-                $resultpattern = self::get_form_string('description_backref_node_cond_subexpr_name', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $resultpattern);
-            } else {
-                $resultpattern = self::get_form_string('description_backref_node_cond_subexpr', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $resultpattern);
-            }
-        } else if ($this->pregnode->subtype===qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
-            if (is_string($this->pregnode->number)) {
-                $resultpattern = self::get_form_string('description_recursive_node_cond_subexpr_name', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $resultpattern);
-            } else if ($this->pregnode->number===0) {
-                $resultpattern = self::get_form_string('description_recursive_node_cond_subexpr_all', $form);
-            } else {
-                $resultpattern = self::get_form_string('description_recursive_node_cond_subexpr', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $resultpattern);
-            }
-        } else if ($this->pregnode->subtype===qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-            $resultpattern = self::get_form_string('description_define_node_cond_subexpr', $form);
-        } else {
-            $resultpattern = self::get_form_string('description_node_cond_subexpr', $form);
-            // $resultpattern = qtype_poasquestion_string::replace('%cond', '%'.count($this->pregnode->operands), $resultpattern);
+        $key = $this->pregnode->is_condition_assertion()
+            ? 'description_' . $this->pregnode->type
+            : 'description_' . $this->pregnode->subtype;
+
+        if ($this->pregnode->number === 0) {
+            $key .= '_all';
+        } else if (is_string($this->pregnode->number)) {
+            $key .= '_name';
         }
-        $elsereplase = count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()
-                     ? self::get_form_string('description_node_cond_subexpr_else', $form)
-                     : '';
-        $resultpattern = qtype_poasquestion_string::replace('%else', $elsereplase, $resultpattern);
-        return $resultpattern;
+
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $result);
+        $result = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $result);
+
+        $else = '';
+        if (count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()) {
+            $else = self::get_form_string('description_' . $this->pregnode->type . '_else', $form);
+
+        }
+        $result = qtype_poasquestion_string::replace('%else', $else, $result);
+
+        return $result;
     }
 
     public function description($numbering_pattern, $node_parent = null, $form = null) {

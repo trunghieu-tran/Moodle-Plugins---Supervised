@@ -293,14 +293,14 @@ $string['description_onceonly_node_subexpr_name'] = 'once checked subexpression 
 $string['description_grouping_node_subexpr'] = 'grouping: [{$a->firstoperand}]';
 $string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers for capturing groups in each alternation): [{$a->firstoperand}]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
+$string['description_subexpr_node_cond_subexpr'] = 'if the subexpression #{$a->number} has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr_name'] = 'if the subexpression "{$a->name}" has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr'] = 'if the pattern #{$a->number} has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr_all'] = 'if the whole pattern has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr_name'] = 'if the pattern "{$a->name}" has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
-$string['description_backref_node_cond_subexpr'] = 'if the subexpression #{$a->number} has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_backref_node_cond_subexpr_name'] = 'if the subexpression "{$a->name}" has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr_all'] = 'if the whole pattern has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr'] = 'if the pattern #{$a->number} has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursive_node_cond_subexpr_name'] = 'if the pattern "{$a->name}" has been successfully recursively matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subexpression match';
 $string['description_fail_leaf_control'] = 'force fail';
@@ -539,6 +539,7 @@ $string['description_dollar_g'] = 'end of the string(form g)';//for testing
 
 // Strings for explaining graph
 $string['explain_backref'] = 'the result of subexpression #';
+$string['explain_define'] = 'TODO';
 $string['explain_recursion'] = 'recursion';
 $string['explain_unknow_node'] = 'unknow node';
 $string['explain_unknow_meta'] = 'unknow meta';
