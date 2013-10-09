@@ -103,17 +103,23 @@ abstract class qtype_preg_syntax_tree_node {
      * Replaces non-printable and special characters in the given string.
      * Highlights them if needed.
      */
-    protected static function userinscription_to_string($userinscription, $negative, $fortooltip) {
+    protected static function userinscription_to_string($userinscription, $fortooltip) {
         if ($userinscription->type === qtype_preg_userinscription::TYPE_FLAG) {
-            if (!$fortooltip) {
-                return $userinscription->data != '.'
-                           ? $userinscription->data
-                           : get_string('description_charflag_dot', 'qtype_preg');
-            } else if ($userinscription->data != '.') {
-                return get_string('description_charflag_slash' . textlib::strtolower($userinscription->data[1]), 'qtype_preg');
-            } else {
+            if ($userinscription->data == '.') {
                 return get_string('description_charflag_dot', 'qtype_preg');
             }
+            if (!$fortooltip) {
+                // For label.
+                return $userinscription->data;
+            }
+            // For tooltip.
+            $tmp = textlib::strtolower($userinscription->data[1]);
+            $negative = ($tmp != $userinscription->data[1]);
+            $result = get_string('description_charflag_slash' . $tmp, 'qtype_preg');
+            if ($negative) {
+                $result = get_string('description_not', 'qtype_preg', $result);
+            }
+            return $result;
         }
 
         $special = array('&' => '&#38;',
@@ -224,7 +230,7 @@ abstract class qtype_preg_syntax_tree_node {
         $label = '';
         $count = count($this->pregnode->userinscription);
         foreach ($this->pregnode->userinscription as $i => $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, false, false));
+            $label .= shorten_text(self::userinscription_to_string($userinscription, false));
             if ($i != $count - 1) {
                 $label .= '&#10;';
             }
@@ -264,6 +270,14 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
 
     public function shape() {
         return 'rectangle';
+    }
+
+    public function tooltip() {
+        $result = parent::tooltip();
+        if ($this->pregnode->negative) {
+                $result = get_string('description_not', 'qtype_preg', $result);
+        }
+        return $result;
     }
 }
 
@@ -321,7 +335,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             if ($tooltip != '') {
                 $tooltip .= ($start > 0) ? '&#10;' : ' ';
             }
-            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], false, true);
+            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], true);
         }
         return $tooltip;
     }

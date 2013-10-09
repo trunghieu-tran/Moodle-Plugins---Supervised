@@ -65,6 +65,18 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($node->tooltip(), 'not a word character');
     }
 
+    function test_simple_assertions() {
+        $tree = new qtype_preg_syntax_tree_tool();
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\b'));
+        $this->assertEquals($node->label(), '\\b');
+        $this->assertEquals($node->tooltip(), 'a word boundary');
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\B'));
+        $this->assertEquals($node->label(), '\\B');
+        $this->assertEquals($node->tooltip(), 'not a word boundary');
+    }
+
     function test_something() {
         $tree = new qtype_preg_syntax_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
