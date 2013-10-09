@@ -1347,6 +1347,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_BACKREF;
+        $this->subtype = $this->type;
         $this->number = $number;
     }
 
@@ -1427,6 +1428,7 @@ class qtype_preg_leaf_options extends qtype_preg_leaf {
 
     public function __construct($posopt = null, $negopt = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
+        $this->subtype = $this->type;
         $this->posopt = $posopt;
         $this->negopt = $negopt;
     }
@@ -1454,6 +1456,7 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_RECURSION;
+        $this->subtype = $this->type;
         $this->number = $number;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
@@ -1552,6 +1555,7 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
 
     public function __construct($leftborder = 0, $rightborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
+        $this->subtype = $this->type;
         $this->leftborder = $leftborder;
         $this->rightborder = $rightborder;
         $this->lazy = $lazy;
@@ -1588,6 +1592,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 
     public function __construct($leftborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
+        $this->subtype = $this->type;
         $this->leftborder = $leftborder;
         $this->lazy = $lazy;
         $this->greedy = $greedy;
@@ -1623,6 +1628,7 @@ class qtype_preg_node_concat extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
+        $this->subtype = $this->type;
     }
 
     public function is_subpattern() {
@@ -1706,6 +1712,7 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ALT;
+        $this->subtype = $this->type;
     }
 
     public function is_subpattern() {

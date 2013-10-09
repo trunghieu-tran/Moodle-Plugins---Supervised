@@ -346,11 +346,11 @@ class qtype_preg_authoring_tool_leaf_meta extends qtype_preg_authoring_tool_leaf
 class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        $key = 'description_' . $this->pregnode->subtype;
+        $result = get_string('description_' . $this->pregnode->subtype, 'qtype_preg');
         if ($this->pregnode->negative) {
-            $key .= '_neg';
+            $result = get_string('description_not', 'qtype_preg', $result);
         }
-        return array(get_string($key, 'qtype_preg'));
+        return array($result);
     }
 
     public function get_color() {
@@ -368,16 +368,11 @@ class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_le
 class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        $tmp = $this->pregnode->number;
-        if (is_integer($this->pregnode->number)) {
-            $a = new stdClass();
-            $a->number = $tmp;
-            return array(get_string('description_backref', 'qtype_preg', $a));
-        } else {
-            $a = new stdClass();
-            $a->name = $tmp;
-            return array(get_string('description_backref_name', 'qtype_preg', $a));
+        $key = 'description_' . $this->pregnode->subtype;
+        if (is_string($this->pregnode->number)) {
+            $key .= '_name';
         }
+        return array(get_string($key, 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
@@ -395,18 +390,13 @@ class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_l
 class qtype_preg_authoring_tool_leaf_recursion extends qtype_preg_authoring_tool_leaf {
 
     public function get_value() {
-        $tmp = $this->pregnode->number;
-        if ($tmp == 0) {
-            return array(get_string('description_recursion_all', 'qtype_preg'));
-        } else if (is_integer($this->pregnode->number)) {
-            $a = new stdClass();
-            $a->number = $tmp;
-            return array(get_string('description_recursion', 'qtype_preg', $a));
-        } else {
-            $a = new stdClass();
-            $a->name = $tmp;
-            return array(get_string('description_recursion_name', 'qtype_preg', $a));
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->number === 0) {
+            $key .= '_all';
+        } else if (is_string($this->pregnode->number)) {
+            $key .= '_name';
         }
+        return array(get_string($key, 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
@@ -628,28 +618,24 @@ class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_t
         $tmp = null;
 
         if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
-
-            $a = new stdClass();
-            $a->number = $this->pregnode->number;
-            $a->name = $this->pregnode->number;
-
-            $condsubexpr->subgraphs[0]->nodes[] =
-                new qtype_preg_explaining_graph_tool_node(
-                        array(is_integer($this->pregnode->number) ?
-                                get_string('description_backref', 'qtype_preg', $a) :
-                                get_string('description_backref_name', 'qtype_preg', $a)),
-                        'ellipse', 'blue', $condsubexpr->subgraphs[0], -1
-                        );
-
-        } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
-
+            $key = 'description_leaf_backref';
+            if (is_string($this->pregnode->number)) {
+                $key .= '_name';
+            }
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
-                                                        array(get_string('description_recursion_all', 'qtype_preg')),
-                                                        'ellipse',
-                                                        'blue',
-                                                        $condsubexpr->subgraphs[0],
-                                                        -1
-                                                    );
+                                                        array(get_string($key, 'qtype_preg', $this->pregnode->number)),
+                                                        'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
+        } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+            $key = 'description_recursion';
+            if ($this->pregnode->number === 0) {
+                $key .= '_all';
+            } else if (is_string($this->pregnode->number)) {
+                $key .= '_name';
+            }
+            return array(get_string($key, 'qtype_preg', $this->pregnode->number));
+            $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(
+                                                        array(get_string($key, 'qtype_preg', $this->pregnode->number)),
+                                                        'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
 
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
 
