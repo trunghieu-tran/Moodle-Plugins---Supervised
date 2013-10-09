@@ -580,7 +580,19 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
             }
         }
 
-        $label = ($this->pregnode->number != -1 ? get_string('explain_subexpression', 'qtype_preg') . $this->pregnode->number : '');
+        $label = '';
+        if ($this->pregnode->number != -1) {
+            $key = 'description_' . $this->pregnode->subtype;
+            if ($this->pregnode->name !== null) {
+                $key .= '_name';
+            }
+            $label = get_string($key, 'qtype_preg');
+            //subexpression "{$a->name}": [{$a->firstoperand}]"
+            $label = qtype_poasquestion_string::replace(': [{$a->firstoperand}]', '', $label);
+            $label = qtype_poasquestion_string::replace('{$a->number}', $this->pregnode->number, $label);
+            $label = qtype_poasquestion_string::replace('{$a->name}', $this->pregnode->name, $label);
+            $label = qtype_poasquestion_string::replace('"', '\\"', $label);// TODO dafuq?
+        }
 
         $generated = $this->handler->is_node_generated($this->pregnode);
 

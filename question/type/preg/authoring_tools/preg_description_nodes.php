@@ -89,7 +89,6 @@ abstract class qtype_preg_description_node {
      * @param string $form Required form.
      */
     protected static function get_form_string($s, $a, $form = null) {
-
         if (is_string($a)) {
             $form = $a;
             $a = null;
@@ -687,47 +686,38 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-        $greedypattern = '';
-        $wrong_borders = $this->pregnode->leftborder > $this->pregnode->rightborder;
-
-        if ($this->pregnode->leftborder == 0 ) {
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->leftborder == 0) {
+            $key .= '_0';
             if ($this->pregnode->rightborder == 1) {
-                $resultpattern = self::get_form_string('description_finite_quant_01', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $resultpattern);
-            } else {
-                $resultpattern = self::get_form_string('description_finite_quant_0', $form);
-                $resultpattern = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $resultpattern);
+                $key .= '_01';
             }
-
         } else if ($this->pregnode->leftborder == 1) {
-            $resultpattern = self::get_form_string('description_finite_quant_1', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $resultpattern);
+            $key .= '_1';
         } else if ($this->pregnode->leftborder == $this->pregnode->rightborder) {
-            $resultpattern = self::get_form_string('description_finite_quant_strict', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%count', $this->pregnode->rightborder, $resultpattern);
-        } else {
-            $resultpattern = self::get_form_string('description_finite_quant', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $resultpattern);
-            $resultpattern = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $resultpattern);
+            $key .= '_strict';
         }
 
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
+        $result = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $result);
+
+        $key = 'description_quant_greedy';
         if ($this->pregnode->lazy) {
-            $greedypattern = self::get_form_string('description_quant_lazy', $form);
-        } else if ($this->pregnode->greedy) {
-            $greedypattern = self::get_form_string('description_quant_greedy', $form);
+            $key = 'description_quant_lazy';
         } else if ($this->pregnode->possessive) {
-            $greedypattern = self::get_form_string('description_quant_possessive', $form);
+            $key = 'description_quant_possessive';
         }
-        $resultpattern = qtype_poasquestion_string::replace('%greedy', $greedypattern, $resultpattern);
+        $greedy = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
 
-        if ($wrong_borders) {
-            $resultpattern = preg_replace('/%(\w+)?1/u', ('%$ {1}1' . self::get_form_string('description_errorbefore', $form)), $resultpattern);
-            $resultpattern = $resultpattern
-                .self::get_form_string('description_finite_quant_borders_err', $form)
-                .self::get_form_string('description_errorafter', $form);
+        if ($this->pregnode->leftborder > $this->pregnode->rightborder) {
+            $result = preg_replace('/%(\w+)?1/u', ('%$ {1}1' . self::get_form_string('description_errorbefore', $form)), $result);
+            $result .= self::get_form_string('description_node_finite_quant_borders_err', $form) .
+                       self::get_form_string('description_errorafter', $form);
         }
-        return $resultpattern;
+
+        return $result;
     }
 }
 
@@ -740,27 +730,26 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-        $greedypattern = '';
+        $key = 'description_' . $this->pregnode->subtype;
         if ($this->pregnode->leftborder == 0) {
-            $resultpattern = self::get_form_string('description_infinite_quant_0', $form);
+            $key .= '_0';
         } else if ($this->pregnode->leftborder == 1) {
-            $resultpattern = self::get_form_string('description_infinite_quant_1', $form);
-        } else {
-            $resultpattern = self::get_form_string('description_infinite_quant', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $resultpattern);
+            $key .= '_1';
         }
 
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
+
+        $key = 'description_quant_greedy';
         if ($this->pregnode->lazy) {
-            $greedypattern = self::get_form_string('description_quant_lazy', $form);
-        } else if ($this->pregnode->greedy) {
-            $greedypattern = self::get_form_string('description_quant_greedy', $form);
+            $key = 'description_quant_lazy';
         } else if ($this->pregnode->possessive) {
-            $greedypattern = self::get_form_string('description_quant_possessive', $form);
+            $key = 'description_quant_possessive';
         }
+        $greedy = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
 
-        $resultpattern = qtype_poasquestion_string::replace('%greedy', $greedypattern, $resultpattern);
-        return $resultpattern;
+        return $result;
     }
 }
 
@@ -811,17 +800,17 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             $neddspacepattern = $type1 == qtype_preg_node::TYPE_LEAF_OPTIONS ||
                                 ($type1 == qtype_preg_node::TYPE_NODE_CONCAT && $left->operands[1]->pregnode->type == qtype_preg_node::TYPE_LEAF_OPTIONS);
 
+            $key = 'description_' . $this->pregnode->subtype;
             if ($neddspacepattern) {
-                $description = self::get_form_string('description_concat_space', $form);
+                $key .= '_space';
             } else if ($needshortpattern || $needcontiuneshortpattern) {
-                $description = self::get_form_string('description_concat_short', $form);
+                $key .= '_short';
             } else if ($firstaheadassert || $secondbehindassert || $aheadassertinprevconcat) {
-                $description = self::get_form_string('description_concat_and', $form);
+                $key .= '_and';
             } else if ($type1 == qtype_preg_node::TYPE_NODE_CONCAT) {
-                $description = self::get_form_string('description_concat_wcomma', $form);
-            } else {
-                $description = self::get_form_string('description_concat', $form);
+                $key .= '_wcomma';
             }
+            $description = self::get_form_string($key, $form);
 
             // setup the description
             $replace = $this->what_to_replace($description);
@@ -855,12 +844,11 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator {
             $left = $this->operands[$i];
             $right = $this->operands[$i + 1];
 
-            // getting pattern
+            $key = 'description_' . $this->pregnode->subtype;
             if ($i !== 0) {
-                $description = self::get_form_string('description_alt_wcomma', $form);
-            } else {
-                $description = self::get_form_string('description_alt', $form);
+                $key .= '_wcomma';
             }
+            $description = self::get_form_string($key, $form);
 
             // setuping description
             $replace = $this->what_to_replace($description);
@@ -901,28 +889,14 @@ class qtype_preg_description_node_subexpr extends qtype_preg_description_operato
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-        if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
-            $resultpattern = self::get_form_string('description_grouping', $form);
-        } else if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_DUPLICATE_SUBEXPRESSIONS) {
-            $resultpattern = self::get_form_string('description_grouping_duplicate', $form);
-        } else if (is_string($this->pregnode->number)) {
-            if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
-                $resultpattern = self::get_form_string('description_subexpression_name', $form);
-            } else {
-                $resultpattern = self::get_form_string('description_subexpression_once_name', $form);
-            }
-            $resultpattern = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $resultpattern);
-        } else {
-            if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
-                $resultpattern = self::get_form_string('description_subexpression', $form);
-            } else {
-                $resultpattern = self::get_form_string('description_subexpression_once', $form);
-            }
-            $resultpattern = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $resultpattern);
-
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->name !== null) {
+            $key .= '_name';
         }
-        return $resultpattern;
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $result);
+        $result = qtype_poasquestion_string::replace('%name', $this->pregnode->name, $result);
+        return $result;
     }
 }
 
