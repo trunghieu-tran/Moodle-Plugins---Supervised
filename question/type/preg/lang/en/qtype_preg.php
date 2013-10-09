@@ -226,10 +226,10 @@ $string['description_not'] = 'not {$a}';
 $string['description_empty_leaf_meta'] = 'nothing';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'a word boundary';
-$string['description_esc_a'] = 'at the start of the subject';
-$string['description_esc_z'] = 'at the end of the subject';
-$string['description_esc_g'] = 'TODO';
-$string['description_circumflex_leaf_assert'] = 'beginning of the string';
+$string['description_esc_a_leaf_assert'] = 'start of the subject';
+$string['description_esc_z_leaf_assert'] = 'end of the subject';
+$string['description_esc_g_leaf_assert'] = 'TODO';
+$string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 // TYPE_LEAF_BACKREF
 $string['description_leaf_backref'] = 'back reference to subexpression #{$a}';
@@ -238,6 +238,26 @@ $string['description_leaf_backref_name'] = 'back reference to subexpression "{$a
 $string['description_leaf_recursion'] = 'recursive match with subexpression #{$a}';
 $string['description_leaf_recursion_all'] = 'recursive match with whole regular expression';
 $string['description_leaf_recursion_name'] = 'recursive match with subexpression "{$a}"';
+// TYPE_LEAF_CONTROL
+$string['description_accept_leaf_control'] = 'force successful subexpression match';
+$string['description_fail_leaf_control'] = 'force fail';
+$string['description_mark_name_leaf_control'] = 'set name to {$a->name} to be passed back';
+$string['description_commit_leaf_control'] = 'if the rest of the pattern does not match - overall failure, no advance of starting point';
+$string['description_prune_leaf_control'] = 'if the rest of the pattern does not match - advance to next starting character';
+$string['description_skip_leaf_control'] = 'if the rest of the pattern does not match - advance to current matching position';
+$string['description_skip_name_leaf_control'] = 'if the rest of the pattern does not match - advance to (*MARK:{$a})';
+$string['description_then_leaf_control'] = 'if the rest of the pattern does not match - backtrack to next alternation';
+$string['description_cr_leaf_control'] = 'newline matches carriage return only';
+$string['description_lf_leaf_control'] = 'newline matches linefeed only';
+$string['description_crlf_leaf_control'] = 'newline matches carriage return followed by linefeed';
+$string['description_anycrlf_leaf_control'] = 'newline matches carriage return, linefeed or carriage return followed by linefeed';
+$string['description_any_leaf_control'] = 'newline matches any Unicode newline sequence';
+$string['description_bsr_anycrlf_leaf_control'] = '\R matches CR, LF, or CRLF';
+$string['description_bsr_unicode_leaf_control'] = '\R matches any Unicode newline sequence';
+$string['description_no_start_opt_leaf_control'] = 'no start-match optimization';
+$string['description_utf8_leaf_control'] = 'UTF-8 mode';
+$string['description_utf16_leaf_control'] = 'UTF-16 mode';
+$string['description_ucp_leaf_control'] = 'PCRE_UCP';
 // TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'caseless';
 $string['description_unsetoption_i'] = 'case sensitive';
@@ -251,12 +271,12 @@ $string['description_option_U'] = 'quantifiers ungreedy by default';
 $string['description_unsetoption_U'] = 'quantifiers greedy by default';
 $string['description_option_J'] = 'allow duplicate names';
 $string['description_unsetoption_J'] = 'disallow duplicate names';
-$string['description_option_wrapper'] = '{$a->option}:';
+$string['description_leaf_options'] = '{$a}:';
 // TYPE_NODE_FINITE_QUANT
 $string['description_node_finite_quant'] = '{$a->firstoperand} is repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
 $string['description_node_finite_quant_strict'] = '{$a->firstoperand} is repeated {$a->leftborder} times{$a->greedy}';
-$string['description_node_finite_quant_0'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times or missing{$a->greedy}';
-$string['description_node_finite_quant_1'] = '{$a->firstoperand} is repeated no more {$a->rightborder} times{$a->greedy}';
+$string['description_node_finite_quant_0'] = '{$a->firstoperand} is repeated no more than {$a->rightborder} times or missing{$a->greedy}';
+$string['description_node_finite_quant_1'] = '{$a->firstoperand} is repeated no more than {$a->rightborder} times{$a->greedy}';
 $string['description_node_finite_quant_01'] = '{$a->firstoperand} may be missing{$a->greedy}';
 $string['description_node_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
 // TYPE_NODE_INFINITE_QUANT
@@ -301,29 +321,6 @@ $string['description_recursion_node_cond_subexpr_name'] = 'if the pattern "{$a->
 $string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
-// TYPE_LEAF_CONTROL
-$string['description_accept_leaf_control'] = 'force successful subexpression match';
-$string['description_fail_leaf_control'] = 'force fail';
-$string['description_mark_name_leaf_control'] = 'set name to {$a->name} to be passed back';
-$string['description_control_backtrack'] = 'if the rest of the pattern does not match {$a->what}';
-$string['description_commit_leaf_control'] = 'overall failure, no advance of starting point';
-$string['description_prune_leaf_control'] = 'advance to next starting character';
-$string['description_skip_leaf_control'] = 'advance to current matching position';
-$string['description_skip_name_leaf_control'] = 'advance to (*MARK:{$a->name})';
-$string['description_then_leaf_control'] = 'backtrack to next alternation';
-$string['description_control_newline'] = 'newline matches {$a->what}';
-$string['description_cr_leaf_control'] = 'carriage return only';
-$string['description_lf_leaf_control'] = 'linefeed only';
-$string['description_crlf_leaf_control'] = 'carriage return followed by linefeed';
-$string['description_anycrlf_leaf_control'] = 'carriage return, linefeed or carriage return followed by linefeed';
-$string['description_any_leaf_control'] = 'any Unicode newline sequence';
-$string['description_control_r'] = '\R matches {$a->what}';
-$string['description_bsr_anycrlf_leaf_control'] = 'CR, LF, or CRLF';
-$string['description_bsr_unicode_leaf_control'] = 'any Unicode newline sequence';
-$string['description_no_start_opt_leaf_control'] = 'no start-match optimization';
-$string['description_utf8_leaf_control'] = 'UTF-8 mode';
-$string['description_utf16_leaf_control'] = 'UTF-16 mode';
-$string['description_ucp_leaf_control'] = 'PCRE_UCP';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: {$a->characters};';
 $string['description_charset_negative'] = 'any symbol except the following: {$a->characters};';

@@ -316,6 +316,13 @@ abstract class qtype_preg_node {
     }
 
     /**
+     * Returns the key for this node in the lang file.
+     */
+    public function lang_key($usedescription = false) {
+        return $usedescription ? 'description_' . $this->subtype : $this->subtype;
+    }
+
+    /**
      * May be overloaded by childs to change name using data from $this->pregnode.
      */
     public function ui_nodename() {
@@ -1351,6 +1358,14 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         $this->number = $number;
     }
 
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
+    }
+
     public function consumes($matcherstateobj = null) {
         if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
@@ -1422,34 +1437,6 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 }
 
-class qtype_preg_leaf_options extends qtype_preg_leaf {
-    public $posopt;
-    public $negopt;
-
-    public function __construct($posopt = null, $negopt = null) {
-        $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
-        $this->subtype = $this->type;
-        $this->posopt = $posopt;
-        $this->negopt = $negopt;
-    }
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
-    }
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implement abstract function character for qtype_preg_leaf_options class before use it!');
-    }
-    public function tohr() {
-        $result = '(?';
-        if (!empty($this->posopt)) {
-            $result .= $this->posopt;
-        }
-        if (!empty($this->negopt)) {
-            $result .= '-'.$this->negopt;
-        }
-        return $result.')';
-    }
-}
-
 class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     public $number;
@@ -1459,12 +1446,25 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
         $this->subtype = $this->type;
         $this->number = $number;
     }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->number === 0) {
+            $result .= '_all';
+        } else if ($usedescription && is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
+    }
+
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implement abstract function match for qtype_preg_leaf_recursion class before use it!');
     }
+
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implement abstract function character for qtype_preg_leaf_recursion class before use it!');
     }
+
     public function tohr() {
         return 'recursion';
     }
@@ -1533,6 +1533,34 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     }
     public function tohr() {
         return 'control';
+    }
+}
+
+class qtype_preg_leaf_options extends qtype_preg_leaf {
+    public $posopt;
+    public $negopt;
+
+    public function __construct($posopt = null, $negopt = null) {
+        $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
+        $this->subtype = $this->type;
+        $this->posopt = $posopt;
+        $this->negopt = $negopt;
+    }
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
+    }
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        die ('TODO: implement abstract function character for qtype_preg_leaf_options class before use it!');
+    }
+    public function tohr() {
+        $result = '(?';
+        if (!empty($this->posopt)) {
+            $result .= $this->posopt;
+        }
+        if (!empty($this->negopt)) {
+            $result .= '-'.$this->negopt;
+        }
+        return $result.')';
     }
 }
 
