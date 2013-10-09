@@ -334,11 +334,11 @@ $string['description_char_16value'] = 'character with code 0x{$a->code}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_charflag_dot'] = 'any character';
-$string['description_charflag_slashd'] = 'decimal digit';
-$string['description_charflag_slashh'] = 'horizontal white space character';
-$string['description_charflag_slashs'] = 'white space';
-$string['description_charflag_slashv'] = 'vertical white space character';//TODO - third string for description \v is it good?
-$string['description_charflag_slashw'] = 'word character';
+$string['description_charflag_slashd'] = 'a decimal digit';
+$string['description_charflag_slashh'] = 'a horizontal white space character';
+$string['description_charflag_slashs'] = 'a white space';
+$string['description_charflag_slashv'] = 'a vertical white space character';//TODO - third string for description \v is it good?
+$string['description_charflag_slashw'] = 'a word character';
 $string['description_char0'] = 'null character(NUL)';
 $string['description_char1'] = 'start of header character (SOH)';
 $string['description_char2'] = 'start of text character(STX)';
