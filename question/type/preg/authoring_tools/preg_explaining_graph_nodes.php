@@ -638,7 +638,7 @@ class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_t
                                                         array(get_string($key, 'qtype_preg', $this->pregnode->number)),
                                                         'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
-            $key = 'description_recursion';
+            $key = 'description_leaf_recursion';
             if ($this->pregnode->number === 0) {
                 $key .= '_all';
             } else if (is_string($this->pregnode->number)) {
