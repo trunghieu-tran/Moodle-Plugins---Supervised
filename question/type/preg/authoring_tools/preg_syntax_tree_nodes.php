@@ -103,7 +103,7 @@ abstract class qtype_preg_syntax_tree_node {
      * Replaces non-printable and special characters in the given string.
      * Highlights them if needed.
      */
-    protected static function userinscription_to_string($userinscription, $fortooltip) {
+    protected static function userinscription_to_string($userinscription, $negative, $fortooltip) {
         if ($userinscription->type === qtype_preg_userinscription::TYPE_FLAG) {
             if (!$fortooltip) {
                 return $userinscription->data != '.'
@@ -224,7 +224,7 @@ abstract class qtype_preg_syntax_tree_node {
         $label = '';
         $count = count($this->pregnode->userinscription);
         foreach ($this->pregnode->userinscription as $i => $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, false));
+            $label .= shorten_text(self::userinscription_to_string($userinscription, false, false));
             if ($i != $count - 1) {
                 $label .= '&#10;';
             }
@@ -328,7 +328,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             if ($tooltip != '') {
                 $tooltip .= ($start > 0) ? '&#10;' : ' ';
             }
-            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], true);
+            $tooltip .= self::userinscription_to_string($this->pregnode->userinscription[$i], false, true);
         }
         return $tooltip;
     }
@@ -359,10 +359,19 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     }
 
     public function tooltip() {
-        $a = new stdClass;
-        $a->number = $this->pregnode->number;
-        return get_string('description_backref', 'qtype_preg', $a);
+        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg', $this->pregnode->number);
     }
+}
+
+class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
+
+    public function label() {
+        return get_string('description_' . $this->pregnode->subtype, 'qtype_preg', $this->pregnode->number);
+    }
+}
+
+class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
+
 }
 
 class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
@@ -374,17 +383,6 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     public function tooltip() {
         return parent::tooltip() . ' \\"' . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg') . '\\"';
     }
-}
-
-class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
-
-    public function label() {
-        return get_string($this->pregnode->type, 'qtype_preg') . ' ' . $this->pregnode->number;
-    }
-}
-
-class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
-
 }
 
 class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {

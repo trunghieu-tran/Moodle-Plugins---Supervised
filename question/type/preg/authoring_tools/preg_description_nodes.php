@@ -100,6 +100,7 @@ abstract class qtype_preg_description_node {
         }
         $str = get_string($s, 'qtype_preg', $a);
         // TODO process $a directly in classes
+        $str = qtype_poasquestion_string::replace('{$a}', '%', $str);
         $str = qtype_poasquestion_string::replace('{$a->firstoperand}', '%1', $str);
         $str = qtype_poasquestion_string::replace('{$a->secondoperand}', '%2', $str);
         $str = qtype_poasquestion_string::replace('{$a->thirdoperand}', '%3', $str);
@@ -413,17 +414,17 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf {
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string('description_empty', $form);
+        return self::get_form_string('description_' . $this->pregnode->subtype, $form);
     }
 }
 
 class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf {
     public function pattern($node_parent = null, $form = null) {
-        $key = 'description_' . $this->pregnode->subtype;
+        $result = self::get_form_string('description_' . $this->pregnode->subtype, $form);
         if ($this->pregnode->negative) {
-            $key .= '_neg';
+            $result = get_string('description_not', 'qtype_preg', $result);
         }
-        return self::get_form_string($key, $form);
+        return $result;
     }
 }
 
@@ -436,11 +437,85 @@ class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf {
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = self::get_form_string('description_backref', $form);
-        $resultpattern = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $resultpattern);
-        return $resultpattern;
+        $key = 'description_' . $this->pregnode->subtype;
+        if (is_string($this->pregnode->number)) {
+            $key .= '_name';
+        }
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%', $this->pregnode->number, $result);
+        return $result;
     }
 
+}
+
+class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf {
+
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        $key = 'description_' . $this->pregnode->subtype;
+        if ($this->pregnode->number === 0) {
+            $key .= '_all';
+        } else if (is_string($this->pregnode->number)) {
+            $key .= '_name';
+        }
+        $result = self::get_form_string($key, $form);
+        $result = qtype_poasquestion_string::replace('%', $this->pregnode->number, $result);
+        return $result;
+    }
+}
+
+/**
+ * Reperesents backtracking control, newline convention etc sequences like (*...).
+ */
+class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
+
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        $resultpattern = '';
+
+        if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ACCEPT ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_FAIL ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_MARK_NAME ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_NO_START_OPT ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF8 ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF16 ||
+            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UCP) {
+
+            $resultpattern = self::get_form_string('description_' . $this->pregnode->subtype, $form);
+
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_COMMIT ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_PRUNE ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_THEN ) {
+
+            $resultpattern = self::get_form_string('description_control_backtrack', $form);
+            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
+
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP_NAME) {
+
+            $resultpattern = self::get_form_string('description_control_backtrack', $form);
+            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
+            $resultpattern = qtype_poasquestion_string::replace('%name', $this->pregnode->name, $resultpattern);
+
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CR ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_LF ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CRLF ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANYCRLF ||
+                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANY) {
+
+            $resultpattern = self::get_form_string('description_control_newline', $form);
+            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
+
+        } else {
+            $resultpattern = self::get_form_string('description_control_r', $form);
+            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
+        }
+        return $resultpattern;
+    }
 }
 
 class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
@@ -518,75 +593,6 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
             $node->handler->state->forceunsetmodifiers = false;
             $node_pattern = $resultpattern . $node_pattern;
         }
-    }
-}
-
-class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf {
-
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::pattern()
-     */
-    public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-        if ($this->pregnode->number === 0) {
-             $resultpattern = self::get_form_string('description_recursion_all', $form);
-        } else {
-             $resultpattern = self::get_form_string('description_recursion', $form);
-             $resultpattern = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $resultpattern);
-        }
-        return $resultpattern;
-    }
-}
-
-/**
- * Reperesents backtracking control, newline convention etc sequences like (*...).
- */
-class qtype_preg_description_leaf_control extends qtype_preg_description_leaf {
-
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::pattern()
-     */
-    public function pattern($node_parent = null, $form = null) {
-        $resultpattern = '';
-
-        if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ACCEPT ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_FAIL ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_MARK_NAME ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_NO_START_OPT ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF8 ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF16 ||
-            $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UCP) {
-
-            $resultpattern = self::get_form_string('description_' . $this->pregnode->subtype, $form);
-
-        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_COMMIT ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_PRUNE ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_THEN ) {
-
-            $resultpattern = self::get_form_string('description_control_backtrack', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
-
-        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP_NAME) {
-
-            $resultpattern = self::get_form_string('description_control_backtrack', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
-            $resultpattern = qtype_poasquestion_string::replace('%name', $this->pregnode->name, $resultpattern);
-
-        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CR ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_LF ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CRLF ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANYCRLF ||
-                   $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANY) {
-
-            $resultpattern = self::get_form_string('description_control_newline', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
-
-        } else {
-            $resultpattern = self::get_form_string('description_control_r', $form);
-            $resultpattern = qtype_poasquestion_string::replace('%what', self::get_form_string('description_' . $this->pregnode->subtype, $form), $resultpattern);
-        }
-        return $resultpattern;
     }
 }
 

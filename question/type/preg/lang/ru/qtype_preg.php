@@ -221,24 +221,23 @@ $string['authoring_form_match_textarea'] = 'Введите строки для �
 $string['authoring_form_check_strings'] = 'Проверить строку (строки)';
 
 // Strings for node description
-
+$string['description_not'] = 'не {$a}';
 // TYPE_LEAF_META
-$string['description_empty'] = 'ничего';
+$string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'граница слова';
-$string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
 $string['description_esc_a'] = 'начало текста';
 $string['description_esc_z'] = 'конец текста';
 $string['description_esc_g'] = 'TODO';
 $string['description_circumflex_leaf_assert'] = 'начало строки';
 $string['description_dollar_leaf_assert'] = 'конец строки';
 // TYPE_LEAF_BACKREF
-$string['description_backref'] = 'обратная ссылка на подвыражение #{$a->number}';
-$string['description_backref_name'] = 'обратная ссылка на подвыражение "{$a->name}"';
+$string['description_leaf_backref'] = 'обратная ссылка на подвыражение #{$a}';
+$string['description_leaf_backref_name'] = 'обратная ссылка на подвыражение "{$a}"';
 // TYPE_LEAF_RECURSION
-$string['description_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
-$string['description_recursion'] = 'рекурсивное совпадение с подмаской  №{$a->number}';
-$string['description_recursion_name'] = 'рекурсивное совпадение с подмаской "{$a->name}"';
+$string['description_leaf_recursion'] = 'рекурсивное совпадение с подмаской #{$a}';
+$string['description_leaf_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
+$string['description_leaf_recursion_name'] = 'рекурсивное совпадение с подмаской "{$a}"';
 // TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'регистронезависимо';
 $string['description_unsetoption_i'] = 'регистрозависимо';
@@ -541,7 +540,6 @@ $string['description_concat_g'] = '{$a->g1} затем {$a->g2}';
 $string['description_concat_short_g'] = '{$a->g1}{$a->g2}';
 $string['description_alt_g'] = '{$a->g1} или {$a->g2}';
 $string['description_alt_wcomma_g'] = '{$a->g1} или {$a->g2}';
-$string['description_empty_g'] = 'ничего(form g)';
 
 // Strings for explaining graph
 $string['explain_subexpression'] = 'подвыражение №';
