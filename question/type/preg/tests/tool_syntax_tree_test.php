@@ -41,17 +41,17 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
         // Some characters in brackets.
         $node = $tree->from_preg_node($this->get_pregnode('[αя]'));
-        $this->assertEquals($node->label(), '&#91;&#10;α&#10;я&#10;&#93;');
+        $this->assertEquals($node->label(), '[αя]');
         $this->assertEquals($node->tooltip(), 'character set&#10;α&#10;я');
 
         // Negative character set of one character.
         $node = $tree->from_preg_node($this->get_pregnode('[^α]'));
-        $this->assertEquals($node->label(), '&#91;^&#10;α&#10;&#93;');
+        $this->assertEquals($node->label(), '[^α]');
         $this->assertEquals($node->tooltip(), 'negative character set&#10;α');
 
          // Negative character set of multiple characters.
         $node = $tree->from_preg_node($this->get_pregnode('[^ab]'));
-        $this->assertEquals($node->label(), '&#91;^&#10;a&#10;b&#10;&#93;');
+        $this->assertEquals($node->label(), '[^ab]');
         $this->assertEquals($node->tooltip(), 'negative character set&#10;a&#10;b');
 
         // Single flag.
@@ -63,6 +63,55 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->from_preg_node($this->get_pregnode('\W'));
         $this->assertEquals($node->label(), '\W');
         $this->assertEquals($node->tooltip(), 'not a word character');
+
+        // All flags.
+        $node = $tree->from_preg_node($this->get_pregnode('[\d\D\h\H\s\S\v\V\w\W]'));
+        $this->assertEquals($node->label(), '[\d\D\h\H\s\S\v\V\w\W]');
+        $this->assertEquals($node->tooltip(), 'character set&#10;'.
+                                              'a decimal digit&#10;'.
+                                              'not a decimal digit&#10;'.
+                                              'a horizontal white space character&#10;'.
+                                              'not a horizontal white space character&#10;'.
+                                              'a white space&#10;'.
+                                              'not a white space&#10;'.
+                                              'a vertical white space character&#10;'.
+                                              'not a vertical white space character&#10;'.
+                                              'a word character&#10;'.
+                                              'not a word character');
+
+        // All POSIX classes.
+        $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]'));
+        $this->assertEquals($node->label(), '[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]');
+        $this->assertEquals($node->tooltip(), 'character set&#10;'.
+                                              'letter or digit&#10;'.
+                                              'letter&#10;'.
+                                              'character with codes 0-127&#10;'.
+                                              'space or tab only&#10;'.
+                                              'control character&#10;'.
+                                              'decimal digit&#10;'.
+                                              'printing character (excluding space)&#10;'.
+                                              'lower case letter&#10;'.
+                                              'printing character (including space)&#10;'.
+                                              'printing character (excluding letters and digits and space)&#10;'.
+                                              'white space&#10;'.
+                                              'upper case letter&#10;'.
+                                              'word character&#10;'.
+                                              'hexadecimal digit');
+
+        // Positive and negative POSIX classes.
+        $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:^alpha:]]'));
+        $this->assertEquals($node->label(), '[[:alnum:][:^alpha:]]');
+        $this->assertEquals($node->tooltip(), 'character set&#10;'.
+                                              'letter or digit&#10;'.
+                                              'not letter');
+
+        // Unicode properties.
+        $node = $tree->from_preg_node($this->get_pregnode('[\pL\PM]'));
+        $this->assertEquals($node->label(), '[\pL\PM]');
+        $this->assertEquals($node->tooltip(), 'character set&#10;'.
+                                              'letter&#10;'.
+                                              'not mark');
+
     }
 
     function test_simple_assertions() {
