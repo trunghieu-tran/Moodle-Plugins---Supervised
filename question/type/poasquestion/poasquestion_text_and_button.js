@@ -99,7 +99,7 @@ M.poasquestion_text_and_button = (function() {
         var is_first_press = self.dialog === null;
 
         self.currentlinput = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
-        self.data = self.currentlinput.val();
+        self.data = self.get_input_data();
         if (is_first_press) {
             // if the 'Test regex' button is first pressed, we should generate a dialog window
             self.setup_dialog();
@@ -159,16 +159,24 @@ M.poasquestion_text_and_button = (function() {
      * into  current input.
      * @param {String} _data data to set into current input
      */
-    close_and_set_new_data : function(_data) {
-        if (typeof(_data) === "string") {
-            self.data = _data;
-            self.currentlinput.val(_data);
+    close_and_set_newodata : function(odata) {
+        if (typeof(odata) === "string") {
+            self.data = odata;
+            self.set_input_data(odata);
         } else {
-            self.currentlinput.val(self.data);
+            self.set_input_data(self.data);
         }
-		$('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
-        $('#id_test_regex').html('');
         self.dialog.dialog('close');
+    },
+
+    get_input_data : function() {
+        return self.currentlinput ? self.currentlinput.val(_data) : '';
+    },
+
+    set_input_data : function(odata) {
+        if (self.currentlinput) {
+            self.currentlinput.val(odata); 
+        }
     }
 };
 
