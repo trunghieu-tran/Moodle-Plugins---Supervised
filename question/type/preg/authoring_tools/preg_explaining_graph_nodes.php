@@ -145,24 +145,22 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         // Now, iterate over userinscription elements.
         foreach ($info as $userinscription) {
             $data = new qtype_poasquestion_string($userinscription->data);
-            // First, we need to define: is it range?
-            // So, check this pattern: <something>-<something>.
+
+            // Check ranges.
             $mpos = textlib::strpos($data, '-');
-            // If position is not in beginning and not in end...
             if ($mpos != 0 && $mpos != $data->length() - 1) {
-                if ($mpos == 1) { // If <something>'s length is 1 then our range hasn't hex code.
+                if ($mpos == 1) { // If length is 1 then our range hasn't hex code.
                     $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . $data->substring(0, $mpos) .
                                           get_string('explain_to', 'qtype_preg') . $data->substring($mpos + 1);
-                } else {            // ...else we deal with hex code in <something>.
-                    $a = new stdClass();
-                    $a->code = $data->substring(2, $mpos - 2)->string();
+                } else {            // ...else we deal with hex code
+                    $a = $data->substring(2, $mpos - 2)->string();
                     $tmp = chr(10) . get_string('explain_from', 'qtype_preg') .
-                                     get_string('description_char_16value', 'qtype_preg', $a) . get_string('explain_to', 'qtype_preg');
-                    $a->code = $data->substring($mpos + 3)->string();
+                                     get_string('description_char_16value', 'qtype_preg', $a) .
+                                     get_string('explain_to', 'qtype_preg');
+                    $a = $data->substring($mpos + 3)->string();
                     $result[] = $tmp . get_string('description_char_16value', 'qtype_preg', $a);
                 }
-
-                continue; // Because we found range we iterate to next unserinscription element.
+                continue;
             }
 
             // Extract flags from lang-file.
@@ -172,60 +170,25 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
                 continue;
             }
 
+            // Check \x.. and \x{..} sequences
+            $hex = $userinscription->is_hex_code();
+            if ($hex !== false) {
+                $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', textlib::strtoupper($hex));
+                continue;
+            }
 
-            // Now we know that this $userinscription hasn't a range.
-            // So, iterate over all characters in $userinscription.
-            for ($i = 0; $i < $data->length(); $i++) {
-                if ($data[$i] == '\\') {
-                    $i++; // Move to next character.
-                    // Now we're just checking all possible <something> variants.
-                    if ($data[$i] == '\\') {    // Here is \-escaping.
-                        $result[count($result) - 1] .= '\\';
-                    }
-                    if ($data[$i] == 'x' || $data[$i] == 'X') { // It may be like this - \x<somthing> or \X<something>, where <something> is hex number.
-                        $i++;
-                        $tmp = '';
-                        if (ctype_xdigit($data[$i])) {
-                            $tmp = $data[$i];
-                            $i++;
-                            if (ctype_xdigit($data[$i])) {
-                                $tmp .= $data[$i];
-                            }
-                        } else if ($data[$i] == '{') { // It also may looks like \x{<something>}.
-                            $i++;
-                            while ($data[$i] != '}') {
-                                $tmp .= $data[$i];
-                                $i++;
-                            }
-                        } else {
-                            $tmp = 0;
-                            $i--;
-                        }
-
-                        // Extract a value from lang-file.
-                        $a = new stdClass();
-                        $a->code = $tmp;
-                        $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', $a);
-                    } else if ($data[$i] == 'n') {
-                        $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
-                    } else if ($data[$i] == 'r') {
-                        $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
-                    } else if ($data[$i] == 't') {
-                        $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                    } else if ($data[$i] == ' ') {
-                        $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                    } else if ($data[$i] == "\t") {
-                        $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                    } else {
-                        $result[0] .= $data[$i];
-                    }
-                } else if ($data[$i] == ' ') {
-                    $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                } else if ($data[$i] == "\t") {
-                    $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                } else {
-                    $result[0] .= $data[$i]; // All another characters are not special.
-                }
+            if ($data == '\\n') {
+                $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
+            } else if ($data == '\\r') {
+                $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
+            } else if ($data == '\\t') {
+                $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
+            } else if ($data == '\\ ') {
+                $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
+            } else if ($data == ' ') {
+                $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
+            } else {
+                $result[0] .= $data;
             }
         }
 

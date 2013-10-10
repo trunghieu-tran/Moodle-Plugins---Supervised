@@ -329,7 +329,7 @@ $string['description_charset_neg'] = 'любой из символов кром�
 $string['description_charset_neg_one'] = 'не {$a->characters}';
 $string['description_charset_range'] = 'любой символ от {$a->start} до {$a->end}';
 $string['description_char'] = '<span style="color:blue">{$a->char}</span>';
-$string['description_char_16value'] = 'символ с кодом 0x{$a->code}';
+$string['description_char_16value'] = 'символ с кодом 0x{$a}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_char0'] = 'ноль-символ(NUL)';
