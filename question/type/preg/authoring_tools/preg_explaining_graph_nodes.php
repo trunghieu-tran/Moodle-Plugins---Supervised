@@ -170,22 +170,19 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
                 continue;
             }
 
-            // Check \x.. and \x{..} sequences
-            $hex = $userinscription->is_hex_code();
-            if ($hex !== false) {
-                $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', textlib::strtoupper($hex));
+            // Check escape sequences
+            $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
+            if ($code !== null) {
+                $hex = textlib::strtoupper(dechex($code));
+                if ($data[1] != 'c' && $data[1] != 'x') {
+                    $result[] = chr(10) . get_string('description_char' . $hex, 'qtype_preg');
+                } else {
+                    $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', $hex);
+                }
                 continue;
             }
 
-            if ($data == '\\n') {
-                $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
-            } else if ($data == '\\r') {
-                $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
-            } else if ($data == '\\t') {
-                $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-            } else if ($data == '\\ ') {
-                $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-            } else if ($data == ' ') {
+            if ($data == '\\ ' || $data == ' ') {
                 $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
             } else {
                 $result[0] .= $data;
