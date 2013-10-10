@@ -174,18 +174,18 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
     }
 
     public function get_shape() {
-
+        if (count($this->pregnode->errors) > 0) {
+            return 'ellipse';
+        }
         if (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
-        } else {
-            if ($this->get_color() == 'hotpink') {
-                return 'ellipse';
-            } else if ($this->pregnode->flags[0][0]->data->length() > 1) {
-                return 'record';
-            } else {
-                return 'ellipse';
-            }
         }
+        if ($this->get_color() == 'hotpink') {
+            return 'ellipse';
+        } else if ($this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::TYPE_SET && $this->pregnode->flags[0][0]->data->length() > 1) {
+            return 'record';
+        }
+        return 'ellipse';
     }
 }
 

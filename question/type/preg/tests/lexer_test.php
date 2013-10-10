@@ -57,7 +57,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[1][0]->data->string() === 'ab');
     }
     function test_charset_ranges() {
-        $lexer = $this->create_lexer('[a-d0-9][3-6][^\x61-\x{63}]');
+        $lexer = $this->create_lexer('[a-d0-9][3-6][^\x61-\x{63}][\a-\n]');
         $token = $lexer->nextToken();// [a-d]
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -72,6 +72,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->negative);
         $this->assertTrue($token->value->flags[0][0]->data->string() === qtype_preg_unicode::code2utf8(0x61).qtype_preg_unicode::code2utf8(0x62).qtype_preg_unicode::code2utf8(0x63));
         $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();
+        $this->assertTrue(count($token->value->flags) > 0);
     }
     function test_charset_misc() {
         $lexer = $this->create_lexer('[^-\w\D][\Q][?\E][]a][^]a]');
