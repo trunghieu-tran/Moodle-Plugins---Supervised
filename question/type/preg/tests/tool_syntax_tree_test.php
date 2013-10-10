@@ -83,27 +83,27 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]'));
         $this->assertEquals($node->label(), '[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'letter or digit&#10;'.
-                                              'letter&#10;'.
-                                              'character with codes 0-127&#10;'.
-                                              'space or tab only&#10;'.
-                                              'control character&#10;'.
-                                              'decimal digit&#10;'.
-                                              'printing character (excluding space)&#10;'.
-                                              'lower case letter&#10;'.
-                                              'printing character (including space)&#10;'.
-                                              'printing character (excluding letters and digits and space)&#10;'.
-                                              'white space&#10;'.
-                                              'upper case letter&#10;'.
-                                              'word character&#10;'.
-                                              'hexadecimal digit');
+                                              'a letter or digit&#10;'.
+                                              'a letter&#10;'.
+                                              'a character with codes 0-127&#10;'.
+                                              'a space or tab only&#10;'.
+                                              'a control character&#10;'.
+                                              'a decimal digit&#10;'.
+                                              'a printing character (excluding space)&#10;'.
+                                              'a lower case letter&#10;'.
+                                              'a printing character (including space)&#10;'.
+                                              'a printing character (excluding letters and digits and space)&#10;'.
+                                              'a white space&#10;'.
+                                              'an upper case letter&#10;'.
+                                              'a word character&#10;'.
+                                              'a hexadecimal digit');
 
         // Positive and negative POSIX classes.
         $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:^alpha:]]'));
         $this->assertEquals($node->label(), '[[:alnum:][:^alpha:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'letter or digit&#10;'.
-                                              'not letter');
+                                              'a letter or digit&#10;'.
+                                              'not a letter');
 
         // Unicode properties.
         $node = $tree->from_preg_node($this->get_pregnode('[\pL\PM]'));
@@ -147,6 +147,13 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->from_preg_node($this->get_pregnode('$'));
         $this->assertEquals($node->label(), '$');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_DOLLAR, 'qtype_preg'));
+    }
+
+    function test_label_subexpr() {
+        $tree = new qtype_preg_syntax_tree_tool('(?<name>body)');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '(?&#60;name&#62;...) #1');
+        $this->assertEquals($node->tooltip(), 'subexpression "name" #1');
     }
 
     function test_something() {

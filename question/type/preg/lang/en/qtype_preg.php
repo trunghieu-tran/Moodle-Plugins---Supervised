@@ -306,12 +306,12 @@ $string['description_nla_node_assert_cond'] = 'further text does not match: [{$a
 $string['description_plb_node_assert_cond'] = 'preceding text matches: [{$a->firstoperand}]';
 $string['description_nlb_node_assert_cond'] = 'preceding text does not match: [{$a->firstoperand}]';
 // TYPE_NODE_SUBEXPR
-$string['description_subexpr_node_subexpr'] = 'subexpression #{$a->number}: [{$a->firstoperand}]';
-$string['description_subexpr_node_subexpr_name'] = 'subexpression "{$a->name}": [{$a->firstoperand}]';
-$string['description_onceonly_node_subexpr'] = 'once checked subexpression #{$a->number}: [{$a->firstoperand}]';
-$string['description_onceonly_node_subexpr_name'] = 'once checked subexpression "{$a->name}": [{$a->firstoperand}]';
-$string['description_grouping_node_subexpr'] = 'grouping: [{$a->firstoperand}]';
-$string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers for capturing groups in each alternation): [{$a->firstoperand}]';
+$string['description_subexpr_node_subexpr'] = 'subexpression #{$a->number}: [ {$a->firstoperand} ]';
+$string['description_subexpr_node_subexpr_name'] = 'subexpression "{$a->name}" #{$a->number}: [ {$a->firstoperand} ]';
+$string['description_onceonly_node_subexpr'] = 'once checked subexpression #{$a->number}: [ {$a->firstoperand} ]';
+$string['description_onceonly_node_subexpr_name'] = 'once checked subexpression "{$a->name} #{$a->number}": [ {$a->firstoperand} ]';
+$string['description_grouping_node_subexpr'] = 'grouping: [ {$a->firstoperand} ]';
+$string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers for capturing groups in each alternation): [ {$a->firstoperand} ]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
 $string['description_subexpr_node_cond_subexpr'] = 'if the subexpression #{$a->number} has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
 $string['description_subexpr_node_cond_subexpr_name'] = 'if the subexpression "{$a->name}" has been successfully matched then check: [{$a->firstoperand}]{$a->else}';

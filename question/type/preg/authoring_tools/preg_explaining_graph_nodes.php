@@ -532,11 +532,8 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 
         $label = '';
         if ($this->pregnode->number != -1) {
-            $label = get_string($this->pregnode->lang_key(true), 'qtype_preg');
-            //subexpression "{$a->name}": [{$a->firstoperand}]"
-            $label = qtype_poasquestion_string::replace(': [{$a->firstoperand}]', '', $label);
-            $label = qtype_poasquestion_string::replace('{$a->number}', $this->pregnode->number, $label);
-            $label = qtype_poasquestion_string::replace('{$a->name}', $this->pregnode->name, $label);
+            $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
+            $label = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $label);
             $label = qtype_poasquestion_string::replace('"', '\\"', $label);// TODO dafuq?
         }
 

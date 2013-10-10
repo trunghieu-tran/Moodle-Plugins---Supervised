@@ -446,14 +446,14 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
     }
 
     public function tooltip() {
-        if ($this->pregnode->number > 0) {
-            return parent::tooltip() . " #" . $this->pregnode->number;
-        }
-        return parent::tooltip();
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
+        $result = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $result);
+        return $result;
     }
 }
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
+
     public function tooltip() {
         return get_string($this->pregnode->subtype, 'qtype_preg');
     }

@@ -306,10 +306,10 @@ $string['description_nla_node_assert_cond'] = 'текст далее не соо
 $string['description_plb_node_assert_cond'] = 'предшествующий текст соответсвует: [{$a->firstoperand}]';
 $string['description_nlb_node_assert_cond'] = 'предшествующий текст не соответствует: [{$a->firstoperand}]';
 // TYPE_NODE_SUBEXPR
-$string['description_subexpr_node_subexpr'] = 'подмаска #{$a->number}: [{$a->firstoperand}]';
-$string['description_subexpr_node_subexpr_name'] = 'подмаска "{$a->name}": [{$a->firstoperand}]';
-$string['description_onceonly_node_subexpr_once'] = 'однократная подмаска #{$a->number}: [{$a->firstoperand}]';
-$string['description_onceonly_node_subexpr_once_name'] = 'однократная подмаска "{$a->name}": [{$a->firstoperand}]';
+$string['description_subexpr_node_subexpr'] = 'подмаска #{$a->number}: [ {$a->firstoperand} ]';
+$string['description_subexpr_node_subexpr_name'] = 'подмаска "{$a->name} #{$a->number}": [ {$a->firstoperand} ]';
+$string['description_onceonly_node_subexpr_once'] = 'однократная подмаска #{$a->number}: [ {$a->firstoperand} ]';
+$string['description_onceonly_node_subexpr_once_name'] = 'однократная подмаска "{$a->name} #{$a->number}": [ {$a->firstoperand} ]';
 $string['description_grouping_node_subexpr'] = 'группировка: [{$a->firstoperand}]';
 $string['description_duplicate_node_subexpr'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [{$a->firstoperand}]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
