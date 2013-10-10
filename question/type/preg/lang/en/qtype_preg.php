@@ -221,6 +221,7 @@ $string['authoring_form_match_textarea'] = 'Input strings to match (one per line
 $string['authoring_form_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
+$string['description_operand'] = 'operand';
 // TYPE_LEAF_META
 $string['description_empty_leaf_meta'] = 'nothing';
 // TYPE_LEAF_ASSERT

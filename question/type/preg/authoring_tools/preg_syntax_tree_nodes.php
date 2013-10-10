@@ -394,28 +394,25 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {
 
     public function tooltip() {
-        $result = parent::tooltip();
-        $key = 'description_quant_greedy';
-        if ($this->pregnode->lazy) {
-            $key = 'description_quant_lazy';
-        } else if ($this->pregnode->possessive) {
-            $key = 'description_quant_possessive';
-        }
-        return $result . get_string($key, 'qtype_preg');
+        $a = new stdClass;
+        $a->leftborder = $this->pregnode->leftborder;
+        $a->rightborder = $this->pregnode->rightborder;
+        $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
+        $result = qtype_poasquestion_string::replace('{$a->firstoperand}', get_string('description_operand', 'qtype_preg'), $result);
+        return $result;
     }
 }
 
 class qtype_preg_syntax_tree_node_infinite_quant extends qtype_preg_syntax_tree_operator {
 
     public function tooltip() {
-        $result = parent::tooltip();
-        $key = 'description_quant_greedy';
-        if ($this->pregnode->lazy) {
-            $key = 'description_quant_lazy';
-        } else if ($this->pregnode->possessive) {
-            $key = 'description_quant_possessive';
-        }
-        return $result . get_string($key, 'qtype_preg');
+        $a = new stdClass;
+        $a->leftborder = $this->pregnode->leftborder;
+        $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
+        $result = qtype_poasquestion_string::replace('{$a->firstoperand}', get_string('description_operand', 'qtype_preg'), $result);
+        return $result;
     }
 }
 

@@ -221,6 +221,7 @@ $string['authoring_form_match_textarea'] = 'Введите строки для �
 $string['authoring_form_check_strings'] = 'Проверить строку (строки)';
 
 // Strings for node description
+$string['description_operand'] = 'операнд';
 // TYPE_LEAF_META
 $string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
