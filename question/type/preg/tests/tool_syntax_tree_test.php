@@ -26,7 +26,7 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         return $lexer->nextToken()->value;
     }
 
-    function test_charset() {
+    function test_label_tooltip_charset() {
         $tree = new qtype_preg_syntax_tree_tool();
 
         // Single character.
@@ -114,16 +114,39 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
     }
 
-    function test_simple_assertions() {
+    function test_label_tooltip_simple_assertions() {
         $tree = new qtype_preg_syntax_tree_tool();
 
         $node = $tree->from_preg_node($this->get_pregnode('\\b'));
         $this->assertEquals($node->label(), '\\b');
-        $this->assertEquals($node->tooltip(), 'a word boundary');
-
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_B, 'qtype_preg'));
         $node = $tree->from_preg_node($this->get_pregnode('\\B'));
         $this->assertEquals($node->label(), '\\B');
-        $this->assertEquals($node->tooltip(), 'not a word boundary');
+        $this->assertEquals($node->tooltip(), 'not ' . get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_B, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\A'));
+        $this->assertEquals($node->label(), '\\A');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_A, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\z'));
+        $this->assertEquals($node->label(), '\\z');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\Z'));
+        $this->assertEquals($node->label(), '\\Z');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('\\G'));
+        $this->assertEquals($node->label(), '\\G');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_G, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('^'));
+        $this->assertEquals($node->label(), '^');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX, 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode('$'));
+        $this->assertEquals($node->label(), '$');
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_DOLLAR, 'qtype_preg'));
     }
 
     function test_something() {

@@ -417,7 +417,7 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf {
 
     public function pattern($node_parent = null, $form = null) {
         $result = self::get_form_string('description_' . $this->pregnode->subtype, $form);
-        if ($this->pregnode->negative) {
+        if ($this->pregnode->negative && $this->pregnode->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
             $result = get_string('description_not', 'qtype_preg', $result);
         }
         return $result;

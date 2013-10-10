@@ -105,11 +105,11 @@ $string['node_error']                  = 'syntax error';
 
 // Subtypes.
 $string['empty_leaf_meta']             = 'emptiness';
-$string['esc_b_leaf_assert']           = 'word boundary assertion';
-$string['esc_a_leaf_assert']           = 'start of the subject assertion';
-$string['esc_z_leaf_assert']           = 'end of the subject assertion';
-$string['esc_g_leaf_assert']           = '';
-$string['circumflex_leaf_assert']      = 'beginning of the string';
+$string['esc_b_leaf_assert']           = 'a word boundary';
+$string['esc_a_leaf_assert']           = 'start of the string';
+$string['esc_z_leaf_assert']           = 'end of the string';
+$string['esc_g_leaf_assert']           = 'first matching position in the string';
+$string['circumflex_leaf_assert']      = 'start of the string';
 $string['dollar_leaf_assert']          = 'end of the string';
 $string['accept_leaf_control']         = '';   // TODO
 $string['fail_leaf_control']           = '';
@@ -226,9 +226,9 @@ $string['description_not'] = 'not {$a}';
 $string['description_empty_leaf_meta'] = 'nothing';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'a word boundary';
-$string['description_esc_a_leaf_assert'] = 'start of the subject';
-$string['description_esc_z_leaf_assert'] = 'end of the subject';
-$string['description_esc_g_leaf_assert'] = 'TODO';
+$string['description_esc_a_leaf_assert'] = 'start of the string';
+$string['description_esc_z_leaf_assert'] = 'end of the string';
+$string['description_esc_g_leaf_assert'] = 'first matching position in the string';
 $string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 // TYPE_LEAF_BACKREF

@@ -340,6 +340,17 @@ class qtype_preg_syntax_tree_leaf_meta extends qtype_preg_syntax_tree_leaf {
 
 class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
 
+    public function tooltip() {
+        if ($this->pregnode->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
+            return parent::tooltip();
+        }
+        $backup = $this->pregnode->negative;
+        $this->pregnode->negative = false;
+        $result = parent::tooltip();
+        $this->pregnode->negative = $backup;
+        return $result;
+    }
+
     public function style() {
         return 'dashed';
     }

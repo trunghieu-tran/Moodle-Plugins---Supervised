@@ -347,7 +347,7 @@ class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_le
 
     public function get_value() {
         $result = get_string('description_' . $this->pregnode->subtype, 'qtype_preg');
-        if ($this->pregnode->negative) {
+        if ($this->pregnode->negative && $this->pregnode->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
             $result = get_string('description_not', 'qtype_preg', $result);
         }
         return array($result);
