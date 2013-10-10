@@ -50,7 +50,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $regular->engine = $engine;
         // Creating query matcher will require necessary matcher code.
         $regular->get_query_matcher($engine);
-        
+
 
         // Create matcher to use for testing regexes.
         // Do not use qtype_preg_question::get_matcher to pass selection to the options.
@@ -58,7 +58,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $matchingoptions = new qtype_preg_matching_options();
         $matchingoptions->modifiers = $regular->get_modifiers($usecase);
         $matchingoptions->extensionneeded = false; // No need to generate next characters there.
-        $matchingoptions->capturesubexpressions = true; // Capture selection - or should this be false? TODO...
+        $matchingoptions->capturesubexpressions = true;
         $matchingoptions->notation = $notation;
         $matchingoptions->exactmatch = $exactmatch;
         $matchingoptions->selection = $selection;

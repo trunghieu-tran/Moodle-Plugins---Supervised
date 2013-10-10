@@ -48,18 +48,26 @@ class backup_qtype_poasquestion_plugin extends backup_qtype_plugin {
         // This qtype uses standard question_answers, add them here
         // to the tree before any other information that will use them.
         $this->add_question_question_answers($pluginwrapper);
+        $answers = $pluginwrapper->get_child('answers');
+        $answer = $answers->get_child('answer');
 
-        // Now create the qtype own structures.
+        // Extra question fields.
         $extraquestionfields = $qtypeobj->extra_question_fields();
-        $tablename = array_shift($extraquestionfields);
+        if (!empty($extraquestionfields)) {
+            $tablename = array_shift($extraquestionfields);
+            $child = new backup_nested_element($qtypeobj->name(), array('id'), $extraquestionfields);
+            $pluginwrapper->add_child($child);
+            $child->set_source_table($tablename, array($qtypeobj->questionid_column_name() => backup::VAR_PARENTID));
+        }
 
-        $child = new backup_nested_element($qtypeobj->name(), array('id'), $extraquestionfields);
-
-        // Now the own qtype tree.
-        $pluginwrapper->add_child($child);
-
-        // Set source to populate the data.
-        $child->set_source_table($tablename, array($qtypeobj->questionid_column_name() => backup::VAR_PARENTID));
+        // Extra answer fields.
+        $extraanswerfields = $qtypeobj->extra_answer_fields();
+        if (!empty($extraanswerfields)) {
+            $tablename = array_shift($extraanswerfields);
+            $child = new backup_nested_element('extraanswerdata', array('id'), $extraanswerfields);
+            $answer->add_child($child);
+            $child->set_source_table($tablename, array('answerid' => backup::VAR_PARENTID));
+        }
 
         // Don't need to annotate ids nor files.
         return $plugin;

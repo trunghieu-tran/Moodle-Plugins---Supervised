@@ -49,7 +49,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * Overloaded from qtype_preg_regex_handler.
      */
     protected function node_infix() {
-        return 'authoring_tool';
+        return 'explaining_graph';
     }
 
     /**
@@ -57,7 +57,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      */
     protected function get_engine_node_name($nodetype, $nodesubtype) {
         if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
-            return 'qtype_preg_authoring_tool_node_quant';
+            return 'qtype_preg_explaining_graph_node_quant';
         }
         return parent::get_engine_node_name($nodetype, $nodesubtype);
     }
@@ -70,7 +70,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
             case qtype_preg_node::TYPE_ABSTRACT:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
             case qtype_preg_node::TYPE_NODE_ERROR:
-                return false;
+                return get_string($pregnode->type, 'qtype_preg');
             default:
                 return true;
         }
@@ -102,7 +102,6 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * @return explainning graph of regular expression.
      */
     public function create_graph($id = -1) {
-        $this->set_flag($this->dst_root);
         $graph = $this->dst_root->create_graph($id);
 
         if ($this->options->exactmatch) {
@@ -125,14 +124,5 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         }
 
         return $graph;
-    }
-
-    protected function set_flag($node) {
-        $node->isexact = $this->is_preg_node_acceptable($node->pregnode);
-        if (isset($node->operands)) {
-            foreach ($node->operands as $operand) {
-                $this->set_flag($operand);
-            }
-        }
     }
 }

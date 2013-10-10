@@ -66,11 +66,11 @@ class qtype_preg extends qtype_shortanswer {
         return $extraquestionfields;
     }
 
-    // Uncomment if going to use extra_answer_fields (depends on Tim).
-    /*public function extra_answer_fields() {
-        return array ('qtype_preg_regex_tests', 'tablename', 'tableid', 'regextests');
-    }*/
+    public function extra_answer_fields() {
+        return array ('qtype_preg_regex_tests', 'regextests');
+    }
 
+    // TODO - clean up when this will be in the core (hopefully 2.6).
     public function save_question_options($question) {
 
         global $DB;
@@ -107,26 +107,40 @@ class qtype_preg extends qtype_shortanswer {
             $question->uselexemhint = false;
         }
 
+        // Perform sanity checks on fractional grades.
+        $maxfraction = -1;
+        foreach ($question->answer as $key => $answerdata) {
+            if ($question->fraction[$key] > $maxfraction) {
+                $maxfraction = $question->fraction[$key];
+            }
+        }
+        if ($maxfraction != 1) {
+            $result->error = get_string('fractionsnomax', 'question', $maxfraction * 100);
+            return $result;
+        }
+
         $context = $question->context;
 
         $oldanswers = $DB->get_records('question_answers',
                 array('question' => $question->id), 'id ASC');
 
-        $oldtests = array();
-        if (!empty($oldanswers)) {
-            list ($sql, $params) = $DB->get_in_or_equal($oldanswers);
-            $oldtests = $DB->get_records_sql('SELECT * FROM {qtype_preg_regex_tests} WHERE ' .
-                'answerid ' . $sql, $params);
-                //'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $questionid . ')' );
+        // We need separate arrays for answers and extra answer data, so no JOINS there.
+        $extraanswerfields = $this->extra_answer_fields();
+        $isextraanswerfields = is_array($extraanswerfields);
+        $extraanswertable = '';
+        $oldanswerextras = array();
+        if ($isextraanswerfields) {
+            $extraanswertable = array_shift($extraanswerfields);
+            if (!empty($oldanswers)) {
+                $oldanswerextras = $DB->get_records_sql("SELECT * FROM {{$extraanswertable}} WHERE " .
+                    'answerid IN (SELECT id FROM {question_answers} WHERE question = ' . $question->id . ')' );
+            }
         }
-
-        $maxfraction = -1;
 
         // Insert all the new answers.
         foreach ($question->answer as $key => $answerdata) {
             // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-                    html_is_blank($question->feedback[$key]['text'])) {
+            if ($this->is_answer_empty($question, $key)) {
                 continue;
             }
 
@@ -140,53 +154,49 @@ class qtype_preg extends qtype_shortanswer {
                 $answer->id = $DB->insert_record('question_answers', $answer);
             }
 
-            $answer->answer   = trim($answerdata);
-            $answer->fraction = $question->fraction[$key];
-            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
-                    $context, 'question', 'answerfeedback', $answer->id);
-            $answer->feedbackformat = $question->feedback[$key]['format'];
+            $this->fill_answer_fields($answer, $question, $key, $context);
             $DB->update_record('question_answers', $answer);
 
-            if ($question->fraction[$key] > $maxfraction) {
-                $maxfraction = $question->fraction[$key];
-            }
+            if ($isextraanswerfields) {
+                // Check, if this answer contains some extra field data.
+                if ($this->is_extra_answer_fields_empty($question, $key)) {
+                    continue;
+                }
 
-            $thistest = '';
-            // Now check, if this answer contains some tests.
-            if (!isset($question->regextests) || trim($question->regextests[$key]) == '') {
-                // continue; //TODO it's not good to have empty strings in DB, but we need a way to pass regex/test relations to the form.
-            } else {
-                $thistest = $question->regextests[$key];
+                $answerextra = array_shift($oldanswerextras);
+                if (!$answerextra) {
+                    $answerextra = new stdClass();
+                    $answerextra->answerid = $answer->id;
+                    // Avoid looking for correct default for any possible DB field type
+                    // by setting real values.
+                    $this->fill_extra_answer_fields($answerextra, $question, $key, $context, $extraanswerfields);
+                    $answerextra->id = $DB->insert_record($extraanswertable, $answerextra);
+                } else {
+                    // Update answerid, as record may be reused from another answer.
+                    $answerextra->answerid = $answer->id;
+                    $this->fill_extra_answer_fields($answerextra, $question, $key, $context, $extraanswerfields);
+                    $DB->update_record($extraanswertable, $answerextra);
+                }
             }
-
-            $test = array_shift($oldtests);
-            if (!$test) {
-                $test = new stdClass();
-                $test->answerid = $answer->id;
-                $test->regextests = '';
-                $test->id = $DB->insert_record('qtype_preg_regex_tests', $test);
-            }
-
-            $test->regextests  = trim($thistest);
-            $DB->update_record('qtype_preg_regex_tests', $test);
 
         }
 
         // We don't want to call shortanswer question function, since it will repeat the steps to save answers.
         $parentresult = question_type::save_question_options($question);
-        
+
         if ($parentresult !== null) {
             // Parent function returns null if all is OK.
             return $parentresult;
         }
 
-        // Delete any left over old test records.
-        $oldtestids = array();
-        foreach ($oldtests as $oldtest) {
-            $oldtestids[] = $oldtest->id;
+        if ($isextraanswerfields) {
+            // Delete any left over extra answer fields records.
+            $oldanswerextraids = array();
+            foreach ($oldanswerextras as $oldextra) {
+                $oldanswerextraids[] = $oldextra->id;
+            }
+            $DB->delete_records_list($extraanswertable, 'id', $oldanswerextraids);
         }
-        $DB->delete_records_list('qtype_preg_regex_tests', 'id', $oldtestids);
-
 
         // Delete any left over old answer records.
         $fs = get_file_storage();
@@ -197,17 +207,160 @@ class qtype_preg extends qtype_shortanswer {
 
         $this->save_hints($question);
 
-        // Perform sanity checks on fractional grades.
-        if ($maxfraction != 1) {
-            $result->noticeyesno = get_string('fractionsnomax', 'question', $maxfraction * 100);
-            return $result;
-        }
-
     }
 
-    /*public function get_question_options($question) {
-        parent::get_question_options($question);
-    }*/
+    /**
+     * Returns true is answer with the $key is empty in the question data and should not be saved in DB.
+     *
+     * The questions with non-standard uses for question_answers table will want to overload this.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @return bool True if answer shouldn't be saved in DB.
+     */
+    protected function is_answer_empty($questiondata, $key) {
+        /*return trim($questiondata->answer[$key]) == '' && $questiondata->fraction[$key] == 0 &&
+                    html_is_blank($questiondata->feedback[$key]['text']);*/ // This is shortanswer part for patch.
+        // Empty regex will match with anything and it's easy to save it by mistake.
+        // So not saving answers with empty regexes.
+        // If the teacher want matcing with anything, he could use .* instead.
+        return trim($questiondata->answer[$key]) == '';
+    }
+
+    /**
+     * Change $answer, filling necessary fields for the question_answers table.
+     *
+     * The questions with non-standard uses for question_answers table will want to overload this.
+     * @param stdClass $answer Object to save data.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @param $context needed for working with files.
+     */
+    protected function fill_answer_fields($answer, $questiondata, $key, $context) {
+        $answer->answer   = $questiondata->answer[$key];
+        $answer->fraction = $questiondata->fraction[$key];
+        $answer->feedback = $this->import_or_save_files($questiondata->feedback[$key],
+                $context, 'question', 'answerfeedback', $answer->id);
+        $answer->feedbackformat = $questiondata->feedback[$key]['format'];
+    }
+
+    /**
+     * Returns true if extra answer fields for answer with the $key is empty 
+     * in the question data and should not be saved in DB.
+     *
+     * Questions where extra answer fields are optional will want to overload this.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @return bool True if extra answer data shouldn't be saved in DB.
+     */
+    protected function is_extra_answer_fields_empty($questiondata, $key) {
+        return !isset($questiondata->regextests) || trim($questiondata->regextests[$key]) == '';
+    }
+
+    /**
+     * Change $answerextra, filling necessary fields for the extra answer fields table.
+     *
+     * The questions may want to overload it to save files or do other data processing.
+     * @param stdClass $answerextra Object to save data.
+     * @param object $questiondata This holds the information from the question editing form or import.
+     * @param int $key A key of the answer in question.
+     * @param $context needed for working with files.
+     */
+    protected function fill_extra_answer_fields($answerextra, $questiondata, $key, $context, $extraanswerfields) {
+        foreach ($extraanswerfields as $field) {
+            // The $questiondata->$field[$key] won't work in PHP.
+            $fieldarray = $questiondata->$field;
+            $answerextra->$field = $fieldarray[$key];
+        }
+    }
+
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    public function get_question_options($question) {
+        global $CFG, $DB, $OUTPUT;
+
+        if (!isset($question->options)) {
+            $question->options = new stdClass();
+        }
+
+        $extraquestionfields = $this->extra_question_fields();
+        if (is_array($extraquestionfields)) {
+            $question_extension_table = array_shift($extraquestionfields);
+            $extra_data = $DB->get_record($question_extension_table,
+                    array($this->questionid_column_name() => $question->id),
+                    implode(', ', $extraquestionfields));
+            if ($extra_data) {
+                foreach ($extraquestionfields as $field) {
+                    $question->options->$field = $extra_data->$field;
+                }
+            } else {
+                echo $OUTPUT->notification('Failed to load question options from the table ' .
+                        $question_extension_table . ' for questionid ' . $question->id);
+                return false;
+            }
+        }
+
+        $extraanswerfields = $this->extra_answer_fields();
+        if (is_array($extraanswerfields)) {
+            $answerextensiontable = array_shift($extraanswerfields);
+            // Use LEFT JOIN in case not every answer has extra data.
+            $question->options->answers = $DB->get_records_sql("
+                    SELECT qa.*, qax." . implode(', qax.', $extraanswerfields) . '
+                    FROM {question_answers} qa ' . "
+                    LEFT JOIN {{$answerextensiontable}} qax ON qa.id = qax.answerid
+                    WHERE qa.question = ?
+                    ORDER BY qa.id", array($question->id));
+            if (!$question->options->answers) {
+                echo $OUTPUT->notification('Failed to load question answers from the table ' .
+                        $answerextensiontable . 'for questionid ' . $question->id);
+                return false;
+            }
+        } else {
+            // Don't check for success or failure because some question types do
+            // not use the answers table.
+            $question->options->answers = $DB->get_records('question_answers',
+                    array('question' => $question->id), 'id ASC');
+        }
+
+        $question->hints = $DB->get_records('question_hints',
+                array('questionid' => $question->id), 'id ASC');
+
+        return true;
+    }
+
+    // TODO - delete when this will be in the core (hopefully 2.6).
+    /**
+     * Initialise question_definition::answers field.
+     * @param question_definition $question the question_definition we are creating.
+     * @param object $questiondata the question data loaded from the database.
+     * @param bool $forceplaintextanswers most qtypes assume that answers are
+     *      FORMAT_PLAIN, and dont use the answerformat DB column (it contains
+     *      the default 0 = FORMAT_MOODLE). Therefore, by default this method
+     *      ingores answerformat. Pass false here to use answerformat. For example
+     *      multichoice does this.
+     */
+    protected function initialise_question_answers(question_definition $question,
+            $questiondata, $forceplaintextanswers = true) {
+        $question->answers = array();
+        if (empty($questiondata->options->answers)) {
+            return;
+        }
+        foreach ($questiondata->options->answers as $a) {
+            $question->answers[$a->id] = $this->make_answer($a);
+            if (!$forceplaintextanswers) {
+                $question->answers[$a->id]->answerformat = $a->answerformat;
+            }
+        }
+    }
+
+    /**
+     * Create a question_answer, or an appropriate subclass for this question,
+     * from a row loaded from the database.
+     * @param object $answer the DB row from the question_answers table plus extra answer fields.
+     * @return question_answer
+     */
+    protected function make_answer($answer) {
+        return new question_answer($answer->id, $answer->answer,
+                    $answer->fraction, $answer->feedback, $answer->feedbackformat);
+    }
 
     /** Overload import from Moodle XML format to import hints */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
@@ -227,7 +380,7 @@ class qtype_preg extends qtype_shortanswer {
         return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
     }
 
-    public function save_hints($formdata, $withparts = false) {// TODO - remove, when Tim will add make_hint_options.
+    public function save_hints($formdata, $withparts = false) {// TODO - remove in 2.6.
         global $DB;
         $context = $formdata->context;
 
@@ -302,15 +455,4 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
-    public function delete_question($questionid, $contextid) {
-        global $DB;
-        $transaction = $DB->start_delegated_transaction();
-
-        $DB->delete_records_select('qtype_preg_regex_tests',
-            'answerid IN (SELECT question FROM {question_answers} WHERE question = ? )', array($questionid));
-
-        $transaction->allow_commit();
-
-        parent::delete_question($questionid, $contextid);
-    }
 }

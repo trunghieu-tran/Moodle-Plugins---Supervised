@@ -57,10 +57,6 @@ class qtype_preg_description_state {
 
     public $forceunsetmodifiers = false;
 
-    public $startofselectionfinded = false;
-
-    public $endofselectionfinded = false;
-
     /**
      * set default values to all state variables
      */
@@ -72,8 +68,6 @@ class qtype_preg_description_state {
         $this->ungreedy        = false;
         $this->duplicate       = false;
         $this->forceunsetmodifiers = false;
-        $this->startofselectionfinded = false;
-        $this->endofselectionfinded = false;
     }
 
     /**
@@ -160,27 +154,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
     /**
      * Overloaded from qtype_preg_regex_handler.
      */
-    protected function get_engine_node_name($nodetype, $nodesubtype) {
-        switch ($nodesubtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
-                return 'qtype_preg_description_leaf_assert_esc_b';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                return 'qtype_preg_description_leaf_assert_esc_a';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:
-                return 'qtype_preg_description_leaf_assert_esc_z';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-                return 'qtype_preg_description_leaf_assert_esc_g';
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                return 'qtype_preg_description_leaf_assert_circumflex';
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                return 'qtype_preg_description_leaf_assert_dollar';
-        }
-        return parent::get_engine_node_name($nodetype, $nodesubtype);
-    }
-
-    /**
-     * Overloaded from qtype_preg_regex_handler.
-     */
     protected function is_preg_node_acceptable($pregnode) {
         return true;
     }
@@ -223,40 +196,29 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param int $rangelengthmax limit for charset ranges in which it is displayed as a enum of characters
      * @return string description.
      */
-    public function description($numbering_pattern, $wholepattern=null, $charsetuserinscr=false, $rangelengthmax=5) {
-
-        // set up options
+    public function description($numbering_pattern, $wholepattern = null, $charsetuserinscr = false, $rangelengthmax = 5) {
         $this->state->reset();// restore default state
         $backupoptions = $this->options;// save original options
-        $this->options->charsetuserinscription  = (bool)$charsetuserinscr;
-        $this->options->rangelengthmax          = (int)$rangelengthmax;
-        // make description
+        $this->options->charsetuserinscription = (bool)$charsetuserinscr;
+        $this->options->rangelengthmax = (int)$rangelengthmax;
+
+        $string = '';
         if (isset($this->dst_root)) {
-            // var_dump(123);
             $string = $this->dst_root->description($numbering_pattern, null, null);
-            $string = $this->postprocessing($string);
-        } else {
-            $string = 'tree was not built';
+            $string = preg_replace('%;((?:</span>)?)]%u', '\1]', $string);   // Postprocessing
         }
         // put string into $wholepattern
-        if ($wholepattern !== null && $wholepattern !== '') {
-            $string = str_replace('%s', $string, $wholepattern);
+        if (!empty($wholepattern)) {
+            $string = qtype_poasquestion_string::replace('%s', $string, $wholepattern);
         }
         $this->options = $backupoptions; // restore original options
         return $string;
-    }
-
-    private function postprocessing($s) {
-
-        $result = preg_replace('%;((?:</span>)?)]%', '\1]', $s);
-        return $result;
     }
 
     /**
      * Calling default description() with default params
      */
     public function default_description() {
-
         return $this->description('<span class="description_node_%n">%s</span>');
     }
 
