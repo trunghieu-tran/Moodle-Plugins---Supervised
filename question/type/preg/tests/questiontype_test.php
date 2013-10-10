@@ -92,7 +92,7 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $this->compare_answers($this->questiondata, $actualquestiondata);
     }
 
-    // User add one answer but deleted one piece of extra data
+    // User added one answer but deleted one piece of extra data
     public function test_add_answers_delete_extra_data() {
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -102,19 +102,54 @@ class qtype_preg_questiontype_test extends advanced_testcase {
         $formdata = test_question_maker::get_question_form_data('preg', 'six_regexes_one_test');
 
         $formdata->category = "{$this->cat->id},{$this->cat->contextid}";
-        qtype_preg_edit_form::mock_submit((array)$formdata);
 
-        $form = qtype_preg_test_helper::get_question_editing_form($this->cat, $questiondata);
-
-        $this->assertTrue($form->is_validated());
-
-        $fromform = $form->get_data();
-        var_dump($formdata);
-        echo "\n\n\n\n\n\n";
-        var_dump($fromform);
         $this->qtype = question_bank::get_qtype('preg');
         $questiondata->id = $this->questionid;
-        $returnedfromsave = $this->qtype->save_question($questiondata, $fromform);
+        $returnedfromsave = $this->qtype->save_question($questiondata, $formdata);
+
+        $actualquestionsdata = question_load_questions(array($this->questionid));
+        $actualquestiondata = end($actualquestionsdata);
+        $this->compare_answers($questiondata, $actualquestiondata);
+    }
+
+    // User deleted one answer with extra data, but added three other pieces of extra data
+    public function test_delete_answers_add_extra_data() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $this->setup_db_question();
+
+        $questiondata = test_question_maker::get_question_data('preg', 'four_regexes_three_tests');
+        $formdata = test_question_maker::get_question_form_data('preg', 'four_regexes_three_tests');
+
+        $formdata->category = "{$this->cat->id},{$this->cat->contextid}";
+
+        $this->qtype = question_bank::get_qtype('preg');
+        $questiondata->id = $this->questionid;
+        $returnedfromsave = $this->qtype->save_question($questiondata, $formdata);
+
+        $actualquestionsdata = question_load_questions(array($this->questionid));
+        $actualquestiondata = end($actualquestionsdata);
+        $this->compare_answers($questiondata, $actualquestiondata);
+    }
+
+    // User deleted one answer with extra data, existing extra data is moved due to it
+    public function test_delete_answers_move_extra_data() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $this->setup_db_question();
+
+        $questiondata = test_question_maker::get_question_data('preg', 'four_regexes_three_tests');
+        $formdata = test_question_maker::get_question_form_data('preg', 'four_regexes_three_tests');
+
+        // Remove first extra data, so that extra data for the fourth regex will now be first.
+        $questiondata->options->answers[13]->regextests = null;
+        $formdata->regextests[0] = '';
+
+        $formdata->category = "{$this->cat->id},{$this->cat->contextid}";
+
+        $this->qtype = question_bank::get_qtype('preg');
+        $questiondata->id = $this->questionid;
+        $returnedfromsave = $this->qtype->save_question($questiondata, $formdata);
 
         $actualquestionsdata = question_load_questions(array($this->questionid));
         $actualquestiondata = end($actualquestionsdata);
