@@ -275,16 +275,16 @@ $string['description_option_J'] = 'allow duplicate names';
 $string['description_unsetoption_J'] = 'disallow duplicate names';
 $string['description_leaf_options'] = '{$a}:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_node_finite_quant'] = '{$a->firstoperand} is repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
-$string['description_node_finite_quant_strict'] = '{$a->firstoperand} is repeated {$a->leftborder} times{$a->greedy}';
-$string['description_node_finite_quant_0'] = '{$a->firstoperand} is repeated no more than {$a->rightborder} times or missing{$a->greedy}';
-$string['description_node_finite_quant_1'] = '{$a->firstoperand} is repeated no more than {$a->rightborder} times{$a->greedy}';
+$string['description_node_finite_quant'] = '{$a->firstoperand} repeated from {$a->leftborder} to {$a->rightborder} times{$a->greedy}';
+$string['description_node_finite_quant_strict'] = '{$a->firstoperand} repeated {$a->leftborder} times{$a->greedy}';
+$string['description_node_finite_quant_0'] = '{$a->firstoperand} repeated no more than {$a->rightborder} times or missing{$a->greedy}';
+$string['description_node_finite_quant_1'] = '{$a->firstoperand} repeated no more than {$a->rightborder} times{$a->greedy}';
 $string['description_node_finite_quant_01'] = '{$a->firstoperand} may be missing{$a->greedy}';
 $string['description_node_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_node_infinite_quant'] = '{$a->firstoperand} is repeated at least {$a->leftborder} times{$a->greedy}';
-$string['description_node_infinite_quant_0'] = '{$a->firstoperand} is repeated any number of times or missing{$a->greedy}';
-$string['description_node_infinite_quant_1'] = '{$a->firstoperand} is repeated any number of times{$a->greedy}';
+$string['description_node_infinite_quant'] = '{$a->firstoperand} repeated at least {$a->leftborder} times{$a->greedy}';
+$string['description_node_infinite_quant_0'] = '{$a->firstoperand} repeated any number of times or missing{$a->greedy}';
+$string['description_node_infinite_quant_1'] = '{$a->firstoperand} repeated any number of times{$a->greedy}';
 // {$a->greedy}
 $string['description_quant_lazy'] = ' (lazy quantifier)';
 $string['description_quant_greedy'] = '';
@@ -695,8 +695,5 @@ $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
 $string['explain_to'] = ' to ';
 $string['explain_from'] = 'from ';
-$string['explain_time'] = ' time';
-$string['explain_times'] = ' times';
-$string['explain_any'] = 'any';
 $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';

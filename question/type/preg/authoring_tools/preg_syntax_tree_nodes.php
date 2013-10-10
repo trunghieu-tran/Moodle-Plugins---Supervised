@@ -391,27 +391,17 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 }
 
-class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {
+class qtype_preg_syntax_tree_node_quant extends qtype_preg_syntax_tree_operator {
 
     public function tooltip() {
         $a = new stdClass;
         $a->leftborder = $this->pregnode->leftborder;
-        $a->rightborder = $this->pregnode->rightborder;
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
+            $a->rightborder = $this->pregnode->rightborder;
+        }
         $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
+        $a->firstoperand = get_string('description_operand', 'qtype_preg');
         $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
-        $result = qtype_poasquestion_string::replace('{$a->firstoperand}', get_string('description_operand', 'qtype_preg'), $result);
-        return $result;
-    }
-}
-
-class qtype_preg_syntax_tree_node_infinite_quant extends qtype_preg_syntax_tree_operator {
-
-    public function tooltip() {
-        $a = new stdClass;
-        $a->leftborder = $this->pregnode->leftborder;
-        $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
-        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
-        $result = qtype_poasquestion_string::replace('{$a->firstoperand}', get_string('description_operand', 'qtype_preg'), $result);
         return $result;
     }
 }

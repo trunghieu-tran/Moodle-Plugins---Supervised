@@ -462,18 +462,14 @@ class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph
     protected function process_operator($graph, $id) {
         $operand = $this->operands[0]->create_graph($id);
 
+        $a = new stdClass;
+        $a->leftborder = $this->pregnode->leftborder;
         if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
-            if ($this->pregnode->rightborder != $this->pregnode->leftborder) {
-                $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg');
-
-                $label .= $this->pregnode->rightborder . qtype_preg_explaining_graph_node_quant::getEnding($this->pregnode->rightborder);
-            } else {
-                $label = $this->pregnode->leftborder . qtype_preg_explaining_graph_node_quant::getEnding($this->pregnode->rightborder);
-            }
-        } else {
-            $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg')
-                    . get_string('explain_any', 'qtype_preg') . get_string('explain_time', 'qtype_preg');
+            $a->rightborder = $this->pregnode->rightborder;
         }
+        $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
+        $a->firstoperand = '';
+        $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
 
         $quant = new qtype_preg_explaining_graph_tool_subgraph($label, 'dotted; color=black', $this->pregnode->id);
         $quant->assume_subgraph($operand);
@@ -483,15 +479,6 @@ class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph
         $graph->exits[] = end($operand->exits);
     }
 
-    /**
-     * Returns "time" or "times" within sending number.
-     * @param int $end just number
-     * @return string right form of "time(s)"
-     */
-    private function getEnding($end) {
-        return ($this->pregnode->rightborder == 1 || $this->pregnode->rightborder == 0)
-            ? get_string('explain_time', 'qtype_preg') : get_string('explain_times', 'qtype_preg');
-    }
 }
 
 /**
