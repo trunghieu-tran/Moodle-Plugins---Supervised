@@ -59,6 +59,8 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
+    // Positions skipped because preserveallnodes option was set to false.
+    protected $skipped_positions = array();
     // Array of lexical errors found.
     protected $errors = array();
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
@@ -283,6 +285,9 @@ class qtype_preg_lexer extends JLexBase  {
             return hexdec(textlib::substr($seq, $start, $end - $start + 1));
         }
         return null;
+    }
+    public function get_skipped_positions() {
+        return $this->skipped_positions;
     }
     public function get_error_nodes() {
         return $this->errors;
@@ -6871,6 +6876,8 @@ array(
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+    } else {
+        $this->skipped_positions[] = $this->current_position_for_node();
     }
 }
 						case -56:
