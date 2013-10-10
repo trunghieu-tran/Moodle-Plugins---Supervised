@@ -94,12 +94,24 @@ class qtype_preg_userinscription {
         return $this->data;
     }
 
+    public function is_posix_flag() {
+        return $this->isflag !== null && $this->data[0] == '[';
+    }
+
+    public function is_uprop_flag() {
+        return $this->isflag !== null && $this->data[0] == '\\' && ($this->data[1] == 'p' || $this->data[1] == 'P');
+    }
+
+    public function is_slash_flag() {
+        return $this->isflag !== null && !$this->is_uprop_flag() && $this->data[0] == '\\';
+    }
+
     public function is_flag_negative() {
         if (!$this->isflag) {
             return false;
         }
         if ($this->data[0] == '\\') {
-            return ctype_upper($this->data[1]); // Fortunately, this works both for \W and, for example, \PL
+            return ctype_upper($this->data[1]); // Fortunately, this works both for \W and, for example, \PL    TODO: \Z, \A
         }
         if ($this->data[0] == '[') {
             return $this->data[2] == '^';

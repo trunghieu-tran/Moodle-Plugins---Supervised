@@ -105,7 +105,7 @@ $string['node_error']                  = 'синтаксическая ошиб�
 
 // Subtypes.
 $string['empty_leaf_meta']             = 'ничего';
-$string['esc_b_leaf_assert']           = 'граничные ассерты слова';
+$string['esc_b_leaf_assert']           = 'граница слова';
 $string['esc_a_leaf_assert']           = 'начало строки';
 $string['esc_z_leaf_assert']           = 'конец строки';
 $string['esc_g_leaf_assert']           = 'первая позиция матчинга в строке';
@@ -226,8 +226,8 @@ $string['description_not'] = 'не {$a}';
 $string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'граница слова';
-$string['description_esc_a_leaf_assert'] = 'начало текста';
-$string['description_esc_z_leaf_assert'] = 'конец текста';
+$string['description_esc_a_leaf_assert'] = 'начало строки';
+$string['description_esc_z_leaf_assert'] = 'конец строки';
 $string['description_esc_g_leaf_assert'] = 'первая позиция матчинга в строке';
 $string['description_circumflex_leaf_assert'] = 'начало строки';
 $string['description_dollar_leaf_assert'] = 'конец строки';
@@ -392,8 +392,6 @@ $string['description_charflag_space'] = 'пробел';
 $string['description_charflag_upper'] = 'заглавная буква';
 $string['description_charflag_word'] = 'символ-слово';
 $string['description_charflag_xdigit'] = 'шестнадцатиричное число';
-$string['description_charflag_hspace'] = 'горизонтальный пробел'; // ??
-$string['description_charflag_vspace'] = 'вертикальный пробел';// ??!!
 $string['description_charflag_Cc'] = 'ASCII или Latin-1 служебный символ';
 $string['description_charflag_Cf'] = 'непечатные символы форматирования (Unicode)';
 $string['description_charflag_Cn'] = 'символ, отсутствующий в юникоде,';// ??
