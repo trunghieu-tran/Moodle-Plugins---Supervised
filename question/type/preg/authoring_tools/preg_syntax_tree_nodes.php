@@ -448,6 +448,7 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
     public function tooltip() {
         $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
         $result = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $result);
+        $result = qtype_poasquestion_string::replace('"', '\\"', $result);
         return $result;
     }
 }
