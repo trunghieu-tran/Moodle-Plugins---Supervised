@@ -160,6 +160,40 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($node->tooltip(), 'subexpression \\"name\\" #1');
     }
 
+    function test_label_finite_quant() {
+        $tree = new qtype_preg_syntax_tree_tool('a{2,3}?');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '&#123;2&#44;3&#125;?');
+        $this->assertEquals($node->tooltip(), 'operand is repeated from 2 to 3 times (lazy quantifier)');
+
+        $tree = new qtype_preg_syntax_tree_tool('a{2,3}');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '&#123;2&#44;3&#125;');
+        $this->assertEquals($node->tooltip(), 'operand is repeated from 2 to 3 times');
+
+        $tree = new qtype_preg_syntax_tree_tool('a{2,3}+');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '&#123;2&#44;3&#125;+');
+        $this->assertEquals($node->tooltip(), 'operand is repeated from 2 to 3 times (possessive quantifier)');
+    }
+
+    function test_label_infinite_quant() {
+        $tree = new qtype_preg_syntax_tree_tool('a+?');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '+?');
+        $this->assertEquals($node->tooltip(), 'operand is repeated any number of times (lazy quantifier)');
+
+        $tree = new qtype_preg_syntax_tree_tool('a+');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '+');
+        $this->assertEquals($node->tooltip(), 'operand is repeated any number of times');
+
+        $tree = new qtype_preg_syntax_tree_tool('a++');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '++');
+        $this->assertEquals($node->tooltip(), 'operand is repeated any number of times (possessive quantifier)');
+    }
+
     function test_something() {
         $tree = new qtype_preg_syntax_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
