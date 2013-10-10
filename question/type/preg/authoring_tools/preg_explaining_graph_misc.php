@@ -42,25 +42,13 @@ class qtype_preg_explaining_graph_tool_node {
     public $fill   = '';         // Filling of node on image.
     public $invert = false;      // Flag of inversion of node.
 
-    /**
-     * Counts a number of links in which node is. Searching executes in owner of node.
-     * @param bool $type Flag parameter: true - node is destination, false - node is source.
-     * @return int A number of links.
-     */
-    public function links_count($type) {
-        $cx = 0; // Links counter.
-        foreach ($this->owner->links as $link) {
-            if ($type) {
-                if ($link->destination === $this) {
-                    ++$cx;
-                }
-            } else {
-                if ($link->source === $this) {
-                    ++$cx;
-                }
-            }
-        }
-        return $cx;
+    public function __construct($lbl, $shp, $clr, $ownr, $id, $fll = '') {
+        $this->label = $lbl;
+        $this->shape = $shp;
+        $this->color = $clr;
+        $this->fill = $fll;
+        $this->owner = $ownr;
+        $this->id = $id;
     }
 
     /**
@@ -69,7 +57,7 @@ class qtype_preg_explaining_graph_tool_node {
      * @param qtype_preg_explaining_graph_tool_subgraph $gr Graph in which searching will occurs.
      * @return qtype_preg_explaining_graph_tool_node Found node or special 'error' node.
      */
-    public function &find_neighbor_dst(&$gr) {
+    public function find_neighbor_dst($gr) {
         // Look over links...
         foreach ($gr->links as $iter) {
             if ($iter->source === $this) {   // If source of link is $nd...
@@ -97,7 +85,7 @@ class qtype_preg_explaining_graph_tool_node {
      * @param qtype_preg_explaining_graph_tool_subgraph $gr Graph in which searching will occurs.
      * @return qtype_preg_explaining_graph_tool_node Found node or special 'error' node.
      */
-    public function &find_neighbor_src(&$gr) {
+    public function find_neighbor_src($gr) {
         // Look over links...
         foreach ($gr->links as $iter) {
             if ($iter->destination === $this) {   // If destination of link is $nd...
@@ -117,29 +105,6 @@ class qtype_preg_explaining_graph_tool_node {
         $result = null;
 
         return $result;
-    }
-
-    /**
-     * Searches links in which node is as any instance.
-     * @return array Links in which this node is.
-     */
-    public function links() {
-        $result = array();
-        foreach ($this->owner->links as $link) {
-            if ($link->destination == $this || $link->source == $this) {
-                $result[] = $link;
-            }
-        }
-        return $result;
-    }
-
-    public function __construct($lbl, $shp, $clr, $ownr, $id, $fll = '') {
-        $this->label = $lbl;
-        $this->shape = $shp;
-        $this->color = $clr;
-        $this->fill = $fll;
-        $this->owner = $ownr;
-        $this->id = $id;
     }
 }
 
