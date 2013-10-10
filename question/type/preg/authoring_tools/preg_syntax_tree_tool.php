@@ -35,6 +35,16 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
     /**
      * Overloaded from qtype_preg_regex_handler.
      */
+    protected function get_engine_node_name($nodetype, $nodesubtype) {
+        if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+            return 'qtype_preg_syntax_tree_node_quant';
+        }
+        return parent::get_engine_node_name($nodetype, $nodesubtype);
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
     protected function is_preg_node_acceptable($pregnode) {
         return true;
     }
