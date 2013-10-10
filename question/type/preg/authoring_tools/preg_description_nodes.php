@@ -623,29 +623,10 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $key = 'description_' . $this->pregnode->subtype;
-        if ($this->pregnode->leftborder == 0) {
-            $key .= '_0';
-            if ($this->pregnode->rightborder == 1) {
-                $key .= '_01';
-            }
-        } else if ($this->pregnode->leftborder == 1) {
-            $key .= '_1';
-        } else if ($this->pregnode->leftborder == $this->pregnode->rightborder) {
-            $key .= '_strict';
-        }
-
-        $result = self::get_form_string($key, $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
         $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
         $result = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $result);
-
-        $key = 'description_quant_greedy';
-        if ($this->pregnode->lazy) {
-            $key = 'description_quant_lazy';
-        } else if ($this->pregnode->possessive) {
-            $key = 'description_quant_possessive';
-        }
-        $greedy = self::get_form_string($key, $form);
+        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), $form);
         $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
 
         if ($this->pregnode->leftborder > $this->pregnode->rightborder) {
@@ -667,25 +648,10 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $key = 'description_' . $this->pregnode->subtype;
-        if ($this->pregnode->leftborder == 0) {
-            $key .= '_0';
-        } else if ($this->pregnode->leftborder == 1) {
-            $key .= '_1';
-        }
-
-        $result = self::get_form_string($key, $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
         $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
-
-        $key = 'description_quant_greedy';
-        if ($this->pregnode->lazy) {
-            $key = 'description_quant_lazy';
-        } else if ($this->pregnode->possessive) {
-            $key = 'description_quant_possessive';
-        }
-        $greedy = self::get_form_string($key, $form);
+        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), $form);
         $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
-
         return $result;
     }
 }
@@ -826,13 +792,7 @@ class qtype_preg_description_node_subexpr extends qtype_preg_description_operato
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $key = 'description_' . $this->pregnode->subtype;
-        if ($this->pregnode->name !== null) {
-            $key .= '_name';
-        }
-        $result = self::get_form_string($key, $form);
-        $result = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $result);
-        $result = qtype_poasquestion_string::replace('%name', $this->pregnode->name, $result);
+        $result = self::get_form_string($this->pregnode->lang_key(true), $this->pregnode, $form);
         return $result;
     }
 }
@@ -885,17 +845,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $key = $this->pregnode->is_condition_assertion()
-            ? 'description_' . $this->pregnode->type
-            : 'description_' . $this->pregnode->subtype;
-
-        if ($this->pregnode->number === 0) {
-            $key .= '_all';
-        } else if (is_string($this->pregnode->number)) {
-            $key .= '_name';
-        }
-
-        $result = self::get_form_string($key, $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
         $result = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $result);
         $result = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $result);
 

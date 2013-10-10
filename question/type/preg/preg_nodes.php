@@ -1600,6 +1600,33 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         // TODO - followpos for situations like {2,10}
     }
 
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription) {
+            if ($this->leftborder == 0) {
+                $result .= '_0';
+                if ($this->rightborder == 1) {
+                    $result .= '_01';
+                }
+            } else if ($this->leftborder == 1) {
+                $result .= '_1';
+            } else if ($this->leftborder == $this->rightborder) {
+                $result .= '_strict';
+            }
+        }
+        return $result;
+    }
+
+    public function lang_key_for_greediness() {
+        if ($this->lazy) {
+            return 'description_quant_lazy';
+        }
+        if ($this->possessive) {
+            return 'description_quant_possessive';
+        }
+        return 'description_quant_greedy';
+    }
+
     // TODO - ui_nodename().
 }
 
@@ -1643,6 +1670,29 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
                 }
             }
         }
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription) {
+            $result = 'description_' . $this->subtype;
+            if ($this->leftborder == 0) {
+                $result .= '_0';
+            } else if ($this->leftborder == 1) {
+                $result .= '_1';
+            }
+        }
+        return $result;
+    }
+
+    public function lang_key_for_greediness() {
+        if ($this->lazy) {
+            return 'description_quant_lazy';
+        }
+        if ($this->possessive) {
+            return 'description_quant_possessive';
+        }
+        return 'description_quant_greedy';
     }
 
     // TODO - ui_nodename().
@@ -1829,6 +1879,14 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
         return true;    // Subexpression is a subpattern.
     }
 
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->name !== null) {
+            $result .= '_name';
+        }
+        return $result;
+    }
+
     // TODO - ui_nodename().
 }
 
@@ -1875,6 +1933,22 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
     public function calculate_nflf(&$followpos) {
         parent::calculate_nflf($followpos);
         // TODO what should be here?
+    }
+
+    public function lang_key($usedescription = false) {
+        if (!$usedescription) {
+            return parent::lang_key($usedescription);
+        }
+        $result = $this->is_condition_assertion()
+            ? 'description_' . $this->type
+            : 'description_' . $this->subtype;
+
+        if ($this->number === 0) {
+            $result .= '_all';
+        } else if (is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
     }
 
     // TODO - ui_nodename().
