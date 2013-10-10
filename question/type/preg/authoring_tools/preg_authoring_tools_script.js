@@ -195,6 +195,8 @@ M.preg_authoring_tools_script = (function ($) {
             $(old_id).val($(new_id).val());
         });
         self.textbutton_widget.close_and_set_new_data();
+        $('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+        $('#id_test_regex').html('');
         M.form.updateFormState("mform1");
     },
 
