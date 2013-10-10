@@ -222,6 +222,7 @@ $string['authoring_form_check_strings'] = 'Проверить строку (ст
 
 // Strings for node description
 $string['description_operand'] = 'операнд';
+$string['description_range'] = 'от {$a->start} до {$a->end}';
 // TYPE_LEAF_META
 $string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
@@ -327,7 +328,7 @@ $string['description_node_cond_subexpr_else'] = ' иначе проверить:
 $string['description_charset'] = 'один из следующих символов: {$a->characters};';
 $string['description_charset_neg'] = 'любой из символов кроме следующих: {$a->characters};';
 $string['description_charset_neg_one'] = 'не {$a->characters}';
-$string['description_charset_range'] = 'любой символ от {$a->start} до {$a->end}';
+$string['description_charset_range'] = 'любой символ {$a}';
 $string['description_char'] = '<span style="color:blue">{$a->char}</span>';
 $string['description_char_16value'] = 'символ с кодом 0x{$a}';
 //$string['description_charset_one'] = '{$a->characters}';
@@ -693,7 +694,5 @@ $string['explain_define'] = 'TODO';
 $string['explain_unknow_meta'] = 'неизвестный мета-узел';
 $string['explain_any_char'] = 'Любой символ из';
 $string['explain_any_char_except'] = 'Любой символ кроме';
-$string['explain_to'] = ' по ';
-$string['explain_from'] = ' c ';
 $string['explain_begin'] = 'начало';
 $string['explain_end'] = 'конец';
