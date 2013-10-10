@@ -88,12 +88,8 @@ abstract class qtype_preg_description_node {
      * @param string $key same as in get_string
      * @param string $form Required form.
      */
-    protected static function get_form_string($key, $a, $form = null) {
-        if (is_string($a)) {
-            $form = $a;
-            $a = null;
-        }
-        if (isset($form) && $form !== '') {
+    protected static function get_form_string($key, $a = null, $form = null) {
+        if (!empty($form)) {
             $key .= '_' . $form;
         }
         $str = get_string($key, 'qtype_preg', $a);
@@ -154,7 +150,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node {
      * Redifinition of abstract qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        return self::get_form_string($this->pregnode->lang_key(true), $form);
+        return self::get_form_string($this->pregnode->lang_key(true), null, $form);
     }
 
     /**
@@ -216,9 +212,9 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
         $hexcode = textlib::strtoupper(dechex($code));
         if ($code <= 32 || $code == 127 || $code == 160 || $code == 173 || $code == 8194 ||
             $code == 8195 || $code == 8201 || $code == 8204 || $code == 8205) {
-            $result = self::get_form_string('description_char' . $hexcode, $form);
+            $result = self::get_form_string('description_char' . $hexcode, null, $form);
         } else {
-            $result = qtype_poasquestion_string::replace('%code', $hexcode, self::get_form_string('description_char_16value', $form));
+            $result = qtype_poasquestion_string::replace('%code', $hexcode, self::get_form_string('description_char_16value', null, $form));
         }
         return $result;
     }
@@ -243,7 +239,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             } else {
                 $result = $iscode ? textlib::code2utf8($utf8chr) : $utf8chr;
             }
-            $result = qtype_poasquestion_string::replace('%char', $result, self::get_form_string('description_char', $form));
+            $result = qtype_poasquestion_string::replace('%char', $result, self::get_form_string('description_char', null, $form));
         }
         return $result;
     }
@@ -321,10 +317,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             if ($flag->negative == true) {
                 // using charset pattern 'description_charset_neg_one' because char pattern 'description_char_neg' has a <span> tag,
                 // but dont need to highlight this
-                $temp_str = self::get_form_string('description_charflag_' . $flag->data, $form);
-                $characters[] = qtype_poasquestion_string::replace('%characters', $temp_str, self::get_form_string('description_charset_neg_one', $form));
+                $temp_str = self::get_form_string('description_charflag_' . $flag->data, null, $form);
+                $characters[] = qtype_poasquestion_string::replace('%characters', $temp_str, self::get_form_string('description_charset_neg_one', null, $form));
             } else {
-                $characters[] = self::get_form_string('description_charflag_' . $flag->data, $form);
+                $characters[] = self::get_form_string('description_charflag_' . $flag->data, null, $form);
             }
         } else if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
             // flag is a simple enumeration of characters
@@ -347,10 +343,11 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
                                 $characters[] = self::describe_chr($i, true, $form);
                             }
                         } else { // otherwise it will be displayed
-                            $temp_str = self::get_form_string('description_charset_range', $form);
-                            $temp_str = qtype_poasquestion_string::replace('%start', self::describe_chr($range[0], true, $form), $temp_str);
-                            $temp_str = qtype_poasquestion_string::replace('%end', self::describe_chr($range[1], true, $form), $temp_str);
-                            $characters[] = $temp_str;
+                            $a = new stdClass;
+                            $a->start = self::describe_chr($range[0], true, $form);
+                            $a->end = self::describe_chr($range[1], true, $form);
+                            $range = get_string('description_range', 'qtype_preg', $a);
+                            $characters[] = self::get_form_string('description_charset_range', $range, $form);
                         }
                     }
                 }
@@ -394,7 +391,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             if (count($characters) == 1) {
                 $key .= '_one';
             }
-            $result = self::get_form_string($key, $form);
+            $result = self::get_form_string($key, null, $form);
             $result = qtype_poasquestion_string::replace('%characters', implode(", ", $characters), $result);
         }
         return $result;
@@ -453,11 +450,11 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
         $options = array();
         for ($i = 0; $i < $this->pregnode->posopt->length(); $i++) {
             $this->handler->state->set_modifier($this->pregnode->posopt[$i], true);
-            $options[] = self::get_form_string('description_option_' . $this->pregnode->posopt[$i], $form);
+            $options[] = self::get_form_string('description_option_' . $this->pregnode->posopt[$i], null, $form);
         }
         for ($i = 0; $i < $this->pregnode->negopt->length(); $i++) {
             $this->handler->state->set_modifier($this->pregnode->negopt[$i], false);
-            $options[] = self::get_form_string('description_unsetoption_' . $this->pregnode->negopt[$i], $form);
+            $options[] = self::get_form_string('description_unsetoption_' . $this->pregnode->negopt[$i], null, $form);
         }
         $options = implode(', ', $options);
         $result = parent::pattern($node_parent, $form);
@@ -487,32 +484,32 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
         } else if ($node->handler->state->forceunsetmodifiers) {
             // TODO - generate 'caseless, singleline:' instead of 'caseless: singleline:'
             if ($mcaseless === true) {
-                $options .= self::get_form_string('description_unsetoption_i', $form);
+                $options .= self::get_form_string('description_unsetoption_i', null, $form);
                 $mcaseless = false;
             }
             if ($msingleline === true) {
-                $options .= self::get_form_string('description_unsetoption_s', $form);
+                $options .= self::get_form_string('description_unsetoption_s', null, $form);
                 $msingleline = false;
             }
             if ($mmultilineline === true) {
-                $options .= self::get_form_string('description_unsetoption_m', $form);
+                $options .= self::get_form_string('description_unsetoption_m', null, $form);
                 $mmultilineline = false;
             }
             if ($mextended === true) {
-                $options .= self::get_form_string('description_unsetoption_x', $form);
+                $options .= self::get_form_string('description_unsetoption_x', null, $form);
                 $mextended = false;
             }
             if ($mungreedy === true) {
-                $options .= self::get_form_string('description_unsetoption_U', $form);
+                $options .= self::get_form_string('description_unsetoption_U', null, $form);
                 $mungreedy = false;
             }
             if ($mduplicate === true) {
-                $options .= self::get_form_string('description_unsetoption_J', $form);
+                $options .= self::get_form_string('description_unsetoption_J', null, $form);
                 $mduplicate = false;
             }
             $result = '';
             if ($options !== '') {
-                $result = self::get_form_string($node->pregnode->lang_key(true), $form) . ' ';
+                $result = self::get_form_string($node->pregnode->lang_key(true), null, $form) . ' ';
                 $result = qtype_poasquestion_string::replace('%', $options, $result);
             }
             $node->handler->state->forceunsetmodifiers = false;
@@ -612,16 +609,16 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
      * Redifinition of abstract qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), null, $form);
         $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
         $result = qtype_poasquestion_string::replace('%rightborder', $this->pregnode->rightborder, $result);
-        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), $form);
+        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), null, $form);
         $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
 
         if ($this->pregnode->leftborder > $this->pregnode->rightborder) {
-            $result = preg_replace('/%(\w+)?1/u', ('%$ {1}1' . self::get_form_string('description_errorbefore', $form)), $result);
-            $result .= self::get_form_string('description_node_finite_quant_borders_err', $form) .
-                       self::get_form_string('description_errorafter', $form);
+            $result = preg_replace('/%(\w+)?1/u', ('%$ {1}1' . self::get_form_string('description_errorbefore', null, $form)), $result);
+            $result .= self::get_form_string('description_node_finite_quant_borders_err', null, $form) .
+                       self::get_form_string('description_errorafter', null, $form);
         }
 
         return $result;
@@ -637,9 +634,9 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
      * Redifinition of abstract qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), null, $form);
         $result = qtype_poasquestion_string::replace('%leftborder', $this->pregnode->leftborder, $result);
-        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), $form);
+        $greedy = self::get_form_string($this->pregnode->lang_key_for_greediness(), null, $form);
         $result = qtype_poasquestion_string::replace('%greedy', $greedy, $result);
         return $result;
     }
@@ -702,7 +699,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             } else if ($type1 == qtype_preg_node::TYPE_NODE_CONCAT) {
                 $key .= '_wcomma';
             }
-            $description = self::get_form_string($key, $form);
+            $description = self::get_form_string($key, null, $form);
 
             // setup the description
             $replace = $this->what_to_replace($description);
@@ -740,7 +737,7 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator {
             if ($i !== 0) {
                 $key .= '_wcomma';
             }
-            $description = self::get_form_string($key, $form);
+            $description = self::get_form_string($key, null, $form);
 
             // setuping description
             $replace = $this->what_to_replace($description);
@@ -768,7 +765,7 @@ class qtype_preg_description_node_assert extends qtype_preg_description_operator
      */
     public function pattern($node_parent = null, $form = null) {
         $suff = ($node_parent !== null && $node_parent->pregnode->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR) ? '_cond' : '';
-        return self::get_form_string('description_' . $this->pregnode->subtype . $suff, $form);
+        return self::get_form_string('description_' . $this->pregnode->subtype . $suff, null, $form);
     }
 }
 
@@ -812,19 +809,19 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         $resultpattern = '';
         switch ($this->pregnode->condbranch->operands[0]->subtype) {
             case qtype_preg_node_assert::SUBTYPE_PLA:
-                $resultpattern = self::get_form_string('description_pla_node_assert', $form);
+                $resultpattern = self::get_form_string('description_pla_node_assert', null, $form);
                 break;
 
             case qtype_preg_node_assert::SUBTYPE_NLA:
-                $resultpattern = self::get_form_string('description_nla_node_assert', $form);
+                $resultpattern = self::get_form_string('description_nla_node_assert', null, $form);
                 break;
 
             case qtype_preg_node_assert::SUBTYPE_PLB:
-                $resultpattern = self::get_form_string('description_plb_node_assert', $form);
+                $resultpattern = self::get_form_string('description_plb_node_assert', null, $form);
                 break;
 
             case qtype_preg_node_assert::SUBTYPE_NLB:
-                $resultpattern = self::get_form_string('description_nlb_node_assert', $form);
+                $resultpattern = self::get_form_string('description_nlb_node_assert', null, $form);
                 break;
         }
         return $resultpattern;
@@ -834,13 +831,13 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
      * Redifinition of abstract qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $result = self::get_form_string($this->pregnode->lang_key(true), $form);
+        $result = self::get_form_string($this->pregnode->lang_key(true), null, $form);
         $result = qtype_poasquestion_string::replace('%number', $this->pregnode->number, $result);
         $result = qtype_poasquestion_string::replace('%name', $this->pregnode->number, $result);
 
         $else = '';
         if (count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()) {
-            $else = self::get_form_string('description_' . $this->pregnode->type . '_else', $form);
+            $else = self::get_form_string('description_' . $this->pregnode->type . '_else', null, $form);
 
         }
         $result = qtype_poasquestion_string::replace('%else', $else, $result);
@@ -861,9 +858,9 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
 class qtype_preg_description_node_error extends qtype_preg_description_operator {
 
     public function pattern($node_parent = null, $form = null) {
-        $resultpattern = self::get_form_string('description_errorbefore', null)
+        $resultpattern = self::get_form_string('description_errorbefore', null, null)
             . $this->pregnode->error_string()
-            . self::get_form_string('description_errorafter', null);
+            . self::get_form_string('description_errorafter', null, null);
 
         $operandplaces = array();
         foreach ($this->pregnode->operands as $i => $operand) {

@@ -135,10 +135,10 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $uiright = new qtype_preg_userinscription($right);
 
             // Make a recursive call; won't get here next time.
-            $left = self::userinscription_to_string($uileft);
-            $right = self::userinscription_to_string($uiright);
-
-            return get_string('explain_from', 'qtype_preg') . $left . get_string('explain_to', 'qtype_preg') . $right;
+            $a = new stdClass;
+            $a->start = self::userinscription_to_string($uileft);
+            $a->end = self::userinscription_to_string($uiright);
+            return get_string('description_range', 'qtype_preg', $a);
         }
 
         // Is it a flag?
