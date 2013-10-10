@@ -2470,21 +2470,26 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue(count($token->value->userinscription) == 3);
         $this->assertTrue($token->value->userinscription[1]->data === '\p{Squirrel}');
-        $lexer = $this->create_lexer('[\xff\x00-\x1fA-B\t\n]');
+        $lexer = $this->create_lexer('[\xff\x{aa}\x00-\x1fA-B\t\n]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue(count($token->value->userinscription) == 7);
+        $this->assertTrue(count($token->value->userinscription) == 8);
         $this->assertTrue($token->value->userinscription[1]->data === '\xff');
         $this->assertTrue($token->value->userinscription[1]->isflag === null);
-        $this->assertTrue($token->value->userinscription[2]->data === '\x00-\x1f');
+        $this->assertTrue($token->value->userinscription[1]->is_hex_code() == 'ff');
+        $this->assertTrue($token->value->userinscription[2]->data === '\x{aa}');
         $this->assertTrue($token->value->userinscription[2]->isflag === null);
-        $this->assertTrue($token->value->userinscription[3]->data === 'A-B');
+        $this->assertTrue($token->value->userinscription[2]->is_hex_code() == 'aa');
+        $this->assertTrue($token->value->userinscription[3]->data === '\x00-\x1f');
         $this->assertTrue($token->value->userinscription[3]->isflag === null);
-        $this->assertTrue($token->value->userinscription[4]->data === '\t');
+        $this->assertTrue($token->value->userinscription[3]->is_hex_code() == false);
+        $this->assertTrue($token->value->userinscription[4]->data === 'A-B');
         $this->assertTrue($token->value->userinscription[4]->isflag === null);
-        $this->assertTrue($token->value->userinscription[5]->data === '\n');
+        $this->assertTrue($token->value->userinscription[5]->data === '\t');
         $this->assertTrue($token->value->userinscription[5]->isflag === null);
+        $this->assertTrue($token->value->userinscription[6]->data === '\n');
+        $this->assertTrue($token->value->userinscription[6]->isflag === null);
         $lexer = $this->create_lexer('[\x20-a]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSELEAF);
@@ -2492,6 +2497,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($token->value->userinscription) == 3);
         $this->assertTrue($token->value->userinscription[1]->data === '\x20-a');
         $this->assertTrue($token->value->userinscription[1]->isflag === null);
+        $this->assertTrue($token->value->userinscription[1]->is_hex_code() === false);
     }
     function test_multiline_regex() {
         // Non-extended mode.

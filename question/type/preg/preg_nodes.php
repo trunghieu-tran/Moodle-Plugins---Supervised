@@ -119,6 +119,22 @@ class qtype_preg_userinscription {
         return false;
     }
 
+    /**
+     * Returns the hex code if it is \x.. or \x{..}, false otherwise.
+     */
+    public function is_hex_code() {
+        if (!$this->isflag && $this->data[0] == '\\' && $this->data[1] == 'x' && textlib::strpos($this->data, '-') === false) {
+            $start = 2;
+            $end = textlib::strlen($this->data) - 1;
+            if ($this->data[2] == '{') {
+                $start++;
+                $end--;
+            }
+            return textlib::substr($this->data, $start, $end - $start + 1);
+        }
+        return false;
+    }
+
     public function lang_key($usedescription = false) {
         if ($this->isflag === null || !$usedescription) {
             return $this->isflag;
