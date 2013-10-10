@@ -108,7 +108,7 @@ $string['empty_leaf_meta']             = 'ничего';
 $string['esc_b_leaf_assert']           = 'граничные ассерты слова';
 $string['esc_a_leaf_assert']           = 'начало строки';
 $string['esc_z_leaf_assert']           = 'конец строки';
-$string['esc_g_leaf_assert']           = '';
+$string['esc_g_leaf_assert']           = 'первая позиция матчинга в строке';
 $string['circumflex_leaf_assert']      = 'начало строки';
 $string['dollar_leaf_assert']          = 'конец строки';
 $string['accept_leaf_control']         = '';   // TODO
@@ -228,7 +228,7 @@ $string['description_empty_leaf_meta'] = 'ничего';
 $string['description_esc_b_leaf_assert'] = 'граница слова';
 $string['description_esc_a_leaf_assert'] = 'начало текста';
 $string['description_esc_z_leaf_assert'] = 'конец текста';
-$string['description_esc_g_leaf_assert'] = 'TODO';
+$string['description_esc_g_leaf_assert'] = 'первая позиция матчинга в строке';
 $string['description_circumflex_leaf_assert'] = 'начало строки';
 $string['description_dollar_leaf_assert'] = 'конец строки';
 // TYPE_LEAF_BACKREF
