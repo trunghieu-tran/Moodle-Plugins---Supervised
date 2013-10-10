@@ -377,7 +377,7 @@ class qtype_preg_test_helper extends question_test_helper {
             ),
             5 => array(
                 'text' => 'Test 555',
-                'format' => FORMAT_PLAIN
+                'format' => FORMAT_HTML
             )
         );
 
@@ -446,8 +446,8 @@ class qtype_preg_test_helper extends question_test_helper {
                 'feedbackformat' => FORMAT_HTML,
                 'regextests' => '000'
             ),
-            15 => (object) array(
-                'id' => 15,
+            14 => (object) array(
+                'id' => 14,
                 'answer' => '222',
                 'answerformat' => FORMAT_PLAIN,
                 'fraction' => '0.8',
@@ -455,8 +455,8 @@ class qtype_preg_test_helper extends question_test_helper {
                 'feedbackformat' => FORMAT_HTML,
                 'regextests' => null
             ),
-            16 => (object) array(
-                'id' => 16,
+            15 => (object) array(
+                'id' => 15,
                 'answer' => '333',
                 'answerformat' => FORMAT_PLAIN,
                 'fraction' => '0.5',
@@ -464,8 +464,8 @@ class qtype_preg_test_helper extends question_test_helper {
                 'feedbackformat' => FORMAT_HTML,
                 'regextests' => '333+'
             ),
-            17 => (object) array(
-                'id' => 17,
+            16 => (object) array(
+                'id' => 16,
                 'answer' => '444',
                 'answerformat' => FORMAT_PLAIN,
                 'fraction' => '1.0',
@@ -539,7 +539,7 @@ class qtype_preg_test_helper extends question_test_helper {
                 'format' => FORMAT_HTML
             ),
             3 => array(
-                'text' => '333+',
+                'text' => 'No tests.',
                 'format' => FORMAT_HTML
             ),
             4 => array(
@@ -555,9 +555,9 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->regextests = array(
             0 => '000',
             1 => '111',
-            2 => '222',
-            3 => '333',
-            4 => '',
+            2 => '',
+            3 => '333+',
+            4 => '444',
             5 => ''
         );
 

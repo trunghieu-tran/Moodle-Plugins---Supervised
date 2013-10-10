@@ -218,8 +218,12 @@ class qtype_preg extends qtype_shortanswer {
      * @return bool True if answer shouldn't be saved in DB.
      */
     protected function is_answer_empty($questiondata, $key) {
-        return trim($questiondata->answer[$key]) == '' && $questiondata->fraction[$key] == 0 &&
-                    html_is_blank($questiondata->feedback[$key]['text']);
+        /*return trim($questiondata->answer[$key]) == '' && $questiondata->fraction[$key] == 0 &&
+                    html_is_blank($questiondata->feedback[$key]['text']);*/ // This is shortanswer part for patch.
+        // Empty regex will match with anything and it's easy to save it by mistake.
+        // So not saving answers with empty regexes.
+        // If the teacher want matcing with anything, he could use .* instead.
+        return trim($questiondata->answer[$key]) == '';
     }
 
     /**
