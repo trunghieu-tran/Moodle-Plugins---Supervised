@@ -144,55 +144,17 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
 
         // Now, iterate over userinscription elements.
         foreach ($info as $userinscription) {
-            $data = new qtype_poasquestion_string($userinscription->data);
-
-            // Check ranges.
-            $mpos = textlib::strpos($data, '-');
-            if ($mpos != 0 && $mpos != $data->length() - 1) {
-                if ($mpos == 1) { // If length is 1 then our range hasn't hex code.
-                    $result[] = chr(10) . get_string('explain_from', 'qtype_preg') . $data->substring(0, $mpos) .
-                                          get_string('explain_to', 'qtype_preg') . $data->substring($mpos + 1);
-                } else {            // ...else we deal with hex code
-                    $a = $data->substring(2, $mpos - 2)->string();
-                    $tmp = chr(10) . get_string('explain_from', 'qtype_preg') .
-                                     get_string('description_char_16value', 'qtype_preg', $a) .
-                                     get_string('explain_to', 'qtype_preg');
-                    $a = $data->substring($mpos + 3)->string();
-                    $result[] = $tmp . get_string('description_char_16value', 'qtype_preg', $a);
-                }
-                continue;
-            }
-
-            // Extract flags from lang-file.
-            if ($userinscription->isflag) {
-                $res = get_string($userinscription->lang_key(true), 'qtype_preg');
-                $result[] = chr(10) . $res;
-                continue;
-            }
-
-            // Check escape sequences
-            $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
-            if ($code !== null) {
-                $hex = textlib::strtoupper(dechex($code));
-                if ($data[1] != 'c' && $data[1] != 'x') {
-                    $result[] = chr(10) . get_string('description_char' . $hex, 'qtype_preg');
-                } else {
-                    $result[] = chr(10) . get_string('description_char_16value', 'qtype_preg', $hex);
-                }
-                continue;
-            }
-
-            if ($data == '\\ ' || $data == ' ') {
-                $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
+            $res = qtype_preg_authoring_tool::userinscription_to_string($userinscription);
+            if ($res === $userinscription->data) {
+                $result[0] .= $userinscription->data;
             } else {
-                $result[0] .= $data;
+                $result[] = $res;
             }
         }
 
         // If first element is empty then delete it.
         if ($result[0] == '') {
-            unset($result[0]);
-            $result = array_values($result);
+            array_shift($result);
         }
 
         return $result;

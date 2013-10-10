@@ -122,6 +122,52 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         return $result;
     }
 
+    public static function userinscription_to_string($userinscription) {
+        $data = new qtype_poasquestion_string($userinscription->data);
+
+        // Is it a range?
+        $mpos = textlib::strpos($data, '-');
+        if ($mpos != 0 && $mpos != $data->length() - 1) {
+            $left = $data->substring(0, $mpos)->string();
+            $right = $data->substring($mpos + 1)->string();
+
+            $uileft = new qtype_preg_userinscription($left);
+            $uiright = new qtype_preg_userinscription($right);
+
+            // Make a recursive call; won't get here next time.
+            $left = self::userinscription_to_string($uileft);
+            $right = self::userinscription_to_string($uiright);
+
+            return get_string('explain_from', 'qtype_preg') . $left . get_string('explain_to', 'qtype_preg') . $right;
+        }
+
+        // Is it a flag?
+        if ($userinscription->isflag) {
+            return get_string($userinscription->lang_key(true), 'qtype_preg');
+        }
+
+        // Is it an escape-sequence?
+        $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
+        if ($code !== null) {
+            $hex = textlib::strtoupper(dechex($code));
+            if ($data[1] != 'c' && $data[1] != 'x') {
+                return get_string('description_char' . $hex, 'qtype_preg');
+            } else {
+                return get_string('description_char_16value', 'qtype_preg', $hex);
+            }
+        }
+
+        if ($data[0] == '\\') {
+            $data = $data->substring(1);
+        }
+
+        if ($data == ' ') {
+            return get_string('description_char20', 'qtype_preg');
+        }
+
+        return $data->string();
+    }
+
     public function generate_json(&$json) {
         $json['regex'] = $this->regex->string();
         $json['engine'] = $this->options->engine;
