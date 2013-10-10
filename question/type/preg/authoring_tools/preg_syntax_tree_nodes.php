@@ -311,10 +311,8 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         $delimiter = $start > 0 ? '&#10;' : ' ';
         for ($i = $start; $i < $end; $i++) {
             $userinscription = $this->pregnode->userinscription[$i];
-            if ($userinscription->isflag) {
-                $tmp = get_string($userinscription->lang_key(true), 'qtype_preg');
-            } else {
-                $tmp = $userinscription->data;
+            $tmp = qtype_preg_authoring_tool::userinscription_to_string($userinscription);
+            if ($tmp === $userinscription->data) {
                 // Replace special characters.
                 foreach ($this->specialchars as $key => $value) {
                     $tmp = qtype_poasquestion_string::replace($key, $value, $tmp);

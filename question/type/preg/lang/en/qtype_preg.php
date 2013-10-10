@@ -222,6 +222,7 @@ $string['authoring_form_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
 $string['description_operand'] = 'operand';
+$string['description_range'] = 'from {$a->start} to {$a->end}';
 // TYPE_LEAF_META
 $string['description_empty_leaf_meta'] = 'nothing';
 // TYPE_LEAF_ASSERT
@@ -325,9 +326,9 @@ $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firs
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: {$a->characters};';
-$string['description_charset_neg'] = 'any symbol except the following: {$a->characters};';
+$string['description_charset_neg'] = 'any character except the following: {$a->characters};';
 $string['description_charset_neg_one'] = 'not {$a->characters}';
-$string['description_charset_range'] = 'any character form {$a->start} to {$a->end}';
+$string['description_charset_range'] = 'any character {$a}';
 $string['description_char'] = '<span style="color:blue">{$a->char}</span>';
 $string['description_char_16value'] = 'character with code 0x{$a}';
 //$string['description_charset_one'] = '{$a->characters}';
@@ -693,7 +694,5 @@ $string['explain_define'] = 'TODO';
 $string['explain_unknow_meta'] = 'unknow meta';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
-$string['explain_to'] = ' to ';
-$string['explain_from'] = 'from ';
 $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';

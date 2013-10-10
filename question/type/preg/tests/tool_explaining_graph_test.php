@@ -44,7 +44,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
             return false;
         }
         if ($n1->label != $n2->label) {
-            print("\nLabels of nodes failed! "  . $n1->label . ' != ' . $n2->label);
+            print("\nLabels of nodes failed! "  . $n1->label[0] . ' != ' . $n2->label[0]);
             return false;
         }
         if ($n1->shape != $n2->shape) {
