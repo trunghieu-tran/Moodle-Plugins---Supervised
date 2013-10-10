@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 /**
  * Abstract class for both operators and leafs.
  */
-abstract class qtype_preg_authoring_tool_node_abstract {
+abstract class qtype_preg_explaining_graph_node_abstract {
 
     public $pregnode; // A reference to the corresponding preg_node.
     public $handler;
@@ -68,7 +68,7 @@ abstract class qtype_preg_authoring_tool_node_abstract {
 /**
  * Class for tree's leaf.
  */
-abstract class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_node_abstract {
+abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_graph_node_abstract {
     /**
      * Returns filling settings of node which will be in graph.
      * @return string Filling settings of node.
@@ -132,45 +132,9 @@ abstract class qtype_preg_authoring_tool_leaf extends qtype_preg_authoring_tool_
 /**
  * Class for tree's charset leaf.
  */
-class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
-        return $this->process_charset();
-    }
-
-    public function get_color() {
-        $tmp = $this->get_value();
-        if (count($tmp) == 1) {
-            if ($tmp[0][0] == chr(10)) {
-                return 'hotpink';
-            } else {
-                return 'black';
-            }
-        } else {
-            return 'black';
-        }
-    }
-
-    public function get_shape() {
-
-        if (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
-            return 'record';
-        } else {
-            if ($this->get_color() == 'hotpink') {
-                return 'ellipse';
-            } else if ($this->pregnode->flags[0][0]->data->length() > 1) {
-                return 'record';
-            } else {
-                return 'ellipse';
-            }
-        }
-    }
-
-    /**
-     * Processes userinscription of charset to make an array of information which one will be in result graph.
-     * @return array Charset values for node of graph.
-     */
-    public function process_charset() {
         $info = $this->pregnode->userinscription;   // Refer a userinscription to new variable for convenience.
         if (count($this->pregnode->userinscription) > 1) {
             array_shift($info);
@@ -203,10 +167,7 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
 
             // Extract flags from lang-file.
             if ($userinscription->isflag) {
-                $res = get_string('description_charflag_' . $userinscription->isflag, 'qtype_preg');
-                if ($userinscription->is_flag_negative()) {
-                    $res = get_string('description_not', 'qtype_preg', $res);
-                }
+                $res = get_string($userinscription->lang_key(true), 'qtype_preg');
                 $result[] = chr(10) . $res;
                 continue;
             }
@@ -276,12 +237,40 @@ class qtype_preg_authoring_tool_leaf_charset extends qtype_preg_authoring_tool_l
 
         return $result;
     }
+
+    public function get_color() {
+        $tmp = $this->get_value();
+        if (count($tmp) == 1) {
+            if ($tmp[0][0] == chr(10)) {
+                return 'hotpink';
+            } else {
+                return 'black';
+            }
+        } else {
+            return 'black';
+        }
+    }
+
+    public function get_shape() {
+
+        if (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
+            return 'record';
+        } else {
+            if ($this->get_color() == 'hotpink') {
+                return 'ellipse';
+            } else if ($this->pregnode->flags[0][0]->data->length() > 1) {
+                return 'record';
+            } else {
+                return 'ellipse';
+            }
+        }
+    }
 }
 
 /**
  * Class for tree's meta leaf.
  */
-class qtype_preg_authoring_tool_leaf_meta extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_meta extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
         if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -303,13 +292,10 @@ class qtype_preg_authoring_tool_leaf_meta extends qtype_preg_authoring_tool_leaf
 /**
  * Class for tree's assert leaf.
  */
-class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_assert extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
-        $result = get_string('description_' . $this->pregnode->subtype, 'qtype_preg');
-        if ($this->pregnode->negative && $this->pregnode->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_Z) {
-            $result = get_string('description_not', 'qtype_preg', $result);
-        }
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg');
         return array($result);
     }
 
@@ -325,7 +311,7 @@ class qtype_preg_authoring_tool_leaf_assert extends qtype_preg_authoring_tool_le
 /**
  * Class for tree's backreference leaf.
  */
-class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_backref extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
         return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
@@ -343,7 +329,7 @@ class qtype_preg_authoring_tool_leaf_backref extends qtype_preg_authoring_tool_l
 /**
  * Class for tree's recursion leaf.
  */
-class qtype_preg_authoring_tool_leaf_recursion extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_recursion extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
         return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
@@ -361,7 +347,7 @@ class qtype_preg_authoring_tool_leaf_recursion extends qtype_preg_authoring_tool
 /**
  * Class for tree's options leaf.
  */
-class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_leaf {
+class qtype_preg_explaining_graph_leaf_options extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
         return array('');
@@ -379,7 +365,7 @@ class qtype_preg_authoring_tool_leaf_options extends qtype_preg_authoring_tool_l
 /**
  * Class for tree's operator.
  */
-abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_tool_node_abstract {
+abstract class qtype_preg_explaining_graph_operator extends qtype_preg_explaining_graph_node_abstract {
 
     public $operands = array(); // An array of operands.
     protected $condid = -1;      // A number of conditional branch of conditional subexpression.
@@ -422,7 +408,7 @@ abstract class qtype_preg_authoring_tool_operator extends qtype_preg_authoring_t
 /**
  * Class for tree's concatenation operator.
  */
-class qtype_preg_authoring_tool_node_concat extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_graph_operator {
 
     protected function process_operator($graph, $id) {
         $left = $this->operands[0]->create_graph($id);
@@ -447,7 +433,7 @@ class qtype_preg_authoring_tool_node_concat extends qtype_preg_authoring_tool_op
 /**
  * Class for tree's alternation operator.
  */
-class qtype_preg_authoring_tool_node_alt extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_operator {
 
     protected function process_operator($graph, $id) {
         $left = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
@@ -471,7 +457,7 @@ class qtype_preg_authoring_tool_node_alt extends qtype_preg_authoring_tool_opera
 /**
  * Class for tree's quantifier operator.
  */
-class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph_operator {
 
     protected function process_operator($graph, $id) {
         $operand = $this->operands[0]->create_graph($id);
@@ -480,9 +466,9 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
             if ($this->pregnode->rightborder != $this->pregnode->leftborder) {
                 $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg');
 
-                $label .= $this->pregnode->rightborder . qtype_preg_authoring_tool_node_quant::getEnding($this->pregnode->rightborder);
+                $label .= $this->pregnode->rightborder . qtype_preg_explaining_graph_node_quant::getEnding($this->pregnode->rightborder);
             } else {
-                $label = $this->pregnode->leftborder . qtype_preg_authoring_tool_node_quant::getEnding($this->pregnode->rightborder);
+                $label = $this->pregnode->leftborder . qtype_preg_explaining_graph_node_quant::getEnding($this->pregnode->rightborder);
             }
         } else {
             $label = get_string('explain_from', 'qtype_preg') . $this->pregnode->leftborder . get_string('explain_to', 'qtype_preg')
@@ -511,7 +497,7 @@ class qtype_preg_authoring_tool_node_quant extends qtype_preg_authoring_tool_ope
 /**
  * Class for tree's subexpression operator.
  */
-class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_graph_operator {
 
     protected function process_operator($graph, $id) {
         if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
@@ -557,7 +543,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
 /**
  * Class for tree's conditional subexpression operator.
  */
-class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explaining_graph_operator {
 
     public function __construct($node, $handler) {
         parent::__construct($node, $handler);
@@ -661,7 +647,7 @@ class qtype_preg_authoring_tool_node_cond_subexpr extends qtype_preg_authoring_t
 /**
  * Class for tree's assert operator.
  */
-class qtype_preg_authoring_tool_node_assert extends qtype_preg_authoring_tool_operator {
+class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_graph_operator {
 
     private static $linkoptions = array(
                                         qtype_preg_node_assert::SUBTYPE_PLA => 'normal, color="green"',

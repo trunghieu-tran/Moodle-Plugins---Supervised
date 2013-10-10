@@ -118,6 +118,17 @@ class qtype_preg_userinscription {
         }
         return false;
     }
+
+    public function lang_key($usedescription = false) {
+        if ($this->isflag === null || !$usedescription) {
+            return $this->isflag;
+        }
+        $result = 'description_charflag_' . $this->isflag;
+        if ($this->is_flag_negative()) {
+            $result .= '_neg';
+        }
+        return $result;
+    }
 }
 
 /**
@@ -384,6 +395,14 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->negative) {
+            $result .= '_neg';
+        }
+        return $result;
     }
 
     /**

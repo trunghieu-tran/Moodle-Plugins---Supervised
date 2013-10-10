@@ -40,19 +40,15 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
      */
     public static function cmp_nodes(&$n1, &$n2) {
         if ($n1->color != $n2->color) {
-            print(chr(10));
-            print('Colors of nodes failed! ' . $n1->color . ' != ' . $n2->color);
-            print(chr(10));
+            print("\nColors of nodes failed! " . $n1->color . ' != ' . $n2->color);
             return false;
         }
         if ($n1->label != $n2->label) {
-            print(chr(10));
-            print('Labels of nodes failed! '  . $n1->label . ' != ' . $n2->label);
+            print("\nLabels of nodes failed! "  . $n1->label . ' != ' . $n2->label);
             return false;
         }
         if ($n1->shape != $n2->shape) {
-            print(chr(10));
-            print('Shapes of nodes failed! '  . $n1->shape . ' != ' . $n2->shape);
+            print("\nShapes of nodes failed! "  . $n1->shape . ' != ' . $n2->shape);
             return false;
         }
 
@@ -510,11 +506,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_interval() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('0-9'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'from 0 to 9');
 
@@ -522,11 +518,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         // ----------------------------------------------------
 
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x30-\x39'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'from character with code 0x30 to character with code 0x39');
 
@@ -534,11 +530,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_posix() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('[:alpha:]'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'letter');
 
@@ -546,11 +542,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_unicode() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\p{C}'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'other unicode property');
 
@@ -558,11 +554,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         // ---------------------------------------------------
 
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\pC'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'other unicode property');
 
@@ -570,11 +566,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_code() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\x{30}'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'character with code 0x30');
 
@@ -582,11 +578,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         // ---------------------------------------------------
 
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\X30'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'character with code 0x30');
 
@@ -594,11 +590,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_special() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\d'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array(chr(10) . 'decimal digit');
 
@@ -606,11 +602,11 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_process_charset_nospecial() {
-        $node = new qtype_preg_authoring_tool_leaf_charset(null, null);
+        $node = new qtype_preg_explaining_graph_leaf_charset(null, null);
         $node->pregnode = new qtype_preg_leaf_charset();
         $node->pregnode->userinscription = array(new qtype_preg_userinscription('\y'));
 
-        $result = $node->process_charset();
+        $result = $node->get_value();
 
         $etalon = array('y');
 

@@ -184,8 +184,8 @@ $string['callout_big_number_node_error']           = 'Номер {$a->addinfo} c
 $string['lnu_unsupported_node_error']              = 'Последовательности \L, \l, \N{name}, \U, и \u не поддерживаются.';
 
 // Types and subtypes needed for authoring tools
-$string['leaf_charset_negative'] = 'отрицательный символьный класс';
-$string['leaf_charset_error']    = 'ошибка в символьном классе';
+$string['leaf_charset_neg'] = 'отрицательный символьный класс';
+$string['leaf_charset_error'] = 'ошибка в символьном классе';
 
 /******* Error messages *******/
 $string['error_PCREincorrectregex']              = 'Некорректное регулярное выражение - ошибка синтаксиса! Ознакомьтесь с <a href="http://pcre.org/pcre.txt">документацией PCRE</a> для получения информации.';
@@ -221,7 +221,6 @@ $string['authoring_form_match_textarea'] = 'Введите строки для �
 $string['authoring_form_check_strings'] = 'Проверить строку (строки)';
 
 // Strings for node description
-$string['description_not'] = 'не {$a}';
 // TYPE_LEAF_META
 $string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
@@ -231,6 +230,8 @@ $string['description_esc_z_leaf_assert'] = 'конец строки';
 $string['description_esc_g_leaf_assert'] = 'первая позиция матчинга в строке';
 $string['description_circumflex_leaf_assert'] = 'начало строки';
 $string['description_dollar_leaf_assert'] = 'конец строки';
+$string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
+$string['description_esc_z_leaf_assert_neg'] = 'конец строки';
 // TYPE_LEAF_BACKREF
 $string['description_leaf_backref'] = 'обратная ссылка на подвыражение #{$a}';
 $string['description_leaf_backref_name'] = 'обратная ссылка на подвыражение "{$a}"';
@@ -323,8 +324,8 @@ $string['description_node_cond_subexpr'] = 'если {$a->cond}, тогда пр
 $string['description_node_cond_subexpr_else'] = ' иначе проверить: [{$a->secondoperand}]';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'один из следующих символов: {$a->characters};';
-$string['description_charset_negative'] = 'любой из символов кроме следующих: {$a->characters};';
-$string['description_charset_one_neg'] = 'не {$a->characters}';
+$string['description_charset_neg'] = 'любой из символов кроме следующих: {$a->characters};';
+$string['description_charset_neg_one'] = 'не {$a->characters}';
 $string['description_charset_range'] = 'любой символ от {$a->start} до {$a->end}';
 $string['description_char'] = '<span style="color:blue">{$a->char}</span>';
 $string['description_char_16value'] = 'символ с кодом 0x{$a->code}';
@@ -374,10 +375,16 @@ $string['description_char200D'] = 'zero width joiner';
 //CHARSET FLAGS
 $string['description_charflag_dot'] = 'любой символ';
 $string['description_charflag_slashd'] = 'десятичная цифра';
-$string['description_charflag_slashh'] = 'символ горизонтального белого разделителя';
+$string['description_charflag_slashh'] = 'горизонтальный белый разделитель';
 $string['description_charflag_slashs'] = 'белый разделитель';
-$string['description_charflag_slashv'] = 'символ вертикального белого разделителя';//TODO - third string for description \v is it good?
+$string['description_charflag_slashv'] = 'вертикальный белый разделитель';
 $string['description_charflag_slashw'] = 'символ слова';
+$string['description_charflag_slashd_neg'] = 'не десятичная цифра';
+$string['description_charflag_slashh_neg'] = 'не горизонтальный белый разделитель';
+$string['description_charflag_slashs_neg'] = 'не белый разделитель';
+$string['description_charflag_slashv_neg'] = 'не вертикальный белый разделитель';
+$string['description_charflag_slashw_neg'] = 'не символ слова';
+// POSIX flags
 $string['description_charflag_alnum'] = 'буква или цифра';
 $string['description_charflag_alpha'] = 'буква';
 $string['description_charflag_ascii'] = 'символы с кодом 0-127';
@@ -392,6 +399,22 @@ $string['description_charflag_space'] = 'пробел';
 $string['description_charflag_upper'] = 'заглавная буква';
 $string['description_charflag_word'] = 'символ-слово';
 $string['description_charflag_xdigit'] = 'шестнадцатиричное число';
+// POSIX flags - negative
+$string['description_charflag_alnum_neg'] = 'не буква и не цифра';
+$string['description_charflag_alpha_neg'] = 'не буква';
+$string['description_charflag_ascii_neg'] = 'не символ с кодом 0-127';
+$string['description_charflag_blank_neg'] = 'не пробел и не табуляция';
+$string['description_charflag_cntrl_neg'] = 'не служебный символ';
+$string['description_charflag_digit_neg'] = 'не десятичное число';
+$string['description_charflag_graph_neg'] = 'не печатный символ';
+$string['description_charflag_lower_neg'] = 'не строчная буква';
+$string['description_charflag_print_neg'] = 'не печатный символ (включая пробел)';
+$string['description_charflag_punct_neg'] = 'не печатный символ (исключая буквы, цифры и пробел)';
+$string['description_charflag_space_neg'] = 'не пробел';
+$string['description_charflag_upper_neg'] = 'не заглавная буква';
+$string['description_charflag_word_neg'] = 'не символ-слово';
+$string['description_charflag_xdigit_neg'] = 'не шестнадцатиричное число';
+// Unicode flags
 $string['description_charflag_Cc'] = 'ASCII или Latin-1 служебный символ';
 $string['description_charflag_Cf'] = 'непечатные символы форматирования (Unicode)';
 $string['description_charflag_Cn'] = 'символ, отсутствующий в юникоде,';// ??
@@ -525,22 +548,148 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh символ';
 $string['description_charflag_Ugaritic'] = 'Ugaritic символ';
 $string['description_charflag_Vai'] = 'Vai символ';
 $string['description_charflag_Yi'] = 'Yi символ';
+// Unicode flags - negative
+$string['description_charflag_Cc_neg'] = 'не ASCII или Latin-1 служебный символ';
+$string['description_charflag_Cf_neg'] = 'не непечатные символы форматирования (Unicode)';
+$string['description_charflag_Cn_neg'] = 'не символ, отсутствующий в юникоде,';// ??
+$string['description_charflag_Co_neg'] = 'не символ с кодом, выделенным для приватного использования,';
+$string['description_charflag_Cs_neg'] = 'не surrogate';
+$string['description_charflag_C_neg'] = 'не непечатный символ или неиспользуемый код символа';
+$string['description_charflag_Ll_neg'] = 'не буква в нижнем регистре';
+$string['description_charflag_Lm_neg'] = 'не спец. символ, используемый как буква,';
+$string['description_charflag_Lo_neg'] = 'не буква без заглавного варианта';
+$string['description_charflag_Lt_neg'] = 'не буква в заглавном регистре';
+$string['description_charflag_Lu_neg'] = 'не буква в верхнем регистре';
+$string['description_charflag_L_neg'] = 'не буква';
+$string['description_charflag_Mc_neg'] = 'не пробельный символ';
+$string['description_charflag_Me_neg'] = 'не enclosing mark';
+$string['description_charflag_Mn_neg'] = 'не не пробельный символ';
+$string['description_charflag_M_neg'] = 'не метка';
+$string['description_charflag_Nd_neg'] = 'не десятичное число';
+$string['description_charflag_Nl_neg'] = 'не letter number';
+$string['description_charflag_No_neg'] = 'не другое число';
+$string['description_charflag_N_neg'] = 'не число';
+$string['description_charflag_Pc_neg'] = 'не connector punctuation';
+$string['description_charflag_Pd_neg'] = 'не тире';
+$string['description_charflag_Pe_neg'] = 'не close punctuation';
+$string['description_charflag_Pf_neg'] = 'не final punctuation';
+$string['description_charflag_Pi_neg'] = 'не initial punctuation';
+$string['description_charflag_Po_neg'] = 'не other punctuation';
+$string['description_charflag_Ps_neg'] = 'не open punctuation';
+$string['description_charflag_P_neg'] = 'не пунктуация';
+$string['description_charflag_Sc_neg'] = 'не денежный символ';
+$string['description_charflag_Sk_neg'] = 'не символ-модификатор';// ??
+$string['description_charflag_Sm_neg'] = 'не математический символ';
+$string['description_charflag_So_neg'] = 'не символ (не математический, денежный)';
+$string['description_charflag_S_neg'] = 'не символ';
+$string['description_charflag_Zl_neg'] = 'не разделитель строк';
+$string['description_charflag_Zp_neg'] = 'не разделитель параграфов';
+$string['description_charflag_Zs_neg'] = 'не пробельный разделитель';
+$string['description_charflag_Z_neg'] = 'не разделитель';
+$string['description_charflag_Xan_neg'] = 'не алфавитно-числовой символ';
+$string['description_charflag_Xps_neg'] = 'не любой POSIX пробельный символ';
+$string['description_charflag_Xsp_neg'] = 'не любой Perl пробельный символ';
+$string['description_charflag_Xwd_neg'] = 'не любой Perl символ-слово';
+$string['description_charflag_Arabic_neg'] = 'не Арабская символ';
+$string['description_charflag_Armenian_neg'] = 'не Армянский символ';
+$string['description_charflag_Avestan_neg'] = 'не Авестийский символ';
+$string['description_charflag_Balinese_neg'] = 'не Balinese символ';
+$string['description_charflag_Bamum_neg'] = 'не Bamum символ';
+$string['description_charflag_Bengali_neg'] = 'не Bengali символ';
+$string['description_charflag_Bopomofo_neg'] = 'не Bopomofo символ';
+$string['description_charflag_Braille_neg'] = 'не Braille символ';
+$string['description_charflag_Buginese_neg'] = 'не Buginese символ';
+$string['description_charflag_Buhid_neg'] = 'не Buhid символ';
+$string['description_charflag_Canadian_Aboriginal_neg'] = 'не Canadian Aboriginal символ';
+$string['description_charflag_Carian_neg'] = 'не Carian символ';
+$string['description_charflag_Cham_neg'] = 'не Cham символ';
+$string['description_charflag_Cherokee_neg'] = 'не Cherokee символ';
+$string['description_charflag_Common_neg'] = 'не Common символ';
+$string['description_charflag_Coptic_neg'] = 'не Coptic символ';
+$string['description_charflag_Cuneiform_neg'] = 'не Cuneiform символ';
+$string['description_charflag_Cypriot_neg'] = 'не Cypriot символ';
+$string['description_charflag_Cyrillic_neg'] = 'не Cyrillic символ';
+$string['description_charflag_Deseret_neg'] = 'не Deseret символ';
+$string['description_charflag_Devanagari_neg'] = 'не Devanagari символ';
+$string['description_charflag_Egyptian_Hieroglyphs_neg'] = 'не Egyptian Hieroglyphs символ';
+$string['description_charflag_Ethiopic_neg'] = 'не Ethiopic символ';
+$string['description_charflag_Georgian_neg'] = 'не Georgian символ';
+$string['description_charflag_Glagolitic_neg'] = 'не Glagolitic символ';
+$string['description_charflag_Gothic_neg'] = 'не Gothic символ';
+$string['description_charflag_Greek_neg'] = 'не Greek символ';
+$string['description_charflag_Gujarati_neg'] = 'не Gujarati символ';
+$string['description_charflag_Gurmukhi_neg'] = 'не Gurmukhi символ';
+$string['description_charflag_Han_neg'] = 'не Han символ';
+$string['description_charflag_Hangul_neg'] = 'не Hangul символ';
+$string['description_charflag_Hanunoo_neg'] = 'не Hanunoo символ';
+$string['description_charflag_Hebrew_neg'] = 'не Hebrew символ';
+$string['description_charflag_Hiragana_neg'] = 'не Hiragana символ';
+$string['description_charflag_Imperial_Aramaic_neg'] = 'не Imperial Aramaic символ';
+$string['description_charflag_Inherited_neg'] = 'не Inherited символ';
+$string['description_charflag_Inscriptional_Pahlavi_neg'] = 'не Inscriptional Pahlavi символ';
+$string['description_charflag_Inscriptional_Parthian_neg'] = 'не Inscriptional Parthian символ';
+$string['description_charflag_Javanese_neg'] = 'не Javanese символ';
+$string['description_charflag_Kaithi_neg'] = 'не Kaithi символ';
+$string['description_charflag_Kannada_neg'] = 'не Kannada символ';
+$string['description_charflag_Katakana_neg'] = 'не Katakana символ';
+$string['description_charflag_Kayah_Li_neg'] = 'не Kayah Li символ';
+$string['description_charflag_Kharoshthi_neg'] = 'не Kharoshthi символ';
+$string['description_charflag_Khmer_neg'] = 'не Khmer символ';
+$string['description_charflag_Lao_neg'] = 'не Lao символ';
+$string['description_charflag_Latin_neg'] = 'не Latin символ';
+$string['description_charflag_Lepcha_neg'] = 'не Lepcha символ';
+$string['description_charflag_Limbu_neg'] = 'не Limbu символ';
+$string['description_charflag_Linear_B_neg'] = 'не Linear B символ';
+$string['description_charflag_Lisu_neg'] = 'не Lisu символ';
+$string['description_charflag_Lycian_neg'] = 'не Lycian символ';
+$string['description_charflag_Lydian_neg'] = 'не Lydian символ';
+$string['description_charflag_Malayalam_neg'] = 'не Malayalam символ';
+$string['description_charflag_Meetei_Mayek_neg'] = 'не Meetei Mayek символ';
+$string['description_charflag_Mongolian_neg'] = 'не Mongolian символ';
+$string['description_charflag_Myanmar_neg'] = 'не Myanmar символ';
+$string['description_charflag_New_Tai_Lue_neg'] = 'не New Tai Lue символ';
+$string['description_charflag_Nko_neg'] = 'не Nko символ';
+$string['description_charflag_Ogham_neg'] = 'не Ogham символ';
+$string['description_charflag_Old_Italic_neg'] = 'не Old Italic символ';
+$string['description_charflag_Old_Persian_neg'] = 'не Old Persian символ';
+$string['description_charflag_Old_South_Arabian_neg'] = 'не Old South_Arabian символ';
+$string['description_charflag_Old_Turkic_neg'] = 'не Old_Turkic символ';
+$string['description_charflag_Ol_Chiki_neg'] = 'не Ol_Chiki символ';
+$string['description_charflag_Oriya_neg'] = 'не Oriya символ';
+$string['description_charflag_Osmanya_neg'] = 'не Osmanya символ';
+$string['description_charflag_Phags_Pa_neg'] = 'не Phags_Pa символ';
+$string['description_charflag_Phoenician_neg'] = 'не Phoenician символ';
+$string['description_charflag_Rejang_neg'] = 'не Rejang символ';
+$string['description_charflag_Runic_neg'] = 'не Runic символ';
+$string['description_charflag_Samaritan_neg'] = 'не Samaritan символ';
+$string['description_charflag_Saurashtra_neg'] = 'не Saurashtra символ';
+$string['description_charflag_Shavian_neg'] = 'не Shavian символ';
+$string['description_charflag_Sinhala_neg'] = 'не Sinhala символ';
+$string['description_charflag_Sundanese_neg'] = 'не Sundanese символ';
+$string['description_charflag_Syloti_Nagri_neg'] = 'не Syloti_Nagri символ';
+$string['description_charflag_Syriac_neg'] = 'не Syriac символ';
+$string['description_charflag_Tagalog_neg'] = 'не Tagalog символ';
+$string['description_charflag_Tagbanwa_neg'] = 'не Tagbanwa символ';
+$string['description_charflag_Tai_Le_neg'] = 'не Tai_Le символ';
+$string['description_charflag_Tai_Tham_neg'] = 'не Tai_Tham символ';
+$string['description_charflag_Tai_Viet_neg'] = 'не Tai_Viet символ';
+$string['description_charflag_Tamil_neg'] = 'не Tamil символ';
+$string['description_charflag_Telugu_neg'] = 'не Telugu символ';
+$string['description_charflag_Thaana_neg'] = 'не Thaana символ';
+$string['description_charflag_Thai_neg'] = 'не Thai символ';
+$string['description_charflag_Tibetan_neg'] = 'не Tibetan символ';
+$string['description_charflag_Tifinagh_neg'] = 'не Tifinagh символ';
+$string['description_charflag_Ugaritic_neg'] = 'не Ugaritic символ';
+$string['description_charflag_Vai_neg'] = 'не Vai символ';
+$string['description_charflag_Yi_neg'] = 'не Yi символ';
 // description errors
 $string['description_errorbefore'] = '<span style="color:red">';
 $string['description_errorafter'] = '</span>';
-// for testing
-$string['description_charflag_word_g'] = 'символ слова(form g)';//for testing only
-$string['description_char_g'] = '<span style="color:blue">{$a->char}</span>(form g)';//for testing only
-$string['description_dollar_g'] = 'конец строки(form g)';//for testing
 
 // Strings for explaining graph
 $string['explain_backref'] = 'результат подвыражения #';
 $string['explain_define'] = 'TODO';
-$string['explain_recursion'] = 'рекурсия';
-$string['explain_unknow_node'] = 'неизвестный узел';
 $string['explain_unknow_meta'] = 'неизвестный мета-узел';
-$string['explain_unknow_charset_flag'] = 'неизвестный флаг набора символов';
-$string['explain_not'] = 'не ';
 $string['explain_any_char'] = 'Любой символ из';
 $string['explain_any_char_except'] = 'Любой символ кроме';
 $string['explain_to'] = ' по ';
