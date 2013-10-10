@@ -49,7 +49,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * Overloaded from qtype_preg_regex_handler.
      */
     protected function node_infix() {
-        return 'authoring_tool';
+        return 'explaining_graph';
     }
 
     /**
@@ -57,7 +57,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      */
     protected function get_engine_node_name($nodetype, $nodesubtype) {
         if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
-            return 'qtype_preg_authoring_tool_node_quant';
+            return 'qtype_preg_explaining_graph_node_quant';
         }
         return parent::get_engine_node_name($nodetype, $nodesubtype);
     }

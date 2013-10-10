@@ -219,23 +219,21 @@ class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
             if ($userinscription->isflag == qtype_preg_charset_flag::META_DOT) {
                 $result .= get_string('description_charflag_dot', 'qtype_preg');
             } else {
-                $result .= $userinscription->data;
+                $tmp = $userinscription->data;
+                // Replace special characters.
+                foreach ($this->specialchars as $key => $value) {
+                    $tmp = qtype_poasquestion_string::replace($key, $value, $tmp);
+                }
+                $result .= $tmp;
             }
         }
-        // Replace special characters.
-        foreach ($this->specialchars as $key => $value) {
-            $result = qtype_poasquestion_string::replace($key, $value, $result);
-        }
+
         return $result;
     }
 
     public function tooltip() {
         // Leaves use description_ strings by default.
-        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg');
-        if ($this->pregnode->negative) {
-            $result = get_string('description_not', 'qtype_preg', $result);
-        }
-        return $result;
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg');
     }
 
     public function shape() {
@@ -292,15 +290,17 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
     public function tooltip() {
         $start = 0;
         $end = count($this->pregnode->userinscription);
+        $key = $this->pregnode->type;
+        $delimiter = '&#10;';
         if (count($this->pregnode->errors) > 0) {
-            $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg') . '&#10;';
+            $key .= '_error';
         } else if ($this->pregnode->negative) {
-            $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg') . '&#10;';
+            $key .= '_neg';
         } else if ($end == 1) {
-            $tooltip = get_string($this->pregnode->type . '_one', 'qtype_preg') . ' ';
-        } else {
-            $tooltip = get_string($this->pregnode->type, 'qtype_preg') . '&#10;';
+            $key .= '_one';
+            $delimiter = ' ';
         }
+        $tooltip = get_string($key, 'qtype_preg') . $delimiter;
         if (count($this->pregnode->userinscription) > 1) {
             $start++;
             $end--;
@@ -308,13 +308,11 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             $tooltip = '';
         }
         // Concatenate userinscriptions.
+        $delimiter = $start > 0 ? '&#10;' : ' ';
         for ($i = $start; $i < $end; $i++) {
             $userinscription = $this->pregnode->userinscription[$i];
             if ($userinscription->isflag) {
-                $tmp = get_string('description_charflag_' . $userinscription->isflag, 'qtype_preg');
-                if ($userinscription->is_flag_negative()) {
-                    $tmp = get_string('description_not', 'qtype_preg', $tmp);
-                }
+                $tmp = get_string($userinscription->lang_key(true), 'qtype_preg');
             } else {
                 $tmp = $userinscription->data;
                 // Replace special characters.
@@ -324,7 +322,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             }
             $tooltip .= $tmp;
             if ($i != $end - 1) {
-                $tooltip .= ($start > 0) ? '&#10;' : ' ';
+                $tooltip .= $delimiter;
             }
         }
         return $tooltip;

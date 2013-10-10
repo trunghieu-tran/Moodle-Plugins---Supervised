@@ -55,62 +55,66 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($node->tooltip(), 'negative character set&#10;a&#10;b');
 
         // Single flag.
+        $node = $tree->from_preg_node($this->get_pregnode('.'));
+        $this->assertEquals($node->label(), get_string('description_charflag_dot', 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), get_string('description_charflag_dot', 'qtype_preg'));
+
         $node = $tree->from_preg_node($this->get_pregnode('\w'));
         $this->assertEquals($node->label(), '\w');
-        $this->assertEquals($node->tooltip(), 'a word character');
+        $this->assertEquals($node->tooltip(), get_string('description_charflag_slashw', 'qtype_preg'));
 
         // Single negative flag.
         $node = $tree->from_preg_node($this->get_pregnode('\W'));
         $this->assertEquals($node->label(), '\W');
-        $this->assertEquals($node->tooltip(), 'not a word character');
+        $this->assertEquals($node->tooltip(), get_string('description_charflag_slashw_neg', 'qtype_preg'));
 
         // All flags.
         $node = $tree->from_preg_node($this->get_pregnode('[\d\D\h\H\s\S\v\V\w\W]'));
         $this->assertEquals($node->label(), '[\d\D\h\H\s\S\v\V\w\W]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'a decimal digit&#10;'.
-                                              'not a decimal digit&#10;'.
-                                              'a horizontal white space character&#10;'.
-                                              'not a horizontal white space character&#10;'.
-                                              'a white space&#10;'.
-                                              'not a white space&#10;'.
-                                              'a vertical white space character&#10;'.
-                                              'not a vertical white space character&#10;'.
-                                              'a word character&#10;'.
-                                              'not a word character');
+                                              get_string('description_charflag_slashd', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashd_neg', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashh', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashh_neg', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashs', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashs_neg', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashv', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashv_neg', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashw', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_slashw_neg', 'qtype_preg'));
 
         // All POSIX classes.
         $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]'));
         $this->assertEquals($node->label(), '[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'a letter or digit&#10;'.
-                                              'a letter&#10;'.
-                                              'a character with codes 0-127&#10;'.
-                                              'a space or tab only&#10;'.
-                                              'a control character&#10;'.
-                                              'a decimal digit&#10;'.
-                                              'a printing character (excluding space)&#10;'.
-                                              'a lower case letter&#10;'.
-                                              'a printing character (including space)&#10;'.
-                                              'a printing character (excluding letters and digits and space)&#10;'.
-                                              'a white space&#10;'.
-                                              'an upper case letter&#10;'.
-                                              'a word character&#10;'.
-                                              'a hexadecimal digit');
+                                              get_string('description_charflag_alnum', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_alpha', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_ascii', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_blank', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_cntrl', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_digit', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_graph', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_lower', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_print', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_punct', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_space', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_upper', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_word', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_xdigit', 'qtype_preg'));
 
         // Positive and negative POSIX classes.
         $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:^alpha:]]'));
         $this->assertEquals($node->label(), '[[:alnum:][:^alpha:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'a letter or digit&#10;'.
-                                              'not a letter');
+                                              get_string('description_charflag_alnum', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_alpha_neg', 'qtype_preg'));
 
         // Unicode properties.
         $node = $tree->from_preg_node($this->get_pregnode('[\pL\PM]'));
         $this->assertEquals($node->label(), '[\pL\PM]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
-                                              'letter&#10;'.
-                                              'not mark');
+                                              get_string('description_charflag_L', 'qtype_preg') . '&#10;' .
+                                              get_string('description_charflag_M_neg', 'qtype_preg'));
 
     }
 
