@@ -153,7 +153,7 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $tree = new qtype_preg_syntax_tree_tool('(?<name>body)');
         $node = $tree->get_dst_root();
         $this->assertEquals($node->label(), '(?&#60;name&#62;...) #1');
-        $this->assertEquals($node->tooltip(), 'subexpression "name" #1');
+        $this->assertEquals($node->tooltip(), 'subexpression \\"name\\" #1');
     }
 
     function test_something() {

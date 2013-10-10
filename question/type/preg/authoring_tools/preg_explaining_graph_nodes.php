@@ -534,7 +534,7 @@ class qtype_preg_authoring_tool_node_subexpr extends qtype_preg_authoring_tool_o
         if ($this->pregnode->number != -1) {
             $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
             $label = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $label);
-            $label = qtype_poasquestion_string::replace('"', '\\"', $label);// TODO dafuq?
+            $label = qtype_poasquestion_string::replace('"', '\\"', $label);
         }
 
         $generated = $this->handler->is_node_generated($this->pregnode);
