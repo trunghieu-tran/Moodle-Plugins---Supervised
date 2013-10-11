@@ -584,19 +584,30 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                $this->flags[0][0]->data->length() == 1;
     }
 
-    public function is_single_escape_character() {
+    public function is_single_printable_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return !qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::Z_ranges()) &&
+               !qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::C_ranges());
+    }
+
+    public function is_single_non_printable_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::Z_ranges()) ||
+               qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::C_ranges());
+    }
+
+    /**
+     * Checks if it's a single \a \b \e \f \r \t
+     */
+    public function is_single_escape_sequence_character() {
         if (!$this->is_single_character()) {
             return false;
         }
         return in_array($this->userinscription[0]->data, qtype_preg_lexer::char_escape_sequences_inside_charset());
-    }
-
-    public function is_single_whitespace() {
-        if (!$this->is_single_character()) {
-            return false;
-        }
-        $ranges = qtype_preg_unicode::space_ranges();
-        return qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], $ranges);
     }
 
     public function is_single_flag() {

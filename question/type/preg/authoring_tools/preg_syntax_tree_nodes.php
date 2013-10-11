@@ -271,9 +271,9 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
     public function label() {
         $userinscription = $this->pregnode->userinscription[0];
-        if ($this->pregnode->is_single_escape_character() ||    // \a \b \n \r \t
-            $this->pregnode->is_single_flag() ||                // \w \d
-            count($this->pregnode->userinscription) > 1)        // [complex charset]
+        if ($this->pregnode->is_single_escape_sequence_character() ||    // \a \b \n \r \t
+            $this->pregnode->is_single_flag() ||                         // \w \d
+            count($this->pregnode->userinscription) > 1)                 // [complex charset]
         {
             // Flag or complex charset - return "as is".
             return parent::label();
