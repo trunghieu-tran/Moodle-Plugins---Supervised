@@ -1020,11 +1020,12 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYINITIAL> \n {
     // Newlines are totally ignored independent on the 'x' option.
 }
-<YYINITIAL> [\ \r\t\f]+ {                        /* More than one whitespace */
+<YYINITIAL> [\ \r\t\f] {                         /* More than one whitespace */
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
-        return $this->string_to_tokens($this->yytext());
+        $text = $this->yytext();
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
     }
 }
 <YYINITIAL> "#" {                                /* Comment beginning when modifier x is set */

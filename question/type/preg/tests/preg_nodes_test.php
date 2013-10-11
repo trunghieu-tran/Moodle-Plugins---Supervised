@@ -395,6 +395,31 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY && $node->position->indfirst == 0 && $node->position->indlast == -1);
     }
 
+    function test_node_by_regex_fragment_whitespaces() {
+        $handler = new qtype_preg_regex_handler("a  \t");
+        $idcounter = 1000;
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(0, 0, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->position->indfirst == 0 && $node->position->indlast == 0);
+        $this->assertTrue($node->flags[0][0]->data == 'a');
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(1, 1, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->position->indfirst == 1 && $node->position->indlast == 1);
+        $this->assertTrue($node->flags[0][0]->data == ' ');
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(2, 2, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->position->indfirst == 2 && $node->position->indlast == 2);
+        $this->assertTrue($node->flags[0][0]->data == ' ');
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(3, 3, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_LEAF_CHARSET && $node->position->indfirst == 3 && $node->position->indlast == 3);
+        $this->assertTrue($node->flags[0][0]->data == "\t");
+    }
+
     function test_selection_as_option() {
         $options = new qtype_preg_handling_options();
         $options->selection = new qtype_preg_position(3, 3);
