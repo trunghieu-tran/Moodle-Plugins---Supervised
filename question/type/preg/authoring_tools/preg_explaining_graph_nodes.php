@@ -157,13 +157,15 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
             if ($res === $userinscription->data) {
                 $result[0] .= $userinscription->data;
             } else {
-                $result[] = $res;
+                $result[] = qtype_preg_authoring_tool::string_to_html($res);
             }
         }
 
         // If first element is empty then delete it.
         if ($result[0] == '') {
             array_shift($result);
+        } else {
+            $result[0] = qtype_preg_authoring_tool::string_to_html($result[0]);
         }
 
         return $result;

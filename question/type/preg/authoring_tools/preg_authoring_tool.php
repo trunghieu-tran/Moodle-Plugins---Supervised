@@ -45,9 +45,11 @@ class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
 
-    protected static $dotescapecodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
+    protected static $htmlspecialcodes = array(34, 38, 44, 60, 62, 91, 92, 93, 123, 124, 125);
 
-    protected static $htmlescapecodes = array(34, 38, 39, 60, 62);
+    protected static $specialcodes = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                                           17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                                           0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D);
 
     public function __construct($regex = null, $options = null) {
         if ($options === null) {
@@ -71,54 +73,51 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
     }
 
     /**
-     * Escaping a character by its code.
-     * @param int $code - character's code.
-     * @param array|string $codesormode - array of codes which should be escaped
-     * or string containing escape mode: 'html' or 'dot'.
-     * @return string escaped character.
+     * Converts a character so it's representable in HTML.
      */
-    public static function escape_char_by_code($code, $codesormode = null) {
-        if ($codesormode === 'html') {
-            $codesormode = self::$htmlescapecodes;
-        } else if ($codesormode === 'dot' || $codesormode === null) {
-            $codesormode = self::$dotescapecodes;
-        }
-
-        if (in_array($code, $codesormode)) {
+    public static function char_to_html($char) {
+        $code = textlib::utf8ord($char);
+        if (in_array($code, self::$htmlspecialcodes)) {
             return '&#' . $code . ';';
         }
-        return textlib::code2utf8($code);
+        return $char;
     }
 
     /**
-     * Escaping a character.
-     * @param code - character to escape.
-     * @param codes - codes which should be escaped.
-     * @return escaped character.
+     * Converts a string so it's representable in HTML.
      */
-    public static function escape_char($character, $codes) {
-        return self::escape_char_by_code(textlib::utf8ord($character), $codes);
-    }
-
-    /**
-     * Escaping a string
-     * @param stringtoescape - string to escape.
-     * @param extracodes - extra codes which should be escaped.
-     * @return escaped string.
-     */
-    public static function escape_string($stringtoescape, $extracodes = null) {
-        if (is_array($extracodes) && count($extracodes) != 0) {
-            $codes = array_intersect(self::$dotescapecodes, $extracodes);
-        } else {
-            $codes = self::$dotescapecodes;
-        }
-
+    public static function string_to_html($string) {
         $result = '';
-        $stringtoescape = new qtype_poasquestion_string($stringtoescape);
-        for ($i = 0; $i < $stringtoescape->length(); ++$i) {
-            $result .= self::escape_char($stringtoescape[$i], $codes);
+        $string = new qtype_poasquestion_string($string);
+        for ($i = 0; $i < $string->length(); ++$i) {
+            $result .= self::char_to_html($string[$i]);
         }
+        return $result;
+    }
 
+    public static function escape_characters($string, $chars) {
+        $result = '';
+        $string = new qtype_poasquestion_string($string);
+        for ($i = 0; $i < $string->length(); ++$i) {
+            $char = $string[$i];
+            $result .= in_array($char, $chars) ? "\\$char" : $char;
+        }
+        return $result;
+    }
+
+    public static function replace_special_characters($string) {
+        $result = '';
+        $string = new qtype_poasquestion_string($string);
+        for ($i = 0; $i < $string->length(); ++$i) {
+            $char = $string[$i];
+            $code = textlib::utf8ord($char);
+            if (in_array($code, self::$specialcodes)) {
+                $hex = textlib::strtoupper(dechex($code));
+                $result .= get_string('description_char' . $hex, 'qtype_preg');
+            } else {
+                $result .= $char;
+            }
+        }
         return $result;
     }
 
