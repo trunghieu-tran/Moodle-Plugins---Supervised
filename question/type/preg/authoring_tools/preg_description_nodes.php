@@ -500,7 +500,7 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf {
             }
             $result = '';
             if ($options !== '') {
-                $result = self::get_form_string($node->pregnode->lang_key(true), null, $form) . ' ';
+                $result = self::get_form_string('description_leaf_options', null, $form) . ' ';
                 $result = qtype_poasquestion_string::replace('%', $options, $result);
             }
             $node->handler->state->forceunsetmodifiers = false;

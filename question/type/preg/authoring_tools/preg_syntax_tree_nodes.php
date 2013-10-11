@@ -262,15 +262,14 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             return false;
         }
         $ui = $this->pregnode->userinscription[0];
-        if ($ui->isflag === null && in_array($ui->data, qtype_preg_lexer::char_escape_sequences_inside_charset())) {
+        if ($ui->is_valid_escape_sequence()) {
             return false;
         }
-        return ($this->pregnode->is_single_dot() ||
-                $this->pregnode->is_single_character() && textlib::utf8ord($this->pregnode->flags[0][0]->data[0]) <= 32);
+        return $this->pregnode->is_single_dot() || $this->pregnode->is_single_non_printable_character();
     }
 
     public function label() {
-        $userinscription = $this->pregnode->userinscription[0];
+        $ui = $this->pregnode->userinscription[0];
         if ($this->pregnode->is_single_escape_sequence_character() ||    // \a \b \n \r \t
             $this->pregnode->is_single_flag() ||                         // \w \d
             count($this->pregnode->userinscription) > 1)                 // [complex charset]
@@ -281,13 +280,13 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
         if ($this->needs_highlighting()) {
             // Something that needs to be highlighted and replaced with a lang string.
-            return qtype_preg_authoring_tool::userinscription_to_string($userinscription);
+            return qtype_preg_authoring_tool::userinscription_to_string($ui);
         }
         // A single character - return the actual value.
-        if ($userinscription->data[0] == '\\') {
-            return textlib::substr($userinscription->data, 1);
+        if (!$ui->is_valid_escape_sequence() && $ui->data[0] == '\\') {
+            return textlib::substr($ui->data, 1);
         }
-        return $userinscription->data;
+        return $ui->data;
     }
 
     public function tooltip() {
@@ -307,14 +306,18 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         if (count($this->pregnode->userinscription) > 1) {
             $start++;
             $end--;
-        } else if ($end == 1 && $this->pregnode->userinscription[0]->isflag) {
-            $tooltip = '';
+        }
+        if ($end == 1) {
+            $ui = $this->pregnode->userinscription[0];
+            if ($ui->isflag !== null || $ui->is_valid_escape_sequence()) {
+                $tooltip = '';
+            }
         }
         // Concatenate userinscriptions.
         $delimiter = $start > 0 ? '&#10;' : ' ';
         for ($i = $start; $i < $end; $i++) {
-            $userinscription = $this->pregnode->userinscription[$i];
-            $tooltip .= qtype_preg_authoring_tool::userinscription_to_string($userinscription);
+            $ui = $this->pregnode->userinscription[$i];
+            $tooltip .= qtype_preg_authoring_tool::userinscription_to_string($ui);
             if ($i != $end - 1) {
                 $tooltip .= $delimiter;
             }
@@ -373,7 +376,14 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 
     public function tooltip() {
-        return parent::tooltip();// . ' \\"' . get_string("description_option_" . $this->pregnode->posopt, 'qtype_preg') . '\\"';
+        $options = array();
+        for ($i = 0; $i < $this->pregnode->posopt->length(); $i++) {
+            $options[] = get_string('description_option_' . $this->pregnode->posopt[$i], 'qtype_preg');
+        }
+        for ($i = 0; $i < $this->pregnode->negopt->length(); $i++) {
+            $options[] = get_string('description_unsetoption_' . $this->pregnode->negopt[$i], 'qtype_preg');
+        }
+        return implode(', ', $options);
     }
 }
 

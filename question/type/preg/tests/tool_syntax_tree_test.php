@@ -76,7 +76,7 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         // Escape sequences representing single characters.
         $node = $tree->from_preg_node($this->get_pregnode('\\n'));
         $this->assertEquals($node->label(), '\\n');
-        $this->assertEquals($node->tooltip(), 'character ' . get_string('description_charA', 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), get_string('description_charA', 'qtype_preg'));
 
         // Single flag.
         $node = $tree->from_preg_node($this->get_pregnode('.'));
@@ -182,6 +182,14 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->from_preg_node($this->get_pregnode('$'));
         $this->assertEquals($node->label(), '$');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_DOLLAR, 'qtype_preg'));
+    }
+
+    function test_label_options() {
+        $tree = new qtype_preg_syntax_tree_tool();
+
+        $node = $tree->from_preg_node($this->get_pregnode('(?i)'));
+        $this->assertEquals($node->label(), '(?i)');
+        $this->assertEquals($node->tooltip(), get_string('description_option_i', 'qtype_preg'));
     }
 
     function test_label_subexpr() {
