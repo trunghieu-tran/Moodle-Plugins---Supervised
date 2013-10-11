@@ -237,6 +237,7 @@ class qtype_preg_lexer extends JLexBase  {
                      '\n',
                      '\r',
                      '\t',
+                     // \ddd
                      '\x');
     }
     public static function char_escape_sequences_inside_charset() {
@@ -248,6 +249,7 @@ class qtype_preg_lexer extends JLexBase  {
                      '\n',
                      '\r',
                      '\t',
+                     // \ddd
                      '\x');
     }
     public static function code_of_char_escape_sequence($seq) {
@@ -258,8 +260,10 @@ class qtype_preg_lexer extends JLexBase  {
                      '\f' => 0x0C,
                      '\n' => 0x0A,
                      '\r' => 0x0D,
-                     '\t' => 0x09/*,
-                     '\x'*/);
+                     '\t' => 0x09,
+                     // \ddd
+                     // \x
+                        );
         if (textlib::strlen($seq) < 2) {
             return null;
         }

@@ -94,6 +94,66 @@ class qtype_preg_userinscription {
         return $this->data;
     }
 
+    /**
+     * Checks if it's a simple character like a, b or й.
+     */
+    public function is_single_character() {
+        return $this->isflag === null &&
+               textlib::strlen($this->data) == 1;
+    }
+
+    /**
+     * Checks if it's a valid (with a special meaning) escape sequence.
+     */
+    public function is_valid_escape_sequence() {
+        $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', 'x',
+                         'd', 'D', 'h', 'H', 's', 'S', 'v', 'V', 'w', 'W',
+                         'p', 'P');
+        return textlib::strlen($this->data) > 1 && $this->data[0] == '\\' &&
+               (in_array($this->data[1], $allowed) || ctype_digit(textlib::substr($this->data, 1)));
+    }
+
+    /**
+     * Checks if it's one of the following characters: \a \b \e \f \n \r \t
+     */
+    public function is_single_escape_sequence_character() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        $allowed = array('a', 'b', 'e', 'f', 'n', 'r', 't');
+        return in_array($this->data[1], $allowed);
+    }
+
+    /**
+     * Checks if it's a character represented as \cx
+     */
+    public function is_single_escape_sequence_character_c() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return $this->data[1] == 'c';
+    }
+
+    /**
+     * Checks if it's a character represented as \ddd
+     */
+    public function is_single_escape_sequence_character_oct() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return ctype_digit(textlib::substr($this->data, 1));
+    }
+
+    /**
+     * Checks if it's a character represented as \xhh of \x{hh}
+     */
+    public function is_single_escape_sequence_character_hex() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return $this->data[1] == 'x';
+    }
+
     public function is_posix_flag() {
         return $this->isflag !== null && $this->data[0] == '[';
     }
