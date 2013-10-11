@@ -2496,6 +2496,82 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->userinscription[1]->data === '\x20-a');
         $this->assertTrue($token->value->userinscription[1]->isflag === null);
     }
+    function test_userinscription_methods() {
+        $lexer = $this->create_lexer(' ');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === ' ');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertTrue($ui->is_single_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character_c());
+        $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+        $this->assertFalse($ui->is_single_escape_sequence_character_hex());
+        foreach (array('a', 'b', 'e', 'f', 'n', 'r', 't') as $char) {
+            $lexer = $this->create_lexer("[\\$char]");
+            $ui = $lexer->nextToken()->value->userinscription[1];
+            $this->assertTrue($ui->data === "\\$char");
+            $this->assertTrue($ui->isflag === null);
+            $this->assertFalse($ui->is_single_character());
+            $this->assertTrue($ui->is_valid_escape_sequence());
+            $this->assertTrue($ui->is_single_escape_sequence_character());
+            $this->assertFalse($ui->is_single_escape_sequence_character_c());
+            $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+            $this->assertFalse($ui->is_single_escape_sequence_character_hex());
+        }
+        $lexer = $this->create_lexer('\cd');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\cd');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertFalse($ui->is_single_character());
+        $this->assertTrue($ui->is_valid_escape_sequence());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertTrue($ui->is_single_escape_sequence_character_c());
+        $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+        $this->assertFalse($ui->is_single_escape_sequence_character_hex());
+        $lexer = $this->create_lexer('\12');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\12');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertFalse($ui->is_single_character());
+        $this->assertTrue($ui->is_valid_escape_sequence());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character_c());
+        $this->assertTrue($ui->is_single_escape_sequence_character_oct());
+        $this->assertFalse($ui->is_single_escape_sequence_character_hex());
+        $lexer = $this->create_lexer('\x1f');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\x1f');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertFalse($ui->is_single_character());
+        $this->assertTrue($ui->is_valid_escape_sequence());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character_c());
+        $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+        $this->assertTrue($ui->is_single_escape_sequence_character_hex());
+        $lexer = $this->create_lexer('\x{1f}');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\x{1f}');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertFalse($ui->is_single_character());
+        $this->assertTrue($ui->is_valid_escape_sequence());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character_c());
+        $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+        $this->assertTrue($ui->is_single_escape_sequence_character_hex());
+        // Invalid cases
+        $lexer = $this->create_lexer('\й');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\й');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertFalse($ui->is_single_character());
+        $this->assertFalse($ui->is_valid_escape_sequence());
+        $this->assertFalse($ui->is_single_escape_sequence_character());
+        $this->assertFalse($ui->is_single_escape_sequence_character_c());
+        $this->assertFalse($ui->is_single_escape_sequence_character_oct());
+        $this->assertFalse($ui->is_single_escape_sequence_character_hex());
+        $lexer = $this->create_lexer('\99');
+        $this->assertTrue(is_array($lexer->nextToken()));
+    }
     function test_multiline_regex() {
         // Non-extended mode.
         $lexer = $this->create_lexer("ab\ncd(?#line1\nline2\r\nline3\rline4)ef");

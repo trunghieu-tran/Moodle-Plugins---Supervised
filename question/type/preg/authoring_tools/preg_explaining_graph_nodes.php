@@ -135,10 +135,6 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
  */
 class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_graph_leaf {
 
-    private function is_single_flag() {
-        return count($this->pregnode->flags) == 1 && $this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG;
-    }
-
     private function is_complex_charset() {
         return count($this->pregnode->errors) == 0 &&   // TODO dafuq?
                count($this->pregnode->userinscription) > 1;
@@ -172,14 +168,20 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
     }
 
     public function get_color() {
-        if ($this->is_single_flag()) {
+        if ($this->pregnode->is_single_non_printable_character()) {
             return 'hotpink';
+        }
+        if (count($this->pregnode->userinscription) == 1) {
+            $ui = $this->pregnode->userinscription[0];
+            if ($ui->is_valid_escape_sequence() || $ui->is_posix_flag()) {
+                return 'hotpink';
+            }
         }
         return 'black';
     }
 
     public function get_shape() {
-        if (count($this->pregnode->errors) > 0 || $this->is_single_flag()) {
+        if (count($this->pregnode->errors) > 0 || $this->pregnode->is_single_flag()) {
             return 'ellipse';
         }
         if ($this->pregnode->negative || $this->is_complex_charset()) {

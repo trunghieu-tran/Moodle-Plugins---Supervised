@@ -319,6 +319,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\n',
                      '\r',
                      '\t',
+                     // \ddd
                      '\x');
     }
 
@@ -331,6 +332,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\n',
                      '\r',
                      '\t',
+                     // \ddd
                      '\x');
     }
 
@@ -342,8 +344,10 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\f' => 0x0C,
                      '\n' => 0x0A,
                      '\r' => 0x0D,
-                     '\t' => 0x09/*,
-                     '\x'*/);
+                     '\t' => 0x09,
+                     // \ddd
+                     // \x
+                        );
 
         if (textlib::strlen($seq) < 2) {
             return null;
