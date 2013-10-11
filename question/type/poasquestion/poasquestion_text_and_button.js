@@ -12,7 +12,7 @@ M.poasquestion_text_and_button = (function() {
     var self = {
 
     /** @var input, from witch we read data */
-    currentlinput : null,
+    current_input : null,
 
     /** @var data, readed from input */
     data : null,
@@ -98,7 +98,7 @@ M.poasquestion_text_and_button = (function() {
         e.preventDefault();
         var is_first_press = self.dialog === null;
 
-        self.currentlinput = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
+        self.current_input = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
         self.data = self.get_input_data();
         if (is_first_press) {
             // if the 'Test regex' button is first pressed, we should generate a dialog window
@@ -159,10 +159,10 @@ M.poasquestion_text_and_button = (function() {
      * into  current input.
      * @param {String} _data data to set into current input
      */
-    close_and_set_newodata : function(odata) {
-        if (typeof(odata) === "string") {
-            self.data = odata;
-            self.set_input_data(odata);
+    close_and_set_new_data : function(_data) {
+        if (typeof(_data) === "string") {
+            self.data = _data;
+            self.set_input_data(_data);
         } else {
             self.set_input_data(self.data);
         }
@@ -170,12 +170,12 @@ M.poasquestion_text_and_button = (function() {
     },
 
     get_input_data : function() {
-        return self.currentlinput ? self.currentlinput.val() : '';
+        return self.current_input ? self.current_input.val() : '';
     },
 
-    set_input_data : function(odata) {
-        if (self.currentlinput) {
-            self.currentlinput.val(odata);
+    set_input_data : function(_data) {
+        if (self.current_input) {
+            self.current_input.val(_data);
         }
     }
 };

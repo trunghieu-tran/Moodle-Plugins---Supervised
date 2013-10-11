@@ -157,7 +157,7 @@ M.preg_authoring_tools_script = (function ($) {
                 self.invalidate_content();
 
                 // Put the testing data into ui.
-                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
+                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
                 $.each(self.matching_options, function(i, option) {
                     var old_id = '#id_' + option,
@@ -195,7 +195,7 @@ M.preg_authoring_tools_script = (function ($) {
             $(old_id).val($(new_id).val());
         });
         self.textbutton_widget.close_and_set_new_data();
-        $('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+        $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
         $('#id_test_regex').html('');
         M.form.updateFormState("mform1");
     },
