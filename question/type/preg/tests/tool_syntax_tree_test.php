@@ -39,13 +39,24 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($node->tooltip(), 'character α');
 
         $node = $tree->from_preg_node($this->get_pregnode(' '));
-        $this->assertEquals($node->label(), 'space');
-        $this->assertEquals($node->tooltip(), 'character space');
+        $this->assertTrue($node->needs_highlighting());
+        $this->assertEquals($node->label(), get_string('description_char20', 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), 'character ' . get_string('description_char20', 'qtype_preg'));
+
+        $node = $tree->from_preg_node($this->get_pregnode("\r"));
+        $this->assertTrue($node->needs_highlighting());
+        $this->assertEquals($node->label(), get_string('description_charD', 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), 'character ' . get_string('description_charD', 'qtype_preg'));
 
         // Single character in brackets.
         $node = $tree->from_preg_node($this->get_pregnode('α'));
         $this->assertEquals($node->label(), 'α');
         $this->assertEquals($node->tooltip(), 'character α');
+
+        $node = $tree->from_preg_node($this->get_pregnode('[ ]'));
+        $this->assertFalse($node->needs_highlighting());
+        $this->assertEquals($node->label(), '[ ]');
+        $this->assertEquals($node->tooltip(), 'character set&#10;' . get_string('description_char20', 'qtype_preg'));
 
         // Some characters in brackets.
         $node = $tree->from_preg_node($this->get_pregnode('[αя]'));
@@ -61,6 +72,11 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->from_preg_node($this->get_pregnode('[^ab]'));
         $this->assertEquals($node->label(), '[^ab]');
         $this->assertEquals($node->tooltip(), 'negative character set&#10;a&#10;b');
+
+        // Escape sequences representing single characters.
+        $node = $tree->from_preg_node($this->get_pregnode('\\n'));
+        $this->assertEquals($node->label(), '\\n');
+        $this->assertEquals($node->tooltip(), 'character ' . get_string('description_charA', 'qtype_preg'));
 
         // Single flag.
         $node = $tree->from_preg_node($this->get_pregnode('.'));
@@ -207,6 +223,11 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->get_dst_root();
         $this->assertEquals($node->label(), '++');
         $this->assertEquals($node->tooltip(), 'operand repeated any number of times (possessive quantifier)');
+    }
+
+    function test_spaces() {
+        $tree = new qtype_preg_syntax_tree_tool(' ');
+        //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
     }
 
     function test_something() {
