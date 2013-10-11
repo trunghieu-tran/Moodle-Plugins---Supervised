@@ -330,7 +330,7 @@ $string['description_charset_neg'] = 'any character except the following: {$a->c
 $string['description_charset_neg_one'] = 'not {$a->characters}';
 $string['description_charset_range'] = 'any character {$a}';
 $string['description_char'] = '<span style="color:blue">{$a->char}</span>';
-$string['description_char_16value'] = 'character with code 0x{$a}';
+$string['description_char_16value'] = 'character with code 0x{$a->code}    {$a->char}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_char0'] = 'null character(NUL)';

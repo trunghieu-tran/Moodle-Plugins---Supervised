@@ -148,10 +148,18 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         }
         $result = array('');    // First element for simple characters.
 
-        foreach ($info as $userinscription) {
-            $res = qtype_preg_authoring_tool::userinscription_to_string($userinscription);
-            if ($res === $userinscription->data) {
-                $result[0] .= $userinscription->data;
+        foreach ($info as $ui) {
+            // Escape sequences \cx and \x{ff} produce plain characters for graph.
+            if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
+                $code = qtype_preg_lexer::code_of_char_escape_sequence($ui->data);
+                $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
+                $result[] = qtype_preg_authoring_tool::userinscription_to_string($tmp);
+                continue;
+            }
+
+            $res = qtype_preg_authoring_tool::userinscription_to_string($ui);
+            if ($res === $ui->data) {
+                $result[0] .= $ui->data;
             } else {
                 $result[] = qtype_preg_authoring_tool::string_to_html($res);
             }
