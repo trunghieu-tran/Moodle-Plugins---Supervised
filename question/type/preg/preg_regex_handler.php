@@ -617,6 +617,9 @@ class qtype_preg_regex_handler {
         // Lexer returns errors for an unclosed character set or wrong modifiers.
         $lexerrors = $this->lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
+            if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
+                $this->parser->doParse(qtype_preg_yyParser::PARSELEAF, $node);
+            }
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
 
@@ -634,7 +637,7 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $root = $this->parser->get_root();
-        if (!$this->errors_exist() && $this->options->exactmatch) { // Add necessary nodes.
+        if ($root !== null && !$this->errors_exist() && $this->options->exactmatch) { // Add necessary nodes.
             $root = $this->add_exact_match_nodes($root);
         }
         $this->ast_root = $root;

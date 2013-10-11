@@ -222,24 +222,26 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     /**
      * Describes character with code $code
      *
-     * @param int|qtype_poasquestion_string $utf8chr character from qtype_poasquestion_string for describe or decimal code of character
+     * @param int|qtype_poasquestion_string $char character from qtype_poasquestion_string for describe or decimal code of character
      * @param bool $escapehtml a flag indicating whether to escape html characters (& < > " ')
      * @param string $form required form
      * @return string describes of character
      */
-    public static function describe_chr($utf8chr, $escapehtml = true, $form = null) {
-        $iscode = is_int($utf8chr);
-        $code = $iscode ? $utf8chr : textlib::utf8ord($utf8chr);
+    public static function describe_chr($char, $escapehtml = true, $form = null) {
+        if (is_int($char)) {
+            $char = textlib::code2utf8($char);
+        }
+        $code = textlib::utf8ord($char);
         $result = self::describe_nonprinting($code);
         if ($result === null) {
             //   &        >       <       "       '
             // &#38;    &#62;   &#60;   &#34;   &#39;
             if ($escapehtml) {
-                $result = qtype_preg_authoring_tool::escape_char_by_code($code, 'html');
+                $result = qtype_preg_authoring_tool::char_to_html($char);
             } else {
-                $result = $iscode ? textlib::code2utf8($utf8chr) : $utf8chr;
+                $result = $char;
             }
-            $result = qtype_poasquestion_string::replace('%char', $result, self::get_form_string('description_char', null, $form));
+            $result = qtype_poasquestion_string::replace('%char', $result, self::get_form_string('description_char', null, $form)); // TODO: wat?
         }
         return $result;
     }

@@ -170,12 +170,12 @@ M.poasquestion_text_and_button = (function() {
     },
 
     get_input_data : function() {
-        return self.currentlinput ? self.currentlinput.val(_data) : '';
+        return self.currentlinput ? self.currentlinput.val() : '';
     },
 
     set_input_data : function(odata) {
         if (self.currentlinput) {
-            self.currentlinput.val(odata); 
+            self.currentlinput.val(odata);
         }
     }
 };

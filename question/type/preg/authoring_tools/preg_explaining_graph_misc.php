@@ -698,7 +698,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             } else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::escape_string($iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . '];';
             }
         }
 
@@ -751,7 +751,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 if ($elements[$i][0] == chr(10)) {
                     $result .= '<TD>' . substr($elements[$i], 1) . '</TD>';
                 } else {
-                    $elements[$i] = qtype_preg_authoring_tool::escape_string($elements[$i]);
+                    $elements[$i] = qtype_preg_authoring_tool::string_to_html($elements[$i]);
                     $result .= '<TD>' . $elements[$i] . '</TD>';
                 }
             }
@@ -778,7 +778,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             } else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::escape_string($iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . '];';
             }
         }
 
