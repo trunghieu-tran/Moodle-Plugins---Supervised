@@ -176,17 +176,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     const OUT_OF_RANGE  = 2;
 
     /**
-     * Checks if charset contains only one printing character
-     */
-    public function is_one_char() {
-        $flag = $this->pregnode->flags[0][0];
-        return count($this->pregnode->flags) === 1
-            && $flag->type===qtype_preg_charset_flag::TYPE_SET
-            && $flag->data->length() === 1
-            && self::is_chr_printable(textlib::utf8ord($flag->data[0]));
-    }
-
-    /**
      * Checks if a character is printable
      *
      * @param $utf8chr character (from qtype_poasquestion_string) for check
@@ -674,12 +663,12 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             $subtype1 = $left->pregnode->subtype;
             $subtype2 = $right->pregnode->subtype;
 
-            $needshortpattern = $type1 == qtype_preg_node::TYPE_LEAF_CHARSET && $left->is_one_char() &&
-                                $type2 == qtype_preg_node::TYPE_LEAF_CHARSET && $right->is_one_char();
+            $needshortpattern = $type1 == qtype_preg_node::TYPE_LEAF_CHARSET && $left->pregnode->is_single_printable_character() &&
+                                $type2 == qtype_preg_node::TYPE_LEAF_CHARSET && $right->pregnode->is_single_printable_character();
 
-            $needcontiuneshortpattern = $type2 == qtype_preg_node::TYPE_LEAF_CHARSET && $right->is_one_char() &&
+            $needcontiuneshortpattern = $type2 == qtype_preg_node::TYPE_LEAF_CHARSET && $right->pregnode->is_single_printable_character() &&
                                         $type1 == qtype_preg_node::TYPE_NODE_CONCAT &&
-                                        $left->operands[1]->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET && $left->operands[1]->is_one_char();
+                                        $left->operands[1]->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET && $left->operands[1]->pregnode->is_single_printable_character();
 
             $firstaheadassert = ($subtype1 == qtype_preg_node_assert::SUBTYPE_PLA || $subtype1 == qtype_preg_node_assert::SUBTYPE_NLA);
 
