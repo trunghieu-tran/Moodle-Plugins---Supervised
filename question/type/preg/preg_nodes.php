@@ -578,9 +578,37 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
     }
 
-    protected function calc_ranges() {
-        $this->israngecalculated = true;
-        die('implement range calulate before use it!');
+    public function is_single_character() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_SET &&
+               $this->flags[0][0]->data->length() == 1;
+    }
+
+    public function is_single_escape_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return in_array($this->userinscription[0]->data, qtype_preg_lexer::char_escape_sequences_inside_charset());
+    }
+
+    public function is_single_whitespace() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        $ranges = qtype_preg_unicode::space_ranges();
+        return qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], $ranges);
+    }
+
+    public function is_single_flag() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG &&
+               $this->flags[0][0]->data != qtype_preg_charset_flag::META_DOT;
+    }
+
+    public function is_single_dot() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG &&
+               $this->flags[0][0]->data == qtype_preg_charset_flag::META_DOT;
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
@@ -820,14 +848,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             }
         }
         return $result;
-    }
-
-    public function add_flag_dis(qtype_preg_charset_flag $flag) {
-        echo 'implement add_flag before use!';
-    }
-
-    public function add_flag_con(qtype_preg_charset_flag $flag) {
-        echo 'implement add_flag before use!';
     }
 
     /**

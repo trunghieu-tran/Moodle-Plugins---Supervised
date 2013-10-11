@@ -154,8 +154,12 @@ abstract class qtype_preg_syntax_tree_node {
       return 'ellipse';
     }
 
-    public function color() {
+    public function shape_color() {
         return count($this->pregnode->errors) > 0 ? 'red' : 'black';
+    }
+
+    public function font_color() {
+        return 'black';
     }
 
     public function style() {
@@ -166,10 +170,11 @@ abstract class qtype_preg_syntax_tree_node {
         $label = qtype_preg_authoring_tool::escape_characters($this->label(), array('\\', '"')) . ' ';        // Extra space to make dot happy
         $tooltip = qtype_preg_authoring_tool::escape_characters($this->tooltip(), array('\\', '"')) . ' ';    // Same thing
         $shape = $this->shape();
-        $color = $this->color();
+        $color = $this->shape_color();
+        $fontcolor = $this->font_color();
         $style = $this->style();
         $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
-        $result = "id = \"$id\", label = \"$label\", tooltip = \"$tooltip\", shape = \"$shape\", color = \"$color\"";
+        $result = "id = \"$id\", label = \"$label\", tooltip = \"$tooltip\", shape = \"$shape\", color = \"$color\", fontcolor = \"$fontcolor\"";
         if ($context->handler->is_node_generated($this->pregnode)) {
             $style .= ', filled';
             $result .= ', fillcolor = lightgrey';
@@ -252,23 +257,37 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
 
 class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
+    public function needs_highlighting() {
+        if (count($this->pregnode->userinscription) > 1) {
+            return false;
+        }
+        $ui = $this->pregnode->userinscription[0];
+        if ($ui->isflag === null && in_array($ui->data, qtype_preg_lexer::char_escape_sequences_inside_charset())) {
+            return false;
+        }
+        return ($this->pregnode->is_single_dot() ||
+                $this->pregnode->is_single_character() && textlib::utf8ord($this->pregnode->flags[0][0]->data[0]) <= 32);
+    }
+
     public function label() {
-        $complex = count($this->pregnode->userinscription) > 1;
-        if ($complex) {
+        $userinscription = $this->pregnode->userinscription[0];
+        if ($this->pregnode->is_single_escape_character() ||    // \a \b \n \r \t
+            $this->pregnode->is_single_flag() ||                // \w \d
+            count($this->pregnode->userinscription) > 1)        // [complex charset]
+        {
+            // Flag or complex charset - return "as is".
             return parent::label();
         }
-        $userinscription = $this->pregnode->userinscription[0];
-        if ($userinscription->isflag === qtype_preg_charset_flag::META_DOT) {
+
+        if ($this->needs_highlighting()) {
+            // Something that needs to be highlighted and replaced with a lang string.
             return qtype_preg_authoring_tool::userinscription_to_string($userinscription);
         }
-        if ($userinscription->isflag !== null) {
-            return $userinscription->data;
+        // A single character - return the actual value.
+        if ($userinscription->data[0] == '\\') {
+            return textlib::substr($userinscription->data, 1);
         }
-        $result = $this->pregnode->flags[0][0]->data->string();
-        if (textlib::utf8ord($result) <= 32) {
-            return qtype_preg_authoring_tool::userinscription_to_string($userinscription);
-        }
-        return $result;
+        return $userinscription->data;
     }
 
     public function tooltip() {
@@ -301,6 +320,13 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             }
         }
         return $tooltip;
+    }
+
+    public function font_color() {
+        if ($this->needs_highlighting()) {
+            return 'blue';
+        }
+        return parent::font_color();
     }
 }
 
@@ -407,7 +433,7 @@ class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator 
         return $this->pregnode->error_string();
     }
 
-    public function color() {
+    public function shape_color() {
         return 'red';
     }
 }

@@ -104,7 +104,6 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $hintmatch = $this->question->hint_object('hintmatchingpart');
         $strings = explode("\n", $this->strings);
         $result = '';
-
         foreach ($strings as $string) {
             $matchresults = $this->matcher->match($string);
             $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true) . '<br />';

@@ -160,8 +160,10 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $data = $data->substring(1);
         }
 
-        if ($data == ' ') {
-            return get_string('description_char20', 'qtype_preg');
+        $code = textlib::utf8ord($data[0]);
+        if ($data->length() == 1 && $code <= 32) {
+            $hex = textlib::strtoupper(dechex($code));
+            return get_string('description_char' . $hex, 'qtype_preg');
         }
 
         return $data->string();
