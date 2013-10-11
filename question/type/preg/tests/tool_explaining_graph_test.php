@@ -137,7 +137,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         return true;
     }
-
+/*
     public function test_create_graph_subexpression() {
         $graph = new qtype_preg_explaining_graph_tool('(b)');
 
@@ -1055,10 +1055,24 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with node assert with simple assert!');
     }
+*/
+    public function test_assert_1() {
+        $tool = new qtype_preg_explaining_graph_tool('(q)$^a');
+        $graph = $tool->create_graph(-1);
+        $dotscript = $graph->create_dot();
+        var_dump($dotscript);
+    }
+
+    public function test_assert_2() {
+        $tool = new qtype_preg_explaining_graph_tool('(a)(\b)b');
+        $graph = $tool->create_graph(-1);
+        $dotscript = $graph->create_dot();
+        var_dump($dotscript);
+    }
 
     public function test_unicode() {
-        $graph = new qtype_preg_explaining_graph_tool('абв');
+        /*$graph = new qtype_preg_explaining_graph_tool('абв');
         $json = array();
-        $graph->generate_json($json);
+        $graph->generate_json($json);*/
     }
 }
