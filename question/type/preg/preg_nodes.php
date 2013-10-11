@@ -712,9 +712,13 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
+        $desired_chars = array(array(0x21, 0x007F));
+        $desired_whitespaces = array(array(0x20, 0x20));
+
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
+
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
@@ -729,15 +733,33 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             if ($this->negative) {
                 $ranges = qtype_preg_unicode::negate_ranges($ranges);
             }
+
+            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_chars);
+            if (!empty($desired)) {
+                $code = $desired[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
+            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_whitespaces);
+            if (!empty($desired)) {
+                $code = $desired[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
+            if (!empty($ranges)) {
+                $code = $ranges[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
             // Check all the returned ranges.
-            foreach ($ranges as $range) {
+            /*foreach ($ranges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
                     // if ($this->match($c, 0, $l)) {
                     return $c;
                     // }
                 }
-            }
+            }*/
         }
         return new qtype_poasquestion_string('');
     }
