@@ -121,8 +121,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         return $result;
     }
 
-    public static function userinscription_to_string($userinscription) {
-        $data = new qtype_poasquestion_string($userinscription->data);
+    public static function userinscription_to_string($ui) {
+        $data = new qtype_poasquestion_string($ui->data);
 
         // Is it a range?
         $mpos = textlib::strpos($data, '-');
@@ -140,20 +140,23 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             return get_string('description_range', 'qtype_preg', $a);
         }
 
-        // Is it a flag?
-        if ($userinscription->isflag) {
-            return get_string($userinscription->lang_key(true), 'qtype_preg');
+        // Is it an escape-sequence for a character?
+        if ($ui->is_single_escape_sequence_character()) {
+            $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
+            $hex = textlib::strtoupper(dechex($code));
+            return get_string('description_char' . $hex, 'qtype_preg');
         }
 
-        // Is it an escape-sequence?
-        $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
-        if ($code !== null) {
+        // Is it \cx or \x{hh} escape sequence?
+        if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
+            $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
             $hex = textlib::strtoupper(dechex($code));
-            if ($data[1] != 'c' && $data[1] != 'x') {
-                return get_string('description_char' . $hex, 'qtype_preg');
-            } else {
-                return get_string('description_char_16value', 'qtype_preg', $hex);
-            }
+            return get_string('description_char_16value', 'qtype_preg', $hex);
+        }
+
+        // Is it another flag or POSIX class?
+        if ($ui->isflag !== null) {
+            return get_string($ui->lang_key(true), 'qtype_preg');
         }
 
         if ($data[0] == '\\') {

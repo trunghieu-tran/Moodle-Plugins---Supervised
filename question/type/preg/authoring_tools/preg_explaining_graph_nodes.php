@@ -173,7 +173,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         }
         if (count($this->pregnode->userinscription) == 1) {
             $ui = $this->pregnode->userinscription[0];
-            if ($ui->is_valid_escape_sequence() || $ui->is_posix_flag()) {
+            if ($ui->isflag !== null || $ui->is_valid_escape_sequence()) {
                 return 'hotpink';
             }
         }
