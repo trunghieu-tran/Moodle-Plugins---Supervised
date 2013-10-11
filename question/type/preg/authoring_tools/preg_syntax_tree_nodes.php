@@ -415,6 +415,9 @@ class qtype_preg_syntax_tree_node_alt extends qtype_preg_syntax_tree_operator {
 
 class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator {
 
+    public function style() {
+        return 'dashed';
+    }
 }
 
 class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operator {
