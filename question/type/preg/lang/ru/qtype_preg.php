@@ -313,8 +313,8 @@ $string['description_subexpr_node_subexpr'] = 'подмаска #{$a->number}: [
 $string['description_subexpr_node_subexpr_name'] = 'подмаска "{$a->name} #{$a->number}": [ {$a->firstoperand} ]';
 $string['description_onceonly_node_subexpr_once'] = 'однократная подмаска #{$a->number}: [ {$a->firstoperand} ]';
 $string['description_onceonly_node_subexpr_once_name'] = 'однократная подмаска "{$a->name} #{$a->number}": [ {$a->firstoperand} ]';
-$string['description_grouping_node_subexpr'] = 'группировка: [{$a->firstoperand}]';
-$string['description_duplicate_node_subexpr'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [{$a->firstoperand}]';
+$string['description_grouping_node_subexpr'] = 'группировка: [ {$a->firstoperand} ]';
+$string['description_duplicate_node_subexpr'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [ {$a->firstoperand} ]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
 $string['description_subexpr_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
 $string['description_subexpr_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
