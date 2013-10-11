@@ -198,12 +198,15 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
         }
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
-        $hexcode = textlib::strtoupper(dechex($code));
+        $hex = textlib::strtoupper(dechex($code));
         if ($code <= 32 || $code == 127 || $code == 160 || $code == 173 || $code == 8194 ||
             $code == 8195 || $code == 8201 || $code == 8204 || $code == 8205) {
-            $result = self::get_form_string('description_char' . $hexcode, null, $form);
+            $result = self::get_form_string('description_char' . $hex, null, $form);
         } else {
-            $result = qtype_poasquestion_string::replace('%code', $hexcode, self::get_form_string('description_char_16value', null, $form));
+            $a = new stdClass;
+            $a->code = $hex;
+            $a->char = textlib::code2utf8($code);
+            $result = self::get_form_string('description_char_16value', $a, $form);
         }
         return $result;
     }

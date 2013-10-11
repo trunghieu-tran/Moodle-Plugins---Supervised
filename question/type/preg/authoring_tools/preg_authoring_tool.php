@@ -150,8 +150,11 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         // Is it \cx or \x{hh} escape sequence?
         if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
             $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
-            $hex = textlib::strtoupper(dechex($code));
-            return get_string('description_char_16value', 'qtype_preg', $hex);
+            $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
+            $a = new stdClass;
+            $a->code = textlib::strtoupper(dechex($code));
+            $a->char = self::userinscription_to_string($tmp);
+            return get_string('description_char_16value', 'qtype_preg', $a);
         }
 
         // Is it another flag or POSIX class?
