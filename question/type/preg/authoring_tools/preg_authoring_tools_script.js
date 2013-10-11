@@ -146,6 +146,9 @@ M.preg_authoring_tools_script = (function ($) {
                         });
                     });
 
+                    // Hide the non-working "displayas".
+                    $('#fgroup_id_charset_process_radioset').hide();
+
                     options.oneachpresscallback();
                 });
             },
