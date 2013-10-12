@@ -193,14 +193,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $parent Processed graph of $this.
      * @param qtype_preg_explaining_graph_tool_subgraph $gmain Main subgraph.
      */
-    public function optimize_graph(&$parent, &$gmain) {
-
+    public function optimize_graph($parent, $gmain) {
         $this->process_simple_characters($gmain);
-
         $this->process_asserts($parent, $gmain);
-
         $this->process_voids($gmain);
-
         foreach ($this->subgraphs as $subgraph) {
             $subgraph->optimize_graph($this, $gmain);
         }
@@ -210,7 +206,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * Second part of optimization - processing sequences of simple characters in graph.
      * @param qtype_preg_explaining_graph_tool_subgraph $gmain Main subgraph.
      */
-    public function process_simple_characters(&$gmain) {
+    public function process_simple_characters($gmain) {
         for ($i = 0; $i < count($this->nodes); $i++) {
             $neighbor = null;   // No neighbor yet.
 
@@ -266,7 +262,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $parent Processed graph of $this.
      * @param qtype_preg_explaining_graph_tool_subgraph $gmain Main subgraph.
      */
-    public function process_asserts(&$parent, &$gmain) {
+    public function process_asserts($parent, $gmain) {
         // Lets find an assert.
         foreach ($this->nodes as $iter) {
             $neighbor = null;
@@ -527,7 +523,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
-                                if ($neighborl->owner->is_parent_for($this, false)) {
+                                if ($neighborl->owner->is_parent_for($this)) {
                                     $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $this->nodes[count($this->nodes) - 1], $neighborl->owner);
                                 } else {
                                     $this->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $this->nodes[count($this->nodes) - 1], $this);
@@ -650,21 +646,17 @@ class qtype_preg_explaining_graph_tool_subgraph {
     }
 
     /**
-     * Checks relationship between $this and $child.
-     * @param qtype_preg_explaining_graph_tool_subgraph $child Inner subraph.
-     * @return bool true if child is subgraph of parent.
+     * Checks if this is parent of $child (recursive for children of children).
      */
-    private function is_parent_for(&$child, $directchild = true) {
+    private function is_parent_for($child) {
         foreach ($this->subgraphs as $iter) {
             if ($iter === $child) {
                 return true;
             }
         }
-        if (!$directchild) {
-            foreach ($this->subgraphs as $iter) {
-                if ($iter->is_parent_for($child, false)) {
-                    return true;
-                }
+        foreach ($this->subgraphs as $iter) {
+            if ($iter->is_parent_for($child, false)) {
+                return true;
             }
         }
         return false;
@@ -677,25 +669,19 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_node $dst Destination of link.
      * @return qtype_preg_explaining_graph_tool_link Found link.
      */
-    private function &find_link(&$src, &$dst) {
-        $result = null;
-        // Look over links...
+    private function find_link($src, $dst) {
         foreach ($this->links as $iter) {
-            // If source and destination is right then set linkowner and return a link.
             if ($iter->destination === $dst && $iter->source === $src) {
                 return $iter;
             }
         }
-
-        // Nothing has found? Look the aim in subgraphs!
         foreach ($this->subgraphs as $iter) {
             $result = $iter->find_link($src, $dst);
-            if (!is_null($result)) { // If we found something then end this loop!
+            if (!is_null($result)) {
                 return $result;
             }
         }
-
-        return $result;
+        return null;
     }
 
     /**
