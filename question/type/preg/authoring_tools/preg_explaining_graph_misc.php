@@ -349,6 +349,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             }
                         } else {
                             //print 'left neighbor is not just a point' . chr(10);
+                            $tmplabel2 = $gmain->find_link($neighborl, $tmpdnode)->label;
                             // Create new link between left neighbor and right neighbor.
                             $this->links[] = new qtype_preg_explaining_graph_tool_link(
                                                     qtype_preg_explaining_graph_tool_link::compute_label($tmpdnode->label[0], $tmplabel2),
