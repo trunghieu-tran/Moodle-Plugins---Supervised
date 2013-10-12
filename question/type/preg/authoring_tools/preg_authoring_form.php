@@ -23,8 +23,8 @@ class qtype_preg_authoring_form extends moodleform {
 
     private $isblock;
 
-    function __construct($_isblock = false) {
-        $isblock = $_isblock;
+    function __construct($isblock = false) {
+        $this->isblock = $isblock;
         $attributes = array('id' => 'mformauthoring');
         parent::moodleform(null, null, 'post', '', $attributes);
     }
@@ -58,9 +58,9 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addGroup($topline, 'input_regex_line', '', array(' '), false);
 
         $radiocharsetprocessarray = array();
-        $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_userinscription', 'qtype_preg'), 'userinscription', null);
-        $radiocharsetprocesarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_flags', 'qtype_preg'), 'flags', null);
-        $mform->addGroup($radiocharsetprocesarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
+        $radiocharsetprocessarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_userinscription', 'qtype_preg'), 'userinscription', null);
+        $radiocharsetprocessarray[] =& $mform->createElement('radio', 'authoring_tools_charset_process', '', get_string('authoring_form_charset_flags', 'qtype_preg'), 'flags', null);
+        $mform->addGroup($radiocharsetprocessarray, 'charset_process_radioset', get_string('authoring_form_charset_mode', 'qtype_preg'), array(' '), false);
         $mform->setDefault('authoring_tools_charset_process', 'userinscription');
 
         // Add matching options.
