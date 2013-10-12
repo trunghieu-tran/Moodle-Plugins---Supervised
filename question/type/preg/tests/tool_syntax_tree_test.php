@@ -214,6 +214,26 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $node = $tree->get_dst_root();
         $this->assertEquals($node->label(), '{2,3}+');
         $this->assertEquals($node->tooltip(), 'operand repeated from 2 to 3 times (possessive quantifier)');
+
+        $tree = new qtype_preg_syntax_tree_tool('a?');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '?');
+        $this->assertEquals($node->tooltip(), 'operand may be missing');
+
+        $tree = new qtype_preg_syntax_tree_tool('a{0,2}');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '{0,2}');
+        $this->assertEquals($node->tooltip(), 'operand repeated no more than 2 times or missing');
+
+        $tree = new qtype_preg_syntax_tree_tool('a{1,}');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '{1,}');
+        $this->assertEquals($node->tooltip(), 'operand repeated any number of times');
+
+        $tree = new qtype_preg_syntax_tree_tool('a{8}');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '{8}');
+        $this->assertEquals($node->tooltip(), 'operand repeated 8 times');
     }
 
     function test_label_infinite_quant() {

@@ -1738,7 +1738,7 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
             if ($this->leftborder == 0) {
                 $result .= '_0';
                 if ($this->rightborder == 1) {
-                    $result .= '_01';
+                    $result .= '1';
                 }
             } else if ($this->leftborder == 1) {
                 $result .= '_1';
