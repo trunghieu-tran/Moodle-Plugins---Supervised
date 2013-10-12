@@ -299,7 +299,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     $tmplabel2 = $gmain->find_link($tmpdnode, $neighborr)->label;
 
                     // If current subgraph is parent of left neighbor's owner...
-                    if ($this->is_child($neighborl->owner)) {
+                    if ($this->is_parent_for($neighborl->owner)) {
                         //print 'current subgraph is parent of left neighbor\'s owner' . chr(10);
                         // If left neighbor is not just a point...
                         if ($neighborl->shape != 'point') {
@@ -375,7 +375,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     // Find a label of link between left neighbor and assert.
                     $tmplabel1 = $gmain->find_link($neighborl, $tmpdnode)->label;
                     // If current subgraph is parent of right neighbor's owner...
-                    if ($this->is_child($neighborr->owner)) {
+                    if ($this->is_parent_for($neighborr->owner)) {
                         // If right neighbor is not just a point...
                         if ($neighborr->shape != 'point') {
                             if ($neighborr->shape != 'box, style=filled') {
@@ -456,7 +456,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $tmplabel1 = $gmain->find_link($neighborl, $tmpdnode)->label;
 
                         // If owners of neighbors are children of current subgraph...
-                        if ($this->is_child($neighborl->owner) && $this->is_child($neighborr->owner)) {
+                        if ($this->is_parent_for($neighborl->owner) && $this->is_parent_for($neighborr->owner)) {
                             // If right neighbor isn't point...
                             if ($neighborr->shape != 'point') {
                                 // Create point-node and link it with right neighbor.
@@ -478,7 +478,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             $this->links[] = new qtype_preg_explaining_graph_tool_link($tmpdnode->label[0], $leftborder, $rightborder, $this);
                         } else {
                             // If only subgraph of left neighbor is child.
-                            if ($this->is_child($neighborl->owner)) {
+                            if ($this->is_parent_for($neighborl->owner)) {
                                 // Create point-node and link it with left neighbor.
                                 $neighborl->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborl->owner, -1);
 
@@ -498,7 +498,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                                     );
 
                                 // If only subgraph of right neighbor is child.
-                            } else if ($this->is_child($neighborr->owner)) {
+                            } else if ($this->is_parent_for($neighborr->owner)) {
                                 // Create point-node and link it with right neighbor.
                                 $neighborr->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborr->owner, -1);
 
@@ -525,7 +525,14 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
-                                $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $this->nodes[count($this->nodes) - 1], $neighborl->owner);
+
+                                if ($neighborl->owner->is_parent_for($this, false)) {
+                                    $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $this->nodes[count($this->nodes) - 1], $neighborl->owner);
+                                } else {
+                                    $this->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $this->nodes[count($this->nodes) - 1], $this);
+                                }
+
+
 
                                 // Link left and right neighbors with corresponding label.
                                 $this->links[] = new qtype_preg_explaining_graph_tool_link(
@@ -646,13 +653,19 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $child Inner subraph.
      * @return bool true if child is subgraph of parent.
      */
-    private function is_child(&$child) {
+    private function is_parent_for(&$child, $directchild = true) {
         foreach ($this->subgraphs as $iter) {
             if ($iter === $child) {
                 return true;
             }
         }
-
+        if (!$directchild) {
+            foreach ($this->subgraphs as $iter) {
+                if ($iter->is_parent_for($child, false)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
