@@ -66,7 +66,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($json['indlast'], 0);
     }
 
-    /*function test_correct() {
+    function test_correct() {
         $regex = 'a|b';
         $strings = "a\nb";
         $usecase = false;
@@ -77,7 +77,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><br /><span class="correct">b</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><br /><span class="correct">b</span><br />');
     }
 
     function test_empty_strings() {
@@ -91,7 +92,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<br />');
     }
 
     function test_syntax_error() {
@@ -105,7 +107,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8.');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8.');
     }
 
     function test_accepting_error() {
@@ -119,7 +122,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
     }
 
     function test_empty_regex() {
@@ -133,13 +137,15 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '');
 
         $strings = "a|b";
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '');
     }
 
     function test_selection_dummy() {
@@ -153,7 +159,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 0));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="partiallycorrect">a</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="partiallycorrect">a</span><br />');
     }
 
     function test_selection_grouping() {
@@ -167,15 +174,18 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 6));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 1));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(6, 6));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">bc</span><span class="correct">d</span><br />');
     }
 
     function test_selection_non_preserved() {
@@ -189,15 +199,18 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 4));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">ab</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">ab</span><br />');
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 4));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="partiallycorrect">a</span><span class="correct">b</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="partiallycorrect">a</span><span class="correct">b</span><br />');
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 5));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">b</span><br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">b</span><br />');
     }
 
     function test_selection_partial_match() {
@@ -211,21 +224,25 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $json = array();
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">bc</span>...<br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">bc</span>...<br />');
 
         $strings = 'ab';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span><span class="partiallycorrect">b</span>...<br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span><span class="partiallycorrect">b</span>...<br />');
 
         $strings = 'a';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<span class="correct">a</span>...<br />');
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<span class="correct">a</span>...<br />');
 
         $strings = '';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $tool->generate_json($json);
-        $this->assertTrue($json['regex_test'] == '<br />');
-    }*/
+        $str = strip_tags($json['regex_test'], '<span><br><b>');
+        $this->assertTrue($str == '<br />');
+    }
  }
