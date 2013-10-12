@@ -585,7 +585,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     public function match_from_pos($str, $startpos) {
-        $possiblematches = array();
         $bruteforce = count($this->get_backrefs()) > 0;
 
         // Find all possible matches. Using the fast match method if there are no backreferences.

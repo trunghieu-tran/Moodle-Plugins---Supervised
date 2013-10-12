@@ -142,7 +142,6 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
 
 
     public function on_subexpr_added($pregnode) {
-        $subpatt_number = $pregnode->subpattern;
         $subexpr_number = $pregnode->number;
 
         // Copy the node to the starting transitions.

@@ -157,7 +157,6 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node {
      * Redifinition of abstract qtype_preg_description_node::description()
      */
     public function description($numbering_pattern, $node_parent = null, $form = null) {
-        $description ='';
         $this->pattern = $this->pattern($node_parent, $form);
         // var_dump($this->pattern);
         $description = $this->numbering_pattern($numbering_pattern, $this->pattern);
@@ -197,18 +196,16 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             return null;
         }
         // ok, character is non-printing, lets find its description in the language file
-        $result = '';
         $hex = textlib::strtoupper(dechex($code));
         if ($code <= 32 || $code == 127 || $code == 160 || $code == 173 || $code == 8194 ||
             $code == 8195 || $code == 8201 || $code == 8204 || $code == 8205) {
-            $result = self::get_form_string('description_char' . $hex, null, $form);
+            return self::get_form_string('description_char' . $hex, null, $form);
         } else {
             $a = new stdClass;
             $a->code = $hex;
             $a->char = textlib::code2utf8($code);
-            $result = self::get_form_string('description_char_16value', $a, $form);
+            return self::get_form_string('description_char_16value', $a, $form);
         }
-        return $result;
     }
 
     /**
@@ -353,7 +350,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
      * Redifinition of abstract qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        $result = '';
         $characters = array();
         // check errors
         if (count($this->pregnode->errors) > 0) {
@@ -376,7 +372,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             // Simulation of:
             // $string['description_charset_one'] = '%characters';
             // w/o calling functions
-            $result = $characters[0];
+            return $characters[0];
         } else {
             $key = 'description_charset';
             if ($this->pregnode->negative) {
@@ -387,8 +383,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             }
             $result = self::get_form_string($key, null, $form);
             $result = qtype_poasquestion_string::replace('%characters', implode(", ", $characters), $result);
+            return $result;
         }
-        return $result;
     }
 }
 
@@ -543,9 +539,6 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
      * Redifinition of abstract qtype_preg_description_node::description()
      */
     public function description($numbering_pattern, $node_parent = null, $form = null) {
-        $description = '';
-        $child_description = '';
-
         $this->pattern = $this->pattern($node_parent, $form);
         $description = $this->numbering_pattern($numbering_pattern, $this->pattern);
 

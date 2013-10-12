@@ -686,7 +686,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;
         }
-        $result = false;
         if ($this->flags === null) {
             return false;
         }
