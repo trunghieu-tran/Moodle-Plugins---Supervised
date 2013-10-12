@@ -12,11 +12,61 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
+ob_start();
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php');
+ob_end_clean();
 
 class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
 
-    function test_correct() {
+    function test_loader_no_selection() {
+        $_GET['regex'] = 'a';
+        $_GET['engine'] = 'nfa_matcher';
+        $_GET['notation'] = 'native';
+        $_GET['exactmatch'] = 0;
+        $_GET['usecase'] = 0;
+        $_GET['indfirst'] = -2;
+        $_GET['indlast'] = -2;
+        $_GET['strings'] = 'a';
+        $_GET['ajax'] = 1;
+
+        $json = qtype_preg_get_json_array();
+        $this->assertEquals($json['indfirst'], -2);
+        $this->assertEquals($json['indlast'], -2);
+    }
+
+    function test_loader_selection() {
+        $_GET['regex'] = 'a';
+        $_GET['engine'] = 'nfa_matcher';
+        $_GET['notation'] = 'native';
+        $_GET['exactmatch'] = 0;
+        $_GET['usecase'] = 0;
+        $_GET['indfirst'] = 0;
+        $_GET['indlast'] = 0;
+        $_GET['strings'] = 'a';
+        $_GET['ajax'] = 1;
+
+        $json = qtype_preg_get_json_array();
+        $this->assertEquals($json['indfirst'], 0);
+        $this->assertEquals($json['indlast'], 0);
+    }
+
+    function test_loader_exact_selection() {
+        $_GET['regex'] = 'a';
+        $_GET['engine'] = 'nfa_matcher';
+        $_GET['notation'] = 'native';
+        $_GET['exactmatch'] = 1;
+        $_GET['usecase'] = 0;
+        $_GET['indfirst'] = 0;
+        $_GET['indlast'] = 0;
+        $_GET['strings'] = 'a';
+        $_GET['ajax'] = 1;
+
+        $json = qtype_preg_get_json_array();
+        $this->assertEquals($json['indfirst'], 0);
+        $this->assertEquals($json['indlast'], 0);
+    }
+
+    /*function test_correct() {
         $regex = 'a|b';
         $strings = "a\nb";
         $usecase = false;
@@ -177,5 +227,5 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $tool->generate_json($json);
         $this->assertTrue($json['regex_test'] == '<br />');
-    }
+    }*/
  }

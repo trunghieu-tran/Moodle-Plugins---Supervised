@@ -281,30 +281,6 @@ class qtype_preg_regex_handler {
             $this->build_tree($regex);
         }
 
-        // Find and expand a node by selection.
-        if ($this->options->selection->indfirst != -2) {
-            $indfirst = $this->options->selection->indfirst;
-            $indlast = $this->options->selection->indlast;
-            foreach ($this->lexer->get_skipped_positions() as $skipped) {
-                if ($indfirst >= $skipped->indfirst && $indfirst <= $skipped->indlast) {
-                    $indfirst = $skipped->indlast + 1;
-                }
-                if ($indlast >= $skipped->indfirst && $indlast <= $skipped->indlast) {
-                    $indlast = $skipped->indfirst - 1;
-                }
-                if ($indlast < $indfirst) {
-                    $indfirst = -2;
-                    $indlast = -2;
-                }
-            }
-            if ($indfirst != -2) {
-                $idcounter = $this->parser->get_max_id();
-                $this->selectednode = $this->ast_root->node_by_regex_fragment($indfirst, $indlast, $idcounter);
-                $this->parser->set_max_id($idcounter);
-                $this->build_dst();
-            }
-        }
-
         // Sometimes engine that use accept_regex still need parsing to count subexpressions.
         // In case with no parsing we should stick to accepting whole regex, not nodes.
         $this->accept_regex();
@@ -637,13 +613,49 @@ class qtype_preg_regex_handler {
 
         // Set AST and DST roots.
         $root = $this->parser->get_root();
-        if ($root !== null && !$this->errors_exist() && $this->options->exactmatch) { // Add necessary nodes.
-            $root = $this->add_exact_match_nodes($root);
+        if ($root !== null && !$this->errors_exist()) { // Add necessary nodes.
+            if ($this->options->exactmatch) {
+                $root = $this->add_exact_match_nodes($root);
+            }
+            if ($this->options->selection->indfirst != -2) {
+                $root = $this->add_selection_nodes($root);
+            }
         }
         $this->ast_root = $root;
-        $this->build_dst();
+
+        if ($this->ast_root != null) {
+            $this->dst_root = $this->from_preg_node(clone $this->ast_root);
+        }
 
         fclose($pseudofile);
+    }
+
+    /**
+     * Adds necessary preg nodes for selection.
+     */
+    protected function add_selection_nodes($oldroot) {
+        // Find and expand a node by selection.
+        $indfirst = $this->options->selection->indfirst;
+        $indlast = $this->options->selection->indlast;
+        foreach ($this->lexer->get_skipped_positions() as $skipped) {
+            if ($indfirst >= $skipped->indfirst && $indfirst <= $skipped->indlast) {
+                $indfirst = $skipped->indlast + 1;
+            }
+            if ($indlast >= $skipped->indfirst && $indlast <= $skipped->indlast) {
+                $indlast = $skipped->indfirst - 1;
+            }
+            if ($indlast < $indfirst) {
+                $indfirst = -2;
+                $indlast = -2;
+                break;
+            }
+        }
+        if ($indfirst != -2) {
+            $idcounter = $this->parser->get_max_id();
+            $this->selectednode = $oldroot->node_by_regex_fragment($indfirst, $indlast, $idcounter);
+            $this->parser->set_max_id($idcounter);
+        }
+        return $oldroot;    // Handler doesn't add any nodes for selection by default.
     }
 
     /**
@@ -666,12 +678,6 @@ class qtype_preg_regex_handler {
         $newroot->operands[2]->set_user_info(new qtype_preg_position($newroot->position->indlast, $newroot->position->indlast), array(new qtype_preg_userinscription('$')));
         $this->parser->set_max_id($idcounter);
         return $newroot;
-    }
-
-    protected function build_dst() {
-        if ($this->ast_root != null) {
-            $this->dst_root = $this->from_preg_node(clone $this->ast_root);
-        }
     }
 
     protected function find_parent_node($node) {
