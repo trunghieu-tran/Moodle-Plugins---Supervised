@@ -505,6 +505,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
+                                // The point-node on the left of the edge goes to the graph which owns the edge.
                                 if ($neighborl->owner->is_parent_for($this)) {
                                     $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
                                 } else {
@@ -528,6 +529,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
+                                // The point-node on the left of the edge goes to the graph which owns the edge.
                                 if ($neighborl->owner->is_parent_for($this)) {
                                     $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
                                 } else {
