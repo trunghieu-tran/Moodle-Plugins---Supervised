@@ -612,16 +612,21 @@ class qtype_preg_regex_handler {
         }
 
         // Set AST and DST roots.
-        $root = $this->parser->get_root();
-        if ($root !== null && !$this->errors_exist()) { // Add necessary nodes.
+        $this->ast_root = $this->parser->get_root();
+        if ($this->ast_root !== null && !$this->errors_exist()) { // Add necessary nodes.
             if ($this->options->exactmatch) {
-                $root = $this->add_exact_match_nodes($root);
+                $newroot = $this->add_exact_match_nodes($this->ast_root);
+                $this->ast_root->subpattern = -1;
+                $this->ast_root = $newroot;
+                $this->ast_root->subpattern = 0;
             }
             if ($this->options->selection->indfirst != -2) {
-                $root = $this->add_selection_nodes($root);
+                $newroot = $this->add_selection_nodes($this->ast_root);
+                $this->ast_root->subpattern = -1;
+                $this->ast_root = $newroot;
+                $this->ast_root->subpattern = 0;
             }
         }
-        $this->ast_root = $root;
 
         if ($this->ast_root != null) {
             $this->dst_root = $this->from_preg_node(clone $this->ast_root);
@@ -680,11 +685,11 @@ class qtype_preg_regex_handler {
         return $newroot;
     }
 
-    protected function find_parent_node($node) {
-        if ($this->ast_root === null || $this->ast_root === $node) {
+    protected function find_parent_node($root, $node) {
+        if ($root === $node) {
             return null;
         }
-        $cur = array($this->ast_root);
+        $cur = array($root);
         while (count($cur) > 0) {
             $tmp = array_pop($cur);
             if (is_a($tmp, 'qtype_preg_leaf')) {

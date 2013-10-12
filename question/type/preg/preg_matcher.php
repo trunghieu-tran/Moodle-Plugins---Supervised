@@ -486,30 +486,30 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
      * Overloaded from qtype_preg_regex_handler.
      */
     protected function add_selection_nodes($oldroot) {
-        $result = parent::add_selection_nodes($oldroot);
+        $newroot = parent::add_selection_nodes($oldroot);
         if ($this->selectednode === null) {
-            return $result;
+            return $newroot;
         }
-        $parent = $this->find_parent_node($this->selectednode);
+
+        $parent = $this->find_parent_node($newroot, $this->selectednode);
         $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
+        $subexpression->subpattern = -2;
+
         if ($parent === null) {
             // Replace the AST root.
-            $subexpression->subpattern = 0;
-            $result->subpattern = -1;
-            $subexpression->operands[] = $result;
+            $subexpression->operands[] = $newroot;
             return $subexpression;
-        } else {
-            // Just insert a subexpression.
-            $subexpression->subpattern = -2;
-            $subexpression->operands[] = $this->selectednode;
-            foreach ($parent->operands as $key => $operand) {
-                if ($operand === $this->selectednode) {
-                    $parent->operands[$key] = $subexpression;
-                    break;
-                }
-            }
-            return $result;
         }
+
+        // Just insert a subexpression.
+        $subexpression->operands[] = $this->selectednode;
+        foreach ($parent->operands as $key => $operand) {
+            if ($operand === $this->selectednode) {
+                $parent->operands[$key] = $subexpression;
+                break;
+            }
+        }
+        return $newroot;
     }
 
     /**
