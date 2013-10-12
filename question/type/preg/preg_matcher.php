@@ -477,33 +477,39 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             $this->options->capturesubexpressions = (count($this->lexer->get_backrefs()) > 0);
         }
 
-        // Add a selection subexpression if needed.
-        if ($this->selectednode !== null) {
-            $parent = $this->find_parent_node($this->selectednode);
-            $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
-            if ($parent === null) {
-                // Replace the AST root.
-                $subexpression->subpattern = 0;
-                $this->ast_root->subpattern = -1;
-                $subexpression->operands[] = $this->ast_root;
-                $this->ast_root = $subexpression;
-            } else {
-                // Just insert a subexpression.
-                $subexpression->subpattern = -2;
-                $subexpression->operands[] = $this->selectednode;
-                foreach ($parent->operands as $key => $operand) {
-                    if ($operand === $this->selectednode) {
-                        $parent->operands[$key] = $subexpression;
-                        break;
-                    }
-                }
-            }
-            $this->build_dst();
-        }
-
         // Invalidate match called later to allow parser to count subexpression.
         $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
         $this->matchresults->invalidate_match();
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function add_selection_nodes($oldroot) {
+        $result = parent::add_selection_nodes($oldroot);
+        if ($this->selectednode === null) {
+            return $result;
+        }
+        $parent = $this->find_parent_node($this->selectednode);
+        $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
+        if ($parent === null) {
+            // Replace the AST root.
+            $subexpression->subpattern = 0;
+            $result->subpattern = -1;
+            $subexpression->operands[] = $result;
+            return $subexpression;
+        } else {
+            // Just insert a subexpression.
+            $subexpression->subpattern = -2;
+            $subexpression->operands[] = $this->selectednode;
+            foreach ($parent->operands as $key => $operand) {
+                if ($operand === $this->selectednode) {
+                    $parent->operands[$key] = $subexpression;
+                    break;
+                }
+            }
+            return $result;
+        }
     }
 
     /**
