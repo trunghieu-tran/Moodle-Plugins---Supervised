@@ -352,12 +352,12 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                                 );
                         }
                     } else {
-                        //print 'current subgraph is parent of right neighbor\'s owner' . chr(10);
+                        //print 'current subgraph is not parent of left neighbor\'s owner' . chr(10);
                         // Create a new point-node in current subgraph.
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link left neighbor with it.
-                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
+                        $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
 
                         // Link it with right neighbor.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(qtype_preg_explaining_graph_tool_link::compute_label(
@@ -429,7 +429,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link it with right neighbor.
-                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $neighborr->owner);
+                        $neighborr->owner->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $neighborr->owner);
 
                         // Link right neighbor with it.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(

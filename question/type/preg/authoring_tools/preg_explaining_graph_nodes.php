@@ -157,7 +157,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
                 continue;
             }
 
-            $res = qtype_preg_authoring_tool::userinscription_to_string($ui, true);
+            $res = qtype_preg_authoring_tool::userinscription_to_string($ui, false);
             if ($res === $ui->data) {
                 $result[0] .= $ui->data;
             } else {
