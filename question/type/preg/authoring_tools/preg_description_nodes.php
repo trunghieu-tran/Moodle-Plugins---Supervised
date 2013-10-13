@@ -119,21 +119,21 @@ abstract class qtype_preg_description_node {
         //return qtype_poasquestion_string::replace('%s', $s, qtype_poasquestion_string::replace('%n', $this->pregnode->id, $numbering_pattern));
         $result = $s;
         $classes = array();
-        $color = 'white';
+        $bgclor = 'white';
         $selected = $this->pregnode->position->indfirst >= $this->handler->get_options()->selection->indfirst &&
                     $this->pregnode->position->indlast <= $this->handler->get_options()->selection->indlast;
 
         // Highlight generated and selected nodes.
         if ($this->handler->is_node_generated($this->pregnode)) {
-            $color = 'lightgrey';
+            $bgclor = 'lightgrey';
         }
         if ($selected) {
-            $color = 'yellow';
+            $bgclor = 'orange';
         }
 
-        if ($classes !== array() || $color !== '') {
-            $classesstr = ' class="' . implode(' ', $classes) . '"';
-            $stylestr = ' style="background: ' . $color . '"';
+        if (count($classes) !== 0 || $bgclor !== null) {
+            $classesstr = count($classes) ? ' class="' . implode(' ', $classes) . '"' : '';
+            $stylestr = $bgclor!==null ? ' style="background: ' . $bgclor . '"' : '';
             $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
         }
 
