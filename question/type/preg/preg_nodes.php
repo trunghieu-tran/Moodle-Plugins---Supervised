@@ -102,10 +102,21 @@ class qtype_preg_userinscription {
                textlib::strlen($this->data) == 1;
     }
 
+    public function is_character_range() {
+        if ($this->isflag !== null) {
+            return false;
+        }
+        $mpos = textlib::strpos($this->data, '-');
+        return $mpos !== null && $mpos > 0 && $mpos < textlib::strlen($this->data);
+    }
+
     /**
      * Checks if it's a valid (with a special meaning) escape sequence.
      */
     public function is_valid_escape_sequence() {
+        if ($this->is_character_range()) {
+            return false;
+        }
         $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', 'x',
                          'd', 'D', 'h', 'H', 's', 'S', 'v', 'V', 'w', 'W',
                          'p', 'P');
