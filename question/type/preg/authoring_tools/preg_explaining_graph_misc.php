@@ -269,9 +269,6 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
             $tmpdnode = $iter; // Let copy current node.
 
-            $tmplabel1;
-            $tmplabel2;
-
             // Assert should has a red color.
             if ($iter->color == 'red') {
                 // Find its neighbors (left and right).
@@ -360,7 +357,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link left neighbor with it.
-                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $parent);
+                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
 
                         // Link it with right neighbor.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(qtype_preg_explaining_graph_tool_link::compute_label(
@@ -432,7 +429,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link it with right neighbor.
-                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $parent);
+                        $parent->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $neighborr->owner);
 
                         // Link right neighbor with it.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(

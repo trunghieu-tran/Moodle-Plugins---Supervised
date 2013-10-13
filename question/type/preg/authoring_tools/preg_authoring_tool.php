@@ -121,7 +121,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         return $result;
     }
 
-    public static function userinscription_to_string($ui) {
+    public static function userinscription_to_string($ui, $isexplaining = false) {
         $data = new qtype_poasquestion_string($ui->data);
 
         // Is it a range?
@@ -135,8 +135,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
             // Make a recursive call; won't get here next time.
             $a = new stdClass;
-            $a->start = self::userinscription_to_string($uileft);
-            $a->end = self::userinscription_to_string($uiright);
+            $a->start = self::userinscription_to_string($uileft, $isexplaining);
+            $a->end = self::userinscription_to_string($uiright, $isexplaining);
             return get_string('description_range', 'qtype_preg', $a);
         }
 
@@ -154,7 +154,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $a = new stdClass;
             $a->code = textlib::strtoupper(dechex($code));
             $a->char = self::userinscription_to_string($tmp);
-            return get_string('description_char_16value', 'qtype_preg', $a);
+            return $isexplaining ? $a->char : get_string('description_char_16value', 'qtype_preg', $a);
         }
 
         // Is it another flag or POSIX class?
