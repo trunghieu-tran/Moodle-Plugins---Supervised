@@ -125,8 +125,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $data = new qtype_poasquestion_string($ui->data);
 
         // Is it a range?
-        $mpos = textlib::strpos($data, '-');
-        if ($mpos != 0 && $mpos != $data->length() - 1) {
+        if ($ui->is_character_range()) {
+            $mpos = textlib::strpos($data, '-');
             $left = $data->substring(0, $mpos)->string();
             $right = $data->substring($mpos + 1)->string();
 

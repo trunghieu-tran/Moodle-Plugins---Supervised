@@ -107,7 +107,7 @@ class qtype_preg_userinscription {
             return false;
         }
         $mpos = textlib::strpos($this->data, '-');
-        return $mpos !== null && $mpos > 0 && $mpos < textlib::strlen($this->data);
+        return $mpos !== null && $mpos > 0 && $mpos < textlib::strlen($this->data) - 1;
     }
 
     /**
