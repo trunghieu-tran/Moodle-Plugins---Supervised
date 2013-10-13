@@ -41,6 +41,7 @@ class qtype_preg_explaining_graph_tool_node {
     public $id     = -1;         // Id of node.
     public $fill   = '';         // Filling of node on image.
     public $invert = false;      // Flag of inversion of node.
+    public $ismarked = false;    // Flag of marking (for voids).
 
     public function __construct($lbl, $shp, $clr, $ownr, $id, $fll = '') {
         $this->label = $lbl;
@@ -611,7 +612,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 $neighborr = $iter->find_neighbor_dst($gmain);
 
                 if ($iter->shape != 'box') {
-                    if ($this->style != 'solid; color=darkgreen') {
+                    if ($this->style != 'solid; color=darkgreen' || $iter->ismarked) {
                         // Find a link between left neighbor and void.
                         $tmpneighbor = $gmain->find_link($neighborl, $iter);
                         $tmpneighbor->destination = $neighborr;    // Set a new destination.

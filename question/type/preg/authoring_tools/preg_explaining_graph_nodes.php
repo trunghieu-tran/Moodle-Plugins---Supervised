@@ -362,6 +362,9 @@ class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_o
 
         foreach ($this->operands as $operand) {
             $newoperand = $operand->create_graph($id);
+            if (count($newoperand->nodes) == 1 && $newoperand->nodes[0]->label[0] == 'Void' && $id == $this->pregnode->id) {
+                $newoperand->nodes[0]->ismarked = true;
+            }
             $graph->assume_subgraph($newoperand);
 
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left, $newoperand->entries[count($newoperand->entries)-1], $graph);
