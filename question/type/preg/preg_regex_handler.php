@@ -28,8 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/questiontype.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
@@ -497,6 +498,10 @@ class qtype_preg_regex_handler {
             throw new qtype_preg_pathtodot_empty('');
         }
 
+        if (!qtype_poasquestion::is_dot_available()) {
+            throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+        }
+
         $cmd = escapeshellarg($CFG->pathtodot) . ' -T' . $type;
         if ($filename !== null) {
             $cmd .= ' -o' . escapeshellarg($filename);
@@ -519,7 +524,7 @@ class qtype_preg_regex_handler {
             proc_close($process);
 
             if (!empty($err)) {
-                throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+                throw new qtype_preg_dot_error('');
             }
         }
         return $output;
