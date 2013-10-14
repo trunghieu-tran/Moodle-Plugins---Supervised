@@ -221,9 +221,14 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
             $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
                 $json[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
-            } else {
+            } else if (is_a($e, 'qtype_preg_pathtodot_incorrect')) {
                 $a->pathtodot = $e->a;
                 $json[$this->json_key()] = get_string('pathtodotincorrect', 'qtype_preg', $a);
+            } else if (is_a($e, 'qtype_preg_dot_error')) {
+                $json[$this->json_key()] = get_string('doterror', 'qtype_preg', $a);
+            } else {
+                // It's not our exception, let it go.
+                throw $e;
             }
         }
     }
