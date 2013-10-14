@@ -498,10 +498,6 @@ class qtype_preg_regex_handler {
             throw new qtype_preg_pathtodot_empty('');
         }
 
-        if (!qtype_poasquestion::is_dot_available()) {
-            throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
-        }
-
         $cmd = escapeshellarg($CFG->pathtodot) . ' -T' . $type;
         if ($filename !== null) {
             $cmd .= ' -o' . escapeshellarg($filename);
@@ -524,7 +520,11 @@ class qtype_preg_regex_handler {
             proc_close($process);
 
             if (!empty($err)) {
-                throw new qtype_preg_dot_error('');
+                if (!qtype_poasquestion::is_dot_available()) {
+                    throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+                } else {
+                    throw new qtype_preg_dot_error('');
+                }
             }
         }
         return $output;
