@@ -708,15 +708,17 @@ class qtype_preg_explaining_graph_tool_subgraph {
      */
     public function create_dot() {
         $this->regenerate_id();
-        $instr = 'digraph { compound=true; rankdir = LR;' . ($this->isexact ?  'graph [bgcolor=lightgray];' : '');
+        $instr = "digraph {\n" .
+                  "compound=true;\n" .
+                  "rankdir = LR;\n" . ($this->isexact ? 'graph [bgcolor=lightgray];' : '') . "\n";
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . "];\n";
             } else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . "];\n";
             }
         }
 
@@ -725,12 +727,11 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($this->links as $iter) {
-            $instr .= '"nd' . $iter->source->id . '" -> "nd';
-
-            $instr .= $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . '];';
+            $instr .= '"nd' . $iter->source->id . '" -> "nd' .
+                      $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . "];\n";
         }
 
-        $instr .= '}';
+        $instr .= "}\n";
 
         return $instr;
     }
@@ -792,11 +793,11 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . "];\n";
             } else {
                 $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
                     ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . '];';
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . "];\n";
             }
         }
 
@@ -805,12 +806,11 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($gr->links as $iter) {
-            $instr .= '"nd' . $iter->source->id . '" -> "nd';
-
-            $instr .= $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . '];';
+            $instr .= '"nd' . $iter->source->id . '" -> "nd' .
+                      $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . "];\n";
         }
 
-        $instr .= '}';
+        $instr .= "}\n";
     }
 
     /**
