@@ -27,14 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'qtype_preg';
 $plugin->version = 2013100500;
 $plugin->requires = 2013051400;
-$plugin->release = 'Preg 2.5';
-$plugin->maturity = MATURITY_BETA;
+$plugin->release = 'Preg 2.5 Release candidate';
+$plugin->maturity = MATURITY_RC;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2013050100,
     'qbehaviour_adaptivehints' => 2013052500,
     'qbehaviour_adaptivehintsnopenalties' => 2013052500,
     'qbehaviour_interactivehints' => 2013060200,
-    'qtype_poasquestion' => 2013062900,
+    'qtype_poasquestion' => 2013101400,
     'block_formal_langs' => 2013071900
 );
