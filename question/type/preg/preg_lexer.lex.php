@@ -267,6 +267,10 @@ class qtype_preg_lexer extends JLexBase  {
         if (textlib::strlen($seq) < 2) {
             return null;
         }
+        $octal = textlib::substr($seq, 1);
+        if (self::ctype_octal($octal)) {
+            return octdec($octal);
+        }
         if (array_key_exists($seq, $codes)) {
             return $codes[$seq];
         }
@@ -308,6 +312,16 @@ class qtype_preg_lexer extends JLexBase  {
     public function set_options($options) {
         $this->options = $options;
         $this->modify_top_options_stack_item($options->modifiers, 0);
+    }
+    protected static function ctype_octal($str) {
+        $str = new qtype_poasquestion_string($str);
+        for ($i = 0; $i < $str->length(); $i++) {
+            $ch = $str[$i];
+            if (!ctype_digit($ch) || (int)$ch > 7) {
+                return false;
+            }
+        }
+        return true;
     }
     protected function modify_top_options_stack_item($set, $unset) {
         $errors = array();
