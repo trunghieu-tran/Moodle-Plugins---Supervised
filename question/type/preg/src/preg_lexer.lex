@@ -80,7 +80,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
                                             $this->state_begin_position->linefirst, $this->yyline,
                                             $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
-        $error->set_user_info($position);
+        $error->set_user_info($position, $this->charset->userinscription);
     }
 
     // End of the regex inside a comment.
@@ -89,7 +89,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
                                             $this->state_begin_position->linefirst, $this->yyline,
                                             $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
-        $error->set_user_info($position);
+        $error->set_user_info($position, array(new qtype_preg_userinscription('(?#')));
     }
 
     // Check for references to unexisting subexpressions.
@@ -99,7 +99,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
             if ($number > $this->max_subexpr) {
                 // Error: unexisting subexpression.
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node);
-                $error->set_user_info($node->position);
+                $error->set_user_info($node->position, $node->userinscription);
             }
             continue;   // No need for further checks if it's an integer number.
         }
@@ -110,7 +110,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
             // Error: unexisting subexpression.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
-            $error->set_user_info($node->position);
+            $error->set_user_info($node->position, $node->userinscription);
         }
 
         // For matchers: replace name with number for simple usage.

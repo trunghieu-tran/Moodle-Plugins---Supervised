@@ -2107,6 +2107,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
         $this->assertTrue($errors[0]->position->colfirst === 2);
         $this->assertTrue($errors[0]->position->collast === 4);
+        $this->assertTrue(count($errors[0]->userinscription) === 3);
         $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR);
         $this->assertTrue($errors[1]->position->colfirst === 0);
         $this->assertTrue($errors[1]->position->collast === 1);

@@ -145,7 +145,8 @@
 
         if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $node->operands = $exprnode->operands;
-            if (count($exprnode->operands) > 2) {
+            $limit = $node->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? 1 : 2;
+            if (count($exprnode->operands) > $limit) {
                 // Error: only one or two top-level alternations allowed in a conditional subexpression.
                 $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $position, array(), array($exprnode));
             }
