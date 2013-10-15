@@ -1129,7 +1129,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $failed = false;
     for ($i = 0; !$failed && $i < qtype_preg_unicode::strlen($str); $i++) {
         $tmp = qtype_preg_unicode::substr($str, $i, 1);
-        if (intval($tmp) < 8) {
+        if ((int)$tmp < 8) {
             $octal = $octal . $tmp;
         } else {
             $failed = true;
@@ -1144,13 +1144,22 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
+    $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
+    $charset->value->position->indlast -= textlib::strlen($tail);
+    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
-        $res = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    } else {
-        $res = array($this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal))));
-        $res = array_merge($res, $this->string_to_tokens($tail));
+        return $charset;
     }
-    return $res;
+    $tokens = $this->string_to_tokens($tail);
+    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    foreach ($tokens as $token) {
+        $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
+                                        $this->yyline, $this->yyline,
+                                        $this->yycol + $offset, $this->yycol + $offset);
+        $offset++;
+    }
+    return array_merge(array($charset), $tokens);
 }
 <YYINITIAL> "\g"-?[0-9][0-9]? {        /* \gn \g-n        Backreference by number */
     $text = $this->yytext();
