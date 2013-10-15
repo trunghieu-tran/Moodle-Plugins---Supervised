@@ -239,7 +239,14 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
             $newcontext = clone $context;
             $newcontext->isroot = false;
             $tmp = $operand->dot_script($newcontext);
-            $dotscript .= $nodename . '->' . $tmp[0];
+            $edgelabel = $this->label_for_edge($operand);
+            if ($edgelabel != '') {
+                $othernodename = $operand->pregnode->id;
+                $dotscript .= $nodename . '->' . $othernodename . "[label=\"$edgelabel\"];\n";
+                $dotscript .= $tmp[0];
+            } else {
+                $dotscript .= $nodename . '->' . $tmp[0];
+            }
             $style .= $tmp[1];
         }
         return array($dotscript, $style);
@@ -252,6 +259,13 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
     public function tooltip() {
         // Operators use subtype strings instead of description_ by default.
         return get_string($this->pregnode->lang_key(false), 'qtype_preg');
+    }
+
+    /**
+     * Returns a label for the edge to the given operand.
+     */
+    public function label_for_edge($operand) {
+        return '';
     }
 }
 
@@ -438,6 +452,16 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
 
+    public function label_for_edge($operand) {
+        $count = count($this->operands);
+        $shift = $this->pregnode->is_condition_assertion() ? 1 : 0;
+        if ($operand === $this->operands[$shift]) {
+            return textlib::strtolower(get_string('yes', 'moodle'));
+        } else if ($shift + 1 < $count && $operand === $this->operands[$shift + 1]) {
+            return textlib::strtolower(get_string('no', 'moodle'));
+        }
+        return '';
+    }
 }
 
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {
