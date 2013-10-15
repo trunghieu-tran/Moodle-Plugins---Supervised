@@ -147,8 +147,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             return get_string('description_char' . $hex, 'qtype_preg');
         }
 
-        // Is it \cx or \x{hh} escape sequence?
-        if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
+        // Is it \cx or \ddd or \ddd or \x{hh} escape sequence?
+        if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_oct() || $ui->is_single_escape_sequence_character_hex()) {
             $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
             $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
             $a = new stdClass;

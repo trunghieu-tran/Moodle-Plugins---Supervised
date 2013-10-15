@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
 
 class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
-    function get_pregnode($str) {
+    function get_node($str) {
         $options = new qtype_preg_handling_options();
         $options->preserveallnodes = true;
         StringStreamController::createRef('regex', $str);
@@ -24,76 +24,80 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $lexer->set_options($options);
         $token = $lexer->nextToken();
+
+        $tree = new qtype_preg_syntax_tree_tool();
         if (is_array($token)) {
-            return $token[0]->value;
+            $result = array();
+            foreach ($token as $t) {
+                $result[] = $tree->from_preg_node($t->value);
+            }
+            return $result;
         }
-        return $token->value;
+        return $tree->from_preg_node($token->value);
     }
 
     function test_label_tooltip_charset() {
-        $tree = new qtype_preg_syntax_tree_tool();
-
         // Single character.
-        $node = $tree->from_preg_node($this->get_pregnode('α'));
+        $node = $this->get_node('α');
         $this->assertEquals($node->label(), 'α');
         $this->assertEquals($node->tooltip(), 'character α');
 
-        $node = $tree->from_preg_node($this->get_pregnode(' '));
+        $node = $this->get_node(' ');
         $this->assertTrue($node->needs_highlighting());
         $this->assertEquals($node->label(), get_string('description_char20', 'qtype_preg'));
         $this->assertEquals($node->tooltip(), 'character ' . get_string('description_char20', 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode("\r"));
+        $node = $this->get_node("\r");
         $this->assertTrue($node->needs_highlighting());
         $this->assertEquals($node->label(), get_string('description_charD', 'qtype_preg'));
         $this->assertEquals($node->tooltip(), 'character ' . get_string('description_charD', 'qtype_preg'));
 
         // Single character in brackets.
-        $node = $tree->from_preg_node($this->get_pregnode('α'));
+        $node = $this->get_node('α');
         $this->assertEquals($node->label(), 'α');
         $this->assertEquals($node->tooltip(), 'character α');
 
-        $node = $tree->from_preg_node($this->get_pregnode('[ ]'));
+        $node = $this->get_node('[ ]');
         $this->assertFalse($node->needs_highlighting());
         $this->assertEquals($node->label(), '[ ]');
         $this->assertEquals($node->tooltip(), 'character set&#10;' . get_string('description_char20', 'qtype_preg'));
 
         // Some characters in brackets.
-        $node = $tree->from_preg_node($this->get_pregnode('[αя]'));
+        $node = $this->get_node('[αя]');
         $this->assertEquals($node->label(), '[αя]');
         $this->assertEquals($node->tooltip(), 'character set&#10;α&#10;я');
 
         // Negative character set of one character.
-        $node = $tree->from_preg_node($this->get_pregnode('[^α]'));
+        $node = $this->get_node('[^α]');
         $this->assertEquals($node->label(), '[^α]');
         $this->assertEquals($node->tooltip(), 'negative character set&#10;α');
 
          // Negative character set of multiple characters.
-        $node = $tree->from_preg_node($this->get_pregnode('[^ab]'));
+        $node = $this->get_node('[^ab]');
         $this->assertEquals($node->label(), '[^ab]');
         $this->assertEquals($node->tooltip(), 'negative character set&#10;a&#10;b');
 
         // Escape sequences representing single characters.
-        $node = $tree->from_preg_node($this->get_pregnode('\\n'));
-        $this->assertEquals($node->label(), '\\n');
+        $node = $this->get_node('\n');
+        $this->assertEquals($node->label(), '\n');
         $this->assertEquals($node->tooltip(), get_string('description_charA', 'qtype_preg'));
 
         // Single flag.
-        $node = $tree->from_preg_node($this->get_pregnode('.'));
+        $node = $this->get_node('.');
         $this->assertEquals($node->label(), get_string('description_charflag_dot', 'qtype_preg'));
         $this->assertEquals($node->tooltip(), get_string('description_charflag_dot', 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('\w'));
+        $node = $this->get_node('\w');
         $this->assertEquals($node->label(), '\w');
         $this->assertEquals($node->tooltip(), get_string('description_charflag_slashw', 'qtype_preg'));
 
         // Single negative flag.
-        $node = $tree->from_preg_node($this->get_pregnode('\W'));
+        $node = $this->get_node('\W');
         $this->assertEquals($node->label(), '\W');
         $this->assertEquals($node->tooltip(), get_string('description_charflag_slashw_neg', 'qtype_preg'));
 
         // All flags.
-        $node = $tree->from_preg_node($this->get_pregnode('[\d\D\h\H\s\S\v\V\w\W]'));
+        $node = $this->get_node('[\d\D\h\H\s\S\v\V\w\W]');
         $this->assertEquals($node->label(), '[\d\D\h\H\s\S\v\V\w\W]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
                                               get_string('description_charflag_slashd', 'qtype_preg') . '&#10;' .
@@ -108,7 +112,7 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
                                               get_string('description_charflag_slashw_neg', 'qtype_preg'));
 
         // All POSIX classes.
-        $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]'));
+        $node = $this->get_node('[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]');
         $this->assertEquals($node->label(), '[[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
                                               get_string('description_charflag_alnum', 'qtype_preg') . '&#10;' .
@@ -127,67 +131,67 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
                                               get_string('description_charflag_xdigit', 'qtype_preg'));
 
         // Positive and negative POSIX classes.
-        $node = $tree->from_preg_node($this->get_pregnode('[[:alnum:][:^alpha:]]'));
+        $node = $this->get_node('[[:alnum:][:^alpha:]]');
         $this->assertEquals($node->label(), '[[:alnum:][:^alpha:]]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
                                               get_string('description_charflag_alnum', 'qtype_preg') . '&#10;' .
                                               get_string('description_charflag_alpha_neg', 'qtype_preg'));
 
         // Unicode properties.
-        $node = $tree->from_preg_node($this->get_pregnode('[\pL\PM]'));
+        $node = $this->get_node('[\pL\PM]');
         $this->assertEquals($node->label(), '[\pL\PM]');
         $this->assertEquals($node->tooltip(), 'character set&#10;'.
                                               get_string('description_charflag_L', 'qtype_preg') . '&#10;' .
                                               get_string('description_charflag_M_neg', 'qtype_preg'));
 
         // Escaping.
-        $node = $tree->from_preg_node($this->get_pregnode('\\\\'));
+        $node = $this->get_node('\\\\');
         $this->assertEquals($node->label(), '\\');
         $this->assertEquals($node->tooltip(), 'character \\');
 
-        $node = $tree->from_preg_node($this->get_pregnode('[\\]\\\\\\-]'));   // For better understanding: [\]\\\-]
+        $node = $this->get_node('[\\]\\\\\\-]');   // For better understanding: [\]\\\-]
         $this->assertEquals($node->tooltip(), 'character set&#10;]&#10;\&#10;-');
+
+        $nodes = $this->get_node('\18');
+        $this->assertEquals($nodes[0]->label(), '\1');
+        $this->assertEquals($nodes[1]->label(), '8');
     }
 
     function test_label_tooltip_simple_assertions() {
-        $tree = new qtype_preg_syntax_tree_tool();
-
-        $node = $tree->from_preg_node($this->get_pregnode('\b'));
+        $node = $this->get_node('\b');
         $this->assertEquals($node->label(), '\b');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_B, 'qtype_preg'));
-        $node = $tree->from_preg_node($this->get_pregnode('\B'));
+        $node = $this->get_node('\B');
         $this->assertEquals($node->label(), '\B');
         $this->assertEquals($node->tooltip(), 'not ' . get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_B, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('\A'));
+        $node = $this->get_node('\A');
         $this->assertEquals($node->label(), '\A');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_A, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('\z'));
+        $node = $this->get_node('\z');
         $this->assertEquals($node->label(), '\z');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('\Z'));
+        $node = $this->get_node('\Z');
         $this->assertEquals($node->label(), '\Z');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('\G'));
+        $node = $this->get_node('\G');
         $this->assertEquals($node->label(), '\G');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_G, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('^'));
+        $node = $this->get_node('^');
         $this->assertEquals($node->label(), '^');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX, 'qtype_preg'));
 
-        $node = $tree->from_preg_node($this->get_pregnode('$'));
+        $node = $this->get_node('$');
         $this->assertEquals($node->label(), '$');
         $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_DOLLAR, 'qtype_preg'));
     }
 
     function test_label_options() {
-        $tree = new qtype_preg_syntax_tree_tool();
-
-        $node = $tree->from_preg_node($this->get_pregnode('(?i)'));
+        $node = $this->get_node('(?i)');
         $this->assertEquals($node->label(), '(?i)');
         $this->assertEquals($node->tooltip(), get_string('description_option_i', 'qtype_preg'));
     }
