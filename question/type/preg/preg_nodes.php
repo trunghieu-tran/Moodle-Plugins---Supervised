@@ -246,8 +246,6 @@ interface qtype_preg_matcher_state {
  */
 abstract class qtype_preg_node {
 
-    /** Abstract node class, not representing real things. */
-    const TYPE_ABSTRACT = 'node_abstract';
     /** A character or a character set. */
     const TYPE_LEAF_CHARSET = 'leaf_charset';
     /** Meta-character or escape sequence matching with a set of characters that couldn't be enumerated. */
@@ -299,7 +297,7 @@ abstract class qtype_preg_node {
     public $lastpos = null;
 
     public function __construct() {
-        $this->type = self::TYPE_ABSTRACT;
+
     }
 
     public function __clone() {

@@ -55,9 +55,7 @@ abstract class qtype_preg_explaining_graph_node_abstract {
      */
     public function accept() {
         switch ($this->pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
-            case qtype_preg_node::TYPE_NODE_ERROR:
                 return get_string($this->pregnode->type, 'qtype_preg');
             default:
                 return true;

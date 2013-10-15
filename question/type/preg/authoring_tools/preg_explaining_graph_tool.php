@@ -55,6 +55,13 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
     /**
      * Overloaded from qtype_preg_regex_handler.
      */
+    public function get_errors() {
+        return qtype_preg_regex_handler::get_errors();
+    }
+
+    /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
     protected function get_engine_node_name($nodetype, $nodesubtype) {
         if ($nodetype == qtype_preg_node::TYPE_NODE_FINITE_QUANT || $nodetype == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
             return 'qtype_preg_explaining_graph_node_quant';
@@ -67,9 +74,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      */
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
-            case qtype_preg_node::TYPE_ABSTRACT:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
-            case qtype_preg_node::TYPE_NODE_ERROR:
                 return get_string($pregnode->type, 'qtype_preg');
             default:
                 return true;

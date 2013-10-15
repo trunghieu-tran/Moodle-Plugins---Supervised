@@ -53,7 +53,7 @@ class qtype_poasquestion extends question_type {
 
         $process = proc_open($cmd, $descriptorspec, $pipes);
         if (is_resource($process)) {
-            fwrite($pipes[0], 'graph { "hey"; }' . "\n");
+            fwrite($pipes[0], 'graph{"hey";}');
             fclose($pipes[0]);
 
             $err = stream_get_contents($pipes[2]);
