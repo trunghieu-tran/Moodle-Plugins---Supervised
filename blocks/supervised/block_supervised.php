@@ -53,6 +53,22 @@ function save_rules($quizid, $lessontypes) {
     }
 }
 
+function supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid) {
+    global $DB;
+    
+    $params = array();
+    $selector = "l.time >= :timefrom AND l.time <= :timeto AND l.ip = :ip AND l.course = :courseid";
+    $params['timefrom'] = $timefrom;
+    $params['timeto']   = $timeto;
+    $params['ip']       = $ip;
+    $params['courseid'] = $courseid;
+    
+    $logs = get_logs($selector, $params);
+    
+    return $logs;
+}
+
+
 class block_supervised extends block_base {
     public function init() {
         $this->title = get_string('supervised', 'block_supervised');
@@ -65,6 +81,26 @@ class block_supervised extends block_base {
             return $this->content;
         }
 
+        ///////////////////
+        $timefrom = new DateTime();
+        $timefrom->setDate(2013,10,5);
+        $timefrom->setTime(17,40,00);
+        $timefrom = $timefrom->getTimestamp();
+        
+        $timeto = new DateTime();
+        $timeto->setDate(2013,10,5);
+        $timeto->setTime(18,00,00);
+        $timeto = $timeto->getTimestamp();
+        $ip  = '127.0.0.1';
+        $courseid = 1;
+        $logs = supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid);
+        
+        
+        //////////////////////
+        echo("<pre>");
+        var_dump($logs);
+        echo("</pre>");
+        //////////////////////
         
         $this->content         =  new stdClass;
         $this->content->text   = 'The content of supervised block!';
