@@ -55,9 +55,13 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
         parent::__clone();
         $oldmistakes = $this->mistakes;
         if (is_array($oldmistakes)) {
-            $this->mistakes = array();
-            foreach($oldmistakes as $mistake) {
-                $this->mistakes[] = clone $mistake;
+            foreach($oldmistakes as $type => $mistakes) {
+                $this->mistakes[$type] = array();
+                if (count($mistakes)) {
+                    foreach($mistakes as $mistake) {
+                        $this->mistakes[$type][] = $mistake;
+                    }
+                }
             }
         }
     }
@@ -71,21 +75,51 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     }
 
     public function mistakes() {
-        return $this->mistakes;
+        $result = array();
+        foreach($this->mistakes as $type => $mistakes) {
+            if (count($result) == 0) {
+                $result = $mistakes;
+            } else {
+                $result = array_merge($result, $mistakes);
+            }
+        }
+        return $result;
     }
 
     public function set_mistakes($mistakes) {
-        $this->mistakes = $mistakes;
+        $this->mistakes = array();
+        $this->append_mistakes($mistakes);
+    }
+
+
+    public function append_mistake($mistake) {
+        $type = get_class($mistake);
+        if (array_key_exists($type, $this->mistakes) == false) {
+            $this->mistakes[$type] = array();
+        }
+        $this->mistakes[$type][] = $mistake;
     }
 
     public function append_mistakes($mistakes) {
         if (count($mistakes) != 0) {
-            if (count($this->mistakes) == 0) {
-                $this->mistakes = $mistakes;
-            } else {
-                $this->mistakes = array_merge($mistakes, $this->mistakes);
+            foreach($mistakes as $mistake) {
+                $this->append_mistake($mistake);
             }
         }
+    }
+
+    public function mistakes_by_type($type) {
+        $totaltype = 'qtype_correctwriting_' . $type;
+        $result = array();
+        if (array_key_exists($totaltype, $this->mistakes)) {
+            $result = $this->mistakes[$totaltype];
+        }
+        return $result;
+    }
+
+    public function set_mistakes_by_type($type, $set) {
+        $totaltype = 'qtype_correctwriting_' . $type;
+        $this->mistakes[$totaltype] = $set;
     }
 
     /**

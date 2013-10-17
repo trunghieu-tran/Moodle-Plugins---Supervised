@@ -79,6 +79,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // 1.1. Replace result with fixed strings
         $result = array( $this->basestringpair );
         // 1.1. Compute own mistakes and place them in mistakes
+        // Also, you must create mistakes of skipped lexemes and additional lexemes
         $mistakes = array( array( ) );
 
         // 2. Merge mistakes into one
@@ -94,6 +95,9 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
 
     protected function bypass() {
         parent::bypass();
+        // You must create mistakes of skipped lexemes and additional lexemes
+        // Also, you need to create matched 1:1 by simply comparing lexemes of two sequences
+        // with ::is_same
         $pairs = $this->result_pairs();
         $string = $pairs[0];
         /** @var qtype_correctwriting_string_pair $string */
@@ -172,7 +176,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      * Returns an array of extra_question_fields used by this analyzer.
      */
     public function extra_question_fields() {
-        return array('lexicalerrorthreshold', 'lexicalerrorweight');
+        return array('lexicalerrorthreshold', 'lexicalerrorweight', 'addedmistakeweight', 'movedmistakeweight');
     }
 
     public function name() {
@@ -183,7 +187,9 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
     // Form and DB related functions.
     public function float_form_fields() {
         return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
-                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1)      //Lexical error weight field
+                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1),      //Lexical error weight field
+                     array('name' => 'absentmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
+                     array('name' =>'addedmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
                     );
     }
 }

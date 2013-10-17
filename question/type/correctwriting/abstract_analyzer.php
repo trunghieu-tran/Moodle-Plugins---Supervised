@@ -253,27 +253,24 @@ abstract class qtype_correctwriting_abstract_analyzer {
 
     /**
      * Analyzer can use this function to filter out all mistakes, thst it does not need
-     * @param array $set of qtype_correctwriting_response_mistake a mistake set
+     * @param qtype_correctwriting_string_pair $pair a string pair
      * @return array of qtype_correctwriting_response_mistake a mistake set
      */
-    protected function remove_mistake_types_from_mistake_set($set) {
-        $result  = array();
+    protected function remove_mistake_types_from_mistake_set($pair) {
         $types = $this->replaces_mistake_types();
 
-        if (count($set)) {
-            foreach($set as $mistake) {
-                if (count($types) != 0) {
-
-                    $removed = false;
-                    foreach($types as $type) {
-                        if (is_a($mistake, $type)) {
-                            $removed = $removed || $this->should_mistake_be_removed($mistake);
+        if (count($types)) {
+            foreach($types as $type) {
+                $mistakes = $pair->mistakes_by_type($type);
+                $resultmistakes = array();
+                if (count($mistakes)) {
+                    foreach($mistakes as $mistake) {
+                        if ($this->should_mistake_be_removed($mistake) == false) {
+                            $resultmistakes[] = $mistake;
                         }
                     }
-
-                } else {
-                    $result[]= clone $mistake;
                 }
+                $pair->set_mistakes_by_type($type, $resultmistakes);
             }
         }
     }
