@@ -216,9 +216,9 @@ $string['authoring_form_options_header_help'] = 'Here you can tune the matching.
 $string['authoring_form_text'] = 'Enter your regex here:';
 $string['authoring_form_tree_build'] = 'Building the tree...';
 $string['authoring_form_graph_build'] = 'Building the graph...';
-$string['authoring_form_match_header'] = 'Regular expression testing';
-$string['authoring_form_match_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red. Icon shows you whether given string matched entire regex (green check mark) or not (reg cross).';
-$string['authoring_form_match_textarea'] = 'Input strings to match (one per line)';
+$string['authoring_form_testing_header'] = 'Regular expression testing';
+$string['authoring_form_testing_header_help'] = 'Here you can input some strings (one per line) to test your regex. After clicking "Check the string(s)" you\'ll see results on the right: matched parts are green, unmatched parts are red. Icon shows you whether given string matched entire regex (green check mark) or not (reg cross).';
+$string['authoring_form_testing_textarea'] = 'Input strings to match (one per line)';
 $string['authoring_form_check_strings'] = 'Check the string(s)';
 
 // Strings for node description
