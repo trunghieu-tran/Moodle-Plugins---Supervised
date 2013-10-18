@@ -68,13 +68,12 @@ M.preg_authoring_tools_script = (function ($) {
     setup_parent_object : function () {
         var options = {
 
-            // Function called on the very first form opening.
             onfirstpresscallback : function () {
                 $.ajax({
                     url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php',
                     type: "GET",
                     dataType: "text"
-                }).done(function( responseText, textStatus, jqXHR ) {
+                }).done(function (responseText, textStatus, jqXHR) {
                     var tmpM = M;
                     $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
                     M = $.extend(M, tmpM);
@@ -84,8 +83,8 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Create a clone of the textarea.
                     var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:both;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
-                    $('#id_regex_text').each(function() {
-                        $.each(this.attributes, function() {
+                    $('#id_regex_text').each(function () {
+                        $.each(this.attributes, function () {
                             if (this.specified) {
                                 textarea.attr(this.name, this.value);
                             }
@@ -94,7 +93,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Replace the textarea with an iframe.
                     var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
-                                         '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"/>' +
+                                         '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"></iframe>' +
                                        '</div>';
 
                     $('#id_regex_text').replaceWith(iframeMarkup);
@@ -103,7 +102,7 @@ M.preg_authoring_tools_script = (function ($) {
                     // Deal with iframe.
                     var iframe = $('#id_regex_text_replacement');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         var innerDoc = iframe[0].contentWindow.document,
                             innerBody = $('body', innerDoc);
                         innerBody.css('margin', '0').css('padding', '0')
@@ -129,7 +128,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add some question options.
                     var header = $('#id_regex_matching_options_header').find('.fcontainer');
-                    $.each(self.matching_options, function(i, option) {
+                    $.each(self.matching_options, function (i, option) {
                         var fitem_id = 'fitem_id_' + option,
                             old_id = 'id_' + option,
                             new_id = old_id + '_auth',
@@ -140,7 +139,7 @@ M.preg_authoring_tools_script = (function ($) {
                         header.append(clone);
 
                         // When an option is changed, update all the tools.
-                        $('#' + new_id).change(function() {
+                        $('#' + new_id).change(function () {
                             $('#id_regex_show').click();
                             $('#id_regex_check_strings').click();
                         });
@@ -153,21 +152,23 @@ M.preg_authoring_tools_script = (function ($) {
                 });
             },
 
-            // Function called on non-first form openings.
             oneachpresscallback : function () {
                 self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
-
                 self.invalidate_content();
 
                 // Put the testing data into ui.
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
-                $.each(self.matching_options, function(i, option) {
+                $.each(self.matching_options, function (i, option) {
                     var old_id = '#id_' + option,
                         new_id = old_id + '_auth';
                     $(new_id).val($(old_id).val());
                 });
                 $('#id_regex_show').click();
+            },
+
+            onclosecallback : function () {
+                self.save_sections_state();
             },
 
             onsaveclicked : function () {
@@ -182,6 +183,20 @@ M.preg_authoring_tools_script = (function ($) {
         self.textbutton_widget.setup(options);
     },
 
+    save_sections_state : function () {
+        var sections = ['regex_input',
+                        'regex_matching_options',
+                        'regex_tree',
+                        'regex_graph',
+                        'regex_description',
+                        'regex_testing'
+                        ];
+        $.each(sections, function (i, section) {
+            var val = $("[name='mform_isexpanded_id_" + section + "_header']").val();
+            M.util.set_user_preference('qtype_preg_' + section + '_expanded', val);
+        });
+    },
+
     btn_show_clicked : function (e) {
         e.preventDefault();
         var sel = self.get_selection();
@@ -192,7 +207,7 @@ M.preg_authoring_tools_script = (function ($) {
     btn_save_clicked : function (e) {
         e.preventDefault();
         self.textbutton_widget.data = self.regex_input.val();
-        $.each(self.matching_options, function(i, option) {
+        $.each(self.matching_options, function (i, option) {
             var old_id = '#id_' + option,
                 new_id = old_id + '_auth';
             $(old_id).val($(new_id).val());
@@ -305,7 +320,7 @@ M.preg_authoring_tools_script = (function ($) {
         self.display_strings(s);
     },
 
-    invalidate_content : function() {
+    invalidate_content : function () {
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),

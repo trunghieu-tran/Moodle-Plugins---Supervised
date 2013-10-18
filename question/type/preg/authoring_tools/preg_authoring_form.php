@@ -44,7 +44,7 @@ class qtype_preg_authoring_form extends moodleform {
 
         // Add the editing widgets.
         $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header', 'qtype_preg'));
-        $mform->setExpanded('regex_input_header', 1);
+        $mform->setExpanded('regex_input_header', (bool)get_user_preferences('qtype_preg_regex_input_expanded', true));
         $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
         $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 150, 'rows' => 1));
         $mform->setType('regex_text', PARAM_RAW);
@@ -65,12 +65,12 @@ class qtype_preg_authoring_form extends moodleform {
 
         // Add matching options.
         $mform->addElement('header', 'regex_matching_options_header', get_string('authoring_form_options_header', 'qtype_preg'));
-        $mform->setExpanded('regex_matching_options_header', 1);
+        $mform->setExpanded('regex_matching_options_header', (bool)get_user_preferences('qtype_preg_regex_matching_options_expanded', true));
         $mform->addHelpButton('regex_matching_options_header', 'authoring_form_options_header', 'qtype_preg');
 
         // Add syntax tree tool.
         $mform->addElement('header', 'regex_tree_header', get_string('syntax_tree_tool', 'qtype_preg'));
-        $mform->setExpanded('regex_tree_header', 1);
+        $mform->setExpanded('regex_tree_header', (bool)get_user_preferences('qtype_preg_regex_tree_expanded', true));
         $mform->addHelpButton('regex_tree_header', 'syntax_tree_tool', 'qtype_preg');
 
         // Add tree orientation radio buttons.
@@ -90,7 +90,7 @@ class qtype_preg_authoring_form extends moodleform {
 
         // Add explaining graph tool.
         $mform->addElement('header', 'regex_graph_header', get_string('explaining_graph_tool', 'qtype_preg'));
-        $mform->setExpanded('regex_graph_header', 1);
+        $mform->setExpanded('regex_graph_header', (bool)get_user_preferences('qtype_preg_regex_graph_expanded', true));
         $mform->addHelpButton('regex_graph_header', 'explaining_graph_tool', 'qtype_preg');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_hnd">' .
                                         '<div id="graph_err"></div>' .
@@ -100,16 +100,16 @@ class qtype_preg_authoring_form extends moodleform {
 
         // Add description tool.
         $mform->addElement('header', 'regex_description_header', get_string('description_tool', 'qtype_preg'));
-        $mform->setExpanded('regex_description_header', 1);
+        $mform->setExpanded('regex_description_header', (bool)get_user_preferences('qtype_preg_regex_description_expanded', true));
         $mform->addHelpButton('regex_description_header', 'description_tool', 'qtype_preg');
         $mform->addElement('html', '<div id="description_handler"></div>');
 
         // Add testing tool.
-        $mform->addElement('header', 'regex_match_header', get_string('authoring_form_match_header', 'qtype_preg'));
-        $mform->setExpanded('regex_match_header', 1);
-        $mform->addHelpButton('regex_match_header', 'authoring_form_match_header', 'qtype_preg');
+        $mform->addElement('header', 'regex_testing_header', get_string('authoring_form_testing_header', 'qtype_preg'));
+        $mform->setExpanded('regex_testing_header', (bool)get_user_preferences('qtype_preg_regex_testing_expanded', true));
+        $mform->addHelpButton('regex_testing_header', 'authoring_form_testing_header', 'qtype_preg');
 
-        $mform->addElement('preg_textarea', 'regex_match_text', get_string('authoring_form_match_textarea', 'qtype_preg'), array('cols' => 50));
+        $mform->addElement('preg_textarea', 'regex_match_text', get_string('authoring_form_testing_textarea', 'qtype_preg'), array('cols' => 50));
 
         $mform->registerNoSubmitButton('regex_check_strings');
         $mform->addElement('button', 'regex_check_strings', get_string('authoring_form_check_strings', 'qtype_preg'));
