@@ -1047,24 +1047,31 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
         $ranges = array();
+        $neg = array();
         $charset = $this->intersect($other);
         foreach ($charset->flags as $flags) {
             foreach ($flags as $flag) {
                 switch ($flag->type) {
                     case qtype_preg_charset_flag::SET:
                         $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                        $neg[] = $flag->negative;
                         break;
                     case qtype_preg_charset_flag::FLAG:
                     case qtype_preg_charset_flag::UPROP:
                         $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                        $neg[] = $flag->negative;
                         break;
                 }
             }
         }
         if (count($ranges) >= 2) {
-            $resrange = qtype_preg_unicode::kinda_operator($ranges[0], $ranges[1], true, false, false, false);
+            $xy = !$neg[0] && !$neg[1];
+            $xny = !$neg[0] && $neg[1];
+            $nxy = $neg[0] && !$neg[1];
+            $nxny = $neg[0] && $neg[1];
+            $resrange = qtype_preg_unicode::kinda_operator($ranges[0], $ranges[1], $xy, $xny, $nxy, $nxny);
             for ($i = 2; $i < count($ranges); $i++) {
-                $resrange = qtype_preg_unicode::kinda_operator($resrange, $ranges[$i], true, false, false, false);
+                $resrange = qtype_preg_unicode::kinda_operator($resrange, $ranges[$i], !$neg[$i], $neg[$i], false, false);
             }
         }
         if (count($resrange) == 0) {
