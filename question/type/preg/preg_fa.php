@@ -1098,6 +1098,13 @@ abstract class qtype_preg_finite_automaton {
         // Removing real numbers.
         unset($this->statenumbers[$state]);
         $this->statecount--;
+        // Check if it is among start and end states.
+        if (array_search($state, $this->startstates) !== false) {
+            unset($this->startstates[array_search($state, $this->startstates)]);
+        }
+        if (array_search($state, $this->endstates) !== false) {
+            unset($this->endstates[array_search($state, $this->endstates)]);
+        }
     }
 
     /**
