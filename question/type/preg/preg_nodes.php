@@ -611,15 +611,22 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      */
     public function tohr() {
         $cur = '';
+        
         foreach ($this->userinscription as $inscrip) {
             if (is_array($inscrip)) {
                 foreach ($inscrip as $in => $interpart) {
                     foreach ($interpart as $character) {
-                        $cur .= $character->data;
+                        if (is_array($character)) {
+                            $this->userinscription = array($character);
+                            $cur = $this->tohr();
+                            break;
+                        } else {
+                            $cur .= $character->data;
+                        }
                     }
-                    if ($in != count($inscrip) - 1) {
+                    if ($in != count($inscrip) - 1 && $cur != '') {
                         $cur .= ' ∩ ';
-                    }   
+                    }
                 }
             } else {
                 $cur .= $inscrip->data;
