@@ -2146,6 +2146,64 @@ abstract class qtype_preg_finite_automaton {
         return $transitions;
     }
 
+    public static function get_wordbreaks_transitions($negative, $isinto) {
+        
+        $result = array();
+        // Create transitions which can replace \b and \B.
+        // Create \w.
+        $flagw = new qtype_preg_charset_flag();
+        $flagw->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+        $charsetw = new qtype_preg_leaf_charset();
+        $charsetw->flags = array(array($flagw));
+        $charsetw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $transitionw = new qtype_preg_nfa_transition(0, $charsetw, 1);
+        // Create \W.
+        $flagW = clone $flagw;
+        $flagW->negative = true;
+        $charsetW = new qtype_preg_leaf_charset();
+        $charsetW->flags = array(array($flagW));
+        $charsetW->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $transitionW = new qtype_preg_nfa_transition(0, $charsetW, 1);
+        // Create ^.
+        $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
+        $transitioncircumflex = new qtype_preg_nfa_transition(0, $assertcircumflex, 1);
+        // Create $.
+        $assertdollar = new qtype_preg_leaf_assert_dollar();
+        $transitiondollar = new qtype_preg_nfa_transition(0, $assertdollar, 1);
+
+        // Incoming transitions.
+        if ($isinto) {
+            $result[] = $transitionw;
+            $result[] = $transitionW;
+            $result[] = $transitioncircumflex;
+            // Case \b.
+            if (!$negative) {
+                $result[] = $transitionw;
+            } else {
+                // Case \B.
+                $result[] = $transitionW;
+            }
+        } else {
+            // Outcoming transitions.
+            // Case \b.
+            if (!$negative) {
+                $result[] = $transitionW;
+                $result[] = $transitionw;
+                $result[] = $transitionw;
+            } else {
+                // Case \B.
+                $result[] = $transitionw;
+                $result[] = $transitionW;
+                $result[] = $transitionW;
+            }
+            $result[] = $transitiondollar;
+        }
+
+        return $result;
+    }
+
+    
+
     /**
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
