@@ -9,6 +9,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/engine/states.php');
 require_once($CFG->dirroot . '/question/type/rendererbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');

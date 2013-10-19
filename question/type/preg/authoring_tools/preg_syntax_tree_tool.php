@@ -8,7 +8,6 @@
  * @package qtype_preg
  */
 
-global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_nodes.php');
 

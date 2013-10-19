@@ -10,7 +10,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**

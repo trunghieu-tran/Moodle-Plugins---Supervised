@@ -10,8 +10,6 @@
 
 //defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-global $PAGE;
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
