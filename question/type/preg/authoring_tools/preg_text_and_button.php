@@ -12,7 +12,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php');
 
 MoodleQuickForm::registerElementType('preg_text_and_button',

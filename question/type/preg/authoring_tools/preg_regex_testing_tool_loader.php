@@ -7,10 +7,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package qtype_preg
  */
+
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(__FILE__) . '/../../../../config.php');
-global $CFG;
-global $PAGE;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
+
 $PAGE->set_context(context_system::instance());
 
 /**
