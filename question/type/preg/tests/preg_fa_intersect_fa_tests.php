@@ -18,19 +18,22 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[c]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            2;
-                            0->1[label="[\t]"];
-                            1->2[label="[c]"];
+                            3;
+                            0->"/1"[label = "[\t ∩ \W]", color = violet];
+                            "/1"->3[label = "[c ∩ \w]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_word_ends() {
@@ -41,19 +44,22 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[\t]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            2;
-                            0->1[label="[c]"];
-                            1->2[label="[\t]"];
+                            3;
+                            0->"/0"[label = "[c ∩ \w]", color = violet];
+                            "/0"->3[label = "[\t ∩ \W]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_wordbreak_into_word() {
@@ -64,7 +70,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[c]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
 
                         }';
 
@@ -85,21 +91,24 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             2->3[label="[a]"];
                             3->4[label="[t]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             4;
-                            0->1[label="[^]"];
-                            1->2[label="[c]"];
-                            2->3[label="[a]"];
-                            3->4[label="[t]"];
+                            0->"/2"[label = "[^]", color = violet];
+                            2->3[label = "[a]", color = violet];
+                            3->4[label = "[t]", color = violet];
+                            "/2"->2[label = "[c ∩ \w]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_word_ends_string() {
@@ -111,21 +120,24 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             2->3[label="[t]"];
                             3->4[label="[\b]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             4;
-                            0->1[label="[c]"];
-                            1->2[label="[a]"];
-                            2->3[label="[t]"];
-                            3->4[label="[$]"];
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            2->"/3"[label = "[t ∩ \w]", color = violet];
+                            "/3"->4[label = "[$]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_wordbreak_not_in_wordboundary_start() {
@@ -220,19 +232,22 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\B]"];
                             2->3[label="[c]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            2;
-                            0->1[label="[a]"];
-                            1->2[label="[c]"];
+                            3;
+                            0->"/0"[label = "[a ∩ \w]", color = violet];
+                            "/0"->3[label = "[c ∩ \w]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_word_no_start_string() {
@@ -287,22 +302,25 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             3->4[label="[a]"];
                             4->5[label="[t]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             5;
-                            0->1[label="[^]"];
-                            1->2[label="[\t]"];
-                            2->3[label="[c]"];
-                            3->4[label="[a]"];
-                            4->5[label="[t]"];
+                            0->"/2"[label = "[^]", color = violet];
+                            2->3[label = "[c]", color = violet];
+                            3->4[label = "[a]", color = violet];
+                            4->5[label = "[t]", color = violet];
+                            "/2"->2[label = "[\t ∩ \W]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_no_wordbreak_not_in_wordboundary_end() {
@@ -315,22 +333,25 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             3->4[label="[\t]"];
                             4->5[label="[\B]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             5;
-                            0->1[label="[c]"];
-                            1->2[label="[a]"];
-                            2->3[label="[t]"];
-                            3->4[label="[\t]"];
-                            4->5[label="[$]"];
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            2->3[label = "[t]", color = violet];
+                            3->"/3"[label = "[\t ∩ \W]", color = violet];
+                            "/3"->5[label = "[$]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_several_wordbreaks() {
@@ -345,22 +366,26 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             5->6[label="[\b]"];
                             6->7[label="[$]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            5;
-                            0->1[label="[^]"];
-                            1->2[label="[c]"];
-                            2->3[label="[a]"];
-                            3->4[label="[t]"];
-                            4->5[label="[$]"];
+                            7;
+                            0->"/2"[label = "[^]", color = violet];
+                            3->4[label = "[a]", color = violet];
+                            4->"/3"[label = "[t ∩ \w]", color = violet];
+                            "/2"->3[label = "[c ∩ \w]", color = violet];
+                            "/3"->7[label = "[$]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_several_not_wordbreaks() {
@@ -375,22 +400,25 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             5->6[label="[t]"];
                             6->7[label="[$]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            5;
-                            0->1[label="[^]"];
-                            1->2[label="[c]"];
-                            2->3[label="[a]"];
-                            3->4[label="[t]"];
-                            4->5[label="[$]"];
+                            7;
+                            0->1[label = "[^]", color = violet];
+                            1->"/0"[label = "[c ∩ \w]", color = violet];
+                            6->7[label = "[$]", color = violet];
+                            "/0"->"//0"[label = "[a ∩ \w ∩ \w]", color = violet];
+                            "//0"->6[label = "[t ∩ \w]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_wordbreak_and_not_wordbreak() {
@@ -407,22 +435,25 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             7->8[label="[\b]"];
                             8->9[label="[$]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
-                            5;
-                            0->1[label="[^]"];
-                            1->2[label="[c]"];
-                            2->3[label="[a]"];
-                            3->4[label="[t]"];
-                            4->5[label="[$]"];
+                            9;
+                            0->"/2"[label = "[^]", color = violet];
+                            "/2"->"/0"[label = "[c ∩ \w ∩ \w]", color = violet];
+                            "/0"->"//0"[label = "[a ∩ \w ∩ \w]", color = violet];
+                            "//0"->"/3"[label = "[t ∩ \w ∩ \w]", color = violet];
+                            "/3"->9[label = "[$]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_wordbreak_and_not_wordbreak_no_success() {
@@ -439,7 +470,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             7->8[label="[\b]"];
                             8->9[label="[$]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
             
                         }';
 
@@ -463,23 +494,26 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             4->6[label="[$]"];
                             5->6[label="[$]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             6;
-                            0->1[label="[c]"];
-                            1->2[label="[a]"];
-                            1->5[label="[\t]"];
-                            2->4[label="[t]"];
-                            4->6[label="[$]"];
-                            5->6[label="[$]"];
+                            0->"/0"[label = "[c ∩ \w]", color = violet];
+                            2->4[label = "[t]", color = violet];
+                            4->6[label = "[$]", color = violet];
+                            5->6[label = "[$]", color = violet];
+                            "/0"->2[label = "[a]", color = violet];
+                            "/0"->5[label = "[\t ∩ \W]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_cycle() {
@@ -493,22 +527,103 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             4->5[label="[t]"];
                             5->1[label="[\b]"];
                         }';
-        $dotresult = 'digraph example {
+        $dotresult = 'digraph res {
                             0;
                             4;
-                            0->1[label="[d]"];
-                            1->2[label="[\t]"];
-                            2->3[label="[c]"];
-                            3->4[label="[a]"];
-                            4->1[label="[t]"];
+                            0->"/0"[label = "[d]", color = violet];
+                            2->3[label = "[c]", color = violet];
+                            3->4[label = "[a]", color = violet];
+                            4->"/0"[label = "[t ∩ \w]", color = violet];
+                            "/0"->2[label = "[\t ∩ \W]", color = violet];
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
         $source->read_fa($description);
         $source->avoid_wordbreaks();
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_to_start() {
+        $description = 'digraph example {
+                            0;
+                            3;
+                            0->1[label="[\t]"];
+                            1->2[label="[a]"];
+                            2->3[label="[c]"];
+                            2->0[label="[\b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            "/0";
+                            3;
+                            1->"/0"[label = "[a ∩ \w]", color = violet];
+                            "/0"->3[label = "[c]", color = violet];
+                            "/0"->1[label = "[\t ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_nfa(0, 0, 0, array());
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_to_start_from_end() {
+        $description = 'digraph example {
+                            0;
+                            2;
+                            0->1[label="[\t]"];
+                            1->2[label="[a]"];
+                            2->0[label="[\b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            "/0";
+                            1;
+                            1->"/0"[label = "[a ∩ \w]", color = violet];
+                            "/0"->1[label = "[\t ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_nfa(0, 0, 0, array());
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_result_state_cycle() {
+        $description = 'digraph example {
+                            0;
+                            1;
+                            0->1[label="[a]"];
+                            1->0[label="[\B]"];
+                        }';
+        $dotresult = 'digraph res {
+                            "/0";
+                            "/0";
+                            "/0"->"/0"[label = "[a ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_nfa(0, 0, 0, array());
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_cycle_no_success() {
@@ -520,16 +635,10 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             2->3[label="[c]"];
                             3->4[label="[a]"];
                             4->5[label="[t]"];
-                            5->1[label="[\b]"];
+                            5->1[label="[\B]"];
                         }';
         $dotresult = 'digraph example {
-                            0;
-                            5;
-                            0->1[label="[d]"];
-                            1->2[label="[\t]"];
-                            2->3[label="[c]"];
-                            3->4[label="[a]"];
-                            4->5[label="[t]"];
+
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
@@ -1411,6 +1520,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $input->go_round_transitions($del);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
+        var_dump($input->fa_to_dot());
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
 
