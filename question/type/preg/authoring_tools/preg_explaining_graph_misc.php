@@ -196,8 +196,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
      */
     public function optimize_graph($parent, $gmain) {
         $this->process_simple_characters($gmain);
-        $this->process_asserts($parent, $gmain);
         $this->process_voids($gmain);
+        $this->process_asserts($parent, $gmain);
         foreach ($this->subgraphs as $subgraph) {
             $subgraph->optimize_graph($this, $gmain);
         }
