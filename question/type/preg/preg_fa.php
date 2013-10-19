@@ -2304,7 +2304,35 @@ abstract class qtype_preg_finite_automaton {
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
      */
     public function avoid_wordbreaks() {
-        // TODO - delete \b and \B.
+        $stateschecked = array();
+        $oldfront = $this->startstates;
+
+        while (count($oldfront) != 0) {
+            // Analysis transitions of each state.
+            foreach ($oldfront as $state) {
+                if (array_search($state, $stateschecked) === false && !$this->is_empty()) {
+                    $transitions = $this->get_adjacent_transitions($state, true);
+                    // Searching transition of given type.
+                    foreach ($transitions as &$tran) {
+                        if ($tran->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B) {
+                            // Add states to new front.
+                            $outtransitions = $this->get_adjacent_transitions($tran->to, true);
+                            foreach ($outtransitions as $outtran) {
+                                $newfront[] = $outtran->to;
+                            }
+                            $this->merge_wordbreaks($tran);
+                            $this->del_blind_states();
+                        } else {
+                            $newfront[] = $tran->to;
+                        }
+                        $stateschecked[] = $state;
+                    }
+                }
+            }
+            $oldfront = $newfront;
+            $newfront = array();
+        }
+        
     }
 
     /**
