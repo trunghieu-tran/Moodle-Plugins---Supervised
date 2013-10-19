@@ -459,6 +459,8 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      */
     public function intersect_leafs($other, $thishastags, $otherhastags) {
         $result = null;
+        $length = 0;
+        $str = new qtype_poasquestion_string("\n");
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
@@ -467,9 +469,23 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     $result->assertionsafter = $this->assertionsafter;
                     $result = $result->intersect_asserts($other);
                     $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
+                    // If there are asserts then intersection is only when there is also \n.
+                    if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
+                        if (!$result->match($str, 0, $length)) {
+                            $result = null;
+                        }
+                    }
                 }
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                 $result = $this->intersect_asserts($other);
+                // If there are asserts then intersection is only when there is also \n.
+                if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
+                    if (!$result->match($str, 0, $length)) {
+                        $result = null;
+                        //$this->assertionsbefore = array();
+                        //$this->assertionsafter = array();
+                    }
+                }
             } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $otherhastags) {
                 $result = $this;
             }
@@ -483,6 +499,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $result = $this->intersect_asserts($other);
+            // If there are asserts then intersection is only when there is also \n.
+            if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
+                if (!$result->match($str, 0, $length)) {
+                    $result = null;
+                }
+            }
         }
         return $result;
     }
