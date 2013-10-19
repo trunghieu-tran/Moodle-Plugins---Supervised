@@ -615,6 +615,9 @@ abstract class qtype_preg_finite_automaton {
         return $this->endstates;
     }
 
+    public function is_empty() {
+        return ($this->statecount == 0);
+    }
     /**
      * Return array of all states' ids of automata.
      *
