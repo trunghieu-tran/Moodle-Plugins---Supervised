@@ -391,7 +391,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
         // Getting result leaf.
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-            $assert = $this;
+            $assert = clone $this;
         } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             $assert = $other;
         } else {
