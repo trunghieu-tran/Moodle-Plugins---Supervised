@@ -562,6 +562,7 @@ abstract class qtype_preg_finite_automaton {
         $this->adjacencymatrix = array();
         $this->startstates = array();
         $this->endstates = array();
+        $this->statenumbers = array();
         $this->deterministic = true;
         $this->haseps = false;
         $this->hasassertiontransitions = false;
