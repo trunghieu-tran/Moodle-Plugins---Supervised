@@ -2202,7 +2202,103 @@ abstract class qtype_preg_finite_automaton {
         return $result;
     }
 
-    
+    public function merge_wordbreaks($tran) {
+        $fromdel = true;
+        $todel = true;
+        $outtransitions = $this->get_adjacent_transitions($tran->to, true);
+        $intotransitions = $this->get_adjacent_transitions($tran->from, false);
+        $startstates = $this->start_states();
+
+        // Add empty transitions if ot's nessesaary.
+        if (count($outtransitions) == 0) {
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_nfa_transition($tran->to, $pregleaf, 1, $tran->origin, $tran->consumeschars);
+            $outtransitions[] = $transition;
+            $todel = false;
+        }
+        if (count($intotransitions) == 0) {
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_nfa_transition(0, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
+            $intotransitions[] = $transition;
+            $fromdel = false;
+        }
+
+        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
+        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
+
+        // Intersect transitions.
+        for ($i = 0; $i < count($wordbreakinto); $i++) {
+            foreach ($intotransitions as $intotran) {
+                $resultinto = $intotran->intersect($wordbreakinto[$i]);
+                if ($resultinto !== null) {
+                    foreach ($outtransitions as $outtran) {
+                        $resultout = $outtran->intersect($wordbreakout[$i]);
+                        if ($resultout !== null) {
+                            // Add state and transition
+                            $statenum = '/' . $i;
+                            $statenumbers = $this->get_state_numbers();
+                            while (array_search($statenum, $statenumbers) !== false) {
+                                $statenum = '/' . $statenum;
+                            }
+                            $state = $this->add_state($statenum);
+                            // Check if we should delete start state.
+                            if (in_array($tran->to, $startstates)) {
+                                $this->add_start_state($state);
+                            }
+                            if ($fromdel) {
+                                // Copy transitions from deleting states.
+                                $copiedout = $this->get_adjacent_transitions($tran->from, true);
+                                foreach ($copiedout as &$copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->from = $state;
+                                        $this->add_transition($copytran);
+                                    }
+                                }
+                            }
+                            if ($todel) {
+                                // Copy transitions from deleting states.
+                                $copiedinto = $this->get_adjacent_transitions($tran->to, false);
+                                foreach ($copiedinto as &$copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->to = $state;
+                                        $this->add_transition($copytran);
+                                    }
+                                }
+                            }
+                            // If result should be one cycled state.
+                            if ($intotran->from == $tran->to) {
+                                $resulttran = new qtype_preg_nfa_transition($state, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $this->add_transition($resulttran);
+                            } else {
+                                $resulttran = new qtype_preg_nfa_transition($intotran->from, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $this->add_transition($resulttran);
+                                $resulttran = new qtype_preg_nfa_transition($state, $resultout->pregleaf, $outtran->to, $tran->origin, $tran->consumeschars);
+                                $this->add_transition($resulttran);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Check if we should delete end state.
+        $endstates = $this->end_states();
+        if (in_array($tran->from, $endstates)) {
+            $endtran = $this->get_adjacent_transitions($tran->from, false);
+            foreach ($endtran as $end) {
+                $this->add_end_state($end->from);
+            }  
+        }
+        if ($fromdel) {
+            $this->remove_state($tran->from);
+        }
+        if ($todel) {
+            $this->remove_state($tran->to);
+        }
+        $startstates = array_values($this->start_states());
+        if (count($this->endstates) == 0) {
+            $this->add_end_state($startstates[0]);
+        }
+    }
 
     /**
      * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
