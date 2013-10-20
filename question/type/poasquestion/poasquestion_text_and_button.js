@@ -177,6 +177,10 @@ M.poasquestion_text_and_button = (function() {
         if (self.current_input) {
             self.current_input.val(_data);
         }
+    },
+
+    is_stand_alone : function() {
+        return typeof self.current_input === 'undifined';
     }
 };
 
