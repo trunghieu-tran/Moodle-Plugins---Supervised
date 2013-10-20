@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 abstract class qtype_preg_explaining_graph_node_abstract {
 
     public $pregnode; // A reference to the corresponding preg_node.
-    public $handler;
+    public $handler;  // A reference to the corresponding preg_regex_handler descendant.
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
@@ -67,14 +67,27 @@ abstract class qtype_preg_explaining_graph_node_abstract {
  */
 abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_graph_node_abstract {
     /**
-     * Returns filling settings of node which will be in graph.
-     * @return string Filling settings of node.
+     * Returns filling color of node which will be in graph.
+     * @return string Filling color of node.
      */
-    public function get_filled() {
+    public function get_fillcolor() {
         if ($this->pregnode->caseless) {
-            return ', style=filled, fillcolor=grey';
+            return 'grey';
+        } else {
+            return 'white';
         }
-        return '';
+    }
+
+    /**
+     * Returns style of node which will be in graph.
+     * @return string Style of node.
+     */
+    public function get_style() {
+        if ($this->pregnode->caseless) {
+            return 'filled';
+        } else {
+            return 'solid';
+        }
     }
 
     /**
@@ -101,17 +114,27 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
      * Implementation of abstract create_graph for leaf.
      */
     public function create_graph($id = -1) {
-        $graph = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $graph = new qtype_preg_explaining_graph_tool_subgraph('');
+        $graph->style = 'solid';
 
-        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->pregnode->id, $this->get_filled());
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(
+            $this->get_value(),
+            $this->get_shape(),
+            $this->get_color(),
+            $graph,
+            $this->pregnode->id,
+            $this->get_style(),
+            $this->get_fillcolor()
+        );
         if ($this->pregnode->negative) {
             $graph->nodes[0]->invert = true;
         }
 
         if ($id == $this->pregnode->id) {
-            $graph->style .= '; color=darkgreen';
+            $graph->color = 'darkgreen';
 
-            $marking = new qtype_preg_explaining_graph_tool_subgraph('', 'solid', 0.5 + $this->pregnode->id);
+            $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
+            $marking->style = 'solid';
             $marking->subgraphs[] = $graph;
 
             $marking->entries[] = end($graph->nodes);
@@ -260,11 +283,20 @@ class qtype_preg_explaining_graph_leaf_recursion extends qtype_preg_explaining_g
  */
 class qtype_preg_explaining_graph_leaf_options extends qtype_preg_explaining_graph_leaf {
 
-    public function get_filled() {
+    public function get_fillcolor() {
         if ($this->pregnode->posopt->contains('i')) {
-            return ', style=filled, fillcolor=grey';
+            return 'grey';
+        } else {
+            return parent::get_fillcolor();
         }
-        return parent::get_filled();
+    }
+
+    public function get_style() {
+        if ($this->pregnode->posopt->contains('i')) {
+            return 'filled';
+        } else {
+            return parent::get_style();
+        }
     }
 
     public function get_value() {
@@ -306,12 +338,15 @@ abstract class qtype_preg_explaining_graph_operator extends qtype_preg_explainin
      * Implementation of abstract create_graph for concatenation.
      */
     public function create_graph($id = -1) {
-        $graph = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+        $graph = new qtype_preg_explaining_graph_tool_subgraph('');
+        $graph->style = 'solid';
 
         $this->process_operator($graph, $id);
 
         if ($id == $this->pregnode->id || ($id == $this->condid && $id != -1) ) {
-            $marking = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=darkgreen', 0.5 + $this->pregnode->id);
+            $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
+            $marking->style = 'solid';
+            $marking->color = 'darkgreen';
             $marking->assume_subgraph($graph);
             $graph->nodes = array();
             $graph->links = array();
@@ -358,8 +393,11 @@ class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_o
         $right = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);
 
         foreach ($this->operands as $operand) {
-            $newoperand = $operand->create_graph($id);
-            if (count($newoperand->nodes) == 1 && $newoperand->nodes[0]->label[0] == 'Void' && $id == $this->pregnode->id) {
+            $newoperand = $operand->create_graph($id); /* $newoperand->nodes[0]->label[0] == 'Void' */
+            if (count($newoperand->nodes) == 1 &&
+                $newoperand->nodes[0] instanceof qtype_preg_explaining_graph_leaf_meta &&
+                $id == $this->pregnode->id) {
+
                 $newoperand->nodes[0]->ismarked = true;
             }
             $graph->assume_subgraph($newoperand);
@@ -392,7 +430,9 @@ class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph
         $a->firstoperand = '';
         $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
 
-        $quant = new qtype_preg_explaining_graph_tool_subgraph($label, 'dotted; color=black', $this->pregnode->id);
+        $quant = new qtype_preg_explaining_graph_tool_subgraph($label, $this->pregnode->id);
+        $quant->style = 'dotted';
+        $quant->color = 'black';
         $quant->assume_subgraph($operand);
 
         $graph->subgraphs[] = $quant;
@@ -411,9 +451,12 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
         if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
             $operand = $this->operands[0]->create_graph($id);
         } else {
-            $operand = new qtype_preg_explaining_graph_tool_subgraph('', 'solid');
+            $operand = new qtype_preg_explaining_graph_tool_subgraph('');
+            $operand->style = 'solid';
             if ($this->operands[0]->pregnode->id == $id) {
-                $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=darkgreen');
+                $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('');
+                $operand->subgraphs[0]->style = 'solid';
+                $operand->subgraphs[0]->color = 'darkgreen';
                 $operand->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand->subgraphs[0], -1);
                 $operand->entries[] = end($operand->subgraphs[0]->nodes);
                 $operand->exits[] = end($operand->subgraphs[0]->nodes);
@@ -435,11 +478,15 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
 
         $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
                         $label,
-                        ($this->pregnode->userinscription[0]->data != '(?i:...)')
-                            ? ($generated ? 'solid; color=invis; bgcolor=white' : 'solid; color=black')
-                            : 'filled; color=lightgrey',
                         $this->pregnode->id
                     );
+        $subexpr->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
+        $subexpr->color = ($this->pregnode->userinscription[0]->data != '(?i:...)')
+                            ? ($generated ? 'invis' : 'black')
+                            : 'lightgrey';
+        if ($this->pregnode->userinscription[0]->data != '(?i:...)' && $generated) {
+            $subexpr->bgcolor = 'white';
+        }
         $subexpr->assume_subgraph($operand);
 
         $graph->subgraphs[] = $subexpr;
@@ -460,15 +507,19 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         }
     }
 
-    public function accept() {
+    public function accept() { 
         // Failing conditional subexpressions before finding a good way to show each of them.
         // TODO - remove when consensus will emerge.
         return get_string($this->pregnode->type, 'qtype_preg');
     }
 
     protected function process_operator($graph, $id) {
-        $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=black', $this->pregnode->id);
-        $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'solid; color=purple', 0.1 + $this->pregnode->id);
+        $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id);
+        $condsubexpr->style = 'solid';
+        $condsubexpr->color = 'black';
+        $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 0.1 + $this->pregnode->id);
+        $condsubexpr->subgraphs[0]->style = 'solid';
+        $condsubexpr->subgraphs[0]->color = 'purple';
         $isassert = $this->pregnode->is_condition_assertion();
         $tmp = null;
 
@@ -504,9 +555,11 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 
         $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(
                                             $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? '' : '',
-                                            'dashed; color=purple',
                                             0.2 + $this->pregnode->id
                                         );
+        $condsubexpr->subgraphs[1]->style = 'dashed';
+        $condsubexpr->subgraphs[1]->color = 'purple';
+
         $tmp = $this->operands[0]->create_graph($id);
         $condsubexpr->subgraphs[1]->assume_subgraph($tmp);
         $condsubexpr->subgraphs[1]->entries[] = end($tmp->entries);
@@ -514,7 +567,9 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 
         if (((count($this->operands) == 2 && !$isassert) || (count($this->operands) == 3 && $isassert))
             && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-            $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 'dashed; color=purple', 0.3 + $this->pregnode->id);
+            $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 0.3 + $this->pregnode->id);
+            $condsubexpr->subgraphs[2]->style = 'dashed';
+            $condsubexpr->subgraphs[2]->color = 'purple';
             $tmp = $this->operands[1]->create_graph($id);
             $condsubexpr->subgraphs[2]->assume_subgraph($tmp);
             $condsubexpr->subgraphs[2]->entries[] = end($tmp->entries);
@@ -548,7 +603,8 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
  */
 class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_graph_operator {
 
-    private static $linkoptions = array(qtype_preg_node_assert::SUBTYPE_PLA => 'normal, color="green"',
+    private static $linkoptions = array(
+                                        qtype_preg_node_assert::SUBTYPE_PLA => 'normal, color="green"',
                                         qtype_preg_node_assert::SUBTYPE_NLA => 'normal, color="red"',
                                         qtype_preg_node_assert::SUBTYPE_PLB => 'inv, color="green"',
                                         qtype_preg_node_assert::SUBTYPE_NLB => 'inv, color="red"'
@@ -557,13 +613,14 @@ class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_grap
     protected function process_operator($graph, $id) {
         $operand = $this->operands[0]->create_graph($id);
 
-        $color = (($this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLA || $this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLB) ? 'green' : 'red');
+        $color = (($this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLA || $this->pregnode->subtype == qtype_preg_node_assert::SUBTYPE_PLB) ?
+                    'green' : 'red');
 
-        $sub = new qtype_preg_explaining_graph_tool_subgraph(
-                    '',
-                    'solid; edge[style=dotted, color=' . $color . ']; node[style=dashed, color=' . $color . ']; color=grey',
-                    $this->pregnode->id
-                );
+        $sub = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id);
+        $sub->style = 'solid';
+        $sub->color = 'grey';
+        $sub->node = 'edge[style=dotted, color=' . $color . '];';
+        $sub->edge = 'node[style=dashed, color=' . $color . '];';
         $sub->assume_subgraph($operand);
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph, -1);

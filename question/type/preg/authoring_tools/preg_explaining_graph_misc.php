@@ -32,20 +32,22 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring
  */
 class qtype_preg_explaining_graph_tool_node {
 
-    public $shape  = 'ellipse';  // Shape of node on image.
-    public $color  = 'black';    // Color of node on image.
-    public $owner  = null;       // Owner of node.
-    public $label  = '';         // Data of node on image.
-    public $id     = -1;         // Id of node.
-    public $fill   = '';         // Filling of node on image.
-    public $invert = false;      // Flag of inversion of node.
-    public $ismarked = false;    // Flag of marking (for voids).
+    public $shape  = 'ellipse';     // Shape of node on image.
+    public $color  = 'black';       // Color of node on image.
+    public $style  = 'solid';       // Style of node on image.
+    public $owner  = null;          // Owner of node.
+    public $label  = '';            // Data of node on image.
+    public $id     = -1;            // Id of node.
+    public $fillcolor   = 'white';  // Filling color of node on image.
+    public $invert = false;         // Flag of inversion of node.
+    public $ismarked = false;       // Flag of marking (for voids).
 
-    public function __construct($lbl, $shp, $clr, $ownr, $id, $fll = '') {
+    public function __construct($lbl, $shp, $clr, $ownr, $id, $stl = 'solid', $fll = 'white') {
         $this->label = $lbl;
         $this->shape = $shp;
         $this->color = $clr;
-        $this->fill = $fll;
+        $this->style = $stl;
+        $this->fillcolor = $fll;
         $this->owner = $ownr;
         $this->id = $id;
     }
@@ -153,17 +155,20 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
     public $label       = '';           // Label of subgraph on image.
     public $style       = 'solid';      // Style of subgraph on image.
+    public $color       = 'black';      // Border color of subgraph.
     public $nodes       = array();      // Array of nodes in subgraph.
     public $links       = array();      // Array of links between nodes in subgraph.
     public $subgraphs   = array();      // Array of subgraphs in subgraph.
     public $entries     = array();      // Array if nodes "entries".
     public $exits       = array();      // Array of nodes "exits".
     public $id          = -1;           // Identifier of subgraph.
+    public $bgcolor     = 'white';      // Background color of subgraph.
+    public $node        = '';           // Special nodes options.
+    public $edge        = '';           // Special edges options.
     public $isexact     = false;
 
-    public function __construct($lbl, $stl, $id = -1) {
+    public function __construct($lbl, $id = -1) {
         $this->label = $lbl;
-        $this->style = $stl;
         $this->id = $id;
     }
 
@@ -217,14 +222,15 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 $neighbor = $tmpdnode->find_neighbor_dst($gmain);
                 // If neighbor is simple node with text too and it's a child of the same subgraph AND it has the same register attribute,
                 // then we need to join this two nodes.
-                if ($neighbor !== null and $neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $this && $neighbor->fill == $tmpdnode->fill) {
+                if ($neighbor !== null and $neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $this && $neighbor->style == $tmpdnode->style) {
                     // Create the new joined node.
                     $tmp = new qtype_preg_explaining_graph_tool_node(
                                 array($tmpdnode->label[0] . $neighbor->label[0]),
                                 $neighbor->shape,
                                 $neighbor->color,
                                 $this, $tmpdnode->id,
-                                $tmpdnode->fill
+                                $tmpdnode->style,
+                                $tmpdnode->fillcolor
                             );
 
                     // Find a link between left neighbor and current node, then change destination to new node.
@@ -610,7 +616,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 $neighborr = $iter->find_neighbor_dst($gmain);
 
                 if ($iter->shape != 'box') {
-                    if ($this->style != 'solid; color=darkgreen' || $iter->ismarked) {
+                    if ($this->color != 'darkgreen' || $iter->ismarked) {
                         // Find a link between left neighbor and void.
                         $tmpneighbor = $gmain->find_link($neighborl, $iter);
                         $tmpneighbor->destination = $neighborr;    // Set a new destination.
@@ -712,11 +718,13 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . "];\n";
+                $instr .= '"nd' .$iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color .
+                    ', label=' . $this->compute_html($iter->label, $iter->invert) . ', fillcolor=' . $iter->fillcolor . "];\n";
             } else {
-                $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
-                    ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . "];\n";
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' .
+                    'color=' . $iter->color . ', ' . 'style=' . $iter->style . ', ' .
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' .
+                    ', fillcolor=' . $iter->fillcolor . "];\n";
             }
         }
 
@@ -784,18 +792,24 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $gr Subgraph.
      * @param string $instr Current dot instructions.
      */
-    private function process_subgraph(&$gr, &$instr) {
+    private function process_subgraph($gr, $instr) {
         $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
+        $instr .= 'color=' . $gr->color . ';';
+        $instr .= 'bgcolor=' . $gr->bgcolor . ';';
         $instr .= 'label="' . $gr->label . '";';
+        $instr .= $gr->edge;
+        $instr .= $gr->node;
 
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . $this->compute_html($iter->label, $iter->invert) . $iter->fill . "];\n";
+                $instr .= '"nd' .$iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color .
+                    ', label=' . $this->compute_html($iter->label, $iter->invert) . ', fillcolor=' . $iter->fillcolor . "];\n";
             } else {
-                $instr .= '"nd' . $iter->id . '" [' . ($iter->shape == 'ellipse' ? '' : 'shape=' . $iter->shape . ', ') .
-                    ($iter->color == 'black' ? '' : 'color=' . $iter->color . ', ') .
-                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' . $iter->fill . "];\n";
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' .
+                    'color=' . $iter->color . ', ' . 'style=' . $iter->style . ', ' .
+                    'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' .
+                    ', fillcolor=' . $iter->fillcolor . "];\n";
             }
         }
 
