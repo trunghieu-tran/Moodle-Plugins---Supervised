@@ -126,25 +126,6 @@ M.preg_authoring_tools_script = (function ($) {
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
 
-                    // Add some question options.
-                    var header = $('#id_regex_matching_options_header').find('.fcontainer');
-                    $.each(self.matching_options, function (i, option) {
-                        var fitem_id = 'fitem_id_' + option,
-                            old_id = 'id_' + option,
-                            new_id = old_id + '_auth',
-                            clone = $('#' + fitem_id).clone();
-
-                        // Change id and append to the DOM.
-                        clone.find('#' + old_id).attr('id', new_id);
-                        header.append(clone);
-
-                        // When an option is changed, update all the tools.
-                        $('#' + new_id).change(function () {
-                            $('#id_regex_show').click();
-                            $('#id_regex_check_strings').click();
-                        });
-                    });
-
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
@@ -160,9 +141,9 @@ M.preg_authoring_tools_script = (function ($) {
                 $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
                 $.each(self.matching_options, function (i, option) {
-                    var old_id = '#id_' + option,
-                        new_id = old_id + '_auth';
-                    $(new_id).val($(old_id).val());
+                    var preg_id = '#id_' + option,
+                        this_id = preg_id + '_auth';
+                    $(this_id).val($(preg_id).val());
                 });
                 $('#id_regex_show').click();
             },
@@ -208,9 +189,9 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         self.textbutton_widget.data = self.regex_input.val();
         $.each(self.matching_options, function (i, option) {
-            var old_id = '#id_' + option,
-                new_id = old_id + '_auth';
-            $(old_id).val($(new_id).val());
+            var preg_id = '#id_' + option,
+                this_id = preg_id + '_auth';
+            $(preg_id).val($(this_id).val());
         });
         self.textbutton_widget.close_and_set_new_data();
         $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());

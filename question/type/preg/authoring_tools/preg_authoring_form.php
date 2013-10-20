@@ -35,7 +35,8 @@ class qtype_preg_authoring_form extends moodleform {
         $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
 
         // Create the form.
-        $mform =& $this->_form;
+        $qtype = new qtype_preg();
+        $mform = $this->_form;
 
         // Add header.
         $mform->addElement('html', '<div align="center"><h2>' . get_string('authoring_form_page_header', 'qtype_preg') . '</h2></div>');
@@ -65,6 +66,22 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('header', 'regex_matching_options_header', get_string('authoring_form_options_header', 'qtype_preg'));
         $mform->setExpanded('regex_matching_options_header', (bool)get_user_preferences('qtype_preg_regex_matching_options_expanded', true));
         $mform->addHelpButton('regex_matching_options_header', 'authoring_form_options_header', 'qtype_preg');
+
+        $engines = $qtype->available_engines();
+        $mform->addElement('select', 'engine_auth', get_string('engine', 'qtype_preg'), $engines);
+        $mform->setDefault('engine_auth', $CFG->qtype_preg_defaultengine);
+        $mform->addHelpButton('engine_auth', 'engine', 'qtype_preg');
+
+        $notations = $qtype->available_notations();
+        $mform->addElement('select', 'notation_auth', get_string('notation', 'qtype_preg'), $notations);
+        $mform->setDefault('notation_auth', $CFG->qtype_preg_defaultnotation);
+        $mform->addHelpButton('notation_auth', 'notation', 'qtype_preg');
+
+        $mform->addElement('selectyesno', 'exactmatch_auth', get_string('exactmatch', 'qtype_preg'));
+        $mform->addHelpButton('exactmatch_auth', 'exactmatch', 'qtype_preg');
+        $mform->setDefault('exactmatch_auth', 1);
+
+        $mform->addElement('select', 'usecase_auth', get_string('casesensitive', 'qtype_shortanswer'), array(get_string('caseno', 'qtype_shortanswer'), get_string('caseyes', 'qtype_shortanswer')));
 
         // Add syntax tree tool.
         $mform->addElement('header', 'regex_tree_header', get_string('syntax_tree_tool', 'qtype_preg'));
@@ -113,7 +130,10 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('button', 'regex_check_strings', get_string('authoring_form_check_strings', 'qtype_preg'));
     }
 
-    //Custom validation should be added here
+    public function qtype() {
+        return 'preg';
+    }
+
     function validation($data, $files) {
         return array();
     }
