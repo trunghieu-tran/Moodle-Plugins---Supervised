@@ -113,8 +113,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
             $graph->isexact = true;
         }
 
-        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
-        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box, style=filled', 'purple', $graph, -1);
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box', 'purple', $graph, -1, 'filled', 'purple');
+        $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box', 'purple', $graph, -1, 'filled', 'purple');
 
         if (count($graph->nodes) == 2 && count($graph->subgraphs) == 0) {
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1], $graph);
