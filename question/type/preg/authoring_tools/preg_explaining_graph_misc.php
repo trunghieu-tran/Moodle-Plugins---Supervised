@@ -792,7 +792,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $gr Subgraph.
      * @param string $instr Current dot instructions.
      */
-    private function process_subgraph(&$gr, &$instr) {
+    private function process_subgraph($gr, $instr) {
         $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'color=' . $gr->color . ';';
