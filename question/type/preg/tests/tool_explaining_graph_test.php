@@ -1088,25 +1088,32 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with node assert with simple assert!');
     }
 
-    /*public function test_assert_1() {
+    public function test_assert_1() {
         $tool = new qtype_preg_explaining_graph_tool('(q)$^a');
         $graph = $tool->create_graph(-1);
-        $dotscript = $graph->create_dot();
-        var_dump($dotscript);
-    }*/
 
-    /*public function test_assert_2() {
+        $etalon = new qtype_preg_explaining_graph_tool_subgraph('');
+        $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array('q'), 'ellipse', 'black', $etalon->subgraphs[0], -1);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('a'), 'ellipse', 'black', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('begin'), 'box', 'purple', $etalon, -1);
+        $etalon->nodes[] = new qtype_preg_explaining_graph_tool_node(array('end'), 'box', 'purple', $etalon, -1);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_explaining_graph_tool_link('',
+            $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[0], $etalon->nodes[2], $etalon);
+        $etalon->links[] = new qtype_preg_explaining_graph_tool_link('start of the string\nend of the string', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[0], $etalon);
+
+        $this->assertTrue(self::cmp_graphs($graph, $etalon), 'Failed with assert 1!');
+    }
+
+    public function test_assert_2() {
         $tool = new qtype_preg_explaining_graph_tool('(a)(\b)b');
         $graph = $tool->create_graph(-1);
         $dotscript = $graph->create_dot();
         var_dump($dotscript);
-    }*/
-
-    /*public function test_unicode() {
-        $graph = new qtype_preg_explaining_graph_tool('абв');
-        $json = array();
-        $graph->generate_json($json);
-    }*/
+    }
 
     /*function test_temp() {
         $tree = new qtype_preg_explaining_graph_tool('(?i)\b');

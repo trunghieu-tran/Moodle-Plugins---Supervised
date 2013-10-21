@@ -496,7 +496,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 // Create point-node and link it with left neighbor.
                                 $neighborl->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborl->owner, -1);
 
-                                $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($neighborl->owner->nodes), $neighborl->owner);
+                                $parent->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($neighborl->owner->nodes), $parent);
                                 $leftborder = end($neighborl->owner->nodes);    // Now left neighbor of assert is point.
 
                                 // Create point-node and link it with right neighbor.
@@ -516,7 +516,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 // Create point-node and link it with right neighbor.
                                 $neighborr->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborr->owner, -1);
 
-                                $neighborr->owner->links[] = new qtype_preg_explaining_graph_tool_link('', end($neighborr->owner->nodes), $neighborr, $neighborr->owner);
+                                $parent->links[] = new qtype_preg_explaining_graph_tool_link('', end($neighborr->owner->nodes), $neighborr, $parent);
                                 $rightborder = end($neighborr->owner->nodes);   // Now right neighbor of assert is point.
 
                                 // Create point-node and link it with left neighbor.
@@ -792,7 +792,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
      * @param qtype_preg_explaining_graph_tool_subgraph $gr Subgraph.
      * @param string $instr Current dot instructions.
      */
-    private function process_subgraph($gr, $instr) {
+    private function process_subgraph($gr, &$instr) {
         $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'color=' . $gr->color . ';';
