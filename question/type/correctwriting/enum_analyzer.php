@@ -118,6 +118,12 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
     }
 
     /**
+     * Returns an array of hint keys, supported by mistakes from this analyzer.
+     */
+	public function supported_hints() {
+		return null;
+	}
+    /**
      * Function to find orders specified enumeration in correctstring, based on analyze correctedstring
      * @param array $correctanswer - correct answer
      * @param array $correctedanswer - corrected student answer
