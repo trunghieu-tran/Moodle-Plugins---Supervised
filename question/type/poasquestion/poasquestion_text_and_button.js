@@ -121,6 +121,18 @@ M.poasquestion_text_and_button = (function() {
      */
     setup_dialog : function(pagewidth) {
         self.dialog = $('<div id="preg_authoring_tools_dialog"><p>Loading...</p></div>');
+
+        if (self.is_stand_alone()) {
+            buttons = [
+                {text: "Cancel", click: self.oncancelclicked}
+            ]
+        } else {
+            buttons = [
+                {text: "Save", click: self.onsaveclicked},
+                {text: "Cancel", click: self.oncancelclicked}
+            ]
+        }
+        
         self.dialog.dialog({
             modal: true,
             closeOnEscape: true,
@@ -131,10 +143,7 @@ M.poasquestion_text_and_button = (function() {
                     self.onclosecallback();
                 }
             },
-            buttons: [
-                {text: "Save", click: self.onsaveclicked},
-                {text: "Cancel", click: self.oncancelclicked}
-            ]
+            buttons: buttons
         });
     },
 
@@ -180,7 +189,7 @@ M.poasquestion_text_and_button = (function() {
     },
 
     is_stand_alone : function() {
-        return typeof self.current_input === 'undifined';
+        return self.current_input.length===0 || (typeof self.current_input === 'undifined');
     }
 };
 

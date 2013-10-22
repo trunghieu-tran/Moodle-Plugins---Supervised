@@ -111,7 +111,11 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add handlers for the buttons.
                     $('#id_regex_show').click(self.btn_show_clicked);
-                    $('#id_regex_save').click(self.btn_save_clicked);
+                    if (!self.textbutton_widget.is_stand_alone()) {
+                        $('#id_regex_save').click(self.btn_save_clicked);
+                    } else {
+                        $('#id_regex_save').hide();
+                    }
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
@@ -138,13 +142,16 @@ M.preg_authoring_tools_script = (function ($) {
                 self.invalidate_content();
 
                 // Put the testing data into ui.
-                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
+                if (!self.textbutton_widget.is_stand_alone()) {
+                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
-                $.each(self.matching_options, function (i, option) {
-                    var preg_id = '#id_' + option,
-                        this_id = preg_id + '_auth';
-                    $(this_id).val($(preg_id).val());
-                });
+
+                    $.each(self.matching_options, function (i, option) {
+                        var preg_id = '#id_' + option,
+                            this_id = preg_id + '_auth';
+                        $(this_id).val($(preg_id).val());
+                    });
+                }
                 $('#id_regex_show').click();
             },
 
