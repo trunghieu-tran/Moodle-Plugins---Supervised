@@ -35,4 +35,6 @@ if($ADMIN->fulltree) {
     $settings->add(new block_formal_langs_admin_setting_language('qtype_correctwriting_defaultlang',
                     get_string('defaultlanglabel', 'block_formal_langs'), get_string('defaultlangdescription', 'block_formal_langs', $a), '1', null));
 
+    $settings->add(new admin_setting_configtext('qtype_correctwriting_maxorderscount', get_string('maxorderscountlabel', 'qtype_correctwriting'),
+                    get_string('maxorderscount', 'qtype_correctwriting'), 5000, PARAM_INT));
 }
