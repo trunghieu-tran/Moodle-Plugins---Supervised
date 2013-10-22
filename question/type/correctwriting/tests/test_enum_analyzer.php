@@ -835,7 +835,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $pairs = array();
         $pairs[] = $pair;
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!One LCS');
     }
 
@@ -869,7 +869,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Several LCS');
     }
 
@@ -942,7 +942,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Same tokens');
     }
 
@@ -976,7 +976,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Gaps of elements');
     }
 
@@ -995,7 +995,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!No LCS');
     }
 
@@ -1025,7 +1025,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Include enumeration tokens wrong order');
     }
 
@@ -1055,7 +1055,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Include enumeration some tokens are missed');
     }
 
@@ -1085,7 +1085,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Include enumeration some tokens are missed');
     }
 
@@ -1113,7 +1113,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Enumeration tokens in wrong order. One LCS');
     }
 
@@ -1141,7 +1141,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         $pairs[] = $pair;
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Enumeration tokens in wrong order. Some LCS');
     }
 
@@ -1180,7 +1180,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Six enumerations');
     }
 
@@ -1208,7 +1208,7 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $correct->enumerations = $enumdescription;
         $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
         // Test body.
-        $temp = new qtype_correctwriting_enum_analyzer($pair);
+        $temp = new qtype_correctwriting_enum_analyzer(null,$pair,null,false);
         $this->assertEquals($pairs, $temp->pairs(), 'Error in work found!Enumeration elements are missed');
     }
 }
