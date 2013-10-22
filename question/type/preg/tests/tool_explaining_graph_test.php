@@ -989,7 +989,10 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_empty_selection() {
-        $graph = new qtype_preg_explaining_graph_tool('a||c');
+        $options = new qtype_preg_authoring_tools_options;
+        $options->selection = new qtype_preg_position(2,1);
+        $graph = new qtype_preg_explaining_graph_tool('a||c', $options);
+        $result = $graph->create_graph();
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('');
@@ -1013,13 +1016,14 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[4], $etalon->nodes[2], $etalon);
         $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[3], $etalon->nodes[5], $etalon);
 
-        $result = $graph->create_graph(3);
-
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with empty selection!');
 
         // ----------------------------------------------------------------------------------
 
-        $graph = new qtype_preg_explaining_graph_tool('a()c');
+        $options = new qtype_preg_authoring_tools_options;
+        $options->selection = new qtype_preg_position(2, 1);
+        $graph = new qtype_preg_explaining_graph_tool('a()c', $options);
+        $result = $graph->create_graph();
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1');
@@ -1038,9 +1042,15 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[2], $etalon->nodes[0], $etalon);
         $etalon->links[] = new qtype_preg_explaining_graph_tool_link('', $etalon->nodes[1], $etalon->nodes[3], $etalon);
 
-        $result = $graph->create_graph(4);
-
         $this->assertTrue(self::cmp_graphs($result, $etalon), 'Failed with empty selection in subexpression!');
+    }
+
+    public function test_preserved_node_selection() {
+        $options = new qtype_preg_authoring_tools_options;
+        $options->selection = new qtype_preg_position(0, 4);
+        $graph = new qtype_preg_explaining_graph_tool('a(?i)b', $options);
+        $result = $graph->create_graph();
+        //var_dump($result);
     }
 
     public function test_node_assert_with_simple_assert() {
@@ -1090,7 +1100,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
     public function test_assert_1() {
         $tool = new qtype_preg_explaining_graph_tool('(q)$^a');
-        $graph = $tool->create_graph(-1);
+        $graph = $tool->create_graph();
 
         $etalon = new qtype_preg_explaining_graph_tool_subgraph('');
         $etalon->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('subexpression #1');
@@ -1110,7 +1120,7 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
 
     public function test_assert_2() {
         $tool = new qtype_preg_explaining_graph_tool('(a)(\b)b');
-        $graph = $tool->create_graph(-1);
+        $graph = $tool->create_graph();
         $dotscript = $graph->create_dot();
         var_dump($dotscript);
     }

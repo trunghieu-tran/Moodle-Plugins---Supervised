@@ -92,10 +92,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * Overloaded from qtype_preg_authoring_tool.
      */
     public function generate_json_for_accepted_regex(&$json) {
-        $id = $this->selectednode !== null
-            ? $this->selectednode->id
-            : -1;
-        $graph = $this->create_graph($id);
+        $graph = $this->create_graph();
         $dotscript = $graph->create_dot();
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         $json[$this->json_key()] = 'data:image/svg+xml;base64,' . base64_encode($rawdata);
@@ -103,11 +100,10 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
 
     /**
      * Creates graph which explaining regular expression.
-     * @param id - identifier of node which will be picked out in image.
      * @return explainning graph of regular expression.
      */
-    public function create_graph($id = -1) {
-        $graph = $this->dst_root->create_graph($id);
+    public function create_graph() {
+        $graph = $this->dst_root->create_graph();
 
         if ($this->options->exactmatch) {
             $graph->isexact = true;
