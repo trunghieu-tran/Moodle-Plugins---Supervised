@@ -255,6 +255,10 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_content_success : function (data, textStatus, jqXHR) {
+        if (typeof data == "object") {
+            new M.core.ajaxException(data);
+            return;
+        }
         var json = JSON.parse(data),
             regex = json['regex'],
             //engine = json['engine'],
@@ -280,6 +284,10 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
+        if (typeof data == "object") {
+            new M.core.ajaxException(data);
+            return;
+        }
         var json = JSON.parse(data),
             regex = json['regex'],
             engine = json['engine'],
