@@ -1245,5 +1245,37 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $temp = new qtype_correctwriting_enum_analyzer('q',$pair,null,false);
         $this->assertEquals($pairs, $temp->result_pairs(), 'Error in work found!Enumeration elements are missed');
     }
+
+	/**
+	 *  Test for all fuctions. 
+	 *  Max count of analyze orders 0.
+	 */
+    public function test_analyze_zero_orders_count() {
+		global $CFG;
+        $lang = new block_formal_langs_language_simple_english;
+        $string = 'Billy was like the other rich kids had bicycle , nurse and .';
+        $corrected = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        // Expected result.
+        $string = 'Billy was like the other rich kids had bicycle , a nurse and swimming pool .';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(10, 11), new enum_element(13, 14), new enum_element(8, 8));
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
+        $indexesintable = array(0, 1, 2, 3, 4, 5, 6, 7, 14, 10, 8, 9, 13, 11, 12, 15);
+        $pair->set_indexes_in_table($indexesintable);
+        $pairs = array();
+        // Input data.
+        $string = 'Billy was like the other rich kids had a nurse , swimming pool and bicycle .';
+        $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
+        $enumdescription = array();
+        $enumdescription[] = array(new enum_element(8, 9), new enum_element(11, 12), new enum_element(14, 14));
+        $correct->enumerations = $enumdescription;
+        $pair = new qtype_correctwriting_string_pair($correct, $corrected, null);
+		$CFG->qtype_correctwriting_maxorderscount = 0;
+        // Test body.
+        $temp = new qtype_correctwriting_enum_analyzer('q',$pair,null,false);
+        $this->assertEquals($pairs, $temp->result_pairs(), 'Error in work found!Enumeration elements are missed');
+    }
 }
 
