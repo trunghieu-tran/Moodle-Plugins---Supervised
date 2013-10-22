@@ -24,7 +24,10 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
 
 
 class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase {
-    // Test for get_enum_change_order, without including in enumerations.
+    /**
+     *  Test for get_enum_change_order function.
+     *  Two enumerations without include one to another.
+     */
     public function testget_enum_change_order_without_including() {
         $enumdescription = array();
         $include_enums = array();
@@ -43,7 +46,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Without including.');
     }
 
-    // Test for get_enum_change_order,second enumeration include in first.
+    /** 
+     * Test for get_enum_change_order function.
+     * First enumeration include second.
+     */
     public function testget_enum_change_order_second_include_in_first() {
         $enumdescription = array();
         $include_enums = array();
@@ -62,7 +68,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Second include in first.');
     }
 
-    // Test for get_enum_change_order,two enumerations include in other.
+    /**
+     *  Test for get_enum_change_order function.
+     *  Three enumerations. First include to others.
+     */
     public function testget_enum_change_order_two_enums_include_in_other() {
         $enumdescription = array();
         $include_enums = array();
@@ -83,7 +92,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Two enums include in other.');
     }
 
-    // Test for get_enum_change_order, matrioshka with three enumerations.
+    /** 
+     * Test for get_enum_change_order function.
+     * Three enumerations. Second enumeration contain first. Third  enumeration contain second.
+     */
     public function testget_enum_change_order_matrioshka_with_three_enums() {
         $enumdescription = array();
         $include_enums = array();
@@ -104,7 +116,11 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Matrioshka with three enums.');
     }
 
-    // Test for get_enum_change_order, six enumeration with difficult include map.
+    /**
+     *  Test for get_enum_change_order, six enumeration with difficult include map.
+     *  Six enumerations. Second enumeration contain fourth and sixth. Fifth is include in third. 
+     *  First contain second and third enumeratins.  
+     */
     public function testget_enum_change_order_six_enums() {
         $enumdescription = array();
         $include_enums = array();
