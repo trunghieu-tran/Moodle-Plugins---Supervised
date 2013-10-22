@@ -86,6 +86,9 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
         // Clone answers.
         $this->correctstring = clone($this->correctstring());
         $this->correctedstring = clone($this->correctedstring());
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
     }
 }
 
