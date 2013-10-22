@@ -23,21 +23,6 @@ require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php'
 class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_analyzer {
 
     /**
-     * Array which contains pairs of answer, with maximum length of LCS in correctstring and correctedstring
-     * @var array
-     */
-    private $pairs;
-
-    private $fitness = 0;               // Fitness for response.
-
-    /**
-    * Return array of finded pairs wit maximal LCS.
-    */
-    public function pairs() {
-        return $this->pairs;
-    }
-        	
-    /**
      * Returns analyzer internal name, which can be used as an argument to get_string().
      */
 	public function name() {
