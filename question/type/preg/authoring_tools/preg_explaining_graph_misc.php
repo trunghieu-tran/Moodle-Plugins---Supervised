@@ -649,10 +649,16 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     }
                 } else {
                     // Find a link between left neighbor and void.
-                    $tmpneighbor = $gmain->find_link($neighborl, $iter);
-                    $tmpneighbor->destination = $neighborr;    // Set a new destination.
+                    $tmpneighbol = $gmain->find_link($neighborl, $iter);
+                    $tmpneighbol->destination = $neighborr;    // Set a new destination.
 
                     $tmpneighbor = $gmain->find_link($iter, $neighborr);
+                    if ($tmpneighbor->owner !== $this && !$this->is_parent_for($tmpneighbor->owner)) {
+                        unset($tmpneighbol->owner->links[array_search($tmpneighbol, $tmpneighbor->owner->links)]);
+                        $tmpneighbol->owner->links = array_values($tmpneighbol->owner->links);
+                        $tmpneighbol->owner = $tmpneighbor->owner;
+                        $tmpneighbor->owner->links[] = $tmpneighbol;
+                    }
                     unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
                     $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
                 }
