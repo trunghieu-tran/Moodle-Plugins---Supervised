@@ -621,7 +621,6 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
      * @param qtype_correctwriting_string_pair - pair of answers.
      */
     protected function analyze() {
-        // If it has something to analyze.
         $maxlcslength = 0; // Current maximal LCS length.
         $allfindorders = array(); // All find enumeration orders.
         $enumchangeorder = array(); // Enumeration change order.
