@@ -109,6 +109,13 @@ abstract class qtype_preg_description_node {
         return true;
     }
 
+    public function is_selected() {
+        $selectednode = $this->handler->get_selected_node();
+        return ($selectednode !== null &&
+                $this->pregnode->position->indfirst >= $selectednode->position->indfirst &&
+                $this->pregnode->position->indlast <= $selectednode->position->indlast);
+    }
+
     /**
      * Puts $s instead of %s in numbering pattern. Puts node id instead of %n.
      *
@@ -119,14 +126,12 @@ abstract class qtype_preg_description_node {
         $result = $s;
         $classes = array();
         $bgclor = 'white';
-        $selected = $this->pregnode->position->indfirst >= $this->handler->get_options()->selection->indfirst &&
-                    $this->pregnode->position->indlast <= $this->handler->get_options()->selection->indlast;
 
         // Highlight generated and selected nodes.
         if ($this->handler->is_node_generated($this->pregnode)) {
             $bgclor = 'lightgrey';
         }
-        if ($selected) {
+        if ($this->is_selected()) {
             $bgclor = 'orange';
         }
 
