@@ -291,6 +291,18 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         return $enumorders;
     }
 
+     
+    /**
+     * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes.
+     * Used to choose best matched answer.
+     * Fitness is negative or zero (no errors, full match).
+     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight.
+     * Each analyzer will calculate fitness only for it's own mistakes, ignoring mistakes from other analyzers.
+     * @param array of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
+     */
+	public function fitness($mistakes) {
+			return 0;
+	}
     /**
      * Function to find orders of all enumerations in corrected answer.
      * @param array $correctanswer - correct answer
