@@ -35,6 +35,13 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
     public function pairs() {
         return $this->pairs;
     }
+        	
+    /**
+     * Returns analyzer internal name, which can be used as an argument to get_string().
+     */
+	public function name() {
+		return 'qtype_correctwriting_enum_analyzer';
+	}
     /**
      * Function to find order of changing enumeration, and included enumerations to all enumerations
      * @param array $enumdescription enumerations description
