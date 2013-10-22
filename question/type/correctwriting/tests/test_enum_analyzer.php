@@ -147,7 +147,11 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $enum_change_order == $result->order, 'Error in change order found!Six enums.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, enumeration tokens are missed.
+    /**
+     * Test for find_enum_orders_in_corrected_string function.
+     * Tokens which contains in enumeration are missed in corrected student answer.
+     * Tokens: Victoria, Carry, Tom do not contains in corrected student answer.
+     */
     public function testfind_enum_orders_in_corrected_string_missing_enum_tokens() {
         $correctanswer = array();
         $correctedanswer = array();
@@ -186,7 +190,16 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!Missing tokens.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, several orders are expected.
+    /**
+     * Test for find_enum_orders_in_corrected_string function.
+     * Several orders of enumeration in corrected student answer.
+     * In corrected student answer we have enumeration tokens in order: Tom, Victoria, Carry, Tom.
+     * Base on that order we can get two orders:
+     *
+     *  Tom, Victoria, Carry 
+     *  AND
+     *  Victoria, Carry, Tom
+     */
     public function testfind_enum_orders_in_corrected_string_several_orders() {
         $correctanswer = array();
         $correctedanswer = array();
@@ -222,7 +235,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!Several orders.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, several orders are expected.
+    /**
+     *  Test for find_enum_orders_in_corrected_string function.
+     *  One order of enumeration tokens in corrected student answer.
+     */
     public function testfind_enum_orders_in_corrected_string_one_order() {
         $correctanswer = array();
         $correctedanswer = array();
@@ -257,7 +273,19 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!One order.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, all orders are expected.
+    /**
+     * Test for find_enum_orders_in_corrected_string function.
+     * All orders of enumeration tokens contain in corrected student answer.
+     * Order in corrected answer:
+     * a nurse, fast bicycle, swimming pool, a nurse, fast bicycle, a nurse, swimming pool, a nurse.
+     * We get orders: 
+     * a nurse, fast bicycle, swimming pool
+     * a nurse, swimming pool, fast bicycle
+     * fast bicycle, swimming pool, a nurse
+     * fast bicycle, a nurse, swimming pool
+     * swimming pool, a nurse, fast bicycle
+     * swimmnig pool, fast bicycle, a nurse
+     */
     public function testfind_enum_orders_in_corrected_string_all_orders() {
         $correctanswer = array();
         $correctedanswer = array();
@@ -298,7 +326,13 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!All orders.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, two include in other.
+    /**
+     * Test for find_enum_orders_in_corrected_string function
+     * Three enumerations. Second contain first and third enumerations.
+     * Enumeration order in corrected student answer:
+     *  friend... , neighbors... , friends... , neighbors...
+     *  Becouse token "my" is include in both of second enumeration.
+     */
     public function testfind_enum_orders_in_corrected_string_two_include_in_other() {
         $correctanswer = array();
         $correctedanswer = array();
