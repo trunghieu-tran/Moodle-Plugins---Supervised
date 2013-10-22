@@ -620,63 +620,65 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
      *
      * @param qtype_correctwriting_string_pair - pair of answers.
      */
-    public function __construct($stringpair= null) {
+    protected function analyze() {
         // If it has something to analyze.
-        if ($stringpair != null) {
-            $maxlcslength = 0; // Current maximal LCS length.
-            $allfindorders = array(); // All find enumeration orders.
-            $enumchangeorder = array(); // Enumeration change order.
-            $includedenums = array(); // Included enumerations indexes for all enumerations.
-            $forstd = 0; // Variable for function,which return std Class objects.
-            $correcttokens = $stringpair->correctstring()->stream->tokens; // Correct answer tokens array;
-            $correctedtokens = $stringpair->correctedstring()->stream->tokens; // Corrected student answer tokens array;
-            $enumdescription = $stringpair->correctstring()->enumerations; // Correct answer enumerations descriptions.
-            $currentorder = array(); // Current order of enumerations elements.
-            $currentstringpair = 0; // Current string pair with current order of enumeration.
-            $currentcorrectstream = $stringpair->correctstring()->stream; // Stream of correct answer with current...
+        $maxlcslength = 0; // Current maximal LCS length.
+        $allfindorders = array(); // All find enumeration orders.
+        $enumchangeorder = array(); // Enumeration change order.
+        $includedenums = array(); // Included enumerations indexes for all enumerations.
+        $forstd = 0; // Variable for function,which return std Class objects.
+        $correcttokens = $this->basestringpair->correctstring()->stream->tokens; // Correct answer tokens array;
+        $correctedtokens = $this->basestringpair->correctedstring()->stream->tokens; // Corrected student answer tokens array;
+        $enumdescription = $this->basestringpair->correctstring()->enumerations; // Correct answer enumerations descriptions.
+        $currentorder = array(); // Current order of enumerations elements.
+        $currentstringpair = 0; // Current string pair with current order of enumeration.
+        $currentcorrectstream = $this->basestringpair->correctstring()->stream; // Stream of correct answer with current...
                                                                            // ...enumerations elements order.
-            $lcsarray = array(); // Array of finded LCS for current enuerations elements order.
-            $correctedstream = $stringpair->correctedstring()->stream; // Stream of corrected answer.
-            $options = new block_formal_langs_comparing_options(); // Options needed to find lcs.
-            $options->usecase = true;
-            $count = 0; // Count of LCS tokens for current pair.
-            // Get enumerations change order and include enumeration arrays.
-            $forstd = $this->get_enum_change_order($enumdescription);
-            $enumchangeorder = $forstd->order;
-            $includedenums = $forstd->includedenums;
-            // Find expected orders for all enumeration.
-            $allfindorders = $this->find_all_enum_orders_in_corrected_string($correcttokens, $correctedtokens, $enumdescription);
-            foreach ($allfindorders as $currentorder) {
-                // Change enumeration elements order.
-                $currentstringpair = null;
-                $currentstringpair = clone $stringpair;
-                $this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
-                // Find LCS of correct and corrected answers.
-                $currentcorrectstream = $currentstringpair->correctstring()->stream;
-                $lcsarray = qtype_correctwriting_sequence_analyzer::lcs($currentcorrectstream, $correctedstream, $options);
-                // If lcs exist keep it's length...
-                // Else length is zero.
-                if (count($lcsarray) === 0) {
-                    $count = 0;
-                } else {
-                    $count = count($lcsarray[0]);
-                }
-                // If length of current lcs are equal length of lcs, which were found early add string pair to array...
-                // ...Else if length of current lcs more than length of lcs, which were found early, clear array...
-                // ... and add string pair to array.
-                if ($maxlcslength === $count) {
-                    $this->pairs[] = $currentstringpair;
-                } else if ($maxlcslength < $count) {
-                    $maxlcslength = $count;
-                    $this->pairs = array();
-                    $this->pairs[] = $currentstringpair;
-                }
-            }  
-            // If maximal LCS length is equal zero array of pair must be empty.
-            if ($maxlcslength === 0) {
-                $this->pairs = array();
+        $lcsarray = array(); // Array of finded LCS for current enuerations elements order.
+        $correctedstream =  $this->basestringpair->correctedstring()->stream; // Stream of corrected answer.
+        $options = new block_formal_langs_comparing_options(); // Options needed to find lcs.
+        $options->usecase = true;
+        $count = 0; // Count of LCS tokens for current pair.
+        // Get enumerations change order and include enumeration arrays.
+        $forstd = $this->get_enum_change_order($enumdescription);
+        $enumchangeorder = $forstd->order;
+        $includedenums = $forstd->includedenums;
+        // Find expected orders for all enumeration.
+        $allfindorders = $this->find_all_enum_orders_in_corrected_string($correcttokens, $correctedtokens, $enumdescription);
+        foreach ($allfindorders as $currentorder) {
+        	// Change enumeration elements order.
+            $currentstringpair = null;
+			$currentstringpair = clone $this->basestringpair;
+			$this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
+            // Find LCS of correct and corrected answers.
+            $currentcorrectstream = $currentstringpair->correctstring()->stream;
+            $lcsarray = qtype_correctwriting_sequence_analyzer::lcs($currentcorrectstream, $correctedstream, $options);
+            // If lcs exist keep it's length...
+            // Else length is zero.
+            if (count($lcsarray) === 0) {
+                $count = 0;
+            } else {
+                $count = count($lcsarray[0]);
             }
-        }
+            // If length of current lcs are equal length of lcs, which were found early add string pair to array...
+            // ...Else if length of current lcs more than length of lcs, which were found early, clear array...
+            // ... and add string pair to array.
+            if ($maxlcslength === $count) {
+                $this->resultstringpairs[] = $currentstringpair;
+		   		$this->resultmistakes[] = true; 
+            } else if ($maxlcslength < $count) {
+                $maxlcslength = $count;
+                $this->resultstringpairs = array();
+		   		$this->resultmistakes = array(); 
+		   		$this->resultmistakes[] = true; 
+                $this->resultstringpairs[] = $currentstringpair;
+            }
+       }  
+       // If maximal LCS length is equal zero array of pair must be empty.
+       if ($maxlcslength === 0) {
+           $this->resultstringpairs = array();
+		   $this->resultmistakes = array();
+       }
     }
 }
 
