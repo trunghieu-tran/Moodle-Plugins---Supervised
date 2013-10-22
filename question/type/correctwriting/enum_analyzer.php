@@ -621,6 +621,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
      * @param qtype_correctwriting_string_pair - pair of answers.
      */
     protected function analyze() {
+		global $CFG;
         $maxlcslength = 0; // Current maximal LCS length.
         $allfindorders = array(); // All find enumeration orders.
         $enumchangeorder = array(); // Enumeration change order.
@@ -644,6 +645,9 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         $includedenums = $forstd->includedenums;
         // Find expected orders for all enumeration.
         $allfindorders = $this->find_all_enum_orders_in_corrected_string($correcttokens, $correctedtokens, $enumdescription);
+		if (count($allfindorders) > $CFG->qtype_correctwriting_maxorderscount) {
+			array_splice($allfindorders,-0,count($allfindorders) - $CFG->qtype_correctwriting_maxorderscount); 
+		}
         foreach ($allfindorders as $currentorder) {
         	// Change enumeration elements order.
             $currentstringpair = null;
