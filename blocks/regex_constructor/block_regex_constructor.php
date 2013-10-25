@@ -40,7 +40,7 @@ class block_regex_constructor extends block_base {
     }
  
     $this->content         =  new stdClass;
-    $this->content->text   = '<a id="'.$this->id.'">' . get_string('openwindow', 'block_regex_constructor') . '</a>';
+    $this->content->text   = '<a href id="'.$this->id.'">' . get_string('openwindow', 'block_regex_constructor') . '</a>';
     $this->content->footer = '';
 
     $this->page->requires->jquery();
