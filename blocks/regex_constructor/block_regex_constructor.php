@@ -47,6 +47,9 @@ class block_regex_constructor extends block_base {
     $this->page->requires->jquery_plugin('ui');
     $this->page->requires->jquery_plugin('ui-css');
 
+    $this->page->requires->string_for_js('collapseall', 'moodle'); 
+    $this->page->requires->string_for_js('expandall', 'moodle'); 
+
     $jsmodule = array('name' => 'poasquestion_text_and_button',
                                 'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
     $jsargs = array(
