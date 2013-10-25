@@ -288,7 +288,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             count($this->pregnode->userinscription) > 1)                 // [complex charset]
         {
             // Flag or complex charset - return "as is".
-            return parent::label();
+            return qtype_preg_authoring_tool::string_to_html(qtype_preg_authoring_tool::string_to_html(parent::label()));	// TODO: should be parent::label() (graphviz bug).
         }
 
         if ($this->needs_highlighting()) {
