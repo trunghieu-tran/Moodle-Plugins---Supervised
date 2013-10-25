@@ -23,6 +23,7 @@
  * @package blocks
  */
 
+$string['jsrequired'] = 'Sorry, Regex constructor needs JavaScript to be enabled in your browser';
 $string['openwindow'] = 'Open regex constructor';
 $string['pluginname'] = 'Regex constructor block';
 $string['regex_constructor'] = 'Regex constructor';

@@ -34,47 +34,49 @@ class block_regex_constructor extends block_base {
     }
 
     public function get_content() {
-    global $CFG;
-    if ($this->content !== null) {
-      return $this->content;
-    }
- 
-    $this->content         =  new stdClass;
-    $this->content->text   = '<a href id="'.$this->id.'">' . get_string('openwindow', 'block_regex_constructor') . '</a>';
-    $this->content->footer = '';
+        global $CFG;
+        if ($this->content !== null) {
+          return $this->content;
+        }
+     
+        $this->content =  new stdClass;
+        $this->content->text = '<noscript>' . get_string('jsrequired', 'block_regex_constructor') . '</noscript>' .
+                               '<a href id="' . $this->id . '" style="display:none">' . get_string('openwindow', 'block_regex_constructor') . '</a>' .
+                               '<script type="text/javascript">document.getElementById("' . $this->id . '").style.display="block";</script>';
+        $this->content->footer = '';
 
-    $this->page->requires->jquery();
-    $this->page->requires->jquery_plugin('ui');
-    $this->page->requires->jquery_plugin('ui-css');
+        $this->page->requires->jquery();
+        $this->page->requires->jquery_plugin('ui');
+        $this->page->requires->jquery_plugin('ui-css');
 
-    $this->page->requires->string_for_js('collapseall', 'moodle'); 
-    $this->page->requires->string_for_js('expandall', 'moodle'); 
+        $this->page->requires->string_for_js('collapseall', 'moodle'); 
+        $this->page->requires->string_for_js('expandall', 'moodle'); 
 
-    $jsmodule = array('name' => 'poasquestion_text_and_button',
-                                'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
-    $jsargs = array(
-                '90%',
-                'todo' // TODO dialog header
+        $jsmodule = array('name' => 'poasquestion_text_and_button',
+                                    'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
+        $jsargs = array(
+                    '90%',
+                    get_string('regex_constructor', 'block_regex_constructor')
+                );
+        $this->page->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $jsmodule);
+
+        $jsargshandler = array(
+                $this->id,
+                ''
             );
-    $this->page->requires->js_init_call('M.poasquestion_text_and_button.init', $jsargs, true, $jsmodule);
 
-    $jsargshandler = array(
-            $this->id,
-            ''
+        $this->page->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargshandler, true, $jsmodule);
+
+        $pregjsmodule = array(
+                    'name' => 'preg_authoring_tools_script',
+                    'fullpath' => '/question/type/preg/authoring_tools/preg_authoring_tools_script.js'
+                );
+        $pregjsargs = array(
+            $CFG->wwwroot,
+            'TODO - poasquestion_text_and_button_objname',  // 'M.poasquestion_text_and_button' ?
         );
-
-    $this->page->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargshandler, true, $jsmodule);
-
-    $pregjsmodule = array(
-                'name' => 'preg_authoring_tools_script',
-                'fullpath' => '/question/type/preg/authoring_tools/preg_authoring_tools_script.js'
-            );
-    $pregjsargs = array(
-        $CFG->wwwroot,
-        'TODO - poasquestion_text_and_button_objname',  // 'M.poasquestion_text_and_button' ?
-    );
-    $this->page->requires->js_init_call('M.preg_authoring_tools_script.init', $pregjsargs, true, $pregjsmodule);
- 
-    return $this->content;
-  }
+        $this->page->requires->js_init_call('M.preg_authoring_tools_script.init', $pregjsargs, true, $pregjsmodule);
+     
+        return $this->content;
+    }
 }
