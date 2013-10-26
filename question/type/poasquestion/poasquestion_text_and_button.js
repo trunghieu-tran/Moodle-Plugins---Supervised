@@ -124,15 +124,15 @@ M.poasquestion_text_and_button = (function() {
 
         if (self.is_stand_alone()) {
             buttons = [
-                {text: "Cancel", click: self.oncancelclicked}
+                {text: M.str.editor.close, click: self.oncancelclicked}
             ]
         } else {
             buttons = [
-                {text: "Save", click: self.onsaveclicked},
-                {text: "Cancel", click: self.oncancelclicked}
+                {text: M.str.moodle.savechanges, click: self.onsaveclicked},
+                {text: M.str.moodle.cancel, click: self.oncancelclicked}
             ]
         }
-        
+
         self.dialog.dialog({
             modal: true,
             closeOnEscape: true,

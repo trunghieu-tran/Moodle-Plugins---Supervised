@@ -38,7 +38,7 @@ class block_regex_constructor extends block_base {
         if ($this->content !== null) {
           return $this->content;
         }
-     
+
         $this->content =  new stdClass;
         $this->content->text = '<noscript>' . get_string('jsrequired', 'block_regex_constructor') . '</noscript>' .
                                '<a href id="' . $this->id . '" style="display:none">' . get_string('openwindow', 'block_regex_constructor') . '</a>' .
@@ -49,8 +49,11 @@ class block_regex_constructor extends block_base {
         $this->page->requires->jquery_plugin('ui');
         $this->page->requires->jquery_plugin('ui-css');
 
-        $this->page->requires->string_for_js('collapseall', 'moodle'); 
-        $this->page->requires->string_for_js('expandall', 'moodle'); 
+        $this->page->requires->string_for_js('collapseall', 'moodle');
+        $this->page->requires->string_for_js('expandall', 'moodle');
+        $this->page->requires->string_for_js('savechanges', 'moodle');
+        $this->page->requires->string_for_js('cancel', 'moodle');
+        $this->page->requires->string_for_js('close', 'editor');
 
         $jsmodule = array('name' => 'poasquestion_text_and_button',
                                     'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
@@ -76,7 +79,7 @@ class block_regex_constructor extends block_base {
             'TODO - poasquestion_text_and_button_objname',  // 'M.poasquestion_text_and_button' ?
         );
         $this->page->requires->js_init_call('M.preg_authoring_tools_script.init', $pregjsargs, true, $pregjsmodule);
-     
+
         return $this->content;
     }
 }
