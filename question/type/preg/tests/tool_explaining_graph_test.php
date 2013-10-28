@@ -1118,16 +1118,18 @@ class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(self::cmp_graphs($graph, $etalon), 'Failed with assert 1!');
     }
 
-    public function test_assert_2() {
+    /*public function test_assert_2() {
         $tool = new qtype_preg_explaining_graph_tool('(a)(\b)b');
         $graph = $tool->create_graph();
         $dotscript = $graph->create_dot();
         var_dump($dotscript);
-    }
+    }*/
 
     /*function test_temp() {
-        $tree = new qtype_preg_explaining_graph_tool('(?i)\b');
+        $options = new qtype_preg_handling_options();
+        //$options->selection = new qtype_preg_position(0, 4);
+        $tree = new qtype_preg_explaining_graph_tool('(b)($)+', $options);
         $graph = $tree->create_graph();
-        //print_r($graph);
+        print_r($graph);
     }*/
 }
