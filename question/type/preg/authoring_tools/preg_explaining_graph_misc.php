@@ -362,7 +362,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link left neighbor with it.
-                        $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
+                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $gmain);
 
                         // Link it with right neighbor.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(qtype_preg_explaining_graph_tool_link::compute_label(
@@ -434,7 +434,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                         // Link it with right neighbor.
-                        $neighborr->owner->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $neighborr->owner);
+                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $gmain);
 
                         // Link right neighbor with it.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(
@@ -515,9 +515,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             } else if ($this->is_parent_for($neighborr->owner)) {
                                 // Create point-node and link it with right neighbor.
                                 $neighborr->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborr->owner, -1);
-
-                                $parent->links[] = new qtype_preg_explaining_graph_tool_link('', end($neighborr->owner->nodes), $neighborr, $parent);
                                 $rightborder = end($neighborr->owner->nodes);   // Now right neighbor of assert is point.
+
+                                $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $rightborder, $neighborr, $gmain);
 
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
@@ -526,7 +526,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 if ($neighborl->owner->is_parent_for($this)) {
                                     $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
                                 } else {
-                                    $this->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $this);
+                                    $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $gmain);
                                 }
 
                                 // Link left and right neighbors with corresponding label.
@@ -539,9 +539,13 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             } else {
                                 // Create point-node and link it with right neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
-
-                                $neighborr->owner->links[] = new qtype_preg_explaining_graph_tool_link('', end($this->nodes), $neighborr, $neighborr->owner);
                                 $rightborder = end($this->nodes);   // Now right neighbor of assert is point.
+
+                                if ($neighborr->owner->is_parent_for($this)) {
+                                    $neighborr->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $rightborder, $neighborr, $neighborr->owner);
+                                } else {
+                                    $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $rightborder, $neighborr, $gmain);
+                                }
 
                                 // Create point-node and link it with left neighbor.
                                 $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
@@ -550,7 +554,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 if ($neighborl->owner->is_parent_for($this)) {
                                     $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $neighborl->owner);
                                 } else {
-                                    $this->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $this);
+                                    $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $gmain);
                                 }
 
                                 // Link left and right neighbors with corresponding label.
