@@ -452,7 +452,16 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
 
     protected function process_operator($graph) {
         if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
-            $operand = $this->operands[0]->create_graph();
+            if ($this->pregnode->operands[0]->type == qtype_preg_node::TYPE_LEAF_OPTIONS) {
+                $operand = new qtype_preg_explaining_graph_tool_subgraph('');
+                $operand->style = 'solid';
+
+                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+                $operand->entries[] = end($operand->nodes);
+                $operand->exits[] = end($operand->nodes);
+            } else {
+                $operand = $this->operands[0]->create_graph();
+            }
         } else {
             $operand = new qtype_preg_explaining_graph_tool_subgraph('');
             $operand->style = 'solid';
