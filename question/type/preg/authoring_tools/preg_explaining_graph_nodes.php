@@ -422,7 +422,16 @@ class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_o
 class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph_operator {
 
     protected function process_operator($graph) {
-        $operand = $this->operands[0]->create_graph();
+        if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_OPTIONS) {
+            $operand = $this->operands[0]->create_graph();
+        } else {
+            $operand = new qtype_preg_explaining_graph_tool_subgraph('');
+            $operand->style = 'solid';
+
+            $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+            $operand->entries[] = end($operand->nodes);
+            $operand->exits[] = end($operand->nodes);
+        }
 
         $a = new stdClass;
         $a->leftborder = $this->pregnode->leftborder;
