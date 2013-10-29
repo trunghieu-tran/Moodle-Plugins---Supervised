@@ -236,8 +236,8 @@ $string['description_dollar_leaf_assert'] = 'конец строки';
 $string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
 $string['description_esc_z_leaf_assert_neg'] = 'конец строки';
 // TYPE_LEAF_BACKREF
-$string['description_leaf_backref'] = 'обратная ссылка на подвыражение #{$a}';
-$string['description_leaf_backref_name'] = 'обратная ссылка на подвыражение "{$a}"';
+$string['description_leaf_backref'] = 'текст, совпавший с подвыражением #{$a}';
+$string['description_leaf_backref_name'] = 'текст, совпавший с подвыражением "{$a}"';
 // TYPE_LEAF_RECURSION
 $string['description_leaf_recursion'] = 'рекурсивное совпадение с подмаской #{$a}';
 $string['description_leaf_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
