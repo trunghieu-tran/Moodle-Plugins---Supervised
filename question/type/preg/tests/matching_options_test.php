@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for PHP preg matcher.
+ * Unit tests for matching options for different matchers.
  *
- * PHP preg_match function works OK, but we need tests to ensure
- * that matcher itself work correctly under any settings.
+ * We need tests to ensure that any matcher work correctly
+ * under any settings. There are too many of them.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 
-class qtype_preg_php_preg_matcher_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
 
     protected $question;
     protected $options;
