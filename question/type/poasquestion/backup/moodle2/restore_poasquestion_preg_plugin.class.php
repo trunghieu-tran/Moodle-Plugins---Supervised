@@ -29,6 +29,11 @@ global $CFG;
 require_once($CFG->dirroot . '/question/engine/bank.php');
 
 class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
+    /**
+     * Describes, whether plugin handles denormalized table of answers in Moodle
+     * @var bool
+     */
+    protected $supportdenormalizedanswers = true;
 
     protected $qtypeobj;
     protected $oldquestionid;
@@ -106,6 +111,8 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
             $qtfield = $this->qtypeobj->questionid_column_name();
             $data[$qtfield] = $this->newquestionid;
 
+            if ($this->supportdenormalizedanswers)  {
+            }
             // Insert record.
             $newitemid = $DB->insert_record($tablename, $data);
 
