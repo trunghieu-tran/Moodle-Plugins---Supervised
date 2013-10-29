@@ -236,8 +236,8 @@ $string['description_dollar_leaf_assert'] = 'end of the string';
 $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 $string['description_esc_z_leaf_assert_neg'] = 'end of the string';
 // TYPE_LEAF_BACKREF
-$string['description_leaf_backref'] = 'back reference to subexpression #{$a}';
-$string['description_leaf_backref_name'] = 'back reference to subexpression "{$a}"';
+$string['description_leaf_backref'] = 'text that matched subexpression #{$a}';
+$string['description_leaf_backref_name'] = 'text that matched subexpression "{$a}"';
 // TYPE_LEAF_RECURSION
 $string['description_leaf_recursion'] = 'recursive match with subexpression #{$a}';
 $string['description_leaf_recursion_all'] = 'recursive match with whole regular expression';
