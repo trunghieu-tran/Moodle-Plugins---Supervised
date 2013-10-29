@@ -654,6 +654,9 @@ class qtype_preg_regex_handler {
         $indfirst = $this->options->selection->indfirst;
         $indlast = $this->options->selection->indlast;
         foreach ($this->lexer->get_skipped_positions() as $skipped) {
+            if ($indfirst - $indlast == 1) {
+                break;  // Fictive leaf.
+            }
             if ($indfirst >= $skipped->indfirst && $indfirst <= $skipped->indlast) {
                 $indfirst = $skipped->indlast + 1;
             }
@@ -679,15 +682,17 @@ class qtype_preg_regex_handler {
      */
     protected function add_exact_match_nodes($oldroot) {
         $idcounter = $this->parser->get_max_id();
+        $position = new qtype_preg_position(min($oldroot->position->indfirst, 0),
+                                            max($oldroot->position->indlast, $this->regex->length() - 1));
         $newroot = new qtype_preg_node_concat();
         $newroot->id = ++$idcounter;
-        $newroot->set_user_info($oldroot->position->add_chars_left(-4)->add_chars_right(2), new qtype_preg_userinscription(''));
+        $newroot->set_user_info($position->add_chars_left(-4)->add_chars_right(2), new qtype_preg_userinscription(''));
         $newroot->operands[0] = new qtype_preg_leaf_assert_circumflex();
         $newroot->operands[0]->id = ++$idcounter;
         $newroot->operands[0]->set_user_info(new qtype_preg_position($newroot->position->indfirst, $newroot->position->indfirst), array(new qtype_preg_userinscription('^')));
         $newroot->operands[1] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $newroot->operands[1]->id = ++$idcounter;
-        $newroot->operands[1]->set_user_info($oldroot->position->add_chars_left(-3)->add_chars_right(1), array(new qtype_preg_userinscription('(?:...)')));
+        $newroot->operands[1]->set_user_info($position->add_chars_left(-3)->add_chars_right(1), array(new qtype_preg_userinscription('(?:...)')));
         $newroot->operands[1]->operands[0] = $oldroot;
         $newroot->operands[2] = new qtype_preg_leaf_assert_dollar();
         $newroot->operands[2]->id = ++$idcounter;
