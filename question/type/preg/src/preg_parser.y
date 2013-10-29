@@ -342,7 +342,7 @@ expr(A) ::= ALT(B) expr(C). [ALT_SHORT] {
         A->operands[] = $epsleaf;
         A->operands[] = C;
     }
-    A->set_user_info(B->position->compose(C->position), C->userinscription);
+    A->set_user_info(B->position->compose(C->position), B->userinscription);
 }
 
 expr(A) ::= ALT(B). [ALT_SHORTEST] {

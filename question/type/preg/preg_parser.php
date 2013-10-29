@@ -1125,7 +1125,7 @@ static public $yy_action = array(
         $this->_retvalue->operands[] = $epsleaf;
         $this->_retvalue->operands[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-    $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + -1]->minor->userinscription);
     }
 #line 1135 "../preg_parser.php"
 #line 346 "../preg_parser.y"
