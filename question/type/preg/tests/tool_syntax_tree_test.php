@@ -257,6 +257,12 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($node->tooltip(), 'operand repeated any number of times (possessive quantifier)');
     }
 
+    function test_label_qe() {
+        $tree = new qtype_preg_syntax_tree_tool('\Q\\\E');
+        $node = $tree->get_dst_root();
+        $this->assertEquals($node->label(), '\\');
+    }
+
     function test_spaces() {
         $tree = new qtype_preg_syntax_tree_tool(' ');
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));

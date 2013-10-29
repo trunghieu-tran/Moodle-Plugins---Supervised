@@ -161,7 +161,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             return get_string($ui->lang_key(true), 'qtype_preg');
         }
 
-        if ($data[0] == '\\') {
+        if ($data != '\\' && $data[0] == '\\') {
             $data = $data->substring(1);
         }
 
