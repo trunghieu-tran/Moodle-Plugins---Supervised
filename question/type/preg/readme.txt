@@ -76,10 +76,10 @@ Then just experiment. If some engine don't allow you to do something you need (y
 regular expression is too complex or hinting is inactive etc) or just have bug in you particular regular expression - try another one.
 
 ==================
-5. Authoring tools
+5. Regex constructor
 ==================
-Authoring tools help you with regular expression development. For now they are concentrated on the describing you regular
-expression in different ways.
+Regex constructor help you with regular expression development. There are several tools in it. For now they are concentrated on the
+describing you regular expression in different ways.
 
 Syntax tree shows you the internal structure of expression - what is inside what. If you understand regular expressions throught operators
 and operands, it can be of a great help to you. If not, it can help you determine if repeating or alternative applied to the correct parts
