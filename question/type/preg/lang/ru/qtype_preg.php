@@ -206,6 +206,7 @@ $string['nfa_transition_limit_description'] = 'Maximum number of transitions in 
 
 /********** Strings for authoring tools **********************/
 $string['authoring_form_page_header'] = 'Конструктор регулярных выражений';
+$string['authoring_form_tooltip'] = 'Открыть конструктор регулярных выражений';
 $string['authoring_form_charset_mode'] = 'Режим отображения для сложных символьных классов:';
 $string['authoring_form_charset_flags'] = 'реальное значение (унифицированный формат)';
 $string['authoring_form_charset_userinscription'] = 'как написано в регулярных выражениях';
