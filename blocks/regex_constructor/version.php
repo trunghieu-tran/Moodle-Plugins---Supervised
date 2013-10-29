@@ -32,5 +32,5 @@ $plugin->release = 'Regex Constructor 2.5';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
-    'qtype_preg' => 2013100500
+    'qtype_preg' => 2013102900
 );
