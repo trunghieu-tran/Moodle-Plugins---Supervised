@@ -206,6 +206,7 @@ $string['nfa_transition_limit_description'] = 'Maximum number of transitions in 
 
 /********** Strings for authoring tools form**********************/
 $string['authoring_form_page_header'] = 'Regex constructor';
+$string['authoring_form_tooltip'] = 'Open regex constructor';
 $string['authoring_form_charset_mode'] = 'Display mode for complex character classes:';
 $string['authoring_form_charset_flags'] = 'real meaning (unified format)';
 $string['authoring_form_charset_userinscription'] = 'as written in regular expressions';

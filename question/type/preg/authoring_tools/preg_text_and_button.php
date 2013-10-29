@@ -52,4 +52,8 @@ class qtype_preg_text_and_button extends qtype_poasquestion_text_and_button {
     public function getDialogTitle() {
         return get_string('authoring_form_page_header', 'qtype_preg');
     }
+
+    public function getTooltip() {
+        return get_string('authoring_form_tooltip', 'qtype_preg');
+    }
 }

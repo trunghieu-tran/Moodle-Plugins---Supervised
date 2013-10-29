@@ -94,6 +94,10 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
         return $this->getAttribute('id') . '_btn';
     }
 
+    public function getTooltip() {
+        return '';
+    }
+
     /**
      * Returns HTML for this form element.
      */
@@ -107,7 +111,7 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
         $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->jsmodule);
 
-        return parent::toHtml() . '<a href="#" name="button_'. $this->getTextareaId() . '" id="' . $this->getButtonId() . '" >' .
+        return parent::toHtml() . '<a href="#" name="button_' . $this->getTextareaId() . '" id="' . $this->getButtonId() . '" title="' . $this->getTooltip() . '" >' .
                                       '<img src="' . $this->linkToBtnImage . '" />' .
                                   '</a>';
     }
