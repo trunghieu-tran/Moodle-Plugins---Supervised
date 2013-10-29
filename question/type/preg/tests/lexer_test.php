@@ -2666,6 +2666,13 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($ui->is_single_character());
         $this->assertFalse($ui->is_character_range());
         $this->assertFalse($ui->is_valid_escape_sequence());
+        $lexer = $this->create_lexer('\Q\\\E');
+        $ui = $lexer->nextToken()->value->userinscription[0];
+        $this->assertTrue($ui->data === '\\');
+        $this->assertTrue($ui->isflag === null);
+        $this->assertTrue($ui->is_single_character());
+        $this->assertFalse($ui->is_character_range());
+        $this->assertFalse($ui->is_valid_escape_sequence());
         // Invalid cases
         $lexer = $this->create_lexer('\й');
         $ui = $lexer->nextToken()->value->userinscription[0];

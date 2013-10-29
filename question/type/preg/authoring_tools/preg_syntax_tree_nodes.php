@@ -296,7 +296,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
             return qtype_preg_authoring_tool::userinscription_to_string($ui);
         }
         // A single character - return the actual value.
-        if (!$ui->is_valid_escape_sequence() && $ui->data[0] == '\\') {
+        if (!$ui->is_valid_escape_sequence() && $ui->data != '\\' && $ui->data[0] == '\\') {
             return textlib::substr($ui->data, 1);
         }
         return $ui->data;
