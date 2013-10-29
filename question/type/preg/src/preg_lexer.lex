@@ -1534,6 +1534,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
     $this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYQEOUT);
 }
 <YYQEOUT> {ANY} {                      /* \Q...\E quotation body */
@@ -1546,6 +1547,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
     $this->state_begin_position = null;
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYINITIAL);
 }
 
@@ -1990,7 +1992,8 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYCHARSET> "\Q" {                   // \Q...\E beginning
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
-    $this->state_begin_position = $this->current_position_for_node();
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYQEIN);
 }
 <YYQEIN> {ANY} {                     // \Q...\E body
@@ -2002,7 +2005,8 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYQEIN> "\E" {                      // \Q...\E ending
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
-    $this->state_begin_position = $this->current_position_for_node();
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYCHARSET);
 }
 <YYCHARSET> \\{ANY} {

@@ -6634,6 +6634,7 @@ array(
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
     $this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYQEOUT);
 }
 						case -28:
@@ -7358,6 +7359,7 @@ array(
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
     $this->state_begin_position = null;
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYINITIAL);
 }
 						case -102:
@@ -7375,7 +7377,8 @@ array(
 							{                      // \Q...\E ending
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
-    $this->state_begin_position = $this->current_position_for_node();
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYCHARSET);
 }
 						case -104:
@@ -7461,7 +7464,8 @@ array(
 							{                   // \Q...\E beginning
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
-    $this->state_begin_position = $this->current_position_for_node();
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYQEIN);
 }
 						case -112:
