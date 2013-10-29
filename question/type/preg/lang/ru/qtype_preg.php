@@ -690,7 +690,6 @@ $string['description_errorbefore'] = '<span style="color:red">';
 $string['description_errorafter'] = '</span>';
 
 // Strings for explaining graph
-$string['explain_backref'] = 'результат подвыражения #';
 $string['explain_define'] = 'TODO';
 $string['explain_unknow_meta'] = 'неизвестный мета-узел';
 $string['explain_any_char'] = 'Любой символ из';
