@@ -73,3 +73,12 @@ class qtype_preg_pathtodot_incorrect extends qtype_preg_exception {
         parent::__construct($errorcode, $a, $debuginfo);
     }
 }
+
+/**
+ * Class for exceptions caused by dot (incorrect dot code or even a bug in dot itself).
+ */
+class qtype_preg_dot_error extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}

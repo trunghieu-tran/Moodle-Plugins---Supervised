@@ -31,26 +31,174 @@ require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.ph
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
+ * Represents a node or a lexem position in 2 ways: "absolute" (considering the whole string)
+ * and "relative" (considering lines and columns).
+ */
+class qtype_preg_position {
+    /** First index of something (absolute positioning). */
+    public $indfirst = -1;
+    /** Last index of something (absolute positioning). */
+    public $indlast = -1;
+    /** Index of the line where something begins. */
+    public $linefirst = -1;
+    /** Index of the line where something ends. */
+    public $linelast = -1;
+    /** Index of the first character on the first line. */
+    public $colfirst = -1;
+    /** Index of the last character on the last line. */
+    public $collast = -1;
+
+    public function __construct($indfirst = -1, $indlast = -1, $linefirst = -1, $linelast = -1, $colfirst = -1, $collast = -1) {
+        $this->indfirst = $indfirst;
+        $this->indlast = $indlast;
+        $this->linefirst = $linefirst;
+        $this->linelast = $linelast;
+        $this->colfirst = $colfirst;
+        $this->collast = $collast;
+    }
+
+    public function compose($with) {
+        return new qtype_preg_position($this->indfirst, $with->indlast,
+                                       $this->linefirst, $with->linelast,
+                                       $this->colfirst, $with->collast);
+    }
+
+    public function add_chars_left($count) {
+        return new qtype_preg_position($this->indfirst + $count, $this->indlast,
+                                       $this->linefirst, $this->linelast,
+                                       $this->colfirst + $count, $this->collast);
+    }
+
+    public function add_chars_right($count) {
+        return new qtype_preg_position($this->indfirst, $this->indlast + $count,
+                                       $this->linefirst, $this->linelast,
+                                       $this->colfirst, $this->collast + $count);
+    }
+}
+
+/**
  * Representation of nodes and leafs as they were typed in the regex.
  */
 class qtype_preg_userinscription {
-    /** General case, contains the same string as typed by user. */
-    const TYPE_GENERAL = 'userinscription_general';
-    /** Flag that needs an additional description that must be stored in the lang file (unicode properties names etc). */
-    const TYPE_CHARSET_FLAG = 'userinscription_charset_flag';
-
     /** String with the leaf itself. */
     public $data = '';
-    /** Type of the user inscription. */
-    public $type = null;
+    /** Subype of the flag in case of \w, \d, [:alnum:] or something. See charset_flag constants. */
+    public $isflag = null;
 
-    public function __construct($data = '', $type = self::TYPE_GENERAL) {
+    public function __construct($data = '', $isflag = null) {
         $this->data = $data;
-        $this->type = $type;
+        $this->isflag = $isflag;
     }
 
     public function __toString() {
         return $this->data;
+    }
+
+    /**
+     * Checks if it's a simple character like a, b or й.
+     */
+    public function is_single_character() {
+        return $this->isflag === null &&
+               textlib::strlen($this->data) == 1;
+    }
+
+    public function is_character_range() {
+        if ($this->isflag !== null) {
+            return false;
+        }
+        $mpos = textlib::strpos($this->data, '-');
+        return $mpos !== null && $mpos > 0 && $mpos < textlib::strlen($this->data) - 1;
+    }
+
+    /**
+     * Checks if it's a valid (with a special meaning) escape sequence.
+     */
+    public function is_valid_escape_sequence() {
+        if ($this->is_character_range()) {
+            return false;
+        }
+        $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', 'x',
+                         'd', 'D', 'h', 'H', 's', 'S', 'v', 'V', 'w', 'W',
+                         'p', 'P');
+        return textlib::strlen($this->data) > 1 && $this->data[0] == '\\' &&
+               (in_array($this->data[1], $allowed) || ctype_digit(textlib::substr($this->data, 1)));
+    }
+
+    /**
+     * Checks if it's one of the following characters: \a \b \e \f \n \r \t
+     */
+    public function is_single_escape_sequence_character() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        $allowed = array('a', 'b', 'e', 'f', 'n', 'r', 't');
+        return in_array($this->data[1], $allowed);
+    }
+
+    /**
+     * Checks if it's a character represented as \cx
+     */
+    public function is_single_escape_sequence_character_c() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return $this->data[1] == 'c';
+    }
+
+    /**
+     * Checks if it's a character represented as \ddd
+     */
+    public function is_single_escape_sequence_character_oct() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return ctype_digit(textlib::substr($this->data, 1));
+    }
+
+    /**
+     * Checks if it's a character represented as \xhh of \x{hh}
+     */
+    public function is_single_escape_sequence_character_hex() {
+        if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
+            return false;
+        }
+        return $this->data[1] == 'x';
+    }
+
+    public function is_posix_flag() {
+        return $this->isflag !== null && $this->data[0] == '[';
+    }
+
+    public function is_uprop_flag() {
+        return $this->isflag !== null && $this->data[0] == '\\' && ($this->data[1] == 'p' || $this->data[1] == 'P');
+    }
+
+    public function is_slash_flag() {
+        return $this->isflag !== null && !$this->is_uprop_flag() && $this->data[0] == '\\';
+    }
+
+    public function is_flag_negative() {
+        if (!$this->isflag) {
+            return false;
+        }
+        if ($this->data[0] == '\\') {
+            return ctype_upper($this->data[1]); // Fortunately, this works both for \W and, for example, \PL    TODO: \Z, \A
+        }
+        if ($this->data[0] == '[') {
+            return $this->data[2] == '^';
+        }
+        return false;
+    }
+
+    public function lang_key($usedescription = false) {
+        if ($this->isflag === null || !$usedescription) {
+            return $this->isflag;
+        }
+        $result = 'description_charflag_' . $this->isflag;
+        if ($this->is_flag_negative()) {
+            $result .= '_neg';
+        }
+        return $result;
     }
 }
 
@@ -58,22 +206,16 @@ class qtype_preg_userinscription {
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
 class qtype_preg_lexem {
-    /** Index of the line where the node begins. */
-    public $linefirst = -1;
-    /** Index of the line where the node ends. */
-    public $linelast = -1;
-    /** Index of the first character on the first line of this node in the regex. */
-    public $indfirst = -1;
-    /** Index of the last character pn the last line of this node in the regex. */
-    public $indlast = -1;
+    /** An instance of qtype_preg_position. */
+    public $position = null;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
 
-    public function __construct($linefirst, $linelast, $indfirst, $indlast, $userinscription) {
-        $this->linefirst = $linefirst;
-        $this->linelast = $linelast;
-        $this->indfirst = $indfirst;
-        $this->indlast = $indlast;
+    /**
+     * Sets position and userinscription for the node.
+     */
+    public function set_user_info($position, $userinscription = array()) {
+        $this->position = $position;
         $this->userinscription = $userinscription;
     }
 }
@@ -104,8 +246,6 @@ interface qtype_preg_matcher_state {
  */
 abstract class qtype_preg_node {
 
-    /** Abstract node class, not representing real things. */
-    const TYPE_ABSTRACT = 'node_abstract';
     /** A character or a character set. */
     const TYPE_LEAF_CHARSET = 'leaf_charset';
     /** Meta-character or escape sequence matching with a set of characters that couldn't be enumerated. */
@@ -143,14 +283,8 @@ abstract class qtype_preg_node {
     public $subtype;
     /** Errors found for this particular node. */
     public $errors = array();
-    /** Index of the line where the node begins. */
-    public $linefirst = -1;
-    /** Index of the line where the node ends. */
-    public $linelast = -1;
-    /** Index of the first character on the first line of this node in the regex. */
-    public $indfirst = -1;
-    /** Index of the last character pn the last line of this node in the regex. */
-    public $indlast = -1;
+    /** An instance of qtype_preg_position. */
+    public $position = null;
     /** An instance of qtype_preg_userinscription. */
     public $userinscription = null;
     /** Identifier of this node. */
@@ -163,7 +297,13 @@ abstract class qtype_preg_node {
     public $lastpos = null;
 
     public function __construct() {
-        $this->type = self::TYPE_ABSTRACT;
+
+    }
+
+    public function __clone() {
+        if ($this->position !== null) {
+            $this->position = clone $this->position;
+        }
     }
 
     /**
@@ -183,7 +323,22 @@ abstract class qtype_preg_node {
      * expands it to be binary for better precision, thus AST is modified. All passed indexes are updated
      * to the indexes of the found subtree.
      */
-    public function node_by_regex_fragment(&$linefirst, &$linelast, &$indfirst, &$indlast, &$idcounter) {
+    public function node_by_regex_fragment($indexfirst, $indexlast, &$idcounter) {
+        if ($indexfirst - $indexlast == 1) {
+            // Special case: fictive leaves.
+            $current = array($this);
+            while (count($current) > 0) {
+                $tmp = array_pop($current);
+                if ($tmp->position->indfirst == $indexfirst && $tmp->position->indlast == $indexlast) {
+                    return $tmp;
+                }
+                if (is_a($tmp, 'qtype_preg_operator')) {
+                    $current = array_merge($current, $tmp->operands);
+                }
+            }
+            return null;
+        }
+
         $result = $this;
         $found = is_a($result, 'qtype_preg_leaf');
 
@@ -191,11 +346,9 @@ abstract class qtype_preg_node {
         while (!$found) {
             $replaced = false;
             foreach ($result->operands as $operand) {
-                $better_than_result = ($operand->linefirst > $result->linefirst || ($operand->linefirst == $result->linefirst && $operand->indfirst >= $result->indfirst)) &&
-                                      ($operand->linelast < $result->linelast || ($operand->linelast == $result->linelast && $operand->indlast <= $result->indlast));
+                $better_than_result = ($operand->position->indfirst >= $result->position->indfirst) && ($operand->position->indlast <= $result->position->indlast);
 
-                $suits_needed = ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) &&
-                                ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast));
+                $suits_needed = ($operand->position->indfirst <= $indexfirst) && ($operand->position->indlast >= $indexlast);
 
                 if ($better_than_result && $suits_needed) {
                     $result = $operand;
@@ -205,8 +358,7 @@ abstract class qtype_preg_node {
             $found = !$replaced || is_a($result, 'qtype_preg_leaf');
         }
 
-        $found = ($result->linefirst < $linefirst || ($result->linefirst == $linefirst && $result->indfirst <= $indfirst)) &&
-                 ($result->linelast > $linelast || ($result->linelast == $linelast && $result->indlast >= $indlast));
+        $found = ($result->position->indfirst <= $indexfirst) && ($result->position->indlast >= $indexlast);
 
         if (!$found) {
             return null;
@@ -220,44 +372,54 @@ abstract class qtype_preg_node {
 
             for ($i = 0; $i < $count; $i++) {
                 $operand = $result->operands[$i];
-                if ($operand->linefirst < $linefirst || ($operand->linefirst == $linefirst && $operand->indfirst <= $indfirst)) {
+                if ($operand->position->indfirst <= $indexfirst) {
                     $from = $i;
                 }
                 $operand = $result->operands[$count - $i - 1];
-                if ($operand->linelast > $linelast || ($operand->linelast == $linelast && $operand->indlast >= $indlast)) {
+                if ($operand->position->indlast >= $indexlast) {
                     $to = $count - $i - 1;
                 }
             }
             $result->expand($from, $to, $idcounter);
+
+            // Update the result again.
+            foreach ($result->operands as $operand) {
+                $better_than_result = ($operand->position->indfirst >= $result->position->indfirst) && ($operand->position->indlast <= $result->position->indlast);
+                $suits_needed = ($operand->position->indfirst <= $indexfirst) && ($operand->position->indlast >= $indexlast);
+                if ($better_than_result && $suits_needed) {
+                    $result = $operand;
+                }
+            }
         }
 
-        // If the node is found, update the indexes, return NULL otherwise.
-        $linefirst = $result->linefirst;
-        $linelast = $result->linelast;
-        $indfirst = $result->indfirst;
-        $indlast = $result->indlast;
         return $result;
     }
 
     /**
      * Expands the subtrees of operands at the given indexes.
      */
-    public function expand($from, $to, &$idcounter) {
+    public function expand($from, $to, &$idcounter, $expandsubtree = false) {
     }
 
     /**
      * Expands the subtrees of all operands.
      */
-    public function expand_all(&$idcounter) {
+    public function expand_all(&$idcounter, $expandsubtree = false) {
     }
 
     /**
-     * Sets indexes and userinscription for the node.
+     * Sets position and userinscription for the node.
      */
-    public function set_user_info($indfirst, $indlast, $userinscription = null) {
-        $this->indfirst = $indfirst;
-        $this->indlast = $indlast;
+    public function set_user_info($position, $userinscription = array()) {
+        $this->position = $position;
         $this->userinscription = $userinscription;
+    }
+
+    /**
+     * Returns the key for this node in the lang file.
+     */
+    public function lang_key($usedescription = false) {
+        return $usedescription ? 'description_' . $this->subtype : $this->subtype;
     }
 
     /**
@@ -292,6 +454,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public $assertionsafter = array();
 
     public function __clone() {
+        parent::__clone();
         // When clonning a leaf we also want the merged assertions to be cloned.
         foreach ($this->assertionsbefore as $i => $assertionbefore) {
             $this->assertionsbefore[$i] = clone $assertionbefore;
@@ -311,6 +474,14 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         $this->nullable = false;
         $this->firstpos = array($this->id);
         $this->lastpos = array($this->id);
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->negative) {
+            $result .= '_neg';
+        }
+        return $result;
     }
 
     /**
@@ -643,6 +814,7 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     public $operands = array();
 
     public function __clone() {
+        parent::__clone();
         // When clonning an operator we also want its subtree to be cloned.
         foreach ($this->operands as $i => $operand) {
             $this->operands[$i] = clone $operand;
@@ -665,9 +837,11 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         }
     }
 
-    public function expand($from, $to, &$idcounter) {
-        for ($i = $from; $i <= $to; $i++) {
-            $this->operands[$i]->expand_all($idcounter);
+    public function expand($from, $to, &$idcounter, $expandsubtree = false) {
+        if ($expandsubtree) {
+            for ($i = $from; $i <= $to; $i++) {
+                $this->operands[$i]->expand_all($idcounter, $expandsubtree);
+            }
         }
 
         if (count($this->operands) <= 2) {
@@ -697,15 +871,24 @@ abstract class qtype_preg_operator extends qtype_preg_node {
 
         // Update operands of this node.
         $this->operands = $operands;
-        $newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+        if ($expandsubtree) {
+        	$newnode->expand(0, count($newnode->operands) - 2, $idcounter);
+        }
+
+        // Fix the new node position.
+        $left = $newnode->operands[0];
+        $right = $newnode->operands[count($newnode->operands) - 1];
+        $newnode->position = new qtype_preg_position($left->position->indfirst, $right->position->indlast,
+                                                     $left->position->linefirst, $right->position->linelast,
+                                                     $left->position->colfirst, $right->position->collast);
 
         if (count($operands) == 1) {
             $this->operands = $newnode->operands;
         }
     }
 
-    public function expand_all(&$idcounter) {
-        $this->expand(0, count($this->operands) - 1, $idcounter);
+    public function expand_all(&$idcounter, $expandsubtree = false) {
+        $this->expand(0, count($this->operands) - 1, $idcounter, $expandsubtree);
     }
 }
 
@@ -740,16 +923,54 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
     }
 
-    protected function calc_ranges() {
-        $this->israngecalculated = true;
-        die('implement range calulate before use it!');
+    public function is_single_character() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_SET &&
+               $this->flags[0][0]->data->length() == 1;
+    }
+
+    public function is_single_printable_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return !qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::Z_ranges()) &&
+               !qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::C_ranges());
+    }
+
+    public function is_single_non_printable_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::Z_ranges()) ||
+               qtype_preg_unicode::is_in_range($this->flags[0][0]->data[0], qtype_preg_unicode::C_ranges());
+    }
+
+    /**
+     * Checks if it's a single \a \b \e \f \r \t
+     */
+    public function is_single_escape_sequence_character() {
+        if (!$this->is_single_character()) {
+            return false;
+        }
+        return in_array($this->userinscription[0]->data, qtype_preg_lexer::char_escape_sequences_inside_charset());
+    }
+
+    public function is_single_flag() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG &&
+               $this->flags[0][0]->data != qtype_preg_charset_flag::META_DOT;
+    }
+
+    public function is_single_dot() {
+        return count($this->flags) == 1 &&
+               $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG &&
+               $this->flags[0][0]->data == qtype_preg_charset_flag::META_DOT;
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;
         }
-        $result = false;
         if ($this->flags === null) {
             return false;
         }
@@ -773,6 +994,59 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $length = 0;
         return false;
     }
+    
+    /*public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
+        $desired_chars = array(array(0x21, 0x007F));
+        $desired_whitespaces = array(array(0x20, 0x20));
+
+        foreach ($this->flags as $flags) {
+            // Get intersection of all current flags.
+            $ranges = qtype_preg_unicode::dot_ranges();
+
+            foreach ($flags as $flag) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                }
+                if ($flag->negative) {
+                    $currange = qtype_preg_unicode::negate_ranges($currange);
+                }
+                $ranges = qtype_preg_unicode::intersect_ranges($ranges, $currange);
+            }
+            if ($this->negative) {
+                $ranges = qtype_preg_unicode::negate_ranges($ranges);
+            }
+
+            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_chars);
+            if (!empty($desired)) {
+                $code = $desired[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
+            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_whitespaces);
+            if (!empty($desired)) {
+                $code = $desired[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
+            if (!empty($ranges)) {
+                $code = $ranges[0][0];
+                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
+            }
+
+            // Check all the returned ranges.
+            //foreach ($ranges as $range) {
+            //    for ($i = $range[0]; $i <= $range[1]; $i++) {
+            //        $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
+            //        // if ($this->match($c, 0, $l)) {
+            //        return $c;
+            //        // }
+            //    }
+            //}
+        }
+        return new qtype_poasquestion_string('');
+    }*/
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
         $circumflex = new qtype_preg_leaf_assert_circumflex;
@@ -828,6 +1102,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return new qtype_poasquestion_string('');
     }
 
+
     /**
      * Check if other charset is included in this. That means that any character matching other also matches this.
      * @param other charset to check.
@@ -845,7 +1120,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -867,7 +1142,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -924,7 +1199,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -946,7 +1221,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -1007,14 +1282,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         return $result;
     }*/
-
-    public function add_flag_dis(qtype_preg_charset_flag $flag) {
-        echo 'implement add_flag before use!';
-    }
-
-    public function add_flag_con(qtype_preg_charset_flag $flag) {
-        echo 'implement add_flag before use!';
-    }
 
     /**
      * Intersects this charset with other one.
@@ -1120,11 +1387,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
 class qtype_preg_charset_flag {
 
     // Charset types.
-    const SET                    = 'enumerable_characters';
-    const FLAG                   = 'functionally_calculated_characters';
-    const UPROP                  = 'unicode_property';
-    const CIRCUMFLEX             = 'circumflex';
-    const DOLLAR                 = 'dollar';
+    const TYPE_SET               = 'enumerable_characters';
+    const TYPE_FLAG              = 'functionally_calculated_characters';
 
     const META_DOT               = 'dot';
 
@@ -1140,7 +1404,7 @@ class qtype_preg_charset_flag {
     const POSIX_ALPHA            = 'alpha';      // [:alpha:]
     const POSIX_ASCII            = 'ascii';      // [:ascii:]
     const POSIX_BLANK            = 'blank';      // [:blank:]
-    const POSIX_CNTRL            = 'cntrl';      // [:ctrl:]
+    const POSIX_CNTRL            = 'cntrl';      // [:cntrl:]
     const POSIX_DIGIT            = 'digit';      // [:digit:]
     const POSIX_GRAPH            = 'graph';      // [:graph:]
     const POSIX_LOWER            = 'lower';      // [:lower:]
@@ -1287,9 +1551,9 @@ class qtype_preg_charset_flag {
 
     /** Is this flag negative? */
     public $negative = false;
-    /** Type of this flag, can be either TYPE_SET or TYPE_FLAG or TYPE_UPROP or TYPE_CIRCUMFLEX or TYPE_DOLLAR. */
+    /** Type of this flag, can be either TYPE_SET or TYPE_FLAG. */
     public $type;
-    /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG or TYPE_UPROP correspondingly. */
+    /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG correspondingly. */
     public $data;
 
 
@@ -1309,10 +1573,6 @@ class qtype_preg_charset_flag {
         $this->data = $data;
     }
 
-    public function is_null_length() {
-        return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
-    }
-
     public function match($str, $pos, $caseless) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
@@ -1325,15 +1585,10 @@ class qtype_preg_charset_flag {
         }
 
         switch ($this->type) {
-            case self::CIRCUMFLEX:
-                return (($pos === 0) xor $this->negative);
-            case self::DOLLAR:
-                return (($pos === $str->length() - 1) xor $this->negative);
-            case self::SET:
+            case self::TYPE_SET:
                 $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data);
                 break;
-            case self::FLAG:
-            case self::UPROP:
+            case self::TYPE_FLAG:
                 $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
                 break;
         }
@@ -1349,20 +1604,11 @@ class qtype_preg_charset_flag {
     public function tohr() {
         $result = '';
         switch ($this->type) {
-            case self::CIRCUMFLEX:
-                $result = '^';
-                break;
-            case self::DOLLAR:
-                $result = '$';
-                break;
-            case self::SET:
+            case self::TYPE_SET:
                 $result = $this->data;
                 break;
-            case self::FLAG:
+            case self::TYPE_FLAG:
                 $result = $this->data;
-                break;
-            case self::UPROP:
-                $result = 'todo';
                 break;
             case self::META_DOT:
                 $result = '.';
@@ -1660,7 +1906,16 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_BACKREF;
+        $this->subtype = $this->type;
         $this->number = $number;
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -1734,47 +1989,34 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 }
 
-class qtype_preg_leaf_options extends qtype_preg_leaf {
-    public $posopt;
-    public $negopt;
-
-    public function __construct($posopt = null, $negopt = null) {
-        $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
-        $this->posopt = $posopt;
-        $this->negopt = $negopt;
-    }
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_options class before use it!');
-    }
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_options class before use it!');
-    }
-    public function tohr() {
-        $result = '(?';
-        if (!empty($this->posopt)) {
-            $result .= $this->posopt;
-        }
-        if (!empty($this->negopt)) {
-            $result .= '-'.$this->negopt;
-        }
-        return $result.')';
-    }
-}
-
 class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     public $number;
 
     public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_RECURSION;
+        $this->subtype = $this->type;
         $this->number = $number;
     }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->number === 0) {
+            $result .= '_all';
+        } else if ($usedescription && is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
+    }
+
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for qtype_preg_leaf_recursion class before use it!');
+        die ('TODO: implement abstract function match for qtype_preg_leaf_recursion class before use it!');
     }
+
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for qtype_preg_leaf_recursion class before use it!');
+        die ('TODO: implement abstract function character for qtype_preg_leaf_recursion class before use it!');
     }
+
     public function tohr() {
         return 'recursion';
     }
@@ -1846,6 +2088,34 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     }
 }
 
+class qtype_preg_leaf_options extends qtype_preg_leaf {
+    public $posopt;
+    public $negopt;
+
+    public function __construct($posopt = null, $negopt = null) {
+        $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
+        $this->subtype = $this->type;
+        $this->posopt = $posopt;
+        $this->negopt = $negopt;
+    }
+    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
+    }
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        die ('TODO: implement abstract function character for qtype_preg_leaf_options class before use it!');
+    }
+    public function tohr() {
+        $result = '(?';
+        if (!empty($this->posopt)) {
+            $result .= $this->posopt;
+        }
+        if (!empty($this->negopt)) {
+            $result .= '-'.$this->negopt;
+        }
+        return $result.')';
+    }
+}
+
 /**
  * Defines finite quantifiers with left and right borders, unary operator.
  * Possible errors: left border is greater than right one.
@@ -1865,6 +2135,7 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
 
     public function __construct($leftborder = 0, $rightborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
+        $this->subtype = $this->type;
         $this->leftborder = $leftborder;
         $this->rightborder = $rightborder;
         $this->lazy = $lazy;
@@ -1880,6 +2151,33 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         parent::calculate_nflf($followpos);
         $this->nullable = $this->nullable || $this->leftborder == 0;
         // TODO - followpos for situations like {2,10}
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription) {
+            if ($this->leftborder == 0) {
+                $result .= '_0';
+                if ($this->rightborder == 1) {
+                    $result .= '1';
+                }
+            } else if ($this->leftborder == 1) {
+                $result .= '_1';
+            } else if ($this->leftborder == $this->rightborder) {
+                $result .= '_strict';
+            }
+        }
+        return $result;
+    }
+
+    public function lang_key_for_greediness() {
+        if ($this->lazy) {
+            return 'description_quant_lazy';
+        }
+        if ($this->possessive) {
+            return 'description_quant_possessive';
+        }
+        return 'description_quant_greedy';
     }
 
     // TODO - ui_nodename().
@@ -1901,6 +2199,7 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 
     public function __construct($leftborder = 0, $lazy = false, $greedy = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
+        $this->subtype = $this->type;
         $this->leftborder = $leftborder;
         $this->lazy = $lazy;
         $this->greedy = $greedy;
@@ -1926,6 +2225,29 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         }
     }
 
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription) {
+            $result = 'description_' . $this->subtype;
+            if ($this->leftborder == 0) {
+                $result .= '_0';
+            } else if ($this->leftborder == 1) {
+                $result .= '_1';
+            }
+        }
+        return $result;
+    }
+
+    public function lang_key_for_greediness() {
+        if ($this->lazy) {
+            return 'description_quant_lazy';
+        }
+        if ($this->possessive) {
+            return 'description_quant_possessive';
+        }
+        return 'description_quant_greedy';
+    }
+
     // TODO - ui_nodename().
 }
 
@@ -1936,6 +2258,7 @@ class qtype_preg_node_concat extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
+        $this->subtype = $this->type;
     }
 
     public function is_subpattern() {
@@ -2019,6 +2342,7 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ALT;
+        $this->subtype = $this->type;
     }
 
     public function is_subpattern() {
@@ -2088,21 +2412,32 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     /** Once-only subexpression. */
     const SUBTYPE_ONCEONLY = 'onceonly_node_subexpr';
     /** Grouping node. For author's tools only.*/
-    const SUBTYPE_GROUPING = 'grouping_node_supbatt';
+    const SUBTYPE_GROUPING = 'grouping_node_subexpr';
     /** Duplicate subexpressions. For authoring tools only.*/
     const SUBTYPE_DUPLICATE_SUBEXPRESSIONS = 'duplicate_node_subexpr';
 
     /** Subexpression number. */
     public $number = -1;
+    /** Subexpression name. */
+    public $name = null;
 
-    public function __construct($subtype, $number = -1) {
+    public function __construct($subtype, $number = -1, $name = null) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
+        $this->name = $name;
     }
 
     public function is_subpattern() {
         return true;    // Subexpression is a subpattern.
+    }
+
+    public function lang_key($usedescription = false) {
+        $result = parent::lang_key($usedescription);
+        if ($usedescription && $this->name !== null) {
+            $result .= '_name';
+        }
+        return $result;
     }
 
     // TODO - ui_nodename().
@@ -2132,14 +2467,16 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
     /** Subexpression number. */
     public $number = -1;
-    /** Is condition satisfied?. */
-    public $condbranch = null;
 
     public function __construct($subtype = null, $number = -1, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
-        $this->condbranch = $condbranch;
+        $this->operands = $condbranch === null ? array() : array($condbranch);   // Assertion condition is the first operand.
+    }
+
+    public function is_condition_assertion() {
+        return $this->subtype == self::SUBTYPE_PLA || $this->subtype == self::SUBTYPE_NLA || $this->subtype == self::SUBTYPE_PLB || $this->subtype == self::SUBTYPE_NLB;
     }
 
     public function is_subpattern() {
@@ -2149,6 +2486,22 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
     public function calculate_nflf(&$followpos) {
         parent::calculate_nflf($followpos);
         // TODO what should be here?
+    }
+
+    public function lang_key($usedescription = false) {
+        if (!$usedescription) {
+            return parent::lang_key($usedescription);
+        }
+        $result = $this->is_condition_assertion()
+            ? 'description_' . $this->type
+            : 'description_' . $this->subtype;
+
+        if ($this->number === 0) {
+            $result .= '_all';
+        } else if (is_string($this->number)) {
+            $result .= '_name';
+        }
+        return $result;
     }
 
     // TODO - ui_nodename().
@@ -2215,8 +2568,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
      */
     public function error_string() {
         $a = new stdClass;
-        $a->indfirst = $this->indfirst;
-        $a->indlast = $this->indlast;
+        $a->linefirst = $this->position->linefirst;
+        $a->linelast = $this->position->linelast;
+        $a->colfirst = $this->position->colfirst;
+        $a->collast = $this->position->collast;
         $a->addinfo = $this->addinfo;
         return get_string($this->subtype, 'qtype_preg', $a);
     }

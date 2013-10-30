@@ -26,7 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
@@ -102,7 +101,7 @@ class qtype_preg_description_state {
 /**
  * Options, for generating description - affects scanning, parsing, description genetating.
  */
-class qtype_preg_description_options extends qtype_preg_handling_options {
+class qtype_preg_description_options extends qtype_preg_authoring_tools_options {
 
     /** @var bool use userinscription for charset description instead of flags */
     public $charsetuserinscription = false;
@@ -129,8 +128,11 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param string $regex - regular expression to handle.
      * @param object $options - options to handle regex, i.e. any necessary additional parameters.
      */
-    public function __construct($regex = null, $options = null, $engine = null, $notation = null) {
-        parent::__construct($regex, $options, $engine, $notation);
+    public function __construct($regex = null, $options = null) {
+        if ($options === null) {
+            $options = new qtype_preg_description_options();
+        }
+        parent::__construct($regex, $options);
         $this->state = new qtype_preg_description_state();
     }
 
@@ -146,27 +148,6 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      */
     protected function node_infix() {
         return 'description';
-    }
-
-    /**
-     * Overloaded from qtype_preg_regex_handler.
-     */
-    protected function get_engine_node_name($nodetype, $nodesubtype) {
-        switch ($nodesubtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
-                return 'qtype_preg_description_leaf_assert_esc_b';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                return 'qtype_preg_description_leaf_assert_esc_a';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:
-                return 'qtype_preg_description_leaf_assert_esc_z';
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-                return 'qtype_preg_description_leaf_assert_esc_g';
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                return 'qtype_preg_description_leaf_assert_circumflex';
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                return 'qtype_preg_description_leaf_assert_dollar';
-        }
-        return parent::get_engine_node_name($nodetype, $nodesubtype);
     }
 
     /**
@@ -188,7 +169,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      *
      * @param array $json contains text of description
      */
-    public function generate_json_for_accepted_regex(&$json, $id = -1) {
+    public function generate_json_for_accepted_regex(&$json) {
         $json[$this->json_key()] = $this->default_description();
     }
 
@@ -214,40 +195,29 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * @param int $rangelengthmax limit for charset ranges in which it is displayed as a enum of characters
      * @return string description.
      */
-    public function description($numbering_pattern, $wholepattern=null, $charsetuserinscr=false, $rangelengthmax=5) {
-
-        // set up options
+    public function description($numbering_pattern, $wholepattern = null, $charsetuserinscr = false, $rangelengthmax = 5) {
         $this->state->reset();// restore default state
         $backupoptions = $this->options;// save original options
-        $this->options->charsetuserinscription  = (bool)$charsetuserinscr;
-        $this->options->rangelengthmax          = (int)$rangelengthmax;
-        // make description
+        $this->options->charsetuserinscription = (bool)$charsetuserinscr;
+        $this->options->rangelengthmax = (int)$rangelengthmax;
+
+        $string = '';
         if (isset($this->dst_root)) {
-            // var_dump(123);
             $string = $this->dst_root->description($numbering_pattern, null, null);
-            $string = $this->postprocessing($string);
-        } else {
-            $string = 'tree was not built';
+            $string = preg_replace('%;((?:</span>)?)]%u', '\1]', $string);   // Postprocessing
         }
         // put string into $wholepattern
-        if ($wholepattern !== null && $wholepattern !== '') {
-            $string = str_replace('%s', $string, $wholepattern);
+        if (!empty($wholepattern)) {
+            $string = qtype_poasquestion_string::replace('%s', $string, $wholepattern);
         }
         $this->options = $backupoptions; // restore original options
         return $string;
-    }
-
-    private function postprocessing($s) {
-
-        $result = preg_replace('%;((?:</span>)?)]%', '\1]', $s);
-        return $result;
     }
 
     /**
      * Calling default description() with default params
      */
     public function default_description() {
-
         return $this->description('<span class="description_node_%n">%s</span>');
     }
 

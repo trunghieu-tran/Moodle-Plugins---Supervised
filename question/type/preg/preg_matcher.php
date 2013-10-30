@@ -483,6 +483,36 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
+     * Overloaded from qtype_preg_regex_handler.
+     */
+    protected function add_selection_nodes($oldroot) {
+        $newroot = parent::add_selection_nodes($oldroot);
+        if ($this->selectednode === null) {
+            return $newroot;
+        }
+
+        $parent = $this->find_parent_node($newroot, $this->selectednode);
+        $subexpression = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, -2);
+        $subexpression->subpattern = -2;
+
+        if ($parent === null) {
+            // Replace the AST root.
+            $subexpression->operands[] = $newroot;
+            return $subexpression;
+        }
+
+        // Just insert a subexpression.
+        $subexpression->operands[] = $this->selectednode;
+        foreach ($parent->operands as $key => $operand) {
+            if ($operand === $this->selectednode) {
+                $parent->operands[$key] = $subexpression;
+                break;
+            }
+        }
+        return $newroot;
+    }
+
+    /**
      * Returns an object of match results, helper method.
      */
     public function get_match_results() {

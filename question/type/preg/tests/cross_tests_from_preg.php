@@ -2740,6 +2740,24 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_zero_length_loop_with_backref() {
+        $test1 = array( 'str'=>' a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>2,1=>0));
+
+        $test2 = array( 'str'=>'[prefix] a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>8,1=>9),
+                        'length'=>array(0=>2,1=>0));
+
+        return array('regex'=>'^*[a-z 0-9](\b)+\1a${1,}\1',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     function data_for_test_empty_string() {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
@@ -2990,6 +3008,25 @@ class qtype_preg_cross_tests_from_preg {
                         'length'=>array(0));
 
         return array('regex'=>'a|b{0}',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_many_quantifiers() {
+        $test1 = array( 'str'=>'Circle.Radius = 25; Circle.Center.point2d.X = 5; Circle.Center.point2d.Y = 0;',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0),
+                        'length'=>array(77));
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(69),
+                        'next'=>'C');
+
+        return array('regex'=>'\s*Circle\s*\.\s*Radius\s*=\s*25\s*;\s*Circle\s*\.\s*Center\s*\.\s*point2d\s*\.\s*X\s*=\s*5;\s*Circle\s*\.\s*Center\s*\.\s*point2d\s*\.\s*Y\s*=\s*0;\s*',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }

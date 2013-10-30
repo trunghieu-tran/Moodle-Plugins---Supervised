@@ -12,7 +12,7 @@ M.poasquestion_text_and_button = (function() {
     var self = {
 
     /** @var input, from witch we read data */
-    currentlinput : null,
+    current_input : null,
 
     /** @var data, readed from input */
     data : null,
@@ -39,6 +39,12 @@ M.poasquestion_text_and_button = (function() {
      * To set this property use method M.poasquestion_text_and_button.setup();
      */
     oneachpresscallback : null,
+
+    onclosecallback : null,
+
+    oncancelclicked : null,
+
+    onsaveclicked : null,
 
     /** @var data for module-extender */
     extendeddata : null,
@@ -92,8 +98,8 @@ M.poasquestion_text_and_button = (function() {
         e.preventDefault();
         var is_first_press = self.dialog === null;
 
-        self.currentlinput = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
-        self.data = self.currentlinput.val();
+        self.current_input = e.data.targetinput;// a reference to input from which we got a regex (this reference is passed as 'this' when we install this handler)
+        self.data = self.get_input_data();
         if (is_first_press) {
             // if the 'Test regex' button is first pressed, we should generate a dialog window
             self.setup_dialog();
@@ -115,14 +121,29 @@ M.poasquestion_text_and_button = (function() {
      */
     setup_dialog : function(pagewidth) {
         self.dialog = $('<div id="preg_authoring_tools_dialog"><p>Loading...</p></div>');
+
+        if (self.is_stand_alone()) {
+            buttons = [
+                {text: M.str.editor.close, click: self.oncancelclicked}
+            ]
+        } else {
+            buttons = [
+                {text: M.str.moodle.savechanges, click: self.onsaveclicked},
+                {text: M.str.moodle.cancel, click: self.oncancelclicked}
+            ]
+        }
+
         self.dialog.dialog({
             modal: true,
+            closeOnEscape: true,
             width: self.dialogwidth,
             title: self.dialogtitle,
-            buttons: [
-                {text: "Save", click: self.onsaveclicked},
-                {text: "Cancel", click: self.oncancelclicked}
-            ]
+            close: function() {
+                if (typeof(self.onclosecallback) === "function") {
+                    self.onclosecallback();
+                }
+            },
+            buttons: buttons
         });
     },
 
@@ -136,6 +157,7 @@ M.poasquestion_text_and_button = (function() {
     setup : function (options) {
         self.onfirstpresscallback = options.onfirstpresscallback;
         self.oneachpresscallback = options.oneachpresscallback;
+        self.onclosecallback = options.onclosecallback;
         self.oncancelclicked = options.oncancelclicked;
         self.onsaveclicked = options.onsaveclicked;
         self.extendeddata = options.extendeddata;
@@ -149,13 +171,25 @@ M.poasquestion_text_and_button = (function() {
     close_and_set_new_data : function(_data) {
         if (typeof(_data) === "string") {
             self.data = _data;
-            self.currentlinput.val(_data);
+            self.set_input_data(_data);
         } else {
-            self.currentlinput.val(self.data);
+            self.set_input_data(self.data);
         }
-		$('input[name=\'regextests[' + $(self.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
-        $('#id_test_regex').html('');
         self.dialog.dialog('close');
+    },
+
+    get_input_data : function() {
+        return self.current_input ? self.current_input.val() : '';
+    },
+
+    set_input_data : function(_data) {
+        if (self.current_input) {
+            self.current_input.val(_data);
+        }
+    },
+
+    is_stand_alone : function() {
+        return self.current_input.length===0 || (typeof self.current_input === 'undifined');
     }
 };
 

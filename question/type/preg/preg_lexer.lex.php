@@ -59,6 +59,8 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
+    // Positions skipped because preserveallnodes option was set to false.
+    protected $skipped_positions = array();
     // Array of lexical errors found.
     protected $errors = array();
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
@@ -85,8 +87,10 @@ class qtype_preg_lexer extends JLexBase  {
     protected $qe_sequence = '';
     // \Q...\E sequence length.
     protected $qe_sequence_length = 0;
-    // An instance of qtype_preg_leaf_charset, used when in YYCHARSET state.
+    // An instance of qtype_preg_leaf_charset, used in YYCHARSET state.
     protected $charset = null;
+    // An instance of qtype_preg_position, used in when yybegin is invoked.
+    protected $state_begin_position = null;
     // Number of characters in the charset excluding flags.
     protected $charset_count = 0;
     // Characters of the charset.
@@ -225,6 +229,74 @@ class qtype_preg_lexer extends JLexBase  {
                                          'Vai'                    => qtype_preg_charset_flag::VAI,
                                          'Yi'                     => qtype_preg_charset_flag::YI
                                   );
+    public static function char_escape_sequences_outside_charset() {
+        return array('\a',
+                     '\c',
+                     '\e',
+                     '\f',
+                     '\n',
+                     '\r',
+                     '\t',
+                     // \ddd
+                     '\x');
+    }
+    public static function char_escape_sequences_inside_charset() {
+        return array('\a',
+                     '\b',
+                     '\c',
+                     '\e',
+                     '\f',
+                     '\n',
+                     '\r',
+                     '\t',
+                     // \ddd
+                     '\x');
+    }
+    public static function code_of_char_escape_sequence($seq) {
+        static $codes = array('\a' => 0x07,
+                     '\b' => 0x08,
+                     /*'\c',*/
+                     '\e' => 0x1B,
+                     '\f' => 0x0C,
+                     '\n' => 0x0A,
+                     '\r' => 0x0D,
+                     '\t' => 0x09,
+                     // \ddd
+                     // \x
+                        );
+        if (textlib::strlen($seq) < 2) {
+            return null;
+        }
+        $octal = textlib::substr($seq, 1);
+        if (self::ctype_octal($octal)) {
+            return octdec($octal);
+        }
+        if (array_key_exists($seq, $codes)) {
+            return $codes[$seq];
+        }
+        if ($seq[1] == 'c') {
+            $x = textlib::strtoupper(textlib::substr($seq, 2));
+            $code = textlib::utf8ord($x);
+            if ($code > 127) {
+                return null;
+            }
+            $code ^= 0x40;
+            return $code;
+        }
+        if ($seq[1] == 'x') {
+            $start = 2;
+            $end = textlib::strlen($seq) - 1;
+            if ($seq[2] == '{') {
+                $start++;
+                $end--;
+            }
+            return hexdec(textlib::substr($seq, $start, $end - $start + 1));
+        }
+        return null;
+    }
+    public function get_skipped_positions() {
+        return $this->skipped_positions;
+    }
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -241,6 +313,16 @@ class qtype_preg_lexer extends JLexBase  {
         $this->options = $options;
         $this->modify_top_options_stack_item($options->modifiers, 0);
     }
+    protected static function ctype_octal($str) {
+        $str = new qtype_poasquestion_string($str);
+        for ($i = 0; $i < $str->length(); $i++) {
+            $ch = $str[$i];
+            if (!ctype_digit($ch) || (int)$ch > 7) {
+                return false;
+            }
+        }
+        return true;
+    }
     protected function modify_top_options_stack_item($set, $unset) {
         $errors = array();
         // Setting and unsetting modifier at the same time is error.
@@ -249,8 +331,7 @@ class qtype_preg_lexer extends JLexBase  {
             foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
                 if ($mod & $setunset) {
                     $modname = qtype_preg_handling_options::modifier_to_char($mod);
-                    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $modname);
-                    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+                    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $modname);
                     $errors[] = $error;
                 }
             }
@@ -289,17 +370,6 @@ class qtype_preg_lexer extends JLexBase  {
             }
         }
     }
-    protected function create_error_node($subtype, $addinfo) {
-        // Create the error node itself.
-        $error = new qtype_preg_node_error($subtype, htmlspecialchars($addinfo));
-        // Add the node to the lexer's errors array.
-        // Also add it to the charset's errors array if charset is not null.
-        $this->errors[] = $error;
-        if ($this->charset !== null) {
-            $this->charset->errors[] = $error;
-        }
-        return $error;
-    }
     /**
      * Sets modifiers for the given node using the top stack item.
      */
@@ -309,167 +379,176 @@ class qtype_preg_lexer extends JLexBase  {
             $node->caseless = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
     }
+    protected function current_position_for_node() {
+        $position = new qtype_preg_position($this->yychar, $this->yychar + $this->yylength() - 1,
+                                       $this->yyline, $this->yyline,
+                                       $this->yycol, $this->yycol + $this->yylength() - 1);
+        return $position;
+    }
+    protected function form_error($subtype, $addinfo, $addtonode = null) {
+        // Create the error node itself.
+        $error = new qtype_preg_node_error($subtype, htmlspecialchars($addinfo));
+        $error->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($addinfo)));
+        // Add the node to the lexer's errors array.
+        // Also add it to $addtonode if specified.
+        $this->errors[] = $error;
+        if ($addtonode !== null) {
+            $addtonode->errors[] = $error;
+        }
+        return $error;
+    }
     /**
      * Returns a quantifier token.
      */
-    protected function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greedy, $possessive) {
-        if ($infinite) {
-            $node = new qtype_preg_node_infinite_quant($leftborder, $lazy, $greedy, $possessive);
-        } else {
-            $node = new qtype_preg_node_finite_quant($leftborder, $rightborder, $lazy, $greedy, $possessive);
-        }
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+    protected function form_quant($text, $infinite, $leftborder, $rightborder, $lazy, $greedy, $possessive) {
+        $node = $infinite
+              ? new qtype_preg_node_infinite_quant($leftborder, $lazy, $greedy, $possessive)
+              : new qtype_preg_node_finite_quant($leftborder, $rightborder, $lazy, $greedy, $possessive);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         if (!$infinite && $leftborder > $rightborder) {
-            $rightoffset = 0;
-            $greedy || $rightoffset++;
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $leftborder . ',' . $rightborder);
-            $error->set_user_info($this->yyline, $this->yyline, $pos + 1, $pos + $length - 2 - $rightoffset, new qtype_preg_userinscription(''));
-            $node->errors[] = $error;
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $leftborder . ',' . $rightborder, $node);
         }
-        return new JLexToken(qtype_preg_yyParser::QUANT, $node);
+        return new JLexToken(qtype_preg_parser::QUANT, $node);
     }
     /**
      * Returns a control sequence token.
      */
-    protected function form_control($text, $pos, $length) {
+    protected function form_control($text) {
         // Error: missing ) at end.
-        if (qtype_preg_unicode::substr($text, $length - 1, 1) !== ')') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        if (qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) !== ')') {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, $text);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
+        $pos = $this->current_position_for_node();
+        $ui = array(new qtype_preg_userinscription($text));
         switch ($text) {
         case '(*ACCEPT)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ACCEPT);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*FAIL)':
         case '(*F)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_FAIL);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*COMMIT)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_COMMIT);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*THEN)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_THEN);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*SKIP)':
         case '(*SKIP:)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_SKIP);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*PRUNE)':
         case '(*PRUNE:)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_PRUNE);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*CR)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_CR);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*LF)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_LF);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*CRLF)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_CRLF);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*ANYCRLF)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ANYCRLF);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*ANY)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ANY);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*BSR_ANYCRLF)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*BSR_UNICODE)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*NO_START_OPT)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_NO_START_OPT);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*UTF8)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UTF8);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*UTF16)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UTF16);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         case '(*UCP)':
             $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UCP);
-            $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+            $node->set_user_info($pos, $ui);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         default:
             $delimpos = qtype_preg_unicode::strpos($text, ':');
             // Error: unknown control sequence.
             if ($delimpos === false) {
-                $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
-                $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-                return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
+                return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
             }
             // There is a parameter separated by ":"
             $subtype = qtype_preg_unicode::substr($text, 2, $delimpos - 2);
-            $name = qtype_preg_unicode::substr($text, $delimpos + 1, $length - $delimpos - 2);
+            $name = qtype_preg_unicode::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
             // Error: empty name.
             if ($name === '') {
-                $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
-                $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-                return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
+                return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
             }
             if ($subtype === 'MARK' || $delimpos === 2) {
                 $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
-                $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-                return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+                $node->set_user_info($pos, $ui);
+                return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
             } else if ($subtype === 'PRUNE') {
                 $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
-                $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $node->set_user_info($pos, $ui);
                 $node2 = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_PRUNE);
-                $node2->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-                return array(new JLexToken(qtype_preg_yyParser::PARSELEAF, $node),
-                             new JLexToken(qtype_preg_yyParser::PARSELEAF, $node2));
+                $node2->set_user_info($pos, $ui);
+                return array(new JLexToken(qtype_preg_parser::PARSELEAF, $node),
+                             new JLexToken(qtype_preg_parser::PARSELEAF, $node2));
             } else if ($subtype === 'SKIP') {
                 $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name);
-                $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-                return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+                $node->set_user_info($pos, $ui);
+                return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
             } else if ($subtype === 'THEN') {
                 $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
-                $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $node->set_user_info($pos, $ui);
                 $node2 = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_THEN);
-                $node2->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-                return array(new JLexToken(qtype_preg_yyParser::PARSELEAF, $node),
-                             new JLexToken(qtype_preg_yyParser::PARSELEAF, $node2));
+                $node2->set_user_info($pos, $ui);
+                return array(new JLexToken(qtype_preg_parser::PARSELEAF, $node),
+                             new JLexToken(qtype_preg_parser::PARSELEAF, $node2));
             }
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
     }
     /**
      * Returns a named subexpression token.
      */
-    protected function form_named_subexpr($text, $pos, $length, $name) {
+    protected function form_named_subexpr($text, $name) {
         // Error: empty name.
         if ($name === '') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
+            return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
-        $number = $this->map_subexpression($name, $pos, $length);
+        $number = $this->map_subexpression($name);
         $this->push_options_stack_item();
         // Error: subexpressions with same names should have same numbers.
         if (is_object($number)) {
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $number);  // An error is actually returned.
+            return new JLexToken(qtype_preg_parser::OPENBRACK, $number);  // $number contains the error object.
         }
         // Are we inside a (?| group?
         $penult = $this->opt_stack[$this->opt_count - 2];
@@ -480,177 +559,170 @@ class qtype_preg_lexer extends JLexBase  {
         }
         // If all is fine, fill the another, inverse, map.
         $this->subexpr_number_to_name_map[$number] = $name;
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
     }
     /**
      * Returns a conditional subexpression (number of name condition) token.
      */
-    protected function form_numeric_or_named_cond_subexpr($text, $pos, $length, $number, $ending = '') {
+    protected function form_numeric_or_named_cond_subexpr($text, $number, $ending = '') {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - strlen($ending)) != $ending) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        if (qtype_preg_unicode::substr($text, $this->yylength() - strlen($ending)) != $ending) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
+            return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
         $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         if (is_integer($number) && $number == 0) {
             // Error: reference to the whole expression.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            $node->errors[] = $error;
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $node);
         } else if ($number === '') {
             // Error: assertion expected.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            $node->errors[] = $error;
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
         }
         $this->nodes_with_subexpr_refs[] = $node;
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
-                     new JLexToken(qtype_preg_yyParser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('|'))));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+        $closebr = new qtype_preg_lexem();
+        $closebr->set_user_info($this->current_position_for_node());
+        return array(new JLexToken(qtype_preg_parser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_parser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_parser::CLOSEBRACK, $closebr));  // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a conditional subexpression (recursion condition) token.
      */
-    protected function form_recursive_cond_subexpr($text, $pos, $length, $number) {
+    protected function form_recursive_cond_subexpr($text, $number) {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - 1) != ')') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        if (qtype_preg_unicode::substr($text, $this->yylength() - 1) != ')') {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
+            return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
         $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         if ($number === '') {
             // Error: assertion expected.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            $node->errors[] = $error;
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
         }
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
-                     new JLexToken(qtype_preg_yyParser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('|'))));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+        $closebr = new qtype_preg_lexem();
+        $closebr->set_user_info($this->current_position_for_node());
+        return array(new JLexToken(qtype_preg_parser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_parser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_parser::CLOSEBRACK, $closebr));  // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a conditional subexpression (assertion condition) token.
      */
-    protected function form_assert_cond_subexpr($text, $pos, $length, $subtype) {
+    protected function form_assert_cond_subexpr($text, $subtype) {
         $this->push_options_stack_item();
         $this->push_options_stack_item();
         $node = new qtype_preg_node_cond_subexpr($subtype);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        return new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        return new JLexToken(qtype_preg_parser::CONDSUBEXPR, $node);
     }
     /**
      * Returns a conditional subexpression (define condition) token.
      */
-    protected function form_define_cond_subexpr($text, $pos, $length) {
+    protected function form_define_cond_subexpr($text) {
         $this->push_options_stack_item();
         // Error: unclosed condition.
-        if (qtype_preg_unicode::substr($text, $length - 1) != ')') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        if (qtype_preg_unicode::substr($text, $this->yylength() - 1) != ')') {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING, $text);
+            return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
         $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        return array(new JLexToken(qtype_preg_yyParser::CONDSUBEXPR, $node),
-                     new JLexToken(qtype_preg_yyParser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
-                     new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('|'))));     // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        $closebr = new qtype_preg_lexem();
+        $closebr->set_user_info($this->current_position_for_node());
+        return array(new JLexToken(qtype_preg_parser::CONDSUBEXPR, $node),
+                     new JLexToken(qtype_preg_parser::PARSELEAF, null),        // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
+                     new JLexToken(qtype_preg_parser::CLOSEBRACK, $closebr));  // Fictive lexem, used to satisfy grammar for both simple and assertion conditions
     }
     /**
      * Returns a named backreference token.
      */
-    protected function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
+    protected function form_named_backref($text, $namestartpos, $opentype, $closetype) {
         // Error: missing opening characters.
         if (qtype_preg_unicode::substr($text, $namestartpos - 1, 1) !== $opentype) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $opentype);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $opentype);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
         // Error: missing closing characters.
-        if (qtype_preg_unicode::substr($text, $length - 1, 1) !== $closetype) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, $closetype);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        if (qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) !== $closetype) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, $closetype);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        $name = qtype_preg_unicode::substr($text, $namestartpos, $length - $namestartpos - 1);
+        $name = qtype_preg_unicode::substr($text, $namestartpos, $this->yylength() - $namestartpos - 1);
         // Error: empty name.
         if ($name === '') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        return $this->form_backref($text, $pos, $length, $name);
+        return $this->form_backref($text, $name);
     }
     /**
      * Returns a backreference token.
      */
-    protected function form_backref($text, $pos, $length, $number) {
+    protected function form_backref($text, $number) {
         $node = new qtype_preg_leaf_backref($number);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $this->set_node_modifiers($node);
         $this->backrefs[] = $node;
         $this->nodes_with_subexpr_refs[] = $node;
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
     /**
      * Returns a simple assertion token.
      */
-    protected function form_simple_assertion($text, $pos, $length, $classname, $negative = false) {
+    protected function form_simple_assertion($text, $classname, $negative = false) {
         $node = new $classname($negative);
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text, $node->subtype)));
         $this->set_node_modifiers($node);
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
     /**
      * Returns a character set token.
      */
-    protected function form_charset($text, $pos, $length, $subtype, $data, $negative = false) {
+    protected function form_charset($text, $type, $data, $negative = false) {
         $node = new qtype_preg_leaf_charset();
-        $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
-        $node->subtype = $subtype;
+        $uitype = $type === qtype_preg_charset_flag::TYPE_SET ? null : $data;
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text, $uitype)));
+        $node->subtype = $type;
         $node->israngecalculated = false;
         $this->set_node_modifiers($node);
         if ($data !== null) {
             $flag = new qtype_preg_charset_flag;
             $flag->negative = $negative;
-            if ($subtype == qtype_preg_charset_flag::SET) {
+            if ($type == qtype_preg_charset_flag::TYPE_SET) {
                 $data = new qtype_poasquestion_string($data);
             }
-            $flag->set_data($subtype, $data);
+            $flag->set_data($type, $data);
             $node->flags = array(array($flag));
         }
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
     /**
      * Returns a named recursion token.
      */
-    protected function form_named_recursion($text, $pos, $length, $name) {
+    protected function form_named_recursion($text, $name) {
         // Error: empty name.
         if ($name === '') {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        return $this->form_recursion($text, $pos, $length, $name);
+        return $this->form_recursion($text, $name);
     }
     /**
      * Returns a recursion token.
      */
-    protected function form_recursion($text, $pos, $length, $number) {
+    protected function form_recursion($text, $number) {
         $node = new qtype_preg_leaf_recursion();
-        $node->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $node->number = $number;
         $this->set_node_modifiers($node);
         $this->nodes_with_subexpr_refs[] = $node;
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
     /**
      * Forms an interval from sequences like a-z, 0-9, etc. If a string contains
@@ -687,14 +759,14 @@ class qtype_preg_lexer extends JLexBase  {
             $this->charset_count -= 3;
             $this->charset_set = qtype_preg_unicode::substr($this->charset_set, 0, $this->charset_count);
             // Form the error node.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $startchar . '-' . $endchar);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol - 2, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $startchar . '-' . $endchar, $this->charset);
+            $error->set_user_info($this->current_position_for_node());
         }
     }
     /**
      * Adds a named subexpression to the map.
      */
-    protected function map_subexpression($name, $pos, $length) {
+    protected function map_subexpression($name) {
         // Does the given name exist?
         $exists = isset($this->subexpr_name_to_number_map[$name]);
         if (!$exists) {
@@ -705,8 +777,7 @@ class qtype_preg_lexer extends JLexBase  {
                 $assumed_name = $this->subexpr_number_to_name_map[$number];
                 if ($name != $assumed_name) {
                     // Subexpression has wrong name.
-                    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $name);
-                    $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
+                    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES, $name);
                     return $error;
                 }
             }
@@ -722,8 +793,7 @@ class qtype_preg_lexer extends JLexBase  {
         $assumed_name = $this->subexpr_number_to_name_map[$number];
         if ($number == $this->last_subexpr && !$modJ) {
             // Two subexpressions with same number in a row is error.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, $pos, $pos + $length - 1, '');
-            $error->set_user_info($this->yyline, $this->yyline, $pos, $pos + $length - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
             return $error;
         }
         if ($modJ && $number == $this->last_subexpr) {
@@ -739,12 +809,10 @@ class qtype_preg_lexer extends JLexBase  {
      * @return character corresponding to the given sequence.
      */
     protected function calculate_cx($cx) {
-        $x = qtype_preg_unicode::strtoupper(qtype_preg_unicode::substr($cx, 2));
-        $code = textlib::utf8ord($x);
-        if ($code > 127) {
+        $code = self::code_of_char_escape_sequence($cx);
+        if ($code === null) {
             return null;
         }
-        $code ^= 0x40;
         return qtype_preg_unicode::code2utf8($code);
     }
     /**
@@ -757,7 +825,7 @@ class qtype_preg_lexer extends JLexBase  {
      */
     protected function add_flag_to_charset($text, $type, $data, $negative = false, $appendtoend = true) {
         switch ($type) {
-        case qtype_preg_charset_flag::SET:
+        case qtype_preg_charset_flag::TYPE_SET:
             $this->charset->userinscription[] = new qtype_preg_userinscription($text);
             $this->charset_count++;
             if ($appendtoend) {
@@ -767,9 +835,8 @@ class qtype_preg_lexer extends JLexBase  {
             }
             $this->expand_charset_range();
             break;
-        case qtype_preg_charset_flag::FLAG:
-        case qtype_preg_charset_flag::UPROP:
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        case qtype_preg_charset_flag::TYPE_FLAG:
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, $data);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
@@ -781,7 +848,7 @@ class qtype_preg_lexer extends JLexBase  {
         $res = array();
         for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
             $char = qtype_preg_unicode::substr($str, $i, 1);
-            $res[] = $this->form_charset($char, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $char);
+            $res[] = $this->form_charset($char, qtype_preg_charset_flag::TYPE_SET, $char);
         }
         return $res;
     }
@@ -809,13 +876,19 @@ class qtype_preg_lexer extends JLexBase  {
 
     // End of the regex inside a character class.
     if ($this->yy_lexical_state == self::YYCHARSET) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, '');
-        $error->set_user_info($this->charset->linefirst, $this->yyline, $this->charset->indfirst, $this->yycol - 1, new qtype_preg_userinscription(''));
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, '');
+        $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
+                                            $this->state_begin_position->linefirst, $this->yyline,
+                                            $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
+        $error->set_user_info($position, $this->charset->userinscription);
     }
     // End of the regex inside a comment.
     if ($this->yy_lexical_state == self::YYCOMMENT) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, '');
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol - $this->comment_length, $this->yycol - 1, new qtype_preg_userinscription(''));
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, '');
+        $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
+                                            $this->state_begin_position->linefirst, $this->yyline,
+                                            $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
+        $error->set_user_info($position, array(new qtype_preg_userinscription('(?#')));
     }
     // Check for references to unexisting subexpressions.
     foreach ($this->nodes_with_subexpr_refs as $node) {
@@ -823,9 +896,8 @@ class qtype_preg_lexer extends JLexBase  {
         if (is_int($number)) {
             if ($number > $this->max_subexpr) {
                 // Error: unexisting subexpression.
-                $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number);
-                $error->set_user_info($node->linefirst, $node->linelast, $node->indfirst, $node->indlast, new qtype_preg_userinscription(''));
-                $node->errors[] = $error;
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node);
+                $error->set_user_info($node->position, $node->userinscription);
             }
             continue;   // No need for further checks if it's an integer number.
         }
@@ -833,9 +905,8 @@ class qtype_preg_lexer extends JLexBase  {
         $number = isset($this->subexpr_name_to_number_map[$number]) ? $this->subexpr_name_to_number_map[$number] : null;
         if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
             // Error: unexisting subexpression.
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number);
-            $error->set_user_info($node->linefirst, $node->linelast, $node->indfirst, $node->indlast, new qtype_preg_userinscription(''));
-            $node->errors[] = $error;
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
+            $error->set_user_info($node->position, $node->userinscription);
         }
         // For matchers: replace name with number for simple usage.
         if (!$this->options->preserveallnodes) {
@@ -853,11 +924,11 @@ class qtype_preg_lexer extends JLexBase  {
 	const YYCHARSET = 5;
 	static $yy_state_dtrans = array(
 		0,
-		99,
-		101,
-		230,
-		231,
-		232
+		94,
+		96,
+		219,
+		220,
+		221
 	);
 	static $yy_acpt = array(
 		/* 0 */ self::YY_NOT_ACCEPT,
@@ -998,7 +1069,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 135 */ self::YY_NO_ANCHOR,
 		/* 136 */ self::YY_NO_ANCHOR,
 		/* 137 */ self::YY_NO_ANCHOR,
-		/* 138 */ self::YY_NO_ANCHOR,
+		/* 138 */ self::YY_NOT_ACCEPT,
 		/* 139 */ self::YY_NO_ANCHOR,
 		/* 140 */ self::YY_NO_ANCHOR,
 		/* 141 */ self::YY_NO_ANCHOR,
@@ -1009,7 +1080,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 146 */ self::YY_NO_ANCHOR,
 		/* 147 */ self::YY_NO_ANCHOR,
 		/* 148 */ self::YY_NO_ANCHOR,
-		/* 149 */ self::YY_NOT_ACCEPT,
+		/* 149 */ self::YY_NO_ANCHOR,
 		/* 150 */ self::YY_NO_ANCHOR,
 		/* 151 */ self::YY_NO_ANCHOR,
 		/* 152 */ self::YY_NO_ANCHOR,
@@ -1036,7 +1107,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 173 */ self::YY_NO_ANCHOR,
 		/* 174 */ self::YY_NO_ANCHOR,
 		/* 175 */ self::YY_NO_ANCHOR,
-		/* 176 */ self::YY_NO_ANCHOR,
+		/* 176 */ self::YY_NOT_ACCEPT,
 		/* 177 */ self::YY_NO_ANCHOR,
 		/* 178 */ self::YY_NO_ANCHOR,
 		/* 179 */ self::YY_NO_ANCHOR,
@@ -1045,19 +1116,19 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 182 */ self::YY_NO_ANCHOR,
 		/* 183 */ self::YY_NO_ANCHOR,
 		/* 184 */ self::YY_NO_ANCHOR,
-		/* 185 */ self::YY_NO_ANCHOR,
+		/* 185 */ self::YY_NOT_ACCEPT,
 		/* 186 */ self::YY_NO_ANCHOR,
 		/* 187 */ self::YY_NOT_ACCEPT,
-		/* 188 */ self::YY_NO_ANCHOR,
-		/* 189 */ self::YY_NO_ANCHOR,
-		/* 190 */ self::YY_NO_ANCHOR,
-		/* 191 */ self::YY_NO_ANCHOR,
-		/* 192 */ self::YY_NO_ANCHOR,
-		/* 193 */ self::YY_NO_ANCHOR,
-		/* 194 */ self::YY_NO_ANCHOR,
-		/* 195 */ self::YY_NO_ANCHOR,
+		/* 188 */ self::YY_NOT_ACCEPT,
+		/* 189 */ self::YY_NOT_ACCEPT,
+		/* 190 */ self::YY_NOT_ACCEPT,
+		/* 191 */ self::YY_NOT_ACCEPT,
+		/* 192 */ self::YY_NOT_ACCEPT,
+		/* 193 */ self::YY_NOT_ACCEPT,
+		/* 194 */ self::YY_NOT_ACCEPT,
+		/* 195 */ self::YY_NOT_ACCEPT,
 		/* 196 */ self::YY_NOT_ACCEPT,
-		/* 197 */ self::YY_NO_ANCHOR,
+		/* 197 */ self::YY_NOT_ACCEPT,
 		/* 198 */ self::YY_NOT_ACCEPT,
 		/* 199 */ self::YY_NOT_ACCEPT,
 		/* 200 */ self::YY_NOT_ACCEPT,
@@ -1125,10 +1196,10 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 262 */ self::YY_NOT_ACCEPT,
 		/* 263 */ self::YY_NOT_ACCEPT,
 		/* 264 */ self::YY_NOT_ACCEPT,
-		/* 265 */ self::YY_NOT_ACCEPT,
-		/* 266 */ self::YY_NOT_ACCEPT,
-		/* 267 */ self::YY_NOT_ACCEPT,
-		/* 268 */ self::YY_NOT_ACCEPT,
+		/* 265 */ self::YY_NO_ANCHOR,
+		/* 266 */ self::YY_NO_ANCHOR,
+		/* 267 */ self::YY_NO_ANCHOR,
+		/* 268 */ self::YY_NO_ANCHOR,
 		/* 269 */ self::YY_NOT_ACCEPT,
 		/* 270 */ self::YY_NOT_ACCEPT,
 		/* 271 */ self::YY_NOT_ACCEPT,
@@ -1136,10 +1207,10 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 273 */ self::YY_NOT_ACCEPT,
 		/* 274 */ self::YY_NOT_ACCEPT,
 		/* 275 */ self::YY_NOT_ACCEPT,
-		/* 276 */ self::YY_NO_ANCHOR,
-		/* 277 */ self::YY_NO_ANCHOR,
-		/* 278 */ self::YY_NO_ANCHOR,
-		/* 279 */ self::YY_NO_ANCHOR,
+		/* 276 */ self::YY_NOT_ACCEPT,
+		/* 277 */ self::YY_NOT_ACCEPT,
+		/* 278 */ self::YY_NOT_ACCEPT,
+		/* 279 */ self::YY_NOT_ACCEPT,
 		/* 280 */ self::YY_NOT_ACCEPT,
 		/* 281 */ self::YY_NOT_ACCEPT,
 		/* 282 */ self::YY_NOT_ACCEPT,
@@ -1185,7 +1256,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 322 */ self::YY_NOT_ACCEPT,
 		/* 323 */ self::YY_NOT_ACCEPT,
 		/* 324 */ self::YY_NOT_ACCEPT,
-		/* 325 */ self::YY_NOT_ACCEPT,
+		/* 325 */ self::YY_NO_ANCHOR,
 		/* 326 */ self::YY_NOT_ACCEPT,
 		/* 327 */ self::YY_NOT_ACCEPT,
 		/* 328 */ self::YY_NOT_ACCEPT,
@@ -1196,7 +1267,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 333 */ self::YY_NOT_ACCEPT,
 		/* 334 */ self::YY_NOT_ACCEPT,
 		/* 335 */ self::YY_NOT_ACCEPT,
-		/* 336 */ self::YY_NO_ANCHOR,
+		/* 336 */ self::YY_NOT_ACCEPT,
 		/* 337 */ self::YY_NOT_ACCEPT,
 		/* 338 */ self::YY_NOT_ACCEPT,
 		/* 339 */ self::YY_NOT_ACCEPT,
@@ -1214,7 +1285,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 351 */ self::YY_NOT_ACCEPT,
 		/* 352 */ self::YY_NOT_ACCEPT,
 		/* 353 */ self::YY_NOT_ACCEPT,
-		/* 354 */ self::YY_NOT_ACCEPT,
+		/* 354 */ self::YY_NO_ANCHOR,
 		/* 355 */ self::YY_NOT_ACCEPT,
 		/* 356 */ self::YY_NOT_ACCEPT,
 		/* 357 */ self::YY_NOT_ACCEPT,
@@ -1225,7 +1296,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 362 */ self::YY_NOT_ACCEPT,
 		/* 363 */ self::YY_NOT_ACCEPT,
 		/* 364 */ self::YY_NOT_ACCEPT,
-		/* 365 */ self::YY_NO_ANCHOR,
+		/* 365 */ self::YY_NOT_ACCEPT,
 		/* 366 */ self::YY_NOT_ACCEPT,
 		/* 367 */ self::YY_NOT_ACCEPT,
 		/* 368 */ self::YY_NOT_ACCEPT,
@@ -1245,7 +1316,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 382 */ self::YY_NOT_ACCEPT,
 		/* 383 */ self::YY_NOT_ACCEPT,
 		/* 384 */ self::YY_NOT_ACCEPT,
-		/* 385 */ self::YY_NOT_ACCEPT,
+		/* 385 */ self::YY_NO_ANCHOR,
 		/* 386 */ self::YY_NOT_ACCEPT,
 		/* 387 */ self::YY_NOT_ACCEPT,
 		/* 388 */ self::YY_NOT_ACCEPT,
@@ -1256,7 +1327,7 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 393 */ self::YY_NOT_ACCEPT,
 		/* 394 */ self::YY_NOT_ACCEPT,
 		/* 395 */ self::YY_NOT_ACCEPT,
-		/* 396 */ self::YY_NO_ANCHOR,
+		/* 396 */ self::YY_NOT_ACCEPT,
 		/* 397 */ self::YY_NOT_ACCEPT,
 		/* 398 */ self::YY_NOT_ACCEPT,
 		/* 399 */ self::YY_NOT_ACCEPT,
@@ -1264,26 +1335,15 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 401 */ self::YY_NOT_ACCEPT,
 		/* 402 */ self::YY_NOT_ACCEPT,
 		/* 403 */ self::YY_NOT_ACCEPT,
-		/* 404 */ self::YY_NOT_ACCEPT,
-		/* 405 */ self::YY_NOT_ACCEPT,
-		/* 406 */ self::YY_NOT_ACCEPT,
-		/* 407 */ self::YY_NOT_ACCEPT,
-		/* 408 */ self::YY_NOT_ACCEPT,
-		/* 409 */ self::YY_NOT_ACCEPT,
-		/* 410 */ self::YY_NOT_ACCEPT,
-		/* 411 */ self::YY_NOT_ACCEPT,
-		/* 412 */ self::YY_NOT_ACCEPT,
-		/* 413 */ self::YY_NOT_ACCEPT,
-		/* 414 */ self::YY_NOT_ACCEPT,
-		/* 415 */ self::YY_NOT_ACCEPT
+		/* 404 */ self::YY_NOT_ACCEPT
 	);
 		static $yy_cmap = array(
  18, 18, 18, 18, 18, 18, 18, 18, 18, 2, 1, 18, 19, 19, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 2, 29, 4, 3, 67, 4, 31, 21,
  22, 25, 7, 6, 10, 15, 42, 4, 9, 72, 72, 72, 72, 72, 72, 72, 13, 13, 26, 4,
  17, 24, 20, 5, 18, 52, 53, 37, 32, 33, 34, 66, 56, 35, 28, 62, 71, 18, 36, 18,
- 23, 38, 30, 58, 18, 69, 59, 61, 63, 18, 65, 39, 12, 41, 40, 18, 4, 43, 64, 44,
- 54, 45, 46, 14, 55, 74, 18, 16, 70, 73, 47, 75, 48, 18, 49, 57, 50, 68, 59, 60,
+ 23, 38, 30, 58, 18, 69, 59, 61, 63, 18, 65, 39, 12, 41, 40, 18, 4, 43, 64, 49,
+ 54, 44, 45, 14, 55, 74, 18, 16, 70, 73, 46, 75, 50, 18, 47, 57, 48, 68, 59, 60,
  51, 18, 65, 8, 27, 11, 4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
@@ -4557,31 +4617,31 @@ class qtype_preg_lexer extends JLexBase  {
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 0, 0,);
 
 		static $yy_rmap = array(
- 0, 1, 1, 2, 1, 1, 3, 4, 5, 6, 7, 1, 1, 8, 1, 1, 1, 1, 9, 10,
- 11, 12, 1, 1, 1, 13, 1, 1, 1, 14, 1, 1, 1, 1, 1, 15, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 16, 17, 1, 18, 1, 1, 1, 19, 1, 20, 21, 22, 1,
- 1, 1, 1, 1, 23, 24, 25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 26, 27,
- 28, 29, 30, 31, 1, 1, 32, 1, 1, 1, 1, 1, 33, 34, 1, 1, 1, 1, 35, 36,
- 1, 37, 38, 1, 1, 1, 1, 1, 1, 1, 1, 1, 39, 1, 1, 40, 1, 1, 1, 1,
- 1, 1, 1, 41, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 1, 1, 42, 43, 1, 1, 1, 44, 45, 1, 1, 46, 47,
- 1, 1, 48, 49, 1, 50, 1, 1, 1, 1, 1, 1, 51, 1, 1, 1, 1, 1, 52, 53,
- 54, 55, 56, 57, 1, 58, 59, 60, 1, 1, 1, 1, 1, 61, 62, 1, 63, 64, 65, 66,
- 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 48, 83, 84, 85,
- 86, 87, 88, 89, 90, 91, 92, 93, 31, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104,
- 105, 59, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123,
- 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
- 144, 145, 146, 147, 148, 149, 150, 151, 147, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162,
- 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
- 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202,
- 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222,
- 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242,
- 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262,
- 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278,);
+ 0, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 1, 1, 7, 1, 1, 1, 1, 8, 9,
+ 10, 11, 1, 1, 1, 12, 1, 1, 1, 13, 14, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+ 1, 1, 15, 16, 1, 17, 1, 1, 1, 18, 1, 19, 20, 21, 1, 1, 1, 1, 1, 22,
+ 23, 24, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 25, 26, 27, 28, 29, 30, 1,
+ 1, 31, 1, 1, 1, 1, 1, 32, 33, 1, 1, 1, 1, 34, 35, 1, 36, 37, 1, 1,
+ 1, 1, 1, 1, 1, 1, 1, 38, 1, 1, 39, 1, 1, 40, 1, 1, 1, 1, 1, 1,
+ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 41, 42,
+ 1, 1, 1, 43, 44, 1, 1, 45, 46, 1, 1, 47, 48, 1, 49, 1, 1, 1, 1, 1,
+ 1, 50, 1, 1, 1, 1, 1, 51, 52, 53, 54, 55, 56, 1, 57, 58, 59, 1, 1, 1,
+ 1, 1, 60, 61, 1, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
+ 77, 78, 79, 80, 81, 47, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 30, 93, 94,
+ 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 58, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+ 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
+ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 146, 151, 152,
+ 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172,
+ 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192,
+ 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212,
+ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232,
+ 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252,
+ 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272,
+ 273, 274, 275, 276, 277,);
 
 		static $yy_nxt = array(
 array(
- 1, 2, 3, 4, 5, 6, 7, 8, 150, 5, 5, 5, 9, 5, 5, 5, 5, 5, 5, 3,
+ 1, 2, 3, 4, 5, 6, 7, 8, 139, 5, 5, 5, 9, 5, 5, 5, 5, 5, 5, 3,
  5, 5, 10, 5, 5, 11, 5, 12, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 13,
  14, 5, 15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
  5, 5, 5, 5, 5, 5, 5, 16, 5, 5, 5, 5, 5, 5, 5, 5,
@@ -4593,37 +4653,31 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3,
+ -1, -1, -1, -1, -1, 140, 140, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 151, 151, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 141, 141, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 152, 152, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, 153, 153, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 142, 142, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
  -1, 17, 17, 17, 17, 17, 17, 17, 17, 18, 17, 17, 17, 19, 20, 17, 21, 17, 17, 17,
- 17, 17, 17, 155, 17, 17, 17, 17, 17, 17, 22, 17, 23, 24, 17, 17, 25, 26, 27, 17,
- 17, 17, 17, 28, 29, 30, 31, 32, 155, 33, 34, 35, 36, 37, 23, 38, 38, 39, 39, 40,
- 41, 41, 42, 43, 37, 44, 45, 17, 46, 46, 46, 46, 19, 17, 17, 17,
+ 17, 17, 17, 144, 17, 17, 17, 17, 17, 17, 22, 17, 23, 24, 17, 17, 25, 26, 27, 17,
+ 17, 17, 17, 28, 28, 28, 28, 28, 28, 29, 144, 30, 31, 32, 23, 33, 33, 34, 34, 35,
+ 36, 36, 37, 38, 32, 39, 40, 17, 41, 41, 41, 41, 19, 17, 17, 17,
 ),
 array(
- -1, -1, -1, -1, -1, 47, -1, 48, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 42, -1, 43, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -4631,1628 +4685,1628 @@ array(
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- 154, 188, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ 143, 177, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 276, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 265, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 276, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 265, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 277, -1, -1, -1, 277, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 266, -1, -1, -1, 266, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 277, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 266, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, 199, 50, -1, -1, -1, 50, -1, 200, -1, 201, -1, -1,
- -1, 202, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, 188, 45, -1, -1, -1, 45, -1, 189, -1, 190, -1, -1,
+ -1, 191, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 45, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, 203, -1, -1, -1, -1, -1, -1, -1, -1, 204, -1, -1,
- -1, 205, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, 206, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, 192, -1, -1, -1, -1, -1, -1, -1, -1, 193, -1, -1,
+ -1, 194, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
- 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
- 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
- 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, 207, 158, -1, -1, -1, 158, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 158, 158, 158, -1, -1, 158, -1, -1,
- -1, -1, -1, 158, 158, 158, 158, -1, -1, -1, -1, -1, 158, 158, 158, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 158, -1, -1, -1, -1, -1, -1, -1, 158, -1, -1, -1,
-),
-array(
- -1, -1, -1, 53, -1, -1, 208, -1, -1, 209, -1, -1, -1, 209, -1, 159, -1, 54, -1, -1,
- 55, 56, 57, 58, 59, 60, 61, 62, 210, 63, 211, 212, 210, -1, -1, -1, -1, 64, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 210, 210, -1, -1, -1, -1, 210, 210, -1,
- -1, -1, -1, 210, -1, -1, -1, -1, 210, 210, -1, -1, 209, 210, 210, -1,
-),
-array(
- -1, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
- 48, 48, 48, 48, 48, 160, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
- 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
- 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 161, -1, -1, -1, 161, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 161, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 163, -1, -1, -1, 163, 163, -1, 163, -1, 163, 163,
- 190, -1, -1, 163, 76, -1, -1, -1, 163, 77, 163, -1, 163, 163, 163, 163, 163, 163, 163, -1,
- -1, -1, -1, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163,
- 163, 163, 163, 163, 163, 163, 163, -1, 163, 163, 163, 163, 163, 163, 163, 163,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 56, -1, -1, -1, 56, 56, -1, 56, -1, 56, 56,
- -1, 164, -1, 56, -1, -1, -1, -1, 56, -1, 56, -1, 56, 56, 56, 56, 56, 56, 56, -1,
- -1, -1, -1, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
- 56, 56, 56, 56, 56, 56, 56, -1, 56, 56, 56, 56, 56, 56, 56, 56,
-),
-array(
- -1, -1, -1, -1, -1, 220, 221, -1, -1, 78, -1, -1, -1, 78, 165, 221, 165, 79, 165, 165,
- -1, 80, -1, 165, -1, 191, -1, -1, 165, -1, 81, -1, 396, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 78, 165, 165, 165,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 82, -1, -1,
- 222, -1, -1, -1, 83, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 64, -1, -1, -1, 64, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 166, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 64, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, 167, 167, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, 195, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 168, 168, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+ 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+ 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+ 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, 196, 147, -1, -1, -1, 147, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 147, 147, 147, -1, -1, 147, -1, -1,
+ -1, -1, -1, 147, 147, 147, -1, -1, -1, 147, -1, -1, 147, 147, 147, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 147, -1, -1, -1, -1, -1, -1, -1, 147, -1, -1, -1,
+),
+array(
+ -1, -1, -1, 48, -1, -1, 197, -1, -1, 198, -1, -1, -1, 198, -1, 148, -1, 49, -1, -1,
+ 50, 51, 52, 53, 54, 55, 56, 57, 199, 58, 200, 201, 199, -1, -1, -1, -1, 59, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 199, 199, -1, -1, -1, -1, 199, 199, -1,
+ -1, -1, -1, 199, -1, -1, -1, -1, 199, 199, -1, -1, 198, 199, 199, -1,
+),
+array(
+ -1, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+ 43, 43, 43, 43, 43, 149, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+ 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+ 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 150, -1, -1, -1, 150, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 150, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 152, -1, -1, -1, 152, 152, -1, 152, -1, 152, 152,
+ 179, -1, -1, 152, 71, -1, -1, -1, 152, 72, 152, -1, 152, 152, 152, 152, 152, 152, 152, -1,
+ -1, -1, -1, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152,
+ 152, 152, 152, 152, 152, 152, 152, -1, 152, 152, 152, 152, 152, 152, 152, 152,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 51, -1, -1, -1, 51, 51, -1, 51, -1, 51, 51,
+ -1, 153, -1, 51, -1, -1, -1, -1, 51, -1, 51, -1, 51, 51, 51, 51, 51, 51, 51, -1,
+ -1, -1, -1, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
+ 51, 51, 51, 51, 51, 51, 51, -1, 51, 51, 51, 51, 51, 51, 51, 51,
+),
+array(
+ -1, -1, -1, -1, -1, 209, 210, -1, -1, 73, -1, -1, -1, 73, 154, 210, 154, 74, 154, 154,
+ -1, 75, -1, 154, -1, 180, -1, -1, 154, -1, 76, -1, 385, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 73, 154, 154, 154,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 77, -1, -1,
+ 211, -1, -1, -1, 78, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 59, -1, -1, -1, 59, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 155, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 59, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, 156, 156, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 78, -1, -1, -1, 78, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 169, -1, -1, 165, -1, 165, -1, 165, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 78, 165, 165, 165,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 79, -1, -1, -1, 79, 79, -1, 79, -1, 79, 79,
- 226, -1, -1, 79, -1, -1, -1, -1, 79, -1, 79, -1, 79, 79, 79, 79, 79, 79, 79, -1,
- -1, -1, -1, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79,
- 79, 79, 79, 79, 79, 79, 79, -1, 79, 79, 79, 79, 79, 79, 79, 79,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 80, -1, -1, -1, 80, 80, -1, 80, -1, 80, 80,
- -1, 227, -1, 80, -1, -1, -1, -1, 80, -1, 80, -1, 80, 80, 80, 80, 80, 80, 80, -1,
- -1, -1, -1, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80,
- 80, 80, 80, 80, 80, 80, 80, -1, 80, 80, 80, 80, 80, 80, 80, 80,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 172, -1, -1, -1, 172, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 192, -1, -1, 165, -1, 165, 93, 165, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 172, 165, 165, 165,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1, 82, 82, -1, 82, -1, 82, 82,
- 173, -1, -1, 82, -1, -1, -1, -1, 82, -1, 82, -1, 82, 82, 82, 82, 82, 82, 82, -1,
- -1, -1, -1, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82,
- 82, 82, 82, 82, 82, 82, 82, -1, 82, 82, 82, 82, 82, 82, 82, 82,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 228, -1, -1, -1, 228, 228, -1, 228, -1, 228, 228,
- -1, -1, -1, 228, -1, 95, -1, -1, 228, -1, 228, -1, 228, 228, 228, 228, 228, 228, 228, -1,
- -1, -1, -1, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228,
- 228, 228, 228, 228, 228, 228, 228, -1, 228, 228, 228, 228, 228, 228, 228, 228,
-),
-array(
- -1, -1, -1, -1, -1, 174, 174, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 157, 157, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 175, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 73, -1, -1, -1, 73, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 158, -1, -1, 154, -1, 154, -1, 154, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 73, 154, 154, 154,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 93, -1, -1, -1, 93, 93, -1, 93, -1, 93, 93,
- -1, -1, -1, 93, -1, 176, -1, -1, 93, -1, 93, -1, 93, 93, 93, 93, 93, 93, 93, -1,
- -1, -1, -1, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93,
- 93, 93, 93, 93, 93, 93, 93, -1, 93, 93, 93, 93, 93, 93, 93, 93,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 74, -1, -1, -1, 74, 74, -1, 74, -1, 74, 74,
+ 215, -1, -1, 74, -1, -1, -1, -1, 74, -1, 74, -1, 74, 74, 74, 74, 74, 74, 74, -1,
+ -1, -1, -1, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74,
+ 74, 74, 74, 74, 74, 74, 74, -1, 74, 74, 74, 74, 74, 74, 74, 74,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 177, -1, -1, 165, -1, 165, -1, 165, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 75, -1, -1, -1, 75, 75, -1, 75, -1, 75, 75,
+ -1, 216, -1, 75, -1, -1, -1, -1, 75, -1, 75, -1, 75, 75, 75, 75, 75, 75, 75, -1,
+ -1, -1, -1, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75,
+ 75, 75, 75, 75, 75, 75, 75, -1, 75, 75, 75, 75, 75, 75, 75, 75,
 ),
 array(
- 1, 100, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 161, -1, -1, -1, 161, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 181, -1, -1, 154, -1, 154, 88, 154, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 161, 154, 154, 154,
 ),
 array(
- 1, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 102, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, 103, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 77, -1, -1, -1, 77, 77, -1, 77, -1, 77, 77,
+ 162, -1, -1, 77, -1, -1, -1, -1, 77, -1, 77, -1, 77, 77, 77, 77, 77, 77, 77, -1,
+ -1, -1, -1, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77, 77,
+ 77, 77, 77, 77, 77, 77, 77, -1, 77, 77, 77, 77, 77, 77, 77, 77,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 104, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 104, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 217, -1, -1, -1, 217, 217, -1, 217, -1, 217, 217,
+ -1, -1, -1, 217, -1, 90, -1, -1, 217, -1, 217, -1, 217, 217, 217, 217, 217, 217, 217, -1,
+ -1, -1, -1, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217, 217,
+ 217, 217, 217, 217, 217, 217, 217, -1, 217, 217, 217, 217, 217, 217, 217, 217,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 278, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 278, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, 234, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 163, 163, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, 235, 185, -1, -1, -1, 185, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 185, 185, 185, -1, -1, 185, -1, -1,
- -1, -1, -1, 185, 185, 185, 185, -1, -1, -1, -1, -1, 185, 185, 185, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 185, -1, -1, -1, -1, -1, -1, -1, 185, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 149, 196, 49, -1, 149, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1, -1, 87, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 164, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 149, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 149, 187, -1, -1, 149, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 149, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 88, -1, -1, -1, 88, 88, -1, 88, -1, 88, 88,
+ -1, -1, -1, 88, -1, 165, -1, -1, 88, -1, 88, -1, 88, 88, 88, 88, 88, 88, 88, -1,
+ -1, -1, -1, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88,
+ 88, 88, 88, 88, 88, 88, 88, -1, 88, 88, 88, 88, 88, 88, 88, 88,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 188, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 166, -1, -1, 154, -1, 154, -1, 154, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
 ),
 array(
- -1, 51, 51, 51, 51, 51, 51, 51, 162, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
- 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
- 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
- 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51,
+ 1, 95, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 189, -1, -1, -1, 189, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 189, 189, 189, -1, -1, 189, -1, -1,
- -1, -1, -1, 189, 189, 189, 189, -1, -1, -1, -1, -1, 189, 189, 189, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 189, -1, -1, -1, -1, -1, -1, -1, 189, -1, -1, -1,
+ 1, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 97, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, 98, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, -1, -1, 218, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 60, 75, -1, 219, -1, -1, -1, 219, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 219, 219, -1, -1, -1, -1, 219, 219, -1,
- -1, -1, -1, 219, -1, -1, -1, -1, 219, 219, -1, -1, 218, 219, 219, -1,
-),
-array(
- -1, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 73, 216, 216, 216, 216, 216, 216, 216, 216,
- 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216,
- 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216,
- 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216, 216,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 163, -1, -1, -1, 163, 163, -1, 163, -1, 163, 163,
- 190, -1, -1, 163, -1, -1, -1, -1, 163, -1, 163, -1, 163, 163, 163, 163, 163, 163, 163, -1,
- -1, -1, -1, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163, 163,
- 163, 163, 163, 163, 163, 163, 163, -1, 163, 163, 163, 163, 163, 163, 163, 163,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 172, -1, -1, -1, 172, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 192, -1, -1, 165, -1, 165, -1, 165, 165, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 172, 165, 165, 165,
-),
-array(
- -1, -1, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
- 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
-),
-array(
- -1, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, -1, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, -1, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
- 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179, 179,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 106, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 99, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 99, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 267, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 108, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 267, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, 223, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 111, 111, 111, 111, 111, 111, 111, 111, 112, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111,
- 111, 111, 111, 183, 111, 111, 111, 111, 111, 111, 111, 111, 113, 114, 111, 111, 115, 111, 116, 111,
- 111, 111, 111, 117, 194, 118, 119, 120, 183, 121, 122, 123, 111, 111, 113, 124, 124, 125, 125, 126,
- 127, 127, 111, 111, 128, 111, 111, 111, 129, 129, 129, 129, 112, 111, 111, 111,
+ -1, -1, -1, -1, -1, -1, -1, -1, 224, 174, -1, -1, -1, 174, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 174, 174, 174, -1, -1, 174, -1, -1,
+ -1, -1, -1, 174, 174, 174, -1, -1, -1, 174, -1, -1, 174, 174, 174, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 174, -1, -1, -1, -1, -1, -1, -1, 174, -1, -1, -1,
 ),
 array(
- -1, 130, 130, 130, 130, 130, 130, 130, 186, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130,
- 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130,
- 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130,
- 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, 185, 44, -1, 138, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 195, -1, -1, -1, 195, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 195, 195, 195, -1, -1, 195, -1, -1,
- -1, -1, -1, 195, 195, 195, 195, -1, -1, -1, -1, -1, 195, 195, 195, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 195, -1, -1, -1, -1, -1, -1, -1, 195, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, 176, -1, -1, 138, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 138, -1, -1, -1,
 ),
 array(
- -1, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 132, 241, 241, 241, 241, 241, 241, 241, 241,
- 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241,
- 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241,
- 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 177, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, 46, 46, 46, 46, 46, 46, 46, 151, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+ 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+ 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+ 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 178, -1, -1, -1, 178, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 178, 178, 178, -1, -1, 178, -1, -1,
+ -1, -1, -1, 178, 178, 178, -1, -1, -1, 178, -1, -1, 178, 178, 178, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 178, -1, -1, -1, -1, -1, -1, -1, 178, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 207, -1, -1, -1, 207, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 55, 70, -1, 208, -1, -1, -1, 208, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 208, 208, -1, -1, -1, -1, 208, 208, -1,
+ -1, -1, -1, 208, -1, -1, -1, -1, 208, 208, -1, -1, 207, 208, 208, -1,
+),
+array(
+ -1, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 68, 205, 205, 205, 205, 205, 205, 205, 205,
+ 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205,
+ 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205,
+ 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 152, -1, -1, -1, 152, 152, -1, 152, -1, 152, 152,
+ 179, -1, -1, 152, -1, -1, -1, -1, 152, -1, 152, -1, 152, 152, 152, 152, 152, 152, 152, -1,
+ -1, -1, -1, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152,
+ 152, 152, 152, 152, 152, 152, 152, -1, 152, 152, 152, 152, 152, 152, 152, 152,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 161, -1, -1, -1, 161, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 181, -1, -1, 154, -1, 154, -1, 154, 154, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 161, 154, 154, 154,
+),
+array(
+ -1, -1, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+ 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167,
+),
+array(
+ -1, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, -1, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, -1, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+ 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 101, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 103, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, 106, 106, 106, 106, 106, 106, 106, 106, 107, 106, 106, 106, 106, 106, 106, 106, 106, 106, 106,
+ 106, 106, 106, 172, 106, 106, 106, 106, 106, 106, 106, 106, 108, 109, 106, 106, 110, 106, 111, 106,
+ 106, 106, 106, 112, 112, 112, 112, 112, 112, 183, 172, 113, 106, 106, 108, 114, 114, 115, 115, 116,
+ 117, 117, 106, 106, 112, 106, 106, 106, 118, 118, 118, 118, 107, 106, 106, 106,
+),
+array(
+ -1, 119, 119, 119, 119, 119, 119, 119, 175, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119,
+ 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119,
+ 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119,
+ 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119, 119,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 184, -1, -1, -1, 184, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 184, 184, 184, -1, -1, 184, -1, -1,
+ -1, -1, -1, 184, 184, 184, -1, -1, -1, 184, -1, -1, 184, 184, 184, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 184, -1, -1, -1, -1, -1, -1, -1, 184, -1, -1, -1,
+),
+array(
+ -1, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 121, 230, 230, 230, 230, 230, 230, 230, 230,
+ 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230,
+ 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230,
+ 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 187, -1, -1, -1, 187, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 187, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 222, -1, 270, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, 277, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+ 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+ 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+ 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 202, -1, 60, -1, 202, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 202, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 93, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 187, -1, 61, -1, 187, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 187, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 203, -1, 62, -1, 203, 204, 269, 204, -1, 204, 204,
+ -1, -1, -1, 204, -1, -1, -1, -1, 204, -1, 204, -1, 204, 204, 204, 204, 204, 204, 204, -1,
+ -1, -1, -1, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204,
+ 204, 204, 204, 204, 204, 204, 204, -1, 204, 204, 204, 204, 203, 204, 204, 204,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 45, -1, -1, -1, 45, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 45, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 190, -1, -1, -1, 190, 190, -1, 190, -1, 190, 190,
+ 63, -1, -1, 190, -1, -1, -1, -1, 190, -1, 190, -1, 190, 190, 190, 190, 190, 190, 190, -1,
+ -1, -1, -1, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190,
+ 190, 190, 190, 190, 190, 190, 190, -1, 190, 190, 190, 190, 190, 190, 190, 190,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 191, -1, -1, -1, 191, 191, -1, 191, -1, 191, 191,
+ -1, 64, -1, 191, -1, -1, -1, -1, 191, -1, 191, -1, 191, 191, 191, 191, 191, 191, 191, -1,
+ -1, -1, -1, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191,
+ 191, 191, 191, 191, 191, 191, 191, -1, 191, 191, 191, 191, 191, 191, 191, 191,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 192, -1, 65, -1, 192, 192, -1, 192, -1, 192, 192,
+ -1, -1, -1, 192, -1, -1, -1, -1, 192, -1, 192, -1, 192, 192, 192, 192, 192, 192, 192, -1,
+ -1, -1, -1, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192,
+ 192, 192, 192, 192, 192, 192, 192, -1, 192, 192, 192, 192, 192, 192, 192, 192,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 193, -1, -1, -1, 193, 193, -1, 193, -1, 193, 193,
+ 66, -1, -1, 193, -1, -1, -1, -1, 193, -1, 193, -1, 193, 193, 193, 193, 193, 193, 193, -1,
+ -1, -1, -1, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193, 193,
+ 193, 193, 193, 193, 193, 193, 193, -1, 193, 193, 193, 193, 193, 193, 193, 193,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 194, -1, -1, -1, 194, 194, -1, 194, -1, 194, 194,
+ -1, 67, -1, 194, -1, -1, -1, -1, 194, -1, 194, -1, 194, 194, 194, 194, 194, 194, 194, -1,
+ -1, -1, -1, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194, 194,
+ 194, 194, 194, 194, 194, 194, 194, -1, 194, 194, 194, 194, 194, 194, 194, 194,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 195, -1, 41, -1, 195, 195, -1, 195, -1, 195, 195,
+ -1, -1, -1, 195, -1, -1, -1, -1, 195, -1, 195, -1, 195, 195, 195, 195, 195, 195, 195, -1,
+ -1, -1, -1, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195, 195,
+ 195, 195, 195, 195, 195, 195, 195, -1, 195, 195, 195, 195, 195, 195, 195, 195,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 206, -1, -1, -1, 206, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 206, 206, 206, -1, -1, 206, -1, -1,
+ -1, -1, -1, 206, 206, 206, -1, -1, -1, 206, -1, -1, 206, 206, 206, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 206, -1, -1, -1, -1, -1, -1, -1, 206, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 207, -1, -1, -1, 207, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 207, -1, -1, -1,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, 198, -1, -1, -1, 198, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 198, -1, -1, -1,
 ),
 array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 208, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 55, 70, -1, 199, -1, -1, -1, 199, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 199, 199, -1, -1, -1, -1, 199, 199, -1,
+ -1, -1, -1, 199, -1, -1, -1, -1, 199, 199, -1, -1, -1, 199, 199, -1,
+),
+array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 233, -1, 281, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, 288, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 79, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
- 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
- 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
- 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131, 131,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 213, -1, 65, -1, 213, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 213, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 98, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 198, -1, 66, -1, 198, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 198, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 214, -1, 67, -1, 214, 215, 280, 215, -1, 215, 215,
- -1, -1, -1, 215, -1, -1, -1, -1, 215, -1, 215, -1, 215, 215, 215, 215, 215, 215, 215, -1,
- -1, -1, -1, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215,
- 215, 215, 215, 215, 215, 215, 215, -1, 215, 215, 215, 215, 214, 215, 215, 215,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1, -1, 50, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1, -1,
-),
-array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, 201, -1, -1, -1, 201, 201, -1, 201, -1, 201, 201,
- 68, -1, -1, 201, -1, -1, -1, -1, 201, -1, 201, -1, 201, 201, 201, 201, 201, 201, 201, -1,
+ -1, -1, -1, 201, -1, 80, -1, -1, 201, -1, 201, -1, 201, 201, 201, 201, 201, 201, 201, -1,
  -1, -1, -1, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201,
  201, 201, 201, 201, 201, 201, 201, -1, 201, 201, 201, 201, 201, 201, 201, 201,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 202, -1, -1, -1, 202, 202, -1, 202, -1, 202, 202,
- -1, 69, -1, 202, -1, -1, -1, -1, 202, -1, 202, -1, 202, 202, 202, 202, 202, 202, 202, -1,
- -1, -1, -1, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202,
- 202, 202, 202, 202, 202, 202, 202, -1, 202, 202, 202, 202, 202, 202, 202, 202,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 202, -1, 81, -1, 202, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 202, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 203, -1, 70, -1, 203, 203, -1, 203, -1, 203, 203,
- -1, -1, -1, 203, -1, -1, -1, -1, 203, -1, 203, -1, 203, 203, 203, 203, 203, 203, 203, -1,
- -1, -1, -1, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203, 203,
- 203, 203, 203, 203, 203, 203, 203, -1, 203, 203, 203, 203, 203, 203, 203, 203,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 212, -1, 82, -1, 212, 204, -1, 204, -1, 204, 204,
+ -1, -1, -1, 204, -1, -1, -1, -1, 204, -1, 204, -1, 204, 204, 204, 204, 204, 204, 204, -1,
+ -1, -1, -1, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204,
+ 204, 204, 204, 204, 204, 204, 204, -1, 204, 204, 204, 204, 212, 204, 204, 204,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 204, -1, -1, -1, 204, 204, -1, 204, -1, 204, 204,
- 71, -1, -1, 204, -1, -1, -1, -1, 204, -1, 204, -1, 204, 204, 204, 204, 204, 204, 204, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 204, -1, 62, -1, 204, 204, -1, 204, -1, 204, 204,
+ -1, -1, -1, 204, -1, -1, -1, -1, 204, -1, 204, -1, 204, 204, 204, 204, 204, 204, 204, -1,
  -1, -1, -1, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204,
  204, 204, 204, 204, 204, 204, 204, -1, 204, 204, 204, 204, 204, 204, 204, 204,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 205, -1, -1, -1, 205, 205, -1, 205, -1, 205, 205,
- -1, 72, -1, 205, -1, -1, -1, -1, 205, -1, 205, -1, 205, 205, 205, 205, 205, 205, 205, -1,
- -1, -1, -1, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205, 205,
- 205, 205, 205, 205, 205, 205, 205, -1, 205, 205, 205, 205, 205, 205, 205, 205,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 206, -1, 83, -1, 206, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 206, 206, 206, -1, -1, 206, -1, -1,
+ -1, -1, -1, 206, 206, 206, -1, -1, -1, 206, -1, -1, 206, 206, 206, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 206, -1, -1, -1, -1, -1, -1, -1, 206, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 206, -1, 46, -1, 206, 206, -1, 206, -1, 206, 206,
- -1, -1, -1, 206, -1, -1, -1, -1, 206, -1, 206, -1, 206, 206, 206, 206, 206, 206, 206, -1,
- -1, -1, -1, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206, 206,
- 206, 206, 206, 206, 206, 206, 206, -1, 206, 206, 206, 206, 206, 206, 206, 206,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 207, -1, -1, -1, 207, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 84, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 207, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 217, -1, -1, -1, 217, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 217, 217, 217, -1, -1, 217, -1, -1,
- -1, -1, -1, 217, 217, 217, 217, -1, -1, -1, -1, -1, 217, 217, 217, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 217, -1, -1, -1, -1, -1, -1, -1, 217, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 55, 70, -1, 208, -1, -1, -1, 208, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 208, 208, -1, -1, -1, -1, 208, 208, -1,
+ -1, -1, -1, 208, -1, -1, -1, -1, 208, 208, -1, -1, -1, 208, 208, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, -1, -1, 218, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 214, -1, -1,
+ -1, -1, -1, -1, 85, -1, -1, -1, -1, 86, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1, -1, 87, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 211, -1, -1, -1, 211, 211, -1, 211, -1, 211, 211,
+ -1, -1, -1, 211, -1, 89, -1, -1, 211, -1, 211, -1, 211, 211, 211, 211, 211, 211, 211, -1,
+ -1, -1, -1, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211, 211,
+ 211, 211, 211, 211, 211, 211, 211, -1, 211, 211, 211, 211, 211, 211, 211, 211,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 204, -1, 82, -1, 204, 204, -1, 204, -1, 204, 204,
+ -1, -1, -1, 204, -1, -1, -1, -1, 204, -1, 204, -1, 204, 204, 204, 204, 204, 204, 204, -1,
+ -1, -1, -1, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204,
+ 204, 204, 204, 204, 204, 204, 204, -1, 204, 204, 204, 204, 204, 204, 204, 204,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, 82, -1, 218, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 209, -1, -1, -1, 209, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 74, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 209, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 219, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 60, 75, -1, 210, -1, -1, -1, 210, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 210, 210, -1, -1, -1, -1, 210, 210, -1,
- -1, -1, -1, 210, -1, -1, -1, -1, 210, 210, -1, -1, -1, 210, 210, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 84, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 91, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 212, -1, -1, -1, 212, 212, -1, 212, -1, 212, 212,
- -1, -1, -1, 212, -1, 85, -1, -1, 212, -1, 212, -1, 212, 212, 212, 212, 212, 212, 212, -1,
- -1, -1, -1, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212, 212,
- 212, 212, 212, 212, 212, 212, 212, -1, 212, 212, 212, 212, 212, 212, 212, 212,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 159, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 213, -1, 86, -1, 213, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 160, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 169, 100, 100, 100, 100, 100, 100, 100,
+ 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+ 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+ 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+),
+array(
+ 1, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 170, 102, 102, 102, 102, 102, 102, 102,
+ 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
+ 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
+ 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
+),
+array(
+ 1, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 171, 104, 104, 104, 104, 104, 104, 104,
+ 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 182,
+ 104, 105, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104,
+ 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104, 104,
+),
+array(
+ -1, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, 222, 222, 222, 225, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, -1, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 223, -1, 118, -1, 223, 223, -1, 223, -1, 223, 223,
+ -1, -1, -1, 223, -1, -1, -1, -1, 223, -1, 223, -1, 223, 223, 223, 223, 223, 223, 223, -1,
+ -1, -1, -1, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223, 223,
+ 223, 223, 223, 223, 223, 223, 223, -1, 223, 223, 223, 223, 223, 223, 223, 223,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 231, -1, -1, -1, 231, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 231, 231, 231, -1, -1, 231, -1, -1,
+ -1, -1, -1, 231, 231, 231, -1, -1, -1, 231, -1, -1, 231, 231, 231, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 231, -1, -1, -1, -1, -1, -1, -1, 231, -1, -1, -1,
+),
+array(
+ -1, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, 222, 222, 222, 225, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, 122, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+ 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 122, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 389, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 391, 387, 387, 387, 387, 387, 393, 395, 397, 387, 387, 399, 387, 387, 401, 387, 387,
+ 356, 387, 387, 387, 358, 387, 387, 387, 360, 387, 362, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, 122, 229, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 231, -1, 123, -1, 231, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 231, 231, 231, -1, -1, 231, -1, -1,
+ -1, -1, -1, 231, 231, 231, -1, -1, -1, 231, -1, -1, 231, 231, 231, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 231, -1, -1, -1, -1, -1, -1, -1, 231, -1, -1, -1,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 122, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 235, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 238, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 124, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 248, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 125, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 124, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 260, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 126, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 127, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 128, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 129, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 130, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 131, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 132, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 133, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 134, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 135, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 136, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 125, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 126, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 127, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 128, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 129, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 130, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 131, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 132, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 133, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 134, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 135, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 136, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 137, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+),
+array(
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 137, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 145, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 145, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 146, -1, -1, -1, 146, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 146, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 173, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 173, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 154, 154, 154, 186, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 213, -1, -1, -1, 213, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 213, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 223, -1, 87, -1, 223, 215, -1, 215, -1, 215, 215,
- -1, -1, -1, 215, -1, -1, -1, -1, 215, -1, 215, -1, 215, 215, 215, 215, 215, 215, 215, -1,
- -1, -1, -1, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215,
- 215, 215, 215, 215, 215, 215, 215, -1, 215, 215, 215, 215, 223, 215, 215, 215,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 386, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 228, -1, 226, 388, 226, 226, 226, 226, 226, 390, 392, 404, 226, 226, 394, 226, 226, 396, 226, 226,
+ 355, 226, 226, 226, 398, 226, 226, 226, 400, 226, 402, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 215, -1, 67, -1, 215, 215, -1, 215, -1, 215, 215,
- -1, -1, -1, 215, -1, -1, -1, -1, 215, -1, 215, -1, 215, 215, 215, 215, 215, 215, 215, -1,
- -1, -1, -1, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215,
- 215, 215, 215, 215, 215, 215, 215, -1, 215, 215, 215, 215, 215, 215, 215, 215,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 233, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 217, -1, 88, -1, 217, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 217, 217, 217, -1, -1, 217, -1, -1,
- -1, -1, -1, 217, 217, 217, 217, -1, -1, -1, -1, -1, 217, 217, 217, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 217, -1, -1, -1, -1, -1, -1, -1, 217, -1, -1, -1,
+ -1, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, -1, 229, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
+ 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, -1, -1, 218, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 89, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 237, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 60, 75, -1, 219, -1, -1, -1, 219, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 219, 219, -1, -1, -1, -1, 219, 219, -1,
- -1, -1, -1, 219, -1, -1, -1, -1, 219, 219, -1, -1, -1, 219, 219, -1,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 251, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 225, -1, -1,
- -1, -1, -1, -1, 90, -1, -1, -1, -1, 91, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 249, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 261, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 222, -1, -1, -1, 222, 222, -1, 222, -1, 222, 222,
- -1, -1, -1, 222, -1, 94, -1, -1, 222, -1, 222, -1, 222, 222, 222, 222, 222, 222, 222, -1,
- -1, -1, -1, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222, 222,
- 222, 222, 222, 222, 222, 222, 222, -1, 222, 222, 222, 222, 222, 222, 222, 222,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 273, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 215, -1, 87, -1, 215, 215, -1, 215, -1, 215, 215,
- -1, -1, -1, 215, -1, -1, -1, -1, 215, -1, 215, -1, 215, 215, 215, 215, 215, 215, 215, -1,
- -1, -1, -1, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215, 215,
- 215, 215, 215, 215, 215, 215, 215, -1, 215, 215, 215, 215, 215, 215, 215, 215,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 234, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 229, -1, 87, -1, 229, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 229, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 240, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 96, -1, -1, -1, -1, 97, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 252, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 170, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 250, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, 171, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 262, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 280, 226,
 ),
 array(
- 1, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 180, 105, 105, 105, 105, 105, 105, 105,
- 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105,
- 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105,
- 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 274, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- 1, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 181, 107, 107, 107, 107, 107, 107, 107,
- 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107,
- 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107,
- 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 241, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- 1, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 182, 109, 109, 109, 109, 109, 109, 109,
- 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 193,
- 109, 110, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109,
- 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109, 109,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 253, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, 233, 233, 233, 236, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, -1, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 263, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 234, -1, 129, -1, 234, 234, -1, 234, -1, 234, 234,
- -1, -1, -1, 234, -1, -1, -1, -1, 234, -1, 234, -1, 234, 234, 234, 234, 234, 234, 234, -1,
- -1, -1, -1, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234, 234,
- 234, 234, 234, 234, 234, 234, 234, -1, 234, 234, 234, 234, 234, 234, 234, 234,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 264, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 242, -1, -1, -1, 242, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 242, 242, 242, -1, -1, 242, -1, -1,
- -1, -1, -1, 242, 242, 242, 242, -1, -1, -1, -1, -1, 242, 242, 242, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 242, -1, -1, -1, -1, -1, -1, -1, 242, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 286, 226, 226,
 ),
 array(
- -1, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, 233, 233, 233, 236, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, 133, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
- 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233, 233,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 281, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 242, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 133, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 254, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 400, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 402, 404, 398, 398, 398, 406, 398, 398, 408, 398, 398, 410, 398, 398, 412, 398, 398,
- 367, 398, 398, 398, 369, 398, 398, 398, 371, 398, 373, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 292, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, 133, 240, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 287, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 242, -1, 134, -1, 242, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 242, 242, 242, -1, -1, 242, -1, -1,
- -1, -1, -1, 242, 242, 242, 242, -1, -1, -1, -1, -1, 242, 242, 242, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 242, -1, -1, -1, -1, -1, -1, -1, 242, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 243, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 133, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 255, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 246, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 296, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 249, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 293, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 135, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 244, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 259, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 256, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 136, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 300, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 135, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 297, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 271, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 245, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 137, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 257, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 138, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 304, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 139, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 301, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 140, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 246, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 141, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 258, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 142, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 308, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 143, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 305, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 144, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 247, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 145, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 259, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 146, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 312, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 147, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 309, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 136, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 236, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 137, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 313, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 138, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 275, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 139, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 239, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 140, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 282, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 141, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 276, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 142, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 288, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 143, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 283, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 144, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 289, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 145, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 154, 154, 268, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 146, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 271, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 147, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 279, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 148, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 278, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 148, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 285, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 156, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 156, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 284, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 157, -1, -1, -1, 157, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 157, -1, -1, -1,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 291, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 184, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 184, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 290, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 165, 165, 165, 197, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 295, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 224, -1, -1, -1, 224, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 224, -1, -1, -1,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 294, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 397, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 239, -1, 237, 399, 401, 237, 237, 237, 403, 237, 237, 415, 237, 237, 405, 237, 237, 407, 237, 237,
- 366, 237, 237, 237, 409, 237, 237, 237, 411, 237, 413, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 299, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 244, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 298, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, -1, 240, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
- 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283, 283,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 303, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 248, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 302, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 262, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 307, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 260, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 306, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 272, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 311, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 284, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 310, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 245, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 315, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 251, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 314, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 263, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 317, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 261, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 316, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 273, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 319, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 291, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 318, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 285, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 321, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 252, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 320, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 264, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 323, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 274, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 322, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 275, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 324, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 297, 237, 237,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 154, 325, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 292, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 326,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 253, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 327,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 265, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 328, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 303, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 381, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 298, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 330, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 254, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 382, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 266, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 332, 226, 226, 226, 334, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 307, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 383,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 304, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 336, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 255, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 329, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 267, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 338, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 311, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 331, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 308, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 340, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 256, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 333, 387, 387, 387, 335, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 268, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 342, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 315, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 337, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 312, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 344, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 257, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 339, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 269, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 346, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 319, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 341, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 316, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 348, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 258, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 384, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 270, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 350, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 323, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 343, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 320, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 352, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 247, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 345, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 324, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 347, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 286, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 349, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 250, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 351, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 293, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 353, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 287, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 154, -1, -1, -1, 154, 154, -1, 154, -1, 154, 154,
+ -1, -1, -1, 154, -1, 180, -1, -1, 154, -1, 154, -1, 154, 354, 154, 154, 154, 154, 154, -1,
+ -1, -1, -1, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154, 154,
+ 154, 154, 154, 154, 154, 154, 154, -1, 154, 154, 154, 154, 154, 154, 154, 154,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 299, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 357, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 294, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 300, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 359, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 361, 226, 226, 226, 226, 226,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 165, 165, 279, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 364, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 282, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 363, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 290, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 366, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 368, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 289, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 365, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 367, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 296, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 370, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 295, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 369, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 302, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 372, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 374, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 301, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 371, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 306, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 376, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 305, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 373, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 310, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 378, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 309, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 375, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 314, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 232, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, -1, 387, 387, 387, 387, 387, 387, 387, 387, 380, 387, 387, 387, 387, 387, 387, 387, 387, 387,
+ 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387, 387,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 313, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 377,
 ),
 array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 318, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 379, 226,
 ),
 array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 317, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 322, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 321, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 326, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 325, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 328, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 327, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 330, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 329, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 332, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 331, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 334, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 333, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 335, 398,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 165, 336, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 337,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 338,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 339, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 392, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 341, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 393, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 343, 345, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 394,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 347, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 340, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 349, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 342, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 351, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 344, 346, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 353, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 348, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 355, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 350, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 357, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 352, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 359, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 395, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 361, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 354, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 363, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 356, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 358, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 360, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 362, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 364, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 165, -1, -1, -1, 165, 165, -1, 165, -1, 165, 165,
- -1, -1, -1, 165, -1, 191, -1, -1, 165, -1, 165, -1, 165, 365, 165, 165, 165, 165, 165, -1,
- -1, -1, -1, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165,
- 165, 165, 165, 165, 165, 165, 165, -1, 165, 165, 165, 165, 165, 165, 165, 165,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 368, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 370, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 372, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 375, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 374, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 377, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 379, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 376, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 378, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 381, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 380, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 383, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 385, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 382, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 387, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 384, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 389, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 386, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
-),
-array(
- -1, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 243, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, -1, 398, 398, 398, 398, 398, 398, 391, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
- 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398, 398,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 388,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 390, 237,
-),
-array(
- -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 238, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
- 237, -1, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 414, 237, 237, 237, 237, 237,
- 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237, 237,
+ -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 227, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
+ 226, -1, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 403, 226, 226, 226, 226, 226,
+ 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226,
 ),
 );
 
@@ -6309,11 +6363,12 @@ array(
 						case -3:
 							break;
 						case 3:
-							{                        /* More than one whitespace */
+							{                         /* More than one whitespace */
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
-        return $this->string_to_tokens($this->yytext());
+        $text = $this->yytext();
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
     }
 }
 						case -4:
@@ -6322,9 +6377,10 @@ array(
 							{                                /* Comment beginning when modifier x is set */
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
+        $this->state_begin_position = $this->current_position_for_node();
         $this->yybegin(self::YYCOMMENTEXT);
     } else {
-        return $this->form_charset('#', $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, '#');
+        return $this->form_charset('#', qtype_preg_charset_flag::TYPE_SET, '#');
     }
 }
 						case -5:
@@ -6332,7 +6388,7 @@ array(
 						case 5:
 							{                 // Just to avoid exceptions.
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
 						case -6:
 							break;
@@ -6342,7 +6398,7 @@ array(
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, 0, 1, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, 0, 1, $lazy, $greedy, $possessive);
 }
 						case -7:
 							break;
@@ -6352,7 +6408,7 @@ array(
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, 1, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, 1, null, $lazy, $greedy, $possessive);
 }
 						case -8:
 							break;
@@ -6362,15 +6418,14 @@ array(
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, 0, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, 0, null, $lazy, $greedy, $possessive);
 }
 						case -9:
 							break;
 						case 9:
 							{                       /* ERROR: \ at the end of the pattern */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\');
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -10:
 							break;
@@ -6380,15 +6435,17 @@ array(
     $this->last_subexpr++;
     $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
     $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->last_subexpr);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('('));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(')));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
 						case -11:
 							break;
 						case 11:
 							{
     $this->pop_options_stack_item();
-    return new JLexToken(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem($this->yyline, $this->yyline, $this->yycol, $this->yycol, new qtype_preg_userinscription(')')));
+    $closebr = new qtype_preg_lexem();
+    $closebr->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription(')')));
+    return new JLexToken(qtype_preg_parser::CLOSEBRACK, $closebr);
 }
 						case -12:
 							break;
@@ -6399,7 +6456,9 @@ array(
     if ($topitem->last_dup_subexpr_number != -1) {
         $this->last_subexpr = $topitem->last_dup_subexpr_number;
     }
-    return new JLexToken(qtype_preg_yyParser::ALT, new qtype_preg_lexem($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('|')));
+    $alt = new qtype_preg_lexem();
+    $alt->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('|')));
+    return new JLexToken(qtype_preg_parser::ALT, $alt);
 }
 						case -13:
 							break;
@@ -6407,16 +6466,14 @@ array(
 							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
-    $this->charset->indfirst = $this->yycol;
+    $this->charset->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
     $this->charset->negative = ($text === '[^' || $text === '[^]');
-    $this->charset->userinscription = array();
     $this->charset_count = 0;
     $this->charset_set = '';
-    $this->charset->linefirst = $this->yyline;
-    $this->charset->indfirst = $this->yycol;
     if ($text === '[^]' || $text === '[]') {
-        $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
+        $this->add_flag_to_charset(']', qtype_preg_charset_flag::TYPE_SET, ']');
     }
+    $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCHARSET);
 }
 						case -14:
@@ -6426,10 +6483,10 @@ array(
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_circumflex');
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
     } else {
         // Default case: the same as \A.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_a');
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
     }
 }
 						case -15:
@@ -6439,10 +6496,10 @@ array(
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
         // The true dot matches everything.
-        return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+        return $this->form_charset($this->yytext(), qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::META_DOT);
     } else {
         // Convert . to [^\n]
-        return $this->form_charset('.', $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, "\n", true);
+        return $this->form_charset('.', qtype_preg_charset_flag::TYPE_SET, "\n", true);
     }
 }
 						case -16:
@@ -6452,13 +6509,13 @@ array(
     $topitem = $this->opt_stack[$this->opt_count - 1];
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_dollar');
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
     } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
         // Not multiline, but dollar endonly; the same as \z.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', false);
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_z', false);
     } else {
         // Default case: the same as \Z.
-        return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', true);
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_z', true);
     }
 }
 						case -17:
@@ -6466,14 +6523,14 @@ array(
 						case 17:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($text, 1, 1));
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::substr($text, 1, 1));
 }
 						case -18:
 							break;
 						case 18:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 						case -19:
 							break;
@@ -6483,14 +6540,14 @@ array(
     $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
         // Return a backreference.
-        return $this->form_backref($text, $this->yycol, $this->yylength(), (int)$str);
+        return $this->form_backref($text, (int)$str);
     }
     // Return a character.
     $octal = '';
     $failed = false;
     for ($i = 0; !$failed && $i < qtype_preg_unicode::strlen($str); $i++) {
         $tmp = qtype_preg_unicode::substr($str, $i, 1);
-        if (intval($tmp) < 8) {
+        if ((int)$tmp < 8) {
             $octal = $octal . $tmp;
         } else {
             $failed = true;
@@ -6505,29 +6562,36 @@ array(
         $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
+    $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
+    $charset->value->position->indlast -= textlib::strlen($tail);
+    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
-        $res = $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    } else {
-        $res = array($this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
-        $res = array_merge($res, $this->string_to_tokens($tail));
+        return $charset;
     }
-    return $res;
+    $tokens = $this->string_to_tokens($tail);
+    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    foreach ($tokens as $token) {
+        $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
+                                        $this->yyline, $this->yyline,
+                                        $this->yycol + $offset, $this->yycol + $offset);
+        $offset++;
+    }
+    return array_merge(array($charset), $tokens);
 }
 						case -20:
 							break;
 						case 20:
 							{                     /* ERROR: missing brackets for \g */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BRACKETS_FOR_G, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_BRACKETS_FOR_G, $this->yytext());
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -21:
 							break;
 						case 21:
 							{                     /* ERROR: missing brackets for \k */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_BRACKETS_FOR_K, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_BRACKETS_FOR_K, $this->yytext());
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -22:
 							break;
@@ -6542,7 +6606,7 @@ array(
 						case 23:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $text === '\D');
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_D, $text === '\D');
 }
 						case -24:
 							break;
@@ -6554,14 +6618,14 @@ array(
 							break;
 						case 25:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, "\n", true);
+    return $this->form_charset($this->yytext(), qtype_preg_charset_flag::TYPE_SET, "\n", true);
 }
 						case -26:
 							break;
 						case 26:
 							{
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT);
+    return $this->form_charset($this->yytext(), qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::META_DOT);
 }
 						case -27:
 							break;
@@ -6569,178 +6633,146 @@ array(
 							{                     /* \Q...\E quotation beginning */
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
+    $this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYQEOUT);
 }
 						case -28:
 							break;
 						case 28:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+    $text = $this->yytext();
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(self::code_of_char_escape_sequence($text)));
 }
 						case -29:
 							break;
 						case 29:
 							{
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c');
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -30:
 							break;
 						case 30:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $text = $this->yytext();
+    if ($this->yylength() < 3) {
+        $str = qtype_preg_unicode::substr($text, 1);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
+    } else {
+        $code = self::code_of_char_escape_sequence($text);
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+        } else {
+            return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+        }
+    }
 }
 						case -31:
 							break;
 						case 31:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
+    return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
 }
 						case -32:
 							break;
 						case 32:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
+    $text = $this->yytext();
+    return $this->form_simple_assertion($text, 'qtype_preg_leaf_assert_esc_b', $text === '\B');
 }
 						case -33:
 							break;
 						case 33:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
+    $text = $this->yytext();
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_H, $text === '\H');
 }
 						case -34:
 							break;
 						case 34:
 							{
-    return $this->form_charset($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+    $text = $this->yytext();
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_S, $text === '\S');
 }
 						case -35:
 							break;
 						case 35:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
-        $str = qtype_preg_unicode::substr($text, 1);
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $str);
-    } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
-        if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
-        } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
-        } else {
-            return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
-        }
-    }
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_V, $text === '\V');
 }
 						case -36:
 							break;
 						case 36:
 							{
-    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_a');
+    $text = $this->yytext();
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W, $text === '\W');
 }
 						case -37:
 							break;
 						case 37:
 							{
-    $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_b', $text === '\B');
+    // TODO: reset start of match.
+    throw new Exception('\K is not implemented yet');
 }
 						case -38:
 							break;
 						case 38:
 							{
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $text === '\H');
+    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
+    // \B, \R, and \X are not special inside a character class.
+    throw new Exception('\R is not implemented yet');
 }
 						case -39:
 							break;
 						case 39:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $text === '\S');
+    return $this->form_simple_assertion($text, 'qtype_preg_leaf_assert_esc_z', $text === '\Z');
 }
 						case -40:
 							break;
 						case 40:
 							{
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $text === '\V');
+    return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_g');
 }
 						case -41:
 							break;
 						case 41:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $text === '\W');
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text);
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -42:
 							break;
 						case 42:
-							{
-    // TODO: reset start of match.
-    throw new Exception('\K is not implemented yet');
+							{                 /* ERROR: Unrecognized character after (? or (?- */
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQH, $this->yytext());
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
 }
 						case -43:
 							break;
 						case 43:
-							{
-    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
-    // \B, \R, and \X are not special inside a character class.
-    throw new Exception('\R is not implemented yet');
+							{            /* (*...) Backtracking control sequence */
+    return $this->form_control($this->yytext());
 }
 						case -44:
 							break;
 						case 44:
-							{
+							{                       // {n}    Quantifier exactly n
     $text = $this->yytext();
-    return $this->form_simple_assertion($text, $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_z', $text === '\Z');
+    $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
+    return $this->form_quant($text, false, $count, $count, false, true, false);
 }
 						case -45:
 							break;
 						case 45:
-							{
-    return $this->form_simple_assertion($this->yytext(), $this->yycol, $this->yylength(), 'qtype_preg_leaf_assert_esc_g');
-}
-						case -46:
-							break;
-						case 46:
-							{
-    $text = $this->yytext();
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text);
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
-}
-						case -47:
-							break;
-						case 47:
-							{                 /* ERROR: Unrecognized character after (? or (?- */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQH, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
-}
-						case -48:
-							break;
-						case 48:
-							{            /* (*...) Backtracking control sequence */
-    return $this->form_control($this->yytext(), $this->yycol, $this->yylength());
-}
-						case -49:
-							break;
-						case 49:
-							{                       // {n}    Quantifier exactly n
-    $text = $this->yytext();
-    $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, $count, $count, false, true, false);
-}
-						case -50:
-							break;
-						case 50:
 							{        /* \gn \g-n        Backreference by number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2);
@@ -6748,111 +6780,107 @@ array(
     if ($number < 0) {
         $number = $this->last_subexpr + $number + 1;
     }
-    return $this->form_backref($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_backref($text, $number);
 }
-						case -51:
+						case -46:
 							break;
-						case 51:
+						case 46:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 2);
     $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
     }
 }
-						case -52:
+						case -47:
 							break;
-						case 52:
+						case 47:
 							{
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
     if ($char === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $text);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $char);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $char);
     }
 }
-						case -53:
+						case -48:
 							break;
-						case 53:
+						case 48:
 							{                                        /* (?#....) Comment beginning */
     $this->comment = $this->yytext();
     $this->comment_length = $this->yylength();
+    $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCOMMENT);
 }
-						case -54:
+						case -49:
 							break;
-						case 54:
+						case 49:
 							{         /* (?<name>...)     Named subexpression (Perl) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '>') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -55:
+						case -50:
 							break;
-						case 55:
+						case 50:
 							{                    /* (?>...)         Atomic, non-capturing group */
     $this->push_options_stack_item();
     $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('(?>'));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?>')));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
-						case -56:
+						case -51:
 							break;
-						case 56:
+						case 51:
 							{         /* (?'name'...)     Named subexpression (Perl) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '\'') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -57:
+						case -52:
 							break;
-						case 57:
+						case 52:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -58:
+						case -53:
 							break;
-						case 58:
+						case 53:
 							{                    /* ERROR: Unrecognized character after (?P */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQP, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQP, $this->yytext());
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
 }
-						case -59:
+						case -54:
 							break;
-						case 59:
+						case 54:
 							{                    /* (?=...)         Positive look ahead assertion */
     $this->push_options_stack_item();
     $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_PLA);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($this->yytext()));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($this->yytext())));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
-						case -60:
+						case -55:
 							break;
-						case 60:
+						case 55:
 							{              /* (?imsxuADSUXJ-imsxuADSUXJ) Option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
@@ -6869,63 +6897,61 @@ array(
     if ($this->options->preserveallnodes) {
         $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
-        $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($text));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     } else {
-        // Do nothing in YYINITIAL state.
+        $this->skipped_positions[] = $this->current_position_for_node();
     }
 }
-						case -61:
+						case -56:
 							break;
-						case 61:
+						case 56:
 							{                    /* (?:...)         Non-capturing group */
     $this->push_options_stack_item();
     $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('(?:'));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?:')));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
-						case -62:
+						case -57:
 							break;
-						case 62:
+						case 57:
 							{                    /* (?|...)         Non-capturing group, duplicate subexpression numbers */
     // Save the top-level subexpression number.
     $this->push_options_stack_item($this->last_subexpr);
     $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription('(?|'));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?|')));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
-						case -63:
+						case -58:
 							break;
-						case 63:
+						case 58:
 							{                    /* (?!...)         Negative look ahead assertion */
     $this->push_options_stack_item();
     $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_NLA);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($this->yytext()));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($this->yytext())));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
 }
-						case -64:
+						case -59:
 							break;
-						case 64:
+						case 59:
 							{          /* (?Cxxx) Callout */
     $text = $this->yytext();
     if (qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) !== ')') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     }
     throw new Exception('Callouts are not implemented yet');
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
         // TODO: for now this code will return either error or exception :)
     }
 }
-						case -65:
+						case -60:
 							break;
-						case 65:
+						case 60:
 							{           // {n,}  Quantifier n or more
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -6935,11 +6961,11 @@ array(
     $possessive = !$greedy&& !$lazy;
     $greedy|| $textlen--;
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, $leftborder, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, $leftborder, null, $lazy, $greedy, $possessive);
 }
-						case -66:
+						case -61:
 							break;
-						case 66:
+						case 61:
 							{           // {,m}  Quantifier no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -6949,29 +6975,29 @@ array(
     $possessive = !$greedy&& !$lazy;
     $greedy|| $textlen--;
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, 0, $rightborder, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, 0, $rightborder, $lazy, $greedy, $possessive);
 }
-						case -67:
+						case -62:
 							break;
-						case 67:
+						case 62:
 							{         /* \g{name}        Backreference by name (Perl) */
-    return $this->form_named_backref($this->yytext(), $this->yycol, $this->yylength(), 3, '{', '}');
+    return $this->form_named_backref($this->yytext(), 3, '{', '}');
 }
-						case -68:
+						case -63:
 							break;
-						case 68:
+						case 63:
 							{         /* \g<name>        Call subexpression by name (Oniguruma) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_recursion($text, $name);
 }
-						case -69:
+						case -64:
 							break;
-						case 69:
+						case 64:
 							{         /* \g'name'        Call subexpression by name (Oniguruma) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_recursion($text, $name);
 // TODO:
 //         \g<n>           call subpattern by absolute number (Oniguruma)
 //         \g'n'           call subpattern by absolute number (Oniguruma)
@@ -6980,27 +7006,27 @@ array(
 //         \g<-n>          call subpattern by relative number (PCRE extension)
 //         \g'-n'          call subpattern by relative number (PCRE extension)
 }
-						case -70:
+						case -65:
 							break;
-						case 70:
+						case 65:
 							{         /* \k{name}        Backreference by name (.NET) */
-    return $this->form_named_backref($this->yytext(), $this->yycol, $this->yylength(), 3, '{', '}');
+    return $this->form_named_backref($this->yytext(), 3, '{', '}');
 }
-						case -71:
+						case -66:
 							break;
-						case 71:
+						case 66:
 							{         /* \k<name>        Backreference by name (Perl) */
-    return $this->form_named_backref($this->yytext(), $this->yycol, $this->yylength(), 3, '<', '>');
+    return $this->form_named_backref($this->yytext(), 3, '<', '>');
 }
-						case -72:
+						case -67:
 							break;
-						case 72:
+						case 67:
 							{         /* \k'name'        Backreference by name (Perl) */
-    return $this->form_named_backref($this->yytext(), $this->yycol, $this->yylength(), 3, '\'', '\'');
+    return $this->form_named_backref($this->yytext(), 3, '\'', '\'');
 }
-						case -73:
+						case -68:
 							break;
-						case 73:
+						case 68:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
@@ -7011,30 +7037,29 @@ array(
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str === 'Any') {
-        $res = $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
+        $res = $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::META_DOT, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         } else {
-            return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+            return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
         }
     }
     return $res;
 }
-						case -74:
+						case -69:
 							break;
-						case 74:
+						case 69:
 							{            /* (?n)            Call subexpression by absolute number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
-    return $this->form_recursion($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_recursion($text, $number);
 }
-						case -75:
+						case -70:
 							break;
-						case 75:
+						case 70:
 							{              /* (?imsxuADSUXJ-imsxuADSUXJ: Subexpression with option setting */
     $text = $this->yytext();
     $delimpos = qtype_preg_unicode::strpos($text, '-');
@@ -7052,109 +7077,107 @@ array(
     if ($this->options->preserveallnodes) {
         $res = array();
         $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($text));
-        $res[] = new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        $res[] = new JLexToken(qtype_preg_parser::OPENBRACK, $node);
         $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
-        $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($text));
-        $res[] = new JLexToken(qtype_preg_yyParser::PARSELEAF, $node);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        $res[] = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         return $res;
     } else {
         $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($text));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
     }
+}
+						case -71:
+							break;
+						case 71:
+							{                   /* (?<=...)        Positive look behind assertion */
+    $this->push_options_stack_item();
+    $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_PLB);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($this->yytext())));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+}
+						case -72:
+							break;
+						case 72:
+							{                   /* (?<!...)        Negative look behind assertion */
+    $this->push_options_stack_item();
+    $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_NLB);
+    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($this->yytext())));
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+}
+						case -73:
+							break;
+						case 73:
+							{          /* (?(n)...                  Conditional subexpression - absolute reference condition */
+    $text = $this->yytext();
+    $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+}
+						case -74:
+							break;
+						case 74:
+							{    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
+    $text = $this->yytext();
+    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, '>)');
+}
+						case -75:
+							break;
+						case 75:
+							{    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
+    $text = $this->yytext();
+    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, "')");
 }
 						case -76:
 							break;
 						case 76:
-							{                   /* (?<=...)        Positive look behind assertion */
-    $this->push_options_stack_item();
-    $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_PLB);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($this->yytext()));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
+							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
+    $text = $this->yytext();
+    $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
+    return $this->form_recursive_cond_subexpr($text, $number);
 }
 						case -77:
 							break;
 						case 77:
-							{                   /* (?<!...)        Negative look behind assertion */
-    $this->push_options_stack_item();
-    $node = new qtype_preg_node_assert(qtype_preg_node_assert::SUBTYPE_NLB);
-    $node->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription($this->yytext()));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $node);
-}
-						case -78:
-							break;
-						case 78:
-							{          /* (?(n)...                  Conditional subexpression - absolute reference condition */
-    $text = $this->yytext();
-    $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $number, ')');
-}
-						case -79:
-							break;
-						case 79:
-							{    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
-    $text = $this->yytext();
-    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, '>)');
-}
-						case -80:
-							break;
-						case 80:
-							{    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
-    $text = $this->yytext();
-    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, "')");
-}
-						case -81:
-							break;
-						case 81:
-							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
-    $text = $this->yytext();
-    $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_recursive_cond_subexpr($text, $this->yycol, $this->yylength(), $number);
-}
-						case -82:
-							break;
-						case 82:
 							{        /* (?P<name>...)    Named subexpression (Python) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '>') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -83:
+						case -78:
 							break;
-						case 83:
+						case 78:
 							{                   /* ERROR: missing closing paren for (?P= */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $this->yytext());
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
-						case -84:
+						case -79:
 							break;
-						case 84:
+						case 79:
 							{                   /* (?R)            Recurse whole pattern */
     $text = $this->yytext();
-    return $this->form_recursion($text, $this->yycol, $this->yylength(), 0);
+    return $this->form_recursion($text, 0);
 }
-						case -85:
+						case -80:
 							break;
-						case 85:
+						case 80:
 							{         /* (?&name)        Call subexpression by name (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_recursion($text, $name);
 }
-						case -86:
+						case -81:
 							break;
-						case 86:
+						case 81:
 							{   // {n,m} Quantifier at least n, no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -7166,11 +7189,11 @@ array(
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, $leftborder, $rightborder, $lazy, $greedy, $possessive);
 }
-						case -87:
+						case -82:
 							break;
-						case 87:
+						case 82:
 							{    /* \g{n} \g{-n}    Backreference by number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
@@ -7178,30 +7201,27 @@ array(
     if ($number < 0) {
         $number = $this->last_subexpr + $number + 1;
     }
-    return $this->form_backref($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_backref($text, $number);
 }
-						case -88:
+						case -83:
 							break;
-						case 88:
+						case 83:
 							{
     $text = $this->yytext();
-    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    $code = hexdec($str);
+    $code = self::code_of_char_escape_sequence($text);
     if ($code > qtype_preg_unicode::max_possible_code()) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else if (0xd800 <= $code && $code <= 0xdfff) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
     }
 }
-						case -89:
+						case -84:
 							break;
-						case 89:
+						case 84:
 							{      /* (?+n) (?-n)     Call subexpression by relative number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
@@ -7210,23 +7230,23 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_recursion($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_recursion($text, $number);
 }
-						case -90:
+						case -85:
 							break;
-						case 90:
+						case 85:
 							{                  /* (?(assert)...             Conditional subexpression - positive look ahead assertion */
-    return $this->form_assert_cond_subexpr($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
+    return $this->form_assert_cond_subexpr($this->yytext(), qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
 }
-						case -91:
+						case -86:
 							break;
-						case 91:
+						case 86:
 							{                  /* (?(assert)...             Conditional subexpression - negative look ahead assertion */
-    return $this->form_assert_cond_subexpr($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
+    return $this->form_assert_cond_subexpr($this->yytext(), qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
 }
-						case -92:
+						case -87:
 							break;
-						case 92:
+						case 87:
 							{    /* (?(+n)... or (?(-n)...    Conditional subexpression - relative reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
@@ -7235,345 +7255,317 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+}
+						case -88:
+							break;
+						case 88:
+							{      /* (?(name)...               Conditional subexpression - specific recursion condition */
+    $text = $this->yytext();
+    $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
+    return $this->form_recursive_cond_subexpr($text, $name);
+}
+						case -89:
+							break;
+						case 89:
+							{        /* (?P>name)       Call subexpression by name (Python) */
+    $text = $this->yytext();
+    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
+    return $this->form_named_recursion($text, $name);
+}
+						case -90:
+							break;
+						case 90:
+							{        /* (?P=name)       Backreference by name (Python) */
+    return $this->form_named_backref($this->yytext(), 4, '=', ')');
+}
+						case -91:
+							break;
+						case 91:
+							{                 /* (?(assert)...             Conditional subexpression - positive look behind assertion */
+    return $this->form_assert_cond_subexpr($this->yytext(), qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
+}
+						case -92:
+							break;
+						case 92:
+							{                 /* (?(assert)...             Conditional subexpression - negative look behind assertion */
+    return $this->form_assert_cond_subexpr($this->yytext(), qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
 }
 						case -93:
 							break;
 						case 93:
-							{      /* (?(name)...               Conditional subexpression - specific recursion condition */
-    $text = $this->yytext();
-    $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_recursive_cond_subexpr($text, $this->yycol, $this->yylength(), $name);
+							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    return $this->form_define_cond_subexpr($this->yytext());
 }
 						case -94:
 							break;
 						case 94:
-							{        /* (?P>name)       Call subexpression by name (Python) */
-    $text = $this->yytext();
-    $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_named_recursion($text, $this->yycol, $this->yylength(), $name);
+							{
+    // Do nothing.
 }
 						case -95:
 							break;
 						case 95:
-							{        /* (?P=name)       Backreference by name (Python) */
-    return $this->form_named_backref($this->yytext(), $this->yycol, $this->yylength(), 4, '=', ')');
+							{
+    $this->state_begin_position = null;
+    $this->yybegin(self::YYINITIAL);
 }
 						case -96:
 							break;
 						case 96:
-							{                 /* (?(assert)...             Conditional subexpression - positive look behind assertion */
-    return $this->form_assert_cond_subexpr($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
-}
-						case -97:
-							break;
-						case 97:
-							{                 /* (?(assert)...             Conditional subexpression - negative look behind assertion */
-    return $this->form_assert_cond_subexpr($this->yytext(), $this->yycol, $this->yylength(), qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
-}
-						case -98:
-							break;
-						case 98:
-							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
-    return $this->form_define_cond_subexpr($this->yytext(), $this->yycol, $this->yylength());
-}
-						case -99:
-							break;
-						case 99:
-							{
-    // Do nothing.
-}
-						case -100:
-							break;
-						case 100:
-							{
-    $this->yybegin(self::YYINITIAL);
-}
-						case -101:
-							break;
-						case 101:
 							{                                      /* Comment body: all characters until ')' or '\' found */
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
-						case -102:
+						case -97:
 							break;
-						case 102:
+						case 97:
 							{                                         /* Comment body: not ')' */
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
-						case -103:
+						case -98:
 							break;
-						case 103:
+						case 98:
 							{                                          /* Comment ending */
     //$this->comment .= $this->yytext();
     //$this->comment_length += $this->yylength();
     // TODO: make use of it?
     $this->comment = '';
     $this->comment_length = 0;
+    $this->state_begin_position = null;
     $this->yybegin(self::YYINITIAL);
 }
-						case -104:
+						case -99:
 							break;
-						case 104:
+						case 99:
 							{                                    /* Comment body: \) or \\ */
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
-						case -105:
+						case -100:
 							break;
-						case 105:
+						case 100:
 							{                      /* \Q...\E quotation body */
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
-						case -106:
+						case -101:
 							break;
-						case 106:
+						case 101:
 							{                       /* \Q...\E quotation ending */
     $this->qe_sequence = '';
     $this->qe_sequence_length = 0;
+    $this->state_begin_position = null;
+    $this->skipped_positions[] = $this->current_position_for_node();
     $this->yybegin(self::YYINITIAL);
 }
-						case -107:
+						case -102:
 							break;
-						case 107:
+						case 102:
 							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
+}
+						case -103:
+							break;
+						case 103:
+							{                      // \Q...\E ending
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
+    $this->yybegin(self::YYCHARSET);
+}
+						case -104:
+							break;
+						case 104:
+							{
+    $text = $this->yytext();
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
+}
+						case -105:
+							break;
+						case 105:
+							{
+    // Form the charset.
+    $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
+                                        $this->state_begin_position->linefirst, $this->yyline,
+                                        $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
+    $this->charset->userinscription[] = new qtype_preg_userinscription(']');
+    $this->charset->set_user_info($position, $this->charset->userinscription);
+    $this->charset->israngecalculated = false;
+    if ($this->charset_set !== '') {
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($this->charset_set));
+        $this->charset->flags[] = array($flag);
+    }
+    $this->set_node_modifiers($this->charset);
+    // Look for possible errors.
+    $ui1 = $this->charset->userinscription[1];
+    $ui2 = $this->charset->userinscription[count($this->charset->userinscription) - 2];
+    if (count($this->charset->userinscription) > 3 && $ui1->data == ':' && $ui2->data == ':') {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, '', $this->charset);
+        $error->set_user_info($position);
+        $res = new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else {
+        $res = new JLexToken(qtype_preg_parser::PARSELEAF, $this->charset);
+    }
+    $this->charset = null;
+    $this->charset_count = 0;
+    $this->charset_set = '';
+    $this->state_begin_position = null;
+    $this->yybegin(self::YYINITIAL);
+    return $res;
+}
+						case -106:
+							break;
+						case 106:
+							{
+    $text = $this->yytext();
+    $char = qtype_preg_unicode::substr($text, 1, 1);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $char, false, $char !== '-');
+}
+						case -107:
+							break;
+						case 107:
+							{
+    $text = $this->yytext();
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
 						case -108:
 							break;
 						case 108:
-							{                      // \Q...\E ending
-    $this->qe_sequence = '';
-    $this->qe_sequence_length = 0;
-    $this->yybegin(self::YYCHARSET);
+							{
+    $text = $this->yytext();
+    $negative = ($text === '\D');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
 }
 						case -109:
 							break;
 						case 109:
 							{
-    $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+    // Do nothing in YYCHARSET state.
 }
 						case -110:
 							break;
 						case 110:
 							{
-    // Form the charset.
-    $this->charset->linelast = $this->yyline;
-    $this->charset->indlast = $this->yycol;
-    $this->charset->israngecalculated = false;
-    if ($this->charset_set !== '') {
-        $flag = new qtype_preg_charset_flag;
-        $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charset_set));
-        $this->charset->flags[] = array($flag);
-    }
-    $this->set_node_modifiers($this->charset);
-    // Look for possible errors.
-    $ui1 = $this->charset->userinscription[0];
-    $ui2 = end($this->charset->userinscription);
-    if (count($this->charset->userinscription) > 1 && $ui1->data == ':' && $ui2->data == ':') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, '');
-        $error->set_user_info($this->yyline, $this->yyline, $this->charset->indfirst, $this->charset->indlast, new qtype_preg_userinscription(''));
-        $res = new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
-    } else {
-        $res = new JLexToken(qtype_preg_yyParser::PARSELEAF, $this->charset);
-    }
-    $this->charset = null;
-    $this->charset_count = 0;
-    $this->charset_set = '';
-    $this->yybegin(self::YYINITIAL);
-    return $res;
+    // TODO: matches any character except new line characters. For now, the same as dot.
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(0x0A), true);
 }
 						case -111:
 							break;
 						case 111:
-							{
-    $text = $this->yytext();
-    $char = qtype_preg_unicode::substr($text, 1, 1);
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
+							{                   // \Q...\E beginning
+    $this->qe_sequence = '';
+    $this->qe_sequence_length = 0;
+    //$this->state_begin_position = $this->current_position_for_node();
+    $this->skipped_positions[] = $this->current_position_for_node();
+    $this->yybegin(self::YYQEIN);
 }
 						case -112:
 							break;
 						case 112:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(self::code_of_char_escape_sequence($text)));
 }
 						case -113:
 							break;
 						case 113:
 							{
     $text = $this->yytext();
-    $negative = ($text === '\D');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_D, $negative);
+    if ($this->yylength() < 3) {
+        $str = qtype_preg_unicode::substr($text, 1);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
+    } else {
+        $code = self::code_of_char_escape_sequence($text);
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
+        } else {
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+        }
+    }
 }
 						case -114:
 							break;
 						case 114:
 							{
-    // Do nothing in YYCHARSET state.
+    $text = $this->yytext();
+    $negative = ($text === '\H');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
 }
 						case -115:
 							break;
 						case 115:
 							{
-    // TODO: matches any character except new line characters. For now, the same as dot.
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A), true);
+    $text = $this->yytext();
+    $negative = ($text === '\S');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
 }
 						case -116:
 							break;
 						case 116:
-							{                   // \Q...\E beginning
-    $this->qe_sequence = '';
-    $this->qe_sequence_length = 0;
-    $this->yybegin(self::YYQEIN);
+							{
+    $text = $this->yytext();
+    $negative = ($text === '\V');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
 }
 						case -117:
 							break;
 						case 117:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+    $text = $this->yytext();
+    $negative = ($text === '\W');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
 }
 						case -118:
 							break;
 						case 118:
 							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $text = $this->yytext();
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text, $this->charset);
+    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
 }
 						case -119:
 							break;
 						case 119:
-							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
-}
-						case -120:
-							break;
-						case 120:
-							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
-}
-						case -121:
-							break;
-						case 121:
-							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
-}
-						case -122:
-							break;
-						case 122:
-							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
-}
-						case -123:
-							break;
-						case 123:
-							{
-    $text = $this->yytext();
-    if ($this->yylength() < 3) {
-        $str = qtype_preg_unicode::substr($text, 1);
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
-    } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
-        if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text);
-        } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        } else {
-            $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
-        }
-    }
-}
-						case -124:
-							break;
-						case 124:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '\H');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_H, $negative);
-}
-						case -125:
-							break;
-						case 125:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '\S');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_S, $negative);
-}
-						case -126:
-							break;
-						case 126:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '\V');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_V, $negative);
-}
-						case -127:
-							break;
-						case 127:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '\W');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W, $negative);
-}
-						case -128:
-							break;
-						case 128:
-							{
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x08));
-}
-						case -129:
-							break;
-						case 129:
-							{
-    $text = $this->yytext();
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text);
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
-}
-						case -130:
-							break;
-						case 130:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 2);
     $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, $subtype);
     } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
     }
 }
-						case -131:
+						case -120:
 							break;
-						case 131:
+						case 120:
 							{
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
     if ($char === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $text, $this->charset);
         $this->charset->userinscription[] = new qtype_preg_userinscription($text);
     } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $char);
     }
 }
-						case -132:
+						case -121:
 							break;
-						case 132:
+						case 121:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
@@ -7584,242 +7576,235 @@ array(
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str === 'Any') {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::META_DOT, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::META_DOT, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype === null) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
+            $this->charset->userinscription[] = new qtype_preg_userinscription($text, $subtype);
         } else {
-            $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
         }
     }
+}
+						case -122:
+							break;
+						case 122:
+							{
+    $text = $this->yytext();
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $text, $this->charset);
+    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+}
+						case -123:
+							break;
+						case 123:
+							{
+    $text = $this->yytext();
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
+    } else {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+    }
+}
+						case -124:
+							break;
+						case 124:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^word:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD, $negative);
+}
+						case -125:
+							break;
+						case 125:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^graph:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_GRAPH, $negative);
+}
+						case -126:
+							break;
+						case 126:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^ascii:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_ASCII, $negative);
+}
+						case -127:
+							break;
+						case 127:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^alnum:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_ALNUM, $negative);
+}
+						case -128:
+							break;
+						case 128:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^alpha:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_ALPHA, $negative);
+}
+						case -129:
+							break;
+						case 129:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^cntrl:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_CNTRL, $negative);
+}
+						case -130:
+							break;
+						case 130:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^print:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_PRINT, $negative);
+}
+						case -131:
+							break;
+						case 131:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^punct:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_PUNCT, $negative);
+}
+						case -132:
+							break;
+						case 132:
+							{
+    $text = $this->yytext();
+    $negative = ($text === '[:^digit:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_DIGIT, $negative);
 }
 						case -133:
 							break;
 						case 133:
 							{
     $text = $this->yytext();
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $text);
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+    $negative = ($text === '[:^space:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_SPACE, $negative);
 }
 						case -134:
 							break;
 						case 134:
 							{
     $text = $this->yytext();
-    $str = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    $code = hexdec($str);
-    if ($code > qtype_preg_unicode::max_possible_code()) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
-    } else if (0xd800 <= $code && $code <= 0xdfff) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
-    }
+    $negative = ($text === '[:^blank:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_BLANK, $negative);
 }
 						case -135:
 							break;
 						case 135:
 							{
     $text = $this->yytext();
-    $negative = ($text === '[:^word:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_WORD, $negative);
+    $negative = ($text === '[:^upper:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_UPPER, $negative);
 }
 						case -136:
 							break;
 						case 136:
 							{
     $text = $this->yytext();
-    $negative = ($text === '[:^graph:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_GRAPH, $negative);
+    $negative = ($text === '[:^lower:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_LOWER, $negative);
 }
 						case -137:
 							break;
 						case 137:
 							{
     $text = $this->yytext();
-    $negative = ($text === '[:^ascii:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ASCII, $negative);
+    $negative = ($text === '[:^xdigit:]');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_XDIGIT, $negative);
 }
 						case -138:
 							break;
-						case 138:
-							{
+						case 139:
+							{                 // Just to avoid exceptions.
     $text = $this->yytext();
-    $negative = ($text === '[:^alnum:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALNUM, $negative);
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
 						case -139:
 							break;
-						case 139:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^alpha:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_ALPHA, $negative);
-}
-						case -140:
-							break;
 						case 140:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^cntrl:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_CNTRL, $negative);
-}
-						case -141:
-							break;
-						case 141:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^print:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PRINT, $negative);
-}
-						case -142:
-							break;
-						case 142:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^punct:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_PUNCT, $negative);
-}
-						case -143:
-							break;
-						case 143:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^digit:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_DIGIT, $negative);
-}
-						case -144:
-							break;
-						case 144:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^space:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_SPACE, $negative);
-}
-						case -145:
-							break;
-						case 145:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^blank:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_BLANK, $negative);
-}
-						case -146:
-							break;
-						case 146:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^upper:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_UPPER, $negative);
-}
-						case -147:
-							break;
-						case 147:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^lower:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_LOWER, $negative);
-}
-						case -148:
-							break;
-						case 148:
-							{
-    $text = $this->yytext();
-    $negative = ($text === '[:^xdigit:]');
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::POSIX_XDIGIT, $negative);
-}
-						case -149:
-							break;
-						case 150:
-							{                 // Just to avoid exceptions.
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $text);
-}
-						case -150:
-							break;
-						case 151:
 							{                     // ?     Quantifier 0 or 1
     $text = $this->yytext();
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, 0, 1, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, 0, 1, $lazy, $greedy, $possessive);
 }
-						case -151:
+						case -140:
 							break;
-						case 152:
+						case 141:
 							{                     // +     Quantifier 1 or more
     $text = $this->yytext();
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, 1, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, 1, null, $lazy, $greedy, $possessive);
 }
-						case -152:
+						case -141:
 							break;
-						case 153:
+						case 142:
 							{                     // *     Quantifier 0 or more
     $text = $this->yytext();
     $greedy = $this->yylength() === 1;
     $lazy = qtype_preg_unicode::substr($text, 1, 1) === '?';
     $possessive = !$greedy && !$lazy;
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, 0, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, 0, null, $lazy, $greedy, $possessive);
 }
-						case -153:
+						case -142:
 							break;
-						case 154:
+						case 143:
 							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
-    $this->charset->indfirst = $this->yycol;
+    $this->charset->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
     $this->charset->negative = ($text === '[^' || $text === '[^]');
-    $this->charset->userinscription = array();
     $this->charset_count = 0;
     $this->charset_set = '';
-    $this->charset->linefirst = $this->yyline;
-    $this->charset->indfirst = $this->yycol;
     if ($text === '[^]' || $text === '[]') {
-        $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
+        $this->add_flag_to_charset(']', qtype_preg_charset_flag::TYPE_SET, ']');
     }
+    $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCHARSET);
 }
-						case -154:
+						case -143:
 							break;
-						case 155:
+						case 144:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($text, 1, 1));
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::substr($text, 1, 1));
 }
-						case -155:
+						case -144:
 							break;
-						case 156:
+						case 145:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
-						case -156:
+						case -145:
 							break;
-						case 157:
+						case 146:
 							{      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
         // Return a backreference.
-        return $this->form_backref($text, $this->yycol, $this->yylength(), (int)$str);
+        return $this->form_backref($text, (int)$str);
     }
     // Return a character.
     $octal = '';
     $failed = false;
     for ($i = 0; !$failed && $i < qtype_preg_unicode::strlen($str); $i++) {
         $tmp = qtype_preg_unicode::substr($str, $i, 1);
-        if (intval($tmp) < 8) {
+        if ((int)$tmp < 8) {
             $octal = $octal . $tmp;
         } else {
             $failed = true;
@@ -7834,54 +7819,60 @@ array(
         $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
+    $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
+    $charset->value->position->indlast -= textlib::strlen($tail);
+    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
-        $res = $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    } else {
-        $res = array($this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
-        $res = array_merge($res, $this->string_to_tokens($tail));
+        return $charset;
     }
-    return $res;
+    $tokens = $this->string_to_tokens($tail);
+    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    foreach ($tokens as $token) {
+        $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
+                                        $this->yyline, $this->yyline,
+                                        $this->yycol + $offset, $this->yycol + $offset);
+        $offset++;
+    }
+    return array_merge(array($charset), $tokens);
 }
-						case -157:
+						case -146:
 							break;
-						case 158:
+						case 147:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_preg_unicode::substr($text, 1);
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $str);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
+        $code = self::code_of_char_escape_sequence($text);
         if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         } else {
-            return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
+            return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
         }
     }
 }
-						case -158:
+						case -147:
 							break;
-						case 159:
+						case 148:
 							{                 /* ERROR: Unrecognized character after (? or (?- */
-    $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQH, $this->yytext());
-    $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-    return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQH, $this->yytext());
+    return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
 }
-						case -159:
+						case -148:
 							break;
-						case 160:
+						case 149:
 							{            /* (*...) Backtracking control sequence */
-    return $this->form_control($this->yytext(), $this->yycol, $this->yylength());
+    return $this->form_control($this->yytext());
 }
-						case -160:
+						case -149:
 							break;
-						case 161:
+						case 150:
 							{        /* \gn \g-n        Backreference by number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2);
@@ -7889,83 +7880,78 @@ array(
     if ($number < 0) {
         $number = $this->last_subexpr + $number + 1;
     }
-    return $this->form_backref($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_backref($text, $number);
 }
-						case -161:
+						case -150:
 							break;
-						case 162:
+						case 151:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 2);
     $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
     }
 }
-						case -162:
+						case -151:
 							break;
-						case 163:
+						case 152:
 							{         /* (?<name>...)     Named subexpression (Perl) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '>') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -163:
+						case -152:
 							break;
-						case 164:
+						case 153:
 							{         /* (?'name'...)     Named subexpression (Perl) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '\'') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -164:
+						case -153:
 							break;
-						case 165:
+						case 154:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -165:
+						case -154:
 							break;
-						case 166:
+						case 155:
 							{          /* (?Cxxx) Callout */
     $text = $this->yytext();
     if (qtype_preg_unicode::substr($text, $this->yylength() - 1, 1) !== ')') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     }
     throw new Exception('Callouts are not implemented yet');
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
         // TODO: for now this code will return either error or exception :)
     }
 }
-						case -166:
+						case -155:
 							break;
-						case 167:
+						case 156:
 							{           // {n,}  Quantifier n or more
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -7975,11 +7961,11 @@ array(
     $possessive = !$greedy&& !$lazy;
     $greedy|| $textlen--;
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), true, $leftborder, null, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, true, $leftborder, null, $lazy, $greedy, $possessive);
 }
-						case -167:
+						case -156:
 							break;
-						case 168:
+						case 157:
 							{           // {,m}  Quantifier no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -7989,57 +7975,56 @@ array(
     $possessive = !$greedy&& !$lazy;
     $greedy|| $textlen--;
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, 0, $rightborder, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, 0, $rightborder, $lazy, $greedy, $possessive);
 }
-						case -168:
+						case -157:
 							break;
-						case 169:
+						case 158:
 							{          /* (?(n)...                  Conditional subexpression - absolute reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
 }
-						case -169:
+						case -158:
 							break;
-						case 170:
+						case 159:
 							{    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, '>)');
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, '>)');
 }
-						case -170:
+						case -159:
 							break;
-						case 171:
+						case 160:
 							{    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, "')");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, "')");
 }
-						case -171:
+						case -160:
 							break;
-						case 172:
+						case 161:
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_recursive_cond_subexpr($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_recursive_cond_subexpr($text, $number);
 }
-						case -172:
+						case -161:
 							break;
-						case 173:
+						case 162:
 							{        /* (?P<name>...)    Named subexpression (Python) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '>') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -173:
+						case -162:
 							break;
-						case 174:
+						case 163:
 							{   // {n,m} Quantifier at least n, no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
@@ -8051,11 +8036,11 @@ array(
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    return $this->form_quant($text, $this->yycol, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greedy, $possessive);
+    return $this->form_quant($text, false, $leftborder, $rightborder, $lazy, $greedy, $possessive);
 }
-						case -174:
+						case -163:
 							break;
-						case 175:
+						case 164:
 							{    /* (?(+n)... or (?(-n)...    Conditional subexpression - relative reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
@@ -8064,252 +8049,242 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
 }
-						case -175:
+						case -164:
 							break;
-						case 176:
+						case 165:
 							{      /* (?(name)...               Conditional subexpression - specific recursion condition */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_recursive_cond_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_recursive_cond_subexpr($text, $name);
 }
-						case -176:
+						case -165:
 							break;
-						case 177:
+						case 166:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
-    return $this->form_define_cond_subexpr($this->yytext(), $this->yycol, $this->yylength());
+    return $this->form_define_cond_subexpr($this->yytext());
 }
-						case -177:
+						case -166:
 							break;
-						case 178:
+						case 167:
 							{
     // Do nothing.
 }
-						case -178:
+						case -167:
 							break;
-						case 179:
+						case 168:
 							{                                      /* Comment body: all characters until ')' or '\' found */
     $this->comment .= $this->yytext();
     $this->comment_length += $this->yylength();
 }
-						case -179:
+						case -168:
 							break;
-						case 180:
+						case 169:
 							{                      /* \Q...\E quotation body */
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
-						case -180:
+						case -169:
 							break;
-						case 181:
+						case 170:
 							{                     // \Q...\E body
     $text = $this->yytext();
     $this->qe_sequence .= $text;
     $this->qe_sequence_length++;
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
-						case -181:
+						case -170:
 							break;
-						case 182:
+						case 171:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
-						case -182:
+						case -171:
 							break;
-						case 183:
+						case 172:
 							{
     $text = $this->yytext();
     $char = qtype_preg_unicode::substr($text, 1, 1);
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $char, false, $char !== '-');
 }
-						case -183:
+						case -172:
 							break;
-						case 184:
+						case 173:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
-						case -184:
+						case -173:
 							break;
-						case 185:
+						case 174:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_preg_unicode::substr($text, 1);
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
+        $code = self::code_of_char_escape_sequence($text);
         if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
             $this->charset->userinscription[] = new qtype_preg_userinscription($text);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
         } else {
-            $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
         }
     }
 }
-						case -185:
+						case -174:
 							break;
-						case 186:
+						case 175:
 							{
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 2);
     $negative = (qtype_preg_unicode::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str);
     if ($subtype === null) {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        $this->charset->userinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str, $this->charset);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text, $subtype);
     } else {
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_FLAG, $subtype, $negative);
     }
 }
-						case -186:
+						case -175:
 							break;
-						case 188:
+						case 177:
 							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
-    $this->charset->indfirst = $this->yycol;
+    $this->charset->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
     $this->charset->negative = ($text === '[^' || $text === '[^]');
-    $this->charset->userinscription = array();
     $this->charset_count = 0;
     $this->charset_set = '';
-    $this->charset->linefirst = $this->yyline;
-    $this->charset->indfirst = $this->yycol;
     if ($text === '[^]' || $text === '[]') {
-        $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
+        $this->add_flag_to_charset(']', qtype_preg_charset_flag::TYPE_SET, ']');
     }
+    $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCHARSET);
 }
-						case -187:
+						case -176:
 							break;
-						case 189:
+						case 178:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_preg_unicode::substr($text, 1);
-        return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, $str);
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
+        $code = self::code_of_char_escape_sequence($text);
         if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-            return new JLexToken(qtype_preg_yyParser::PARSELEAF, $error);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
+            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         } else {
-            return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
+            return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
         }
     }
 }
-						case -188:
+						case -177:
 							break;
-						case 190:
+						case 179:
 							{         /* (?<name>...)     Named subexpression (Perl) */
     $text = $this->yytext();
     $last = qtype_preg_unicode::substr($text, $this->yylength() - 1, 1);
     if ($last != '>') {
-        $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
-        $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
-        return new JLexToken(qtype_preg_yyParser::OPENBRACK, $error);
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_NAME_ENDING, $text);
+        return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
     }
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_subexpr($text, $this->yycol, $this->yylength(), $name);
+    return $this->form_named_subexpr($text, $name);
 }
-						case -189:
+						case -178:
 							break;
-						case 191:
+						case 180:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -190:
+						case -179:
 							break;
-						case 192:
+						case 181:
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_recursive_cond_subexpr($text, $this->yycol, $this->yylength(), $number);
+    return $this->form_recursive_cond_subexpr($text, $number);
 }
-						case -191:
+						case -180:
 							break;
-						case 193:
+						case 182:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $text);
 }
-						case -192:
+						case -181:
 							break;
-						case 194:
+						case 183:
 							{
     $text = $this->yytext();
     $char = qtype_preg_unicode::substr($text, 1, 1);
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $char, false, $char !== '-');
 }
-						case -193:
+						case -182:
 							break;
-						case 195:
+						case 184:
 							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_preg_unicode::substr($text, 1);
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
-        $code = hexdec(qtype_preg_unicode::substr($text, 2));
+        $code = self::code_of_char_escape_sequence($text);
         if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
             $this->charset->userinscription[] = new qtype_preg_userinscription($text);
         } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . $str);
-            $error->set_user_info($this->yyline, $this->yyline, $this->yycol, $this->yycol + $this->yylength() - 1, new qtype_preg_userinscription(''));
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
         } else {
-            $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8($code));
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
         }
     }
 }
-						case -194:
+						case -183:
 							break;
-						case 197:
+						case 186:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -195:
+						case -184:
 							break;
-						case 276:
+						case 265:
 							{
     $text = $this->yytext();
-    return $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
-						case -196:
+						case -185:
 							break;
-						case 277:
+						case 266:
 							{      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
         // Return a backreference.
-        return $this->form_backref($text, $this->yycol, $this->yylength(), (int)$str);
+        return $this->form_backref($text, (int)$str);
     }
     // Return a character.
     $octal = '';
     $failed = false;
     for ($i = 0; !$failed && $i < qtype_preg_unicode::strlen($str); $i++) {
         $tmp = qtype_preg_unicode::substr($str, $i, 1);
-        if (intval($tmp) < 8) {
+        if ((int)$tmp < 8) {
             $octal = $octal . $tmp;
         } else {
             $failed = true;
@@ -8324,54 +8299,63 @@ array(
         $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
+    $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
+    $charset->value->position->indlast -= textlib::strlen($tail);
+    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
-        $res = $this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    } else {
-        $res = array($this->form_charset($text, $this->yycol, $this->yylength(), qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
-        $res = array_merge($res, $this->string_to_tokens($tail));
+        return $charset;
     }
-    return $res;
+    $tokens = $this->string_to_tokens($tail);
+    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    foreach ($tokens as $token) {
+        $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
+                                        $this->yyline, $this->yyline,
+                                        $this->yycol + $offset, $this->yycol + $offset);
+        $offset++;
+    }
+    return array_merge(array($charset), $tokens);
 }
-						case -197:
+						case -186:
 							break;
-						case 278:
+						case 267:
 							{
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
-						case -198:
+						case -187:
 							break;
-						case 279:
+						case 268:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -199:
+						case -188:
 							break;
-						case 336:
+						case 325:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -200:
+						case -189:
 							break;
-						case 365:
+						case 354:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -201:
+						case -190:
 							break;
-						case 396:
+						case 385:
 							{        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $this->yycol, $this->yylength(), $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
 }
-						case -202:
+						case -191:
 							break;
 						default:
 						$this->yy_error('INTERNAL',false);

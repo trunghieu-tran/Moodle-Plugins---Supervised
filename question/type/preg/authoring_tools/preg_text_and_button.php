@@ -12,7 +12,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_text_and_button.php');
 
 MoodleQuickForm::registerElementType('preg_text_and_button',
@@ -30,7 +29,7 @@ class qtype_preg_text_and_button extends qtype_poasquestion_text_and_button {
         $attributes = array('rows' => 1, 'cols' => 80);
         $elementLinks = array(
             'link_to_button_image' => $CFG->wwwroot . '/theme/image.php/standard/core/1359744739/t/edit',
-            'link_to_page' => $CFG->wwwroot . '/question/type/preg/authoring_tools/ast_preg_form.php'
+            'link_to_page' => $CFG->wwwroot . '/question/type/preg/authoring_tools/preg_authoring.php'
         );
         $dialogWidth = '90%';
 
@@ -51,6 +50,10 @@ class qtype_preg_text_and_button extends qtype_poasquestion_text_and_button {
     }
 
     public function getDialogTitle() {
-        return get_string('authoring_tool_page_header', 'qtype_preg');
+        return get_string('authoring_form_page_header', 'qtype_preg');
+    }
+
+    public function getTooltip() {
+        return get_string('authoring_form_tooltip', 'qtype_preg');
     }
 }

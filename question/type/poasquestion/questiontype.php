@@ -29,8 +29,40 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/questiontypebase.php');
 
 class qtype_poasquestion extends question_type {
+
     public function menu_name() {
         // Don't include this question type in the 'add new question' menu.
+        return false;
+    }
+
+    /**
+     * Checks is dot of graphviz is installed and available via.
+     */
+    public static function is_dot_available() {
+        global $CFG;
+
+        if (empty($CFG->pathtodot)) {
+            return false;
+        }
+
+        $cmd = escapeshellarg($CFG->pathtodot);
+
+        $descriptorspec = array(0 => array('pipe', 'r'),  // stdin
+                                1 => array('pipe', 'w'),  // stdout
+                                2 => array('pipe', 'w')); // stderr
+
+        $process = proc_open($cmd, $descriptorspec, $pipes);
+        if (is_resource($process)) {
+            fwrite($pipes[0], 'graph{"hey";}');
+            fclose($pipes[0]);
+
+            $err = stream_get_contents($pipes[2]);
+
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+            return empty($err);
+        }
         return false;
     }
 }

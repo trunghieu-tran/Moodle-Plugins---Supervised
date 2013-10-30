@@ -92,6 +92,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function count_captured_subpatters() {
         $result = 0;
         foreach ($this->matches as $subpatt => $repetitions) {
+            if ($subpatt == -2) {
+                continue;
+            }
             foreach ($repetitions as $repetition) {
                 if ($repetition[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                     $result++;
@@ -190,7 +193,11 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function to_matching_results() {
         $index = array();
         $length = array();
+        $subexprs = array(-2);
         for ($subexpr = 0; $subexpr <= $this->matcher->automaton->max_subexpr(); $subexpr++) {
+            $subexprs[] = $subexpr;
+        }
+        foreach ($subexprs as $subexpr) {
             if (!isset($this->subexpr_to_subpatt[$subexpr])) {
                 // Can get here when {0} occurs in the regex.
                 $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
@@ -207,6 +214,13 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 }
             }
         }
+        if ($length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $cur = $this->current_match(-2);
+            if ($cur !== null && $cur[0] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $index[-2] = $cur[0];
+                $length[-2] = $this->length - $cur[0];
+            }
+        }
         $index[0] = $this->startpos;
         $length[0] = $this->length;
         $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
@@ -219,32 +233,31 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     /**
      * Resets the given subpattern to no match.
      */
-    public function begin_subpatt_iteration($node, $skipwholematch) {
+    public function begin_subpatt_iteration($node) {
         if (!$this->matcher->get_options()->capturesubexpressions && $node->subpattern != $this->root_subpatt_number()) {
             return;
         }
 
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->begin_subpatt_iteration($operand, $skipwholematch);
+        $nodes = array_merge($this->matcher->get_nested_nodes($node->subpattern), array($node));
+
+        foreach ($nodes as $node) {
+            if ($node->subpattern == -1) {
+                continue;
             }
-        }
-        if ($node->subpattern == -1) {
-            return;
-        }
 
-        $cur = $this->current_match($node->subpattern);
+            $cur = $this->current_match($node->subpattern);
 
-        if ($cur === null) {
-            // Very first iteration.
-            $this->matches[$node->subpattern] = array(self::empty_subpatt_match());
-        } else {
-            // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
-            $skip = !$this->matcher->get_options()->capturesubexpressions;
-            $skip = $skip || ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND);
-            $skip = $skip || ($skipwholematch && $node->subpattern == $this->root_subpatt_number());
-            if (!$skip) {
-                $this->matches[$node->subpattern][] = self::empty_subpatt_match();
+            if ($cur === null) {
+                // Very first iteration.
+                $this->matches[$node->subpattern] = array(self::empty_subpatt_match());
+            } else {
+                // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
+                $skip = !$this->matcher->get_options()->capturesubexpressions;
+                $skip = $skip || ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND);
+                $skip = $skip || ($node->subpattern == $this->root_subpatt_number());
+                if (!$skip) {
+                    $this->matches[$node->subpattern][] = self::empty_subpatt_match();
+                }
             }
         }
     }
@@ -348,13 +361,33 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     }
 
     /**
+     * Returns true if this beats other, false if other beats this; for equal states returns false.
+     */
+    public function leftmost_shortest($other) {
+        // Check for full match.
+        if ($this->full && !$other->full) {
+            return true;
+        } else if (!$this->full && $other->full) {
+            return false;
+        }
+
+        if ($this->length < $other->length) {
+            return true;
+        } else if ($other->length < $this->length) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $pos, $matchlen) {
         // Begin a new iteration of a subpattern. In fact, we can call the method for
         // the subpattern with minimal number; all "bigger" subpatterns will be reset recursively.
         if ($transition->min_subpatt_node != null) {
-            $this->begin_subpatt_iteration($transition->min_subpatt_node, true);
+            $this->begin_subpatt_iteration($transition->min_subpatt_node);
         }
 
         $options = $this->matcher->get_options();
