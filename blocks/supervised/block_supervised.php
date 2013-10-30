@@ -53,18 +53,21 @@ function save_rules($quizid, $lessontypes) {
     }
 }
 
-function supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid) {
+function supervisedblock_get_logs($timefrom, $timeto, $courseid, $ip=0) {
     global $DB;
     
     $params = array();
-    $selector = "l.time >= :timefrom AND l.time <= :timeto AND l.ip = :ip AND l.course = :courseid";
+    $selector = "l.time >= :timefrom AND l.time <= :timeto AND l.course = :courseid";
     $params['timefrom'] = $timefrom;
     $params['timeto']   = $timeto;
-    $params['ip']       = $ip;
     $params['courseid'] = $courseid;
     
-    $logs = get_logs($selector, $params);
+    if($ip!=0) {
+        $selector .= " AND l.ip = :ip";
+        $params['ip'] = $ip;
+    }
     
+    $logs = get_logs($selector, $params);
     return $logs;
 }
 
@@ -82,6 +85,7 @@ class block_supervised extends block_base {
         }
 
         ///////////////////
+        
         $timefrom = new DateTime();
         $timefrom->setDate(2013,10,5);
         $timefrom->setTime(17,40,00);
@@ -93,7 +97,7 @@ class block_supervised extends block_base {
         $timeto = $timeto->getTimestamp();
         $ip  = '127.0.0.1';
         $courseid = 1;
-        $logs = supervisedblock_get_logs($timefrom, $timeto, $ip, $courseid);
+        $logs = supervisedblock_get_logs($timefrom, $timeto, $courseid, $ip);
         
         
         //////////////////////
