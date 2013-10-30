@@ -72,7 +72,7 @@ class LemonActtab
         if ($this->nLookahead <= 0) {
             throw new Exception('nLookahead is not set up?');
         }
-    
+
         /* Scan the existing action table looking for an offset where we can
         ** insert the current transaction set.  Fall out of the loop when that
         ** offset is found.  In the worst case, we fall out of the loop when
@@ -144,7 +144,7 @@ class LemonActtab
                             'action' => -1,
                         );
                     }
-                    if ($this->aLookahead[$j]['lookahead'] != 
+                    if ($this->aLookahead[$j]['lookahead'] !=
                           $this->aAction[$k]['lookahead']) {
                         break;
                     }
@@ -207,7 +207,7 @@ class LemonSymbol
     const TERMINAL = 1;
     const NONTERMINAL = 2;
     const MULTITERMINAL = 3;
-    
+
     const LEFT = 1;
     const RIGHT = 2;
     const NONE = 3;
@@ -307,11 +307,11 @@ class LemonSymbol
 
     /**
      * Sort function helper for symbols
-     * 
+     *
      * Symbols that begin with upper case letters (terminals or tokens)
      * must sort before symbols that begin with lower case letters
      * (non-terminals).  Other than that, the order does not matter.
-     * 
+     *
      * We find experimentally that leaving the symbols in their original
      * order (the order they appeared in the grammar file) gives the
      * smallest parser tables in SQLite.
@@ -433,7 +433,7 @@ class LemonConfig {
      * @var LemonConfig
      */
     static public $basisend;      /* Last on list of basis configs */
-    
+
     static public $x4a = array();
 
     /**
@@ -743,7 +743,7 @@ class LemonConfig {
 //        x4node *np;
 //        int h;
 //        int ph;
-        
+
         $h = self::confighash($data);
         if (isset(self::$x4a[$h])) {
             $np = self::$x4a[$h];
@@ -809,15 +809,15 @@ class LemonAction {
     ACCEPT,
     REDUCE,
     ERROR,
-    CONFLICT,                /* Was a reduce, but part of a conflict 
-    SH_RESOLVED,             /* Was a shift.  Precedence resolved conflict 
-    RD_RESOLVED,             /* Was reduce.  Precedence resolved conflict 
-    NOT_USED                 /* Deleted by compression 
+    CONFLICT,                /* Was a reduce, but part of a conflict
+    SH_RESOLVED,             /* Was a shift.  Precedence resolved conflict
+    RD_RESOLVED,             /* Was reduce.  Precedence resolved conflict
+    NOT_USED                 /* Deleted by compression
   } */
     public $type;
   /* union {
-    struct state *stp;     /* The new state, if a shift 
-    struct rule *rp;       /* The rule, if a reduce 
+    struct state *stp;     /* The new state, if a shift
+    struct rule *rp;       /* The rule, if a reduce
   } */
     public $x = array('stp' => null, 'rp' => null);
     /**
@@ -1169,7 +1169,7 @@ class LemonData {
     public $argv0;             /* Name of the program */
 
     /* Find a precedence symbol of every rule in the grammar.
-     * 
+     *
      * Those rules which have a precedence symbol coded in the input
      * grammar using the "[symbol]" construct will already have the
      * rp->precsym field filled.  Other rules take as their precedence
@@ -1278,7 +1278,7 @@ class LemonData {
     function FindStates()
     {
         LemonConfig::Configlist_init();
-    
+
         /* Find the start symbol */
         if ($this->start) {
             $sp = LemonSymbol::Symbol_find($this->start);
@@ -1293,7 +1293,7 @@ class LemonData {
         } else {
             $sp = $this->rule->lhs;
         }
-    
+
         /* Make sure the start symbol doesn't occur on the right-hand side of
         ** any rule.  Report an error if it does.  (YACC would generate a new
         ** start symbol in this case.) */
@@ -1318,7 +1318,7 @@ class LemonData {
                 }
             }
         }
-    
+
         /* The basis configuration set for the first state
         ** is all rules which have the start symbol as their
         ** left-hand side */
@@ -1326,7 +1326,7 @@ class LemonData {
             $newcfp = LemonConfig::Configlist_addbasis($rp, 0);
             $newcfp->fws[0] = 1;
         }
-    
+
         /* Compute the first state.  All other states will be
         ** computed automatically during the computation of the first one.
         ** The returned pointer to the first state is not used. */
@@ -1346,7 +1346,7 @@ class LemonData {
         ** by prior calls to "Configlist_addbasis()". */
         LemonConfig::Configlist_sortbasis();
         $bp = LemonConfig::Configlist_basis();
-    
+
         /* Get a state with the same basis */
         $stp = LemonState::State_find($bp);
         if ($stp) {
@@ -1392,14 +1392,14 @@ class LemonData {
 //    struct symbol *sp;   /* Symbol following the dot in configuration "cfp" */
 //    struct symbol *bsp;  /* Symbol following the dot in configuration "bcfp" */
 //    struct state *newstp; /* A pointer to a successor state */
-    
+
         /* Each configuration becomes complete after it contibutes to a successor
         ** state.  Initially, all configurations are incomplete */
         $cfp = $stp->cfp;
         for ($cfp = $stp->cfp; $cfp; $cfp = $cfp->next) {
             $cfp->status = LemonConfig::INCOMPLETE;
         }
-    
+
         /* Loop through all configurations of the state "stp" */
         for ($cfp = $stp->cfp; $cfp; $cfp = $cfp->next) {
             if ($cfp->status == LemonConfig::COMPLETE) {
@@ -1410,7 +1410,7 @@ class LemonData {
             }
             LemonConfig::Configlist_reset();                      /* Reset the new config set */
             $sp = $cfp->rp->rhs[$cfp->dot];             /* Symbol after the dot */
-    
+
             /* For every configuration in the state "stp" which has the symbol "sp"
             ** following its dot, add the same configuration to the basis set under
             ** construction but with the dot shifted one symbol to the right. */
@@ -1463,7 +1463,7 @@ class LemonData {
         foreach ($this->sorted as $info) {
             $info->key->stp = $info->data;
         }
-        
+
         /* Convert all backlinks into forward links.  Only the forward
         ** links are used in the follow-set computation. */
         for ($i = 0; $i < $this->nstate; $i++) {
@@ -1482,7 +1482,7 @@ class LemonData {
      */
     function FindActions()
     {
-        /* Add all of the reduce actions 
+        /* Add all of the reduce actions
         ** A reduce action is added for each element of the followset of
         ** a configuration which has its dot at the extreme right.
         */
@@ -1516,7 +1516,7 @@ class LemonData {
         ** finite state machine) an action to ACCEPT if the lookahead is the
         ** start nonterminal.  */
         LemonAction::Action_add($this->sorted[0]->data->ap, LemonAction::ACCEPT, $sp, 0);
-    
+
         /* Resolve conflicts */
         for ($i = 0; $i < $this->nstate; $i++) {
     //    struct action *ap, *nap;
@@ -1534,7 +1534,7 @@ class LemonData {
                 }
             }
         }
-    
+
         /* Report an error for each rule that can never be reduced. */
         for ($rp = $this->rule; $rp; $rp = $rp->next) {
             $rp->canReduce = false;
@@ -1815,7 +1815,7 @@ class LemonData {
     ** a pointer to the opened file. */
     private function tplt_open()
     {
-        $templatename = dirname(__FILE__) . '/' . "Lempar.php";
+        $templatename = dirname(__FILE__) . "/Lempar.php";
         $buf = $this->filenosuffix . '.lt';
         if (file_exists($buf) && is_readable($buf)) {
             $tpltname = $buf;
@@ -1912,7 +1912,7 @@ class LemonData {
                 $cfp->status = LemonConfig::INCOMPLETE;
             }
         }
-        
+
         do {
             $progress = 0;
             for ($i = 0; $i < $this->nstate; $i++) {
@@ -1952,7 +1952,7 @@ class LemonData {
 //        int mnTknOfst, mxTknOfst;
 //        int mnNtOfst, mxNtOfst;
 //        struct axset *ax;
-        
+
         $in = $this->tplt_open();
         if (!$in) {
             return;
@@ -1965,7 +1965,7 @@ class LemonData {
         $this->outname = $this->filenosuffix . ".php";
         $lineno = 1;
         $this->tplt_xfer($this->name, $in, $out, $lineno);
-        
+
         /* Generate the include code, if any */
         $this->tplt_print($out, $this->include_code, $this->includeln, $lineno);
         $this->tplt_xfer($this->name, $in, $out, $lineno);
@@ -2006,7 +2006,7 @@ class LemonData {
             ($this->nstate + $this->nrule) . ";\n");
         $lineno++;
         $this->tplt_xfer($this->name, $in, $out, $lineno);
-        
+
         /* Generate the action table and its associates:
         **
         **  yy_action[]        A single table containing all actions.
@@ -2218,7 +2218,7 @@ class LemonData {
                     if ($ap->type == LemonAction::SHIFT ||
                           $ap->type == LemonAction::REDUCE) {
                         fwrite($out, $ap->sp->index . ', ');
-                    }       
+                    }
                 }
             }
             fwrite($out, "),\n");
@@ -2355,7 +2355,7 @@ class LemonData {
         $this->tplt_xfer($this->name, $in, $out, $lineno);
 
         /* Generate code which executes every time a symbol is popped from
-        ** the stack while processing errors or while destroying the parser. 
+        ** the stack while processing errors or while destroying the parser.
         ** (In other words, generate the %destructor actions)
         */
 
@@ -2415,7 +2415,7 @@ class LemonData {
                     $sp2->destructor = 0;
                 }
             }
-        
+
             $this->emit_destructor_code($out, $this->symbols[$i], $lineno);
             fprintf($out, "      break;\n");
             $lineno++;
@@ -2427,7 +2427,7 @@ class LemonData {
         $this->tplt_print($out, $this->overflow, $this->overflowln, $lineno);
         $this->tplt_xfer($this->name, $in, $out, $lineno);
 
-        /* Generate the table of rule information 
+        /* Generate the table of rule information
         **
         ** Note: This code depends on the fact that rules are number
         ** sequentually beginning with 0.
@@ -2507,7 +2507,7 @@ class LemonData {
     function emit_code($out, LemonRule $rp, &$lineno)
     {
         $linecnt = 0;
-        
+
         /* Generate code to do the reduce action */
         if ($rp->code) {
             $this->tplt_linedir($out, $rp->line, $this->filename);
@@ -2534,7 +2534,7 @@ class LemonData {
     {
         static $z = '';
         $zInt = '';
-        
+
         if ($zText === '') {
             $ret = $z;
             $z = '';
@@ -2566,11 +2566,11 @@ class LemonData {
     {
         $lhsused = 0;    /* True if the LHS element has been used */
         $used = array();   /* True for each RHS element which is used */
-    
+
         for($i = 0; $i < $rp->nrhs; $i++) {
             $used[$i] = 0;
         }
-        
+
         $this->append_str('', 0);
         for ($i = 0; $i < strlen($rp->code); $i++) {
             $cp = $rp->code[$i];
@@ -2616,7 +2616,7 @@ class LemonData {
             }
             $this->append_str($cp, 1);
         } /* End loop */
-        
+
         /* Check to make sure the LHS has been used */
         if ($rp->lhsalias && !$lhsused) {
             Lemon::ErrorMsg($this->filename, $rp->ruleline,
@@ -2624,7 +2624,7 @@ class LemonData {
                 $rp->lhsalias, $rp->lhs->name, $rp->lhsalias);
                 $this->errorcnt++;
         }
-        
+
         /* Generate destructor code for RHS symbols which are not used in the
         ** reduce code */
         for($i = 0; $i < $rp->nrhs; $i++) {
@@ -2663,7 +2663,7 @@ class LemonData {
 //    int *lineno;
     {
         $cp = 0;
-        
+
         $linecnt = 0;
         if ($sp->type == LemonSymbol::TERMINAL) {
             $cp = $this->tokendest;
@@ -3030,7 +3030,7 @@ class Lemon
         $this->OptInit($_SERVER['argv']);
         if ($this->version) {
             echo "Lemon version 1.0/PHP port version 1.0\n";
-            exit(0); 
+            exit(0);
         }
         if ($this->OptNArgs($_SERVER['argv']) != 1) {
             echo "Exactly one filename argument is required.\n";
@@ -3209,7 +3209,7 @@ class Lemon
         }
         return $head;
     }
-    
+
     /*
     ** Inputs:
     **   list:      Pointer to a singly-linked list of structures.
@@ -3282,7 +3282,7 @@ class Lemon
         }
         $prefixsize = strlen($prefix);
         $availablewidth = 79 - $prefixsize;
-        
+
         /* Generate the error message */
         $ap = func_get_args();
         array_shift($ap); // $filename
@@ -3295,7 +3295,7 @@ class Lemon
             --$linewidth;
             $errmsg = substr($errmsg, 0, strlen($errmsg) - 1);
         }
-        
+
         /* Print the error message */
         $base = 0;
         $errmsg = str_replace(array("\r", "\n", "\t"), array(' ', ' ', ' '), $errmsg);
@@ -3313,7 +3313,7 @@ class Lemon
     }
 
     /**
-     * Duplicate the input file without comments and without actions 
+     * Duplicate the input file without comments and without actions
      * on rules
      */
     function Reprint()
@@ -3533,7 +3533,7 @@ class LemonParser
 
     /**
      * In spite of its name, this function is really a scanner.
-     * 
+     *
      * It reads in the entire input file (all at once) then tokenizes it.
      * Each token is passed to the function "parseonetoken" which builds all
      * the appropriate data structures in the global state vector "gp".
@@ -3542,12 +3542,12 @@ class LemonParser
     function Parse($gp)
     {
         $startline = 0;
-    
+
         $this->gp = $gp;
         $this->filename = $gp->filename;
         $this->errorcnt = 0;
         $this->state = self::INITIALIZE;
-    
+
         /* Begin by reading the input file */
         $filebuf = file_get_contents($this->filename);
         if (!$filebuf) {
@@ -3564,7 +3564,7 @@ class LemonParser
 
         /* Make an initial pass through the file to handle %ifdef and %ifndef */
         $this->preprocess_input($filebuf);
-    
+
         /* Now scan the text of the input file */
         $lineno = 1;
         for ($cp = 0, $c = $filebuf[0]; $cp < strlen($filebuf); $cp++) {
@@ -4108,7 +4108,6 @@ class LemonParser
     }
 }
 $a = new Lemon;
-//$_SERVER['argv'] = array('lemon', '-s', '/development/lemon/PHP_Parser.y');
-//$_SERVER['argv'] = array('lemon', '-s', '/development/File_ChessPGN/ChessPGN/Parser.y');
 $_SERVER['argv'] = array('lemon', '-s', '../preg_parser.y');
+//$_SERVER['argv'] = array('lemon', '-s', '/development/File_ChessPGN/ChessPGN/Parser.y');
 $a->main();

@@ -1,5 +1,5 @@
 <?php
-/* Driver template for the LEMON parser generator.
+/* Driver template for the PHP_ParserGenerator parser generator. (PHP port of LEMON)
 */
 
 /**
@@ -30,7 +30,7 @@ class ParseyyToken implements ArrayAccess
 
     function __toString()
     {
-        return $this->_string;
+        return $this->string;
     }
 
     function offsetExists($offset)
@@ -58,9 +58,10 @@ class ParseyyToken implements ArrayAccess
             return;
         }
         if ($value instanceof ParseyyToken) {
-            $this->string .= $value->string;
-            $this->metadata[$offset] = $value->metadata;
-        } else {
+            if ($value->metadata) {
+                $this->metadata[$offset] = $value->metadata;
+            }
+        } elseif ($value) {
             $this->metadata[$offset] = $value;
         }
     }
@@ -70,9 +71,6 @@ class ParseyyToken implements ArrayAccess
         unset($this->metadata[$offset]);
     }
 }
-
-// code external to the class is included here
-%%
 
 /** The following structure represents a single element of the
  * parser's stack.  Information stored includes:
@@ -95,25 +93,22 @@ class ParseyyStackEntry
                      ** is the value of the token  */
 };
 
-// any extra class_declaration (extends/implements) are defined here
-/**
- * The state of the parser is completely contained in an instance of
- * the following structure
- */
-class ParseyyParser
+// code external to the class is included here
+%%
+
+// declare_class is output here
 %%
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
 %%
 
-/* Next is all token values, in a form suitable for use by makeheaders.
-** This section will be null unless lemon is run with the -m switch.
+/* Next is all token values, as class constants
 */
-/*
+/* 
 ** These constants (all generated automatically by the parser generator)
 ** specify the various kinds of tokens (terminals) that the parser
-** understands.
+** understands. 
 **
 ** Each symbol here is a terminal symbol in the grammar.
 */
@@ -122,85 +117,73 @@ class ParseyyParser
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
 ** functions that take a state number and lookahead value and return an
-** action integer.
+** action integer.  
 **
 ** Suppose the action integer is N.  Then the action is determined as
 ** follows
 **
-**   0 <= N < YYNSTATE                  Shift N.  That is, push the lookahead
-**                                      token onto the stack and goto state N.
+**   0 <= N < self::YYNSTATE                              Shift N.  That is,
+**                                                        push the lookahead
+**                                                        token onto the stack
+**                                                        and goto state N.
 **
-**   YYNSTATE <= N < YYNSTATE+YYNRULE   Reduce by rule N-YYNSTATE.
+**   self::YYNSTATE <= N < self::YYNSTATE+self::YYNRULE   Reduce by rule N-YYNSTATE.
 **
-**   N == YYNSTATE+YYNRULE              A syntax error has occurred.
+**   N == self::YYNSTATE+self::YYNRULE                    A syntax error has occurred.
 **
-**   N == YYNSTATE+YYNRULE+1            The parser accepts its input.
+**   N == self::YYNSTATE+self::YYNRULE+1                  The parser accepts its
+**                                                        input. (and concludes parsing)
 **
-**   N == YYNSTATE+YYNRULE+2            No such action.  Denotes unused
-**                                      slots in the yy_action[] table.
+**   N == self::YYNSTATE+self::YYNRULE+2                  No such action.  Denotes unused
+**                                                        slots in the yy_action[] table.
 **
-** The action table is constructed as a single large table named yy_action[].
+** The action table is constructed as a single large static array $yy_action.
 ** Given state S and lookahead X, the action is computed as
 **
-**      yy_action[ yy_shift_ofst[S] + X ]
+**      self::$yy_action[self::$yy_shift_ofst[S] + X ]
 **
-** If the index value yy_shift_ofst[S]+X is out of range or if the value
-** yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]
-** is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table
-** and that yy_default[S] should be used instead.
+** If the index value self::$yy_shift_ofst[S]+X is out of range or if the value
+** self::$yy_lookahead[self::$yy_shift_ofst[S]+X] is not equal to X or if
+** self::$yy_shift_ofst[S] is equal to self::YY_SHIFT_USE_DFLT, it means that
+** the action is not in the table and that self::$yy_default[S] should be used instead.  
 **
 ** The formula above is for computing the action when the lookahead is
 ** a terminal symbol.  If the lookahead is a non-terminal (as occurs after
-** a reduce action) then the yy_reduce_ofst[] array is used in place of
-** the yy_shift_ofst[] array and YY_REDUCE_USE_DFLT is used in place of
-** YY_SHIFT_USE_DFLT.
+** a reduce action) then the static $yy_reduce_ofst array is used in place of
+** the static $yy_shift_ofst array and self::YY_REDUCE_USE_DFLT is used in place of
+** self::YY_SHIFT_USE_DFLT.
 **
 ** The following are the tables generated in this section:
 **
-**  yy_action[]        A single table containing all actions.
-**  yy_lookahead[]     A table containing the lookahead for each entry in
-**                     yy_action.  Used to detect hash collisions.
-**  yy_shift_ofst[]    For each state, the offset into yy_action for
-**                     shifting terminals.
-**  yy_reduce_ofst[]   For each state, the offset into yy_action for
-**                     shifting non-terminals after a reduce.
-**  yy_default[]       Default action for each state.
+**  self::$yy_action        A single table containing all actions.
+**  self::$yy_lookahead     A table containing the lookahead for each entry in
+**                          yy_action.  Used to detect hash collisions.
+**  self::$yy_shift_ofst    For each state, the offset into self::$yy_action for
+**                          shifting terminals.
+**  self::$yy_reduce_ofst   For each state, the offset into self::$yy_action for
+**                          shifting non-terminals after a reduce.
+**  self::$yy_default       Default action for each state.
 */
 %%
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
-**    YYCODETYPE         is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 terminals
-**                       and nonterminals.  "int" is used otherwise.
-**    YYNOCODE           is a number of type YYCODETYPE which corresponds
-**                       to no legal terminal or nonterminal number.  This
-**                       number is used to fill in empty slots of the hash
-**                       table.
-**    YYFALLBACK         If defined, this indicates that one or more tokens
-**                       have fall-back values which should be used if the
-**                       original value of the token will not parse.
-**    YYACTIONTYPE       is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 rules and
-**                       states combined.  "int" is used otherwise.
-**    ParseTOKENTYPE     is the data type used for minor tokens given
-**                       directly to the parser from the tokenizer.
-**    YYMINORTYPE        is the data type used for all minor tokens.
-**                       This is typically a union of many types, one of
-**                       which is ParseTOKENTYPE.  The entry in the union
-**                       for base tokens is called "yy0".
-**    YYSTACKDEPTH       is the maximum depth of the parser's stack.
-**    ParseARG_DECL      A global declaration for the %extra_argument
-**    YYNSTATE           the combined number of states.
-**    YYNRULE            the number of rules in the grammar
-**    YYERRORSYMBOL      is the code number of the error symbol.  If not
-**                       defined, then do no error processing.
+**    self::YYNOCODE      is a number which corresponds
+**                        to no legal terminal or nonterminal number.  This
+**                        number is used to fill in empty slots of the hash 
+**                        table.
+**    self::YYFALLBACK    If defined, this indicates that one or more tokens
+**                        have fall-back values which should be used if the
+**                        original value of the token will not parse.
+**    self::YYSTACKDEPTH  is the maximum depth of the parser's stack.
+**    self::YYNSTATE      the combined number of states.
+**    self::YYNRULE       the number of rules in the grammar
+**    self::YYERRORSYMBOL is the code number of the error symbol.  If not
+**                        defined, then do no error processing.
 */
 %%
     /** The next table maps tokens into fallback tokens.  If a construct
      * like the following:
-     *
+     * 
      *      %fallback ID X Y Z.
      *
      * appears in the grammer, then ID becomes a fallback token for X, Y,
@@ -214,10 +197,10 @@ class ParseyyParser
     /**
      * Turn parser tracing on by giving a stream to which to write the trace
      * and a prompt to preface each trace message.  Tracing is turned off
-     * by making either argument NULL
+     * by making either argument NULL 
      *
      * Inputs:
-     *
+     * 
      * - A stream resource to which trace output should be written.
      *   If NULL, then tracing is turned off.
      * - A prefix string written at the beginning of every
@@ -225,7 +208,7 @@ class ParseyyParser
      *   turned off.
      *
      * Outputs:
-     *
+     * 
      * - None.
      * @param resource
      * @param string
@@ -241,23 +224,32 @@ class ParseyyParser
         self::$yyTracePrompt = $zTracePrompt;
     }
 
+    /**
+     * Output debug information to output (php://output stream)
+     */
     static function PrintTrace()
     {
         self::$yyTraceFILE = fopen('php://output', 'w');
         self::$yyTracePrompt = '';
     }
 
+    /**
+     * @var resource|0
+     */
     static public $yyTraceFILE;
+    /**
+     * String to prepend to debug output
+     * @var string|0
+     */
     static public $yyTracePrompt;
     /**
      * @var int
      */
-    public $yyidx;                    /* Index of top element in stack */
+    public $yyidx = -1;                    /* Index of top element in stack */
     /**
      * @var int
      */
     public $yyerrcnt;                 /* Shifts left before out of the error */
-    //public $???????;      /* A place to hold %extra_argument - dynamically added */
     /**
      * @var array
      */
@@ -268,7 +260,7 @@ class ParseyyParser
      * are required.  The following table supplies these names
      * @var array
      */
-    static public $yyTokenName = array(
+    static public $yyTokenName = array( 
 %%
     );
 
@@ -288,6 +280,9 @@ class ParseyyParser
      */
     function tokenName($tokenType)
     {
+        if ($tokenType === 0) {
+            return 'End of Input';
+        }
         if ($tokenType > 0 && $tokenType < count(self::$yyTokenName)) {
             return self::$yyTokenName[$tokenType];
         } else {
@@ -295,18 +290,19 @@ class ParseyyParser
         }
     }
 
-    /* The following function deletes the value associated with a
-    ** symbol.  The symbol can be either a terminal or nonterminal.
-    ** "yymajor" is the symbol code, and "yypminor" is a pointer to
-    ** the value.
-    */
+    /**
+     * The following function deletes the value associated with a
+     * symbol.  The symbol can be either a terminal or nonterminal.
+     * @param int the symbol code
+     * @param mixed the symbol's value
+     */
     static function yy_destructor($yymajor, $yypminor)
     {
         switch ($yymajor) {
         /* Here is inserted the actions which take place when a
         ** terminal or non-terminal is destroyed.  This can happen
         ** when the symbol is popped from the stack during a
-        ** reduce or during error processing or when a parser is
+        ** reduce or during error processing or when a parser is 
         ** being destroyed before it is finished parsing.
         **
         ** Note: during a reduce, the only symbols destroyed are those
@@ -359,6 +355,12 @@ class ParseyyParser
         }
     }
 
+    /**
+     * Based on the current state and parser stack, get a list of all
+     * possible lookahead tokens
+     * @param int
+     * @return array
+     */
     function yy_get_expected_tokens($token)
     {
         $state = $this->yystack[$this->yyidx]->stateno;
@@ -398,7 +400,7 @@ class ParseyyParser
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new qtype_preg_yyStackEntry;
+                        $x = new ParseyyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -425,8 +427,20 @@ class ParseyyParser
         return array_unique($expected);
     }
 
+    /**
+     * Based on the parser state and current parser stack, determine whether
+     * the lookahead token is possible.
+     * 
+     * The parser will convert the token value to an error token if not.  This
+     * catches some unusual edge cases where the parser would fail.
+     * @param int
+     * @return bool
+     */
     function yy_is_expected_token($token)
     {
+        if ($token === 0) {
+            return true; // 0 is not part of this
+        }
         $state = $this->yystack[$this->yyidx]->stateno;
         if (in_array($token, self::$yyExpectedTokens[$state], true)) {
             return true;
@@ -460,7 +474,7 @@ class ParseyyParser
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new qtype_preg_yyStackEntry;
+                        $x = new ParseyyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -488,6 +502,8 @@ class ParseyyParser
             }
             break;
         } while (true);
+        $this->yyidx = $yyidx;
+        $this->yystack = $stack;
         return true;
     }
 
@@ -503,7 +519,7 @@ class ParseyyParser
     function yy_find_shift_action($iLookAhead)
     {
         $stateno = $this->yystack[$this->yyidx]->stateno;
-
+     
         /* if ($this->yyidx < 0) return self::YY_NO_ACTION;  */
         if (!isset(self::$yy_shift_ofst[$stateno])) {
             // no shift actions
@@ -536,11 +552,11 @@ class ParseyyParser
 
     /**
      * Find the appropriate action for a parser given the non-terminal
-     * look-ahead token iLookAhead.
+     * look-ahead token $iLookAhead.
      *
-     * If the look-ahead token is YYNOCODE, then check to see if the action is
+     * If the look-ahead token is self::YYNOCODE, then check to see if the action is
      * independent of the look-ahead.  If it is, return the action, otherwise
-     * return YY_NO_ACTION.
+     * return self::YY_NO_ACTION.
      * @param int Current state number
      * @param int The look-ahead token
      */
@@ -598,7 +614,7 @@ class ParseyyParser
             fprintf(self::$yyTraceFILE, "%sShift %d\n", self::$yyTracePrompt,
                 $yyNewState);
             fprintf(self::$yyTraceFILE, "%sStack:", self::$yyTracePrompt);
-            for($i = 1; $i <= $this->yyidx; $i++) {
+            for ($i = 1; $i <= $this->yyidx; $i++) {
                 fprintf(self::$yyTraceFILE, " %s",
                     self::$yyTokenName[$this->yystack[$i]->major]);
             }
@@ -610,10 +626,14 @@ class ParseyyParser
      * The following table contains information about every rule that
      * is used during the reduce.
      *
-     * static const struct {
-     *  YYCODETYPE lhs;         Symbol on the left-hand side of the rule
-     *  unsigned char nrhs;     Number of right-hand side symbols in the rule
-     * }
+     * <pre>
+     * array(
+     *  array(
+     *   int $lhs;         Symbol on the left-hand side of the rule
+     *   int $nrhs;     Number of right-hand side symbols in the rule
+     *  ),...
+     * );
+     * </pre>
      */
     static public $yyRuleInfo = array(
 %%
@@ -622,7 +642,7 @@ class ParseyyParser
     /**
      * The following table contains a mapping of reduce action to method name
      * that handles the reduction.
-     *
+     * 
      * If a rule is not set, it has no handler.
      */
     static public $yyReduceMap = array(
@@ -638,14 +658,14 @@ class ParseyyParser
 
     /**
      * placeholder for the left hand side in a reduce operation.
-     *
+     * 
      * For a parser with a rule like this:
      * <pre>
      * rule(A) ::= B. { A = 1; }
      * </pre>
-     *
+     * 
      * The parser will translate to something like:
-     *
+     * 
      * <code>
      * function yy_r0(){$this->_retvalue = 1;}
      * </code>
@@ -655,13 +675,13 @@ class ParseyyParser
     /**
      * Perform a reduce action and the shift that must immediately
      * follow the reduce.
-     *
+     * 
      * For a rule such as:
-     *
+     * 
      * <pre>
      * A ::= B blah C. { dosomething(); }
      * </pre>
-     *
+     * 
      * This function will first call the action, if any, ("dosomething();" in our
      * example), and then it will pop three states from the stack,
      * one for each entry on the right-hand side of the expression
@@ -678,7 +698,7 @@ class ParseyyParser
         //ParseyyStackEntry $yymsp;            /* The top of the parser's stack */
         //int $yysize;                     /* Amount to pop the stack */
         $yymsp = $this->yystack[$this->yyidx];
-        if (self::$yyTraceFILE && $yyruleno >= 0
+        if (self::$yyTraceFILE && $yyruleno >= 0 
               && $yyruleno < count(self::$yyRuleName)) {
             fprintf(self::$yyTraceFILE, "%sReduce (%d) [%s].\n",
                 self::$yyTracePrompt, $yyruleno,
@@ -695,7 +715,7 @@ class ParseyyParser
         $yygoto = self::$yyRuleInfo[$yyruleno]['lhs'];
         $yysize = self::$yyRuleInfo[$yyruleno]['rhs'];
         $this->yyidx -= $yysize;
-        for($i = $yysize; $i; $i--) {
+        for ($i = $yysize; $i; $i--) {
             // pop all of the right-hand side parameters
             array_pop($this->yystack);
         }
@@ -722,6 +742,8 @@ class ParseyyParser
 
     /**
      * The following code executes when the parse fails
+     * 
+     * Code from %parse_fail is inserted here
      */
     function yy_parse_failed()
     {
@@ -738,6 +760,8 @@ class ParseyyParser
 
     /**
      * The following code executes when a syntax error first occurs.
+     * 
+     * %syntax_error code is inserted here
      * @param int The major type of the error token
      * @param mixed The minor type of the error token
      */
@@ -746,9 +770,11 @@ class ParseyyParser
 %%
     }
 
-    /*
-    ** The following is executed when the parser accepts
-    */
+    /**
+     * The following is executed when the parser accepts
+     * 
+     * %parse_accept code is inserted here
+     */
     function yy_accept()
     {
         if (self::$yyTraceFILE) {
@@ -763,37 +789,23 @@ class ParseyyParser
     }
 
     /**
-     *  The main parser program.
-     * The first argument is a pointer to a structure obtained from
-     * "ParseAlloc" which describes the current state of the parser.
-     * The second argument is the major token number.  The third is
-     * the minor token.  The fourth optional argument is whatever the
-     * user wants (and specified in the grammar) and is available for
-     * use by the action routines.
+     * The main parser program.
+     * 
+     * The first argument is the major token number.  The second is
+     * the token value string as scanned from the input.
      *
-     * Inputs:
+     * @param int   $yymajor      the token number
+     * @param mixed $yytokenvalue the token value
+     * @param mixed ...           any extra arguments that should be passed to handlers
      *
-     * - A pointer to the parser (an opaque structure.)
-     * - The major token number.
-     * - The minor token number (token value).
-     * - An option argument of a grammar-specified type.
-     *
-     * Outputs:
-     * None.
-     * @param int the token number
-     * @param mixed the token value
-     * @param mixed any extra arguments that should be passed to handlers
+     * @return void
      */
-    function doParse($yymajor, $yytokenvalue, $extraargument = null)
+    function doParse($yymajor, $yytokenvalue)
     {
-        if (self::ParseARG_DECL && $extraargument !== null) {
-            $this->{self::ParseARG_DECL} = $extraargument;
-        }
-//        YYMINORTYPE yyminorunion;
-//        int yyact;            /* The parser action. */
-//        int yyendofinput;     /* True if we are at the end of input */
+//        $yyact;            /* The parser action. */
+//        $yyendofinput;     /* True if we are at the end of input */
         $yyerrorhit = 0;   /* True if yymajor has invoked an error */
-
+        
         /* (re)initialize the parser, if necessary */
         if ($this->yyidx === null || $this->yyidx < 0) {
             /* if ($yymajor == 0) return; // not sure why this was here... */
@@ -806,16 +818,21 @@ class ParseyyParser
             array_push($this->yystack, $x);
         }
         $yyendofinput = ($yymajor==0);
-
+        
         if (self::$yyTraceFILE) {
-            fprintf(self::$yyTraceFILE, "%sInput %s\n",
-                self::$yyTracePrompt, self::$yyTokenName[$yymajor]);
+            fprintf(
+                self::$yyTraceFILE,
+                "%sInput %s\n",
+                self::$yyTracePrompt,
+                self::$yyTokenName[$yymajor]
+            );
         }
-
+        
         do {
             $yyact = $this->yy_find_shift_action($yymajor);
-            if ($yymajor < self::YYERRORSYMBOL &&
-                  !$this->yy_is_expected_token($yymajor)) {
+            if ($yymajor < self::YYERRORSYMBOL
+                && !$this->yy_is_expected_token($yymajor)
+            ) {
                 // force a syntax error
                 $yyact = self::YY_ERROR_ACTION;
             }
@@ -831,13 +848,16 @@ class ParseyyParser
                 $this->yy_reduce($yyact - self::YYNSTATE);
             } elseif ($yyact == self::YY_ERROR_ACTION) {
                 if (self::$yyTraceFILE) {
-                    fprintf(self::$yyTraceFILE, "%sSyntax Error!\n",
-                        self::$yyTracePrompt);
+                    fprintf(
+                        self::$yyTraceFILE,
+                        "%sSyntax Error!\n",
+                        self::$yyTracePrompt
+                    );
                 }
                 if (self::YYERRORSYMBOL) {
                     /* A syntax error has occurred.
                     ** The response to an error depends upon whether or not the
-                    ** grammar defines an error token "ERROR".
+                    ** grammar defines an error token "ERROR".  
                     **
                     ** This is what we do if the grammar does define ERROR:
                     **
@@ -858,18 +878,22 @@ class ParseyyParser
                         $this->yy_syntax_error($yymajor, $yytokenvalue);
                     }
                     $yymx = $this->yystack[$this->yyidx]->major;
-                    if ($yymx == self::YYERRORSYMBOL || $yyerrorhit ){
+                    if ($yymx == self::YYERRORSYMBOL || $yyerrorhit ) {
                         if (self::$yyTraceFILE) {
-                            fprintf(self::$yyTraceFILE, "%sDiscard input token %s\n",
-                                self::$yyTracePrompt, self::$yyTokenName[$yymajor]);
+                            fprintf(
+                                self::$yyTraceFILE,
+                                "%sDiscard input token %s\n",
+                                self::$yyTracePrompt,
+                                self::$yyTokenName[$yymajor]
+                            );
                         }
                         $this->yy_destructor($yymajor, $yytokenvalue);
                         $yymajor = self::YYNOCODE;
                     } else {
-                        while ($this->yyidx >= 0 &&
-                                 $yymx != self::YYERRORSYMBOL &&
-        ($yyact = $this->yy_find_shift_action(self::YYERRORSYMBOL)) >= self::YYNSTATE
-                              ){
+                        while ($this->yyidx >= 0
+                            && $yymx != self::YYERRORSYMBOL
+                            && ($yyact = $this->yy_find_shift_action(self::YYERRORSYMBOL)) >= self::YYNSTATE
+                        ) {
                             $this->yy_pop_parser_stack();
                         }
                         if ($this->yyidx < 0 || $yymajor==0) {
@@ -907,7 +931,7 @@ class ParseyyParser
             } else {
                 $this->yy_accept();
                 $yymajor = self::YYNOCODE;
-            }
+            }            
         } while ($yymajor != self::YYNOCODE && $this->yyidx >= 0);
     }
 }

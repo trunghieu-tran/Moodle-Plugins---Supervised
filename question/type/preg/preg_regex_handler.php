@@ -585,7 +585,7 @@ class qtype_preg_regex_handler {
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->set_options($this->options);
 
-        $this->parser = new qtype_preg_yyParser($this->options);
+        $this->parser = new qtype_preg_parser($this->options);
 
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
@@ -601,7 +601,7 @@ class qtype_preg_regex_handler {
         $lexerrors = $this->lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
-                $this->parser->doParse(qtype_preg_yyParser::PARSELEAF, $node);
+                $this->parser->doParse(qtype_preg_parser::PARSELEAF, $node);
             }
             $this->errornodes[] = $node;
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
