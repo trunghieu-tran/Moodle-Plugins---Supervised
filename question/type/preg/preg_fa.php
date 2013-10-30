@@ -178,7 +178,7 @@ class qtype_preg_fa_transition {
      * @param other another transition for intersection.
      */
     public function is_eps() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_META && ($this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY));
+        return $this->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY;
     }
 
     /**
@@ -670,7 +670,7 @@ abstract class qtype_preg_finite_automaton {
         return $this->statenumbers;
     }
 
-    public function state_exists(&$state) {
+    public function state_exists($state) {
         foreach ($this->states as $curstate) {
             if ($curstate === $state) {
                 return true;
@@ -685,7 +685,7 @@ abstract class qtype_preg_finite_automaton {
      * @param direction - direction of passing(0-forward; 1-back).
      * @return array with ids of passed states.
      */
-    public function pass_automata($direction) {
+    public function reachable_states($direction) {
         // Initialization wavefront.
         if ($direction == 0) {
             // Going forward in automata.
@@ -716,7 +716,7 @@ abstract class qtype_preg_finite_automaton {
                     }
                     // Analysis outtransitions if go forward and intotransitions if go back.
                     $transitions = $this->get_adjacent_transitions($curstate, !$direction);
-                    
+  
                     // No any interconnecting states.
                     if (count($transitions) != 0 || $isendstate) {
                         $aregone[] = $curstate;
@@ -750,9 +750,9 @@ abstract class qtype_preg_finite_automaton {
      */
     public function del_blind_states() {
         // Pass automata forward.
-        $aregoneforward = $this->pass_automata(0);
+        $aregoneforward = $this->reachable_states(0);
         // Pass automata forward.
-        $aregoneback = $this->pass_automata(1);
+        $aregoneback = $this->reachable_states(1);
         // Check for each state of atomata was it gone or not.
         $states = $this->get_states();
         foreach ($states as $curstate) {
@@ -764,48 +764,9 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Find index of state by its numbers.
-     *
-     * @param number1 - the first number of state.
-     * @param number2 - the second number of state.
-     * @return index of state if it was found and -1 if it wasn't found.
-     */
-    public function find_state_index($number1, $number2 = -1) {
-        $index = -1;
-        // Searching only by first numbers.
-        if ($number2 == -1) {
-            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
-                $num1 = $this->states[$i]->firstnumbers[0];
-                if ($num1 == $number1) {
-                    $index = $i;
-                }
-            }
-        } else if ($number1==-1) {
-            // Searching only by second numbers.
-            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
-                $num2 = $this->states[$i]->secondnumbers[0];
-                if ($num2 == $number2) {
-                    $index = $i;
-                }
-            }
-        } else {
-            // Searching by both numbers.
-            for ($i = 0; $i < count($this->states) && $index < 0; $i++) {
-                $num1 = $this->states[$i]->firstnumbers[0];
-                $num2 = $this->states[$i]->secondnumbers[0];
-                if ($num1 == $number1 && $num2 == $number2) {
-                    $index = $i;
-                }
-            }
-        }
-        return $index;
-    }
-
-    /**
      * Write automata as a dot-style string.
      * @param type type of the resulting image, should be 'svg', png' or something.
      * @param filename the absolute path to the resulting image file.
-
      * @return dot_style string with the description of automata.
      */
     public function fa_to_dot($type = null, $filename = null) {
@@ -897,7 +858,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Remove all end states of the automaton.
      */
-    public function clean_end_states() {
+    public function remove_all_end_states() {
         // Cleaning end states.
         $endstates = $this->end_states();
         foreach ($endstates as $endstate) {
@@ -908,7 +869,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Remove all start states of the automaton.
      */
-    public function clean_start_states() {
+    public function remove_all_start_states() {
         // Cleaning end states.
         $startstates = $this->start_states();
         foreach ($startstates as $startstate) {
@@ -981,7 +942,7 @@ abstract class qtype_preg_finite_automaton {
      *
      * @param del transition for deleting.
      */
-    public function del_transition ($del) {
+    public function del_transition($del) {
         unset($this->adjacencymatrix[$del->from][$del->to]);
     }
 
@@ -1108,7 +1069,7 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Removes this fa. Return enpty fa.
+     * Removes this fa. Return empty fa.
      */
     public function remove_fa() {
         $result = new qtype_preg_nfa(0, 0, 0, array());
@@ -1119,11 +1080,7 @@ abstract class qtype_preg_finite_automaton {
      * Check if this state is from intersection part of autmata.
      */
     public function is_intersectionstate($state) {
-        if (strpos($this->statenumbers[$state], ',') === false) {
-            return false;
-        } else {
-            return true;
-        }
+        return strpos($this->statenumbers[$state], ',') !== false;
     }
 
     /**
@@ -1150,22 +1107,14 @@ abstract class qtype_preg_finite_automaton {
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
-        if (array_search($state, $this->startstates) === false) {
-            return false;
-        } else {
-            return true;
-        }
+        return array_search($state, $this->startstates) === false;
     }
 
     /**
      * Check if such state is in array of end states.
      */
     public function has_endstate($state) {
-        if (array_search($state, $this->endstates) === false) {
-            return false;
-        } else {
-            return true;
-        }
+        return array_search($state, $this->endstates) === false;
     }
 
     /**
@@ -1173,39 +1122,39 @@ abstract class qtype_preg_finite_automaton {
      */
     public function read_fa($dotstring, $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
         //  Dotstring split into an array of strings.
-        $dotstring = explode("\n",$dotstring);
+        $dotstring = explode("\n", $dotstring);
         // String of start states split into an array of start states.
-        $startstates = explode(";",$dotstring[1]);
+        $startstates = explode(";", $dotstring[1]);
         // Append start states in automata.
         for ($i = 0; $i < count($startstates) - 1; $i++) {
             $startstates[$i] = trim($startstates[$i]);
-            $startstates[$i] = trim($startstates[$i],'"');
+            $startstates[$i] = trim($startstates[$i], '"');
             $this->add_state($startstates[$i]);
             $this->add_start_state(($this->statecount) - 1);
         }
         // String of end states split into an array of end states.
-        $endstates = explode(";",$dotstring[2]);
+        $endstates = explode(";", $dotstring[2]);
         // Append end states in automata.
         for ($i = 0; $i < count($endstates) - 1; $i++) {
             $endstates[$i] = trim($endstates[$i]);
-            $endstates[$i] = trim($endstates[$i],'"');
+            $endstates[$i] = trim($endstates[$i], '"');
             $this->add_state($endstates[$i]);
             $this->add_end_state(($this->statecount) - 1);
         }
         // Append transition in automata.
         for ($i = 3; $i < (count($dotstring) - 1); $i++) {
-            $arraystrings = preg_split('/(->|\[label="\[|\]"|color=|\];$)/u',$dotstring[$i]);
+            $arraystrings = preg_split('/(->|\[label="\[|\]"|color=|\];$)/u', $dotstring[$i]);
             // Delete the spaces at the beginning and end of line.
             $arraystrings[0] = trim($arraystrings[0]);
-            $arraystrings[0] = trim($arraystrings[0],'"');
-            if(array_search($arraystrings[0], $this->statenumbers) === false) {
+            $arraystrings[0] = trim($arraystrings[0], '"');
+            if (array_search($arraystrings[0], $this->statenumbers) === false) {
                 $this->add_state($arraystrings[0]);
             }
             $statefrom = array_search($arraystrings[0], $this->statenumbers);
             // Delete the spaces at the beginning and end of line.
             $arraystrings[1] = trim($arraystrings[1]);
-            $arraystrings[1] = trim($arraystrings[1],'"');
-            if(array_search($arraystrings[1], $this->statenumbers) === false) {
+            $arraystrings[1] = trim($arraystrings[1], '"');
+            if (array_search($arraystrings[1], $this->statenumbers) === false) {
                 $this->add_state($arraystrings[1]);
             }
             $stateto = array_search($arraystrings[1], $this->statenumbers);
@@ -1219,34 +1168,32 @@ abstract class qtype_preg_finite_automaton {
             $currentindex = 0;
             $point = false;
             // Parse a string into components.
-            while($currentindex < strlen($arraystrings[2])) {
+            while ($currentindex < strlen($arraystrings[2])) {
                 // If subpatt_start.
-                if($arraystrings[2][$currentindex] == '(') {
-                    if($currentindex == 0 || $arraystrings[2][$currentindex - 1] != '\\') {
-                        while($arraystrings[2][$currentindex] != '/') {
+                if ($arraystrings[2][$currentindex] == '(') {
+                    if ($currentindex == 0 || $arraystrings[2][$currentindex - 1] != '\\') {
+                        while ($arraystrings[2][$currentindex] != '/') {
                             $subpatt_start[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                             $currentindex++;
                         }
                     }
                     $currentindex++;
                     // If subexpr_start.
-                    if($arraystrings[2][$currentindex] == '(') {
-                        while($arraystrings[2][$currentindex] == '(') {
+                    if ($arraystrings[2][$currentindex] == '(') {
+                        while ($arraystrings[2][$currentindex] == '(') {
                             $subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                             $currentindex++;
                         }
                     }
-                }
-                // If subexpr_start without subpatt_start.
-                else if($arraystrings[2][$currentindex] == '/' && $arraystrings[2][$currentindex + 1] == '(') {
+                } else if ($arraystrings[2][$currentindex] == '/' && $arraystrings[2][$currentindex + 1] == '(') {
+                    // If subexpr_start without subpatt_start.
                     $currentindex++;
-                    while($arraystrings[2][$currentindex] == '(') {
+                    while ($arraystrings[2][$currentindex] == '(') {
                         $subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                         $currentindex++;
                     }
-                }
-                // If current symbol is back_slash.
-                else if($arraystrings[2][$currentindex] == '\\') {
+                } else if ($arraystrings[2][$currentindex] == '\\') {
+                    // If current symbol is back_slash.
                     switch($arraystrings[2][$currentindex+1]) {
                         case 'b': $asserts[] = '\\b'; break;
                         case 'B': $asserts[] = '\\B'; break;
@@ -1631,8 +1578,8 @@ abstract class qtype_preg_finite_automaton {
             $needredactinginto = false;
             $transitions = $this->get_adjacent_transitions($del->to, true);
             $intotransitions = $this->get_adjacent_transitions($del->from, false);
-            
-            if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || (count($intotransitions) != 0 && 
+
+            if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || (count($intotransitions) != 0 &&
                 count($del->pregleaf->assertionsbefore) == 0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
                 && !$del->has_tags())) {
                 // Possibility of merging with intotransitions.
@@ -1683,7 +1630,7 @@ abstract class qtype_preg_finite_automaton {
                 // Adding intotransitions from merged state if we merge back.
                 if ($needredactinginto) {
                     $outtransitions = $this->get_adjacent_transitions($del->to, true);
-                    foreach ($outtransitions as &$outtran) {  
+                    foreach ($outtransitions as &$outtran) {
                         $outtran->from = $del->from;
                         $this->add_transition($outtran);
                     }
@@ -1915,7 +1862,7 @@ abstract class qtype_preg_finite_automaton {
         // Getting all states which are in automata for coping.
         $stateswere = $this->get_state_numbers();
         // Cleaning end states.
-        $this->clean_end_states();
+        $this->remove_all_end_states();
 
         // Coping.
         while (count ($oldfront) != 0) {
@@ -2147,23 +2094,23 @@ abstract class qtype_preg_finite_automaton {
     }
 
     public static function get_wordbreaks_transitions($negative, $isinto) {
-        
+
         $result = array();
         // Create transitions which can replace \b and \B.
         // Create \w.
-        $flagw = new qtype_preg_charset_flag();
-        $flagw->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
-        $charsetw = new qtype_preg_leaf_charset();
-        $charsetw->flags = array(array($flagw));
-        $charsetw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
-        $transitionw = new qtype_preg_nfa_transition(0, $charsetw, 1);
+        $flagbigw = new qtype_preg_charset_flag();
+        $flagbigw->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+        $charsetbigw = new qtype_preg_leaf_charset();
+        $charsetbigw->flags = array(array($flagbigw));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $tranbigw = new qtype_preg_nfa_transition(0, $charsetbigw, 1);
         // Create \W.
-        $flagW = clone $flagw;
-        $flagW->negative = true;
-        $charsetW = new qtype_preg_leaf_charset();
-        $charsetW->flags = array(array($flagW));
-        $charsetW->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
-        $transitionW = new qtype_preg_nfa_transition(0, $charsetW, 1);
+        $flagbigw = clone $flagbigw;
+        $flagbigw->negative = true;
+        $charsetbigw = new qtype_preg_leaf_charset();
+        $charsetbigw->flags = array(array($flagbigw));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $tranbigw = new qtype_preg_nfa_transition(0, $charsetbigw, 1);
         // Create ^.
         $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
         $transitioncircumflex = new qtype_preg_nfa_transition(0, $assertcircumflex, 1);
@@ -2173,28 +2120,28 @@ abstract class qtype_preg_finite_automaton {
 
         // Incoming transitions.
         if ($isinto) {
-            $result[] = $transitionw;
-            $result[] = $transitionW;
+            $result[] = $tranbigw;
+            $result[] = $tranbigw;
             $result[] = $transitioncircumflex;
             // Case \b.
             if (!$negative) {
-                $result[] = $transitionw;
+                $result[] = $tranbigw;
             } else {
                 // Case \B.
-                $result[] = $transitionW;
+                $result[] = $tranbigw;
             }
         } else {
             // Outcoming transitions.
             // Case \b.
             if (!$negative) {
-                $result[] = $transitionW;
-                $result[] = $transitionw;
-                $result[] = $transitionw;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
             } else {
                 // Case \B.
-                $result[] = $transitionw;
-                $result[] = $transitionW;
-                $result[] = $transitionW;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
             }
             $result[] = $transitiondollar;
         }
@@ -2286,7 +2233,7 @@ abstract class qtype_preg_finite_automaton {
             $endtran = $this->get_adjacent_transitions($tran->from, false);
             foreach ($endtran as $end) {
                 $this->add_end_state($end->from);
-            }  
+            }
         }
         if ($fromdel) {
             $this->remove_state($tran->from);
@@ -2332,7 +2279,6 @@ abstract class qtype_preg_finite_automaton {
             $oldfront = $newfront;
             $newfront = array();
         }
-        
     }
 
     /**
@@ -2409,7 +2355,7 @@ abstract class qtype_preg_finite_automaton {
      *
      * @return flag if automata has cycle or not.
      */
-    public function has_cycle() {
+    public function has_cycle() {// TODO: запоминать есть ли циклы при построении
         $newfront = array();
         $aregone = array();
         $hascycle = false;
@@ -2564,7 +2510,7 @@ abstract class qtype_preg_finite_automaton {
      * @param withcycle boolean intersect in case of forming right cycle.
      * @return result automata.
      */
-    public function get_intersection_part ($anotherfa, &$result, $start, $direction, $withcycle) {
+    public function get_intersection_part($anotherfa, &$result, $start, $direction, $withcycle) {
         $oldfront = array();
         $newfront = array();
         $clones = array();
@@ -2643,7 +2589,7 @@ abstract class qtype_preg_finite_automaton {
         // Set right start and end states.
         if ($direction == 0) {
             // Cleaning end states.
-            $result->clean_end_states();
+            $result->remove_all_end_states();
             foreach ($possibleend as $end) {
                 $result->add_end_state($end);
             }
@@ -2788,7 +2734,7 @@ abstract class qtype_preg_finite_automaton {
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
-    public function intersect ($anotherfa, $stateindex, $isstart) {
+    public function intersect($anotherfa, $stateindex, $isstart) {
         // Check right direction.
         if ($isstart != 0 && $isstart !=1) {
             throw new qtype_preg_exception('intersect error: Wrong direction');
@@ -3009,16 +2955,16 @@ abstract class qtype_preg_finite_automaton {
         $result->set_start_end_states_before_coping($this, $anotherfa);
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             // Cleaning end states.
-            $result->clean_end_states();
+            $result->remove_all_end_states();
             // Cleaning start states.
-            $result->clean_start_states();
+            $result->remove_all_start_states();
             // Set right start and end states for completing branches.
             $result->set_start_end_states_before_coping($this, $anotherfa);
             $result->complete_non_intersection_branches($this, $anotherfa, $isstart);
             // Cleaning end states.
-            $result->clean_end_states();
+            $result->remove_all_end_states();
             // Cleaning start states.
-            $result->clean_start_states();
+            $result->remove_all_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
             $result = $result->remove_fa();
