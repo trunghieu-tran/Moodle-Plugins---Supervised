@@ -112,7 +112,9 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      * Implement in child classes to show to be continued after hint.
      */
     public function to_be_continued($matchresults) {
-        return false;
+        return $matchresults->is_match() && !$matchresults->full && 
+                $matchresults->index_first() + $matchresults->length() == qtype_poasquestion_string::strlen($matchresults->str()) &&
+                $matchresults->length() !== qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
     /**
@@ -121,20 +123,56 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     public function render_hint($renderer, question_attempt $qa = null, question_display_options $options = null, $response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
+        return $this->render_colored_string_by_matchresults($renderer, $matchresults);
+    }
+
+    /**
+     * Actually renders the colored string.
+     *
+     * Placed outside render_hint to be able to get colored string without real question.
+     * You still need a dummy one with 'engine' field set.
+     * @param $withpic bool show by icon whether match is full.
+     */
+    public function render_colored_string_by_matchresults($renderer, $matchresults, $withpic = false) {
+
+        $wronghead = '';
+        $correctpart = '';
+        $wrongtail = '';
+        if ($withpic) { // Add icon, showing whether match is full or no.
+           $wronghead .= $renderer->render_match_icon($matchresults->full);
+        }
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
-            $correctpart = $renderer->render_matched($matchresults->matched_part());
+
+            $wronghead .= $renderer->render_unmatched($matchresults->match_heading());
+
+            if (!isset($matchresults->length[-2]) || $matchresults->length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                // No selection or no match with selection.
+                $correctpart = $renderer->render_matched($matchresults->matched_part());
+            } else {
+                // We need to substract index_first of the match from all indexes when cuttring from matched part.
+                $correctstr = $matchresults->matched_part();
+                $substract = $matchresults->index_first();
+                // Before selection.
+                $correctpart = $renderer->render_matched(textlib::substr($correctstr, 0, $matchresults->index_first(-2) - $substract));
+                // Selection.
+                $correctpart .= $renderer->render_hinted(textlib::substr($correctstr, $matchresults->index_first(-2) - $substract, $matchresults->length(-2)));
+                // After selection.
+                $correctpart .= $renderer->render_matched(textlib::substr($correctstr, $matchresults->index_first(-2) - $substract + $matchresults->length(-2)));
+            }
             $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
-            return $wronghead.$correctpart.$wrongtail;
+            if ($this->to_be_continued($matchresults)) {
+                $wrongtail .= $renderer->render_tobecontinued();
+            }
         }
-        return '';
+
+         return $wronghead.$correctpart.$wrongtail;
     }
-	
+
     public function could_show_hint($matchresults) {
         $queryengine = $this->question->get_query_matcher($this->question->engine);
         // Correctness should be shown if engine support partial matching or a full match is achieved.
-        // Also correctness should be shown if this is not pure-assert match.
+        // Also correctness should be shown if this is not pure-assert match as there is no green part on pure-assert matches.
         return ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) && $matchresults->length[0] !== 0;
     }
 

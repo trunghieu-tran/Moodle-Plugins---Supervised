@@ -218,8 +218,8 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // Preg savepoint reached.
         upgrade_plugin_savepoint(true, 2013062600, 'qtype', 'preg');
     }
-	
-	if ($oldversion < 2013071400) {
+
+    if ($oldversion < 2013071400) {
 
         // Define table qtype_preg_regex_tests to be created.
         $table = new xmldb_table('qtype_preg_regex_tests');
@@ -241,5 +241,30 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // Preg savepoint reached.
         upgrade_plugin_savepoint(true, 2013071400, 'qtype', 'preg');
     }
+
+    if ($oldversion < 2013100500) {
+
+        // Rename field tableid on table qtype_preg_regex_tests to NEWNAMEGOESHERE.
+        $table = new xmldb_table('qtype_preg_regex_tests');
+        $field = new xmldb_field('tableid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'tablename');
+
+        // Launch rename field tableid.
+        $dbman->rename_field($table, $field, 'answerid');
+
+        // Define field tablename to be dropped from qtype_preg_regex_tests.
+        $table = new xmldb_table('qtype_preg_regex_tests');
+        $field = new xmldb_field('tablename');
+
+        // Conditionally launch drop field tablename.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Preg savepoint reached.
+        upgrade_plugin_savepoint(true, 2013100500, 'qtype', 'preg');
+    }
+
+    // There ends code for Preg 2.5 release upgrade.
+
     return true;
 }

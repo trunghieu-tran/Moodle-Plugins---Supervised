@@ -208,14 +208,14 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             } elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
             } elseif ($result->next=='wordchar') {
                 $tmpflag = new qtype_preg_charset_flag;
-                $tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+                $tmpflag->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
                 $tmp = new qtype_preg_leaf_charset;
                 $tmp->flags = array(array($tmpflag));
                 $length=1;
                 $extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
             } elseif ($result->next=='notwordchar') {
                 $tmpflag = new qtype_preg_charset_flag;
-                $tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+                $tmpflag->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
                 $tmpflag->negative = true;
                 $tmp = new qtype_preg_leaf_charset;
                 $tmp->flags = array(array($tmpflag));

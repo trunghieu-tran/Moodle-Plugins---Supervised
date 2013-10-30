@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Script for button "Check", "Back" and push in interactive tree
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
@@ -15,47 +15,36 @@ M.preg_authoring_tools_script = (function ($) {
 
     var self = {
 
+    TREE_KEY : 'tree',
+
+    TREE_MAP_KEY : 'map',
+
+    GRAPH_KEY : 'graph',
+
+    DESCRIPTION_KEY : 'description',
+
+    STRINGS_KEY : 'regex_test',
+
+    TREE_MAP_ID : '#qtype_preg_graph',
+
     /** @var string with moodle root url (smth like 'http://moodle.site.ru/') */
     www_root : null,
 
     /** @var {string} name of qtype_preg_textbutton parent object */
     textbutton_widget : null,
 
-    /** @var {Object} reference for 'input' on top of dialog */
-    main_input : null,
+    /** @var {Object} reference to the regex textarea */
+    regex_input : null,
 
-    /** @var {Integer} id of the currently selected node */
-    node_id : '-1',
+    matching_options : ['engine', 'notation', 'exactmatch', 'usecase'],
 
-    /** @var {Object} cache of content; first dimension is orientation, second id regex, third is node id */
+    /** @var {Object} cache of content; dimensions are: 1) tool name, 2) concatenated options, selection borders, etc. */
     cache : {
-        vertical: {
-            userinscription: {},
-            flags: {}
-        },
-        horizontal: {
-            userinscription: {},
-            flags: {}
-        }
+        tree : {},
+        graph : {},
+        description : {},
+        regex_test : {}
     },
-
-    tree_orientation : null,
-
-    displayas : null,
-
-    REGEX_KEY : 'regex',
-
-    ID_KEY : 'id',
-
-    TREE_KEY : 'tree_src',
-
-    TREE_MAP_KEY : 'map',
-
-    TREE_MAP_ID : '#qtype_preg_graph',
-
-    GRAPH_KEY : 'graph_src',
-
-    DESCRIPTION_KEY : 'description',
 
     /**
      * setups module
@@ -79,58 +68,95 @@ M.preg_authoring_tools_script = (function ($) {
     setup_parent_object : function () {
         var options = {
 
-            // Function called on the very first form opening.
             onfirstpresscallback : function () {
                 $.ajax({
-                    url: self.www_root + '/question/type/preg/authoring_tools/ast_preg_form.php',
+                    url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php',
                     type: "GET",
                     dataType: "text"
-                }).done(function( responseText, textStatus, jqXHR ) {
-                    $(self.textbutton_widget.dialog).html( $.parseHTML( responseText, document, true ) );
+                }).done(function (responseText, textStatus, jqXHR) {
+                    var tmpM = M;
+                    $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
+                    M = $.extend(M, tmpM);
 
-                    //TODO: set empty src in all field
+                    // Remove the "skip to main content" link.
+                    $(self.textbutton_widget.dialog).find('.skiplinks').remove();
+
+                    // Create a clone of the textarea.
+                    var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:both;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
+                    $('#id_regex_text').each(function () {
+                        $.each(this.attributes, function () {
+                            if (this.specified) {
+                                textarea.attr(this.name, this.value);
+                            }
+                        });
+                    });
+
+                    // Replace the textarea with an iframe.
+                    var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
+                                         '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"></iframe>' +
+                                       '</div>';
+
+                    $('#id_regex_text').replaceWith(iframeMarkup);
+                    $('#id_regex_resizable').resizable();
+
+                    // Deal with iframe.
+                    var iframe = $('#id_regex_text_replacement');
+
+                    setTimeout(function () {
+                        var innerDoc = iframe[0].contentWindow.document,
+                            innerBody = $('body', innerDoc);
+                        innerBody.css('margin', '0').css('padding', '0')
+                                 .append(textarea);
+                    }, 1);
 
                     // Add handlers for the buttons.
-                    $('#id_regex_update').click(self.btn_update_clicked);
-                    $('#id_regex_save').click(self.btn_save_clicked);
-                    $("#id_regex_cancel").click(self.btn_cancel_clicked);
+                    $('#id_regex_show').click(self.btn_show_clicked);
+                    if (!self.textbutton_widget.is_stand_alone()) {
+                        $('#id_regex_save').click(self.btn_save_clicked);
+                    } else {
+                        $('#id_regex_save').hide();
+                    }
+                    $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
-                    $('#id_regex_show_selection').click(self.btn_show_selection_clicked);
 
                     // Add handlers for the radiobuttons.
-                    $("#fgroup_id_tree_orientation_radioset input").change(self.rbtn_changed);
-                    $("#fgroup_id_charset_process_radioset input").change(self.rbtn_changed);
+                    $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
+                    $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
-                    self.main_input = $('#id_regex_text').change(self.regex_change)
-                                                         //.change(self.textbutton_widget.fix_textarea_rows)
-                                                         .keyup(self.textbutton_widget.fix_textarea_rows);
+                    // Add handlers for the regex textarea.
+                    self.regex_input = textarea;
+                    self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
 
-                    $(self.main_input).val(self.textbutton_widget.data).trigger('keyup');
+                    // Add handlers for the regex testing textarea.
+                    $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
 
-                    // TODO - FIND A GOOD WAY TO HIDE THE "EXPAND ALL" BUTTON!
-                    //$(".collapsible-actions").hide();
+                    // Hide the non-working "displayas".
+                    $('#fgroup_id_charset_process_radioset').hide();
 
-                    // get testing data from hidden field and put it into ui
-                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val())
-                                             .keyup(self.textbutton_widget.fix_textarea_rows)
-                                             .trigger('keyup');
-                    $("#id_regex_input_header").after('<div id="form_properties"></div>');
-
-                    options.display_question_options();
-                    self.regex_selection_widget._init();
-                    self.load_content('-1');
-
+                    options.oneachpresscallback();
                 });
             },
 
-            // Function called on non-first form openings.
             oneachpresscallback : function () {
-                self.main_input.val(self.textbutton_widget.data).trigger('keyup');
-                // get testing data from hidden field and put it into ui
-                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.currentlinput).attr('id').split("id_answer_")[1] + ']\']').val());
+                self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
+                self.invalidate_content();
 
-                options.display_question_options();
-                self.load_content('-1');
+                // Put the testing data into ui.
+                if (!self.textbutton_widget.is_stand_alone()) {
+                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
+                                         .trigger('keyup');
+
+                    $.each(self.matching_options, function (i, option) {
+                        var preg_id = '#id_' + option,
+                            this_id = preg_id + '_auth';
+                        $(this_id).val($(preg_id).val());
+                    });
+                }
+                $('#id_regex_show').click();
+            },
+
+            onclosecallback : function () {
+                self.save_sections_state();
             },
 
             onsaveclicked : function () {
@@ -139,342 +165,310 @@ M.preg_authoring_tools_script = (function ($) {
 
             oncancelclicked : function () {
                 $('#id_regex_cancel').click();
-            },
-
-            display_question_options : function () {
-                $('#form_properties').html('<div>' +
-                                           'engine: '     + $('#id_engine :selected').text() + '<br/>' +
-                                           'usecase: '    + $('#id_usecase :selected').text() + '<br/>' +
-                                           'exactmatch: ' + $('#id_exactmatch :selected').text() + '<br/>' +
-                                           'notation: '   + $('#id_notation :selected').text() +
-                                           '</div>');
             }
         };
 
         self.textbutton_widget.setup(options);
     },
 
-    btn_update_clicked : function (e) {
+    save_sections_state : function () {
+        var sections = ['regex_input',
+                        'regex_matching_options',
+                        'regex_tree',
+                        'regex_graph',
+                        'regex_description',
+                        'regex_testing'
+                        ];
+        $.each(sections, function (i, section) {
+            var val = $("[name='mform_isexpanded_id_" + section + "_header']").val();
+            M.util.set_user_preference('qtype_preg_' + section + '_expanded', val);
+        });
+    },
+
+    btn_show_clicked : function (e) {
         e.preventDefault();
-        self.load_content('-1');
-        self.btn_check_strings_clicked();
+        var sel = self.get_selection();
+        self.load_content(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);
     },
 
     btn_save_clicked : function (e) {
         e.preventDefault();
-        var new_regex = self.main_input.val();
-        self.textbutton_widget.data = new_regex;
+        self.textbutton_widget.data = self.regex_input.val();
+        $.each(self.matching_options, function (i, option) {
+            var preg_id = '#id_' + option,
+                this_id = preg_id + '_auth';
+            $(preg_id).val($(this_id).val());
+        });
         self.textbutton_widget.close_and_set_new_data();
+        $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
+        $('#id_test_regex').html('');
+        M.form.updateFormState("mform1");
     },
 
     btn_cancel_clicked : function (e) {
+        e.preventDefault();
         self.textbutton_widget.dialog.dialog("close");
         $('#id_test_regex').html('');
     },
 
     btn_check_strings_clicked : function (e) {
-        $.ajax({
-            type: 'GET',
-            url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
-            data: {
-                regex: self.main_input.val(),
-                strings: $('#id_regex_match_text').val(),
-                usecase: $('#id_usecase :selected').val(),
-                exactmatch: $('#id_exactmatch :selected').val(),
-                engine: $('#id_engine :selected').val(),
-                notation: $('#id_notation :selected').val(),
-                ajax: true
-            },
-            success: self.upd_check_strings_success,
-            error: self.upd_failure
-        });
-    },
-
-    btn_show_selection_clicked : function (e) {
-        var range = self.regex_selection_widget.get_selected_text_range(self.main_input[0]);
-        self.load_content_by_range(range.start, range.end);
+        e.preventDefault();
+        var sel = self.get_selection();
+        self.load_strings(sel.indfirst, sel.indlast);
     },
 
     rbtn_changed : function (e) {
-        self.load_content(self.node_id);
+        e.preventDefault();
+        var sel = self.get_selection();
+        self.load_content(sel.indfirst, sel.indlast);
     },
 
-    upd_tools_success : function (data, textStatus, jqXHR) {
-        var jsonarray = JSON.parse(data),
-            orientation = self.get_orientation(),
-            displayas = self.get_displayas(),
-            r = jsonarray[self.REGEX_KEY],
-            i = jsonarray[self.ID_KEY] + '',
-            t = jsonarray[self.TREE_KEY],
-            m = jsonarray[self.TREE_MAP_KEY],
-            g = jsonarray[self.GRAPH_KEY],
-            d = jsonarray[self.DESCRIPTION_KEY];
+    tree_node_clicked : function (e) {
+        e.preventDefault();
+        var tmp = e.target.id.split(','),
+            indfirst = tmp[1],
+            indlast = tmp[2];
+        self.load_content(indfirst, indlast);
+        self.load_strings(indfirst, indlast);
+    },
 
-        // Cache the data.
-        if (orientation && displayas && r && i && t && m && g && d) {
-            self.cache_data(orientation, displayas, r, i, t, m, g, d);
+    tree_node_misclicked : function (e) {
+        e.preventDefault();
+        self.load_content();
+        self.load_strings();
+    },
+
+    cache_key_for_explaining_tools : function (indfirst, indlast) {
+        return '' +
+               self.regex_input.val() +
+               $('#id_notation_auth').val() +
+               $('#id_exactmatch_auth').val() +
+               $('#id_usecase_auth').val() +
+               self.get_orientation() +
+               self.get_displayas() +
+               indfirst + ',' + indlast;
+    },
+
+    cache_key_for_testing_tool : function (indfirst, indlast) {
+        return '' +
+               self.regex_input.val() +
+               $('#id_engine_auth').val() +
+               $('#id_notation_auth').val() +
+               $('#id_exactmatch_auth').val() +
+               $('#id_usecase_auth').val() +
+               $('#id_regex_match_text').val() +
+               indfirst + ',' + indlast;
+    },
+
+    upd_content_success : function (data, textStatus, jqXHR) {
+        if (typeof data == "object") {
+            new M.core.ajaxException(data);
+            return;
         }
+        var json = JSON.parse(data),
+            regex = json['regex'],
+            //engine = json['engine'],
+            notation = json['notation'],
+            exactmatch = json['exactmatch'],
+            usecase = json['usecase'],
+            treeorientation = json['treeorientation'],
+            displayas = json['displayas'],
+            indfirst = json['indfirst'],
+            indlast = json['indlast'],
+            t = json[self.TREE_KEY],
+            g = json[self.GRAPH_KEY],
+            d = json[self.DESCRIPTION_KEY],
+            k = '' + regex + notation + exactmatch + usecase + treeorientation + displayas + indfirst + ',' + indlast;
 
-        // Display the data.
-        self.display_data(i, t, m, g, d);
+        // Cache the content.
+        self.cache[self.TREE_KEY][k] = t;
+        self.cache[self.GRAPH_KEY][k] = g;
+        self.cache[self.DESCRIPTION_KEY][k] = d;
+
+        // Display the content.
+        self.display_content(t, g, d, indfirst, indlast);
     },
 
-    upd_check_strings_success : function (data, textStatus, jqXHR) {
-        var jsonarray = JSON.parse(data);
-        $('#id_test_regex').html(jsonarray.regex_test);
-    },
-
-    upd_failure : function (data, textStatus, jqXHR) {
-       alert('Error\n' + textStatus + '\n' + jqXHR.responseText);
-    },
-
-    // Stores images and description for the given regex and node id in the cache
-    cache_data : function (orientation, displayas, regex, id, t, m, g, d) {
-        if (!self.cache[orientation][displayas][regex]) {
-            self.cache[orientation][displayas][regex] = {};
+    upd_strings_success : function (data, textStatus, jqXHR) {
+        if (typeof data == "object") {
+            new M.core.ajaxException(data);
+            return;
         }
-        if (!self.cache[orientation][displayas][regex][id]) {
-            self.cache[orientation][displayas][regex][id] = {};
-        }
-        self.cache[orientation][displayas][regex][id][self.TREE_KEY] = t;
-        self.cache[orientation][displayas][regex][id][self.TREE_MAP_KEY] = m;
-        self.cache[orientation][displayas][regex][id][self.GRAPH_KEY] = g;
-        self.cache[orientation][displayas][regex][id][self.DESCRIPTION_KEY] = d;
+        var json = JSON.parse(data),
+            regex = json['regex'],
+            engine = json['engine'],
+            notation = json['notation'],
+            exactmatch = json['exactmatch'],
+            usecase = json['usecase'],
+            treeorientation = json['treeorientation'],
+            displayas = json['displayas'],
+            indfirst = json['indfirst'],
+            indlast = json['indlast'],
+            strings = json['strings'],
+            s = json[self.STRINGS_KEY],
+            k = '' + regex + engine + notation + exactmatch + usecase + strings + indfirst + ',' + indlast;
+
+        // Cache the strings.
+        self.cache[self.STRINGS_KEY][k] = s;
+
+        // Display the strings.
+        self.display_strings(s);
     },
 
-    // Displays given images and description
-    display_data : function (id, t, m, g, d) {
+    invalidate_content : function () {
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
             graph_img = $('#graph_img'),
-            err = null;
+            desc_hnd = $('#description_handler');
 
-        if (t) {
-            err = (t.substring(0, 4) != 'data');
-            tree_err.html(err ? t : '');
-            tree_img.attr('src', err ? '""' : t).css('visibility', err ? 'hidden' : 'visible');
-        }
-        if (m) {
-            tree_map.html(m);
-            tree_img.click(self.tree_node_misclicked);
-            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
-        }
-        if (g) {
-            err = (g.substring(0, 4) != 'data');
-            graph_err.html(err ? g : '');
-            graph_img.attr('src', err ? '""' : g).css('visibility', err ? 'hidden' : 'visible');
-        }
-        if (d) {
-            $('#description_handler').html(d);
-        }
+        tree_err.html('');
+        tree_img.removeAttr('src').css('visibility', 'hidden');
+        tree_map.html('');
 
-        self.highlight_description(id);
+        graph_err.html('');
+        graph_img.removeAttr('src').css('visibility', 'hidden');
+
+        desc_hnd.html('');
     },
 
-    load_content_by_range : function (start, end) {
-        var text = self.main_input.val(),
-            firstline = 0,
-            lastline = 0,
-            lastpos = 0,
-            pos = text.indexOf("\n");
-        while (pos != -1 && pos < start) {
-            ++firstline;
-            lastpos = pos;
-            pos = text.indexOf("\n", pos + 1);
+    // Displays given images and description
+    display_content : function (t, g, d, indfirst, indlast) {
+        var scroll = $(window).scrollTop(),
+            tree_err = $('#tree_err'),
+            tree_img = $('#tree_img'),
+            tree_map = $('#tree_map'),
+            graph_err = $('#graph_err'),
+            graph_img = $('#graph_img'),
+            desc_hnd = $('#description_handler');
+
+        self.invalidate_content();
+
+        if (typeof t != 'undefined' && t.img && t.map) {
+            tree_img.attr('src', t.img).css('visibility', 'visible');
+            tree_map.html(t.map);
+            tree_img.click(self.tree_node_misclicked);
+            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
+        } else if (typeof t != 'undefined') {
+            tree_err.html(t);
         }
-        if (firstline > 0) {
-            start -= lastpos;
+
+        if (typeof g != 'undefined' && g.substring(0, 4) == 'data') {
+            graph_img.attr('src', g).css('visibility', 'visible');
+        } else if (typeof g != 'undefined') {
+            graph_err.html(g);
         }
-        while (pos != -1 && pos < end) {
-            ++lastline;
-            lastpos = pos;
-            pos = text.indexOf("\n", pos + 1);
+
+        if (typeof d != 'undefined') {
+            desc_hnd.html(d);
         }
-        if (lastline > 0) {
-            end -= lastpos;
+
+        var length =  indlast - indfirst + 1;
+        if (indfirst < 0) {
+            indfirst = 0;
         }
-        --end;
-        self.load_content('-1', {linefirst: firstline, linelast: lastline, indfirst: start, indlast: end}, true);
+        if (indlast < 0) {
+            length = 0;
+        }
+        self.regex_input.textrange('set', indfirst, length);
+        $(window).scrollTop(scroll);
+    },
+
+    display_strings : function (s) {
+        $('#id_test_regex').html(s);
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
-    load_content : function (id, coordinates, no_cache) {
-        // Deselect the node when clicked for the second time.
-        if (self.node_id == id && self.tree_orientation == self.get_orientation() && self.displayas == self.get_displayas()) {
-            id = '-1';
+    load_content : function (indfirst, indlast) {
+        if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
+            indfirst = indlast = -2;
         }
-
-        // Update the fields.
-        self.node_id = id;
-        self.tree_orientation = self.get_orientation();
-        self.displayas = self.get_displayas();
 
         // Unbind tree handlers so nothing is clickable till the response is received.
         $('#tree_img').unbind();
         $(self.TREE_MAP_ID + ' > area').unbind();
 
-        var regex = self.main_input.val(),
-            cachedregex = null,
-            cachedid = null;
-
         // Check the cache.
-        if (!no_cache) {
-            cachedregex = self.cache[self.tree_orientation][self.displayas][regex];
-            if (cachedregex) {
-                cachedid = cachedregex[id];
-            }
-            if (cachedid) {
-                self.display_data(id, cachedid[self.TREE_KEY], cachedid[self.TREE_MAP_KEY], cachedid[self.GRAPH_KEY], cachedid[self.DESCRIPTION_KEY]);
-                return;
-            }
+        var k = self.cache_key_for_explaining_tools(indfirst, indlast);
+        cached = self.cache[self.TREE_KEY][k];
+        if (cached) {
+            self.display_content(self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
+            return;
         }
-        var data = {
-            regex: regex,
-            id: id,
-            tree_orientation: self.tree_orientation,
-            notation: $('#id_notation :selected').val(),
-            engine: $('#id_engine :selected').val(),
-            displayas: self.displayas,
-            ajax: true
-        };
-        if (coordinates) {
-            $.extend(data,coordinates);
-            data.rangeselection = true;
-        }
+
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
-            data: data,
-            success: self.upd_tools_success,
-            error: self.upd_failure
+            data: {
+                regex: self.regex_input.val(),
+                engine: $('#id_engine_auth :selected').val(),
+                notation: $('#id_notation_auth :selected').val(),
+                exactmatch: $('#id_exactmatch_auth :selected').val(),
+                usecase: $('#id_usecase_auth :selected').val(),
+                indfirst: indfirst,
+                indlast: indlast,
+                treeorientation: self.get_orientation(),
+                displayas: self.get_displayas(),
+                ajax: true
+            },
+            success: self.upd_content_success
         });
     },
 
-    /**
-     * Highlights part of text description of regex corresponding to given id.
-     * Highlights nothing if '-1' is passed.
-     */
-    highlight_description : function (id) {
-        var highlightedclass = 'description_highlighted',
-            oldhighlighted = $('.' + highlightedclass),
-            targetspan = $('.description_node_' + id);
-        if (oldhighlighted != null) {
-           oldhighlighted.removeClass(highlightedclass).css('background', 'transparent');
+    load_strings : function (indfirst, indlast) {
+        if (typeof indfirst == "undefined" || typeof indlast == "undefined") {
+            indfirst = indlast = -2;
         }
-        if (targetspan != null) {
-            targetspan.addClass(highlightedclass);
-            targetspan.css('background', '#FFFF00');
+
+        // Check the cache.
+        var k = self.cache_key_for_testing_tool(indfirst, indlast);
+        cached = self.cache[self.STRINGS_KEY][k];
+        if (cached) {
+            self.display_strings(cached);
+            return;
         }
+
+        $.ajax({
+            type: 'GET',
+            url: self.www_root + '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php',
+            data: {
+                regex: self.regex_input.val(),
+                engine: $('#id_engine_auth :selected').val(),
+                notation: $('#id_notation_auth :selected').val(),
+                exactmatch: $('#id_exactmatch_auth :selected').val(),
+                usecase: $('#id_usecase_auth :selected').val(),
+                indfirst: indfirst,
+                indlast: indlast,
+                strings: $('#id_regex_match_text').val(),
+                ajax: true
+            },
+            success: self.upd_strings_success
+        });
     },
 
-    /**
-     * Handler of clicking on a node (map area, in fact)
-     */
-    tree_node_clicked : function (e) {
-       var id = $(e.target).attr('id') + '';
-       self.load_content(id);
-    },
-
-    /**
-     * Handler of clicking on area outside all nodes
-     */
-    tree_node_misclicked : function (e) {
-        self.load_content('-1');
-    },
-
-    /**
-     * Handler of pressing on area of a map on regex tree image
-     */
-    regex_change : function (e) {
-       self.textbutton_widget.data = self.main_input.val();
+    get_selection : function () {
+        var scroll = $(window).scrollTop(),
+            selection = self.regex_input.textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        $(window).scrollTop(scroll);
+        return {
+            indfirst : indfirst,
+            indlast : indlast
+        };
     },
 
     get_orientation : function () {
-        return $("#fgroup_id_tree_orientation_radioset input:checked").val();
+        return $('#fgroup_id_tree_orientation_radioset input:checked').val();
     },
 
     get_displayas : function () {
-        return $("#fgroup_id_charset_process_radioset input:checked").val();
-    },
-
-    regex_selection_widget : {
-
-        _fake_selection_el : null,
-
-        _init : function () {
-            this._fake_selection_el = document.createElement("div");
-            $(this._fake_selection_el).css('border','1px dashed red')
-                                      .css('position','absolute')
-                                      .css('z-index','1000')
-                                      .hide();
-            $('#preg_authoring_tools_dialog').append(this._fake_selection_el);
-        },
-
-        _get_selection_position : function () {
-            //TODO
-        },
-
-        get_selected_text_range : function (el) {
-            var start = 0, end = 0, normalizedValue, range,
-                textInputRange, len, endRange;
-
-            if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
-                start = el.selectionStart;
-                end = el.selectionEnd;
-            } else {
-                range = document.selection.createRange();
-
-                if (range && range.parentElement() == el) {
-                    len = el.value.length;
-                    normalizedValue = el.value.replace(/\r\n/g, "\n");
-
-                    // Create a working TextRange that lives only in the input
-                    textInputRange = el.createTextRange();
-                    textInputRange.moveToBookmark(range.getBookmark());
-
-                    // Check if the start and end of the selection are at the very end
-                    // of the input, since moveStart/moveEnd doesn't return what we want
-                    // in those cases
-                    endRange = el.createTextRange();
-                    endRange.collapse(false);
-
-                    if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
-                        start = end = len;
-                    } else {
-                        start = -textInputRange.moveStart("character", -len);
-                        start += normalizedValue.slice(0, start).split("\n").length - 1;
-
-                        if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
-                            end = len;
-                        } else {
-                            end = -textInputRange.moveEnd("character", -len);
-                            end += normalizedValue.slice(0, end).split("\n").length - 1;
-                        }
-                    }
-                }
-            }
-            return { start: start, end: end };
-        },
-
-        /**
-         * @param object coords coordinates of fake div: {top, bottom, left, right, height, width}
-         */
-        draw_fake_selection : function (coords) {
-            $(this._fake_selection_el).css('top', coords.top)
-                                      .css('bottom', coords.bottom)
-                                      .css('left', coords.left)
-                                      .css('right', coords.right)
-                                      .css('height', coords.height)
-                                      .css('width', coords.width)
-                                      .show();
-            return true;
-        },
-
-        hide_fake_selection : function () {
-            $(this._fake_selection_el).hide();
-        }
+        return $('#fgroup_id_charset_process_radioset input:checked').val();
     }
 };
 

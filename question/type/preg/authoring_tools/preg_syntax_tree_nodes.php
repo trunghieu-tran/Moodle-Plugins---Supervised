@@ -10,7 +10,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
@@ -18,15 +17,28 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class qtype_preg_dot_node_context {
 
+    // Reference to the handler.
+    public $handler;
+
     // Whether the node is the root or not.
     public $isroot;
 
-    // Id of the ast node to be selected.
-    public $selectid;
+    // Direction of the tree.
+    public $rankdirlr;
 
-    public function __construct($isroot, $selectid = -1) {
+    // Selection coordinates, an instance of qtype_preg_position.
+    public $selection;
+
+    public $insideusercluster = false;
+    public $insideselectioncluster = false;
+
+    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null) {
+        $this->handler = $handler;
         $this->isroot = $isroot;
-        $this->selectid = $selectid;
+        $this->rankdirlr = $rankdirlr;
+        $this->selection = $selection !== null
+                         ? $selection
+                         : new qtype_preg_position();
     }
 }
 
@@ -37,6 +49,8 @@ abstract class qtype_preg_syntax_tree_node {
 
     // A reference to the corresponding preg_node.
     public $pregnode;
+
+
 
     public function __construct($node, $handler) {
         $this->pregnode = $node;
@@ -58,72 +72,32 @@ abstract class qtype_preg_syntax_tree_node {
 
     /**
      * Returns heading of a dot script which is usually looks like "digraph {".
-     * @param string $rankdirlr if true, also adds "rankdir = LR".
-     * @return string the heading of a dot script.
      */
-    public static function get_dot_head($rankdirlr = false) {
-        // TODO protected
-        $result = 'digraph ' . self::get_graph_name() . ' {';
-        if ($rankdirlr) {
+    protected static function get_dot_head($context) {
+        $result = 'digraph ' . self::get_graph_name() . " {\n";
+        if ($context->handler->is_node_generated($context->handler->get_ast_root())) {
+            $result .= "bgcolor=lightgrey;\n";
+        }
+        if ($context->rankdirlr) {
             $result .= 'rankdir = LR;';
         }
         return $result;
+    }
+
+    protected static function get_user_cluster_head() {
+        return "subgraph cluster_user { color=invis; bgcolor=white;\n";
+    }
+
+    protected static function get_sel_cluster_head() {
+        return "subgraph cluster_sel { style=solid; color=darkgreen;\n";
     }
 
     /**
      * Returns tail of a dot script which is usually looks like "}".
      * @return string the tail of a dot script.
      */
-    public static function get_dot_tail() {
-        // TODO protected
+    protected static function get_dot_tail() {
         return '}';
-    }
-
-    /**
-     * Replaces non-printable and special characters in the given string.
-     * Highlights them if needed.
-     */
-    protected static function userinscription_to_string($userinscription, $usecolor) {
-        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
-            return $usecolor ? '<font color="blue">' . $userinscription->data . '</font>' : $userinscription->data;
-        }
-
-        $special = array('"' => '&#34;',
-                         '&' => '&#38;',
-                         ',' => '&#44;',
-                         '<' => '&#60;',
-                         '>' => '&#62;',
-                         '[' => '&#91;',
-                         ']' => '&#93;',
-                         '{' => '&#123;',
-                         '|' => '&#124;',
-                         '}' => '&#125;',
-                         '\\\\'=> '&#92;'
-                         );
-
-        for ($code = 1; $code <= 0x20; $code++) {
-            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
-            if ($usecolor) {
-                $replacement = '<font color="blue">' . $replacement . '</font>';
-            }
-            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
-        }
-        foreach (array(0x7F, 0xA0, 0xAD, 0x2002, 0x2003, 0x2009, 0x200C, 0x200D) as $code) {
-            $replacement = get_string('description_char' . strtoupper(dechex($code)), 'qtype_preg');
-            if ($usecolor) {
-                $replacement = '<font color="blue">' . $replacement . '</font>';
-            }
-            $special[qtype_preg_unicode::code2utf8($code)] = $replacement;
-        }
-
-        $result = $userinscription->data;
-
-        foreach ($special as $key => $value) {
-            $result = str_replace($key, $value, $result);
-        }
-
-        $result = str_replace('\\', '\\\\', $result);
-        return $result;
     }
 
     /**
@@ -131,44 +105,81 @@ abstract class qtype_preg_syntax_tree_node {
      * @param context an instance of qtype_preg_dot_node_context.
      * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
      */
-    public abstract function dot_script($context);  // TODO: move from preg_nodes.php
+    public function dot_script($context) {
+        $nodename = $this->pregnode->id;
+        $dotscript = $nodename . ";\n";
 
-    protected function get_style($context) {
-        $label = $this->label();
-        $tooltip = $this->tooltip();
-        $shape = $this->shape();
-        $color = $this->color();
-        $result = "id = {$this->pregnode->id}, label = $label, tooltip = \"$tooltip\", shape = $shape, color = $color";
-        if ($context->selectid == $this->pregnode->id) {
-            $result .= ', style = dotted';
+        $startusercluster = !$context->insideusercluster && !$context->handler->is_node_generated($this->pregnode);
+        $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);
+        $context->insideusercluster = $context->insideusercluster || $startusercluster;
+        $context->insideselectioncluster = $context->insideselectioncluster || $startselectioncluster;
+        if ($startusercluster) {
+            $dotscript .= self::get_user_cluster_head();
         }
-        return '[' . $result . ']';
+        if ($startselectioncluster) {
+            $dotscript .= self::get_sel_cluster_head();
+        }
+
+        $innerresult = $this->dot_script_inner($context);
+        $dotscript .= $innerresult[0];
+        $style = $innerresult[1];
+
+        if ($startusercluster) {
+            $dotscript .= self::get_dot_tail();
+        }
+        if ($startselectioncluster) {
+            $dotscript .= self::get_dot_tail();
+        }
+
+        if ($context->isroot) {
+            return self::get_dot_head($context) . $style . $dotscript . self::get_dot_tail();
+        } else {
+            return array($dotscript, $style);
+        }
     }
 
-    protected function label() {
-        // Is userinscription an object?
-        if (is_object($this->pregnode->userinscription)) {
-            return shorten_text(self::userinscription_to_string($this->pregnode->userinscription, true));
-        }
-        // Userinscription is an array, iterate over all objects.
-        $label = '';
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $label .= shorten_text(self::userinscription_to_string($userinscription, true)) . '&#10;';
-        }
-        return $label;
+    protected function is_selected($context) {
+        return $this->pregnode->position->indfirst >= $context->selection->indfirst &&
+               $this->pregnode->position->indlast <= $context->selection->indlast;
     }
 
-    protected function tooltip() {
-        // Almost all nodes use its type as string key.
-        return get_string($this->pregnode->type, 'qtype_preg');
-    }
+    public abstract function dot_script_inner($context);
 
-    protected function shape() {
+    public abstract function label();
+
+    public abstract function tooltip();
+
+    public function shape() {
       return 'ellipse';
     }
 
-    protected function color() {
+    public function shape_color() {
         return count($this->pregnode->errors) > 0 ? 'red' : 'black';
+    }
+
+    public function font_color() {
+        return 'black';
+    }
+
+    public function style() {
+        return 'solid';
+    }
+
+    public function get_style($context) {
+        $label = qtype_preg_authoring_tool::escape_characters($this->label(), array('\\', '"')) . ' ';        // Extra space to make dot happy
+        $tooltip = qtype_preg_authoring_tool::escape_characters($this->tooltip(), array('\\', '"')) . ' ';    // Same thing
+        $shape = $this->shape();
+        $color = $this->shape_color();
+        $fontcolor = $this->font_color();
+        $style = $this->style();
+        $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+        $result = "id = \"$id\", label = \"$label\", tooltip = \"$tooltip\", shape = \"$shape\", color = \"$color\", fontcolor = \"$fontcolor\"";
+        if ($context->handler->is_node_generated($this->pregnode)) {
+            $style .= ', filled';
+            $result .= ', fillcolor = lightgrey';
+        }
+        $result .= ", style = \"$style\"";
+        return '[' . $result . ']';
     }
 }
 
@@ -177,23 +188,31 @@ abstract class qtype_preg_syntax_tree_node {
  */
 class qtype_preg_syntax_tree_leaf extends qtype_preg_syntax_tree_node {
 
-    public function dot_script($context, $rankdirlr = false) {
+    public function dot_script_inner($context) {
         // Calculate the node name, style and the result.
         $nodename = $this->pregnode->id;
-        $style = $nodename . self::get_style($context) . ';';
-        $dotscript = $nodename . ';';
-        if ($context->isroot) {
-            $dotscript = self::get_dot_head($rankdirlr) . $style . $dotscript . self::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
-        }
+        $style = $nodename . self::get_style($context) . ";\n";
+        $dotscript = $nodename . ";\n";
+        return array($dotscript, $style);
     }
 
-    protected function shape() {
+    public function label() {
+        // Just concatenate userinscriptions.
+        $result = '';
+        foreach ($this->pregnode->userinscription as $userinscription) {
+            $result .= $userinscription->data;
+        }
+        return $result;
+    }
+
+    public function tooltip() {
+        // Leaves use description_ strings by default.
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg');
+    }
+
+    public function shape() {
         return 'rectangle';
     }
-    // TODO: тут может быть еще что-то полезное
 }
 
 /**
@@ -210,195 +229,247 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
         }
     }
 
-    public function dot_script($context, $rankdirlr = false) {
+    public function dot_script_inner($context) {
         // Calculate the node name and style.
         $nodename = $this->pregnode->id;
-        $style = $nodename . self::get_style($context) . ';';
-
-        // Get child dot scripts and styles.
-        $childscripts = array();
-
+        $style = $nodename . self::get_style($context) . ";\n";
+        $dotscript = $nodename . ";\n";
         foreach ($this->operands as $operand) {
-            // Change the context to select the subtree.
             $newcontext = clone $context;
             $newcontext->isroot = false;
-            if ($newcontext->selectid == $this->pregnode->id) {
-                $newcontext->selectid = $operand->pregnode->id;
+            $tmp = $operand->dot_script($newcontext);
+            $edgelabel = $this->label_for_edge($operand);
+            if ($edgelabel != '') {
+                $othernodename = $operand->pregnode->id;
+                $dotscript .= $nodename . '->' . $othernodename . "[label=\"$edgelabel\"];\n";
+                $dotscript .= $tmp[0];
+            } else {
+                $dotscript .= $nodename . '->' . $tmp[0];
             }
-            // Recursive call to subtree.
-            $tmp = $operand->dot_script($newcontext, $rankdirlr);
-            $childscripts[] = $tmp[0];
             $style .= $tmp[1];
         }
+        return array($dotscript, $style);
+    }
 
-        // Form the result.
-        $dotscript = $nodename . ';';
-        foreach ($childscripts as $childscript) {
-            $dotscript .= $nodename . '->' . $childscript;
-        }
-        if ($context->isroot) {
-            $dotscript = self::get_dot_head($rankdirlr) . $style . $dotscript . self::get_dot_tail();
-            return $dotscript;
-        } else {
-            return array($dotscript, $style);
-        }
+    public function label() {
+        return $this->pregnode->userinscription[0]->data;
+    }
+
+    public function tooltip() {
+        // Operators use subtype strings instead of description_ by default.
+        return get_string($this->pregnode->lang_key(false), 'qtype_preg');
+    }
+
+    /**
+     * Returns a label for the edge to the given operand.
+     */
+    public function label_for_edge($operand) {
+        return '';
     }
 }
 
 class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        $result = parent::label();
-        if ($this->pregnode->negative) {
-            $result = '^' . $result;
+    public function needs_highlighting() {
+        if (count($this->pregnode->userinscription) > 1) {
+            return false;
         }
-        if (is_array($this->pregnode->userinscription)) {
-            $result = '&#91;' . $result . '&#93;';
+        $ui = $this->pregnode->userinscription[0];
+        if ($ui->is_valid_escape_sequence()) {
+            return false;
         }
-        return '<' . $result . '>';
+        return $this->pregnode->is_single_dot() || $this->pregnode->is_single_non_printable_character();
     }
 
-    protected function tooltip() {
-        if (count($this->pregnode->errors) > 0) {
-            $tooltip = get_string($this->pregnode->type . '_error', 'qtype_preg');
-        } else if ($this->pregnode->negative) {
-            $tooltip = get_string($this->pregnode->type . '_negative', 'qtype_preg');
-        } else {
-            $tooltip = get_string($this->pregnode->type, 'qtype_preg');
+    public function label() {
+        $ui = $this->pregnode->userinscription[0];
+        if ($this->pregnode->is_single_escape_sequence_character() ||    // \a \b \n \r \t
+            $this->pregnode->is_single_flag() ||                         // \w \d
+            count($this->pregnode->userinscription) > 1)                 // [complex charset]
+        {
+            // Flag or complex charset - return "as is".
+            return qtype_preg_authoring_tool::string_to_html(qtype_preg_authoring_tool::string_to_html(parent::label()));	// TODO: should be parent::label() (graphviz bug).
         }
 
-        if (is_object($this->pregnode->userinscription)) {
-            return $tooltip . '&#10;' . self::userinscription_to_string($this->pregnode->userinscription, false);
+        if ($this->needs_highlighting()) {
+            // Something that needs to be highlighted and replaced with a lang string.
+            return qtype_preg_authoring_tool::userinscription_to_string($ui);
         }
-        foreach ($this->pregnode->userinscription as $userinscription) {
-            $tooltip .= '&#10;' . self::userinscription_to_string($userinscription, false);
+        // A single character - return the actual value.
+        if (!$ui->is_valid_escape_sequence() && $ui->data != '\\' && $ui->data[0] == '\\') {
+            return textlib::substr($ui->data, 1);
+        }
+        return $ui->data;
+    }
+
+    public function tooltip() {
+        $start = 0;
+        $end = count($this->pregnode->userinscription);
+        $key = $this->pregnode->type;
+        $delimiter = '&#10;';
+        if (count($this->pregnode->errors) > 0) {
+            $key .= '_error';
+        } else if ($this->pregnode->negative) {
+            $key .= '_neg';
+        } else if ($end == 1) {
+            $key .= '_one';
+            $delimiter = ' ';
+        }
+        $tooltip = get_string($key, 'qtype_preg') . $delimiter;
+        if (count($this->pregnode->userinscription) > 1) {
+            $start++;
+            $end--;
+        }
+        if ($end == 1) {
+            $ui = $this->pregnode->userinscription[0];
+            if ($ui->isflag !== null || $ui->is_valid_escape_sequence()) {
+                $tooltip = '';
+            }
+        }
+        // Concatenate userinscriptions.
+        $delimiter = $start > 0 ? '&#10;' : ' ';
+        for ($i = $start; $i < $end; $i++) {
+            $ui = $this->pregnode->userinscription[$i];
+            $tooltip .= qtype_preg_authoring_tool::userinscription_to_string($ui);
+            if ($i != $end - 1) {
+                $tooltip .= $delimiter;
+            }
         }
         return $tooltip;
+    }
+
+    public function font_color() {
+        if ($this->needs_highlighting()) {
+            return 'blue';
+        }
+        return parent::font_color();
     }
 }
 
 class qtype_preg_syntax_tree_leaf_meta extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
-    }
-
-    protected function tooltip() {
+    public function label() {
         return get_string($this->pregnode->subtype, 'qtype_preg');
     }
 }
 
 class qtype_preg_syntax_tree_leaf_assert extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string($this->pregnode->subtype, 'qtype_preg') . '"';
-    }
-
-    protected function tooltip() {
-        return get_string($this->pregnode->subtype, 'qtype_preg');
+    public function style() {
+        return 'dashed';
     }
 }
 
 class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        $a = new stdClass;
-        $a->number = $this->pregnode->number;
-        return '"' . get_string('description_backref', 'qtype_preg', $a) . '"';
+    public function style() {
+        return 'rounded';
     }
-}
 
-class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
-
-    protected function label() {
-        return '"' . parent::label() . '"';
+    public function tooltip() {
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
     }
 }
 
 class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string('leaf_recursion', 'qtype_preg') . ' ' . $this->pregnode->number . '"';
+    public function label() {
+        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
     }
 }
 
 class qtype_preg_syntax_tree_leaf_control extends qtype_preg_syntax_tree_leaf {
 
-    protected function label() {
-        return '"' . get_string('leaf_control', 'qtype_preg') . ' ' . parent::label() . '"';
+}
+
+class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
+
+    public function style() {
+        return 'diagonals';
+    }
+
+    public function tooltip() {
+        $options = array();
+        for ($i = 0; $i < $this->pregnode->posopt->length(); $i++) {
+            $options[] = get_string('description_option_' . $this->pregnode->posopt[$i], 'qtype_preg');
+        }
+        for ($i = 0; $i < $this->pregnode->negopt->length(); $i++) {
+            $options[] = get_string('description_unsetoption_' . $this->pregnode->negopt[$i], 'qtype_preg');
+        }
+        return implode(', ', $options);
     }
 }
 
-class qtype_preg_syntax_tree_node_finite_quant extends qtype_preg_syntax_tree_operator {
+class qtype_preg_syntax_tree_node_quant extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
-}
-
-class qtype_preg_syntax_tree_node_infinite_quant extends qtype_preg_syntax_tree_operator {
-
-    protected function label() {
-        return '"' . parent::label() . '"';
+    public function tooltip() {
+        $a = new stdClass;
+        $a->leftborder = $this->pregnode->leftborder;
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
+            $a->rightborder = $this->pregnode->rightborder;
+        }
+        $a->greedy = get_string($this->pregnode->lang_key_for_greediness(), 'qtype_preg');
+        $a->firstoperand = get_string('description_operand', 'qtype_preg');
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
+        return $result;
     }
 }
 
 class qtype_preg_syntax_tree_node_concat extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"&#8226;"';
+    public function label() {
+        return '&#8226;';
     }
 }
 
 class qtype_preg_syntax_tree_node_alt extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
-    }
 }
 
 class qtype_preg_syntax_tree_node_assert extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . get_string($this->pregnode->type, 'qtype_preg') . ' ' . parent::label() . '"';
+    public function style() {
+        return 'dashed';
     }
 }
 
 class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . parent::label() . '"';
+    public function label() {
+        if ($this->pregnode->number > 0) {
+            return parent::label() . " #" . $this->pregnode->number;
+        }
+        return parent::label();
+    }
+
+    public function tooltip() {
+        $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
+        $result = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $result);
+        return $result;
     }
 }
 
 class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_operator {
 
-    public function __construct($node, $handler) {
-        parent::__construct($node, $handler);
-        // Add the condbranch as the first operand.
-        // It simplifies the drawing process.
-        if ($this->pregnode->condbranch !== null) {
-            $condbranch = $handler->from_preg_node($this->pregnode->condbranch);
-            $this->operands = array_merge(array($condbranch), $this->operands);
+    public function label_for_edge($operand) {
+        $count = count($this->operands);
+        $shift = $this->pregnode->is_condition_assertion() ? 1 : 0;
+        if ($operand === $this->operands[$shift]) {
+            return textlib::strtolower(get_string('yes', 'moodle'));
+        } else if ($shift + 1 < $count && $operand === $this->operands[$shift + 1]) {
+            return textlib::strtolower(get_string('no', 'moodle'));
         }
-    }
-
-    protected function label() {
-        return '"' . parent::label() . '"';
+        return '';
     }
 }
 
 class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator {
 
-    protected function label() {
-        return '"' . get_string('node_error', 'qtype_preg') . '"';
-    }
-
-    protected function tooltip() {
+    public function tooltip() {
         return $this->pregnode->error_string();
     }
 
-    protected function color() {
+    public function shape_color() {
         return 'red';
     }
 }

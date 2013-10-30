@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/correctwriting/db" VERSION="20120402" COMMENT="XMLDB file for CorrectWriting question type"
+<XMLDB PATH="blocks/formal_langs/db" VERSION="20120402" COMMENT="XMLDB file for Formal languages block"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -13,7 +13,8 @@
             <FIELD NAME="scanrules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Scan rules for user-defined language" PREVIOUS="name" NEXT="parserules" />
             <FIELD NAME="parserules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Parse rules for user-defined language" PREVIOUS="scanrules" NEXT="version" />
             <FIELD NAME="version" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Version of language" PREVIOUS="parserules" NEXT="visible" />
-            <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="version"/>
+            <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="version" NEXT="lexemname" />
+            <FIELD NAME="lexemname" TYPE="text"  SEQUENCE="false" COMMENT="A name for lexeme in language" PREVIOUS="visible" />
         </FIELDS>
         <KEYS>
             <KEY NAME="primary" TYPE="primary" FIELDS="id" />

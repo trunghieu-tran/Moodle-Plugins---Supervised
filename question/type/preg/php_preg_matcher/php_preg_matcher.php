@@ -84,17 +84,18 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         // TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict.
         // $this->errors = array();
 
-        $for_regexp = $this->regex;
-        if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
-            $for_regexp = implode('\/', explode('/', $for_regexp));
+        $regex = $this->regex;
+        if (strpos($regex, '/') !== false) {// Escape any slashes.
+            $regex = implode('\/', explode('/', $regex));
         }
         if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
-            $for_regexp = qtype_poasquestion_string::replace("\n", '', $for_regexp);
+            $regex = qtype_poasquestion_string::replace("\n", '', $regex);
         }
-        $for_regexp = '/'.$for_regexp.'/u';
+        $regex = '/' . $regex . '/u';
 
-        if (preg_match($for_regexp, 'test') === false) {// preg_match returns false when regular expression contains error.
-            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex', 'qtype_preg'), '' , -2, -2, -2, -2, true);// Preserve error message to show the link.
+        if (preg_match($regex, 'test') === false) {// Function preg_match returns false when regular expression contains error.
+            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex', 'qtype_preg'), '',
+                                                   new qtype_preg_position(-2, -2, -2, -2, -2, -2), true);  // Preserve error message to show the link.
             return false;
         }
 
@@ -112,20 +113,27 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         $matchresults->invalidate_match();
 
         // Preparing regexp.
-        $for_regexp = $this->regex;
-        if (strpos($for_regexp, '/') !== false) {// Escape any slashes.
-            $for_regexp = implode('\/', explode('/', $for_regexp));
+        $regex = $this->regex;
+        // Enclose 
+        if (strpos($regex, '/') !== false) {// Escape any slashes.
+            $regex = implode('\/', explode('/', $regex));
+        }
+        if ($this->options->exactmatch) {
+        // Add characters to regex in exact match mode, since adding nodes to the tree won't affects preg_match.
+        // Using grouping to not interfere with user's subexpressions numbering, but in case regex contains top-level alternatives.
+        // Adding line break in the end, since in extended notation regex may end on the comment; in other notations it would be deleted anyway.
+            $regex = '^(?:' . $regex . "\n)$";
         }
         if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
-            $for_regexp = qtype_poasquestion_string::replace("\n", '', $for_regexp);
+            $regex = qtype_poasquestion_string::replace("\n", '', $regex);
         }
-        $for_regexp = '/'.$for_regexp.'/u';
-        $for_regexp .= $this->options->modifiers_to_string();
+        $regex = '/' . $regex . '/u';
+        $regex .= $this->options->modifiers_to_string();
 
         // Do matching.
         $matches = array();
         // No need to find all matches since preg_match don't return partial matches, any full match is sufficient.
-        $full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
+        $full = preg_match($regex, $str, $matches, PREG_OFFSET_CAPTURE);
         // $matches[0] - match with the whole regexp, $matches[1] - first subexpression etc.
         // $matches[$i] format is array(0=> match, 1 => offset of this match).
         if ($full) {
@@ -138,7 +146,15 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
                     $matchresults->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
                 }
             }
+            // Show selection if it is equivalent to some capturing subexpression.
+            // TODO: find a way to show selection when it's not equivalent to capturing subexpression, without interfering with subpattern numbering.
+            if ($this->selectednode !== null && is_a($this->selectednode, 'qtype_preg_node_subexpr') && $this->selectednode->number > -1) {
+                // There is selection and it is capturing subexpression.
+                $matchresults->index_first[-2] = $matchresults->index_first[$this->selectednode->number];
+                $matchresults->length[-2] = $matchresults->length[$this->selectednode->number];
+            }
         }
+
         return $matchresults;
     }
 }
