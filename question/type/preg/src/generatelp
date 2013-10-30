@@ -3,7 +3,7 @@
 SOURCE=$(readlink -f $0)
 DIR_SOURCE=$(dirname $SOURCE)
 DIR_JLEX=$DIR_SOURCE"/JLexPhp"
-DIR_LEMON=$DIR_SOURCE"/Lemon php"
+DIR_LEMON=$DIR_SOURCE"/PHP_ParserGenerator"
 DIR_TARGET=$(dirname $DIR_SOURCE)
 
 echo "Generating lexer..."

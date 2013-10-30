@@ -1,10 +1,11 @@
 %name qtype_preg_
-%include{
+%include {
     global $CFG;
     require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 }
+%declare_class {class qtype_preg_parser}
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     private $root;

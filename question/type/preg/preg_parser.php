@@ -1,5 +1,5 @@
 <?php
-/* Driver template for the LEMON parser generator.
+/* Driver template for the PHP_qtype_preg_rGenerator parser generator. (PHP port of LEMON)
 */
 
 /**
@@ -30,7 +30,7 @@ class qtype_preg_yyToken implements ArrayAccess
 
     function __toString()
     {
-        return $this->_string;
+        return $this->string;
     }
 
     function offsetExists($offset)
@@ -58,9 +58,10 @@ class qtype_preg_yyToken implements ArrayAccess
             return;
         }
         if ($value instanceof qtype_preg_yyToken) {
-            $this->string .= $value->string;
-            $this->metadata[$offset] = $value->metadata;
-        } else {
+            if ($value->metadata) {
+                $this->metadata[$offset] = $value->metadata;
+            }
+        } elseif ($value) {
             $this->metadata[$offset] = $value;
         }
     }
@@ -70,15 +71,6 @@ class qtype_preg_yyToken implements ArrayAccess
         unset($this->metadata[$offset]);
     }
 }
-
-// code external to the class is included here
-#line 2 "../preg_parser.y"
-
-    global $CFG;
-    require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-    require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
-    require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
-#line 83 "../preg_parser.php"
 
 /** The following structure represents a single element of the
  * parser's stack.  Information stored includes:
@@ -101,16 +93,22 @@ class qtype_preg_yyStackEntry
                      ** is the value of the token  */
 };
 
-// any extra class_declaration (extends/implements) are defined here
-/**
- * The state of the parser is completely contained in an instance of
- * the following structure
- */
-class qtype_preg_yyParser
+// code external to the class is included here
+#line 2 "../preg_parser.y"
+
+    global $CFG;
+    require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+#line 105 "../preg_parser.php"
+
+// declare_class is output here
+#line 8 "../preg_parser.y"
+class qtype_preg_parser#line 110 "../preg_parser.php"
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 8 "../preg_parser.y"
+#line 9 "../preg_parser.y"
 
     // Root of the Abstract Syntax Tree (AST).
     private $root;
@@ -335,15 +333,14 @@ class qtype_preg_yyParser
         }
         return false;
     }
-#line 341 "../preg_parser.php"
+#line 340 "../preg_parser.php"
 
-/* Next is all token values, in a form suitable for use by makeheaders.
-** This section will be null unless lemon is run with the -m switch.
+/* Next is all token values, as class constants
 */
-/*
+/* 
 ** These constants (all generated automatically by the parser generator)
 ** specify the various kinds of tokens (terminals) that the parser
-** understands.
+** understands. 
 **
 ** Each symbol here is a terminal symbol in the grammar.
 */
@@ -366,49 +363,52 @@ class qtype_preg_yyParser
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
 ** functions that take a state number and lookahead value and return an
-** action integer.
+** action integer.  
 **
 ** Suppose the action integer is N.  Then the action is determined as
 ** follows
 **
-**   0 <= N < YYNSTATE                  Shift N.  That is, push the lookahead
-**                                      token onto the stack and goto state N.
+**   0 <= N < self::YYNSTATE                              Shift N.  That is,
+**                                                        push the lookahead
+**                                                        token onto the stack
+**                                                        and goto state N.
 **
-**   YYNSTATE <= N < YYNSTATE+YYNRULE   Reduce by rule N-YYNSTATE.
+**   self::YYNSTATE <= N < self::YYNSTATE+self::YYNRULE   Reduce by rule N-YYNSTATE.
 **
-**   N == YYNSTATE+YYNRULE              A syntax error has occurred.
+**   N == self::YYNSTATE+self::YYNRULE                    A syntax error has occurred.
 **
-**   N == YYNSTATE+YYNRULE+1            The parser accepts its input.
+**   N == self::YYNSTATE+self::YYNRULE+1                  The parser accepts its
+**                                                        input. (and concludes parsing)
 **
-**   N == YYNSTATE+YYNRULE+2            No such action.  Denotes unused
-**                                      slots in the yy_action[] table.
+**   N == self::YYNSTATE+self::YYNRULE+2                  No such action.  Denotes unused
+**                                                        slots in the yy_action[] table.
 **
-** The action table is constructed as a single large table named yy_action[].
+** The action table is constructed as a single large static array $yy_action.
 ** Given state S and lookahead X, the action is computed as
 **
-**      yy_action[ yy_shift_ofst[S] + X ]
+**      self::$yy_action[self::$yy_shift_ofst[S] + X ]
 **
-** If the index value yy_shift_ofst[S]+X is out of range or if the value
-** yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]
-** is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table
-** and that yy_default[S] should be used instead.
+** If the index value self::$yy_shift_ofst[S]+X is out of range or if the value
+** self::$yy_lookahead[self::$yy_shift_ofst[S]+X] is not equal to X or if
+** self::$yy_shift_ofst[S] is equal to self::YY_SHIFT_USE_DFLT, it means that
+** the action is not in the table and that self::$yy_default[S] should be used instead.  
 **
 ** The formula above is for computing the action when the lookahead is
 ** a terminal symbol.  If the lookahead is a non-terminal (as occurs after
-** a reduce action) then the yy_reduce_ofst[] array is used in place of
-** the yy_shift_ofst[] array and YY_REDUCE_USE_DFLT is used in place of
-** YY_SHIFT_USE_DFLT.
+** a reduce action) then the static $yy_reduce_ofst array is used in place of
+** the static $yy_shift_ofst array and self::YY_REDUCE_USE_DFLT is used in place of
+** self::YY_SHIFT_USE_DFLT.
 **
 ** The following are the tables generated in this section:
 **
-**  yy_action[]        A single table containing all actions.
-**  yy_lookahead[]     A table containing the lookahead for each entry in
-**                     yy_action.  Used to detect hash collisions.
-**  yy_shift_ofst[]    For each state, the offset into yy_action for
-**                     shifting terminals.
-**  yy_reduce_ofst[]   For each state, the offset into yy_action for
-**                     shifting non-terminals after a reduce.
-**  yy_default[]       Default action for each state.
+**  self::$yy_action        A single table containing all actions.
+**  self::$yy_lookahead     A table containing the lookahead for each entry in
+**                          yy_action.  Used to detect hash collisions.
+**  self::$yy_shift_ofst    For each state, the offset into self::$yy_action for
+**                          shifting terminals.
+**  self::$yy_reduce_ofst   For each state, the offset into self::$yy_action for
+**                          shifting non-terminals after a reduce.
+**  self::$yy_default       Default action for each state.
 */
     const YY_SZ_ACTTAB = 123;
 static public $yy_action = array(
@@ -488,33 +488,18 @@ static public $yy_action = array(
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
-**    YYCODETYPE         is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 terminals
-**                       and nonterminals.  "int" is used otherwise.
-**    YYNOCODE           is a number of type YYCODETYPE which corresponds
-**                       to no legal terminal or nonterminal number.  This
-**                       number is used to fill in empty slots of the hash
-**                       table.
-**    YYFALLBACK         If defined, this indicates that one or more tokens
-**                       have fall-back values which should be used if the
-**                       original value of the token will not parse.
-**    YYACTIONTYPE       is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 rules and
-**                       states combined.  "int" is used otherwise.
-**    qtype_preg_TOKENTYPE     is the data type used for minor tokens given
-**                       directly to the parser from the tokenizer.
-**    YYMINORTYPE        is the data type used for all minor tokens.
-**                       This is typically a union of many types, one of
-**                       which is qtype_preg_TOKENTYPE.  The entry in the union
-**                       for base tokens is called "yy0".
-**    YYSTACKDEPTH       is the maximum depth of the parser's stack.
-**    qtype_preg_ARG_DECL      A global declaration for the %extra_argument
-**    YYNSTATE           the combined number of states.
-**    YYNRULE            the number of rules in the grammar
-**    YYERRORSYMBOL      is the code number of the error symbol.  If not
-**                       defined, then do no error processing.
+**    self::YYNOCODE      is a number which corresponds
+**                        to no legal terminal or nonterminal number.  This
+**                        number is used to fill in empty slots of the hash 
+**                        table.
+**    self::YYFALLBACK    If defined, this indicates that one or more tokens
+**                        have fall-back values which should be used if the
+**                        original value of the token will not parse.
+**    self::YYSTACKDEPTH  is the maximum depth of the parser's stack.
+**    self::YYNSTATE      the combined number of states.
+**    self::YYNRULE       the number of rules in the grammar
+**    self::YYERRORSYMBOL is the code number of the error symbol.  If not
+**                        defined, then do no error processing.
 */
     const YYNOCODE = 17;
     const YYSTACKDEPTH = 100;
@@ -526,7 +511,7 @@ static public $yy_action = array(
     const YYFALLBACK = 0;
     /** The next table maps tokens into fallback tokens.  If a construct
      * like the following:
-     *
+     * 
      *      %fallback ID X Y Z.
      *
      * appears in the grammer, then ID becomes a fallback token for X, Y,
@@ -539,10 +524,10 @@ static public $yy_action = array(
     /**
      * Turn parser tracing on by giving a stream to which to write the trace
      * and a prompt to preface each trace message.  Tracing is turned off
-     * by making either argument NULL
+     * by making either argument NULL 
      *
      * Inputs:
-     *
+     * 
      * - A stream resource to which trace output should be written.
      *   If NULL, then tracing is turned off.
      * - A prefix string written at the beginning of every
@@ -550,7 +535,7 @@ static public $yy_action = array(
      *   turned off.
      *
      * Outputs:
-     *
+     * 
      * - None.
      * @param resource
      * @param string
@@ -566,23 +551,32 @@ static public $yy_action = array(
         self::$yyTracePrompt = $zTracePrompt;
     }
 
+    /**
+     * Output debug information to output (php://output stream)
+     */
     static function PrintTrace()
     {
         self::$yyTraceFILE = fopen('php://output', 'w');
         self::$yyTracePrompt = '';
     }
 
+    /**
+     * @var resource|0
+     */
     static public $yyTraceFILE;
+    /**
+     * String to prepend to debug output
+     * @var string|0
+     */
     static public $yyTracePrompt;
     /**
      * @var int
      */
-    public $yyidx;                    /* Index of top element in stack */
+    public $yyidx = -1;                    /* Index of top element in stack */
     /**
      * @var int
      */
     public $yyerrcnt;                 /* Shifts left before out of the error */
-    //public $???????;      /* A place to hold %extra_argument - dynamically added */
     /**
      * @var array
      */
@@ -593,7 +587,7 @@ static public $yy_action = array(
      * are required.  The following table supplies these names
      * @var array
      */
-    static public $yyTokenName = array(
+    static public $yyTokenName = array( 
   '$',             'ERROR_PREC_SHORTEST',  'ERROR_PREC_SHORT',  'ERROR_PREC',  
   'CLOSEBRACK',    'ALT_SHORTEST',  'ALT_SHORT',     'ALT',         
   'CONC',          'PARSELEAF',     'QUANT',         'OPENBRACK',   
@@ -637,6 +631,9 @@ static public $yy_action = array(
      */
     function tokenName($tokenType)
     {
+        if ($tokenType === 0) {
+            return 'End of Input';
+        }
         if ($tokenType > 0 && $tokenType < count(self::$yyTokenName)) {
             return self::$yyTokenName[$tokenType];
         } else {
@@ -644,18 +641,19 @@ static public $yy_action = array(
         }
     }
 
-    /* The following function deletes the value associated with a
-    ** symbol.  The symbol can be either a terminal or nonterminal.
-    ** "yymajor" is the symbol code, and "yypminor" is a pointer to
-    ** the value.
-    */
+    /**
+     * The following function deletes the value associated with a
+     * symbol.  The symbol can be either a terminal or nonterminal.
+     * @param int the symbol code
+     * @param mixed the symbol's value
+     */
     static function yy_destructor($yymajor, $yypminor)
     {
         switch ($yymajor) {
         /* Here is inserted the actions which take place when a
         ** terminal or non-terminal is destroyed.  This can happen
         ** when the symbol is popped from the stack during a
-        ** reduce or during error processing or when a parser is
+        ** reduce or during error processing or when a parser is 
         ** being destroyed before it is finished parsing.
         **
         ** Note: during a reduce, the only symbols destroyed are those
@@ -707,6 +705,12 @@ static public $yy_action = array(
         }
     }
 
+    /**
+     * Based on the current state and parser stack, get a list of all
+     * possible lookahead tokens
+     * @param int
+     * @return array
+     */
     function yy_get_expected_tokens($token)
     {
         $state = $this->yystack[$this->yyidx]->stateno;
@@ -773,8 +777,20 @@ static public $yy_action = array(
         return array_unique($expected);
     }
 
+    /**
+     * Based on the parser state and current parser stack, determine whether
+     * the lookahead token is possible.
+     * 
+     * The parser will convert the token value to an error token if not.  This
+     * catches some unusual edge cases where the parser would fail.
+     * @param int
+     * @return bool
+     */
     function yy_is_expected_token($token)
     {
+        if ($token === 0) {
+            return true; // 0 is not part of this
+        }
         $state = $this->yystack[$this->yyidx]->stateno;
         if (in_array($token, self::$yyExpectedTokens[$state], true)) {
             return true;
@@ -836,6 +852,8 @@ static public $yy_action = array(
             }
             break;
         } while (true);
+        $this->yyidx = $yyidx;
+        $this->yystack = $stack;
         return true;
     }
 
@@ -851,7 +869,7 @@ static public $yy_action = array(
     function yy_find_shift_action($iLookAhead)
     {
         $stateno = $this->yystack[$this->yyidx]->stateno;
-
+     
         /* if ($this->yyidx < 0) return self::YY_NO_ACTION;  */
         if (!isset(self::$yy_shift_ofst[$stateno])) {
             // no shift actions
@@ -884,11 +902,11 @@ static public $yy_action = array(
 
     /**
      * Find the appropriate action for a parser given the non-terminal
-     * look-ahead token iLookAhead.
+     * look-ahead token $iLookAhead.
      *
-     * If the look-ahead token is YYNOCODE, then check to see if the action is
+     * If the look-ahead token is self::YYNOCODE, then check to see if the action is
      * independent of the look-ahead.  If it is, return the action, otherwise
-     * return YY_NO_ACTION.
+     * return self::YY_NO_ACTION.
      * @param int Current state number
      * @param int The look-ahead token
      */
@@ -945,7 +963,7 @@ static public $yy_action = array(
             fprintf(self::$yyTraceFILE, "%sShift %d\n", self::$yyTracePrompt,
                 $yyNewState);
             fprintf(self::$yyTraceFILE, "%sStack:", self::$yyTracePrompt);
-            for($i = 1; $i <= $this->yyidx; $i++) {
+            for ($i = 1; $i <= $this->yyidx; $i++) {
                 fprintf(self::$yyTraceFILE, " %s",
                     self::$yyTokenName[$this->yystack[$i]->major]);
             }
@@ -957,10 +975,14 @@ static public $yy_action = array(
      * The following table contains information about every rule that
      * is used during the reduce.
      *
-     * static const struct {
-     *  YYCODETYPE lhs;         Symbol on the left-hand side of the rule
-     *  unsigned char nrhs;     Number of right-hand side symbols in the rule
-     * }
+     * <pre>
+     * array(
+     *  array(
+     *   int $lhs;         Symbol on the left-hand side of the rule
+     *   int $nrhs;     Number of right-hand side symbols in the rule
+     *  ),...
+     * );
+     * </pre>
      */
     static public $yyRuleInfo = array(
   array( 'lhs' => 14, 'rhs' => 1 ),
@@ -990,7 +1012,7 @@ static public $yy_action = array(
     /**
      * The following table contains a mapping of reduce action to method name
      * that handles the reduction.
-     *
+     * 
      * If a rule is not set, it has no handler.
      */
     static public $yyReduceMap = array(
@@ -1023,7 +1045,7 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 247 "../preg_parser.y"
+#line 248 "../preg_parser.y"
     function yy_r0(){
     // Set the root node.
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
@@ -1042,13 +1064,13 @@ static public $yy_action = array(
     // Calculate nullable, firstpos, lastpos and followpos for all nodes.
     $this->root->calculate_nflf($this->followpos);
     }
-#line 1050 "../preg_parser.php"
-#line 266 "../preg_parser.y"
+#line 1073 "../preg_parser.php"
+#line 267 "../preg_parser.y"
     function yy_r1(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 1055 "../preg_parser.php"
-#line 270 "../preg_parser.y"
+#line 1078 "../preg_parser.php"
+#line 271 "../preg_parser.y"
     function yy_r2(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT) {
         $this->yystack[$this->yyidx + -1]->minor->operands = array_merge($this->yystack[$this->yyidx + -1]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
@@ -1066,8 +1088,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position));
     }
-#line 1074 "../preg_parser.php"
-#line 288 "../preg_parser.y"
+#line 1097 "../preg_parser.php"
+#line 289 "../preg_parser.y"
     function yy_r3(){
     if ($this->yystack[$this->yyidx + -2]->minor->type == qtype_preg_node::TYPE_NODE_ALT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
         $this->yystack[$this->yyidx + -2]->minor->operands = array_merge($this->yystack[$this->yyidx + -2]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
@@ -1085,8 +1107,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -2]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + -1]->minor->userinscription);
     }
-#line 1093 "../preg_parser.php"
-#line 306 "../preg_parser.y"
+#line 1116 "../preg_parser.php"
+#line 307 "../preg_parser.y"
     function yy_r4(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + -1]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
@@ -1106,8 +1128,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1114 "../preg_parser.php"
-#line 326 "../preg_parser.y"
+#line 1137 "../preg_parser.php"
+#line 327 "../preg_parser.y"
     function yy_r5(){
     if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + 0]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
@@ -1127,33 +1149,33 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + -1]->minor->userinscription);
     }
-#line 1135 "../preg_parser.php"
-#line 346 "../preg_parser.y"
+#line 1158 "../preg_parser.php"
+#line 347 "../preg_parser.y"
     function yy_r6(){
     $this->_retvalue = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1141 "../preg_parser.php"
-#line 351 "../preg_parser.y"
+#line 1164 "../preg_parser.php"
+#line 352 "../preg_parser.y"
     function yy_r7(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1148 "../preg_parser.php"
-#line 357 "../preg_parser.y"
+#line 1171 "../preg_parser.php"
+#line 358 "../preg_parser.y"
     function yy_r8(){
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info($this->yystack[$this->yyidx + 0]->minor->position->add_chars_right(-1), array_merge($this->yystack[$this->yyidx + -1]->minor->userinscription, $this->yystack[$this->yyidx + 0]->minor->userinscription));
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -1]->minor, $emptynode, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1155 "../preg_parser.php"
-#line 363 "../preg_parser.y"
+#line 1178 "../preg_parser.php"
+#line 364 "../preg_parser.y"
     function yy_r9(){
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1160 "../preg_parser.php"
-#line 367 "../preg_parser.y"
+#line 1183 "../preg_parser.php"
+#line 368 "../preg_parser.y"
     function yy_r10(){
     if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1162,8 +1184,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1170 "../preg_parser.php"
-#line 376 "../preg_parser.y"
+#line 1193 "../preg_parser.php"
+#line 377 "../preg_parser.y"
     function yy_r11(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1172,8 +1194,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, null, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1180 "../preg_parser.php"
-#line 385 "../preg_parser.y"
+#line 1203 "../preg_parser.php"
+#line 386 "../preg_parser.y"
     function yy_r12(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1182,8 +1204,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1190 "../preg_parser.php"
-#line 394 "../preg_parser.y"
+#line 1213 "../preg_parser.php"
+#line 395 "../preg_parser.y"
     function yy_r13(){
     if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1192,66 +1214,66 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -2]->minor, null, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1200 "../preg_parser.php"
-#line 408 "../preg_parser.y"
+#line 1223 "../preg_parser.php"
+#line 409 "../preg_parser.y"
     function yy_r14(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription, array($this->yystack[$this->yyidx + -1]->minor));
     }
-#line 1208 "../preg_parser.php"
-#line 415 "../preg_parser.y"
+#line 1231 "../preg_parser.php"
+#line 416 "../preg_parser.y"
     function yy_r15(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1216 "../preg_parser.php"
-#line 422 "../preg_parser.y"
+#line 1239 "../preg_parser.php"
+#line 423 "../preg_parser.y"
     function yy_r16(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + -1]->minor->position->indfirst, $this->yystack[$this->yyidx + -1]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + -1]->minor->position->linefirst, $this->yystack[$this->yyidx + -1]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + -1]->minor->position->colfirst, $this->yystack[$this->yyidx + -1]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + -1]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 1224 "../preg_parser.php"
-#line 429 "../preg_parser.y"
+#line 1247 "../preg_parser.php"
+#line 430 "../preg_parser.y"
     function yy_r17(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1232 "../preg_parser.php"
-#line 436 "../preg_parser.y"
+#line 1255 "../preg_parser.php"
+#line 437 "../preg_parser.y"
     function yy_r18(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + -3]->minor->position->indfirst, $this->yystack[$this->yyidx + -3]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + -3]->minor->position->linefirst, $this->yystack[$this->yyidx + -3]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + -3]->minor->position->colfirst, $this->yystack[$this->yyidx + -3]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -3]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + -3]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -2]->minor));
     }
-#line 1240 "../preg_parser.php"
-#line 457 "../preg_parser.y"
+#line 1263 "../preg_parser.php"
+#line 458 "../preg_parser.y"
     function yy_r21(){
     $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
                                         $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
     $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1248 "../preg_parser.php"
+#line 1271 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
-     *
+     * 
      * For a parser with a rule like this:
      * <pre>
      * rule(A) ::= B. { A = 1; }
      * </pre>
-     *
+     * 
      * The parser will translate to something like:
-     *
+     * 
      * <code>
      * function yy_r0(){$this->_retvalue = 1;}
      * </code>
@@ -1261,13 +1283,13 @@ static public $yy_action = array(
     /**
      * Perform a reduce action and the shift that must immediately
      * follow the reduce.
-     *
+     * 
      * For a rule such as:
-     *
+     * 
      * <pre>
      * A ::= B blah C. { dosomething(); }
      * </pre>
-     *
+     * 
      * This function will first call the action, if any, ("dosomething();" in our
      * example), and then it will pop three states from the stack,
      * one for each entry on the right-hand side of the expression
@@ -1284,7 +1306,7 @@ static public $yy_action = array(
         //qtype_preg_yyStackEntry $yymsp;            /* The top of the parser's stack */
         //int $yysize;                     /* Amount to pop the stack */
         $yymsp = $this->yystack[$this->yyidx];
-        if (self::$yyTraceFILE && $yyruleno >= 0
+        if (self::$yyTraceFILE && $yyruleno >= 0 
               && $yyruleno < count(self::$yyRuleName)) {
             fprintf(self::$yyTraceFILE, "%sReduce (%d) [%s].\n",
                 self::$yyTracePrompt, $yyruleno,
@@ -1301,7 +1323,7 @@ static public $yy_action = array(
         $yygoto = self::$yyRuleInfo[$yyruleno]['lhs'];
         $yysize = self::$yyRuleInfo[$yyruleno]['rhs'];
         $this->yyidx -= $yysize;
-        for($i = $yysize; $i; $i--) {
+        for ($i = $yysize; $i; $i--) {
             // pop all of the right-hand side parameters
             array_pop($this->yystack);
         }
@@ -1328,6 +1350,8 @@ static public $yy_action = array(
 
     /**
      * The following code executes when the parse fails
+     * 
+     * Code from %parse_fail is inserted here
      */
     function yy_parse_failed()
     {
@@ -1339,16 +1363,18 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 231 "../preg_parser.y"
+#line 232 "../preg_parser.y"
 
     if (count($this->errornodes) === 0) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, null, new qtype_preg_position(), array());
     }
-#line 1353 "../preg_parser.php"
+#line 1378 "../preg_parser.php"
     }
 
     /**
      * The following code executes when a syntax error first occurs.
+     * 
+     * %syntax_error code is inserted here
      * @param int The major type of the error token
      * @param mixed The minor type of the error token
      */
@@ -1356,9 +1382,11 @@ static public $yy_action = array(
     {
     }
 
-    /*
-    ** The following is executed when the parser accepts
-    */
+    /**
+     * The following is executed when the parser accepts
+     * 
+     * %parse_accept code is inserted here
+     */
     function yy_accept()
     {
         if (self::$yyTraceFILE) {
@@ -1372,37 +1400,23 @@ static public $yy_action = array(
     }
 
     /**
-     *  The main parser program.
-     * The first argument is a pointer to a structure obtained from
-     * "qtype_preg_Alloc" which describes the current state of the parser.
-     * The second argument is the major token number.  The third is
-     * the minor token.  The fourth optional argument is whatever the
-     * user wants (and specified in the grammar) and is available for
-     * use by the action routines.
+     * The main parser program.
+     * 
+     * The first argument is the major token number.  The second is
+     * the token value string as scanned from the input.
      *
-     * Inputs:
+     * @param int   $yymajor      the token number
+     * @param mixed $yytokenvalue the token value
+     * @param mixed ...           any extra arguments that should be passed to handlers
      *
-     * - A pointer to the parser (an opaque structure.)
-     * - The major token number.
-     * - The minor token number (token value).
-     * - An option argument of a grammar-specified type.
-     *
-     * Outputs:
-     * None.
-     * @param int the token number
-     * @param mixed the token value
-     * @param mixed any extra arguments that should be passed to handlers
+     * @return void
      */
-    function doParse($yymajor, $yytokenvalue, $extraargument = null)
+    function doParse($yymajor, $yytokenvalue)
     {
-        if (self::qtype_preg_ARG_DECL && $extraargument !== null) {
-            $this->{self::qtype_preg_ARG_DECL} = $extraargument;
-        }
-//        YYMINORTYPE yyminorunion;
-//        int yyact;            /* The parser action. */
-//        int yyendofinput;     /* True if we are at the end of input */
+//        $yyact;            /* The parser action. */
+//        $yyendofinput;     /* True if we are at the end of input */
         $yyerrorhit = 0;   /* True if yymajor has invoked an error */
-
+        
         /* (re)initialize the parser, if necessary */
         if ($this->yyidx === null || $this->yyidx < 0) {
             /* if ($yymajor == 0) return; // not sure why this was here... */
@@ -1415,16 +1429,21 @@ static public $yy_action = array(
             array_push($this->yystack, $x);
         }
         $yyendofinput = ($yymajor==0);
-
+        
         if (self::$yyTraceFILE) {
-            fprintf(self::$yyTraceFILE, "%sInput %s\n",
-                self::$yyTracePrompt, self::$yyTokenName[$yymajor]);
+            fprintf(
+                self::$yyTraceFILE,
+                "%sInput %s\n",
+                self::$yyTracePrompt,
+                self::$yyTokenName[$yymajor]
+            );
         }
-
+        
         do {
             $yyact = $this->yy_find_shift_action($yymajor);
-            if ($yymajor < self::YYERRORSYMBOL &&
-                  !$this->yy_is_expected_token($yymajor)) {
+            if ($yymajor < self::YYERRORSYMBOL
+                && !$this->yy_is_expected_token($yymajor)
+            ) {
                 // force a syntax error
                 $yyact = self::YY_ERROR_ACTION;
             }
@@ -1440,13 +1459,16 @@ static public $yy_action = array(
                 $this->yy_reduce($yyact - self::YYNSTATE);
             } elseif ($yyact == self::YY_ERROR_ACTION) {
                 if (self::$yyTraceFILE) {
-                    fprintf(self::$yyTraceFILE, "%sSyntax Error!\n",
-                        self::$yyTracePrompt);
+                    fprintf(
+                        self::$yyTraceFILE,
+                        "%sSyntax Error!\n",
+                        self::$yyTracePrompt
+                    );
                 }
                 if (self::YYERRORSYMBOL) {
                     /* A syntax error has occurred.
                     ** The response to an error depends upon whether or not the
-                    ** grammar defines an error token "ERROR".
+                    ** grammar defines an error token "ERROR".  
                     **
                     ** This is what we do if the grammar does define ERROR:
                     **
@@ -1467,18 +1489,22 @@ static public $yy_action = array(
                         $this->yy_syntax_error($yymajor, $yytokenvalue);
                     }
                     $yymx = $this->yystack[$this->yyidx]->major;
-                    if ($yymx == self::YYERRORSYMBOL || $yyerrorhit ){
+                    if ($yymx == self::YYERRORSYMBOL || $yyerrorhit ) {
                         if (self::$yyTraceFILE) {
-                            fprintf(self::$yyTraceFILE, "%sDiscard input token %s\n",
-                                self::$yyTracePrompt, self::$yyTokenName[$yymajor]);
+                            fprintf(
+                                self::$yyTraceFILE,
+                                "%sDiscard input token %s\n",
+                                self::$yyTracePrompt,
+                                self::$yyTokenName[$yymajor]
+                            );
                         }
                         $this->yy_destructor($yymajor, $yytokenvalue);
                         $yymajor = self::YYNOCODE;
                     } else {
-                        while ($this->yyidx >= 0 &&
-                                 $yymx != self::YYERRORSYMBOL &&
-        ($yyact = $this->yy_find_shift_action(self::YYERRORSYMBOL)) >= self::YYNSTATE
-                              ){
+                        while ($this->yyidx >= 0
+                            && $yymx != self::YYERRORSYMBOL
+                            && ($yyact = $this->yy_find_shift_action(self::YYERRORSYMBOL)) >= self::YYNSTATE
+                        ) {
                             $this->yy_pop_parser_stack();
                         }
                         if ($this->yyidx < 0 || $yymajor==0) {
@@ -1516,7 +1542,7 @@ static public $yy_action = array(
             } else {
                 $this->yy_accept();
                 $yymajor = self::YYNOCODE;
-            }
+            }            
         } while ($yymajor != self::YYNOCODE && $this->yyidx >= 0);
     }
 }
