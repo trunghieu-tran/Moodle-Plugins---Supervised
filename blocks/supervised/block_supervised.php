@@ -85,7 +85,7 @@ class block_supervised extends block_base {
         }
 
         ///////////////////
-        
+        /*
         $timefrom = new DateTime();
         $timefrom->setDate(2013,10,5);
         $timefrom->setTime(17,40,00);
@@ -105,7 +105,7 @@ class block_supervised extends block_base {
         var_dump($logs);
         echo("</pre>");
         //////////////////////
-        
+        */
         $this->content         =  new stdClass;
         $this->content->text   = 'The content of supervised block!';
         $this->content->footer = 'Footer here...';
