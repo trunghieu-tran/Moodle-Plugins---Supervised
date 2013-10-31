@@ -449,6 +449,7 @@ abstract class qtype_preg_finite_automaton {
 
     protected $transitionlimit;
     protected $transitioncount;
+    protected $statecounter;
 
 
     public function __construct() {
@@ -462,6 +463,7 @@ abstract class qtype_preg_finite_automaton {
         $this->statecount = 0;
         $this->transitioncount = 0;
         $this->set_limits();
+        $this->statecounter = 0;
     }
 
     /**
@@ -807,7 +809,11 @@ abstract class qtype_preg_finite_automaton {
      * @param real number of state.
      * @return state id of added state.
      */
-    public function add_state($statenumber) {
+    public function add_state($statenumber = null) {
+        if ($statenumber === null) {
+            $statenumber = $this->statecounter;
+            $this->statecounter++;
+        }
         if ((count($this->statenumbers) != 0 && array_search($statenumber, $this->statenumbers) === false) || count($this->statenumbers) == 0) {
             $this->adjacencymatrix[] = array();
             $this->statenumbers[] = $statenumber;
