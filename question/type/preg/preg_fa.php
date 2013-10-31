@@ -227,8 +227,8 @@ class qtype_preg_fa_transition {
             foreach ($this->subexpr_start as $subpatt) {
                 $result .= '(';
             }
-            return $result;
         }
+        return $result;
     }
 
     public function close_tags_tohr() {
@@ -241,8 +241,8 @@ class qtype_preg_fa_transition {
             foreach ($this->subpatt_end as $subpatt) {
                 $result .= ')';
             }
-            return $result;
         }
+        return $result;
     }
 }
 
@@ -433,7 +433,7 @@ class qtype_preg_fa_state {
         foreach ($this->states as $thisstate) {
             $find = false;
             foreach ($another->states as $anotherstate) {
-                if ($thisstate == anotherstate) {
+                if ($thisstate == $anotherstate) {
                     $find = true;
                 }
             }
@@ -1000,7 +1000,7 @@ abstract class qtype_preg_finite_automaton {
                     if (array_search($tran->to, $this->endstates) !== false) {
                         $this->add_end_state($newto);
                     }
-                    $states = $this->get_state_numbers();
+                    $states = $this->get_state_numbers();    // TODO: unused
                     // Change transition.
                     $transition->to = $newto;
                     // Copy outtransitions for clone state.
@@ -1236,7 +1236,6 @@ abstract class qtype_preg_finite_automaton {
             // Fill transition.
             if(strlen($arraystrings[2]) > 0) {
                 if(strlen($chars) != 0) {
-                    $pregleaf = new qtype_preg_leaf_charset();
                     if ($point) {
                         $chars = '.';
                     }
@@ -1264,7 +1263,7 @@ abstract class qtype_preg_finite_automaton {
                     }
                 }
                 else if(count($asserts) != 0) {
-                    $type = '';
+                    $type = '';    // TODO: unused
                     switch($asserts[0]) {
                         case '\\b': $pregleaf = new qtype_preg_leaf_assert_esc_b; break;
                         case '\\B': $pregleaf = new qtype_preg_leaf_assert_esc_b(true); break;
@@ -2012,9 +2011,9 @@ abstract class qtype_preg_finite_automaton {
                         $tran = &$transition;
                     }
                     if ($direction == 0) {
-                        $clone = $tran->to;
+                        $clone = $tran->to;    // TODO:
                     } else {
-                        $clone = $tran->from;
+                        $clone = $tran->from;  // unused
                     }
                     $addnumber = $numbertofind . ',' . $addnum . '   ' . $numbers[1];
                     foreach ($secnumbers as $num) {
@@ -2325,7 +2324,7 @@ abstract class qtype_preg_finite_automaton {
         } else {
             // Has transitions from previous states.
             if (array_search($realnumber, $resnumbers) !== false) {
-                $hasalredy = true;
+                $hasalready = true;
             }
             unset($clones[count($clones) - 2]);
         }
@@ -2927,7 +2926,6 @@ abstract class qtype_preg_finite_automaton {
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
         // Change state first from intersection.
-        $numbers = $this->get_state_numbers();
         $secondnumbers = $anotherfa->get_state_numbers();
         if ($isstart == 0) {
             $states = $anotherfa->start_states();
