@@ -247,104 +247,6 @@ class qtype_preg_fa_transition {
 }
 
 /**
- * Class for finite automaton state.
- */
-class qtype_preg_fa_state {
-
-    /** @var object reference to the qtype_preg_finite_automaton object this state belongs to.
-     *
-     * We are violating principle "a child shouldn't know the parent" there, but the state need to signal important information back to
-     * automaton during its construction: becoming non-deterministic, having eps or pure-assert transitions etc.
-     */
-    protected $fa;
-    /** @var array of qtype_preg_fa_transition child objects, indexed. */
-    protected $outtransitions;
-    /** @var array of qtype_preg_fa_transition child objects, indexed. */
-    protected $intotransitions;
-    /** @var boolean whether state is from intersection part or not. */
-    public $hasintersection;
-    /** @var boolean whether state was copied or not. */
-    public $wascopied;
-    /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
-    protected $deterministic;
-    /** @var array of int - first numbers of the state. */
-    public $firstnumbers;
-    /** @var array of int - second numbers of the state, if state is from intersection part. */
-    public $secondnumbers;
-
-    public function __construct(&$fa = null) {
-        $this->fa = $fa;
-        $this->firstnumbers = array(-1);    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
-        $this->secondnumbers = array();
-        $this->outtransitions = array();
-        $this->intotransitions = array();
-        $this->hasintersection = false;
-        $this->wascopied = false;
-        $this->deterministic = true;
-    }
-
-    public function set_fa(&$fa) {
-        $this->fa = $fa;
-    }
-
-    /**
-     * Adds a transtition to the given state.
-     *
-     * @param transtion a reference to an object of child class of qtype_preg_fa_transition.
-     */
-    public function add_transition(&$transition) {
-        $transition->from = $this;
-        $this->outtransitions[] = $transition;
-        // TODO - check whether it makes a node non-deterministic.
-        // TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class.
-
-        if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-            $this->fa->epsilon_transtion_added();
-        }
-
-        if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_ASSERT) {
-            $this->fa->assertion_transition_added();
-        }
-
-        $this->fa->transition_added();
-    }
-
-    /**
-     * Replaces oldref with newref in each transition.
-     *
-     * @param oldref - a reference to the old state.
-     * @param newref - a reference to the new state.
-     */
-    public function update_state_references(&$oldref, &$newref) {
-        foreach ($this->outtransitions as $transition) {
-            if ($transition->to === $oldref) {
-                $transition->to = $newref;
-            }
-        }
-    }
-
-    public function outgoing_transitions() {
-        return $this->outtransitions;
-    }
-
-    /**
-     * Returns an array of transitions possible with current string and position.
-     */
-    public function possible_transitions($str, $pos) {
-        // TODO - use pregnode->match from transitions.
-    }
-
-    /**
-     * Returns true if this is accepting end state.
-     *
-     * End state doesn't have outgoing transitions.
-     */
-    /*public function is_end_state() {
-        return empty($this->outtransitions);
-    }*/
-}
-
-/**
  * Class for finite automaton group of states.
  */
  class qtype_preg_fa_group {
@@ -521,8 +423,6 @@ class qtype_preg_fa_state {
  */
 abstract class qtype_preg_finite_automaton {
 
-    /** @var array of qtype_preg_fa_state, indexed by state numbers(will be deleted, do not use). */
-    public $states;
     /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
     public $statenumbers;
     /** @var array of int ids of states - start states. */
@@ -893,44 +793,6 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Replaces oldref with newref in every transition of the automaton.
-     *
-     * @param oldref - a reference to the old state.
-     * @param newref - a reference to the new state.
-     */
-    public function update_state_references(&$oldref, &$newref) {
-        foreach ($this->states as $curstate) {
-            $curstate->update_state_references($oldref, $newref);
-        }
-    }
-
-    public function has_epsilons() {
-        return $this->haseps;
-    }
-
-    /**
-     * Used from qype_preg_fa_state class to signal that a transition was added to the automaton.
-     */
-    public function transition_added() {
-        $this->transitioncount++;
-        if ($this->transitioncount > $this->transitionlimit) {
-            throw new qtype_preg_toolargefa_exception('');
-        }
-    }
-
-    /**
-     * Used from qype_preg_fa_state class to signal that an epsilon-transition was added to the automaton.
-     * Note that only methods of the automaton can delete all epsilon-transitions and make property false.
-     */
-    public function epsilon_transtion_added() {
-        $this->haseps = true;
-    }
-
-    public function has_assertion_transitions() {
-        return $this->hasassertiontransitions;
-    }
-
-    /**
      * Delete transition.
      *
      * @param del transition for deleting.
@@ -940,17 +802,9 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Used from qype_preg_fa_state class to signal that an assert-transition was added to the automaton.
-     * Note that only methods of the automaton the merge all assert-transitions and make property false.
-     */
-    public function assertion_transition_added() {
-        $this->hasassertiontransitions = false;
-    }
-
-    /**
      * Adds a state to the automaton.
      *
-     * @param state a reference to an object of qtype_preg_fa_state class.
+     * @param real number of state.
      * @return state id of added state.
      */
     public function add_state($statenumber) {
@@ -1319,28 +1173,6 @@ abstract class qtype_preg_finite_automaton {
             $transition->set_transition_type();
             $this->add_transition($transition);
         }
-    }
-
-    /**
-     * Numerates FA states starting from 0 and trying to go from left to right (in a wawe).
-     * Useful mainly for outputting and cloning FA.
-     *
-     * @return array where states are values and states number - keys.
-     */
-    public function numerate_states() {
-        $result = array();
-        $idcounter = 0;
-        foreach ($this->states as $state) {
-            $state->number = $idcounter++;
-        }
-        return $result;
-    }
-
-    /**
-     * Creates a dot-file for the given FA. Mainly used for debugging.
-     */
-    public function write_fa_to_dot($file) {
-        // TODO - kolesov.
     }
 
     /**
@@ -1944,28 +1776,6 @@ abstract class qtype_preg_finite_automaton {
         // Remove flag of coping from states of source automata.
         $source->remove_flags_of_coping();
         return $resultstop;
-    }
-
-    /**
-     * Merges simple assertion transitions into other transtions.
-     */
-    public function merge_simple_assertions() {
-        if (!$this->hasassertiontransitions) {    // Nothing to merge.
-            return;
-        }
-        // TODO - merge.
-        $this->hasassertiontransitions = false;
-    }
-
-    /**
-     * Deletes epsilon-transitions from the automaton.
-     */
-    public function aviod_eps() {
-        if (!$this->haseps) {    // Nothing to delete.
-            return;
-        }
-        // TODO - delete eps.
-        $this->haseps = false;
     }
 
     /**
