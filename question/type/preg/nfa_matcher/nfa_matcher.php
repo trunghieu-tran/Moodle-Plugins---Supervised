@@ -684,7 +684,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         try {
             $stack = array();
             $dst_node->create_automaton($result, $stack);
-            $result->numerate_states();
         } catch (Exception $e) {
             $result = false;
         }

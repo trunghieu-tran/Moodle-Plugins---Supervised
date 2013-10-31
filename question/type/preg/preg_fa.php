@@ -513,17 +513,12 @@ abstract class qtype_preg_finite_automaton {
     public function is_empty() {
         return ($this->statecount == 0);
     }
+
     /**
-     * Return array of all states' ids of automata.
-     *
+     * Return array of all state ids of automata.
      */
     public function get_states() {
-        if (count($this->adjacencymatrix) == 0) {
-            $states = array();
-        } else {
-            $states = array_keys($this->adjacencymatrix);
-        }
-        return $states;
+        return array_keys($this->adjacencymatrix);
     }
 
     /**
@@ -547,19 +542,17 @@ abstract class qtype_preg_finite_automaton {
      * Return outtransitions of state with id $state.
      *
      * @param state - id of state which outtransitions are intresting.
-     * @param isoutcoming - boolean flag which type of transitions to get (true - outtransitions, false - intotransitions).
+     * @param outgoing - boolean flag which type of transitions to get (true - outtransitions, false - intotransitions).
      */
-    public function get_adjacent_transitions($state, $isoutcoming) {
-        if ($isoutcoming) {
-            return $this->adjacencymatrix[$state];
-        } else {
-            return $this->get_column($this->adjacencymatrix, $state);
+    public function get_adjacent_transitions($stateid, $outgoing = true) {
+        if ($outgoing) {
+            return $this->adjacencymatrix[$stateid];
         }
+        return $this->get_column($this->adjacencymatrix, $stateid);
     }
 
     /**
      * Get array with reak numbers of states of this automata.
-     *
      */
     public function get_state_numbers() {
         return $this->statenumbers;
@@ -666,7 +659,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function fa_to_dot($type = null, $filename = null) {
         $addedcharacters = '/(), ';
-        $result = "digraph res {\n    ";
+        $result = "digraph {\n    rankdir=LR;\n    ";
         if ($this->statecount != 0) {
             // Add start states.
             foreach ($this->startstates as $start) {
@@ -712,12 +705,11 @@ abstract class qtype_preg_finite_automaton {
      * Add the start state of the automaton to given state.
      */
     public function add_start_state($state) {
-        if (array_key_exists($state, $this->adjacencymatrix)) {
-            if (array_search($state, $this->startstates) === false) {
-                $this->startstates[] = $state;
-            }
-        } else {
+        if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
+        }
+        if (!in_array($state, $this->startstates)) {
+            $this->startstates[] = $state;
         }
     }
 
@@ -725,12 +717,11 @@ abstract class qtype_preg_finite_automaton {
      * Add the end state of the automaton to given state.
      */
     public function add_end_state($state) {
-        if (array_key_exists($state, $this->adjacencymatrix)) {
-            if (array_search($state, $this->endstates) === false) {
-                $this->endstates[] = $state;
-            }
-        } else {
+        if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
+        }
+        if (!in_array($state, $this->endstates)) {
+            $this->endstates[] = $state;
         }
     }
 
@@ -811,10 +802,9 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_state($statenumber = null) {
         if ($statenumber === null) {
-            $statenumber = $this->statecounter;
-            $this->statecounter++;
+            $statenumber = $this->statecounter++;
         }
-        if ((count($this->statenumbers) != 0 && array_search($statenumber, $this->statenumbers) === false) || count($this->statenumbers) == 0) {
+        if (!in_array($statenumber, $this->statenumbers)) {
             $this->adjacencymatrix[] = array();
             $this->statenumbers[] = $statenumber;
             $this->statecount++;

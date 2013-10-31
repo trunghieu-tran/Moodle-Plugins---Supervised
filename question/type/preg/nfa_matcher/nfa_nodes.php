@@ -198,7 +198,7 @@ abstract class qtype_preg_nfa_node {
         $body = array_pop($stack);
 
         // Copy this node to the starting transitions.
-        foreach ($body['start']->outgoing_transitions() as $transition) {
+        foreach ($automaton->get_adjacent_transitions($body['start']) as $transition) {
             $transition->subpatt_start[$this->pregnode->subpattern] = $this->pregnode;
             if ($this->pregnode->subpattern < 0) {
                 continue;
@@ -209,11 +209,9 @@ abstract class qtype_preg_nfa_node {
         }
 
         // Copy this node to the ending transitions.
-        foreach ($automaton->get_states() as $state) {
-            foreach ($state->outgoing_transitions() as $transition) {
-                if ($transition->to === $body['end']) {
-                    $transition->subpatt_end[$this->pregnode->subpattern] = $this->pregnode;
-                }
+        foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
+            if ($transition->to === $body['end']) {
+                $transition->subpatt_end[$this->pregnode->subpattern] = $this->pregnode;
             }
         }
 
@@ -243,17 +241,15 @@ class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 
     protected function create_automaton_inner(&$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
-        $start = new qtype_preg_fa_state($automaton);
-        $end = new qtype_preg_fa_state($automaton);
-        $automaton->add_state($start);
-        $automaton->add_state($end);
+        $start = $automaton->add_state();
+        $end = $automaton->add_state();
 
         // Add a corresponding transition between them.
-        $start->add_transition(new qtype_preg_nfa_transition($start, $this->pregnode, $end));
+        $automaton->add_transition(new qtype_preg_nfa_transition($start, $this->pregnode, $end));
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($start);
-        $automaton->set_end_state($end);
+        $automaton->add_start_state($start);
+        $automaton->add_end_state($end);
         $stack[] = array('start' => $start, 'end' => $end);
     }
 }
@@ -274,11 +270,9 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
 
     public static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
         if (count($stack_item['end']->outgoing_transitions()) > 0) {
-            $end = new qtype_preg_fa_state();
-            $automaton->add_state($end);
-
+            $end = $automaton->add_state();
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $stack_item['end']->add_transition(new qtype_preg_nfa_transition($stack_item['end'], $epsleaf, $end));
+            $automaton->add_transition(new qtype_preg_nfa_transition($stack_item['end'], $epsleaf, $end));
             $stack_item['end'] = $end;
         }
     }
@@ -307,8 +301,8 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($result['start']);
-        $automaton->set_end_state($result['end']);
+        $automaton->add_start_state($result['start']);
+        $automaton->add_end_state($result['end']);
         $stack[] = $result;
     }
 }
