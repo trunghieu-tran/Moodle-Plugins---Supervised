@@ -46,11 +46,11 @@ class qtype_preg_fa_transition {
     const TYPE_TRANSITION_CAPTURE = 'capturing';
 
     /** Transition from first automata. */
-    const ORIGIN_TRANSITION_FIRST = 'first';
+    const ORIGIN_TRANSITION_FIRST = 0x01;
     /** Transition from second automata. */
-    const ORIGIN_TRANSITION_SECOND = 'second';
+    const ORIGIN_TRANSITION_SECOND = 0x02;
     /** Transition from intersection part. */
-    const ORIGIN_TRANSITION_INTER = 'intersection';
+    const ORIGIN_TRANSITION_INTER = 0x04;
 
     /** @var object of qtype_preg_fa_state class - a state which transition starts from. */
     public $from;
