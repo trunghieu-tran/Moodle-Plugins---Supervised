@@ -108,7 +108,8 @@ $string['node_error']                  = 'syntax error';
 $string['empty_leaf_meta']             = 'emptiness';
 $string['esc_b_leaf_assert']           = 'a word boundary';
 $string['esc_a_leaf_assert']           = 'start of the string';
-$string['esc_z_leaf_assert']           = 'end of the string';
+$string['small_esc_z_leaf_assert']     = 'end of the string';
+$string['capital_esc_z_leaf_assert']   = 'end of the string';
 $string['esc_g_leaf_assert']           = 'first matching position in the string';
 $string['circumflex_leaf_assert']      = 'start of the string';
 $string['dollar_leaf_assert']          = 'end of the string';
@@ -230,12 +231,12 @@ $string['description_empty_leaf_meta'] = 'nothing';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'a word boundary';
 $string['description_esc_a_leaf_assert'] = 'start of the string';
-$string['description_esc_z_leaf_assert'] = 'end of the string';
+$string['description_small_esc_z_leaf_assert'] = 'end of the string';
+$string['description_capital_esc_z_leaf_assert'] = 'end of the string';
 $string['description_esc_g_leaf_assert'] = 'first matching position in the string';
 $string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
-$string['description_esc_z_leaf_assert_neg'] = 'end of the string';
 // TYPE_LEAF_BACKREF
 $string['description_leaf_backref'] = 'text that matched subpattern #{$a}';
 $string['description_leaf_backref_name'] = 'text that matched subpattern "{$a}"';

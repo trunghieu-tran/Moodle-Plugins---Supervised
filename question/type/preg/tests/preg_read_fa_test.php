@@ -75,7 +75,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
-    
+
     public function test_loop() {
         $dotdescription = 'digraph example {
                     0;
@@ -243,10 +243,10 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
-        
+
         $automata = new qtype_preg_nfa(0, 0, 0, array());
         $automata->read_fa($dotdescription);
-        
+
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
 
@@ -288,7 +288,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_Z);
+        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z);
         $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
@@ -334,10 +334,10 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
-        
+
         $automata = new qtype_preg_nfa(0, 0, 0, array());
         $automata->read_fa($dotdescription);
-        
+
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
 
@@ -597,10 +597,10 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
 
         $automata = new qtype_preg_nfa(0, 0, 0, array());
         $automata->read_fa($dotdescription);
-        
+
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
-    
+
     public function test_different_automata(){
         $dotdescription = 'digraph example {
                     "0,";
@@ -653,7 +653,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
-    
+
     public function test_eps_transition() {
         $dotdescription = 'digraph example {
                     0;
@@ -702,13 +702,13 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
-        
+
         $automata = new qtype_preg_nfa(0, 0, 0, array());
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
     }
-    
+
     public function test_imposition_transitions() {
         $dotdescription = 'digraph example {
                     0;
@@ -756,7 +756,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
-        
+
         $automata = new qtype_preg_nfa(0, 0, 0, array());
         $automata->read_fa($dotdescription);
 

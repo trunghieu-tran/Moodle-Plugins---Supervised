@@ -332,8 +332,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === 'a');
         $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($root->operands[2]->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_Z);   // Converted by lexer.
-        $this->assertTrue($root->operands[2]->negative);
+        $this->assertTrue($root->operands[2]->subtype === qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z);   // Converted by lexer.
+        $this->assertFalse($root->operands[2]->negative);
         $this->assertTrue($root->nullable === false);
         $this->assertTrue($root->firstpos == array(2));
         $this->assertTrue($root->lastpos == array(4));
@@ -354,8 +354,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === 'a');
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($root->operands[1]->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_Z);   // Converted by lexer.
-        $this->assertTrue($root->operands[1]->negative);
+        $this->assertTrue($root->operands[1]->subtype === qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z);   // Converted by lexer.
+        $this->assertFalse($root->operands[1]->negative);
     }
     function test_parser_error() {
         $handler = $this->run_handler('^((ab|cd)ef$');

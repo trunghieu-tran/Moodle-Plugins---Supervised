@@ -108,7 +108,8 @@ $string['node_error']                  = 'синтаксическая ошиб�
 $string['empty_leaf_meta']             = 'ничего';
 $string['esc_b_leaf_assert']           = 'граница слова';
 $string['esc_a_leaf_assert']           = 'начало строки';
-$string['esc_z_leaf_assert']           = 'конец строки';
+$string['small_esc_z_leaf_assert']     = 'конец строки';
+$string['capital_esc_z_leaf_assert']   = 'конец строки';
 $string['esc_g_leaf_assert']           = 'первая позиция матчинга в строке';
 $string['circumflex_leaf_assert']      = 'начало строки';
 $string['dollar_leaf_assert']          = 'конец строки';
@@ -230,12 +231,12 @@ $string['description_empty_leaf_meta'] = 'ничего';
 // TYPE_LEAF_ASSERT
 $string['description_esc_b_leaf_assert'] = 'граница слова';
 $string['description_esc_a_leaf_assert'] = 'начало строки';
-$string['description_esc_z_leaf_assert'] = 'конец строки';
+$string['description_small_esc_z_leaf_assert'] = 'конец строки';
+$string['description_capital_esc_z_leaf_assert'] = 'конец строки';
 $string['description_esc_g_leaf_assert'] = 'первая позиция матчинга в строке';
 $string['description_circumflex_leaf_assert'] = 'начало строки';
 $string['description_dollar_leaf_assert'] = 'конец строки';
 $string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
-$string['description_esc_z_leaf_assert_neg'] = 'конец строки';
 // TYPE_LEAF_BACKREF
 $string['description_leaf_backref'] = 'текст, совпавший с подвыражением #{$a}';
 $string['description_leaf_backref_name'] = 'текст, совпавший с подвыражением "{$a}"';

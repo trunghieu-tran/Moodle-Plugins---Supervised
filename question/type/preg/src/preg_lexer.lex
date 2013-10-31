@@ -1742,9 +1742,11 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYINITIAL> "\A" {
     return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
 }
-<YYINITIAL> "\z"|"\Z" {
-    $text = $this->yytext();
-    return $this->form_simple_assertion($text, 'qtype_preg_leaf_assert_esc_z', $text === '\Z');
+<YYINITIAL> "\z" {
+    return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
+}
+<YYINITIAL> "\Z" {
+    return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
 }
 <YYINITIAL> "\G" {
     return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_g');
@@ -1766,10 +1768,10 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
     } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
         // Not multiline, but dollar endonly; the same as \z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_z', false);
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
     } else {
         // Default case: the same as \Z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_z', true);
+        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
     }
 }
 <YYINITIAL> "\c" {

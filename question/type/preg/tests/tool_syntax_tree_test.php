@@ -171,11 +171,11 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
         $node = $this->get_node('\z');
         $this->assertEquals($node->label(), '\z');
-        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, 'qtype_preg'));
 
         $node = $this->get_node('\Z');
         $this->assertEquals($node->label(), '\Z');
-        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_ESC_Z, 'qtype_preg'));
+        $this->assertEquals($node->tooltip(), get_string(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, 'qtype_preg'));
 
         $node = $this->get_node('\G');
         $this->assertEquals($node->label(), '\G');
