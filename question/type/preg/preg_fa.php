@@ -356,30 +356,30 @@ class qtype_preg_fa_state {
     protected $char;
     /** @var array of qtype_preg_fa_group through which are in this group. */
     public $prev_groups;
-    
+
     public function __construct(&$fa = null) {
         $this->fa = $fa;
         $this->states = array();
         $this->char = 0;
         $this->prev_groups = array();
     }
-    
+
     /**
-     * Change reference to qtype_preg_finite_automaton object this group of states belongs to. 
+     * Change reference to qtype_preg_finite_automaton object this group of states belongs to.
      *
      * @param fa - a reference to new automata.
      */
     public function set_fa(&$fa) {
         $this->fa = $fa;
     }
-    
+
     /**
      * Return character on which it made transition to this group.
      */
     public function get_char() {
         return $this->char;
     }
-    
+
     /**
      * Change character on which it made transition to this group.
      *
@@ -388,14 +388,14 @@ class qtype_preg_fa_state {
     public function set_char($char) {
         $this->char = $char;
     }
-    
+
     /**
      * Return array of int ids of states, which include in this group.
      */
     public function get_states() {
         return $this->states;
     }
-    
+
     /**
      * Append new state in group.
      *
@@ -404,14 +404,14 @@ class qtype_preg_fa_state {
     public function add_state($state) {
         $this->state[] = $state;
     }
-    
+
     /**
      * Return array of group through which are in this group.
      */
     public function get_prev_groups() {
         return $this->prev_groups;
     }
-    
+
     /**
      * Fill array of group through which are in this group.
      *
@@ -420,7 +420,7 @@ class qtype_preg_fa_state {
     public function fill_prev_groups($prev_groups) {
         $this->prev_groups = $prev_groups;
     }
-    
+
     /**
      * Compare two groups.
      *
@@ -443,11 +443,11 @@ class qtype_preg_fa_state {
         }
         return true;
     }
-    
+
     public function is_empty() {
         return (count($this->states) == 0);
     }
-    
+
     public function has_end_states() {
         $endstates = $this->fa->end_states();
         foreach ($this->states as $thisstate) {
@@ -459,7 +459,7 @@ class qtype_preg_fa_state {
         }
         return false;
     }
-    
+
     /**
      * Create string with way.
      *
@@ -709,7 +709,7 @@ abstract class qtype_preg_finite_automaton {
                     }
                     // Analysis outtransitions if go forward and intotransitions if go back.
                     $transitions = $this->get_adjacent_transitions($curstate, !$direction);
-  
+
                     // No any interconnecting states.
                     if (count($transitions) != 0 || $isendstate) {
                         $aregone[] = $curstate;
@@ -1362,7 +1362,7 @@ abstract class qtype_preg_finite_automaton {
                 $error = $error.' Only second automata has endstate.';
             }
             $differences[] = $error;
-            
+
         }
         else {
             // Append pair of groups in fifo and stack of groups
@@ -1392,7 +1392,7 @@ abstract class qtype_preg_finite_automaton {
             while($allend == false) {
                 // TODO - Search next pair.
                 $p = new qtype_preg_fa_group($this);
-                $q = new qtype_preg_fa_group($another); 
+                $q = new qtype_preg_fa_group($another);
                 // Check pair.
                 $ismet = false;
                 /* TODO
@@ -2985,156 +2985,5 @@ abstract class qtype_preg_finite_automaton {
 
     public function __clone() {
         // TODO - clone automaton.
-    }
-
-    /**
-     * Generates dot code for drawing FA.
-     * @param type image type.
-     * @param filename - name of the resulting image file.
-     * @deprecated since 2.5
-     */
-    public function draw($type, $filename) {
-        $result = 'digraph {rankdir = LR;';
-        foreach ($this->states as $curstate) {
-            $index1 = $curstate->number;
-
-            if (count($curstate->outgoing_transitions()) == 0) {
-                // Draw a single state.
-                $result .= $index1 . ';';
-            } else {
-                // Draw a state with transitions.
-                foreach ($curstate->outgoing_transitions() as $curtransition) {
-                    $result .= $curtransition->get_label_for_dot();
-                }
-            }
-        }
-        // Make start and end states more fancy.
-        $result .= $this->start_state()->number . '[shape=rarrow];';
-        $result .= $this->end_state()->number . '[shape=doublecircle];';
-        $result .= '};';
-        qtype_preg_regex_handler::execute_dot($result, $type, $filename);
-    }
-
-
-    /**
-     * Reads fa from a special code and modifies current object.
-     * code format: i->abc->j;k->charset->l; e.t.c.
-     * maximum count of subexpressions when reading fa is 9 in current implementation.
-     * @param facode string with the code of the finite automaton.
-     */
-    public function input_fa($facode) {
-        $this->read_code_member($facode);
-        $this->set_start_state($this->states[0]);
-        $this->set_end_state($this->states[$this->statecount - 1]);
-    }
-
-    /**
-     * Reads one code member.
-     * @param facode string with the code of the finite automaton.
-     * @param start index of the first character of current member in facode.
-     */
-    protected function read_code_member($facode, $start = 0) {
-        if ($start >= strlen($facode)) {
-            return;
-        }
-        $end = $start;
-        $tmpstr = '';
-        while ($facode[$end] != '-') {
-            $tmpstr .= $facode[$end];
-            $end++;
-        }
-        $end += 2;
-        $fir = (int)$tmpstr;
-        $tmpstr = '';
-        $transition = self::read_transition($facode, $end);
-        $end++;
-        while ($facode[$end - 2] != '-' || $facode[$end - 1] != '>') {
-            $end++;
-        }
-        while ($facode[$end] != ';') {
-            $tmpstr .= $facode[$end];
-            $end++;
-        }
-        $lst = (int)$tmpstr;
-        if (!isset($this->states[$fir])) {
-            $this->states[$fir] = new qtype_preg_fa_state();
-            $this->states[$fir]->set_fa($this);
-            $this->statecount++;
-            if ($this->statecount > $this->statelimit) {
-                throw new qtype_preg_toolargefa_exception('');
-            }
-        }
-        if (!isset($this->states[$lst])) {
-            $this->states[$lst] = new qtype_preg_fa_state();
-            $this->states[$lst]->set_fa($this);
-            $this->statecount++;
-            if ($this->statecount > $this->statelimit) {
-                throw new qtype_preg_toolargefa_exception('');
-            }
-        }
-        $transition->to = $this->states[$lst];
-        $end++;
-        $this->states[$fir]->add_transition($transition);
-        $this->read_code_member($facode, $end);
-    }
-
-    /**
-     * Read one leaf of regex from the code of finite automaton.
-     * @param facode string with the code of finite automaton
-     * @param start index of first character of current leaf in facode.
-     */
-    static protected function read_transition($facode, $start) {
-        $i = $start;
-        $subexprstarts = array();
-        $subexprends = array();
-        $charset = '';
-        $error = false;
-        // Input subexpressions.
-        if ($facode[$start] == '#') {
-            $i = $start + 1;
-            do {
-                if ($i >= strlen($facode)) {
-                    $error = true;
-                    echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
-                    // TODO: correct error message.
-                } else if ($facode[$i] == 's') {
-                    $subexprstarts[] = (int)$facode[$i + 1];
-                } else if ($facode[$i] == 'e') {
-                    $subexprends[] = (int)$facode[$i + 1];
-                } else {
-                    $error = true;
-                    echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
-                    // TODO: correct error message.
-                }
-                $i += 2;
-            } while (!$error && $i < strlen($facode) && $facode[$i] != '#');
-            $i++;
-        }
-        if ($error || $i >= strlen($facode)) {
-            return;
-        }
-        // Input transition leaf.
-        while ($facode[$i] != '-' || $facode[$i + 1] != '>') {
-            if ($facode[$i] == '\\') {
-                $charset .= $facode[$i + 1];
-                $i += 2;
-            } else {
-                $charset .= $facode[$i];
-                $i++;
-            }
-        }
-        $leaf = new qtype_preg_leaf_charset();
-        $leaf->charset = $charset;
-        // TODO: input for dfa.
-        $trash =  new qtype_preg_fa_state();
-        $transition = new qtype_preg_nfa_transition($trash, $leaf, $trash);
-        $transition->tags = array();
-        foreach ($subexprstarts as $val) {
-            $transition->tags[] = $val * 2;
-        }
-        foreach ($subexprends as $val) {
-            $transition->tags[] = $val * 2 + 1;
-        }
-        return $transition;
     }
 }
