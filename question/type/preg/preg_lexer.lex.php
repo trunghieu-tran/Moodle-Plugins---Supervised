@@ -689,7 +689,6 @@ class qtype_preg_lexer extends JLexBase  {
         $uitype = $type === qtype_preg_charset_flag::TYPE_SET ? null : $data;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text, $uitype)));
         $node->subtype = $type;
-        $node->israngecalculated = false;
         $this->set_node_modifiers($node);
         if ($data !== null) {
             $flag = new qtype_preg_charset_flag;
@@ -7404,7 +7403,6 @@ array(
                                         $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
     $this->charset->userinscription[] = new qtype_preg_userinscription(']');
     $this->charset->set_user_info($position, $this->charset->userinscription);
-    $this->charset->israngecalculated = false;
     if ($this->charset_set !== '') {
         $flag = new qtype_preg_charset_flag;
         $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($this->charset_set));

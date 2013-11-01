@@ -116,6 +116,20 @@ class qtype_preg_fa_transition {
         }
     }
 
+    protected static function compare_preg_nodes($node1, $node2) {
+      return $node1 === $node2 ? 0 : 1;
+    }
+
+    /**
+     * Checks if this transition has exactly same tags as other.
+     */
+    public function has_exact_same_tags($other) {
+        return empty(array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes')) &&
+               empty(array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes')) &&
+               empty(array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes')) &&
+               empty(array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes'));
+    }
+
     /**
      * Copies tags from other transition in this transition.
      */
@@ -149,6 +163,11 @@ class qtype_preg_fa_transition {
             $resulttran->unite_tags($other);
         }
         return $resulttran;
+    }
+
+    public function unite($other) {
+        // TODO
+        return null;
     }
 
     /**
@@ -395,47 +414,33 @@ class qtype_preg_fa_transition {
  */
 abstract class qtype_preg_finite_automaton {
 
-    /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
-    public $statenumbers;
-    /** @var array of int ids of states - start states. */
-    public $startstates;
-    /** @var array of of int ids of states - end states. */
-    public $endstates;
-
     /** @var two-dimensional array of qtype_preg_fa_transition objects: first index is "from", second index is "to"*/
-    protected $adjacencymatrix;
+    public $adjacencymatrix = array();
+    /** @var array with strings with numbers of states, indexed by their ids from adjacencymatrix. */
+    public $statenumbers = array();
+    /** @var array of int ids of states - start states. */
+    public $startstates = array();
+    /** @var array of of int ids of states - end states. */
+    public $endstates = array();
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
-     *
      * May be used for optimisation when an NFA object actually stores a DFA.
      */
-    protected $deterministic;
+    protected $deterministic = true;
 
     /** @var boolean whether automaton has epsilon-transtions. */
-    protected $haseps;
+    protected $haseps = false;
     /** @var boolean whether automaton has simple assertion transtions. */
-    protected $hasassertiontransitions;
+    protected $hasassertiontransitions = false;
+
+    protected $statecount = 0;
+    protected $transitioncount = 0;
 
     protected $statelimit;
-    protected $statecount;
-
     protected $transitionlimit;
-    protected $transitioncount;
-    protected $statecounter;
-
 
     public function __construct() {
-        $this->adjacencymatrix = array();
-        $this->startstates = array();
-        $this->endstates = array();
-        $this->statenumbers = array();
-        $this->deterministic = true;
-        $this->haseps = false;
-        $this->hasassertiontransitions = false;
-        $this->statecount = 0;
-        $this->transitioncount = 0;
         $this->set_limits();
-        $this->statecounter = 0;
     }
 
     /**
@@ -774,7 +779,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_state($statenumber = null) {
         if ($statenumber === null) {
-            $statenumber = $this->statecounter++;
+            $statenumber = $this->statecount++;
         }
         if (!in_array($statenumber, $this->statenumbers)) {
             $this->adjacencymatrix[] = array();
@@ -790,20 +795,14 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Changes states which transitions come to/from.
      */
-    public function redirect_transitions($oldstateid, $newstateid, $deleteoldstate = true) {
+    public function redirect_transitions($oldstateid, $newstateid) {
         // Get intotransitions.
         $outgoing = $this->get_adjacent_transitions($oldstateid, true);
         $incoming = $this->get_adjacent_transitions($oldstateid, false);
         $transitions = array_merge($outgoing, $incoming);
 
-        // Delete state with transitions or only transitions.
-        if ($deleteoldstate) {
-            $this->remove_state($oldstateid);
-        } else {
-            foreach ($transitions as $transition) {
-                $this->remove_transition($transition);
-            }
-        }
+        // Delete the old state.
+        $this->remove_state($oldstateid);
 
         // Add new transitions.
         foreach ($transitions as $transition) {
@@ -818,73 +817,52 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Add transition.
-     *
-     * @param transition transition for adding.
+     * Adds a transition.
      */
     public function add_transition($transition) {
         $outtransitions = $this->get_adjacent_transitions($transition->from, true);
-        // Automata  has already such ttransition.
-        if (array_key_exists($transition->to, $outtransitions)) {
-            // Get transition which it had before.
-            $tran = $this->adjacencymatrix[$transition->from][$transition->to];
-            // Transitions are not equal.
-            if ($tran != $transition) {
-                // Find tags.
-                $thishastags = $tran->has_tags();
-                $otherhastags = $transition->has_tags();
-                // Get union of leafs.
-                $newleaf = $tran->pregleaf->unite_leafs($transition->pregleaf, $thishastags, $otherhastags);
-                // Union isn't possible.
-                if ($newleaf === null) {
-                    $clones = array();  // array of clones of coping transitions.
-                    // Get coping transitions.
-                    $outtransitions = $this->get_adjacent_transitions($tran->to, true);
-                    $intotransitions = $this->get_adjacent_transitions($tran->to, false);
-                    // Get new number of cloned state.
-                    $newnumber = '/' . $this->statenumbers[$transition->to];
-                    $newto = $this->add_state($newnumber);
-                    // Add clone state in start states if it's possible.
-                    if (array_search($tran->to, $this->startstates) !== false) {
-                        $this->add_start_state($newto);
-                    }
-                    // Add clone state in end states if it's possible
-                    if (array_search($tran->to, $this->endstates) !== false) {
-                        $this->add_end_state($newto);
-                    }
-                    $states = $this->get_state_numbers();    // TODO: unused
-                    // Change transition.
-                    $transition->to = $newto;
-                    // Copy outtransitions for clone state.
-                    foreach ($outtransitions as $outtran) {
-                        $clone = clone($outtran);
-                        $clone->from = $newto;
-                        $clones[] = $clone;
-                    }
-                    // Copy intotransitions for clone state.
-                    foreach ($intotransitions as $intotran) {
-                        if ($tran->from != $intotran->from) {
-                            $clone = clone($intotran);
-                            $clone->to = $newto;
-                            $clones[] = $clone;
-                        }
-                    }
-                    // Add transitions of clone to automata.
-                    foreach ($clones as $clone) {
-                        $this->add_transition($clone);
-                    }
-                    // Add transition.
-                    $this->adjacencymatrix[$transition->from][$newto] = $transition;
-                } else {
-                    // Add union of transitions.
-                    $transition->pregleaf = $newleaf;
-                    $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
-                }
-            }
-        } else {
+        if (!array_key_exists($transition->to, $outtransitions)) {
             // No such transition.
             $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
+            return;
         }
+
+        // Get the transition which it had before.
+        $existing = $this->adjacencymatrix[$transition->from][$transition->to];
+        if ($existing === $transition) {
+            return;
+        }
+
+        // Is it possible to just unit preg leaves?
+        if ($existing->has_exact_same_tags($transition)) {
+            $existing->pregleaf = $existing->pregleaf->unite($transition->pregleaf);
+            return;
+        }
+
+        // Need to add a new state.
+        $newto = $this->add_state();
+        if (in_array($existing->to, $this->startstates)) {
+            $this->add_start_state($newto);
+        }
+        if (in_array($existing->to, $this->endstates)) {
+            $this->add_end_state($newto);
+        }
+
+        // Copy transitions for clone state.
+        foreach ($this->get_adjacent_transitions($existing->to, true) as $tran) {
+            $clone = clone $tran;
+            $clone->from = $newto;
+            $this->adjacencymatrix[$clone->from][$clone->to] = $clone;
+        }
+        foreach ($this->get_adjacent_transitions($existing->to, false) as $tran) {
+            $clone = clone $tran;
+            $clone->to = $newto;
+            $this->adjacencymatrix[$clone->from][$clone->to] = $clone;
+        }
+
+        // Add the transition itself.
+        $transition->to = $newto;
+        $this->adjacencymatrix[$transition->from][$newto] = $transition;
     }
 
     /**
