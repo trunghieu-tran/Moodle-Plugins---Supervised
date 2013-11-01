@@ -546,78 +546,41 @@ abstract class qtype_preg_finite_automaton {
 
     /**
      * Passing automata in given direction.
-     *
-     * @param direction - direction of passing(0-forward; 1-back).
      * @return array with ids of passed states.
      */
-    public function reachable_states($direction) {
+    public function reachable_states($backwards = false) {
         // Initialization wavefront.
-        if ($direction == 0) {
-            // Going forward in automata.
-            $oldfront = array_values($this->startstates);
-        } else {
-            // Going back in automata.
-            $oldfront = array_values($this->endstates);
-        }
+        $front = $direction
+                  ? array_values($this->endstates)
+                  : array_values($this->startstates);
 
-        $aregone = array();
-        $newfront = array();
-        // Working with states from currendt front of wave.
-        while (count($oldfront)!=0) {
-            // Searching ways from current state.
-            foreach ($oldfront as $curstate) {
-                $isendstate = false;
-                // State has not been already gone.
-                if (array_search($curstate, $aregone) === false) {
-                    // Comparing with end states or start states.
-                    if ($direction == 0) {
-                        if (array_search($curstate, $this->endstates) !== false) {
-                            $isendstate = true;
-                        }
-                    } else {
-                        if (array_search($curstate, $this->startstates) !== false) {
-                            $isendstate = true;
-                        }
-                    }
-                    // Analysis outtransitions if go forward and intotransitions if go back.
-                    $transitions = $this->get_adjacent_transitions($curstate, !$direction);
+        $reached = array();
 
-                    // No any interconnecting states.
-                    if (count($transitions) != 0 || $isendstate) {
-                        $aregone[] = $curstate;
-                    }
-
-                    // Has interconnecting states.
-                    if (count($transitions) != 0) {
-                        // Adding interconnecting states to new wave front.
-                        foreach ($transitions as $curtran) {
-                            if ($direction == 0) {
-                                $newfront[] = $curtran->to;
-                            } else {
-                                $newfront[] = $curtran->from;
-                            }
-                        }
-                    }
-                }
+        while (!empty($front)) {
+            $curstate = array_pop($front);
+            if (in_array($curstate, $reached)) {
+                continue;
             }
-            // Coping new wavefront to old.
-            $oldfront = $newfront;
-
-            $newfront = array();
+            $reached[] = $curstate;
+            $transitions = $this->get_adjacent_transitions($curstate, !$direction);
+            foreach ($transitions as $transition) {
+                $front[] = $direction
+                         ? $transition->from
+                         : $transition->to;
+            }
         }
 
-        return $aregone;
+        return $reached;
     }
 
     /**
      * Delete all blind states in automata.
-     *
      */
     public function del_blind_states() {
         // Pass automata forward.
-        $aregoneforward = $this->reachable_states(0);
-        // Pass automata forward.
-        $aregoneback = $this->reachable_states(1);
+        $aregoneforward = $this->reachable_states(false);
+        // Pass automata backward.
+        $aregoneback = $this->reachable_states(true);
         // Check for each state of atomata was it gone or not.
         $states = $this->get_states();
         foreach ($states as $curstate) {
