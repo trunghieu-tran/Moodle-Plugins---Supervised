@@ -662,35 +662,6 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     }
 
     /**
-     * Returns union of leafs.
-     *
-     * @param other another leaf for union.
-     */
-    public function unite_leafs($other, $thishastags, $otherhastags) {
-        $result = null;
-        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                if ($thishastags || $otherhastags) {
-                    if ($this->has_equal_tags($other)) {
-                        if ($this->assertionsbefore == $other->assertionsbefore && $this->assertionsafter == $other->assertionsafter) {
-                            $result = $this->unite($other);
-                            $result->userinscription = array_merge($this->userinscription, $other->userinscription);
-                        }
-                    }
-                } else if ($this->assertionsbefore == $other->assertionsbefore && $this->assertionsafter == $other->assertionsafter) {
-                    $result = $this->unite($other);
-                    $result->userinscription = array_merge($this->userinscription, $other->userinscription);
-                }
-            }
-        } else if ($this == $other) {
-            if ((!$thishastags && !$otherhastags) || (($thishastags || $otherhastags) && $this->has_equal_tags($other))) {
-                $result = $this;
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Returns label of leaf.
      *
      */
@@ -870,8 +841,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     protected $ranges = array();
     /** Array of assertion flags (it's impossible to calculate an assertion as a range), each asserts[i] is an array of 0/1/2 asserts as flags; for ranges[i]. */
     protected $asserts = array();
-    /** true if the charset is a DNF range matrix, false if charset is DNF of flags. */
-    public $israngecalculated = true;
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_LEAF_CHARSET;
@@ -1269,7 +1238,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
-        $result->israngecalculated = false;
         return $result;
     }
 
@@ -1331,7 +1299,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $resflags = array_merge($this->flags, $other->flags);
         }
         $result->flags = $resflags;
-        $result->israngecalculated = false;
+        $result->userinscription = array_merge($this->userinscription, $other->userinscription);
         return $result;
     }
 
