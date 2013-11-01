@@ -17,8 +17,6 @@
     private $id_counter;
     // Counter of subpatterns.
     private $subpatt_counter;
-    // Followpos map.
-    private $followpos;
     // Max difference (right - left).
     private $max_finite_quant_borders_difference;   // В принципе это костыль; когда ДКА будет получаться из НКА - удалить это.
 
@@ -31,7 +29,6 @@
         $this->handlingoptions = $handlingoptions;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
-        $this->followpos = array();
         $this->max_finite_quant_borders_difference = 0;
     }
 
@@ -57,10 +54,6 @@
 
     public function get_max_subpatt() {
         return $this->subpatt_counter;
-    }
-
-    public function get_followpos() {
-        return $this->followpos;
     }
 
     public function get_max_finite_quant_borders_difference() {
@@ -261,9 +254,6 @@ start ::= expr(B). {
 
     // Assign identifiers.
     $this->assign_ids($this->root);
-
-    // Calculate nullable, firstpos, lastpos and followpos for all nodes.
-    $this->root->calculate_nflf($this->followpos);
 }
 
 expr(A) ::= PARSELEAF(B). {
