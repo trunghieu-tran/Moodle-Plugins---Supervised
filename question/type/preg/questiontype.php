@@ -37,9 +37,7 @@ class qtype_preg extends qtype_shortanswer {
      */
     public function available_engines() {
         return array(   'php_preg_matcher' => get_string('php_preg_matcher', 'qtype_preg'),
-                        'dfa_matcher' => get_string('dfa_matcher', 'qtype_preg'),
-                        'nfa_matcher' => get_string('nfa_matcher', 'qtype_preg')/*,
-                        'backtracking_matcher' => 'backtracking_matcher'*/
+                        'nfa_matcher' => get_string('nfa_matcher', 'qtype_preg')
                     );
     }
 
@@ -244,7 +242,7 @@ class qtype_preg extends qtype_shortanswer {
     }
 
     /**
-     * Returns true if extra answer fields for answer with the $key is empty 
+     * Returns true if extra answer fields for answer with the $key is empty
      * in the question data and should not be saved in DB.
      *
      * Questions where extra answer fields are optional will want to overload this.

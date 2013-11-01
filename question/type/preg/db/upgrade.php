@@ -266,5 +266,19 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
 
     // There ends code for Preg 2.5 release upgrade.
 
+    /*if ($oldversion < TODO) {
+
+        // Change matching engine.
+        $queries = array("UPDATE {qtype_preg} SET engine='nfa_matcher' WHERE engine='dfa_matcher'",
+                         "UPDATE {config} SET value='nfa_matcher' WHERE value='dfa_matcher'");
+
+        foreach ($queries as $query) {
+            $DB->execute($query);
+        }
+
+        // Preg savepoint reached.
+        upgrade_plugin_savepoint(true, TODO, 'qtype', 'preg');
+    }*/
+
     return true;
 }

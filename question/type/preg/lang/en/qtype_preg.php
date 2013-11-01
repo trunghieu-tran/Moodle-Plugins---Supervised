@@ -25,10 +25,9 @@ $string['defaultnotationdescription'] = 'Notation selected by default when creat
 $string['defaultnotationlabel'] = 'Default notation';
 $string['description_tool'] = 'Description';
 $string['description_tool_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
-$string['dfa_matcher'] = 'Deterministic finite state automata';
 $string['doterror'] = 'Can\'t draw {$a->name} for this regex';
 $string['engine'] = 'Matching engine';
-$string['engine_help'] = '<p>There is no \'best\' matching engine, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP language. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p>The <b>NFA matching engine</b> and the <b>DFA matching engine</b> are engines that use custom matching code. They support partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>The NFA engine is probably the best choice if you don\'t use lookaround assertions.</p><p>Avoid using the DFA engine for the new questions, as it is deprecated. contains more bugs than other two, and lacking development in the last time. Use it only when you can\'t get what you need using other engines.</p>';
+$string['engine_help'] = '<p>There is no \'best\' matching engine, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP language. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p><b>NFA matching engine</b> uses custom matching code. It supports partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>NFA engine is probably the best choice if you don\'t use lookaround assertions.</p>';
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching returns true if there is at least one match in the given string (answer). Exact matching means that the match must be the entire string.</p><p>Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives you additional flexibility: you can specify an answer with low (or zero) grade to catch common errors and give comments on them. You still can specify exact matches for some of your regular expressions if you start them with ^ and end with $.</p>';
 $string['explaining_graph_tool'] = 'Explaining graph';
@@ -193,16 +192,13 @@ $string['leaf_charset_error'] = 'incorrect character set';
 $string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
 
-/******* DFA and NFA limitations *******/
+/******* NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
 $string['fa_state_limit'] = 'Automata size limit: states';
 $string['fa_transition_limit'] = 'Automata size limit: transitions';
-$string['dfa_settings_heading'] = 'Deterministic finite state automata engine settings';
 $string['nfa_settings_heading'] = 'Nondeterministic finite state automata engine settings';
-$string['dfa_state_limit_description'] = 'Allows you to tune time and memory limits for the DFA engine when matching complex regexes';
 $string['nfa_state_limit_description'] = 'Allows you to tune time and memory limits for the NFA engine when matching complex regexes';
-$string['dfa_transition_limit_description'] = 'Maximum number of transitions in DFA';
 $string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
 
 /********** Strings for authoring tools form**********************/

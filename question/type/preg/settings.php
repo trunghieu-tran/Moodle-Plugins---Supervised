@@ -45,14 +45,7 @@ if ($ADMIN->fulltree) {
                     get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
     $settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));
 
-    /******* DFA and NFA limitations *******/
-    $settings->add(new admin_setting_heading('dfa_settings_heading', get_string('dfa_settings_heading', 'qtype_preg'),
-                    get_string('engine_heading_descriptions', 'qtype_preg')));
-    $settings->add(new admin_setting_configtext('qtype_preg_dfa_state_limit', get_string('fa_state_limit', 'qtype_preg'),
-                    get_string('dfa_state_limit_description', 'qtype_preg'), 250, PARAM_INT));
-    $settings->add(new admin_setting_configtext('qtype_preg_dfa_transition_limit', get_string('fa_transition_limit', 'qtype_preg'),
-                    get_string('dfa_transition_limit_description', 'qtype_preg'), 250, PARAM_INT));
-
+    /******* NFA limitations *******/
     $settings->add(new admin_setting_heading('nfa_settings_heading', get_string('nfa_settings_heading', 'qtype_preg'),
                     get_string('engine_heading_descriptions', 'qtype_preg')));
     $settings->add(new admin_setting_configtext('qtype_preg_nfa_state_limit', get_string('fa_state_limit', 'qtype_preg'),

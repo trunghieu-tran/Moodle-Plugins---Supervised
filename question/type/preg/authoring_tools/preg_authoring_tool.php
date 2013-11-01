@@ -12,7 +12,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
