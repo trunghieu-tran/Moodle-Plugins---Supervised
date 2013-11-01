@@ -217,14 +217,6 @@ abstract class qtype_preg_nfa_node {
 
         $stack[] = $body;
     }
-
-    public static function move_transitions_and_delete_state($automaton, $from, $to) {
-        $transitions = $from->outgoing_transitions();
-        $automaton->remove_state($from);
-        foreach ($transitions as $transition) {
-            $to->add_transition($transition);   // "from" is set automatically.
-        }
-    }
 }
 
 /**
@@ -269,7 +261,8 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
     }
 
     public static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
-        if (count($stack_item['end']->outgoing_transitions()) > 0) {
+        $outgoing = $automaton->get_adjacent_transitions($stack_item['end'], true);
+        if (!empty($outgoing)) {
             $end = $automaton->add_state();
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $automaton->add_transition(new qtype_preg_nfa_transition($stack_item['end'], $epsleaf, $end));
@@ -294,13 +287,14 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
             if ($result === null) {
                 $result = $cur;
             } else {
-                $automaton->update_state_references($cur['start'], $result['end']);
-                self::move_transitions_and_delete_state($automaton, $cur['start'], $result['end']);
+                $automaton->redirect_transitions($cur['start'], $result['end']);
                 $result = array('start' => $result['start'], 'end' => $cur['end']);
             }
         }
 
         // Update automaton/stack properties.
+        $automaton->remove_all_start_states();
+        $automaton->remove_all_end_states();
         $automaton->add_start_state($result['start']);
         $automaton->add_end_state($result['end']);
         $stack[] = $result;
@@ -325,16 +319,16 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
                 $result = $cur;
             } else {
                 // Merge start and end states.
-                $automaton->update_state_references($cur['start'], $result['start']);
-                $automaton->update_state_references($cur['end'], $result['end']);
-                self::move_transitions_and_delete_state($automaton, $cur['start'], $result['start']);
-                $automaton->remove_state($cur['end']);
+                $automaton->redirect_transitions($cur['start'], $result['start']);
+                $automaton->redirect_transitions($cur['end'], $result['end']);
             }
         }
 
         // Update automaton/stack properties.
-        $automaton->set_start_state($result['start']);
-        $automaton->set_end_state($result['end']);
+        $automaton->remove_all_start_states();
+        $automaton->remove_all_end_states();
+        $automaton->add_start_state($result['start']);
+        $automaton->add_end_state($result['end']);
         $stack[] = $result;
     }
 }

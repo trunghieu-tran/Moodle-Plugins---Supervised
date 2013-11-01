@@ -816,33 +816,32 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Change state which transition/transitions come to.
-     *
-     * @param oldto state which transition has came to.
-     * @param newto state which transition should come to.
-     * @param deleteoldstate boolean flag if oldstate should be removed from automata.
+     * Changes states which transitions come to/from.
      */
-    public function redirect_transitions($oldto, $newto, $deleteoldstate = true) {
+    public function redirect_transitions($oldstateid, $newstateid, $deleteoldstate = true) {
         // Get intotransitions.
-        $transitions = $this->get_adjacent_transitions($oldto, false);
-        // Clone and change state.
-        $tranclones = array();
-        foreach ($transitions as $tran) {
-            $clone = clone $tran;
-            $clone->to = $newto;
-            $tranclones[] = $clone;
-        }
+        $outgoing = $this->get_adjacent_transitions($oldstateid, true);
+        $incoming = $this->get_adjacent_transitions($oldstateid, false);
+        $transitions = array_merge($outgoing, $incoming);
+
         // Delete state with transitions or only transitions.
         if ($deleteoldstate) {
-            $this->remove_state($oldto);
+            $this->remove_state($oldstateid);
         } else {
-            foreach ($transitions as $tran) {
-                $this-> remove_transition($tran);
+            foreach ($transitions as $transition) {
+                $this->remove_transition($transition);
             }
         }
+
         // Add new transitions.
-        foreach ($tranclones as &$clonetran) {
-            $this->add_transition($clonetran);
+        foreach ($transitions as $transition) {
+            if ($transition->from == $oldstateid) {
+                $transition->from = $newstateid;
+            }
+            if ($transition->to == $oldstateid) {
+                $transition->to = $newstateid;
+            }
+            $this->add_transition($transition);
         }
     }
 
@@ -851,12 +850,12 @@ abstract class qtype_preg_finite_automaton {
      *
      * @param transition transition for adding.
      */
-    public function add_transition(&$transition) {
+    public function add_transition($transition) {
         $outtransitions = $this->get_adjacent_transitions($transition->from, true);
         // Automata  has already such ttransition.
         if (array_key_exists($transition->to, $outtransitions)) {
             // Get transition which it had before.
-            $tran = &$this->adjacencymatrix[$transition->from][$transition->to];
+            $tran = $this->adjacencymatrix[$transition->from][$transition->to];
             // Transitions are not equal.
             if ($tran != $transition) {
                 // Find tags.
