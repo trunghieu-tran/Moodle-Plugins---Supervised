@@ -583,19 +583,19 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                         $assert = new qtype_preg_leaf_assert_small_esc_z;
                         break;
                     case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                        $assert = new qtype_preg_leaf_assert_dollar; 
+                        $assert = new qtype_preg_leaf_assert_dollar;
                         break;
                 }
                 unset($resultbefore[0]);
             } else if (count($resultafter) != 0) {
                 switch($resultafter[0]->subtype) {
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                        $assert = new qtype_preg_leaf_assert_esc_a; 
+                        $assert = new qtype_preg_leaf_assert_esc_a;
                         break;
                     case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-                        $assert = new qtype_preg_leaf_assert_esc_g; 
+                        $assert = new qtype_preg_leaf_assert_esc_g;
                         break;
-                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:    
+                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                         $assert = new qtype_preg_leaf_assert_circumflex;
                         break;
                 }
@@ -994,7 +994,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $length = 0;
         return false;
     }
-    
+
     /*public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
         $desired_chars = array(array(0x21, 0x007F));
         $desired_whitespaces = array(array(0x20, 0x20));
@@ -1056,7 +1056,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
             foreach ($flags as $flag) {
-                if ($flag->type === qtype_preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -1318,12 +1318,12 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         foreach ($charset->flags as $flags) {
             foreach ($flags as $flag) {
                 switch ($flag->type) {
-                    case qtype_preg_charset_flag::SET:
+                    case qtype_preg_charset_flag::TYPE_SET:
                         $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                         $neg[] = $flag->negative;
                         break;
-                    case qtype_preg_charset_flag::FLAG:
-                    case qtype_preg_charset_flag::UPROP:
+                    case qtype_preg_charset_flag::TYPE_FLAG:
+                    case qtype_preg_charset_flag::TYPE_UPROP:
                         $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
                         $neg[] = $flag->negative;
                         break;
@@ -1357,7 +1357,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $resultstring = $this->flags[0][0]->data->string() . $other->flags[0][0]->data->string();
             preg_replace('#(.)\\1{2,}#ius', '\\1', $resultstring);
             $resflag = new qtype_preg_charset_flag;
-            $resflag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($resultstring));
+            $resflag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($resultstring));
             $resflags = array(array($resflag));
             $result = new qtype_preg_leaf_charset;
         } else {
