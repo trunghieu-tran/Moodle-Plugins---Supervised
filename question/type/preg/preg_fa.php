@@ -816,6 +816,37 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Change state which transition/transitions come to.
+     *
+     * @param oldto state which transition has came to.
+     * @param newto state which transition should come to.
+     * @param deleteoldstate boolean flag if oldstate should be removed from automata.
+     */
+    public function redirect_transitions($oldto, $newto, $deleteoldstate = true) {
+        // Get intotransitions.
+        $transitions = $this->get_adjacent_transitions($oldto, false);
+        // Clone and change state.
+        $tranclones = array();
+        foreach ($transitions as $tran) {
+            $clone = clone $tran;
+            $clone->to = $newto;
+            $tranclones[] = $clone;
+        }
+        // Delete state with transitions or only transitions.
+        if ($deleteoldstate) {
+            $this->remove_state($oldto);
+        } else {
+            foreach ($transitions as $tran) {
+                $this-> remove_transition($tran);
+            }
+        }
+        // Add new transitions.
+        foreach ($tranclones as &$clonetran) {
+            $this->add_transition($clonetran);
+        }
+    }
+
+    /**
      * Add transition.
      *
      * @param transition transition for adding.
