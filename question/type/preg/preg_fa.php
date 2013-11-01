@@ -790,7 +790,7 @@ abstract class qtype_preg_finite_automaton {
      *
      * @param del transition for deleting.
      */
-    public function del_transition($del) {
+    public function remove_transition($del) {
         unset($this->adjacencymatrix[$del->from][$del->to]);
     }
 
@@ -1352,7 +1352,7 @@ abstract class qtype_preg_finite_automaton {
                     $this->add_transition($tran);
                 }
             }
-            $this->del_transition($del);
+            $this-> remove_transition($del);
         }
     }
 
@@ -1389,7 +1389,7 @@ abstract class qtype_preg_finite_automaton {
         $waschanged = false;
         // Cycle with empty transition
         if ($del->to == $del->from && $del->is_eps()) {
-            $this->del_transition($del);
+            $this-> remove_transition($del);
         }
 
         // Transition for merging isn't cycle.
@@ -1522,7 +1522,7 @@ abstract class qtype_preg_finite_automaton {
                             foreach ($outtransitions as $outtran) {
                                 if (!$wasdel) {
                                     if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
-                                        $this->del_transition($outtran);
+                                        $this-> remove_transition($outtran);
                                         unset($newfront[count($newfront)-1]);
                                         $wasdel = true;
                                     }
