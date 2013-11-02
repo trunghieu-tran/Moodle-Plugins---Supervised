@@ -168,8 +168,17 @@ class qtype_preg_fa_transition {
     }
 
     public function unite($other) {
-        // TODO
-        return null;
+        $result = null;
+        var_dump($this->has_exact_same_tags($other));
+        if ($this->has_exact_same_tags($other)) {
+            // Get union of leafs.
+            $newleaf = $this->pregleaf->unite_leafs($other->pregleaf);
+            if ($newleaf !== null) {
+                $result = $this;
+                $this->pregleaf = $newleaf;
+            }
+        }
+        return $result;
     }
 
     /**
