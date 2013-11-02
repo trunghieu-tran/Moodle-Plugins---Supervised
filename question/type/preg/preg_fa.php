@@ -809,8 +809,9 @@ abstract class qtype_preg_finite_automaton {
         }
 
         // Is it possible to just unit preg leaves?
-        if ($existing->has_exact_same_tags($transition)) {
-            $existing->pregleaf = $existing->pregleaf->unite($transition->pregleaf);
+        $newtran = $existing->unite($transition);
+        if ($newtran !== null) {
+            $existing = $newtran;
             return;
         }
 
