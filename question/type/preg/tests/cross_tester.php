@@ -307,12 +307,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
             // Check indexes and lengths.
             $subexprsupported = $matcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING);
-            foreach ($obtained->index_first as $key => $index) {
+            foreach ($obtained->indexfirst as $key => $index) {
                 if (!$subexprsupported && $key != 0) {
                     continue;
                 }
                 $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $expected['index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                          (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->index_first[$key]));
+                                                          (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->indexfirst[$key]));
             }
             foreach ($obtained->length as $key => $index) {
                 if (!$subexprsupported && $key != 0) {
@@ -323,12 +323,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             }
 
             if ($obtained->extendedmatch !== null && array_key_exists('ext_index_first', $expected)) {
-                foreach ($obtained->extendedmatch->index_first as $key => $index) {
+                foreach ($obtained->extendedmatch->indexfirst as $key => $index) {
                     if (!$subexprsupported && $key != 0) {
                         continue;
                     }
                     $extindexfirstpassed = $extindexfirstpassed && ((!array_key_exists($key, $expected['ext_index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                              (array_key_exists($key, $expected['ext_index_first']) && $expected['ext_index_first'][$key] === $obtained->extendedmatch->index_first[$key]));
+                                                              (array_key_exists($key, $expected['ext_index_first']) && $expected['ext_index_first'][$key] === $obtained->extendedmatch->indexfirst[$key]));
                 }
                 foreach ($obtained->extendedmatch->length as $key => $index) {
                     if (!$subexprsupported && $key != 0) {
@@ -380,7 +380,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
             // index_first
             if (!$indexfirstpassed) {
-                $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $obtained->index_first);
+                $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $obtained->indexfirst);
                 $expectedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $expected['index_first']);
             }
 
@@ -392,7 +392,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
             // ext_index_first
             if (!$extindexfirstpassed) {
-                $obtainedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $obtained->extendedmatch->index_first);
+                $obtainedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $obtained->extendedmatch->indexfirst);
                 $expectedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $expected['ext_index_first']);
             }
 

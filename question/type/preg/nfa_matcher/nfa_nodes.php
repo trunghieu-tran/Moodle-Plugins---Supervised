@@ -75,22 +75,22 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 class qtype_preg_nfa extends qtype_preg_finite_automaton {
 
     // The AST root node.
-    protected $ast_root;
+    protected $astroot;
 
     // Number of subpatterns in the regular expression.
     protected $max_subpatt;
 
     // Number of subexpressions in the regular expression.
-    protected $max_subexpr;
+    protected $maxsubexpr;
 
     // Backreference numbers existing in the regex.
     protected $backref_numbers;
 
-    public function __construct($ast_root, $max_subpatt, $max_subexpr, $backrefs) {
+    public function __construct($astroot, $max_subpatt, $maxsubexpr, $backrefs) {
         parent::__construct();
-        $this->ast_root = $ast_root;
+        $this->astroot = $astroot;
         $this->max_subpatt = $max_subpatt;
-        $this->max_subexpr = $max_subexpr;
+        $this->maxsubexpr = $maxsubexpr;
         $this->backref_numbers = array();
         foreach ($backrefs as $backref) {
             $this->backref_numbers[] = $backref->number;
@@ -129,7 +129,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     }
 
     public function ast_root() {
-        return $this->ast_root;
+        return $this->astroot;
     }
 
     public function max_subpatt() {
@@ -137,7 +137,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     }
 
     public function max_subexpr() {
-        return $this->max_subexpr;
+        return $this->maxsubexpr;
     }
 
 
