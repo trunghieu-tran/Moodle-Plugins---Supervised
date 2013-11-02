@@ -140,25 +140,12 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         return $this->maxsubexpr;
     }
 
-
     public function on_subexpr_added($pregnode) {
-        $subexpr_number = $pregnode->number;
-
         // Copy the node to the starting transitions.
         foreach ($this->startstates as $state) {
             $outgoing = $this->get_adjacent_transitions($state, true);
             foreach ($outgoing as $transition) {
-                $transition->subexpr_start[$subexpr_number] = $pregnode;
                 $transition->starts_backrefed_subexprs = $transition->starts_backrefed_subexprs || in_array($pregnode->number, $this->backref_numbers);
-            }
-        }
-
-
-        // Copy the node to the ending transitions.
-        foreach ($this->endstates as $state) {
-            $incoming = $this->get_adjacent_transitions($state, false);
-            foreach ($incoming as $transition) {
-                $transition->subexpr_end[$subexpr_number] = $pregnode;
             }
         }
     }

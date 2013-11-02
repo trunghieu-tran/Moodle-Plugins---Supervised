@@ -67,10 +67,6 @@ class qtype_preg_fa_transition {
     public $subpatt_start;
     /** @var array of qtype_preg_nodes representing subpatterns ending at this transition. */
     public $subpatt_end;
-    /** @var array of qtype_preg_nodes representing subexpressions starting at this transition. */
-    public $subexpr_start;
-    /** @var array of qtype_preg_nodes representing subexpressions ending at this transition. */
-    public $subexpr_end;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
@@ -84,8 +80,6 @@ class qtype_preg_fa_transition {
         $this->consumeschars = $consumeschars;
         $this->subpatt_start = array();
         $this->subpatt_end = array();
-        $this->subexpr_start = array();
-        $this->subexpr_end = array();
     }
 
     public function get_label_for_dot($index1, $index2) {
@@ -103,10 +97,10 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
-        $lab = $this->open_tags_tohr();
-        $lab .= $this->pregleaf->leaf_tohr();
-        $lab .= $this->close_tags_tohr();
-        $lab = '"[' . str_replace('"', '\"', $lab) . ']"';
+        $open = $this->open_tags_tohr();
+        $close = $this->close_tags_tohr();
+        $lab = $this->pregleaf->leaf_tohr();
+        $lab = '"' . $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close . '"';
 
         // Dummy transitions are displayed dotted.
         if ($this->consumeschars) {
@@ -126,9 +120,7 @@ class qtype_preg_fa_transition {
     public function has_exact_same_tags($other) {
         $startsubpatternd = array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes');
         $endsubpatternd = array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes');
-        $startsubexprd = array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes');
-        $endsubexprd = array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes');
-        return empty($startsubpatternd) && empty($endsubpatternd) && empty($startsubexprd) && empty($endsubexprd);
+        return empty($startsubpatternd) && empty($endsubpatternd);
     }
 
     /**
@@ -137,8 +129,6 @@ class qtype_preg_fa_transition {
     public function unite_tags($other) {
         $this->subpatt_start = array_values(array_merge($this->subpatt_start, $other->subpatt_start));
         $this->subpatt_end = array_values(array_merge($this->subpatt_end, $other->subpatt_end));
-        $this->subexpr_start = array_values(array_merge($this->subexpr_start, $other->subexpr_start));
-        $this->subexpr_end = array_values(array_merge($this->subexpr_end, $other->subexpr_end));
     }
 
     /**
@@ -183,7 +173,7 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        return count($this->subpatt_start) || count($this->subpatt_end) || count($this->subexpr_start) || count($this->subexpr_end);
+        return count($this->subpatt_start) || count($this->subpatt_end);
     }
 
     /**
@@ -218,31 +208,19 @@ class qtype_preg_fa_transition {
     }
 
     public function open_tags_tohr() {
-        $result ='';
-        if (count($this->subpatt_start) != 0 || count($this->subexpr_start) != 0) {
-            foreach ($this->subpatt_start as $subpatt) {
-                $result .= '(';
-            }
-            $result .= '/';
-            foreach ($this->subexpr_start as $subpatt) {
-                $result .= '(';
-            }
+        $numbers = array();
+        foreach ($this->subpatt_start as $subpatt) {
+            $numbers[] = $subpatt->subpattern;
         }
-        return $result;
+        return implode(',', $numbers);
     }
 
     public function close_tags_tohr() {
-        $result ='';
-        if (count($this->subpatt_end) != 0 || count($this->subexpr_end) != 0) {
-            foreach ($this->subexpr_end as $subpatt) {
-                $result .= ')';
-            }
-            $result .= '/';
-            foreach ($this->subpatt_end as $subpatt) {
-                $result .= ')';
-            }
+        $numbers = array();
+        foreach ($this->subpatt_end as $subpatt) {
+            $numbers[] = $subpatt->subpattern;
         }
-        return $result;
+        return implode(',', $numbers);
     }
 }
 
@@ -459,6 +437,16 @@ abstract class qtype_preg_finite_automaton {
      */
     abstract protected function set_limits();
 
+    public function transitions_tohr() {
+        $result = '';
+        foreach ($this->adjacencymatrix as $from => $transitions) {
+            foreach ($transitions as $to => $transition) {
+                $result .= $from . ' -> ' . $transition->pregleaf->leaf_tohr() . ' -> ' . $to . "\n";
+            }
+        }
+        return $result;
+    }
+
     /**
      * Returns whether automaton is really deterministic.
      */
@@ -560,8 +548,8 @@ abstract class qtype_preg_finite_automaton {
     public function reachable_states($backwards = false) {
         // Initialization wavefront.
         $front = $backwards
-                  ? array_values($this->endstates)
-                  : array_values($this->startstates);
+               ? array_values($this->endstates)
+               : array_values($this->startstates);
 
         $reached = array();
 
@@ -578,7 +566,6 @@ abstract class qtype_preg_finite_automaton {
                          : $transition->to;
             }
         }
-
         return $reached;
     }
 
@@ -606,40 +593,33 @@ abstract class qtype_preg_finite_automaton {
      * @param filename the absolute path to the resulting image file.
      * @return dot_style string with the description of automata.
      */
-    public function fa_to_dot($type = null, $filename = null) {
+    public function fa_to_dot($type = null, $filename = null, $usestateids = false) {
         $addedcharacters = '/(), ';
         $result = "digraph {\n    rankdir=LR;\n    ";
         if ($this->statecount != 0) {
             // Add start states.
-            foreach ($this->startstates as $start) {
-                $realnumber = $this->statenumbers[$start];
-                if (strpbrk($realnumber, $addedcharacters) !== false) {
-                    $result .= '"' . $realnumber . '"';
-                } else {
-                    $result .= $realnumber;
+            foreach ($this->adjacencymatrix as $id => $state) {
+                $realnumber = $usestateids
+                            ? $id
+                            : $this->statenumbers[$start];
+                $result .= '"' . $realnumber . '"';
+                if (in_array($id, $this->startstates)) {
+                    $result .= '[shape=rarrow]';
+                } else if (in_array($id, $this->endstates)) {
+                    $result .= '[shape=doublecircle]';
                 }
-                $result .= '[shape=rarrow];';
-            }
-            $result .= "\n    ";
-            // Add end states.
-            foreach ($this->endstates as $end) {
-                $realnumber = $this->statenumbers[$end];
-                if (strpbrk($realnumber, $addedcharacters) !== false) {
-                    $result .= '"' . $realnumber . '"';
-                } else {
-                    $result .= $realnumber;
-                }
-                $result .= '[shape=doublecircle];';
-            }
-            // Add connected states.
-            $states = $this->get_states();
-            foreach ($states as $curstate) {
-                $outtransitions = $this->get_adjacent_transitions($curstate, true);
+                $result .= ';';
+
+                $outtransitions = $this->get_adjacent_transitions($id, true);
                 foreach ($outtransitions as $tran) {
                     $result .= "\n    ";
-                    $fromindex = $this->statenumbers[$tran->from];
-                    $toindex = $this->statenumbers[$tran->to];
-                    $result .= $tran->get_label_for_dot($fromindex, $toindex);
+                    $from = $tran->from;
+                    $to = $tran->to;
+                    if (!$usestateids) {
+                        $from = $this->statenumbers[$from];
+                        $to = $this->statenumbers[$to];
+                    }
+                    $result .= $tran->get_label_for_dot($from, $to);
                 }
             }
         }
@@ -936,8 +916,6 @@ abstract class qtype_preg_finite_automaton {
             $asserts = array();
             $subpatt_start = array();
             $subpatt_end = array();
-            $subexpr_start = array();
-            $subexpr_end = array();
             $currentindex = 0;
             $point = false;
             // Parse a string into components.
@@ -954,7 +932,7 @@ abstract class qtype_preg_finite_automaton {
                     // If subexpr_start.
                     if ($arraystrings[2][$currentindex] == '(') {
                         while ($arraystrings[2][$currentindex] == '(') {
-                            $subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+                            //$subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                             $currentindex++;
                         }
                     }
@@ -962,7 +940,7 @@ abstract class qtype_preg_finite_automaton {
                     // If subexpr_start without subpatt_start.
                     $currentindex++;
                     while ($arraystrings[2][$currentindex] == '(') {
-                        $subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+                        //$subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                         $currentindex++;
                     }
                 } else if ($arraystrings[2][$currentindex] == '\\') {
@@ -986,7 +964,7 @@ abstract class qtype_preg_finite_automaton {
                 // If subexpr_end.
                 else if($arraystrings[2][$currentindex] == ')') {
                     while($arraystrings[2][$currentindex] != '/') {
-                        $subexpr_end[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
+                        //$subexpr_end[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
                         $currentindex++;
                     }
                     $currentindex++;
@@ -1074,9 +1052,6 @@ abstract class qtype_preg_finite_automaton {
                 $transition = new qtype_preg_nfa_transition($statefrom,$pregleaf, $stateto);
                 $transition->subpatt_start = $subpatt_start;
                 $transition->subpatt_end = $subpatt_end;
-                $transition->subexpr_start = $subexpr_start;
-                $transition->subexpr_end = $subexpr_end;
-
             }
             else {
                 $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);

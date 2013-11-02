@@ -411,7 +411,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         }
 
         // Some stuff for subexpressions.
-        foreach ($transition->subexpr_start as $node) {
+        foreach ($transition->subpatt_start as $node) {
+            if ($node->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+                continue;
+            }
             if ($options->capturesubexpressions || $node->subpattern == $this->root_subpatt_number()) {
                 $this->subexpr_to_subpatt[$node->number] = $node->subpattern;
             }

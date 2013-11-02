@@ -37,8 +37,6 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->subpatt_start[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition->subpatt_start[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $transition->subexpr_start[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
-        $transition->subexpr_end[] = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
         // Fill pregleaf.
