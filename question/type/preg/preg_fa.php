@@ -422,6 +422,7 @@ abstract class qtype_preg_finite_automaton {
 
     protected $statecount = 0;
     protected $transitioncount = 0;
+    protected $idcounter = 0;
 
     protected $statelimit;
     protected $transitionlimit;
@@ -723,12 +724,13 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_state($statenumber = null) {
         if ($statenumber === null) {
-            $statenumber = $this->statecount++;
+            $statenumber = $this->idcounter;
         }
         if (!in_array($statenumber, $this->statenumbers)) {
             $this->adjacencymatrix[] = array();
             $this->statenumbers[] = $statenumber;
             $this->statecount++;
+            $this->idcounter++;
             if ($this->statecount > $this->statelimit) {
                 throw new qtype_preg_toolargefa_exception('');
             }
