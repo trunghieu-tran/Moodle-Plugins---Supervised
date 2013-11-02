@@ -760,6 +760,9 @@ abstract class qtype_preg_finite_automaton {
      * Changes states which transitions come to/from.
      */
     public function redirect_transitions($oldstateid, $newstateid) {
+        if ($oldstateid == $newstateid) {
+            return;
+        }
         // Get intotransitions.
         $outgoing = $this->get_adjacent_transitions($oldstateid, true);
         $incoming = $this->get_adjacent_transitions($oldstateid, false);
