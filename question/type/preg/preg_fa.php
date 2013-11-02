@@ -561,7 +561,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function reachable_states($backwards = false) {
         // Initialization wavefront.
-        $front = $direction
+        $front = $backwards
                   ? array_values($this->endstates)
                   : array_values($this->startstates);
 
@@ -573,9 +573,9 @@ abstract class qtype_preg_finite_automaton {
                 continue;
             }
             $reached[] = $curstate;
-            $transitions = $this->get_adjacent_transitions($curstate, !$direction);
+            $transitions = $this->get_adjacent_transitions($curstate, !$backwards);
             foreach ($transitions as $transition) {
-                $front[] = $direction
+                $front[] = $backwards
                          ? $transition->from
                          : $transition->to;
             }
@@ -600,6 +600,7 @@ abstract class qtype_preg_finite_automaton {
                 $this->remove_state($curstate);
             }
         }
+
     }
 
     /**
