@@ -66,7 +66,7 @@ class qtype_preg_lexer extends JLexBase  {
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
     protected $last_subexpr = 0;
     // Max subexpression number.
-    protected $max_subexpr = 0;
+    protected $maxsubexpr = 0;
     // Map of subexpression names => numbers.
     protected $subexpr_name_to_number_map = array();
     // Map of subexpression numbers => names.
@@ -301,7 +301,7 @@ class qtype_preg_lexer extends JLexBase  {
         return $this->errors;
     }
     public function get_max_subexpr() {
-        return $this->max_subexpr;
+        return $this->maxsubexpr;
     }
     public function get_subexpr_map() {
         return $this->subexpr_name_to_number_map;
@@ -366,7 +366,7 @@ class qtype_preg_lexer extends JLexBase  {
             $previtem = $this->opt_stack[$this->opt_count - 1];
             if ($previtem->last_dup_subexpr_number == -1) {
                 // Yes we are outside; set subpattern numeration to max occurred number.
-                $this->last_subexpr = $this->max_subexpr;
+                $this->last_subexpr = $this->maxsubexpr;
             }
         }
     }
@@ -782,7 +782,7 @@ class qtype_preg_lexer extends JLexBase  {
             }
             $this->subexpr_name_to_number_map[$name] = $number;
             $this->last_subexpr++;
-            $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+            $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
             return $number;
         }
         // This subexpression does exist.
@@ -799,7 +799,7 @@ class qtype_preg_lexer extends JLexBase  {
             $number++;
         }
         $this->last_subexpr++;
-        $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+        $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
         return $number;
     }
     /**
@@ -893,7 +893,7 @@ class qtype_preg_lexer extends JLexBase  {
     foreach ($this->nodes_with_subexpr_refs as $node) {
         $number = $node->number;
         if (is_int($number)) {
-            if ($number > $this->max_subexpr) {
+            if ($number > $this->maxsubexpr) {
                 // Error: unexisting subexpression.
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node);
                 $error->set_user_info($node->position, $node->userinscription);
@@ -6433,7 +6433,7 @@ array(
 							{                      /* (...)           Subexpression */
     $this->push_options_stack_item();
     $this->last_subexpr++;
-    $this->max_subexpr = max($this->max_subexpr, $this->last_subexpr);
+    $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
     $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->last_subexpr);
     $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(')));
     return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
@@ -6538,7 +6538,7 @@ array(
 							{      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
+    if ((int)$str < 10 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
         return $this->form_backref($text, (int)$str);
     }
@@ -7799,7 +7799,7 @@ array(
 							{      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
+    if ((int)$str < 10 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
         return $this->form_backref($text, (int)$str);
     }
@@ -8279,7 +8279,7 @@ array(
 							{      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->max_subexpr && (int)$str < 100)) {
+    if ((int)$str < 10 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
         return $this->form_backref($text, (int)$str);
     }
