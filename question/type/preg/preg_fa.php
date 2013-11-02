@@ -124,10 +124,12 @@ class qtype_preg_fa_transition {
      * Checks if this transition has exactly same tags as other.
      */
     public function has_exact_same_tags($other) {
-        return empty(array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes')) &&
-               empty(array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes')) &&
-               empty(array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes')) &&
-               empty(array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes'));
+        $startsubpatterndif = array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes');
+        var_dump($startsubpatterndif);
+        $endsubpatterndif = array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes');
+        $startsubexprdif = array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes');
+        $endsubexprdif = array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes');
+        return empty($startsubpatterndif) && empty($endsubpatterndif) && empty($startsubexprdif) && empty($endsubexprdif);
     }
 
     /**
