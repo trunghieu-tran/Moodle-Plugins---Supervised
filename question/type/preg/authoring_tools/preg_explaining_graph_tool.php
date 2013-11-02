@@ -103,7 +103,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * @return explainning graph of regular expression.
      */
     public function create_graph() {
-        $graph = $this->dst_root->create_graph();
+        $graph = $this->dstroot->create_graph();
 
         if ($this->options->exactmatch) {
             $graph->isexact = true;
