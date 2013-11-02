@@ -124,12 +124,11 @@ class qtype_preg_fa_transition {
      * Checks if this transition has exactly same tags as other.
      */
     public function has_exact_same_tags($other) {
-        $startsubpatterndif = array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes');
-        var_dump($startsubpatterndif);
-        $endsubpatterndif = array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes');
-        $startsubexprdif = array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes');
-        $endsubexprdif = array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes');
-        return empty($startsubpatterndif) && empty($endsubpatterndif) && empty($startsubexprdif) && empty($endsubexprdif);
+        $startsubpatternd = array_udiff($this->subpatt_start, $other->subpatt_start, 'self::compare_preg_nodes');
+        $endsubpatternd = array_udiff($this->subpatt_end, $other->subpatt_end, 'self::compare_preg_nodes');
+        $startsubexprd = array_udiff($this->subexpr_start, $other->subexpr_start, 'self::compare_preg_nodes');
+        $endsubexprd = array_udiff($this->subexpr_end, $other->subexpr_end, 'self::compare_preg_nodes');
+        return empty($startsubpatternd) && empty($endsubpatternd) && empty($startsubexprd) && empty($endsubexprd);
     }
 
     /**
@@ -169,7 +168,6 @@ class qtype_preg_fa_transition {
 
     public function unite($other) {
         $result = null;
-        var_dump($this->has_exact_same_tags($other));
         if ($this->has_exact_same_tags($other)) {
             // Get union of leafs.
             $newleaf = $this->pregleaf->unite_leafs($other->pregleaf);
@@ -600,7 +598,6 @@ abstract class qtype_preg_finite_automaton {
                 $this->remove_state($curstate);
             }
         }
-
     }
 
     /**
@@ -621,7 +618,7 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     $result .= $realnumber;
                 }
-                $result .= ';';
+                $result .= '[shape=rarrow];';
             }
             $result .= "\n    ";
             // Add end states.
@@ -632,7 +629,7 @@ abstract class qtype_preg_finite_automaton {
                 } else {
                     $result .= $realnumber;
                 }
-                $result .= ';';
+                $result .= '[shape=doublecircle];';
             }
             // Add connected states.
             $states = $this->get_states();
@@ -697,22 +694,14 @@ abstract class qtype_preg_finite_automaton {
      * Remove all end states of the automaton.
      */
     public function remove_all_end_states() {
-        // Cleaning end states.
-        $endstates = $this->end_states();
-        foreach ($endstates as $endstate) {
-            $this->remove_end_state($endstate);
-        }
+        $this->endstates = array();
     }
 
     /**
      * Remove all start states of the automaton.
      */
     public function remove_all_start_states() {
-        // Cleaning end states.
-        $startstates = $this->start_states();
-        foreach ($startstates as $startstate) {
-            $this->remove_start_state($startstate);
-        }
+        $this->startstates = array();
     }
 
     /**
@@ -803,42 +792,24 @@ abstract class qtype_preg_finite_automaton {
         }
 
         // Get the transition which it had before.
-        $existing = $this->adjacencymatrix[$transition->from][$transition->to];
+        $existing = $outtransitions[$transition->to];
         if ($existing === $transition) {
             return;
         }
 
         // Is it possible to just unit preg leaves?
-        $newtran = $existing->unite($transition);
-        if ($newtran !== null) {
-            $existing = $newtran;
+        if ($existing->unite($transition) !== null) {
             return;
         }
 
         // Need to add a new state.
-        $newto = $this->add_state();
-        if (in_array($existing->to, $this->startstates)) {
-            $this->add_start_state($newto);
-        }
-        if (in_array($existing->to, $this->endstates)) {
-            $this->add_end_state($newto);
-        }
-
-        // Copy transitions for clone state.
-        foreach ($this->get_adjacent_transitions($existing->to, true) as $tran) {
-            $clone = clone $tran;
-            $clone->from = $newto;
-            $this->adjacencymatrix[$clone->from][$clone->to] = $clone;
-        }
-        foreach ($this->get_adjacent_transitions($existing->to, false) as $tran) {
-            $clone = clone $tran;
-            $clone->to = $newto;
-            $this->adjacencymatrix[$clone->from][$clone->to] = $clone;
-        }
+        $newfrom = $this->add_state();
+        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->adjacencymatrix[$transition->from][$newfrom] = new qtype_preg_nfa_transition($transition->from, $epsleaf, $newfrom);
 
         // Add the transition itself.
-        $transition->to = $newto;
-        $this->adjacencymatrix[$transition->from][$newto] = $transition;
+        $transition->from = $newfrom;
+        $this->adjacencymatrix[$newfrom][$transition->to] = $transition;
     }
 
     /**
