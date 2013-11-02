@@ -602,7 +602,7 @@ abstract class qtype_preg_finite_automaton {
             foreach ($this->adjacencymatrix as $id => $state) {
                 $realnumber = $usestateids
                             ? $id
-                            : $this->statenumbers[$start];
+                            : $this->statenumbers[$id];
                 $result .= '"' . $realnumber . '"';
                 if (in_array($id, $this->startstates)) {
                     $result .= '[shape=rarrow]';
