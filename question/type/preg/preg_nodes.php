@@ -662,6 +662,26 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     }
 
     /**
+     * Returns union of leafs.
+     *
+     * @param other another leaf for union.
+     */
+    public function unite_leafs($other) {
+        $result = null;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+            if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                if ($this->assertionsbefore == $other->assertionsbefore && $this->assertionsafter == $other->assertionsafter) {
+                    $result = $this->unite($other);
+                    $result->userinscription = array_merge($this->userinscription, $other->userinscription);
+                }
+            }
+        } else if ($this == $other) {
+            $result = $this;
+        }
+        return $result;
+    }
+
+    /**
      * Returns label of leaf.
      *
      */
