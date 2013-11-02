@@ -202,8 +202,8 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         $this->options->rangelengthmax = (int)$rangelengthmax;
 
         $string = '';
-        if (isset($this->dst_root)) {
-            $string = $this->dst_root->description($numbering_pattern, null, null);
+        if (isset($this->dstroot)) {
+            $string = $this->dstroot->description($numbering_pattern, null, null);
             $string = preg_replace('%;((?:</span>)?)]%u', '\1]', $string);   // Postprocessing
         }
         // put string into $wholepattern
@@ -225,7 +225,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * for testing
      */
     public function form_description($form) {
-        $result = $this->dst_root->description('%s', null, $form);
+        $result = $this->dstroot->description('%s', null, $form);
         return $result;
     }
 }

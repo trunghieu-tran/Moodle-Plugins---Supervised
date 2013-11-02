@@ -139,7 +139,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         if ($full) {
             $matchresults->full = true;// No partial matching from preg_match.
             foreach ($matches as $i => $match) {
-                $matchresults->index_first[$i] = $match[1];
+                $matchresults->indexfirst[$i] = $match[1];
                 if ($match[1] !== -1) {
                     $matchresults->length[$i] = qtype_preg_unicode::strlen($match[0]);
                 } else {
@@ -150,7 +150,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             // TODO: find a way to show selection when it's not equivalent to capturing subexpression, without interfering with subpattern numbering.
             if ($this->selectednode !== null && is_a($this->selectednode, 'qtype_preg_node_subexpr') && $this->selectednode->number > -1) {
                 // There is selection and it is capturing subexpression.
-                $matchresults->index_first[-2] = $matchresults->index_first[$this->selectednode->number];
+                $matchresults->indexfirst[-2] = $matchresults->indexfirst[$this->selectednode->number];
                 $matchresults->length[-2] = $matchresults->length[$this->selectednode->number];
             }
         }

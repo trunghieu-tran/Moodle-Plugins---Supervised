@@ -97,7 +97,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->state = $state;
 
         $result->matches = array();
-        $result->subexpr_to_subpatt = array(0 => $this->ast_root->subpattern);
+        $result->subexpr_to_subpatt = array(0 => $this->astroot->subpattern);
         $result->startpos = $startpos;
         $result->length = 0;
 
@@ -697,14 +697,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $nfa = self::build_nfa($this->ast_root, $this->dst_root);
+        $nfa = self::build_nfa($this->astroot, $this->dstroot);
         if ($nfa !== false) {
             $this->automaton = $nfa;
             $this->nestingmap = array();
-            $this->calculate_nesting_map($this->ast_root, array($this->ast_root->subpattern));
+            $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
-            // $this->automaton->on_subexpr_added($this->ast_root);
+            // $this->automaton->on_subexpr_added($this->astroot);
         } else {
             $this->automaton = null;
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
