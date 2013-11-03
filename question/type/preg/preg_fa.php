@@ -1818,17 +1818,17 @@ abstract class qtype_preg_finite_automaton {
         // Create transitions which can replace \b and \B.
         // Create \w.
         $flagbigw = new qtype_preg_charset_flag();
-        $flagbigw->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SLASH_W);
+        $flagbigw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
         $charsetbigw = new qtype_preg_leaf_charset();
         $charsetbigw->flags = array(array($flagbigw));
-        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W));
         $tranbigw = new qtype_preg_nfa_transition(0, $charsetbigw, 1);
         // Create \W.
         $flagbigw = clone $flagbigw;
         $flagbigw->negative = true;
         $charsetbigw = new qtype_preg_leaf_charset();
         $charsetbigw->flags = array(array($flagbigw));
-        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_userinscription::TYPE_CHARSET_FLAG));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
         $tranbigw = new qtype_preg_nfa_transition(0, $charsetbigw, 1);
         // Create ^.
         $assertcircumflex = new qtype_preg_leaf_assert_circumflex();

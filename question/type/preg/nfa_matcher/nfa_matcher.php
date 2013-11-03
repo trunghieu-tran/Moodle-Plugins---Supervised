@@ -437,7 +437,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
             $curstate = array_pop($curstates);
-            var_dump($curstate->state);
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
                 $curpos = $startpos + $curstate->length;
