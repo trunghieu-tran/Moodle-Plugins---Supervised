@@ -127,7 +127,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      */
     protected function epsilon_closure($startstates) {
         $curstates = $startstates;
-        $result = $startstates;
+        $result = array('lazy' => array(),
+                        'greedy' => $startstates
+                        );
         $endstates = $this->automaton->end_states();
 
         while (count($curstates) != 0) {
@@ -137,8 +139,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             foreach ($transitions as $transition) {
                 $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
-                if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY ||
-                    $transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                     continue;
                 }
 
@@ -161,9 +162,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state;
-                if (!isset($result[$number]) || $newstate->leftmost_longest($result[$number])) {
-                    $result[$number] = $newstate;
-                    $curstates[] = $newstate;
+                $key = $transition->greediness == qtype_preg_fa_transition::GREED_LAZY
+                     ? 'lazy'
+                     : 'greedy';
+                if (!isset($result[$key][$number]) || $newstate->leftmost_longest($result[$key][$number])) {
+                    $result[$key][$number] = $newstate;
+                    if ($key != 'lazy') {
+                        $curstates[] = $newstate;
+                    }
                 }
             }
         }
@@ -206,6 +212,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 continue;
             }
             $closure = $this->epsilon_closure(array($laststate->state => $laststate));
+            $closure = array_merge($closure['lazy'], $closure['greedy']);
             foreach ($closure as $curclosure) {
                 if (in_array($curclosure->state, $endstates)) {
                     // The end state is reachable; return it immediately.
@@ -320,6 +327,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         // Get an epsilon-closure of the resume state.
         $closure = $this->epsilon_closure(array($resumestate->state => $resumestate));
+        $closure = array_merge($closure['lazy'], $closure['greedy']);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state] = $curclosure;
             $curstates[] = $curclosure->state;
@@ -334,6 +342,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             while (count($curstates) != 0) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
+                if ($curstate->full) {
+                    if ($result === null || $curstate->leftmost_shortest($result)) {
+                        $result = $curstate;
+                    }
+                }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -385,15 +398,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     if (!isset($reached[$number]) || $newstate->leftmost_shortest($reached[$number])) {
                         $reached[$number] = $newstate;
                     }
-                    if ($newstate->full) {
-                        if ($result === null || $newstate->leftmost_shortest($result)) {
-                            $result = $newstate;
-                        }
-                    }
                 }
             }
 
             $reached = $this->epsilon_closure($reached);
+            $reached = array_merge($reached['lazy'], $reached['greedy']);
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
@@ -423,7 +432,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         foreach ($this->automaton->start_states() as $state) {
             $curstates[] = $this->create_initial_state($state, $str, $startpos);
         }
-var_dump($this->automaton->transitions_tohr());die;
+
         // Do search.
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
@@ -451,12 +460,10 @@ var_dump($this->automaton->transitions_tohr());die;
                     if ($transition->causes_backtrack()) {
                         $newstate->backtrack_states[] = $curstate;
                     }
-                    var_dump($transition->from . $transition->pregleaf->leaf_tohr() . $transition->to);
-                    var_dump($newstate->state);
 
                     // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
-                        if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                        if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             $lazystates[] = $newstate;
                         } else {
                             $curstates[] = $newstate;
@@ -523,10 +530,13 @@ var_dump($this->automaton->transitions_tohr());die;
             }
         }
         $closure = $this->epsilon_closure($curstates);
+        $lazystates = array_merge($lazystates, $closure['lazy']);
+        $closure = $closure['greedy'];
         $curstates = array();
         foreach ($closure as $curclosure) {
             $states[$curclosure->state] = $curclosure;
             $curstates[] = $curclosure->state;
+            $endstatereached = $endstatereached || $curclosure->full;
         }
 
         // Do search.
@@ -565,7 +575,7 @@ var_dump($this->automaton->transitions_tohr());die;
                         $endstatereached = $endstatereached || $newstate->full;
 
                         // Save the current result.
-                        if ($transition->quant == qtype_preg_nfa_transition::QUANT_LAZY) {
+                        if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             $lazystates[] = $newstate;
                         } else {
                             $number = $newstate->state;
@@ -590,6 +600,8 @@ var_dump($this->automaton->transitions_tohr());die;
             }
 
             $reached = $this->epsilon_closure($reached);
+            $lazystates = array_merge($lazystates, $reached['lazy']);
+            $reached = $reached['greedy'];
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {

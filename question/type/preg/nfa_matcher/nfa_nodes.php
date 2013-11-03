@@ -35,13 +35,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
  */
 class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
-    const QUANT_NONE = 0;
-    const QUANT_LAZY = 1;
-    const QUANT_GREEDY = 2;
-    const QUANT_POSSESSIVE = 4;
 
-    // Type of the quantifier that this transition belongs to, one of the constants above.
-    public $quant;
+
+
 
     // A subpattern node with minimal number.
     public $min_subpatt_node;
@@ -57,7 +53,6 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     public function __construct($from, $pregleaf, $to, $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, $consumeschars = true) {
         parent::__construct($from, $pregleaf, $to, $origin, $consumeschars);
-        $this->quant = self::QUANT_NONE;
         $this->min_subpatt_node = null;
         $this->starts_backrefed_subexprs = false;
         $this->starts_quantifier = false;
@@ -350,10 +345,10 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
         $body = array_pop($stack);
 
         // Now, clone all transitions from the start state to the end state.
-        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
+        $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
         foreach ($outgoing as $transition) {
-            $transition->quant = $quant;        // Set this field for ALL repetitions.
+            $transition->greediness = $greediness;        // Set this field for ALL repetitions.
             $newtransition = clone $transition;
             $newtransition->from = $body['end'];
             $newtransition->is_loop = true;
@@ -384,11 +379,11 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
             $cur = array_pop($stack);
             // The last block is repeated.
             if ($i == $leftborder - 1) {
-                $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
+                $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
                 $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
                 foreach ($outgoing as $transition) {
                     $newtransition = clone $transition;
-                    $newtransition->quant = $quant; // Set this field for the LAST repetition.
+                    $newtransition->greediness = $greediness; // Set this field for the LAST repetition.
                     $newtransition->from = $cur['end'];
                     $newtransition->is_loop = true;
                     $automaton->add_transition($newtransition);
@@ -433,10 +428,10 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
         $body = array_pop($stack);
 
         // Set the greediness.
-        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
+        $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
         foreach ($outgoing as $transition) {
-            $transition->quant = $quant;
+            $transition->greediness = $greediness;
         }
 
         // The body automaton can be skipped by an eps-transition.
@@ -460,7 +455,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
-        $quant = $this->pregnode->lazy ? qtype_preg_nfa_transition::QUANT_LAZY : qtype_preg_nfa_transition::QUANT_GREEDY;
+        $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         for ($i = 0; $i < $rightborder; $i++) {
             $this->operands[0]->create_automaton($automaton, $stack);
             $cur = array_pop($stack);
@@ -468,7 +463,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
                 self::add_ending_eps_transition_if_needed($automaton, $cur);
                 $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
                 foreach ($outgoing as $transition) {
-                    $transition->quant = $quant;
+                    $transition->greediness = $greediness;
                 }
                 $borderstates[] = $cur['start'];
             }

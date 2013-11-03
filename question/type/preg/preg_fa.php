@@ -36,6 +36,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
  */
 class qtype_preg_fa_transition {
 
+    const GREED_LAZY = 1;
+    const GREED_GREEDY = 2;
+    const GREED_POSSESSIVE = 4;
+
     /** Empty transition. */
     const TYPE_TRANSITION_EPS = 'eps_transition';
     /** Transition with unmerged simple assert. */
@@ -58,6 +62,8 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
+    /** @var greediness of this transition. */
+    public $greediness;
     /** @var type of the transition - should be equal to a constant defined in this class. */
     public $type;
     /** @var origin of the transition - should be equal to a constant defined in this class. */
@@ -76,6 +82,7 @@ class qtype_preg_fa_transition {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
+        $this->greediness = self::GREED_GREEDY;
         $this->origin = $origin;
         $this->consumeschars = $consumeschars;
         $this->subpatt_start = array();
@@ -102,11 +109,18 @@ class qtype_preg_fa_transition {
         $lab = $this->pregleaf->leaf_tohr();
         $lab = '"' . $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close . '"';
 
+        $thickness = 2;
+        if ($this->greediness == self::GREED_LAZY) {
+            $thickness = 1;
+        } else if ($this->greediness == self::GREED_POSSESSIVE) {
+            $thickness = 3;
+        }
+
         // Dummy transitions are displayed dotted.
         if ($this->consumeschars) {
-            return "$index1->$index2" . "[label = $lab, color = $color];";
+            return "$index1->$index2" . "[label = $lab, color = $color, penwidth = $thickness];";
         } else {
-            return "$index1->$index2" . "[label = $lab, color = $color, style = dotted];";
+            return "$index1->$index2" . "[label = $lab, color = $color, penwidth = $thickness, style = dotted];";
         }
     }
 
