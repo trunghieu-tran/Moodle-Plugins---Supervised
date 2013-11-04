@@ -876,14 +876,14 @@ abstract class qtype_preg_finite_automaton {
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
-        return array_search($state, $this->startstates) === false;
+        return array_search($state, $this->startstates) !== false;
     }
 
     /**
      * Check if such state is in array of end states.
      */
     public function has_endstate($state) {
-        return array_search($state, $this->endstates) === false;
+        return array_search($state, $this->endstates) !== false;
     }
 
     /**
