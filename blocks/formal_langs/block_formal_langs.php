@@ -26,7 +26,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 
-class block_formal_langs extends block_base {
+class block_formal_langs extends block_list {
     //TODO: Implement this
     public function init() {
         $this->title = get_string('pluginname', 'block_formal_langs');
@@ -44,22 +44,25 @@ class block_formal_langs extends block_base {
      */
     public static function available_langs($contextid = null) {
         global $CFG;
-        $languages = block_formal_langs::all_languages();
-        // TODO - create a table with eye icons and set "visible" DB field for the language accordingly instead of using $CFG->xxx.
-        $showedlanguages = $CFG->block_formal_langs_showablelangs;
-        if (textlib::strlen($showedlanguages) != 0)
-        {
-            $availablelanguages = array();
-            $showedlanguages = explode(',', $showedlanguages);
-            foreach($showedlanguages as $langkey)
-            {
-                // Copy only visible langugages.
-                $availablelanguages[$langkey] = $languages[$langkey];
-            }
+        if ($contextid == null) {
+            $currentcontexts = array( context_system::instance()->id );
         } else {
-            $availablelanguages = $languages;
+            $context = context::instance_by_id($contextid);
+            $currentcontexts = $context->get_parent_context_ids(false);
+            $currentcontexts[] = $context->id;
         }
-        return $availablelanguages;
+
+        $table = block_formal_langs::build_visibility_for_all_languages($currentcontexts);
+
+
+        $languages = block_formal_langs::all_languages();
+        foreach($table as $record) {
+            if ($record->visible == 0 && array_key_exists($record->languageid, $languages)) {
+                unset($languages[$record->languageid]);
+            }
+        }
+
+        return $languages;
     }
 
     /**
@@ -271,7 +274,7 @@ class block_formal_langs extends block_base {
      * @param  array $contexttree of int list of parent contexts
      * @return array of stdClass <int id, string name, string ui_name, string version, bool visible>
      */
-    public function build_visibility_for_all_languages($contexttree) {
+    public static function build_visibility_for_all_languages($contexttree) {
         global $DB;
         $languages = $DB->get_records('block_formal_langs', array('visible' => '1'));
         if (count($contexttree) == 0) {
@@ -322,7 +325,7 @@ class block_formal_langs extends block_base {
      * @param int $visibility visibility of data
      * @param int $contextid id of context for items
      */
-    public function update_language_visibility($languageid, $visibility, $contextid) {
+    public static function update_language_visibility($languageid, $visibility, $contextid) {
         global $DB;
         $contexttree = context::instance_by_id($contextid)->get_parent_context_ids(true);
         list($insql, $params) = $DB->get_in_or_equal($contexttree);
@@ -445,10 +448,183 @@ class block_formal_langs extends block_base {
     }
 
     public function get_content() {
-        global $_REQUEST;
+        global $_REQUEST, $PAGE, $CFG, $OUTPUT, $DB;
+
+        $PAGE->requires->jquery();
+
+        $this->content         = new stdClass;
+        $this->content->items  = array();
+        $this->content->icons  = array();
+
+
+        $context  = $this->page->context;
+        $contexts = $context->get_parent_context_ids(true);
+        array_unshift($contexts, $context->id);
+
+        // Do not add anything, if we cannot edit
+        if (!has_capability('moodle/course:manageactivities', $context)) {
+            return null;
+        }
+
+        $action  = optional_param('action', '', PARAM_RAW);
+        if ($action == 'removeformallanguage') {
+            $langid = required_param('languageid', PARAM_INT);
+            $DB->delete_records('block_formal_langs', array('id' => $langid));
+            $DB->delete_records('block_formal_langs_perms', array('languageid' => $langid));
+        }
+        if ($action == 'flanguagevisibility') {
+            $langid = required_param('languageid', PARAM_INT);
+            $visible = required_param('visible', PARAM_INT);
+            block_formal_langs::update_language_visibility($langid, $visible, $context->id);
+        }
+
+        $permissions = block_formal_langs::build_visibility_for_all_languages($contexts);
+
+        if ($this->page->user_is_editing()) {
+            $link = $CFG->wwwroot . '/blocks/formal_langs/edit.php?new=1&context=' . $context->id;
+            $icon =  html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/add')));
+            $icona = html_writer::tag('a', $icon, array('href' => $link, 'title' => get_string('addnewlanguage', 'block_formal_langs')));
+            $this->content->icons[] = $icona;
+            $this->content->items[] =  html_writer::tag('a', get_string('addnewlanguage', 'block_formal_langs'), array('href' => $link));;
+        }
+        foreach($permissions as $permission) {
+            if ($permission->visible) {
+                $visible = 0;
+                $icon = 'i/hide';
+            } else {
+                $visible = 1;
+                $icon = 'i/show';
+            }
+
+            // $link  = $this->page->url->out(false, array('languageid' => $permission->id, 'action' => 'flanguagevisibility', 'visible' => $visible));
+            $link = 'javascript: void(0)';
+            $viconattr =  array('src' => $OUTPUT->pix_url($icon), 'width' => '16', 'height' => '16');
+            $viconhref =  array(
+                'href' => $link,
+                'class' => 'padright changevisibility',
+                'title' => get_string('changevisibility', 'block_formal_langs'),
+                'data-id' => $permission->id,
+                'data-visible' => $permission->visible
+            );
+            $visibleicon = html_writer::tag('a', html_writer::empty_tag('img', $viconattr), $viconhref);
+
+            $editlinks = '';
+            if ($this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0) {
+                $editlink = $CFG->wwwroot . '/blocks/formal_langs/edit.php?id=' . $permission->id . '&context=' . $context->id;
+                $editiconattr =  array('src' => $OUTPUT->pix_url('t/edit'));
+                $editiconhref =  array('href' => $editlink, 'class' => 'padright', 'title' => get_string('editlanguage', 'block_formal_langs', $permission->uiname));
+                $editlinks .= html_writer::tag('a', html_writer::empty_tag('img', $editiconattr), $editiconhref);
+
+                // $link  = $this->page->url->out(false, array('languageid' => $permission->id, 'action' => 'removeformallanguage'));
+                $link = 'javascript: void(0)';
+                $viconattr =  array('src' => $OUTPUT->pix_url('t/delete'));
+                $viconhref =  array(
+                    'href' => $link,
+                    'class' => 'padright deletelanguage',
+                    'title' => get_string('deletelanguage', 'block_formal_langs', $permission->uiname),
+                    'data-id' => $permission->id
+                );
+                $editlinks .= html_writer::tag('a', html_writer::empty_tag('img', $viconattr), $viconhref);
+            }
+            $class = '';
+            if (!($permission->visible)) {
+                $class = 'dimmed_text';
+            }
+            $text =  html_writer::tag('span',  $visibleicon . $editlinks, array('class' => $class, 'data-id' => $permission->id));
+            $this->content->icons[] = $text;
+            $text = $permission->uiname . ' (' . $permission->version . ')';
+            $text =  html_writer::tag('span',  $text, array('class' => $class, 'data-id' => $permission->id));
+            $this->content->items[]  = $text;
+        }
+
         if ($_REQUEST['debug'] == 'Y') {
             return $this->deprecated_get_content();
         }
         return null;
+    }
+
+    protected function formatted_contents($output) {
+        global $OUTPUT;
+        $result = parent::formatted_contents($output);
+        $style = '<style>
+                .block_formal_langs .icon.column.c0 {
+                    padding-right: 3px;
+                }
+                .block_formal_langs .column.c1 {
+                    display: inline !important;
+                }
+                .block_formal_langs .padright {
+                    padding-right: 6px;
+                }
+                .block_formal_langs li {
+                    margin-bottom: 5px;
+                }
+            </style>
+        ';
+        $context  = $this->page->context;
+        $icon = new pix_icon('t/show', get_string('hide'));
+        $hidesrc = $OUTPUT->pix_url($icon->pix, $icon->component);
+        $icon = new pix_icon('t/hide', get_string('hide'));
+        $showsrc = $OUTPUT->pix_url($icon->pix, $icon->component);
+        $ajaxhandlerurl = new moodle_url('/blocks/formal_langs/ajaxhandler.php');
+        $localpage = $ajaxhandlerurl->out();
+        $js = '
+            var localpage="' . $localpage . '";
+            var context = ' .  $context->id .';
+            var hidesrc = "' .$hidesrc . '";
+            var showsrc = "' .$showsrc . '";
+            $("document").ready(function() {
+                $("a.deletelanguage").click(function() {
+                    var id = $(this).attr("data-id");
+                    $("span[data-id=" + id + "]").parent().parent().remove();
+                    $.ajax({
+                    "url": localpage,
+                    "type" : "GET",
+                    "data": {
+                        "action": "removeformallanguage",
+                        "languageid" : id
+                    },
+                    "dataType": "text",
+                    "success": function() {
+                    },
+                    "error": function(xhr) {
+                    }
+                    });
+                });
+                $("a.changevisibility").click(function() {
+                    var id = $(this).attr("data-id");
+                    var visible = $(this).attr("data-visible");
+                    var src = hidesrc;
+                    if (visible == 1)
+                    {
+                        visible = 0;
+                        $("span[data-id=" + id + "]").addClass("dimmed_text");
+                    } else {
+                        visible = 1;
+                        $("span[data-id=" + id + "]").removeClass("dimmed_text");
+                        src = showsrc;
+                    }
+                    $(this).find("img").attr("src", src);
+                    $(this).attr("data-visible", visible);
+                    $.ajax({
+                    "url": localpage,
+                    "type" : "GET",
+                    "data": {
+                        "action": "flanguagevisibility",
+                        "languageid" : id,
+                        "visible" : visible,
+                        "context" : context
+                    },
+                    "dataType": "text",
+                    "success": function() {
+                    },
+                    "error": function(xhr) {
+                    }
+                    });
+                });
+            });
+        ';
+        $script = html_writer::tag('script', $js);
+        return $result . $style . $script;
     }
 }
