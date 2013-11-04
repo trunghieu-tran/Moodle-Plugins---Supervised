@@ -1467,11 +1467,11 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
                         0->1[label="[a-z]"];
                         1->2[label="[0-9]"];
                         3->4[label="[a-c]"];
-                        2->"/3"[label="[01]"];
-                        "/3"->4[label="[a-c]"];
+                        2->5[label="[01]"];
+                        5->4[label="[a-c]"];
                         2->4[label="[a-c]"];
                         0->3[label="[xy]"];
-                        0->"/3"[label="[xy]"];
+                        0->5[label="[xy]"];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1483,6 +1483,7 @@ class qtype_preg_fa_go_round_transitions_test extends PHPUnit_Framework_TestCase
         $del = $outtransitions[$number];
         $input->go_round_transitions($del);
         $result = new qtype_preg_nfa(0, 0, 0, array());
+        var_dump($input->fa_to_dot());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
     }
@@ -1800,10 +1801,11 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 0->1[label="[]"];
                                 1->2[label="[0-9]"];
                             }';
-        $dotresult = 'digraph example {
-                        "0   1";
-                        2;
-                        "0   1"->2[label="[0-9]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0   1"[shape=rarrow];
+                        2[shape=doublecircle];
+                        "0   1"->2[label = "[[0-9]]", color = violet];
                     }';
         
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1814,9 +1816,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+         $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_unsuccessful_merging_last_state_with_tag() {
@@ -1853,10 +1858,11 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 0->1[label="[0-9]"];
                                 1->2[label="[^]"];
                             }';
-        $dotresult = 'digraph res {
-                        0;
-                        "1   2";
-                        0->"1   2"[label = "[0-9^]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        "1   2"[shape=doublecircle];
+                        0->"1   2"[label = "[[0-9]^]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1882,10 +1888,11 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 0->1[label="[0-9]"];
                                 1->2[label="[]"];
                             }';
-        $dotresult = 'digraph res {
-                        0;
-                        "1   2";
-                        0->"1   2"[label = "[0-9]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        "1   2"[shape=doublecircle];
+                        0->"1   2"[label = "[[0-9]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1914,12 +1921,13 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 0->3[label="[xy]"];
                                 1->3[label="[01]"];
                             }';
-        $dotresult = 'digraph res {
-                        0;
-                        "2   3";
-                        0->1[label = "[0-9]", color = violet];
-                        0->"2   3"[label = "[xy]", color = violet];
-                        1->"2   3"[label = "[a-c01]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        "2   3"[shape=doublecircle];
+                        0->1[label = "[[0-9]]", color = violet];
+                        0->"2   3"[label = "[[xy]]", color = violet];
+                        1->"2   3"[label = "[[a-c][01]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1975,11 +1983,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 1->2[label="[0-9]"];
                                 2->1[label="[a-z]"];
                             }';
-        $dotresult = 'digraph example {
-                        "0   1";
-                        2;
-                        "0   1"->2[label="[0-9]"];
-                        2->"0   1"[label="[a-z]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0   1"[shape=rarrow];
+                        2[shape=doublecircle];
+                        "0   1"->2[label = "[[0-9]]", color = violet];
+                        2->"0   1"[label = "[[a-z]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -1990,9 +1999,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merging_end_of_cycle() {
@@ -2003,11 +2015,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 1->2[label="[]"];
                                 1->0[label="[a-f]"];
                             }';
-        $dotresult = 'digraph res {
-                        0;
-                        "1   2";
-                        0->"1   2"[label = "[0-9]", color = violet];
-                        "1   2"->0[label = "[a-f]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        "1   2"[shape=doublecircle];
+                        0->"1   2"[label = "[[0-9]]", color = violet];
+                        "1   2"->0[label = "[[a-f]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2034,11 +2047,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                                 1->2[label="[x-z]"];
                                 1->0[label="[a-f]"];
                             }';
-        $dotresult = 'digraph example {
-                        "0   1";
-                        2;
-                        "0   1"->2[label="[x-z]"];
-                        "0   1"->"0   1"[label="[^a-f]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0   1"[shape=rarrow];
+                        2[shape=doublecircle];
+                        "0   1"->2[label = "[[x-z]]", color = violet];
+                        "0   1"->"0   1"[label = "[[a-f]^]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2049,10 +2063,12 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
         $number = array_search('1', $realnumbers);
         $del = $outtransitions[$number];
         $input->merge_transitions($del);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        var_dump($input->fa_to_dot());
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merging_in_cycle() {
@@ -2092,10 +2108,11 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 0->1[label="[]"];
                                 1->2[label="[0-9]"];
                             }';
-        $dotresult = 'digraph res {
-                        "0   1";
-                        2;
-                        "0   1"->2[label="[0-9]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0   1"[shape=rarrow];
+                        2[shape=doublecircle];
+                        "0   1"->2[label = "[[0-9]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2103,9 +2120,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $transitiontype = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
         $number = 2;
         $input->merge_uncapturing_transitions($transitiontype, $number);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_capturing_transitions_between_states() {
@@ -2156,6 +2176,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
+        var_dump($input->fa_to_dot());
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -2169,11 +2190,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 1->2[label="[^]"];
                                 2->3[label="[\\A0-9]"];
                             }';
-        $dotresult = 'digraph example {
-                        0;
-                        3;
-                        0->"1   2"[label="[^0-9]"];
-                        "1   2"->3[label="[\\A0-9]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        3[shape=doublecircle];
+                        0->"1   2"[label = "[[0-9]^]", color = violet];
+                        "1   2"->3[label = "[[0-9]\A]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2182,9 +2204,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $realnumbers = $input->get_state_numbers();
         $number = array_search('0', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merging_one_state_several_times() {
@@ -2195,11 +2220,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 1->2[label="[]"];
                                 2->3[label="[0-9]"];
                             }';
-        $dotresult = 'digraph example {
-                        0;
-                        3;
-                        0->"1   2"[label="[^]"];
-                        "1   2"->3[label="[0-9]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        3[shape=doublecircle];
+                        0->"1   2"[label = "[^]", color = violet];
+                        "1   2"->3[label = "[[0-9]]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2208,9 +2234,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $realnumbers = $input->get_state_numbers();
         $number = array_search('3', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_only_eps_transitions() {
@@ -2221,9 +2250,10 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 1->2[label="[]"];
                                 2->3[label="[]"];
                             }';
-        $dotresult = 'digraph example {
-                        "0   1   2   3";
-                        "0   1   2   3";
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0   1   2   3"[shape=rarrow];
+                        "0   1   2   3"[shape=doublecircle];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
@@ -2232,9 +2262,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $realnumbers = $input->get_state_numbers();
         $number = array_search('2', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        $result->read_fa($dotresult);
-        $this->assertEquals($input, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $input->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_another_way_without_state_for_intersection() {
@@ -2316,11 +2349,12 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
                                 1->2[label="[^]"];
                                 2->3[label="[\\A0-9]"];
                             }';
-        $dotresult = 'digraph res {
-                        0;
-                        3;
-                        0->"1   2"[label = "[0-9^]", color = violet];
-                        "1   2"->3[label = "[0-9\\A]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        0[shape=rarrow];
+                        3[shape=doublecircle];
+                        0->"1   2"[label = "[[0-9]^]", color = violet];
+                        "1   2"->3[label = "[[0-9]\A]", color = violet];
                     }';
 
         $input = new qtype_preg_nfa(0, 0, 0, array());
