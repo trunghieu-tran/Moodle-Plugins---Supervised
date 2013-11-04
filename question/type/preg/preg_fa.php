@@ -454,9 +454,11 @@ abstract class qtype_preg_finite_automaton {
 
     public function transitions_tohr() {
         $result = '';
-        foreach ($this->adjacencymatrix as $from => $transitions) {
-            foreach ($transitions as $to => $transition) {
-                $result .= $from . ' -> ' . $transition->pregleaf->leaf_tohr() . ' -> ' . $to . "\n";
+        foreach ($this->adjacencymatrix as $from => $row) {
+            foreach ($row as $to => $transitions) {
+                foreach ($transitions as $transition) {
+                    $result .= $from . ' -> ' . $transition->pregleaf->leaf_tohr() . ' -> ' . $to . "\n";
+                }
             }
         }
         return $result;
@@ -511,33 +513,25 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Return column with key from matrix $array.
-     *
-     * @param array - matrix.
-     * @param key - key of column.
-     */
-    public function get_column($array, $key) {
-        $result = array();
-        foreach ($array as $element) {
-            $reskey = array_search($element, $array);
-            if (array_key_exists($key, $element)) {
-                $result[$reskey] = $element[$key];
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Return outtransitions of state with id $state.
      *
      * @param state - id of state which outtransitions are intresting.
      * @param outgoing - boolean flag which type of transitions to get (true - outtransitions, false - intotransitions).
      */
     public function get_adjacent_transitions($stateid, $outgoing = true) {
+        $result = array();
         if ($outgoing) {
-            return $this->adjacencymatrix[$stateid];
+            foreach ($this->adjacencymatrix[$stateid] as $transitions) {
+                $result = array_merge($result, $transitions);
+            }
+        } else {
+            foreach ($this->adjacencymatrix as $row) {
+                if (array_key_exists($stateid, $row)) {
+                    $result = array_merge($result, $row[$stateid]);
+                }
+            }
         }
-        return $this->get_column($this->adjacencymatrix, $stateid);
+        return $result;
     }
 
     /**
@@ -613,7 +607,7 @@ abstract class qtype_preg_finite_automaton {
         $result = "digraph {\n    rankdir=LR;\n    ";
         if ($this->statecount != 0) {
             // Add start states.
-            foreach ($this->adjacencymatrix as $id => $state) {
+            foreach ($this->get_states() as $id) {
                 $realnumber = $usestateids
                             ? $id
                             : $this->statenumbers[$id];
@@ -625,16 +619,16 @@ abstract class qtype_preg_finite_automaton {
                 }
                 $result .= ';';
 
-                $outtransitions = $this->get_adjacent_transitions($id, true);
-                foreach ($outtransitions as $tran) {
+                $outgoing = $this->get_adjacent_transitions($id, true);
+                foreach ($outgoing as $transition) {
                     $result .= "\n    ";
-                    $from = $tran->from;
-                    $to = $tran->to;
+                    $from = $transition->from;
+                    $to = $transition->to;
                     if (!$usestateids) {
                         $from = $this->statenumbers[$from];
                         $to = $this->statenumbers[$to];
                     }
-                    $result .= $tran->get_label_for_dot($from, $to);
+                    $result .= $transition->get_label_for_dot($from, $to);
                 }
             }
         }
@@ -722,15 +716,6 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Delete transition.
-     *
-     * @param del transition for deleting.
-     */
-    public function remove_transition($del) {
-        unset($this->adjacencymatrix[$del->from][$del->to]);
-    }
-
-    /**
      * Adds a state to the automaton.
      *
      * @param real number of state.
@@ -753,22 +738,56 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
+     * Removes a state from the automaton.
+     */
+    public function remove_state($stateid) {
+        // Remove outgoing transitions.
+        unset($this->adjacencymatrix[$stateid]);
+
+        // Remove incoming transitions.
+        foreach ($this->adjacencymatrix as &$column) {
+            if (array_key_exists($stateid, $column)) {
+                unset($column[$stateid]);
+            }
+        }
+
+        // Remove real numbers.
+        unset($this->statenumbers[$stateid]);
+        $this->statecount--;
+
+        // Remove from start and end states.
+        $key = array_search($stateid, $this->startstates);
+        if ($key !== false) {
+            unset($this->startstates[$key]);
+        }
+        $key = array_search($stateid, $this->endstates);
+        if ($key !== false) {
+            unset($this->endstates[$key]);
+        }
+    }
+
+    /**
      * Changes states which transitions come to/from.
      */
     public function redirect_transitions($oldstateid, $newstateid) {
         if ($oldstateid == $newstateid) {
             return;
         }
-        // Get intotransitions.
+
+        // Get all transitions.
         $outgoing = $this->get_adjacent_transitions($oldstateid, true);
         $incoming = $this->get_adjacent_transitions($oldstateid, false);
         $transitions = array_merge($outgoing, $incoming);
 
-        // Delete the old state.
-        $this->remove_state($oldstateid);
-
-        // Add new transitions.
+        // Remember transitions to be added and remove them.
+        $toadd = array();
         foreach ($transitions as $transition) {
+            $toadd[] = $transition;
+            $this->remove_transition($transition);
+        }
+
+        // Change "from" and "to" and add the transitions again.
+        foreach ($toadd as $transition) {
             if ($transition->from == $oldstateid) {
                 $transition->from = $newstateid;
             }
@@ -777,72 +796,30 @@ abstract class qtype_preg_finite_automaton {
             }
             $this->add_transition($transition);
         }
+
+        // Delete the old state.
+        $this->remove_state($oldstateid);
     }
 
     /**
      * Adds a transition.
      */
     public function add_transition($transition) {
-        $outtransitions = $this->get_adjacent_transitions($transition->from, true);
-        if (!array_key_exists($transition->to, $outtransitions)) {
-            // No such transition.
-            $this->adjacencymatrix[$transition->from][$transition->to] = $transition;
-            return;
+        if (!array_key_exists($transition->to, $this->adjacencymatrix[$transition->from])) {
+            // No transitions from->to yet.
+            $this->adjacencymatrix[$transition->from][$transition->to] = array();
         }
+        $this->adjacencymatrix[$transition->from][$transition->to][] = $transition;
 
-        // Get the transition which it had before.
-        $existing = $outtransitions[$transition->to];
-        if ($existing === $transition) {
-            return;
-        }
-
-        // Is it possible to just unit preg leaves?
-        if ($existing->unite($transition) !== null) {
-            return;
-        }
-
-        // Need to add a new state.
-        $newfrom = $this->add_state();
-        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $this->adjacencymatrix[$transition->from][$newfrom] = new qtype_preg_nfa_transition($transition->from, $epsleaf, $newfrom);
-
-        // Add the transition itself.
-        $transition->from = $newfrom;
-        $this->adjacencymatrix[$newfrom][$transition->to] = $transition;
+        // TODO: toolargefa exception?
     }
 
     /**
-     * Removes a state from the automaton.
-     *
-     * @param state an id of the state to be removed.
+     * Removes a transition.
      */
-    public function remove_state($state) {
-        // Removing row.
-        unset($this->adjacencymatrix[$state]);
-        // Removing column.
-        foreach ($this->adjacencymatrix as &$curcolumn) {
-            if (array_key_exists($state, $curcolumn)) {
-                unset($curcolumn[$state]);
-            }
-        }
-        // Removing real numbers.
-        unset($this->statenumbers[$state]);
-        $this->statecount--;
-        // Check if it is among start and end states.
-        if (array_search($state, $this->startstates) !== false) {
-            unset($this->startstates[array_search($state, $this->startstates)]);
-        }
-        if (array_search($state, $this->endstates) !== false) {
-            unset($this->endstates[array_search($state, $this->endstates)]);
-        }
-    }
-
-    /**
-     * Removes this fa. Return empty fa.
-     */
-    public function remove_fa() {
-        $result = new qtype_preg_nfa(0, 0, 0, array());
-        return $result;
+    public function remove_transition($transition) {
+        $key = array_search($transition, $this->adjacencymatrix[$transition->from][$transition->to]);
+        unset($this->adjacencymatrix[$transition->from][$transition->to][$key]);
     }
 
     /**
@@ -1123,14 +1100,14 @@ abstract class qtype_preg_finite_automaton {
             $secondtransitionto = array();
             $states = $P->get_states();
             foreach ($states as $state) {
-                foreach ($this->adjacencymatrix[$state] as $transit) {
+                foreach ($this->get_adjacent_transitions($state, true) as $transit) {
                     $firsttransitionto[] = $transit->to;
                     // TODO - convert ranges.
                 }
             }
             $states = $Q->get_states();
             foreach ($states as $state) {
-                foreach ($another->adjacencymatrix[$state] as $transit) {
+                foreach ($another->get_adjacent_transitions($state, true) as $transit) {
                     $firsttransitionto[] = $transit->to;
                     // TODO - convert ranges.
                 }
@@ -2685,7 +2662,7 @@ abstract class qtype_preg_finite_automaton {
             $result->remove_all_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
-            $result = $result->remove_fa();
+            $result = new qtype_preg_nfa();
         }
         return $result;
     }

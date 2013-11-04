@@ -35,10 +35,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
  */
 class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
-
-
-
-
     // A subpattern node with minimal number.
     public $min_subpatt_node;
 
@@ -81,7 +77,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Backreference numbers existing in the regex.
     protected $backref_numbers;
 
-    public function __construct($astroot, $maxsubpatt, $maxsubexpr, $backrefs) {
+    public function __construct($astroot = null, $maxsubpatt = 0, $maxsubexpr = 0, $backrefs = array()) {
         parent::__construct();
         $this->astroot = $astroot;
         $this->maxsubpatt = $maxsubpatt;
