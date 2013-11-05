@@ -17,39 +17,23 @@
 function save_rules($quizid, $lessontypes) {
     global $DB;
     
-    $rules = $DB->get_records('quizaccess_supervisedcheck', array(quizid=>$quizid));
-    // Count of existing records more or equal than count of new records.
-    if(count($rules) >= count($lessontypes)) {
-        $remove_count = count($rules) - count($lessontypes);
-        // Remove unnecessary records from DB.
-        $keys = array_keys($rules);
-        for ($i=0; $i<$remove_count; $i++) {
-            $DB->delete_records('quizaccess_supervisedcheck', array('id'=>$keys[$i]));
-            unset($rules[$keys[$i]]);   // Remove from local array.
+    $oldrules = $DB->get_records('quizaccess_supervisedcheck', array(quizid=>$quizid));
+    
+    for ($i=0; $i<count($lessontypes); $i++) {
+        // Update an existing rule if possible.
+        $rule = array_shift($oldrules);
+        if (!$rule) {
+            $rule = new stdClass();
+            $rule->quizid = $quizid;
+            $rule->lessontypeid = 0;
+            $rule->id = $DB->insert_record('quizaccess_supervisedcheck', $rule);
         }
-        // Now we have equal numbers of records. Just update all of them in DB.
-        $i = 0;
-        foreach ($rules as $id=>$record) {
-            $record->lessontypeid = $lessontypes[$i];        
-            $DB->update_record('quizaccess_supervisedcheck', $record);
-            $i++;
-        }
+        $rule->lessontypeid = $lessontypes[$i];
+        $DB->update_record('quizaccess_supervisedcheck', $rule);
     }
-    else{
-        // Update existing records.
-        $i = 0;
-        foreach ($rules as $id=>$record) {
-            $record->lessontypeid = $lessontypes[$i];        
-            $DB->update_record('quizaccess_supervisedcheck', $record);
-            $i++;
-        }
-        // Add new records.
-        for($i; $i<count($lessontypes); $i++){
-            $record = new stdClass();
-            $record->quizid        = $quizid;
-            $record->lessontypeid  = $lessontypes[$i];
-            $DB->insert_record('quizaccess_supervisedcheck', $record);
-        }
+    // Delete any remaining old rules.
+    foreach ($oldrules as $oldrule) {
+        $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
     }
 }
 
@@ -94,6 +78,7 @@ class block_supervised extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
+        
         
         /*///////////////////
         
