@@ -264,10 +264,10 @@ class qtype_preg_lexer extends JLexBase  {
                      // \ddd
                      // \x
                         );
-        if (textlib::strlen($seq) < 2) {
+        if (core_text::strlen($seq) < 2) {
             return null;
         }
-        $octal = textlib::substr($seq, 1);
+        $octal = core_text::substr($seq, 1);
         if (self::ctype_octal($octal)) {
             return octdec($octal);
         }
@@ -275,8 +275,8 @@ class qtype_preg_lexer extends JLexBase  {
             return $codes[$seq];
         }
         if ($seq[1] == 'c') {
-            $x = textlib::strtoupper(textlib::substr($seq, 2));
-            $code = textlib::utf8ord($x);
+            $x = core_text::strtoupper(core_text::substr($seq, 2));
+            $code = core_text::utf8ord($x);
             if ($code > 127) {
                 return null;
             }
@@ -285,12 +285,12 @@ class qtype_preg_lexer extends JLexBase  {
         }
         if ($seq[1] == 'x') {
             $start = 2;
-            $end = textlib::strlen($seq) - 1;
+            $end = core_text::strlen($seq) - 1;
             if ($seq[2] == '{') {
                 $start++;
                 $end--;
             }
-            return hexdec(textlib::substr($seq, $start, $end - $start + 1));
+            return hexdec(core_text::substr($seq, $start, $end - $start + 1));
         }
         return null;
     }
@@ -743,12 +743,12 @@ class qtype_preg_lexer extends JLexBase  {
         array_pop($this->charset->userinscription);
         $userinscriptionstart = array_pop($this->charset->userinscription);
         $this->charset->userinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
-        if (textlib::utf8ord($startchar) <= textlib::utf8ord($endchar)) {
+        if (core_text::utf8ord($startchar) <= core_text::utf8ord($endchar)) {
             // Replace last 3 characters by all the characters between them.
             $this->charset_set = qtype_preg_unicode::substr($this->charset_set, 0, $this->charset_count - 3);
             $this->charset_count -= 3;
-            $curord = textlib::utf8ord($startchar);
-            $endord = textlib::utf8ord($endchar);
+            $curord = core_text::utf8ord($startchar);
+            $endord = core_text::utf8ord($endchar);
             while ($curord <= $endord) {
                 $this->charset_set .= qtype_preg_unicode::code2utf8($curord++);
                 $this->charset_count++;
@@ -6563,14 +6563,14 @@ array(
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
     $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    $charset->value->position->indlast -= textlib::strlen($tail);
-    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->position->indlast -= core_text::strlen($tail);
+    $charset->value->position->collast -= core_text::strlen($tail);
     $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
         return $charset;
     }
     $tokens = $this->string_to_tokens($tail);
-    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    $offset = core_text::strlen($text) - core_text::strlen($tail);
     foreach ($tokens as $token) {
         $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
                                         $this->yyline, $this->yyline,
@@ -7824,14 +7824,14 @@ array(
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
     $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    $charset->value->position->indlast -= textlib::strlen($tail);
-    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->position->indlast -= core_text::strlen($tail);
+    $charset->value->position->collast -= core_text::strlen($tail);
     $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
         return $charset;
     }
     $tokens = $this->string_to_tokens($tail);
-    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    $offset = core_text::strlen($text) - core_text::strlen($tail);
     foreach ($tokens as $token) {
         $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
                                         $this->yyline, $this->yyline,
@@ -8304,14 +8304,14 @@ array(
     }
     // Return a single lexem if all digits are octal, an array of lexems otherwise.
     $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    $charset->value->position->indlast -= textlib::strlen($tail);
-    $charset->value->position->collast -= textlib::strlen($tail);
+    $charset->value->position->indlast -= core_text::strlen($tail);
+    $charset->value->position->collast -= core_text::strlen($tail);
     $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
     if (qtype_preg_unicode::strlen($tail) === 0) {
         return $charset;
     }
     $tokens = $this->string_to_tokens($tail);
-    $offset = textlib::strlen($text) - textlib::strlen($tail);
+    $offset = core_text::strlen($text) - core_text::strlen($tail);
     foreach ($tokens as $token) {
         $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
                                         $this->yyline, $this->yyline,

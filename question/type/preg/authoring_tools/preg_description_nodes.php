@@ -200,14 +200,14 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             return null;
         }
         // ok, character is non-printing, lets find its description in the language file
-        $hex = textlib::strtoupper(dechex($code));
+        $hex = core_text::strtoupper(dechex($code));
         if ($code <= 32 || $code == 127 || $code == 160 || $code == 173 || $code == 8194 ||
             $code == 8195 || $code == 8201 || $code == 8204 || $code == 8205) {
             return self::get_form_string('description_char' . $hex, null, $form);
         } else {
             $a = new stdClass;
             $a->code = $hex;
-            $a->char = textlib::code2utf8($code);
+            $a->char = core_text::code2utf8($code);
             return self::get_form_string('description_char_16value', $a, $form);
         }
     }
@@ -222,9 +222,9 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
      */
     public static function describe_chr($char, $escapehtml = true, $form = null) {
         if (is_int($char)) {
-            $char = textlib::code2utf8($char);
+            $char = core_text::code2utf8($char);
         }
-        $code = textlib::utf8ord($char);
+        $code = core_text::utf8ord($char);
         $result = self::describe_nonprinting($code);
         if ($result === null) {
             //   &        >       <       "       '
@@ -263,7 +263,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
         $state = self::FIRST_CHAR;
         $curcode = -1;
         for ($i = 0; $i < $length; $i++) {
-            $curcode = textlib::utf8ord($str[$i]);
+            $curcode = core_text::utf8ord($str[$i]);
             if ($state == self::FIRST_CHAR) {
                 $state = self::OUT_OF_RANGE;
             } else if ($state == self::INTO_RANGE) {
@@ -831,7 +831,7 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
 
     public function description($numbering_pattern, $node_parent = null, $form = null) {
         $resultpattern = parent::description($numbering_pattern, $this, $form);
-        if (textlib::strpos($resultpattern, '%cond') !== false) {
+        if (core_text::strpos($resultpattern, '%cond') !== false) {
             $conddescription = $this->condbranch->description($numbering_pattern, $this, $form);
             $resultpattern = qtype_poasquestion_string::replace('%cond', $conddescription, $resultpattern);
         }

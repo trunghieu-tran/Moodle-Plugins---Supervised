@@ -99,15 +99,15 @@ class qtype_preg_userinscription {
      */
     public function is_single_character() {
         return $this->isflag === null &&
-               textlib::strlen($this->data) == 1;
+               core_text::strlen($this->data) == 1;
     }
 
     public function is_character_range() {
         if ($this->isflag !== null) {
             return false;
         }
-        $mpos = textlib::strpos($this->data, '-');
-        return $mpos !== null && $mpos > 0 && $mpos < textlib::strlen($this->data) - 1;
+        $mpos = core_text::strpos($this->data, '-');
+        return $mpos !== null && $mpos > 0 && $mpos < core_text::strlen($this->data) - 1;
     }
 
     /**
@@ -120,8 +120,8 @@ class qtype_preg_userinscription {
         $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', 'x',
                          'd', 'D', 'h', 'H', 's', 'S', 'v', 'V', 'w', 'W',
                          'p', 'P');
-        return textlib::strlen($this->data) > 1 && $this->data[0] == '\\' &&
-               (in_array($this->data[1], $allowed) || ctype_digit(textlib::substr($this->data, 1)));
+        return core_text::strlen($this->data) > 1 && $this->data[0] == '\\' &&
+               (in_array($this->data[1], $allowed) || ctype_digit(core_text::substr($this->data, 1)));
     }
 
     /**
@@ -152,7 +152,7 @@ class qtype_preg_userinscription {
         if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
             return false;
         }
-        return ctype_digit(textlib::substr($this->data, 1));
+        return ctype_digit(core_text::substr($this->data, 1));
     }
 
     /**
@@ -1404,6 +1404,7 @@ class qtype_preg_charset_flag {
                 break;
             case self::META_DOT:
                 $result = '.';
+                break;
             default:
                 return '';
         }

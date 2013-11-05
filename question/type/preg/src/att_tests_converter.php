@@ -227,5 +227,3 @@ foreach ($filenames as $filename) {
     process_file($filename);
 }
 echo "Done!\n";
-
-?>

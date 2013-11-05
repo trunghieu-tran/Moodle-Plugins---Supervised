@@ -286,7 +286,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z);
+        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_small_esc_z();
         $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
@@ -307,7 +307,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_esc_a();
         $transition = new qtype_preg_nfa_transition(4,$pregleaf, 5);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
@@ -515,7 +515,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
+        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_dollar();
         $transition = new qtype_preg_nfa_transition(2,$pregleaf, 3);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();
@@ -526,7 +526,7 @@ class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $pregleaf = $lexer->nextToken()->value;
-        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert(qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $pregleaf->mergedassertions[] = new qtype_preg_leaf_assert_circumflex();
         $transition = new qtype_preg_nfa_transition(3,$pregleaf, 1);
         $transition->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
         $transition->set_transition_type();

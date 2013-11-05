@@ -5510,7 +5510,7 @@ class qtype_preg_cross_tests_from_pcre {
         array_shift($codes);
         $str = '';
         foreach ($codes as $code) {
-            $str .= textlib::code2utf8(octdec($code));
+            $str .= core_text::code2utf8(octdec($code));
         }
         $test1 = array( 'str'=>$str,
                         'is_match'=>true,

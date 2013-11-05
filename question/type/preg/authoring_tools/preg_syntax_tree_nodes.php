@@ -297,7 +297,7 @@ class qtype_preg_syntax_tree_leaf_charset extends qtype_preg_syntax_tree_leaf {
         }
         // A single character - return the actual value.
         if (!$ui->is_valid_escape_sequence() && $ui->data != '\\' && $ui->data[0] == '\\') {
-            return textlib::substr($ui->data, 1);
+            return core_text::substr($ui->data, 1);
         }
         return $ui->data;
     }
@@ -455,9 +455,9 @@ class qtype_preg_syntax_tree_node_cond_subexpr extends qtype_preg_syntax_tree_op
         $count = count($this->operands);
         $shift = $this->pregnode->is_condition_assertion() ? 1 : 0;
         if ($operand === $this->operands[$shift]) {
-            return textlib::strtolower(get_string('yes', 'moodle'));
+            return core_text::strtolower(get_string('yes', 'moodle'));
         } else if ($shift + 1 < $count && $operand === $this->operands[$shift + 1]) {
-            return textlib::strtolower(get_string('no', 'moodle'));
+            return core_text::strtolower(get_string('no', 'moodle'));
         }
         return '';
     }
@@ -473,5 +473,3 @@ class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator 
         return 'red';
     }
 }
-
-?>

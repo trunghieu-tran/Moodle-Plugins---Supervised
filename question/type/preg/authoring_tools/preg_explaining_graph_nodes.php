@@ -178,7 +178,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
             // Escape sequences \cx and \x{ff} produce plain characters for graph.
             if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
                 $code = qtype_preg_lexer::code_of_char_escape_sequence($ui->data);
-                $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
+                $tmp = new qtype_preg_userinscription(core_text::code2utf8($code));
                 $result[] = qtype_preg_authoring_tool::userinscription_to_string($tmp);
                 continue;
             }
