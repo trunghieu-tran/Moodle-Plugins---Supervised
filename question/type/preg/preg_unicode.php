@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
-class qtype_preg_unicode extends textlib {
+class qtype_preg_unicode extends core_text {
 
     public static function min_possible_code() {
         return 0;

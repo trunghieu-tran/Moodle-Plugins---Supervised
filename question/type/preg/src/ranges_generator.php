@@ -246,4 +246,3 @@ foreach ($props as $funcname => $regex) {
 }
 echo 'Done!' . $eol;
 fclose($out);
-?>

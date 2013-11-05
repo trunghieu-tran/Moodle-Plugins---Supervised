@@ -74,7 +74,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
      * Converts a character so it's representable in HTML.
      */
     public static function char_to_html($char) {
-        $code = textlib::utf8ord($char);
+        $code = core_text::utf8ord($char);
         if (in_array($code, self::$htmlspecialcodes)) {
             return '&#' . $code . ';';
         }
@@ -108,9 +108,9 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $string = new qtype_poasquestion_string($string);
         for ($i = 0; $i < $string->length(); ++$i) {
             $char = $string[$i];
-            $code = textlib::utf8ord($char);
+            $code = core_text::utf8ord($char);
             if (in_array($code, self::$specialcodes)) {
-                $hex = textlib::strtoupper(dechex($code));
+                $hex = core_text::strtoupper(dechex($code));
                 $result .= get_string('description_char' . $hex, 'qtype_preg');
             } else {
                 $result .= $char;
@@ -124,7 +124,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
         // Is it a range?
         if ($ui->is_character_range()) {
-            $mpos = textlib::strpos($data, '-');
+            $mpos = core_text::strpos($data, '-');
             $left = $data->substring(0, $mpos)->string();
             $right = $data->substring($mpos + 1)->string();
 
@@ -141,16 +141,16 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         // Is it an escape-sequence for a character?
         if ($ui->is_single_escape_sequence_character()) {
             $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
-            $hex = textlib::strtoupper(dechex($code));
+            $hex = core_text::strtoupper(dechex($code));
             return get_string('description_char' . $hex, 'qtype_preg');
         }
 
         // Is it \cx or \ddd or \ddd or \x{hh} escape sequence?
         if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_oct() || $ui->is_single_escape_sequence_character_hex()) {
             $code = qtype_preg_lexer::code_of_char_escape_sequence($data->string());
-            $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
+            $tmp = new qtype_preg_userinscription(core_text::code2utf8($code));
             $a = new stdClass;
-            $a->code = textlib::strtoupper(dechex($code));
+            $a->code = core_text::strtoupper(dechex($code));
             $a->char = self::userinscription_to_string($tmp);
             return $explaincodes ? get_string('description_char_16value', 'qtype_preg', $a) : $a->char;
         }
@@ -164,9 +164,9 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
             $data = $data->substring(1);
         }
 
-        $code = textlib::utf8ord($data[0]);
+        $code = core_text::utf8ord($data[0]);
         if ($data->length() == 1 && $code <= 32) {
-            $hex = textlib::strtoupper(dechex($code));
+            $hex = core_text::strtoupper(dechex($code));
             return get_string('description_char' . $hex, 'qtype_preg');
         }
 
@@ -198,7 +198,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
     }
 
     public function generate_json_for_unaccepted_regex(&$json) {
-        $a =  textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+        $a =  core_text::strtolower(get_string($this->name(), 'qtype_preg'));
         $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
         foreach ($this->get_error_messages(true) as $error) {
             $result .= '<br />' . $error;
@@ -216,7 +216,7 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
         } catch (Exception $e) {
             // Something is wrong with graphviz.
             $a = new stdClass;
-            $a->name = textlib::strtolower(get_string($this->name(), 'qtype_preg'));
+            $a->name = core_text::strtolower(get_string($this->name(), 'qtype_preg'));
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
                 $json[$this->json_key()] = get_string('pathtodotempty', 'qtype_preg', $a);
             } else if (is_a($e, 'qtype_preg_pathtodot_incorrect')) {
@@ -231,5 +231,3 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
         }
     }
 }
-
-?>

@@ -208,7 +208,7 @@ class qtype_preg_parser#line 110 "../preg_parser.php"
         $condbranch = new qtype_preg_node_assert($subtype);
         $condbranch->operands = array($assertbody);
         $condbranch->set_user_info($node->position->compose($assertbody->position)->add_chars_left(2)->add_chars_right(1),
-                                   array(new qtype_preg_userinscription(textlib::substr($node->userinscription[0], 2) . '...)')));
+                                   array(new qtype_preg_userinscription(core_text::substr($node->userinscription[0], 2) . '...)')));
 
         $node->operands = array($condbranch);
 

@@ -200,7 +200,7 @@ M.preg_authoring_tools_script = (function ($) {
                 this_id = preg_id + '_auth';
             $(preg_id).val($(this_id).val());
         });
-        self.textbutton_widget.close_and_set_new_data();
+        self.textbutton_widget.close_and_set_new_data('');
         $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
         $('#id_test_regex').html('');
         M.form.updateFormState("mform1");
@@ -392,7 +392,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
-        cached = self.cache[self.TREE_KEY][k];
+        var cached = self.cache[self.TREE_KEY][k];
         if (cached) {
             self.display_content(self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
             return;
@@ -424,7 +424,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Check the cache.
         var k = self.cache_key_for_testing_tool(indfirst, indlast);
-        cached = self.cache[self.STRINGS_KEY][k];
+        var cached = self.cache[self.STRINGS_KEY][k];
         if (cached) {
             self.display_strings(cached);
             return;
