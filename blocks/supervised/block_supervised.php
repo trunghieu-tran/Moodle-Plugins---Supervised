@@ -61,7 +61,7 @@ function supervisedblock_get_logs($sessionid, $timefrom, $timeto, $userid=0) {
     
     // Prepare query
     $params = array();
-    $selector = "l.time >= :timefrom AND l.time <= :timeto AND l.course = :courseid";
+    $selector = "(l.time BETWEEN :timefrom AND :timeto) AND l.course = :courseid";
     $params['timefrom'] = $timefrom;
     $params['timeto']   = $timeto;
     $params['courseid'] = $session->courseid;
