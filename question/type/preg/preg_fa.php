@@ -603,36 +603,35 @@ abstract class qtype_preg_finite_automaton {
      * @return dot_style string with the description of automata.
      */
     public function fa_to_dot($type = null, $filename = null, $usestateids = false) {
-        $addedcharacters = '/(), ';
-        $result = "digraph {\n    rankdir=LR;\n    ";
+        $start = '';
+        $end = '';
+        $transitions = '';
         if ($this->statecount != 0) {
             // Add start states.
             foreach ($this->get_states() as $id) {
                 $realnumber = $usestateids
                             ? $id
                             : $this->statenumbers[$id];
-                $result .= '"' . $realnumber . '"';
+                $tmp = '"' . $realnumber . '"';
                 if (in_array($id, $this->startstates)) {
-                    $result .= '[shape=rarrow]';
+                    $start .= "{$tmp}[shape=rarrow];\n";
                 } else if (in_array($id, $this->endstates)) {
-                    $result .= '[shape=doublecircle]';
+                    $end .= "   {$tmp}[shape=doublecircle];\n";
                 }
-                $result .= ';';
 
                 $outgoing = $this->get_adjacent_transitions($id, true);
                 foreach ($outgoing as $transition) {
-                    $result .= "\n    ";
                     $from = $transition->from;
                     $to = $transition->to;
                     if (!$usestateids) {
                         $from = $this->statenumbers[$from];
                         $to = $this->statenumbers[$to];
                     }
-                    $result .= $transition->get_label_for_dot($from, $to);
+                    $transitions .= '    ' . $transition->get_label_for_dot($from, $to) . "\n";
                 }
             }
         }
-        $result .= "\n}";
+        $result = "digraph {\n    rankdir=LR;\n    " . $start . $end . $transitions . "\n}";
         if ($type != null) {
             $result = qtype_preg_regex_handler::execute_dot($result, $type, $filename);
         }
