@@ -196,11 +196,17 @@ abstract class qtype_preg_nfa_node {
             }
         }
 
-        // Update automaton/stack properties.
+        $stack[] = $body;
+    }
+
+    protected function update_automaton(&$automaton, &$stack) {
+        $body = array_pop($stack);
+
         $automaton->remove_all_start_states();
         $automaton->remove_all_end_states();
         $automaton->add_start_state($body['start']);
         $automaton->add_end_state($body['end']);
+
         $stack[] = $body;
     }
 }
@@ -226,6 +232,7 @@ class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
         $automaton->add_transition(new qtype_preg_nfa_transition($start, $this->pregnode, $end));
 
         $stack[] = array('start' => $start, 'end' => $end);
+        $this->update_automaton($automaton, $stack);
     }
 }
 
@@ -276,6 +283,7 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
         }
 
         $stack[] = $result;
+        $this->update_automaton($automaton, $stack);
     }
 }
 
@@ -302,8 +310,8 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
             }
         }
 
-        // Update automaton/stack properties.
         $stack[] = $result;
+        $this->update_automaton($automaton, $stack);
     }
 }
 
@@ -406,7 +414,9 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
         }
         $body = array_pop($stack);
         $this->mark_transitions($automaton, $body['start']);
+
         $stack[] = $body;
+        $this->update_automaton($automaton, $stack);
     }
 }
 
@@ -503,7 +513,9 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
         }
         $body = array_pop($stack);
         $this->mark_transitions($automaton, $body['start']);
+
         $stack[] = $body;
+        $this->update_automaton($automaton, $stack);
     }
 }
 
@@ -525,6 +537,8 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
         if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
             return;
         }
+
+        $this->update_automaton($automaton, $stack);
 
         $automaton->on_subexpr_added($this->pregnode);
     }
