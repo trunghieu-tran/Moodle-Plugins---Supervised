@@ -1591,7 +1591,7 @@ class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($pos == $str->length() - 1 && $str[$pos] == "\n"));
+        return ($pos == $str->length() - 1 && $str[$pos] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
@@ -1636,7 +1636,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos] == "\n"));
+        return ($str[$pos - 1] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
@@ -1660,7 +1660,7 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return (parent::match_inner($str, $pos, $length, $matcherstateobj) || ($str[$pos] == "\n"));
+        return ($str[$pos] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
