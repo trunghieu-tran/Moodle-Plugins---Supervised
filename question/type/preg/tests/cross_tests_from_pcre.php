@@ -8145,8 +8145,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>21),
-                        'left'=>array(7),
-                        'next'=>'m',
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>15),
+                        'left'=>array(11),
+                        'next'=>'t',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?s-i:more.*than).*million',
@@ -8199,8 +8201,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>21),
-                        'left'=>array(7),
-                        'next'=>'m',
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>15),
+                        'left'=>array(11),
+                        'next'=>'t',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?:(?s-i)more.*than).*million',
@@ -9700,8 +9704,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test3 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>2),
-                        'length'=>array(0=>3,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(1),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -9723,8 +9727,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test6 = array( 'str'=>'aaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>7,1=>1),
+                        'index_first'=>array(0=>0,1=>3),    // 4th repetition is
+                        'length'=>array(0=>8,1=>3),         // incomplete at backreference
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -9732,8 +9736,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test7 = array( 'str'=>'aaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>7,1=>1),
+                        'index_first'=>array(0=>0,1=>3),    // 4th repetition is
+                        'length'=>array(0=>9,1=>3),         // incomplete at backreference
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -13595,8 +13599,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test4 = array( 'str'=>'aaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>9,1=>1),
+                        'index_first'=>array(0=>0,1=>3),    // 4th repetition is
+                        'length'=>array(0=>9,1=>3),         // incomplete at backreference
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
