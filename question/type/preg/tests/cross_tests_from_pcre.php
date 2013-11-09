@@ -1836,9 +1836,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>7),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'length'=>array(0=>15),
+                        'left'=>array(1),
+                        'next'=>'"',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^\".*\"\s*(;.*)?$',
@@ -5404,9 +5404,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>14),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'length'=>array(0=>15),
+                        'left'=>array(1),
+                        'next'=>'[^k]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'1234567@a.b.c.d',
@@ -5982,7 +5982,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>59),
+                        'length'=>array(0=>64),
                         'left'=>array(9),
                         'next'=>'o',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -5996,9 +5996,11 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>159),
-                        'left'=>array(9),
-                        'next'=>'o',
+                        'length'=>array(0=>163),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>119),
+                        'left'=>array(4),
+                        'next'=>'w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'word (?:[a-zA-Z0-9]+ ){0,300}otherword',
@@ -8136,7 +8138,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>12),
+                        'length'=>array(0=>21),
                         'left'=>array(7),
                         'next'=>'m',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -8190,7 +8192,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>12),
+                        'length'=>array(0=>21),
                         'left'=>array(7),
                         'next'=>'m',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -10652,7 +10654,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(1),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -10661,7 +10663,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(1),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -10670,7 +10672,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(1),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -13588,7 +13590,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>7,1=>1),
+                        'length'=>array(0=>9,1=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
