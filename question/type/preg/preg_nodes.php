@@ -1037,7 +1037,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                         if (array_search($dollar, $this->assertionsbefore) !== false ||
                             array_search($bigz, $this->assertionsbefore) !== false) {
                             if ($c == "\n") {
-                                return array(self::NEXT_CHAR_OK, $c);
+                                if (array_search($bigz, $this->assertionsbefore) !== false) {
+                                    return array(self::NEXT_CHAR_END_HERE, $c);
+                                } else {
+                                    return array(self::NEXT_CHAR_OK, $c);
+                                }
                             } else {
                                 return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
                             }

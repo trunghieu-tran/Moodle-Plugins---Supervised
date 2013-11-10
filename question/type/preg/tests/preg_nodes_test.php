@@ -714,6 +714,19 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
+    function test_generation_last_character() {
+        $str = new qtype_poasquestion_string("a\n");
+        $length = 1;
+        $lexer = $this->create_lexer("[\n]");
+        $leaf = $lexer->nextToken()->value;
+        $assert = new qtype_preg_leaf_assert_capital_esc_z;
+        $leaf->assertionsbefore[] = $assert;
+        $pos = 1;
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return flag is not equal to expected');
+    }
+
 /***************************************** Tests for charset *****************************************/
 
     function test_charflag_set_match() {
