@@ -418,11 +418,11 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns all backreference nodes in the regex.
+     * Returns all nodes with references to subexpressions (backreferences, conditional subexpressions, recursion).
      */
-    public function get_backrefs() {
+    public function get_nodes_with_subexpr_refs() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_backrefs();
+            return $this->lexer->get_nodes_with_subexpr_refs();
         }
         return array();
     }

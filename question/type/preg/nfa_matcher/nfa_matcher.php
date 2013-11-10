@@ -638,7 +638,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     public function match_from_pos($str, $startpos) {
-        $bruteforce = count($this->get_backrefs()) > 0;
+        $bruteforce = count($this->get_nodes_with_subexpr_refs()) > 0;
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce
@@ -731,7 +731,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
     protected function build_nfa($ast_node, $dst_node) {
-        $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_backrefs());
+        $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_nodes_with_subexpr_refs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {

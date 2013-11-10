@@ -74,17 +74,17 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Number of subexpressions in the regular expression.
     protected $maxsubexpr;
 
-    // Backreference numbers existing in the regex.
-    protected $backref_numbers;
+    // Subexpr references (numbers) existing in the regex.
+    protected $subexpr_ref_numbers;
 
-    public function __construct($astroot = null, $maxsubpatt = 0, $maxsubexpr = 0, $backrefs = array()) {
+    public function __construct($astroot = null, $maxsubpatt = 0, $maxsubexpr = 0, $subexprrefs = array()) {
         parent::__construct();
         $this->astroot = $astroot;
         $this->maxsubpatt = $maxsubpatt;
         $this->maxsubexpr = $maxsubexpr;
-        $this->backref_numbers = array();
-        foreach ($backrefs as $backref) {
-            $this->backref_numbers[] = $backref->number;
+        $this->subexpr_ref_numbers = array();
+        foreach ($subexprrefs as $ref) {
+            $this->subexpr_ref_numbers[] = $ref->number;
         }
     }
 
@@ -136,7 +136,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         foreach ($this->startstates as $state) {
             $outgoing = $this->get_adjacent_transitions($state, true);
             foreach ($outgoing as $transition) {
-                $transition->starts_backrefed_subexprs = $transition->starts_backrefed_subexprs || in_array($pregnode->number, $this->backref_numbers);
+                $transition->starts_backrefed_subexprs = $transition->starts_backrefed_subexprs || in_array($pregnode->number, $this->subexpr_ref_numbers);
             }
         }
     }

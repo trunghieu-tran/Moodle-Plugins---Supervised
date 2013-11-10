@@ -144,9 +144,6 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, recursion.
     protected $nodes_with_subexpr_refs = array();
 
-    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subexpressions.
-    protected $backrefs = array();
-
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
 
@@ -401,8 +398,8 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         return $this->subexpr_name_to_number_map;
     }
 
-    public function get_backrefs() {
-        return $this->backrefs;
+    public function get_nodes_with_subexpr_refs() {
+        return $this->nodes_with_subexpr_refs;
     }
 
     public function set_options($options) {
@@ -820,7 +817,6 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $this->set_node_modifiers($node);
-        $this->backrefs[] = $node;
         $this->nodes_with_subexpr_refs[] = $node;
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
