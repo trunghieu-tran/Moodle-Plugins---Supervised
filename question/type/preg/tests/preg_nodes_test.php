@@ -19,6 +19,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 
 class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
+    function create_lexer($regex, $options = null) {
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+            $options->preserveallnodes = true;
+        }
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $lexer->set_options($options);
+        return $lexer;
+    }
+
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
         $anode = new qtype_preg_leaf_charset();
@@ -47,107 +59,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($copyroot->operands[1]->operands[0] == $altnode->operands[1]->operands[0], 'B character node contents copied wrong');
         $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copied');
     }
-    function test_backref_no_match() {
-        $regex = '(abc)';
-        $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
-        $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
-        $backref->matcher = $matcher;
 
-        // Matching at the end of the string.
-        $res = $backref->match(new qtype_poasquestion_string('abc'), 3, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
-        $this->assertFalse($res);
-        $this->assertEquals($length, 0);
-        $this->assertEquals($ch, 'abc');
-        // The string doesn't match with backref at all.
-        $res = $backref->match(new qtype_poasquestion_string('abcdef'), 3, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
-        $this->assertFalse($res);
-        $this->assertEquals($length, 0);
-        $this->assertEquals($ch, 'abc');
-    }
-    function test_backref_partial_match() {
-        $regex = '(abc)';
-        $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
-        $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
-        $backref->matcher = $matcher;
-
-        // Reaching the end of the string.
-        $res = $backref->match(new qtype_poasquestion_string('abcab'), 3, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
-        $this->assertFalse($res);
-        $this->assertEquals($length, 2);
-        $this->assertEquals($ch, 'c');
-        // The string matches backref partially.
-        $res = $backref->match(new qtype_poasquestion_string('abcacd'), 3, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
-        $this->assertFalse($res);
-        $this->assertEquals($length, 1);
-        $this->assertEquals($ch, 'bc');
-    }
-    function test_backref_full_match() {
-        $regex = '(abc)';
-        $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
-        $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
-        $backref->matcher = $matcher;
-
-        $res = $backref->match(new qtype_poasquestion_string('abcabc'), 3, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 3, $length, $matcher->get_match_results());
-        $this->assertTrue($res);
-        $this->assertEquals($length, 3);
-        $this->assertEquals($ch, '');
-    }
-    function test_backref_empty_match() {
-        $regex = '(^$)';
-        $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
-        $matcher->match('');
-        $this->assertTrue($matcher->get_match_results()->full);
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
-        $backref->matcher = $matcher;
-
-        $res = $backref->match(new qtype_poasquestion_string(''), 0, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string(''), -1, $length, $matcher->get_match_results());
-        $this->assertTrue($res);
-        $this->assertEquals($length, 0);
-        $this->assertEquals($ch, '');
-    }
-    function test_backref_alt_match() {
-        $regex = '(ab|cd|)';
-        $length = 0;
-        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
-        $matcher->match('ab');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
-        $backref->matcher = $matcher;
-
-        // 2 characters matched
-        $res = $backref->match(new qtype_poasquestion_string('aba'), 2, $length, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
-        $this->assertFalse($res);
-        $this->assertEquals($length, 1);
-        $this->assertEquals($ch, 'b');
-        // Emptiness matched.
-        $matcher->match('xyz');
-        $res = $backref->match(new qtype_poasquestion_string('xyz'), 0, $length, $matcher->get_match_results());
-        $this->assertTrue($res);
-        $this->assertEquals($length, 0);
-    }
     function test_anchoring() {
         $handler = new qtype_preg_nfa_matcher('^');
         $this->assertTrue($handler->is_regex_anchored());
@@ -176,6 +88,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_nfa_matcher('^(?:a.+$)|.*cd|(^a|.*x)|(|c)');    // (|c) makes anchoring
         $this->assertTrue($handler->is_regex_anchored());
     }
+
     function test_syntax_errors() {
         $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
         $errors = $handler->get_errors();
@@ -362,7 +275,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $node = $root->node_by_regex_fragment(28, 28, $idcounter);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_ALT);
     }
-    
+
     function test_node_by_regex_fragment_emptiness() {
         $handler = new qtype_preg_regex_handler("a|b|");
         $idcounter = 1000;
@@ -431,22 +344,116 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node->operands[0]->flags[0][0]->data == 'b');
         $this->assertTrue($node->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     }
-}
 
-class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
-    function create_lexer($regex, $options = null) {
-        if ($options === null) {
-            $options = new qtype_preg_handling_options();
-            $options->preserveallnodes = true;
-        }
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->set_options($options);
-        return $lexer;
+/***************************************** Tests fir matching and next character generation *****************************************/
+
+    function test_backref_no_match() {
+        $regex = '(abc)';
+        $length = 0;
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
+        $matcher->match('abc');
+        $backref = new qtype_preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        // Matching at the end of the string.
+        $res = $backref->match(new qtype_poasquestion_string('abc'), 3, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
+        $this->assertFalse($res);
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, 'abc');
+        // The string doesn't match with backref at all.
+        $res = $backref->match(new qtype_poasquestion_string('abcdef'), 3, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
+        $this->assertFalse($res);
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, 'abc');
     }
 
-    function test_string_ends() {
+    function test_backref_partial_match() {
+        $regex = '(abc)';
+        $length = 0;
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
+        $matcher->match('abc');
+        $backref = new qtype_preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        // Reaching the end of the string.
+        $res = $backref->match(new qtype_poasquestion_string('abcab'), 3, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
+        $this->assertFalse($res);
+        $this->assertEquals($length, 2);
+        $this->assertEquals($ch, 'c');
+        // The string matches backref partially.
+        $res = $backref->match(new qtype_poasquestion_string('abcacd'), 3, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
+        $this->assertFalse($res);
+        $this->assertEquals($length, 1);
+        $this->assertEquals($ch, 'bc');
+    }
+
+    function test_backref_full_match() {
+        $regex = '(abc)';
+        $length = 0;
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
+        $matcher->match('abc');
+        $backref = new qtype_preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        $res = $backref->match(new qtype_poasquestion_string('abcabc'), 3, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abc'), 3, $length, $matcher->get_match_results());
+        $this->assertTrue($res);
+        $this->assertEquals($length, 3);
+        $this->assertEquals($ch, '');
+    }
+
+    function test_backref_empty_match() {
+        $regex = '(^$)';
+        $length = 0;
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
+        $matcher->match('');
+        $this->assertTrue($matcher->get_match_results()->full);
+        $backref = new qtype_preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        $res = $backref->match(new qtype_poasquestion_string(''), 0, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string(''), -1, $length, $matcher->get_match_results());
+        $this->assertTrue($res);
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, '');
+    }
+
+    function test_backref_alt_match() {
+        $regex = '(ab|cd|)';
+        $length = 0;
+        $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, $matchoptions);
+        $matcher->match('ab');
+        $backref = new qtype_preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        // 2 characters matched
+        $res = $backref->match(new qtype_poasquestion_string('aba'), 2, $length, $matcher->get_match_results());
+        list($flag, $ch) = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
+        $this->assertFalse($res);
+        $this->assertEquals($length, 1);
+        $this->assertEquals($ch, 'b');
+        // Emptiness matched.
+        $matcher->match('xyz');
+        $res = $backref->match(new qtype_poasquestion_string('xyz'), 0, $length, $matcher->get_match_results());
+        $this->assertTrue($res);
+        $this->assertEquals($length, 0);
+    }
+
+    function test_match_string_ends() {
         $str = new qtype_poasquestion_string("a\n");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
@@ -459,7 +466,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1, 'Return length is not equal to expected');
     }
 
-    function test_character_with_circumflex() {
+    function test_match_character_with_circumflex() {
         $str = new qtype_poasquestion_string("ab\n");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
@@ -471,7 +478,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_string_ends_dollar_assert() {
+    function test_match_string_ends_dollar_assert() {
         $str = new qtype_poasquestion_string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
@@ -483,7 +490,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1, 'Return length is not equal to expected');
     }
 
-    function test_character_with_dollar() {
+    function test_match_character_with_dollar() {
         $str = new qtype_poasquestion_string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
@@ -495,7 +502,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_one_string() {
+    function test_match_one_string() {
         $str = new qtype_poasquestion_string("ab");
         $length = 0;
         $lexer = $this->create_lexer("[a]");
@@ -505,7 +512,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1, 'Return length is not equal to expected');
     }
 
-    function test_single_assert() {
+    function test_match_single_assert() {
         $str = new qtype_poasquestion_string("ab\na\nas");
         $length = 0;
         $leaf= new qtype_preg_leaf_assert_circumflex;
@@ -514,7 +521,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_before_and_after_asserts_true() {
+    function test_match_before_and_after_asserts_true() {
         $str = new qtype_poasquestion_string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
@@ -528,7 +535,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1, 'Return length is not equal to expected');
     }
 
-    function test_before_and_after_asserts_false() {
+    function test_match_before_and_after_asserts_false() {
         $str = new qtype_poasquestion_string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
@@ -542,7 +549,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_empty_string_true() {
+    function test_match_empty_string_true() {
         $str = new qtype_poasquestion_string("ab\n\nas");
         $length = 0;
         $lexer = $this->create_lexer("[a-z\n]");
@@ -556,7 +563,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1, 'Return length is not equal to expected');
     }
 
-    function test_empty_string_false() {
+    function test_match_empty_string_false() {
         $str = new qtype_poasquestion_string("ab\n\nas");
         $length = 0;
         $lexer = $this->create_lexer("[a-z]");
@@ -570,7 +577,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_single_dollar_in_the_end() {
+    function test_match_single_dollar_in_the_end() {
         $str = new qtype_poasquestion_string("ab\n\nas");
         $length = 0;
         $leaf = new qtype_preg_leaf_assert_dollar;
@@ -579,7 +586,7 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
 
-    function test_middle_of_the_string() {
+    function test_match_middle_of_the_string() {
         $str = new qtype_poasquestion_string("bcd");
         $length = 0;
         $lexer = $this->create_lexer("[a-c\n]");
@@ -590,22 +597,8 @@ class qtype_preg_match_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
     }
-}
 
-class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
-    function create_lexer($regex, $options = null) {
-        if ($options === null) {
-            $options = new qtype_preg_handling_options();
-            $options->preserveallnodes = true;
-        }
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->set_options($options);
-        return $lexer;
-    }
-
-    function test_empty_string() {
+    function test_generation_empty_string() {
         $str = new qtype_poasquestion_string("ax");
         $length = 1;
         $lexer = $this->create_lexer("[ab\n]");
@@ -613,10 +606,11 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), "\n", 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
-    function test_string_ends_false() {
+    function test_generation_string_ends_false() {
         $str = new qtype_poasquestion_string("b\n");
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
@@ -624,10 +618,11 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
-    function test_string_ends_dollar_assert() {
+    function test_generation_string_ends_dollar_assert() {
         $str = new qtype_poasquestion_string("bx\na\nas");
         $length = 2;
         $lexer = $this->create_lexer("[ab\n]");
@@ -635,10 +630,11 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_dollar;
         $leaf->assertionsbefore[] = $assert;
         $pos = 2;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), "\n", 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
-    function test_character_with_dollar() {
+    function test_generation_character_with_dollar() {
         $str = new qtype_poasquestion_string("b\na\nas");
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
@@ -646,27 +642,30 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_dollar;
         $leaf->assertionsbefore[] = $assert;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
-    function test_one_string() {
+    function test_generation_one_string() {
         $str = new qtype_poasquestion_string("ab");
         $length = 1;
         $lexer = $this->create_lexer("[x-z]");
         $leaf = $lexer->nextToken()->value;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), 'x', 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, 'x', 'Return character is not equal to expected');
     }
 
-    function test_single_assert() {
+    function test_generation_single_assert() {
         $str = new qtype_poasquestion_string("\n\nas");
         $length = 0;
         $leaf = new qtype_preg_leaf_assert_circumflex;
         $pos = 0;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), qtype_preg_leaf::NEXT_CHAR_NOT_NEEDED, 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, '', 'Return character is not equal to expected');
     }
 
-    function test_before_and_after_asserts_false() {
+    function test_generation_before_and_after_asserts_false() {
         $str = new qtype_poasquestion_string("a\na\nas");
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
@@ -676,10 +675,11 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
-    function test_before_and_after_asserts_true() {
+    function test_generation_before_and_after_asserts_true() {
         $str = new qtype_poasquestion_string("abcd\nas");
         $length = 1;
         $lexer = $this->create_lexer("[a-z\n]");
@@ -689,18 +689,20 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), "\n", 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
-    function test_single_dollar_in_the_end() {
+    function test_generation_single_dollar_in_the_end() {
         $str = new qtype_poasquestion_string("as");
         $length = 2;
         $leaf = new qtype_preg_leaf_assert_dollar;
         $pos = 2;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return character is not equal to expected');
     }
 
-    function test_middle_of_the_string() {
+    function test_generation_middle_of_the_string() {
         $str = new qtype_poasquestion_string("bcd");
         $length = 1;
         $lexer = $this->create_lexer("[c\n]");
@@ -708,6 +710,7 @@ class qtype_preg_next_character_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;
         $pos = 1;
-        $this->assertEquals($leaf->next_character($str, $pos, $length), "\n", 'Return character is not equal to expected');
+        list($flag, $ch) = $leaf->next_character($str, $pos, $length);
+        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 }
