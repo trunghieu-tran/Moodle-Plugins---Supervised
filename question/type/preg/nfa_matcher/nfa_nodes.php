@@ -534,12 +534,57 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
     protected function create_automaton_inner(&$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($automaton, $stack);
-        if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
-            return;
-        }
 
         $this->update_automaton($automaton, $stack);
 
-        $automaton->on_subexpr_added($this->pregnode);
+        if ($this->pregnode->subpattern != -1) {
+            $automaton->on_subexpr_added($this->pregnode);
+        }
+    }
+}
+
+/**
+ * Class for conditional subexpressions.
+ */
+class qtype_preg_nfa_node_cond_subexpr extends qtype_preg_nfa_operator {
+
+    public function __construct($node, $matcher) {
+        $this->pregnode = $node;
+
+        $shift = (int)$node->is_condition_assertion();
+
+        // Add an eps leaf if there's only positive branch.
+        if (count($node->operands) - $shift == 1) {
+            $node->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        }
+
+        $concatpos = new qtype_preg_node_concat();
+        $concatpos->operands[] = new qtype_preg_leaf_assert_subexpr_captured(false, $node->number);
+        $concatpos->operands[] = $node->operands[0 + $shift];
+
+        $concatneg = new qtype_preg_node_concat();
+        $concatneg->operands[] = new qtype_preg_leaf_assert_subexpr_captured(true, $node->number);
+        $concatneg->operands[] = $node->operands[1 + $shift];
+
+        $alt = new qtype_preg_node_alt();
+        $alt->operands[] = $concatpos;
+        $alt->operands[] = $concatneg;
+
+        $grouping = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $grouping->subpattern = $node->subpattern;
+        $grouping->operands[] = $alt;
+
+        $this->operands = array($matcher->from_preg_node($grouping));
+    }
+
+    public function accept() {
+        if ($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+            return get_string($this->pregnode->subtype, 'qtype_preg');
+        }
+        return true;
+    }
+
+    protected function create_automaton_inner(&$automaton, &$stack) {
+        $this->operands[0]->create_automaton($automaton, $stack);
     }
 }

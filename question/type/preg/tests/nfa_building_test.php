@@ -110,4 +110,8 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
     function test_build_subexpr_uncounted() {
         $this->draw('(?:ab)+', 'test_build_subexpr_uncounted.svg');
     }
+
+    function test_build_cond_subexpr() {
+        $this->draw('(a)(?(1)yes|no)', 'test_build_cond_subexpr.svg');
+    }
 }

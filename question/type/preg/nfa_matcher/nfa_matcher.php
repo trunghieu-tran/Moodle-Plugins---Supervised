@@ -46,6 +46,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_NODE_CONCAT:
             case qtype_preg_node::TYPE_NODE_ALT:
             case qtype_preg_node::TYPE_NODE_SUBEXPR:
+            case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
                 return 'qtype_preg_nfa_' . $nodetype;
             case qtype_preg_node::TYPE_LEAF_CHARSET:
             case qtype_preg_node::TYPE_LEAF_META:
@@ -196,8 +197,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $resumestate->write_subpatt_info($laststate->last_transition, $prevpos, $backref_length);
 
             // Re-write the string with correct characters.
-            $newchr = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
-            $resumestate->str->concatenate($newchr);
+            list($flag, $newchr) = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
+            if ($newchr != null) {
+                $resumestate->str->concatenate($newchr);
+            }
 
             return $resumestate;
         }
@@ -291,13 +294,17 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
 
                 // Generate a next character.
-                if ($length > 0) {
-                    $newchr = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
-                    $newstate->str->concatenate($newchr);
-                }
+                //if ($length > 0) {
+                    list($flag, $newchr) = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                    if ($newchr != null) {
+                        $newstate->str->concatenate($newchr);
+                    }
+                //}
 
                 // Save the new state.
-                $curstates[] = $newstate;
+                if ($flag != qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+                    $curstates[] = $newstate;
+                }
             }
         }
         return $result;
@@ -388,14 +395,16 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
 
                     // Generate a next character.
-                    if ($length > 0) {
-                        $newchr = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
-                        $newstate->str->concatenate($newchr);
-                    }
+                    //if ($length > 0) {
+                        list($flag, $newchr) = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                        if ($newchr != null) {
+                            $newstate->str->concatenate($newchr);
+                        }
+                    //}
 
                     // Save the current result.
                     $number = $newstate->state;
-                    if (!isset($reached[$number]) || $newstate->leftmost_shortest($reached[$number])) {
+                    if ($flag != qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE && (!isset($reached[$number]) || $newstate->leftmost_shortest($reached[$number]))) {
                         $reached[$number] = $newstate;
                     }
                 }
