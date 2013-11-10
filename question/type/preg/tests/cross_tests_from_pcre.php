@@ -8420,8 +8420,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'bA',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
                         'left'=>array(1),
                         'next'=>'B',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -8434,7 +8434,7 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'aa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),
+                        'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>2,1=>1),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8770,8 +8770,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'1234',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>2,1=>1,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -14610,8 +14610,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test6 = array( 'str'=>'(blah',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>5),
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>5,1=>1),
                         'left'=>array(1),
                         'next'=>'\)',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -14656,8 +14656,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'(blah',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>5),
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>5,1=>1),
                         'left'=>array(1),
                         'next'=>'\)',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
