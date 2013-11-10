@@ -601,7 +601,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_generation_empty_string() {
         $str = new qtype_poasquestion_string("ax");
         $length = 1;
-        $lexer = $this->create_lexer("[ab\n]");
+        $lexer = $this->create_lexer("[ab\n\\x1]");
         $leaf = $lexer->nextToken()->value;
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;

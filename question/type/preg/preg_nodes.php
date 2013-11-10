@@ -951,14 +951,33 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return false;
     }
 
-    /*public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
+        $circumflex = array('before' => false, 'after' => false);
+        $dollar = array('before' => false, 'after' => false);
+        $capz = array('before' => false, 'after' => false);
+
+        $key = 'before';
+        foreach (array($this->assertionsbefore, $this->assertionsafter) as $assertions) {
+            foreach ($assertions as $assertion) {
+                if ($assertion->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                    $circumflex[$key] = true;
+                }
+                if ($assertion->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                    $dollar[$key] = true;
+                }
+                if ($assertion->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                    $capz[$key] = true;
+                }
+            }
+            $key = 'after';
+        }
+
         $desired_chars = array(array(0x21, 0x007F));
         $desired_whitespaces = array(array(0x20, 0x20));
 
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
-
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
@@ -974,86 +993,36 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 $ranges = qtype_preg_unicode::negate_ranges($ranges);
             }
 
-            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_chars);
+            /*$desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_chars);
+            if (empty($desired)) {
+                $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_whitespaces);
+            }
             if (!empty($desired)) {
-                $code = $desired[0][0];
-                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
-            }
+                $ranges = $desired;
+            }*/
 
-            $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_whitespaces);
-            if (!empty($desired)) {
-                $code = $desired[0][0];
-                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
-            }
-
-            if (!empty($ranges)) {
-                $code = $ranges[0][0];
-                return new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($code));
-            }
-
-            // Check all the returned ranges.
-            //foreach ($ranges as $range) {
-            //    for ($i = $range[0]; $i <= $range[1]; $i++) {
-            //        $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
-            //        // if ($this->match($c, 0, $l)) {
-            //        return $c;
-            //        // }
-            //    }
-            //}
-        }
-        return new qtype_poasquestion_string('');
-    }*/
-
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
-        $circumflex = new qtype_preg_leaf_assert_circumflex;
-        $dollar = new qtype_preg_leaf_assert_dollar;
-        $bigz = new qtype_preg_leaf_assert_capital_esc_z;
-        foreach ($this->flags as $flags) {
-            // Get intersection of all current flags.
-            $ranges = qtype_preg_unicode::dot_ranges();
-            foreach ($flags as $flag) {
-                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
-                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
-                } else {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
-                }
-                if ($flag->negative) {
-                    $currange = qtype_preg_unicode::negate_ranges($currange);
-                }
-                $ranges = qtype_preg_unicode::intersect_ranges($ranges, $currange);
-            }
-            if ($this->negative) {
-                $ranges = qtype_preg_unicode::negate_ranges($ranges);
-            }
             // Check all the returned ranges.
             foreach ($ranges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
+
                     // There is no merge assertions.
-                    if (count($this->assertionsbefore) == 0 && count($this->assertionsafter)== 0) {
+                    if (count($this->assertionsbefore) == 0 && count($this->assertionsafter) == 0) {
                         return array(self::NEXT_CHAR_OK, $c);
-                    } else {
+                    }
+
+                    if ($dollar['before'] || $capz['before']) {
                         // There are end string assertions.
-                        if (array_search($dollar, $this->assertionsbefore) !== false ||
-                            array_search($bigz, $this->assertionsbefore) !== false) {
-                            if ($c == "\n") {
-                                if (array_search($bigz, $this->assertionsbefore) !== false) {
-                                    return array(self::NEXT_CHAR_END_HERE, $c);
-                                } else {
-                                    return array(self::NEXT_CHAR_OK, $c);
-                                }
-                            } else {
-                                return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+                        if ($c == "\n") {
+                            if ($capz['before']) {
+                                return array(self::NEXT_CHAR_END_HERE, $c);
                             }
+                            return array(self::NEXT_CHAR_OK, $c);
+                        }
+                    } else if ($circumflex['after']) {
                         // There are start string assertions.
-                        } else if (array_search($circumflex, $this->assertionsafter) !== false) {
-                            if ($c == "\n") {
-                                return array(self::NEXT_CHAR_OK, $c);
-                            } else {
-                                return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
-                            }
-                        } else {
-                            return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+                        if ($c == "\n") {
+                            return array(self::NEXT_CHAR_OK, $c);
                         }
                     }
                 }
