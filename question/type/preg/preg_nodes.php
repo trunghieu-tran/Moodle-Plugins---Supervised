@@ -722,7 +722,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $result = $result && $beforeassert->match($str, $pos, $length, $matcherstateobj) && $pos != $str->length() - 1;
         }
         foreach ($this->assertionsafter as $afterassert) {
-            $result = $result && $afterassert->match($str, $pos, $length, $matcherstateobj) && $pos != 0;
+            $result = $result && $afterassert->match($str, $pos + $this->consumes(), $length, $matcherstateobj) && $pos != 0;
         }
         // Now check this leaf.
         $result = $result && $this->match_inner($str, $pos, $length, $matcherstateobj);
