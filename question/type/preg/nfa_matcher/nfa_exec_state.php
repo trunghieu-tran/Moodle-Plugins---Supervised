@@ -271,11 +271,12 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             if ($count < 2) {
                 continue;
             }
-
-            $penult = $repetitions[$count - 2];
-            $last = $repetitions[$count - 1];
-            if ($last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $penult == $last) {
-                return true;
+            for ($i = $count - 1; $i > 0; $i--) {
+                $penult = $repetitions[$i - 1];
+                $last = $repetitions[$i];
+                if ($last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $penult == $last) {
+                    return true;
+                }
             }
         }
         return false;

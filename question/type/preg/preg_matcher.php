@@ -474,7 +474,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
         // If there were backreferences in regex, subexpression capturing should be forced.
         if ($this->lexer !== null && !$this->options->capturesubexpressions) {
-            $this->options->capturesubexpressions = (count($this->lexer->get_backrefs()) > 0);
+            $this->options->capturesubexpressions = (count($this->lexer->get_nodes_with_subexpr_refs()) > 0);
         }
 
         // Invalidate match called later to allow parser to count subexpression.
