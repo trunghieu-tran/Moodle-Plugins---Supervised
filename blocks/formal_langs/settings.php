@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 if($ADMIN->fulltree) {
 
-    $setting = block_formal_langs::get_visible_language_setting();
-    $settings->add($setting);
+    //$setting = block_formal_langs::get_visible_language_setting();
+    //$settings->add($setting);
 
 }
