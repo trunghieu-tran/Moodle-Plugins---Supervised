@@ -17,6 +17,12 @@
 function xmldb_block_formal_langs_install() {
     global $DB;
 
+    $systemcontext = context_system::instance()->id;
+    $templatepermission = new stdClass();
+    $templatepermission->languageid = 0;
+    $templatepermission->contextid = $systemcontext;
+    $templatepermission->visible = 1;
+
     $lang = new stdClass();
     $lang->uiname = 'Simple english';
     $lang->description = 'Simple english language definition';
@@ -27,7 +33,9 @@ function xmldb_block_formal_langs_install() {
     $lang->visible = 1;
     $lang->lexemname = '';
     
-    $DB->insert_record('block_formal_langs',$lang);
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
     $lang = new stdClass();
     $lang->uiname = 'C programming language';
@@ -39,8 +47,9 @@ function xmldb_block_formal_langs_install() {
     $lang->visible = 1;
     $lang->lexemname = '';
     
-    $DB->insert_record('block_formal_langs',$lang);
-
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
     $lang = new stdClass();
     $lang->uiname = 'C++ programming language';
@@ -51,7 +60,9 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
 
-    $DB->insert_record('block_formal_langs',$lang);
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
     $lang = new stdClass();
     $lang->uiname = 'C formatting string rules';
@@ -63,7 +74,8 @@ function xmldb_block_formal_langs_install() {
     $lang->visible = 1;
     $lang->lexemname = '';
 
-    $DB->insert_record('block_formal_langs',$lang);
-
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 }
 
