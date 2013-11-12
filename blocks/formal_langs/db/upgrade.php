@@ -90,5 +90,9 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         block_formal_langs::sync_contexts_with_config();
     }
 
+    if ($oldversion < 2013111018)  {
+        block_formal_langs::sync_contexts_with_config();
+    }
+
     return true;
 }

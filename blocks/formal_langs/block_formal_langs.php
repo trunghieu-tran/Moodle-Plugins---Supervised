@@ -375,77 +375,6 @@ class block_formal_langs extends block_list {
         }
     }
 
-    /**
-     * @deprecated
-     * DO NOT ADD THIS BLOCK! This code is for testing only!
-     * @return null|stdClass
-     */
-    public function deprecated_get_content() {
-        global $CFG, $USER, $DB;
-
-        if ($this->content !== NULL) {
-            return $this->content;
-        }
-
-        $this->content = new stdClass;
-        $this->content->text = '';
-        $this->content->footer = '';
-
-        // Insert language.
-        $language = new stdClass();
-        $language->name = 'Test language';
-        $language->uiname = 'Test';
-        $language->description = 'Description';
-        $language->scanrules = 'a';
-        $language->parserules = 'a';
-        $language->version = '1.0';
-        $language->visible = '1';
-        $language->lexemname = 'lexeme';
-        $language->id = $this->find_or_insert_language((array)$language);
-        if ($language->id <= 0) {
-            $this->content->text .= 'Failed to insert language<br />';
-        } else {
-            $this->content->text .= 'Successfully inserted language <br />';
-        }
-        $language->scanrules = 'b';
-
-        // Update language.
-        $DB->update_record('block_formal_langs', $language);
-        $testlanguage  = $DB->get_record('block_formal_langs', array('id' => $language->id));
-        if ($testlanguage->scanrules != $language->scanrules) {
-            $this->content->text .= 'Failed to update language <br />';
-        } else {
-            $this->content->text .= 'Successfully updated language<br />';
-        }
-        // Delete language.
-        $DB->delete_records('block_formal_langs', array('id' => $language->id));
-        $testlanguage  = $DB->get_record('block_formal_langs', array('id' => $language->id));
-        if ($testlanguage != false) {
-            $this->content->text .= 'Failed to remove language<br />';
-        } else {
-            $this->content->text .= 'Successfully removed language <br />';
-        }
-
-        $tree = array_keys( $this->page->context->get_parent_contexts(true) );
-        // Somehow inner context id differs from outer context id, So we add it.
-        $tree[] = $this->context->id;
-
-        $this->content->text .= '<pre>';
-        $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
-        $this->content->text .= '</pre>';
-
-        $this->update_language_visibility(1, 0, $this->context->id);
-        $this->content->text .= 'After first update <br /><pre>';
-        $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
-        $this->content->text .= '</pre>';
-        $this->update_language_visibility(1, 1, $this->context->id);
-        $this->content->text .= 'After second update <br /><pre>';
-        $this->content->text .= var_export($this->build_visibility_for_all_languages($tree), true);
-        $this->content->text .= '</pre>';
-
-
-        return null;
-    }
 
     public function get_content() {
         global $_REQUEST, $PAGE, $CFG, $OUTPUT, $DB;
@@ -537,9 +466,6 @@ class block_formal_langs extends block_list {
             $this->content->items[]  = $text;
         }
 
-        if ($_REQUEST['debug'] == 'Y') {
-            return $this->deprecated_get_content();
-        }
         return null;
     }
 
