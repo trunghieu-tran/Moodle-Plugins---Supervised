@@ -111,11 +111,7 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add handlers for the buttons.
                     $('#id_regex_show').click(self.btn_show_clicked);
-                    if (!self.textbutton_widget.is_stand_alone()) {
-                        $('#id_regex_save').click(self.btn_save_clicked);
-                    } else {
-                        $('#id_regex_save').hide();
-                    }
+                    $('#id_regex_save').click(self.btn_save_clicked);
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
@@ -133,6 +129,8 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
+                    // Init panzoom on images
+                    self.panzooms.init();
                     options.oneachpresscallback();
                 });
             },
@@ -142,16 +140,13 @@ M.preg_authoring_tools_script = (function ($) {
                 self.invalidate_content();
 
                 // Put the testing data into ui.
-                if (!self.textbutton_widget.is_stand_alone()) {
-                    $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
+                $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
                                          .trigger('keyup');
-
-                    $.each(self.matching_options, function (i, option) {
-                        var preg_id = '#id_' + option,
-                            this_id = preg_id + '_auth';
-                        $(this_id).val($(preg_id).val());
-                    });
-                }
+                $.each(self.matching_options, function (i, option) {
+                    var preg_id = '#id_' + option,
+                        this_id = preg_id + '_auth';
+                    $(this_id).val($(preg_id).val());
+                });
                 $('#id_regex_show').click();
             },
 
@@ -190,6 +185,7 @@ M.preg_authoring_tools_script = (function ($) {
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
+        self.panzooms.reset_all();
     },
 
     btn_save_clicked : function (e) {
@@ -200,7 +196,7 @@ M.preg_authoring_tools_script = (function ($) {
                 this_id = preg_id + '_auth';
             $(preg_id).val($(this_id).val());
         });
-        self.textbutton_widget.close_and_set_new_data('');
+        self.textbutton_widget.close_and_set_new_data();
         $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
         $('#id_test_regex').html('');
         M.form.updateFormState("mform1");
@@ -222,6 +218,7 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
+        self.panzooms.reset_tree();
     },
 
     tree_node_clicked : function (e) {
@@ -234,9 +231,9 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     tree_node_misclicked : function (e) {
-        e.preventDefault();
+        /*e.preventDefault();
         self.load_content();
-        self.load_strings();
+        self.load_strings();*/
     },
 
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -262,10 +259,6 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_content_success : function (data, textStatus, jqXHR) {
-        if (typeof data == "object") {
-            new M.core.ajaxException(data);
-            return;
-        }
         var json = JSON.parse(data),
             regex = json['regex'],
             //engine = json['engine'],
@@ -291,10 +284,6 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
-        if (typeof data == "object") {
-            new M.core.ajaxException(data);
-            return;
-        }
         var json = JSON.parse(data),
             regex = json['regex'],
             engine = json['engine'],
@@ -387,17 +376,17 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        $('#tree_img').unbind();
-        $(self.TREE_MAP_ID + ' > area').unbind();
+        $('#tree_img').unbind('click', self.tree_node_misclicked);
+        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
-        var cached = self.cache[self.TREE_KEY][k];
+        cached = self.cache[self.TREE_KEY][k];
         if (cached) {
             self.display_content(self.cache[self.TREE_KEY][k], self.cache[self.GRAPH_KEY][k], self.cache[self.DESCRIPTION_KEY][k], indfirst, indlast);
             return;
         }
-
+         
         $.ajax({
             type: 'GET',
             url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring_tools_loader.php',
@@ -424,7 +413,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Check the cache.
         var k = self.cache_key_for_testing_tool(indfirst, indlast);
-        var cached = self.cache[self.STRINGS_KEY][k];
+        cached = self.cache[self.STRINGS_KEY][k];
         if (cached) {
             self.display_strings(cached);
             return;
@@ -469,6 +458,50 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_displayas : function () {
         return $('#fgroup_id_charset_process_radioset input:checked').val();
+    },
+
+    panzooms : {
+        reset_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("reset");
+        },
+
+        reset_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("reset");
+        },
+
+        reset_all : function() {
+            self.panzooms.reset_tree();
+            self.panzooms.reset_graph();
+            self.panzooms.reset_tree_dimensions();
+            self.panzooms.reset_graph_dimensions();
+        },
+
+        reset_tree_dimensions : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("resetDimensions");
+        },
+
+        reset_graph_dimensions : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("resetDimensions");
+        },
+
+        init_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom();
+        },
+
+        init_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom();
+        },
+
+        init : function() {
+            self.panzooms.init_graph();
+            self.panzooms.init_tree();
+        }
     }
 };
 
