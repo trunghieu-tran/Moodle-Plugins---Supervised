@@ -133,6 +133,8 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
+                    // Init panzoom on images
+                    self.panzooms.init();
                     options.oneachpresscallback();
                 });
             },
@@ -190,6 +192,7 @@ M.preg_authoring_tools_script = (function ($) {
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
+        self.panzooms.reset_all();
     },
 
     btn_save_clicked : function (e) {
@@ -222,6 +225,7 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
+        self.panzooms.reset_tree();
     },
 
     tree_node_clicked : function (e) {
@@ -234,9 +238,9 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     tree_node_misclicked : function (e) {
-        e.preventDefault();
+        /*e.preventDefault();
         self.load_content();
-        self.load_strings();
+        self.load_strings();*/
     },
 
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -387,8 +391,8 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        $('#tree_img').unbind();
-        $(self.TREE_MAP_ID + ' > area').unbind();
+        $('#tree_img').unbind('click', self.tree_node_misclicked);
+        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
@@ -469,6 +473,50 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_displayas : function () {
         return $('#fgroup_id_charset_process_radioset input:checked').val();
+    },
+
+    panzooms : {
+        reset_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("reset");
+        },
+
+        reset_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("reset");
+        },
+
+        reset_all : function() {
+            self.panzooms.reset_tree();
+            self.panzooms.reset_graph();
+            self.panzooms.reset_tree_dimensions();
+            self.panzooms.reset_graph_dimensions();
+        },
+
+        reset_tree_dimensions : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("resetDimensions");
+        },
+
+        reset_graph_dimensions : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("resetDimensions");
+        },
+
+        init_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom();
+        },
+
+        init_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom();
+        },
+
+        init : function() {
+            self.panzooms.init_graph();
+            self.panzooms.init_tree();
+        }
     }
 };
 
