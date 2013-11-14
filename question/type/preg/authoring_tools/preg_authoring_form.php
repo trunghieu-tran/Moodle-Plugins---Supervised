@@ -33,7 +33,6 @@ class qtype_preg_authoring_form extends moodleform {
         global $PAGE;
 
         $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
-        $PAGE->requires->js('/question/type/preg/authoring_tools/jquerypanzoommin.js');
 
         // Create the form.
         $qtype = new qtype_preg();
@@ -100,8 +99,9 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div id="tree_map" ></div></br>');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
+                                        '<div style="width:10px">' .
                                             '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
-                                        '</div></br>');
+                                        '</div></div></br>');
 
         // Add explaining graph tool.
         $mform->addElement('header', 'regex_graph_header', get_string('explaining_graph_tool', 'qtype_preg'));
@@ -109,8 +109,9 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addHelpButton('regex_graph_header', 'explaining_graph_tool', 'qtype_preg');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_hnd">' .
                                         '<div id="graph_err"></div>' .
+                                        '<div style="width:10px">' .
                                             '<img src="" id="graph_img" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
-                                        '</div></br>');
+                                        '</div></div></br>');
 
         // Add description tool.
         $mform->addElement('header', 'regex_description_header', get_string('description_tool', 'qtype_preg'));
