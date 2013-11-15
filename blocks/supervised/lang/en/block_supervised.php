@@ -33,3 +33,9 @@ $string['lessontypespagetitle']     = 'Lesson types';
 $string['lessontypesheader']        = 'Lesson types in current course';
 $string['lessontypesbreadcrumb']    = 'Lesson types';
 $string['lessontype']               = 'Lesson type';
+
+
+$string['edit']                     = 'Edit';
+$string['delete']                   = 'Delete';
+
+$string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';

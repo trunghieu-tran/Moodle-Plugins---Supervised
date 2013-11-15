@@ -1,6 +1,6 @@
 <?php
  
-require_once('../../config.php');
+require_once('../../../config.php');
  
 global $DB, $OUTPUT, $PAGE;
 
@@ -13,13 +13,13 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 }
 
 require_login($course);
-$PAGE->set_url('/blocks/supervised/lessontypes.php', array('courseid' => $courseid, 'blockid' => $blockid));
+$PAGE->set_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
-$PAGE->set_heading(get_string('lessontypesheader', 'block_supervised'));
+$PAGE->set_title(get_string('classroomspagetitle', 'block_supervised'));
+$PAGE->set_heading(get_string('classroomsheader', 'block_supervised'));
 
 // Add links into Administration block.
-include("administrationlinks.php");
+include("../administrationlinks.php");
 
 $site = get_site();
 // Display header.
@@ -27,14 +27,14 @@ echo $OUTPUT->header();
 
 // Display page content.
 // Prepare table data
-$lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid));
+$classrooms = $DB->get_records('block_supervised_classroom');
 $tabledata = array();
-foreach ($lessontypes as $lessontype) {
-    $tabledata[] = array($lessontype->name);
+foreach ($classrooms as $classroom) {
+    $tabledata[] = array($classroom->name, $classroom->iplist);
 }
 // Build table.
 $table = new html_table();
-$table->head = array(get_string('lessontype', 'block_supervised'));
+$table->head = array(get_string('classroom', 'block_supervised'), get_string('iplist', 'block_supervised'));
 $table->data = $tabledata;
 echo html_writer::table($table);
 
