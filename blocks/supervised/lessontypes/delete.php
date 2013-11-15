@@ -7,7 +7,7 @@
     $blockid    = required_param('blockid', PARAM_INT);
     $delete     = optional_param('delete', '', PARAM_ALPHANUM); // delete confirmation hash
     
-    $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id));
+    $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid, 'blockid' => $blockid));
     require_login();
 
     $site = get_site();
