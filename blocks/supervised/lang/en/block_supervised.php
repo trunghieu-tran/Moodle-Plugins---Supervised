@@ -39,3 +39,5 @@ $string['edit']                     = 'Edit';
 $string['delete']                   = 'Delete';
 
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
+$string['cannotdeletelessontype']   = 'You can not delete this lesson type (you do not have the permission OR lesson type is used in some session OR lesson type is used in some quiz)';
+$string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
