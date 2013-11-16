@@ -10,7 +10,7 @@ class mod_lessontype_form extends moodleform {
         
         // add group
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        // add name element.
+        // add name element
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'48'));
         $mform->addRule('name', null, 'required', null, 'client');
 
