@@ -2,7 +2,6 @@
 require_once('../../../config.php');
 
 $courseid   = required_param('courseid', PARAM_INT);
-$blockid    = required_param('blockid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // lessontype id (only for edit mode)
 $site = get_site();
 
@@ -15,7 +14,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-$PAGE->set_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid, 'blockid' => $blockid));
+$PAGE->set_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
 
@@ -45,13 +44,12 @@ if (file_exists($modmoodleform)) {
     print_error('noformdesc');
 }
 $mform = new mod_lessontype_form();
-$toform['blockid'] = $blockid;
 $toform['courseid'] = $courseid;
 $mform->set_data($toform);
 
 if($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
-     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
+     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
@@ -68,7 +66,7 @@ if($mform->is_cancelled()) {
         }
 
     }
-    $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
+    $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
     // form didn't validate or this is the first display

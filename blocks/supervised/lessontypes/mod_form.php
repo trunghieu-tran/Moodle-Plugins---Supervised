@@ -15,7 +15,6 @@ class mod_lessontype_form extends moodleform {
         $mform->addRule('name', null, 'required', null, 'client');
 
         // hidden elements
-        $mform->addElement('hidden', 'blockid');
         $mform->addElement('hidden', 'courseid');
         $mform->addElement('hidden', 'id');
         

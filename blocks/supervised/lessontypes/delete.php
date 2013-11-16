@@ -4,7 +4,6 @@ require_once('../lib.php');
 
 $id         = required_param('id', PARAM_INT);              // lessontype id
 $courseid   = required_param('courseid', PARAM_INT);
-$blockid    = required_param('blockid', PARAM_INT);
 $delete     = optional_param('delete', '', PARAM_ALPHANUM); // delete confirmation hash
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -14,7 +13,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 
 $site = get_site();
 require_login($course);
-$PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid, 'blockid' => $blockid));
+$PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid));
 include("breadcrumbs.php");
 
 if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id, "courseid"=>$courseid))) {
@@ -37,7 +36,7 @@ if (! $delete) {
 
     $message = "$strdeletelessontypecheck<br /><br />" . $lessontype->name;
 
-    echo $OUTPUT->confirm($message, "delete.php?id=$id&blockid=$blockid&courseid=$courseid&delete=".md5($lessontype->name), "view.php?blockid=$blockid&courseid=$courseid");
+    echo $OUTPUT->confirm($message, "delete.php?id=$id&courseid=$courseid&delete=".md5($lessontype->name), "view.php?courseid=$courseid");
 
     echo $OUTPUT->footer();
     exit;
@@ -57,5 +56,5 @@ if (!confirm_sesskey()) {
 
 $DB->delete_records('block_supervised_lessontype', array('id'=>$id));
 // Redirect to lessontypes page
-$url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
+$url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
 redirect($url);

@@ -40,10 +40,10 @@ class block_supervised extends block_base {
         $this->content->text   = 'The content of supervised block!';
 
         
-        $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('blockid' => $this->instance->id, 'courseid' => $COURSE->id));
+        $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
         $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
         
-        $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $this->instance->id, 'courseid' => $COURSE->id));
+        $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
         $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
 
         $this->content->footer = join(' ', $links);
