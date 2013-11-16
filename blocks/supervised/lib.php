@@ -9,3 +9,8 @@ function can_delete_lessontype($lessontypeid) {
     //$DB->record_exists_select('log', $select, $params);
     return true;
 }
+
+function can_delete_classroom($classroomid) {
+    // TODO check: user permissions; is in session(s);
+    return true;
+}

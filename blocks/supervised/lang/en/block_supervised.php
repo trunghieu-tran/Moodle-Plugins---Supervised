@@ -30,6 +30,8 @@ $string['classroom']                = 'Classroom';
 $string['iplist']                   = 'IP list';
 $string['invalidclassroomid']       = 'You are trying to use an invalid classroom ID';
 $string['insertclassroomerror']     = 'Database error! Can not insert classroom into database';
+$string['cannotdeleteclassroom']   = 'You can not delete this classroom because it\'s used in some sessions';
+$string['deleteclassroomcheck']    = 'Are you absolutely sure you want to completely delete this classroom?';
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
@@ -42,7 +44,7 @@ $string['editlessontypepagetitle']  = 'Edit lesson type';
 $string['editinglessontype']        = 'Editing lesson type';
 
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
-$string['cannotdeletelessontype']   = 'You can not delete this lesson type (you do not have the permission OR lesson type is used in some session OR lesson type is used in some quiz)';
+$string['cannotdeletelessontype']   = 'You can not delete this lesson type (lesson type is used in some session OR lesson type is used in some quiz)';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
 
 $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';
