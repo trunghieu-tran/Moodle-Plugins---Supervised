@@ -30,8 +30,8 @@ if(!$id){   // Add mode.
     $title = get_string('editlessontypepagetitle', 'block_supervised');
     $heading = get_string("editinglessontype", 'block_supervised');
     
+    $toform['id']   = $lessontype->id;
     $toform['name'] = $lessontype->name;
-    $toform['id'] = $lessontype->id;
 }
 
 $PAGE->set_title($title);
@@ -49,11 +49,10 @@ $mform->set_data($toform);
 
 if($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
-     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
+    $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
-    $fromform->courseid = $courseid;
     if(!$id){   // Add mode.
         // TODO Logging
         if (!$DB->insert_record('block_supervised_lessontype', $fromform)) {

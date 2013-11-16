@@ -28,10 +28,29 @@ $string['supervisedsettings']       = 'Supervised settings';
 $string['classroomsbreadcrumb']     = 'Classrooms';
 $string['classroom']                = 'Classroom';
 $string['iplist']                   = 'IP list';
+$string['iplist_help']              = 
+'IP list is a comma separated string of subnet definitions.
+
+Subnet strings can be in one of those formats:
+
+* xxx.xxx.xxx.xxx     (full IP address)
+
+* xxx.xxx.xxx.xxx/nn  (number of bits in net mask)
+
+* xxx.xxx.xxx.xxx-yyy (a range of IP addresses in the last group)
+
+* xxx.xxx or xxx.xxx. (incomplete address)';
+$string['active']                   = 'Use this classroom in sessions?';
+$string['active_help']              = 'If enabled, you can create new sessions in this classroom';
 $string['invalidclassroomid']       = 'You are trying to use an invalid classroom ID';
 $string['insertclassroomerror']     = 'Database error! Can not insert classroom into database';
-$string['cannotdeleteclassroom']   = 'You can not delete this classroom because it\'s used in some sessions';
-$string['deleteclassroomcheck']    = 'Are you absolutely sure you want to completely delete this classroom?';
+$string['cannotdeleteclassroom']    = 'You can not delete this classroom because it\'s used in some sessions';
+$string['deleteclassroomcheck']     = 'Are you absolutely sure you want to completely delete this classroom?';
+$string['addclassroompagetitle']    = 'Add classroom';
+$string['addingnewclassroom']       = 'Adding new classroom';
+$string['editclassroompagetitle']   = 'Edit classroom';
+$string['editingclassroom']         = 'Editing classroom';
+
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
