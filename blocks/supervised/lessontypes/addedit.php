@@ -14,7 +14,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-$PAGE->set_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid));
+$PAGE->set_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
 
@@ -37,13 +37,13 @@ if(!$id){   // Add mode.
 $PAGE->set_title($title);
 
 // Prepare form.
-$modmoodleform = "mod_form.php";
-if (file_exists($modmoodleform)) {
-    require_once($modmoodleform);
+$mform = "addedit_form.php";
+if (file_exists($mform)) {
+    require_once($mform);
 } else {
     print_error('noformdesc');
 }
-$mform = new mod_lessontype_form();
+$mform = new addedit_lessontype_form();
 $toform['courseid'] = $courseid;
 $mform->set_data($toform);
 

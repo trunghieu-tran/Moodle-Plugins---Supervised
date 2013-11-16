@@ -29,7 +29,7 @@ $classrooms = $DB->get_records('block_supervised_classroom');
 $tabledata = array();
 foreach ($classrooms as $id=>$classroom) {
     // Prepare icons.
-    $editurl = new moodle_url('/blocks/supervised/classrooms/mod.php', array('id' => $id, 'courseid' => $courseid));
+    $editurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('id' => $id, 'courseid' => $courseid));
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $deleteurl = new moodle_url('/blocks/supervised/classrooms/delete.php', array('courseid' => $courseid, 'id' => $id));
     $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
@@ -45,7 +45,7 @@ foreach ($classrooms as $id=>$classroom) {
     // Combine new row.
     $tabledata[] = array($classroom->name, $classroom->iplist, $iconedit . $icondelete . $iconshowhide);
 }
-$addurl = new moodle_url('/blocks/supervised/classrooms/mod.php', array('courseid' => $courseid));
+$addurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
 $iconadd = $OUTPUT->action_icon($addurl, new pix_icon('t/add', get_string('add')));
 
 // Build table.

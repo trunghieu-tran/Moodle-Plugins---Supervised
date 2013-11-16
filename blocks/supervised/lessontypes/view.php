@@ -29,7 +29,7 @@ $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=
 $tabledata = array();
 foreach ($lessontypes as $id=>$lessontype) {
     // Prepare icons.
-    $editurl = new moodle_url('/blocks/supervised/lessontypes/mod.php', array('id' => $id, 'courseid' => $courseid));
+    $editurl = new moodle_url('/blocks/supervised/lessontypes/addedit.php', array('id' => $id, 'courseid' => $courseid));
     $deleteurl = new moodle_url('/blocks/supervised/lessontypes/delete.php', array('courseid' => $courseid, 'id' => $id));
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
@@ -37,7 +37,7 @@ foreach ($lessontypes as $id=>$lessontype) {
     $tabledata[] = array($lessontype->name . $iconedit . $icondelete);
 }
 $headname = get_string('lessontype', 'block_supervised');
-$addurl = new moodle_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid));
+$addurl = new moodle_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $iconadd = $OUTPUT->action_icon($addurl, new pix_icon('t/add', get_string('add')));
 // Build table.
 $table = new html_table();
