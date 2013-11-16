@@ -1,21 +1,23 @@
 <?php
     require_once('../../../config.php');
-    //require_once('../lib.php');
-    //global $DB, $OUTPUT, $PAGE;
 
     $courseid   = required_param('courseid', PARAM_INT);
     $blockid    = required_param('blockid', PARAM_INT);
     $id         = optional_param('id', '', PARAM_INT);        // lessontype id (only for edit mode)
     
-    require_login();
+    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        print_error('invalidcourse', 'block_supervised', $courseid);
+    }
+    
+    $site = get_site();
+    require_login($course);
     $PAGE->set_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid, 'blockid' => $blockid));
     $PAGE->set_pagelayout('standard');
-    $PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
-    $PAGE->set_heading(get_string('lessontypesheader', 'block_supervised'));
-    
-    $PAGE->navbar->add(get_string("mycourses"), new moodle_url('/my/'));
-
-    $site = get_site();
+    $PAGE->set_title(get_string('addlessontypepagetitle', 'block_supervised'));
+    $PAGE->set_heading($course->fullname);
+    $PAGE->navbar->add(get_string('pluginname', 'block_supervised'));
+    $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
+    $PAGE->navbar->add(get_string('lessontypesbreadcrumb', 'block_supervised'), $lessontypesurl);
 
     // Add mode
     if($id == "") {

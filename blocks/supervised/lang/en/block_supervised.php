@@ -30,7 +30,8 @@ $string['classroom']                = 'Classroom';
 $string['iplist']                   = 'IP list';
 
 $string['lessontypespagetitle']     = 'Lesson types';
-$string['lessontypesheader']        = 'Lesson types in current course';
+$string['addlessontypepagetitle']   = 'Add lesson type';
+$string['lessontypesview']          = 'Lesson types in current course';
 $string['lessontypesbreadcrumb']    = 'Lesson types';
 $string['lessontype']               = 'Lesson type';
 $string['addingnewlessontype']      = 'Adding new lesson type';

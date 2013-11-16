@@ -7,10 +7,17 @@
     $blockid    = required_param('blockid', PARAM_INT);
     $delete     = optional_param('delete', '', PARAM_ALPHANUM); // delete confirmation hash
     
-    $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid, 'blockid' => $blockid));
-    require_login();
+    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        print_error('invalidcourse', 'block_supervised', $courseid);
+    }
+    
 
     $site = get_site();
+    require_login($course);
+    $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid, 'blockid' => $blockid));
+    $PAGE->navbar->add(get_string('pluginname', 'block_supervised'));
+    $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
+    $PAGE->navbar->add(get_string('lessontypesbreadcrumb', 'block_supervised'), $lessontypesurl);
 
     if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id))) {
         print_error(get_string("invalidlessontypeid", 'block_supervised'));
@@ -19,8 +26,6 @@
     if (!can_delete_lessontype($id)) {
         print_error(get_string("cannotdeletelessontype", 'block_supervised'));
     }
-
-    $PAGE->navbar->add(get_string("mycourses"), new moodle_url('/my/'));
     
     // Show form first time.
     if (! $delete) {
@@ -28,8 +33,8 @@
         $strdeletelessontypecheck = get_string("deletelessontypecheck", 'block_supervised');
 
         $PAGE->navbar->add($strdeletecheck);
-        $PAGE->set_title("$site->shortname: $strdeletecheck");
-        $PAGE->set_heading($site->fullname);
+        $PAGE->set_title("$course->shortname: $strdeletecheck");
+        $PAGE->set_heading($course->fullname);
         echo $OUTPUT->header();
 
         $message = "$strdeletelessontypecheck<br /><br />" . $lessontype->name;

@@ -1,31 +1,30 @@
 <?php
- 
+
 require_once('../../../config.php');
- 
+
 global $DB, $OUTPUT, $PAGE;
 
 // Check for all required variables.
 $courseid = required_param('courseid', PARAM_INT);
 $blockid = required_param('blockid', PARAM_INT);
- 
+
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'block_supervised', $courseid);
 }
-
+$site = get_site();
 require_login($course);
+
 $PAGE->set_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
-$PAGE->set_heading(get_string('lessontypesheader', 'block_supervised'));
-
-// Add links into Administration block.
-include("../administrationlinks.php");
-
-$site = get_site();
+$PAGE->set_heading($course->fullname);
+$PAGE->navbar->add(get_string('pluginname', 'block_supervised'));
+$lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
+$PAGE->navbar->add(get_string('lessontypesbreadcrumb', 'block_supervised'), $lessontypesurl);
 // Display header.
 echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 3);
 
-// Display page content.
 
 // Prepare table data
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid));
@@ -45,16 +44,6 @@ $table = new html_table();
 $table->head = array($headname . $iconadd);
 $table->data = $tabledata;
 echo html_writer::table($table);
-
-
-//$icon = new moodle_action_icon();
-//$icon->image->src = $OUTPUT->old_icon_url('moodlelogo');
-//$icon->image->alt = 'What is moodle?';
-//$icon->link->url = new moodle_url('http://domain.com/index.php');
-//$icon->add_confirm_action('Are you sure?'); // Optional. Equivalent to doing $icon->link->add_confirm_action('Are you sure?');
-//echo $OUTPUT->action_icon($icon);
-
-
 
 // Display footer.
 echo $OUTPUT->footer();
