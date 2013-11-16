@@ -4,12 +4,16 @@ require_once('../../../config.php');
 $courseid   = required_param('courseid', PARAM_INT);
 $blockid    = required_param('blockid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // lessontype id (only for edit mode)
+$site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'block_supervised', $courseid);
 }
+if ($site->id == $course->id) {
+    // block can not work in the main course (frontpage)
+    print_error("invalidcourseid");
+}
 
-$site = get_site();
 require_login($course);
 $PAGE->set_url('/blocks/supervised/lessontypes/mod.php', array('courseid' => $courseid, 'blockid' => $blockid));
 $PAGE->set_pagelayout('standard');
@@ -21,11 +25,11 @@ if(!$id){   // Add mode.
     $title = get_string('addlessontypepagetitle', 'block_supervised');
     $heading = get_string("addingnewlessontype", 'block_supervised');
 } else{     // Edit mode.
-    if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id))) {
+    if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id, "courseid"=>$courseid))) {
         print_error(get_string("invalidlessontypeid", 'block_supervised'));
     }
-    $title = "Edit";
-    $heading = "Edit lessontype";
+    $title = get_string('editlessontypepagetitle', 'block_supervised');
+    $heading = get_string("editinglessontype", 'block_supervised');
     
     $toform['name'] = $lessontype->name;
     $toform['id'] = $lessontype->id;

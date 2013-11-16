@@ -5,12 +5,16 @@ global $DB, $OUTPUT, $PAGE;
 
 $courseid   = required_param('courseid', PARAM_INT);
 $blockid    = required_param('blockid', PARAM_INT);
+$site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'block_supervised', $courseid);
 }
+if ($site->id == $course->id) {
+    // block can not work in the main course (frontpage)
+    print_error("invalidcourseid");
+}
 
-$site = get_site();
 require_login($course);
 $PAGE->set_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid, 'blockid' => $blockid));
 $PAGE->set_pagelayout('standard');

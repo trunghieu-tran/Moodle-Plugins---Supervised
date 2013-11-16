@@ -17,7 +17,7 @@ require_login($course);
 $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid, 'blockid' => $blockid));
 include("breadcrumbs.php");
 
-if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id))) {
+if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id"=>$id, "courseid"=>$courseid))) {
     print_error(get_string("invalidlessontypeid", 'block_supervised'));
 }
 

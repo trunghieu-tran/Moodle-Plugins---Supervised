@@ -31,11 +31,13 @@ $string['iplist']                   = 'IP list';
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
+$string['addingnewlessontype']      = 'Adding new lesson type';
 $string['lessontypesview']          = 'Lesson types in current course';
 $string['lessontypesbreadcrumb']    = 'Lesson types';
 $string['lessontype']               = 'Lesson type';
-$string['addingnewlessontype']      = 'Adding new lesson type';
 
+$string['editlessontypepagetitle']  = 'Edit lesson type';
+$string['editinglessontype']        = 'Editing lesson type';
 
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
 $string['cannotdeletelessontype']   = 'You can not delete this lesson type (you do not have the permission OR lesson type is used in some session OR lesson type is used in some quiz)';
