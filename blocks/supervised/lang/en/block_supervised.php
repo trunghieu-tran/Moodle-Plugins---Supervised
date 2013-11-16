@@ -28,6 +28,8 @@ $string['supervisedsettings']       = 'Supervised settings';
 $string['classroomsbreadcrumb']     = 'Classrooms';
 $string['classroom']                = 'Classroom';
 $string['iplist']                   = 'IP list';
+$string['invalidclassroomid']       = 'You are trying to use an invalid classroom ID';
+$string['insertclassroomerror']     = 'Database error! Can not insert classroom into database';
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
@@ -43,4 +45,4 @@ $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson t
 $string['cannotdeletelessontype']   = 'You can not delete this lesson type (you do not have the permission OR lesson type is used in some session OR lesson type is used in some quiz)';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
 
-$string['insertlessontypeerror']              = 'Database error! Can not insert lessontype into database';
+$string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';

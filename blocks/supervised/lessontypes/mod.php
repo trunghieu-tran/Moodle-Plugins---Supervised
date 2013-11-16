@@ -51,8 +51,8 @@ $mform->set_data($toform);
 
 if($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
-     $courseurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
-    redirect($courseurl);
+     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
+    redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
     $fromform->courseid = $courseid;
@@ -68,8 +68,8 @@ if($mform->is_cancelled()) {
         }
 
     }
-    $courseurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
-    redirect($courseurl);
+    $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('blockid' => $blockid, 'courseid' => $courseid));
+    redirect($url);
 } else {
     // form didn't validate or this is the first display
     echo $OUTPUT->header();

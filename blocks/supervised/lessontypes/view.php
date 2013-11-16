@@ -29,10 +29,12 @@ echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 3);
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid));
 $tabledata = array();
 foreach ($lessontypes as $id=>$lessontype) {
+    // Prepare icons.
     $editurl = new moodle_url('/blocks/supervised/lessontypes/mod.php', array('id' => $id, 'blockid' => $blockid, 'courseid' => $courseid));
     $deleteurl = new moodle_url('/blocks/supervised/lessontypes/delete.php', array('blockid' => $blockid, 'courseid' => $courseid, 'id' => $id));
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
+    // Combine new row.
     $tabledata[] = array($lessontype->name . $iconedit . $icondelete);
 }
 $headname = get_string('lessontype', 'block_supervised');
