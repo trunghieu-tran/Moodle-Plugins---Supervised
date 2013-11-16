@@ -17,6 +17,7 @@ class mod_lessontype_form extends moodleform {
         // hidden elements
         $mform->addElement('hidden', 'blockid');
         $mform->addElement('hidden', 'courseid');
+        $mform->addElement('hidden', 'id');
         
         $this->add_action_buttons();
     }
