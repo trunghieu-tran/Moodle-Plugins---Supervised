@@ -25,7 +25,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("classroomsheader", 'block_supervised'), 3);
 
 // Prepare table data
-$classrooms = $DB->get_records('block_supervised_classroom');
+$classrooms = $DB->get_records('block_supervised_classroom', null, 'name');
 $tabledata = array();
 foreach ($classrooms as $id=>$classroom) {
     // Prepare icons.

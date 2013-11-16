@@ -25,7 +25,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 3);
 
 // Prepare table data
-$lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid));
+$lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid), 'name');
 $tabledata = array();
 foreach ($lessontypes as $id=>$lessontype) {
     // Prepare icons.
