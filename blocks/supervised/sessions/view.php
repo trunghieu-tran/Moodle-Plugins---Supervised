@@ -37,7 +37,7 @@ $select = "SELECT
 {user}.firstname,
 {user}.lastname,
 {groups}.name                       AS groupname,
-{course}.shortname                  AS coursename
+{course}.fullname                   AS coursename
 
 FROM {block_supervised_session}
     JOIN {block_supervised_classroom}
@@ -52,11 +52,15 @@ ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}
     AND {block_supervised_session}.groupid      =   {groups}.id
     AND {block_supervised_session}.courseid     =   {course}.id
 
+
+";
+/*TODO Add WHERE for filtering
 WHERE ({block_supervised_session}.timestart BETWEEN :time1 AND :time2)
     AND {block_supervised_session}.courseid     = :courseid
     AND {block_supervised_session}.teacherid    = :teacherid
     AND {block_supervised_session}.groupid      = :groupid
-";
+*/
+
 // TODO initialize from filter
 $time1      = 1378024800;
 $time2      = 1378024890;
@@ -68,7 +72,7 @@ $params['courseid']     = $courseid;
 $params['teacherid']    = $teacherid;
 $params['groupid']      = $groupid;
 
-$sessions = $DB->get_records_sql($select, $params);
+$sessions = $DB->get_records_sql($select/*, $params*/);
 
 $tabledata = array();
 foreach ($sessions as $id=>$session) {
@@ -81,7 +85,8 @@ foreach ($sessions as $id=>$session) {
     
 
     // Combine new row.
-    $tabledata[] = array(   $session->classroomname,
+    $tabledata[] = array(   $session->coursename,
+                            $session->classroomname,
                             $session->groupname,
                             
                             html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), $session->firstname . " " . $session->lastname),
@@ -91,16 +96,17 @@ foreach ($sessions as $id=>$session) {
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             '[State]',
-                            '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',    // TODO action_link
+                            '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',    // TODO use action_link
                             $iconedit . $icondelete . $iconshowhide
                         );
 }
 $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . '[Plane new session]' . '</a>');
+echo ('<a href="'.$addurl.'">' . '[Plane new session]' . '</a>');   // TODO use action_link
 
 // Build table.
 $table = new html_table();
 // Prepare headers.
+$headcourse         = get_string('course', 'block_supervised');
 $headclassroom      = get_string('classroom', 'block_supervised');
 $headgroup          = get_string('group', 'block_supervised');
 $headteacher        = get_string('teacher', 'block_supervised');
@@ -113,7 +119,7 @@ $headlogs           = get_string('logs', 'block_supervised');
 $headedit           = get_string('edit');
 
 
-$table->head = array($headclassroom, $headgroup, $headteacher, $headlessontype, $headtimestart, $headduration, $headtimeend, $headstate, $headlogs, $headedit);
+$table->head = array($headcourse, $headclassroom, $headgroup, $headteacher, $headlessontype, $headtimestart, $headduration, $headtimeend, $headstate, $headlogs, $headedit);
 $table->data = $tabledata;
 echo html_writer::table($table);
 
