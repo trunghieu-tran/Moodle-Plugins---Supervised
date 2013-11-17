@@ -1,5 +1,6 @@
 <?php
 require_once('../../../config.php');
+require_once('sessionstate.php');
  
 global $DB, $OUTPUT, $PAGE;
 
@@ -32,6 +33,7 @@ $select = "SELECT
 {block_supervised_session}.timeend,
 {block_supervised_session}.courseid,
 {block_supervised_session}.teacherid,
+{block_supervised_session}.state,
 {block_supervised_classroom}.name   AS classroomname,
 {block_supervised_lessontype}.name  AS lessontypename,
 {user}.firstname,
@@ -95,7 +97,7 @@ foreach ($sessions as $id=>$session) {
                             userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime),
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
-                            '[State]',
+                            StateSession::getStateName($session->state),
                             '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',    // TODO use action_link
                             $iconedit . $icondelete . $iconshowhide
                         );
