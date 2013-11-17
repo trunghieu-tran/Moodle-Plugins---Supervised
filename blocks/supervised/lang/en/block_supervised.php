@@ -21,6 +21,7 @@ $string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Mood
 
 $string['classroomsurl']            = '[Classrooms]';
 $string['lessontypesurl']           = '[Lesson types]';
+$string['sessionsurl']              = '[Sessions]';
 
 $string['classroomspagetitle']      = 'Classrooms list';
 $string['classroomsheader']         = 'Classrooms list';
@@ -58,12 +59,26 @@ $string['addingnewlessontype']      = 'Adding new lesson type';
 $string['lessontypesview']          = 'Lesson types in current course';
 $string['lessontypesbreadcrumb']    = 'Lesson types';
 $string['lessontype']               = 'Lesson type';
-
 $string['editlessontypepagetitle']  = 'Edit lesson type';
 $string['editinglessontype']        = 'Editing lesson type';
-
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
 $string['cannotdeletelessontype']   = 'You can not delete this lesson type (lesson type is used in some session OR lesson type is used in some quiz)';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
-
 $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';
+
+$string['sessionspagetitle']        = 'Sessions';
+$string['sessionsbreadcrumb']       = 'Sessions';
+$string['sessionsheader']           = 'Sessions in course';
+
+
+
+$string['course']       = 'Course';
+$string['group']        = 'Group';
+$string['teacher']      = 'Teacher';
+$string['timestart']    = 'Time start';
+$string['duration']     = 'Duration';
+$string['timeend']      = 'Time end';
+$string['state']        = 'State';
+$string['logs']         = 'Logs';
+$string['showlogs']     = '[Show logs]';
+
