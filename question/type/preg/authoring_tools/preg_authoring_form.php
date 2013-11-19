@@ -15,6 +15,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tr
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_textarea.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
+require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 class qtype_preg_authoring_form extends moodleform {
@@ -33,7 +34,7 @@ class qtype_preg_authoring_form extends moodleform {
         global $PAGE;
 
         $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
-        $PAGE->requires->js('/question/type/preg/authoring_tools/jquerypanzoommin.js');
+        $PAGE->requires->js('/question/type/poasquestion/jquerypanzoommin.js');
 
         // Create the form.
         $qtype = new qtype_preg();
