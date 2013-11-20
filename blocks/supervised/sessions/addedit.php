@@ -1,6 +1,7 @@
 <?php
 require_once('../../../config.php');
-global $DB, $PAGE, $OUTPUT;
+require_once('sessionstate.php');
+global $DB, $PAGE, $OUTPUT, $USER;
 
 $courseid   = required_param('courseid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // session id (only for edit mode)
@@ -21,12 +22,15 @@ include("breadcrumbs.php");
 
 
 // Initializing variables depending of mode.
+$toform['courseid'] = $courseid;
 if(!$id){   // Add mode.
     $title = get_string('addsessionpagetitle', 'block_supervised');
     $heading = get_string("addingnewsession", 'block_supervised');
 
     // Setting default values
-    //$toform['courseid'] = $courseid;
+    $toform['teacherid'] = $USER->id;
+    $toform['sendemail'] = 1;
+    $toform['duration']  = 90;
 } else{     // Edit mode.
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
@@ -34,11 +38,17 @@ if(!$id){   // Add mode.
     $title = get_string('editsessionpagetitle', 'block_supervised');
     $heading = get_string("editingsession", 'block_supervised');
     
-    $toform['id']       = $session->id;
-    //$toform['courseid'] = $session->courseid;
-    //$toform['name']     = $session->name;
-    //$toform['iplist']   = $session->iplist;
-    //$toform['active']   = $session->active;
+    $toform['id']               = $session->id;
+    $toform['courseid']         = $session->courseid;
+    $toform['classroomid']      = $session->classroomid;
+    $toform['groupid']          = $session->groupid;
+    $toform['teacherid']        = $session->teacherid;
+    $toform['lessontypeid']     = $session->lessontypeid;
+    $toform['timestart']        = $session->timestart;
+    $toform['duration']         = $session->duration;
+    $toform['timeend']          = $session->timeend;
+    $toform['sendemail']        = $session->sendemail;
+    $toform['sessioncomment']   = $session->sessioncomment;
 }
 
 $PAGE->set_title($title);
@@ -62,14 +72,18 @@ if($mform->is_cancelled()) {
     // Store the submitted data.
     if(!$id){   // Add mode.
         // TODO Logging
-        /*if (!$DB->insert_record('block_supervised_session', $fromform)) {
+        $fromform->state    = StateSession::Planned;
+        $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
+
+        if (!$DB->insert_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
-        }*/
+        }
     } else{     // Edit mode.
         // TODO Logging
-        /*if (!$DB->update_record('block_supervised_session', $fromform)) {
+        $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
+        if (!$DB->update_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
-        }*/
+        }
 
     }
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));

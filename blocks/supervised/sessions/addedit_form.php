@@ -54,7 +54,7 @@ class addedit_session_form extends moodleform {
         // add send e-mail checkbox
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));
         $mform->addHelpButton('sendemail', 'sendemail', 'block_supervised');
-        // add course label);     // TODO what is difference with course.name (or fullname)?
+        // add course label     // TODO what is difference with course.name (or fullname)?
         $mform->addElement('static', 'course', get_string('course', 'block_supervised'), get_course_display_name_for_list($course));
         // add classroom combobox
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
@@ -78,6 +78,7 @@ class addedit_session_form extends moodleform {
 
         // hidden elements
         $mform->addElement('hidden', 'id');
+        $mform->addElement('hidden', 'courseid');
         
         $this->add_action_buttons();
     }
