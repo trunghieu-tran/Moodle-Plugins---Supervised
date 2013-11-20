@@ -8,7 +8,7 @@ $courseid   = required_param('courseid', PARAM_INT);
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('invalidcourse', 'block_supervised', $courseid);
+    print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
     // block can not work in the main course (frontpage)

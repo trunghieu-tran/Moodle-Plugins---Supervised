@@ -7,7 +7,7 @@ $courseid   = required_param('courseid', PARAM_INT);
 $delete     = optional_param('delete', '', PARAM_ALPHANUM); // delete confirmation hash
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('invalidcourse', 'block_supervised', $courseid);
+    print_error("invalidcourseid");
 }
 
 
