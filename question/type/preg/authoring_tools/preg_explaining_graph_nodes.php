@@ -117,6 +117,12 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
     }
 
     /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public abstract function get_type();
+
+    /**
      * Implementation of abstract create_graph for leaf.
      */
     public function create_graph() {
@@ -135,6 +141,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
         if ($this->pregnode->negative) {
             $graph->nodes[0]->invert = true;
         }
+        $graph->nodes[0]->type = $this->get_type();
 
         if ($this->is_selected()) {
             $graph->color = 'darkgreen';
@@ -178,7 +185,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
             // Escape sequences \cx and \x{ff} produce plain characters for graph.
             if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
                 $code = qtype_preg_lexer::code_of_char_escape_sequence($ui->data);
-                $tmp = new qtype_preg_userinscription(core_text::code2utf8($code));
+                $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
                 $result[] = qtype_preg_authoring_tool::userinscription_to_string($tmp);
                 continue;
             }
@@ -223,6 +230,16 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         }
         return 'ellipse';
     }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return $this->get_shape() == 'ellipse' ?
+            qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE : qtype_preg_explaining_graph_tool_node::TYPE_OTHER;
+    }
 }
 
 /**
@@ -240,6 +257,15 @@ class qtype_preg_explaining_graph_leaf_meta extends qtype_preg_explaining_graph_
     public function get_color() {
         return 'orange';
     }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_VOID;
+    }
 }
 
 /**
@@ -253,6 +279,15 @@ class qtype_preg_explaining_graph_leaf_assert extends qtype_preg_explaining_grap
 
     public function get_color() {
         return 'red';
+    }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_ASSERT;
     }
 }
 
@@ -268,6 +303,15 @@ class qtype_preg_explaining_graph_leaf_backref extends qtype_preg_explaining_gra
     public function get_color() {
         return 'blue';
     }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_OTHER;
+    }
 }
 
 /**
@@ -281,6 +325,15 @@ class qtype_preg_explaining_graph_leaf_recursion extends qtype_preg_explaining_g
 
     public function get_color() {
         return 'blue';
+    }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_OTHER;
     }
 }
 
@@ -315,6 +368,15 @@ class qtype_preg_explaining_graph_leaf_options extends qtype_preg_explaining_gra
 
     public function get_shape() {
         return 'box';
+    }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_OPTION;
     }
 }
 
@@ -658,3 +720,4 @@ class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_grap
         $graph->exits[] = $graph->nodes[count($graph->nodes) - 1];
     }
 }
+

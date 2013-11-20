@@ -41,6 +41,16 @@ class qtype_preg_explaining_graph_tool_node {
     public $fillcolor   = 'white';  // Filling color of node on image.
     public $invert = false;         // Flag of inversion of node.
     public $ismarked = false;       // Flag of marking (for voids).
+    public $type = self::TYPE_OTHER;// Type of node.
+
+    // Possible types of node.
+    const TYPE_POINT       = 'node_point';
+    const TYPE_SIMPLE      = 'node_simple';
+    const TYPE_ASSERT      = 'node_assert';
+    const TYPE_BOUNDARY    = 'node_boundary';
+    const TYPE_VOID        = 'node_void';
+    const TYPE_OPTION      = 'node_option';
+    const TYPE_OTHER       = 'node_other';
 
     public function __construct($lbl, $shp, $clr, $ownr, $id, $stl = 'solid', $fll = 'white') {
         $this->label = $lbl;
@@ -217,7 +227,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             $tmpdnode = $this->nodes[$i];  // Remember current node.
 
             // If it is simple node with text...
-            if ($tmpdnode->color == 'black' && $tmpdnode->shape == 'ellipse') {
+            if ($tmpdnode->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE) {
                 // Find a right neighbor of node.
                 $neighbor = $tmpdnode->find_neighbor_dst($gmain);
                 // If neighbor is simple node with text too and it's a child of the same subgraph AND it has the same register attribute,
@@ -275,7 +285,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             $tmpdnode = $iter; // Let copy current node.
 
             // Assert should has a red color.
-            if ($iter->color == 'red') {
+            if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_VOID) {
                 // Find its neighbors (left and right).
                 $neighborr = $tmpdnode->find_neighbor_dst($gmain);
                 $neighborl = $tmpdnode->find_neighbor_src($gmain);
@@ -300,9 +310,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     if ($this->is_parent_for($neighborl->owner)) {
                         //print 'current subgraph is parent of left neighbor\'s owner' . chr(10);
                         // If left neighbor is not just a point...
-                        if ($neighborl->shape != 'point') {
+                        if ($neighborl->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                             //print 'left neighbor is just a point' . chr(10);
-                            if ($neighborl->shape != 'box, style=filled') {
+                            if ($neighborl->type != qtype_preg_explaining_graph_tool_node::TYPE_BOUNDARY) {
                                 // Create a new point-node.
                                 $neighborl->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborl->owner, -1);
 
@@ -376,8 +386,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     // If current subgraph is parent of right neighbor's owner...
                     if ($this->is_parent_for($neighborr->owner)) {
                         // If right neighbor is not just a point...
-                        if ($neighborr->shape != 'point') {
-                            if ($neighborr->shape != 'box, style=filled') {
+                        if ($neighborr->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
+                            if ($neighborr->type != qtype_preg_explaining_graph_tool_node::TYPE_BOUNDARY) {
                                 // Create a new point-node.
                                 $neighborr->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborr->owner, -1);
 
@@ -460,7 +470,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             // If right neighbor isn't point...
                             $truelabel = $tmpdnode->label[0];
 
-                            if ($neighborr->shape != 'point') {
+                            if ($neighborr->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                                 // Create point-node and link it with right neighbor.
                                 $neighborr->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborr->owner, -1);
 
@@ -475,7 +485,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             }
 
                             // If left neighbor isn't point...
-                            if ($neighborl->shape != 'point') {
+                            if ($neighborl->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                                 // Create point-node and link it with left neighbor.
                                 $neighborl->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborl->owner, -1);
 
@@ -575,7 +585,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $rightborder = end($this->nodes);
 
                         // If left neighbor isn't point-node then create it and link them.
-                        if ($neighborl->shape != 'point') {
+                        if ($neighborl->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                             $neighborl->owner->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $neighborl->owner, -1);
 
                             $neighborl->owner->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($neighborl->owner->nodes), $neighborl->owner);
@@ -614,12 +624,12 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public function process_voids($gmain) {
         foreach ($this->nodes as $iter) {
             // Void should has an orange color.
-            if ($iter->color == 'orange') {
+            if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_VOID) {
                 // Find neighbors of void.
                 $neighborl = $iter->find_neighbor_src($gmain);
                 $neighborr = $iter->find_neighbor_dst($gmain);
 
-                if ($iter->shape != 'box') {
+                if ($iter->type != qtype_preg_explaining_graph_tool_node::TYPE_OPTION) {
                     if ($this->color != 'darkgreen' || $iter->ismarked) {
                         // Find a link between left neighbor and void.
                         $tmpneighbor = $gmain->find_link($neighborl, $iter);

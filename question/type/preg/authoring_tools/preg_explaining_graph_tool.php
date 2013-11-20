@@ -103,14 +103,16 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      * @return explainning graph of regular expression.
      */
     public function create_graph() {
-        $graph = $this->dstroot->create_graph();
+        $graph = $this->dst_root->create_graph();
 
         if ($this->options->exactmatch) {
             $graph->isexact = true;
         }
 
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_begin', 'qtype_preg')), 'box', 'purple', $graph, -1, 'filled', 'purple');
+        $graph->nodes[count($graph->nodes) - 1]->type = qtype_preg_explaining_graph_tool_node::TYPE_BOUNDARY;
         $graph->nodes[] = new qtype_preg_explaining_graph_tool_node(array(get_string('explain_end', 'qtype_preg')), 'box', 'purple', $graph, -1, 'filled', 'purple');
+        $graph->nodes[count($graph->nodes) - 1]->type = qtype_preg_explaining_graph_tool_node::TYPE_BOUNDARY;
 
         if (count($graph->nodes) == 2 && count($graph->subgraphs) == 0) {
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1], $graph);
@@ -121,7 +123,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
             $graph->entries = array();
             $graph->exits = array();
 
-            $graph->optimize_graph($graph, $graph);
+            $graph->optimize_graph($graph);
         }
 
         return $graph;
