@@ -75,7 +75,7 @@ $string['addsessionpagetitle']      = 'Plan new session';
 $string['addingnewsession']         = 'Plan new session';
 $string['editsessionpagetitle']     = 'Edit planned session';
 $string['editingsession']           = 'Editing planned session';
-$string['sendemail']                = 'Send notifications by e-mail';
+$string['sendemail']                = 'Send e-mail';
 $string['sendemail_help']           = 'If checked, selected teacher will be notified about creation, removing and any changes in his session. If teacher will be changed, both will be notified.';
 
 
@@ -84,11 +84,13 @@ $string['course']       = 'Course';
 $string['group']        = 'Group';
 $string['teacher']      = 'Teacher';
 $string['timestart']    = 'Time start';
-$string['duration']     = 'Duration';
+$string['duration']     = 'Duration (min)';
 $string['timeend']      = 'Time end';
 $string['state']        = 'State';
 $string['logs']         = 'Logs';
 $string['showlogs']     = '[Show logs]';
 
-$string['allgroups']     = 'All goups';
-$string['notspecified']  = 'Not specified';
+$string['allgroups']        = 'All goups';
+$string['notspecified']     = 'Not specified';
+$string['sessioncomment']   = 'Comment';
+
