@@ -1,5 +1,5 @@
 <?php
-
+global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
  
 class addedit_session_form extends moodleform {
@@ -18,14 +18,8 @@ class addedit_session_form extends moodleform {
             }
         }
 
-        // Find all courses.
-        if ($ccc = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
-            foreach ($ccc as $cc) {
-                if ($cc->category) {    // We don't add the main course (frontpage)
-                    $courses["$cc->id"] = format_string(get_course_display_name_for_list($cc));     // TODO what is difference with course.name (or fullname)?
-                }
-            }
-        }
+        // Find course.
+        $course = $DB->get_record('course', array('id' => $this->_customdata['courseid']));
 
         // Find all classrooms.
         if ($cclassrooms = $DB->get_records('block_supervised_classroom')) {
@@ -35,7 +29,7 @@ class addedit_session_form extends moodleform {
         }
 
         // Gets array of all groups in current course.
-        /*$groups[0] = get_string('allgroups', 'block_supervised');
+        $groups[0] = get_string('allgroups', 'block_supervised');
         if ($cgroups = groups_get_all_groups($this->_customdata['courseid'])) {
             foreach ($cgroups as $cgroup) {
                 $groups[$cgroup->id] = $cgroup->name;
@@ -47,26 +41,6 @@ class addedit_session_form extends moodleform {
         if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$this->_customdata['courseid']))) {
             foreach ($clessontypes as $clessontype) {
                 $lessontypes[$clessontype->id] = $clessontype->name;
-            }
-        }*/
-
-        // Gets array of groups in courses.
-        foreach($courses as $id=>$coursename){
-            $groups[$id][0] = get_string('allgroups', 'block_supervised');
-            if ($cgroups = groups_get_all_groups($id)) {
-                foreach ($cgroups as $cgroup) {
-                    $groups[$id][$cgroup->id] = $cgroup->name;
-                }
-            }
-        }
-
-        // Gets array of lessontypes in courses.
-        foreach($courses as $id=>$coursename){
-            $lessontypes[$id][0] = get_string('notspecified', 'block_supervised');
-            if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$id))) {
-                foreach ($clessontypes as $clessontype) {
-                    $lessontypes[$id][$clessontype->id] = $clessontype->name;
-                }
             }
         }
 
@@ -82,21 +56,14 @@ class addedit_session_form extends moodleform {
         // add send e-mail checkbox
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));
         $mform->addHelpButton('sendemail', 'sendemail', 'block_supervised');
-        // add course combobox
-        //$mform->addElement('select', 'courseid', get_string('course', 'block_supervised'), $courses);
+        // add course label);     // TODO what is difference with course.name (or fullname)?
+        $mform->addElement('static', 'course', get_string('course', 'block_supervised'), get_course_display_name_for_list($course));
         // add classroom combobox
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         // add group combobox
-        //$mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
+        $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         // add lessontype combobox
-        //$mform->addElement('select', 'lessontypeid', get_string('lessontype', 'block_supervised'), $lessontypes);
-
-        //$mform->addElement('static', 'name_of_static_element', "LABEL", "TEXT");
-
-        $sel1 =& $mform->addElement('hierselect', 'courses_groups', 'Choose course and group:');
-        $sel1->setOptions(array($courses, $groups));
-        $sel2 =& $mform->addElement('hierselect', 'courses_lessontypes', 'Choose lessontype and group:');
-        $sel2->setOptions(array($courses, $lessontypes));
+        $mform->addElement('select', 'lessontypeid', get_string('lessontype', 'block_supervised'), $lessontypes);
 
 
 

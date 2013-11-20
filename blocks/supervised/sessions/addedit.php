@@ -1,5 +1,6 @@
 <?php
 require_once('../../../config.php');
+global $DB, $PAGE, $OUTPUT;
 
 $courseid   = required_param('courseid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // session id (only for edit mode)
@@ -25,7 +26,7 @@ if(!$id){   // Add mode.
     $heading = get_string("addingnewsession", 'block_supervised');
 
     // Setting default values
-    $toform['courseid'] = $courseid;
+    //$toform['courseid'] = $courseid;
 } else{     // Edit mode.
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
@@ -34,7 +35,7 @@ if(!$id){   // Add mode.
     $heading = get_string("editingsession", 'block_supervised');
     
     $toform['id']       = $session->id;
-    $toform['courseid'] = $session->courseid;
+    //$toform['courseid'] = $session->courseid;
     //$toform['name']     = $session->name;
     //$toform['iplist']   = $session->iplist;
     //$toform['active']   = $session->active;
