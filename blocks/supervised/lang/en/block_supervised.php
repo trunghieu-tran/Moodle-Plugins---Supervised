@@ -69,6 +69,14 @@ $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
 $string['sessionsheader']           = 'Sessions in course';
+$string['invalidsessionid']         = 'You are trying to use an invalid session ID';
+$string['insertsessionerror']       = 'Database error! Can not insert session into database';
+$string['addsessionpagetitle']      = 'Plan new session';
+$string['addingnewsession']         = 'Plan new session';
+$string['editsessionpagetitle']     = 'Edit planned session';
+$string['editingsession']           = 'Editing planned session';
+$string['sendemail']                = 'Send notifications by e-mail';
+$string['sendemail_help']           = 'If checked, selected teacher will be notified about creation, removing and any changes in his session. If teacher will be changed, both will be notified.';
 
 
 
@@ -82,3 +90,5 @@ $string['state']        = 'State';
 $string['logs']         = 'Logs';
 $string['showlogs']     = '[Show logs]';
 
+$string['allgroups']     = 'All goups';
+$string['notspecified']  = 'Not specified';
