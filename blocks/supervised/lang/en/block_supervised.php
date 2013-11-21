@@ -71,6 +71,7 @@ $string['sessionsbreadcrumb']       = 'Sessions';
 $string['sessionsheader']           = 'Sessions in course';
 $string['invalidsessionid']         = 'You are trying to use an invalid session ID';
 $string['insertsessionerror']       = 'Database error! Can not insert session into database';
+$string['sessionediterror']         = 'You can edit only Planned session';
 $string['addsessionpagetitle']      = 'Plan new session';
 $string['addingnewsession']         = 'Plan new session';
 $string['editsessionpagetitle']     = 'Edit planned session';

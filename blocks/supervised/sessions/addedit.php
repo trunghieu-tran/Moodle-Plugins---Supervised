@@ -35,6 +35,9 @@ if(!$id){   // Add mode.
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
+    if ($session->state != StateSession::Planned) {
+        print_error(get_string("sessionediterror", 'block_supervised'));
+    }
     $title = get_string('editsessionpagetitle', 'block_supervised');
     $heading = get_string("editingsession", 'block_supervised');
     
