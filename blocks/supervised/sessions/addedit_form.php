@@ -18,9 +18,6 @@ class addedit_session_form extends moodleform {
             }
         }
 
-        // Find course.
-        $course = $DB->get_record('course', array('id' => $this->_customdata['courseid']));
-
         // Find all classrooms.
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
             foreach ($cclassrooms as $cclassroom) {
@@ -54,8 +51,8 @@ class addedit_session_form extends moodleform {
         // add send e-mail checkbox
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));
         $mform->addHelpButton('sendemail', 'sendemail', 'block_supervised');
-        // add course label     // TODO what is difference with course.name (or fullname)?
-        $mform->addElement('static', 'course', get_string('course', 'block_supervised'), get_course_display_name_for_list($course));
+        // add course label
+        $mform->addElement('static', 'coursename', get_string('course', 'block_supervised'));
         // add classroom combobox
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');

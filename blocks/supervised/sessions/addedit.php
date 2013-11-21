@@ -21,6 +21,11 @@ $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
 
 
+
+
+
+
+
 // Initializing variables depending of mode.
 $toform['courseid'] = $courseid;
 if(!$id){   // Add mode.
@@ -28,9 +33,10 @@ if(!$id){   // Add mode.
     $heading = get_string("addingnewsession", 'block_supervised');
 
     // Setting default values
-    $toform['teacherid'] = $USER->id;
-    $toform['sendemail'] = 1;
-    $toform['duration']  = 90;
+    $toform['teacherid']    = $USER->id;
+    $toform['sendemail']    = 1;
+    $toform['duration']     = 90;
+    $toform['coursename']   = $course->fullname;
 } else{     // Edit mode.
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
@@ -42,7 +48,7 @@ if(!$id){   // Add mode.
     $heading = get_string("editingsession", 'block_supervised');
     
     $toform['id']               = $session->id;
-    $toform['courseid']         = $session->courseid;
+    $toform['coursename']       = $course->fullname;
     $toform['classroomid']      = $session->classroomid;
     $toform['groupid']          = $session->groupid;
     $toform['teacherid']        = $session->teacherid;
@@ -65,10 +71,10 @@ if (file_exists($mform)) {
 }
 $mform = new addedit_session_form(null, array('courseid' => $courseid));
 
-$mform->set_data($toform);
+
 
 if($mform->is_cancelled()) {
-    // Cancelled forms redirect to the course main page.
+    // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
@@ -95,6 +101,8 @@ if($mform->is_cancelled()) {
     // form didn't validate or this is the first display
     echo $OUTPUT->header();
     echo $OUTPUT->heading($heading, 3);
+
+    $mform->set_data($toform);
     $mform->display();
     echo $OUTPUT->footer();
 }

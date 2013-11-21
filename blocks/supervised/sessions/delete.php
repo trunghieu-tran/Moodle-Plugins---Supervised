@@ -1,6 +1,7 @@
 <?php
 require_once('../../../config.php');
 require_once('sessionstate.php');
+global $DB, $PAGE, $OUTPUT, $USER;
 
 $id         = required_param('id', PARAM_INT);              // session id
 $courseid   = required_param('courseid', PARAM_INT);
@@ -104,8 +105,7 @@ if($mform->is_cancelled()) {
 
     $mform->set_data($toform);
     $mform->display();
+
+
+    echo $OUTPUT->footer();
 }
-
-
-
-echo $OUTPUT->footer();
