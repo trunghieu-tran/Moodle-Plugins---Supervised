@@ -71,6 +71,7 @@ class addedit_session_form extends moodleform {
         // add duration
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
         $mform->addRule('duration', null, 'required', null, 'client');
+        $mform->addRule('duration', null, 'numeric', null, 'client');
         // add comment
         $mform->addElement('textarea', 'sessioncomment', get_string("sessioncomment", "block_supervised"), 'rows="4" cols="30"');
 
@@ -81,5 +82,25 @@ class addedit_session_form extends moodleform {
         $mform->addElement('hidden', 'courseid');
         
         $this->add_action_buttons();
+    }
+
+    // Form validation
+    function validation($data, $files) {
+        $errors = array();
+
+        // Session must be active at least after 10 minutes from current time.
+        $sessiontimeend = $data["timestart"] + $data["duration"]*60;
+        $minimumtimeend = time() + 10*60;
+        if($sessiontimeend <= $minimumtimeend){
+            $strftimedatetime = get_string("strftimerecent");
+            $timeformatted = userdate($minimumtimeend, '%a').' '.userdate($minimumtimeend, $strftimedatetime);
+            $errors["duration"] = get_string("timeendvalidationerror", "block_supervised", $timeformatted);
+        }
+        // Duration must be greater than zero value.
+        if($data["duration"] <= 0){
+            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        }
+
+        return $errors;
     }
 }
