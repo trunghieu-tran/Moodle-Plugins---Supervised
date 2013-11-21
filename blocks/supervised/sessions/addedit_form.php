@@ -22,7 +22,7 @@ class addedit_session_form extends moodleform {
         $course = $DB->get_record('course', array('id' => $this->_customdata['courseid']));
 
         // Find all classrooms.
-        if ($cclassrooms = $DB->get_records('block_supervised_classroom')) {
+        if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
             foreach ($cclassrooms as $cclassroom) {
                 $classrooms[$cclassroom->id] = $cclassroom->name;
             }
