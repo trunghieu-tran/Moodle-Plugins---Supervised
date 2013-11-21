@@ -72,13 +72,19 @@ $string['sessionsheader']           = 'Sessions in course';
 $string['invalidsessionid']         = 'You are trying to use an invalid session ID';
 $string['insertsessionerror']       = 'Database error! Can not insert session into database';
 $string['sessionediterror']         = 'You can edit only Planned session';
+$string['sessiondeleteerror']       = 'You can delete only Planned session';
 $string['addsessionpagetitle']      = 'Plan new session';
 $string['addingnewsession']         = 'Plan new session';
 $string['editsessionpagetitle']     = 'Edit planned session';
 $string['editingsession']           = 'Editing planned session';
 $string['sendemail']                = 'Send e-mail';
 $string['sendemail_help']           = 'If checked, selected teacher will be notified about creation, removing and any changes in his session. If teacher will be changed, both will be notified.';
-
+$string['sessiondeleteheader']      = 'Do you want delete this session?';
+$string['deletesessionnavbar']      = 'Delete session?';
+$string['sessiondeletetitle']       = 'Delete session';
+$string['notifyteacher']            = 'Notify teacher by e-mail';
+$string['notifyteacher_help']       = 'If checked, the teacher will be notified about session removing. You can add message for teacher';
+$string['messageforteacher']        = 'Message for teacher';
 
 
 $string['course']       = 'Course';
