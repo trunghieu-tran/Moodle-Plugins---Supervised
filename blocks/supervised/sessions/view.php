@@ -97,7 +97,7 @@ foreach ($sessions as $id=>$session) {
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             StateSession::getStateName($session->state),
                             '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',    // TODO use action_link
-                            $iconedit . $icondelete . $iconshowhide
+                            ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('')
                         );
 }
 $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
