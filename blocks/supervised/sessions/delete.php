@@ -102,6 +102,7 @@ if($mform->is_cancelled()) {
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
     $toform['sessioncomment']   = $session->sessioncomment;
+    $toform['notifyteacher']    = 1;
 
     $mform->set_data($toform);
     $mform->display();
