@@ -16,6 +16,63 @@
 
 
 class block_supervised extends block_base {
+
+    private function get_planned_session(){
+        require_once('sessions/sessionstate.php');
+        global $DB, $COURSE, $USER;
+
+        // Find nearest Planned sessions.
+        $select = "SELECT
+        {block_supervised_session}.id,
+        {block_supervised_session}.timestart,
+        {block_supervised_session}.duration,
+        {block_supervised_session}.timeend,
+        {block_supervised_session}.courseid,
+        {block_supervised_session}.teacherid,
+        {block_supervised_session}.state,
+        {block_supervised_classroom}.name   AS classroomname,
+        {block_supervised_lessontype}.name  AS lessontypename,
+        {user}.firstname,
+        {user}.lastname,
+        {groups}.name                       AS groupname,
+        {course}.fullname                   AS coursename
+
+        FROM {block_supervised_session}
+            JOIN {block_supervised_classroom}
+              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
+            LEFT JOIN {block_supervised_lessontype}
+              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
+            JOIN {user}
+              ON {block_supervised_session}.teacherid    =   {user}.id
+            LEFT JOIN {groups}
+              ON {block_supervised_session}.groupid      =   {groups}.id
+            JOIN {course}
+              ON {block_supervised_session}.courseid     =   {course}.id
+
+        WHERE ({block_supervised_session}.timestart BETWEEN :time1 AND :time2)
+            AND {block_supervised_session}.courseid     = :courseid
+            AND {block_supervised_session}.teacherid    = :teacherid
+            AND {block_supervised_session}.state        = :stateplanned
+        ";
+
+        $time1      = time() - 20*60;
+        $time2      = time() + 20*60;
+        $teacherid  = $USER->id;
+        $courseid   = $COURSE->id;
+        $params['time1']            = $time1;
+        $params['time2']            = $time2;
+        $params['courseid']         = $courseid;
+        $params['teacherid']        = $teacherid;
+        //$params['stateactive']      = StateSession::Active;
+        $params['stateplanned']     = StateSession::Planned;
+
+        $plannedsession = $DB->get_record_sql($select, $params);
+
+        return $plannedsession;
+    }
+
+
+
     public function init() {
         $this->title = get_string('blocktitle', 'block_supervised');
     }
@@ -29,17 +86,58 @@ class block_supervised extends block_base {
     }
 
     public function get_content() {
-        global $DB;
-        global $COURSE;
-
+        require_once('sessions/sessionstate.php');
+        global $DB, $COURSE, $USER, $CFG;
         if ($this->content !== null) {
             return $this->content;
         }
 
-        $this->content         =  new stdClass;
-        $this->content->text   = 'The content of supervised block!';
 
-        
+
+
+        // TODO teacher or student?
+
+        // Planned sessions.
+        $plannedsession = $this->get_planned_session();
+
+        if( !empty($plannedsession) ){
+            $plannedsessionstitle = get_string('plannedsessionsnum', 'block_supervised', count($plannedsession));
+            // Prepare form.
+            $mform = $CFG->dirroot."/blocks/supervised/plannedsession_block_form.php";
+            if (file_exists($mform)) {
+                require_once($mform);
+            } else {
+                print_error('noformdesc');
+            }
+            $mform = new plannedsession_block_form();
+
+            if ($fromform = $mform->get_data()) {
+                // TODO Start session.
+                // TODO Logging
+            } else {
+                // Display form.
+                //$mform->set_data($toform);
+                $plannedsessionform = $mform->render();
+            }
+        }
+        else{
+            $plannedsessionstitle = get_string('plannedsessionsnum', 'block_supervised', 0);
+        }
+
+
+
+
+        // Add block body.
+        $this->content         = new stdClass;
+        $this->content->text   = $plannedsessionstitle . $plannedsessionform;
+
+
+
+
+
+
+
+        // Add footer.
         $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
         $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
         $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
