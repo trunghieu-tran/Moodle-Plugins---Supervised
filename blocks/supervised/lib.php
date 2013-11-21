@@ -11,6 +11,11 @@ function can_delete_lessontype($lessontypeid) {
 }
 
 function can_delete_classroom($classroomid) {
-    // TODO check: user permissions; is in session(s);
+    global $DB;
+    // Can not remove classroom used in session(s)
+    if($DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid))){
+        return false;
+    }
+
     return true;
 }

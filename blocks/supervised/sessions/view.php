@@ -101,7 +101,7 @@ foreach ($sessions as $id=>$session) {
                         );
 }
 $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . '[Plane new session]' . '</a>');   // TODO use action_link
+echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');   // TODO use action_link
 
 // Build table.
 $table = new html_table();

@@ -1,5 +1,6 @@
 <?php
 require_once('../../../config.php');
+require_once('../lib.php');
  
 global $DB, $OUTPUT, $PAGE;
 
@@ -43,17 +44,22 @@ foreach ($classrooms as $id=>$classroom) {
     $showhideurl = new moodle_url('/blocks/supervised/classrooms/showhide.php', array('courseid' => $courseid, 'id' => $id));
     $iconshowhide = $OUTPUT->action_icon($showhideurl, new pix_icon('t/'.$showhide, get_string($showhide)));
     // Combine new row.
-    $tabledata[] = array($classroom->name, $classroom->iplist, $iconedit . $icondelete . $iconshowhide);
+    $tabledata[] = array(
+        $classroom->name,
+        $classroom->iplist,
+        can_delete_classroom($id) ? $iconedit . $icondelete . $iconshowhide : $iconedit . $iconshowhide
+    );
 }
+
 $addurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
-$iconadd = $OUTPUT->action_icon($addurl, new pix_icon('t/add', get_string('add')));
+echo ('<a href="'.$addurl.'">' . get_string('addclassroom', 'block_supervised') . '</a>');
 
 // Build table.
 $table = new html_table();
 $headclassroom = get_string('classroom', 'block_supervised');
 $headiplist = get_string('iplist', 'block_supervised');
 $headedit = get_string('edit');
-$table->head = array($headclassroom . $iconadd, $headiplist, $headedit);
+$table->head = array($headclassroom, $headiplist, $headedit);
 $table->data = $tabledata;
 echo html_writer::table($table);
 

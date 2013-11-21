@@ -45,13 +45,13 @@ $string['active']                   = 'Use this classroom in sessions?';
 $string['active_help']              = 'If enabled, you can create new sessions in this classroom';
 $string['invalidclassroomid']       = 'You are trying to use an invalid classroom ID';
 $string['insertclassroomerror']     = 'Database error! Can not insert classroom into database';
-$string['cannotdeleteclassroom']    = 'You can not delete this classroom because it\'s used in some sessions';
+$string['cannotdeleteclassroom']    = 'You can not remove classroom used in session(s)';
 $string['deleteclassroomcheck']     = 'Are you absolutely sure you want to completely delete this classroom?';
 $string['addclassroompagetitle']    = 'Add classroom';
 $string['addingnewclassroom']       = 'Adding new classroom';
 $string['editclassroompagetitle']   = 'Edit classroom';
 $string['editingclassroom']         = 'Editing classroom';
-
+$string['addclassroom']             = '[Add classroom]';
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
@@ -62,7 +62,7 @@ $string['lessontype']               = 'Lesson type';
 $string['editlessontypepagetitle']  = 'Edit lesson type';
 $string['editinglessontype']        = 'Editing lesson type';
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
-$string['cannotdeletelessontype']   = 'You can not delete this lesson type (lesson type is used in some session OR lesson type is used in some quiz)';
+$string['cannotdeletelessontype']   = 'You can not delete this lesson type, it\'s used used in sessions or quizzes';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
 $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';
 
@@ -87,6 +87,7 @@ $string['notifyteacher_help']       = 'If checked, the teacher will be notified 
 $string['messageforteacher']        = 'Message for teacher';
 $string['timeendvalidationerror']   = 'The session must be active before {$a} at least.';
 $string['durationvalidationerror']  = 'Duration must be greater than zero value.';
+$string['plansession']              = '[Plan new session]';
 
 
 $string['course']       = 'Course';
