@@ -36,4 +36,39 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
  * @author    Andrey Ushakov <andrey200964@yandex.ru>
  */
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
+
+    public static function add_settings_form_fields(
+        mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
+        global $DB, $COURSE;
+
+        //Radiobuttons
+        $radioarray=array();
+        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'No', 0);
+        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'Yes, for all lessontypes (include "Not specified" lessontype)', 1);
+        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'Yes, for custom lessontype list:', 2);
+        $mform->addGroup($radioarray, 'radioar', 'Allow supervised access?', '<br/>', false);
+
+        //print_object($radioarray);
+        // Lessontypes checkboxes
+        $mform->addElement('advcheckbox', 'supervisedlessontype_0', '', get_string("notspecified", 'block_supervised'));
+        $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id));
+        foreach($lessontypes as $id=>$lessontype){
+            $mform->addElement('advcheckbox', 'supervisedlessontype_'.$id, '', $lessontype->name);
+        }
+    }
+
+    public static function save_settings($quiz) {
+        global $DB;
+        //print_object($quiz);
+        /*if (empty($quiz->honestycheckrequired)) {
+            $DB->delete_records('quizaccess_honestycheck', array('quizid' => $quiz->id));
+        } else {
+            if (!$DB->record_exists('quizaccess_honestycheck', array('quizid' => $quiz->id))) {
+                $record = new stdClass();
+                $record->quizid = $quiz->id;
+                $record->honestycheckrequired = 1;
+                $DB->insert_record('quizaccess_honestycheck', $record);
+            }
+        }*/
+    }
 }
