@@ -96,12 +96,12 @@ foreach ($sessions as $id=>$session) {
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             StateSession::getStateName($session->state),
-                            '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',    // TODO use action_link
+                            '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',
                             ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('')
                         );
 }
 $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');   // TODO use action_link
+echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');
 
 // Build table.
 $table = new html_table();

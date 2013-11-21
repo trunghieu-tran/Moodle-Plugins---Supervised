@@ -1,5 +1,6 @@
 <?php
 require_once('../../../config.php');
+require_once('../lib.php');
 
 global $DB, $OUTPUT, $PAGE;
 
@@ -34,14 +35,20 @@ foreach ($lessontypes as $id=>$lessontype) {
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
     // Combine new row.
-    $tabledata[] = array($lessontype->name . $iconedit . $icondelete);
+    $tabledata[] = array(
+        $lessontype->name,
+        can_delete_lessontype($id) ? $iconedit . $icondelete : $iconedit
+    );
 }
-$headname = get_string('lessontype', 'block_supervised');
+
 $addurl = new moodle_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
-$iconadd = $OUTPUT->action_icon($addurl, new pix_icon('t/add', get_string('add')));
+echo ('<a href="'.$addurl.'">' . get_string('addlessontype', 'block_supervised') . '</a>');
+
 // Build table.
 $table = new html_table();
-$table->head = array($headname . $iconadd);
+$headname = get_string('lessontype', 'block_supervised');
+$headedit = get_string('edit');
+$table->head = array($headname, $headedit);
 $table->data = $tabledata;
 echo html_writer::table($table);
 

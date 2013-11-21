@@ -62,9 +62,10 @@ $string['lessontype']               = 'Lesson type';
 $string['editlessontypepagetitle']  = 'Edit lesson type';
 $string['editinglessontype']        = 'Editing lesson type';
 $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson type ID';
-$string['cannotdeletelessontype']   = 'You can not delete this lesson type, it\'s used used in sessions or quizzes';
+$string['cannotdeletelessontype']   = 'You can not delete this lesson type, it\'s used in sessions or quizzes';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
 $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';
+$string['addlessontype']           = '[Add lessontype]';
 
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
