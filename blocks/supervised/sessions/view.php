@@ -25,6 +25,7 @@ include("breadcrumbs.php");
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 3);
 
+
 // Prepare table data 
 $select = "SELECT
 {block_supervised_session}.id,
@@ -43,25 +44,22 @@ $select = "SELECT
 
 FROM {block_supervised_session}
     JOIN {block_supervised_classroom}
-    JOIN {block_supervised_lessontype}
+      ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
+    LEFT JOIN {block_supervised_lessontype}
+      ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
     JOIN {user}
-    JOIN {groups}
+      ON {block_supervised_session}.teacherid    =   {user}.id
+    LEFT JOIN {groups}
+      ON {block_supervised_session}.groupid      =   {groups}.id
     JOIN {course}
-
-ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-    AND {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-    AND {block_supervised_session}.teacherid    =   {user}.id
-    AND {block_supervised_session}.groupid      =   {groups}.id
-    AND {block_supervised_session}.courseid     =   {course}.id
-
-
+      ON {block_supervised_session}.courseid     =   {course}.id
 ";
 /*TODO Add WHERE for filtering
 WHERE ({block_supervised_session}.timestart BETWEEN :time1 AND :time2)
     AND {block_supervised_session}.courseid     = :courseid
     AND {block_supervised_session}.teacherid    = :teacherid
     AND {block_supervised_session}.groupid      = :groupid
-*/
+
 
 // TODO initialize from filter
 $time1      = 1378024800;
@@ -73,7 +71,7 @@ $params['time2']        = $time2;
 $params['courseid']     = $courseid;
 $params['teacherid']    = $teacherid;
 $params['groupid']      = $groupid;
-
+*/
 $sessions = $DB->get_records_sql($select/*, $params*/);
 
 $tabledata = array();
@@ -89,11 +87,11 @@ foreach ($sessions as $id=>$session) {
     // Combine new row.
     $tabledata[] = array(   $session->coursename,
                             $session->classroomname,
-                            $session->groupname,
+                            $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname,
                             
                             html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), $session->firstname . " " . $session->lastname),
                             
-                            $session->lessontypename,
+                            $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename,
                             userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime),
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
