@@ -30,11 +30,12 @@ class block_supervised extends block_base {
         {block_supervised_session}.courseid,
         {block_supervised_session}.teacherid,
         {block_supervised_session}.state,
-        {block_supervised_classroom}.name   AS classroomname,
-        {block_supervised_lessontype}.name  AS lessontypename,
+        {block_supervised_session}.sessioncomment,
+        {block_supervised_classroom}.id   AS classroomid,
+        {block_supervised_lessontype}.id  AS lessontypeid,
         {user}.firstname,
         {user}.lastname,
-        {groups}.name                       AS groupname,
+        {groups}.id                       AS groupid,
         {course}.fullname                   AS coursename
 
         FROM {block_supervised_session}
@@ -86,8 +87,9 @@ class block_supervised extends block_base {
     }
 
     public function get_content() {
+        global $PAGE, $COURSE, $USER, $CFG;
         require_once('sessions/sessionstate.php');
-        global $DB, $COURSE, $USER, $CFG;
+        //echo '<link href="block.css" rel="stylesheet">';
         if ($this->content !== null) {
             return $this->content;
         }
@@ -116,7 +118,15 @@ class block_supervised extends block_base {
                 // TODO Logging
             } else {
                 // Display form.
-                //$mform->set_data($toform);
+                $strftimedatetime = get_string("strftimerecent");
+                $toform['classroomid']      = $plannedsession->classroomid;
+                $toform['groupid']          = $plannedsession->groupid;
+                $toform['lessontypeid']     = $plannedsession->lessontypeid;
+                $toform['duration']         = $plannedsession->duration;
+                $toform['timestart']        = userdate($plannedsession->timestart, $strftimedatetime);
+                $toform['sessioncomment']   = $plannedsession->sessioncomment;
+
+                $mform->set_data($toform);
                 $plannedsessionform = $mform->render();
             }
         }

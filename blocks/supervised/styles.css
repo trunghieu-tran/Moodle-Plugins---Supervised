@@ -1,0 +1,14 @@
+.block_supervised .content {
+    font-size: 11px;
+}
+.block_supervised .content .footer {
+    font-size: 13px;
+}
+
+.block_supervised .content .mform .fitem .felement {
+    margin-left: 35%;
+}
+
+.block_supervised .content .mform .fdescription.required {
+    display: none;
+}

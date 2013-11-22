@@ -109,6 +109,7 @@ $string['showlogs']     = '[Show logs]';
 $string['allgroups']        = 'All goups';
 $string['notspecified']     = 'Not specified';
 $string['sessioncomment']   = 'Comment';
+$string['sessioninfo']      = 'Session information';
 
 
 
