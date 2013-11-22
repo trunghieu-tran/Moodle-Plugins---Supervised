@@ -31,11 +31,13 @@ class block_supervised extends block_base {
         {block_supervised_session}.teacherid,
         {block_supervised_session}.state,
         {block_supervised_session}.sessioncomment,
-        {block_supervised_classroom}.id   AS classroomid,
-        {block_supervised_lessontype}.id  AS lessontypeid,
+        {block_supervised_session}.classroomid,
+        {block_supervised_session}.lessontypeid,
+        {block_supervised_session}.teacherid,
+        {block_supervised_session}.sendemail,
+        {block_supervised_session}.groupid,
         {user}.firstname,
         {user}.lastname,
-        {groups}.id                       AS groupid,
         {course}.fullname                   AS coursename
 
         FROM {block_supervised_session}
@@ -87,14 +89,11 @@ class block_supervised extends block_base {
     }
 
     public function get_content() {
-        global $PAGE, $COURSE, $USER, $CFG;
+        global $PAGE, $COURSE, $USER, $CFG, $DB;
         require_once('sessions/sessionstate.php');
-        //echo '<link href="block.css" rel="stylesheet">';
         if ($this->content !== null) {
             return $this->content;
         }
-
-
 
 
         // TODO teacher or student?
@@ -112,14 +111,28 @@ class block_supervised extends block_base {
                 print_error('noformdesc');
             }
             $mform = new plannedsession_block_form();
-
             if ($fromform = $mform->get_data()) {
                 // TODO Start session.
                 // TODO Logging
-                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
-                redirect($url);
+                $plannedsessionstitle = get_string('plannedsessionsnum', 'block_supervised', 0);
+                // Start session and update fields that user could edit
+                $plannedsession->state          = StateSession::Active;
+                $plannedsession->classroomid    = $fromform->classroomid;
+                $plannedsession->groupid        = $fromform->groupid;
+                $plannedsession->lessontypeid   = $fromform->lessontypeid;
+                $plannedsession->timestart      = time();
+                $plannedsession->duration       = $fromform->duration;
+                $plannedsession->timeend        = time() + $fromform->duration*60;
+                if (!$DB->update_record('block_supervised_session', $plannedsession)) {
+                    print_error('insertsessionerror', 'block_supervised');
+                }
+
+                //$url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+                //redirect($url);
             } else {
                 // Display form.
+                $toform['id']               = $COURSE->id;
+
                 $strftimedatetime = get_string("strftimerecent");
                 $toform['classroomid']      = $plannedsession->classroomid;
                 $toform['groupid']          = $plannedsession->groupid;

@@ -54,6 +54,9 @@ class plannedsession_block_form extends moodleform {
         // add comment
         $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
 
+        // hidden elements.
+        $mform->addElement('hidden', 'id');     // course id
+
         $this->add_action_buttons(false, get_string('startsession', "block_supervised"));
     }
 }
