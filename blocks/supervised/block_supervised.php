@@ -116,6 +116,8 @@ class block_supervised extends block_base {
             if ($fromform = $mform->get_data()) {
                 // TODO Start session.
                 // TODO Logging
+                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+                redirect($url);
             } else {
                 // Display form.
                 $strftimedatetime = get_string("strftimerecent");

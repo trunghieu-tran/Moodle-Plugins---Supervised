@@ -5,7 +5,7 @@ require_once("{$CFG->libdir}/formslib.php");
 class plannedsession_block_form extends moodleform {
  
     function definition() {
-        global $DB;
+        global $DB, $COURSE;
 
         $mform =& $this->_form;
 
@@ -19,7 +19,7 @@ class plannedsession_block_form extends moodleform {
 
         // Gets array of all groups in current course.
         $groups[0] = get_string('allgroups', 'block_supervised');
-        if ($cgroups = groups_get_all_groups($this->_customdata['courseid'])) {
+        if ($cgroups = groups_get_all_groups($COURSE->id)) {
             foreach ($cgroups as $cgroup) {
                 $groups[$cgroup->id] = $cgroup->name;
             }
@@ -27,7 +27,7 @@ class plannedsession_block_form extends moodleform {
 
         // Find lessontypes in current course.
         $lessontypes[0] = get_string('notspecified', 'block_supervised');
-        if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$this->_customdata['courseid']))) {
+        if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id))) {
             foreach ($clessontypes as $clessontype) {
                 $lessontypes[$clessontype->id] = $clessontype->name;
             }
@@ -54,7 +54,6 @@ class plannedsession_block_form extends moodleform {
         // add comment
         $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
 
-        
         $this->add_action_buttons(false, get_string('startsession', "block_supervised"));
     }
 }

@@ -12,3 +12,7 @@
 .block_supervised .content .mform .fdescription.required {
     display: none;
 }
+
+.block_supervised .content select {
+    width: 98px;
+}
