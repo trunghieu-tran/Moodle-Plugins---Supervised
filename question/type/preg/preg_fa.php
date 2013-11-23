@@ -2186,7 +2186,8 @@ abstract class qtype_preg_finite_automaton {
         $numbers = $this->get_state_numbers();
         $anotherfanumbers = $anotherfa->get_state_numbers();
         $realnum = $numbers[$state];
-        $realsecond = explode(',', $realnum, 2)[1];
+        $realsecond = explode(',', $realnum, 2);
+        $realsecond = $realsecond[1];
         foreach ($anotherfanumbers as $curnum) {
             if (strpos($realsecond, $curnum) !== false) {
                 $count++;
