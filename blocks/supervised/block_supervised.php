@@ -150,7 +150,7 @@ class block_supervised extends block_base {
             return $this->content;
         }
 
-
+        $formbody = '';
         // TODO teacher or student?
 
         // Planned sessions.
@@ -197,7 +197,7 @@ class block_supervised extends block_base {
                 $toform['sessioncomment']   = $plannedsession->sessioncomment;
 
                 $mform->set_data($toform);
-                $plannedsessionform = $mform->render();
+                $formbody = $mform->render();
             }
         }
 
@@ -214,10 +214,9 @@ class block_supervised extends block_base {
                 print_error('noformdesc');
             }
             $mform = new activesession_block_form();
-            if ($fromform = $mform->get_data()) {
-                // TODO Start session.
-                // TODO Logging
+            if($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields
+                // TODO Logging
                 $curtime = time();
                 $activesession->state           = StateSession::Finished;
                 $activesession->timeend         = $curtime;
@@ -229,8 +228,23 @@ class block_supervised extends block_base {
 
                 //$url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
                 //redirect($url);
+            } else if ($fromform = $mform->get_data()) {
+                // Update session
+                // TODO Logging
+                $sessionstitle = get_string('activesessiontitle', 'block_supervised');
+
+                $activesession->classroomid     = $fromform->classroomid;
+                $activesession->groupid         = $fromform->groupid;
+                $activesession->duration        = $fromform->duration;
+                $activesession->timeend         = $activesession->timestart  + $fromform->duration*60;
+
+                if (!$DB->update_record('block_supervised_session', $activesession)) {
+                    print_error('insertsessionerror', 'block_supervised');
+                }
+                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+                redirect($url);
+
             } else {
-                //print_object($activesession);
                 $sessionstitle = get_string('activesessiontitle', 'block_supervised');
                 // Display form.
                 $toform['id']               = $COURSE->id;
@@ -244,7 +258,7 @@ class block_supervised extends block_base {
                 $toform['sessioncomment']   = $activesession->sessioncomment;
 
                 $mform->set_data($toform);
-                $plannedsessionform = $mform->render();
+                $formbody = $mform->render();
             }
         }
 
@@ -254,7 +268,7 @@ class block_supervised extends block_base {
 
         // Add block body.
         $this->content         = new stdClass;
-        $this->content->text   = $sessionstitle . $plannedsessionform;
+        $this->content->text   = $sessionstitle . $formbody;
 
 
 

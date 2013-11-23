@@ -115,6 +115,7 @@ $string['sessioninfo']      = 'Session information';
 
 
 $string['startsession']     = 'Start session';
-$string['savesettings']     = 'Save settings';
+$string['updatesession']    = 'Update';
 $string['finishsession']    = 'Finish session';
+$string['savechanges']      = 'Save changes';
 

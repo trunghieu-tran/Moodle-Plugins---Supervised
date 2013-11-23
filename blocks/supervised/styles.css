@@ -16,3 +16,7 @@
 .block_supervised .content select {
     width: 98px;
 }
+
+.block_supervised .content .mform .fitem .fgroup {
+    margin-left: 0;
+}
