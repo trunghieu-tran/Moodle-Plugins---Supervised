@@ -19,8 +19,9 @@ $string['blocktitle']               = 'Supervised block';
 $string['supervised:addinstance']   = 'Add a new Supervised block';
 $string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Moodle page';
 
-$string['plannedsessionsnum']       = 'You have {$a} planned session';
-$string['activesessionsnum']        = 'You have {$a} active session';
+$string['plannedsessiontitle']      = 'You have a planned session';
+$string['activesessiontitle']       = 'You have an active session';
+$string['nosessionstitle']          = 'You haven\'t any planned or active sessions';
 
 
 
@@ -113,5 +114,7 @@ $string['sessioninfo']      = 'Session information';
 
 
 
-$string['startsession']   = 'Start session';
+$string['startsession']     = 'Start session';
+$string['savesettings']     = 'Save settings';
+$string['finishsession']    = 'Finish session';
 
