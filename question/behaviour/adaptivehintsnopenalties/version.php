@@ -18,19 +18,18 @@
  * Question behaviour where the student can submit questions one at a
  * time for immediate feedback with qtype specific hints support.
  *
- * @package    qbehaviour
- * @subpackage adaptivehintsnopenalties
+ * @package    qbehaviour_adaptivehintsnopenalties
  * @copyright  2013 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $plugin->component = 'qbehaviour_adaptivehintsnopenalties';
-$plugin->version  = 2013052500;
-$plugin->requires = 2013051400;
-$plugin->release = 'Adaptive with hints (no penalties) behaviour 2.5';
+$plugin->version  = 2013112400;
+$plugin->requires = 2013111800;
+$plugin->release = 'Adaptive with hints (no penalties) behaviour 2.6';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
-    'qbehaviour_adaptivehints' => 2013052500,
+    'qbehaviour_adaptivehints' => 2013112400,
 );
 ?>

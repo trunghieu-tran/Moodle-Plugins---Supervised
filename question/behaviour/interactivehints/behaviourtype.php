@@ -14,24 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
+
+
 /**
- * Question behaviour where the student can submit questions one at a
- * time for immediate feedback with qtype specific hints support.
+ * Question behaviour type information for adaptive with hints behaviour.
  *
  * @package    qbehaviour_interactivehints
  * @copyright  2013 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'qbehaviour_interactivehints';
-$plugin->version   = 2013112400;
-$plugin->requires  = 2013111800;
-$plugin->release = 'Interactive with hints behaviour 2.5';
-$plugin->maturity  = MATURITY_STABLE;
-
-$plugin->dependencies = array(
-    'qbehaviour_interactive' => 2013110500,
-    'qtype_poasquestion' => 2013062900
-);
+class qbehaviour_interactivehints_type extends question_behaviour_type {
+    public function is_archetypal() {
+        return false;
+    }
+}
