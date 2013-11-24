@@ -64,17 +64,63 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
     }
 
     public static function save_settings($quiz) {
-        global $DB;
-        //print_object($quiz);
-        /*if (empty($quiz->honestycheckrequired)) {
-            $DB->delete_records('quizaccess_honestycheck', array('quizid' => $quiz->id));
-        } else {
-            if (!$DB->record_exists('quizaccess_honestycheck', array('quizid' => $quiz->id))) {
-                $record = new stdClass();
-                $record->quizid = $quiz->id;
-                $record->honestycheckrequired = 1;
-                $DB->insert_record('quizaccess_honestycheck', $record);
+        global $DB, $COURSE;
+        $oldrules = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $quiz->id));
+
+
+        if($quiz->supervisedcheckrequired == 2){
+            // Find checked lessontypes.
+            $lessontypesincourse = $DB->get_records('block_supervised_lessontype', array('courseid' => $COURSE->id));
+            $lessontypesinquiz = array();
+
+            // Check for "Not specified" lessontype.
+            if($quiz->supervisedlessontype_0){
+                $lessontypesinquiz[] = 0;
             }
-        }*/
+            // Checks for all other lessontypes.
+            foreach($lessontypesincourse as $id=>$lessontype){
+                if($quiz->{'supervisedlessontype_'.$id}){
+                    $lessontypesinquiz[] = $id;
+                }
+
+            }
+
+            // Update rules.
+            for ($i=0; $i<count($lessontypesinquiz); $i++) {
+                // Update an existing rule if possible.
+                $rule = array_shift($oldrules);
+                if (!$rule) {
+                    $rule = new stdClass();
+                    $rule->quizid = $quiz->id;
+                    $rule->lessontypeid = 0;
+                    $rule->mode = $quiz->supervisedcheckrequired; // must be 2
+                    $rule->id = $DB->insert_record('quizaccess_supervisedcheck', $rule);
+                }
+                $rule->lessontypeid = $lessontypesinquiz[$i];
+                $DB->update_record('quizaccess_supervisedcheck', $rule);
+            }
+            // Delete any remaining old rules.
+            foreach ($oldrules as $oldrule) {
+                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+            }
+        }
+        else{
+            // Update an existing rule if possible.
+            $rule = array_shift($oldrules);
+            if (!$rule) {
+                $rule = new stdClass();
+                $rule->quizid = $quiz->id;
+                $rule->lessontypeid = NULL;
+                $rule->mode = $quiz->supervisedcheckrequired;   // 0 or 1
+                $rule->id = $DB->insert_record('quizaccess_supervisedcheck', $rule);
+            }
+            $rule->lessontypeid = NULL;
+            $rule->mode = $quiz->supervisedcheckrequired;   // 0 or 1
+            $DB->update_record('quizaccess_supervisedcheck', $rule);
+            // Delete any remaining old rules.
+            foreach ($oldrules as $oldrule) {
+                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+            }
+        }
     }
 }
