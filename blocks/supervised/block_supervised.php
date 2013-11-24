@@ -121,7 +121,6 @@ class block_supervised extends block_base {
         $params['time2']            = $time2;
         $params['courseid']         = $courseid;
         $params['teacherid']        = $teacherid;
-        //$params['stateactive']      = StateSession::Active;
         $params['stateplanned']     = StateSession::Planned;
 
         $plannedsession = $DB->get_record_sql($select, $params);
@@ -153,7 +152,9 @@ class block_supervised extends block_base {
         $formbody = '';
         // TODO teacher or student?
 
-        // Planned sessions.
+
+
+        // Planned session: render planned session form.
         $plannedsession = $this->get_planned_session();
         if( !empty($plannedsession) ){
             // Prepare form.
@@ -181,6 +182,7 @@ class block_supervised extends block_base {
                     print_error('insertsessionerror', 'block_supervised');
                 }
 
+                unset($plannedsession);
                 //$url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
                 //redirect($url);
             } else {
@@ -203,8 +205,8 @@ class block_supervised extends block_base {
 
 
 
-        // Active sessions.
-        $activesession = $this->get_active_session();
+        // Active session: render active session form.
+        $activesession  = $this->get_active_session();
         if( !empty($activesession) ){
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/activesession_block_form.php";
@@ -226,6 +228,7 @@ class block_supervised extends block_base {
                     print_error('insertsessionerror', 'block_supervised');
                 }
 
+                unset($activesession);
                 //$url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
                 //redirect($url);
             } else if ($fromform = $mform->get_data()) {
@@ -263,8 +266,44 @@ class block_supervised extends block_base {
         }
 
 
-        if($sessionstitle == '')
+
+        // No sessions: render start session form.
+        if(empty($plannedsession) && empty($activesession)){
             $sessionstitle = get_string('nosessionstitle', 'block_supervised');
+
+            // Prepare form.
+            $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
+            if (file_exists($mform)) {
+                require_once($mform);
+            } else {
+                print_error('noformdesc');
+            }
+            $mform = new startsession_block_form();
+            if ($fromform = $mform->get_data()) {
+                // TODO Start session.
+                // TODO Logging
+                // Start session
+                $curtime = time();
+                $fromform->state          = StateSession::Active;
+                $fromform->courseid       = $COURSE->id;
+                $fromform->teacherid      = $USER->id;
+                $fromform->timestart      = $curtime;
+                $fromform->timeend        = $curtime + $fromform->duration*60;
+                if (!$DB->insert_record('block_supervised_session', $fromform)) {
+                    print_error('insertsessionerror', 'block_supervised');
+                }
+                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+                redirect($url);
+            } else {
+                // Display form.
+                $toform['id']               = $COURSE->id;
+                $toform['duration']         = 90;
+
+                $mform->set_data($toform);
+                $formbody = $mform->render();
+            }
+        }
+
 
         // Add block body.
         $this->content         = new stdClass;

@@ -21,7 +21,7 @@ $string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Mood
 
 $string['plannedsessiontitle']      = 'You have a planned session';
 $string['activesessiontitle']       = 'You have an active session';
-$string['nosessionstitle']          = 'You haven\'t any planned or active sessions';
+$string['nosessionstitle']          = 'You haven\'t any planned or active sessions. You can start new session right now';
 
 
 
