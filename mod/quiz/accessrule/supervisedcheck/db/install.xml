@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/quiz/accessrule/supervisedcheck/db" VERSION="20131002" COMMENT="XMLDB file for Moodle mod/quiz/accessrule/supervisedcheck"
+<XMLDB PATH="mod/quiz/accessrule/supervisedcheck/db" VERSION="20131124" COMMENT="XMLDB file for Moodle mod/quiz/accessrule/supervisedcheck"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -8,7 +8,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to quiz.id."/>
-        <FIELD NAME="lessontypeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to block_supervised_lessontype.id."/>
+        <FIELD NAME="lessontypeid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key to block_supervised_lessontype.id."/>
+        <FIELD NAME="supervisedmode" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

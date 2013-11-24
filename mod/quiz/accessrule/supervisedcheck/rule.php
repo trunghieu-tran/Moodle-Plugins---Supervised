@@ -90,13 +90,13 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 // Update an existing rule if possible.
                 $rule = array_shift($oldrules);
                 if (!$rule) {
-                    $rule = new stdClass();
-                    $rule->quizid = $quiz->id;
-                    $rule->lessontypeid = 0;
-                    $rule->mode = $quiz->supervisedcheckrequired; // must be 2
-                    $rule->id = $DB->insert_record('quizaccess_supervisedcheck', $rule);
+                    $rule                   = new stdClass();
+                    $rule->quizid           = $quiz->id;
+                    $rule->lessontypeid     = 0;
+                    $rule->supervisedmode   = $quiz->supervisedcheckrequired; // must be 2
+                    $rule->id               = $DB->insert_record('quizaccess_supervisedcheck', $rule);
                 }
-                $rule->lessontypeid = $lessontypesinquiz[$i];
+                $rule->lessontypeid         = $lessontypesinquiz[$i];
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
             // Delete any remaining old rules.
@@ -108,14 +108,14 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             // Update an existing rule if possible.
             $rule = array_shift($oldrules);
             if (!$rule) {
-                $rule = new stdClass();
-                $rule->quizid = $quiz->id;
-                $rule->lessontypeid = NULL;
-                $rule->mode = $quiz->supervisedcheckrequired;   // 0 or 1
-                $rule->id = $DB->insert_record('quizaccess_supervisedcheck', $rule);
+                $rule                   = new stdClass();
+                $rule->quizid           = $quiz->id;
+                $rule->lessontypeid     = NULL;
+                $rule->supervisedmode   = $quiz->supervisedcheckrequired;   // 0 or 1
+                $rule->id               = $DB->insert_record('quizaccess_supervisedcheck', $rule);
             }
-            $rule->lessontypeid = NULL;
-            $rule->mode = $quiz->supervisedcheckrequired;   // 0 or 1
+            $rule->lessontypeid         = NULL;
+            $rule->supervisedmode       = $quiz->supervisedcheckrequired;   // 0 or 1
             $DB->update_record('quizaccess_supervisedcheck', $rule);
             // Delete any remaining old rules.
             foreach ($oldrules as $oldrule) {
@@ -123,4 +123,12 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             }
         }
     }
+
+
+    /*public static function get_settings_sql($quizid) {
+        return array(
+            'honestycheckrequired',
+            'LEFT JOIN {quizaccess_honestycheck} honestycheck ON honestycheck.quizid = quiz.id',
+            array());
+    }*/
 }
