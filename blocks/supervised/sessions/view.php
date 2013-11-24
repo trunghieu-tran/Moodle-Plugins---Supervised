@@ -74,6 +74,7 @@ $params['groupid']      = $groupid;
 */
 $sessions = $DB->get_records_sql($select/*, $params*/);
 
+$strftimedatetime = get_string("strftimerecent");
 $tabledata = array();
 foreach ($sessions as $id=>$session) {
     // Prepare icons and urls.
