@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 
 
+
 /**
  * A rule for supervised block.
  *
@@ -39,22 +40,27 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
     public static function add_settings_form_fields(
         mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
-        global $DB, $COURSE;
+        global $DB, $COURSE, $PAGE, $CFG;
 
         //Radiobuttons
-        $radioarray=array();
-        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'No', 0);
-        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'Yes, for all lessontypes (include "Not specified" lessontype)', 1);
-        $radioarray[] =& $mform->createElement('radio', 'radiosupervised', '', 'Yes, for custom lessontype list:', 2);
-        $mform->addGroup($radioarray, 'radioar', 'Allow supervised access?', '<br/>', false);
+        $radioarray = array();
+        $radioarray[] =& $mform->createElement('radio', 'supervisedcheckrequired', '', get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
+        $radioarray[] =& $mform->createElement('radio', 'supervisedcheckrequired', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
+        $radioarray[] =& $mform->createElement('radio', 'supervisedcheckrequired', '', get_string('customcheck', 'quizaccess_supervisedcheck'), 2);
+        $mform->addGroup($radioarray, 'radioar', get_string('allowcontrol', 'quizaccess_supervisedcheck'), '<br/>', false);
 
-        //print_object($radioarray);
-        // Lessontypes checkboxes
-        $mform->addElement('advcheckbox', 'supervisedlessontype_0', '', get_string("notspecified", 'block_supervised'));
+        $cbarray = array();
+        $cbarray[] =& $mform->createElement('advcheckbox', 'supervisedlessontype_0', '', get_string('notspecified', 'block_supervised'));
         $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id));
         foreach($lessontypes as $id=>$lessontype){
-            $mform->addElement('advcheckbox', 'supervisedlessontype_'.$id, '', $lessontype->name);
+            $cbarray[] =& $mform->createElement('advcheckbox', 'supervisedlessontype_'.$id, '', $lessontype->name);
         }
+        $mform->addGroup($cbarray, 'lessontypesgroup', '', '<br/>', false);
+
+
+        $PAGE->requires->jquery();
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/supervisedcheck/lib.js') );
+        $PAGE->requires->css( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/supervisedcheck/style.css') );
     }
 
     public static function save_settings($quiz) {
