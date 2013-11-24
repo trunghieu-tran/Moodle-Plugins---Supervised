@@ -166,7 +166,6 @@ class block_supervised extends block_base {
             }
             $mform = new plannedsession_block_form();
             if ($fromform = $mform->get_data()) {
-                // TODO Start session.
                 // TODO Logging
                 //$sessionstitle = get_string('plannedsessiontitle', 'block_supervised');
                 // Start session and update fields that user could edit
@@ -183,8 +182,6 @@ class block_supervised extends block_base {
                 }
 
                 unset($plannedsession);
-                //$url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
-                //redirect($url);
             } else {
                 $sessionstitle = get_string('plannedsessiontitle', 'block_supervised');
                 // Display form.
@@ -280,7 +277,6 @@ class block_supervised extends block_base {
             }
             $mform = new startsession_block_form();
             if ($fromform = $mform->get_data()) {
-                // TODO Start session.
                 // TODO Logging
                 // Start session
                 $curtime = time();
