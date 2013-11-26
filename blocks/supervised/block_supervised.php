@@ -317,6 +317,8 @@ class block_supervised extends block_base {
         {block_supervised_session}.groupid,
         {user}.firstname,
         {user}.lastname,
+        {block_supervised_classroom}.name   AS classroomname,
+        {groups}.name                       AS groupname,
         {course}.fullname                   AS coursename,
         {block_supervised_lessontype}.name  AS lessontypename
 
@@ -359,11 +361,34 @@ class block_supervised extends block_base {
 
 
     private function render_block_for_student(){
+        global $COURSE, $CFG;
+
         $activesessions = $this->get_student_active_sessions();
 
         if(!empty($activesessions)){
             $sessionstitle = get_string('activesessionsstudenttitle', 'block_supervised', count($activesessions));
             $blockbody = '';
+            // Prepare form.
+            $mform = $CFG->dirroot."/blocks/supervised/activesessionstudent_block_form.php";
+            if (file_exists($mform)) {
+                require_once($mform);
+            } else {
+                print_error('noformdesc');
+            }
+            $strftimedatetime = get_string("strftimerecent");
+            foreach($activesessions as $session){
+                $mform = new activesessionstudent_block_form();
+                $toform['id']               = $COURSE->id;
+                $toform['teacher']          = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), $session->firstname . " " . $session->lastname);
+                $toform['lessontypename']   = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+                $toform['classroomname']    = $session->classroomname;
+                $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
+                $toform['timestart']        = userdate($session->timestart, $strftimedatetime);
+                $toform['duration']         = $session->duration;
+                $toform['timeend']          = userdate($session->timeend, $strftimedatetime);
+                $mform->set_data($toform);
+                $blockbody .= $mform->render();
+            }
         }
         else{
             $sessionstitle = get_string('nosessionsstudenttitle', 'block_supervised');
