@@ -130,30 +130,9 @@ class block_supervised extends block_base {
 
 
 
-    public function init() {
-        $this->title = get_string('blocktitle', 'block_supervised');
-    }
-
-    /**
-    */
-    public function applicable_formats() {
-        return array(
-            'all' => false,
-            'course-view' => true);
-    }
-
-    public function get_content() {
-        global $PAGE, $COURSE, $USER, $CFG, $DB;
-        require_once('sessions/sessionstate.php');
-        if ($this->content !== null) {
-            return $this->content;
-        }
-
+    private function render_block_for_teacher(){
+        global $CFG, $COURSE, $DB, $USER;
         $formbody = '';
-        // TODO teacher or student?
-
-
-
         // Planned session: render planned session form.
         $plannedsession = $this->get_planned_session();
         if( !empty($plannedsession) ){
@@ -305,12 +284,6 @@ class block_supervised extends block_base {
         $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $formbody;
 
-
-
-
-
-
-
         // Add footer.
         $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
         $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
@@ -320,6 +293,34 @@ class block_supervised extends block_base {
         $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
 
         $this->content->footer = join(' ', $links);
+    }
+
+
+
+    public function init() {
+        $this->title = get_string('blocktitle', 'block_supervised');
+    }
+
+    /**
+    */
+    public function applicable_formats() {
+        return array(
+            'all' => false,
+            'course-view' => true);
+    }
+
+    public function get_content() {
+        global $PAGE, $COURSE, $USER, $CFG, $DB;
+        require_once('sessions/sessionstate.php');
+        if ($this->content !== null) {
+            return $this->content;
+        }
+
+        // TODO teacher or student?
+        $this->render_block_for_teacher();
+
+
+
 
         return $this->content;
     }

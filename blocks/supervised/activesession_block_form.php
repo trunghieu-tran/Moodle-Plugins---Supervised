@@ -42,12 +42,9 @@ class activesession_block_form extends moodleform {
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // add comment
         $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
-
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
-
-        //$this->add_action_buttons(true, get_string('savechanges', "block_supervised"));
-
+        // add submit and cancel buttons
         $buttonarray=array();
         $buttonarray[] =& $mform->createElement('submit', 'submitbutton', get_string('updatesession', "block_supervised"));
         $buttonarray[] =& $mform->createElement('cancel', 'cancelbutton', get_string('finishsession', "block_supervised"));
