@@ -17,7 +17,7 @@
 
 class block_supervised extends block_base {
 
-    private function get_active_session(){
+    private function get_teacher_active_session(){
         require_once('sessions/sessionstate.php');
         global $DB, $COURSE, $USER;
 
@@ -72,7 +72,7 @@ class block_supervised extends block_base {
         return $activesession;
     }
 
-    private function get_planned_session(){
+    private function get_teacher_planned_session(){
         require_once('sessions/sessionstate.php');
         global $DB, $COURSE, $USER;
 
@@ -134,7 +134,7 @@ class block_supervised extends block_base {
         global $CFG, $COURSE, $DB, $USER;
         $formbody = '';
         // Planned session: render planned session form.
-        $plannedsession = $this->get_planned_session();
+        $plannedsession = $this->get_teacher_planned_session();
         if( !empty($plannedsession) ){
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/plannedsession_block_form.php";
@@ -182,7 +182,7 @@ class block_supervised extends block_base {
 
 
         // Active session: render active session form.
-        $activesession  = $this->get_active_session();
+        $activesession  = $this->get_teacher_active_session();
         if( !empty($activesession) ){
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/activesession_block_form.php";
@@ -296,6 +296,89 @@ class block_supervised extends block_base {
     }
 
 
+    private function get_student_active_sessions(){
+        require_once('sessions/sessionstate.php');
+        global $DB, $COURSE, $USER;
+
+        // Find Active sessions.
+        $select = "SELECT
+        {block_supervised_session}.id,
+        {block_supervised_session}.timestart,
+        {block_supervised_session}.duration,
+        {block_supervised_session}.timeend,
+        {block_supervised_session}.courseid,
+        {block_supervised_session}.teacherid,
+        {block_supervised_session}.state,
+        {block_supervised_session}.sessioncomment,
+        {block_supervised_session}.classroomid,
+        {block_supervised_session}.lessontypeid,
+        {block_supervised_session}.teacherid,
+        {block_supervised_session}.sendemail,
+        {block_supervised_session}.groupid,
+        {user}.firstname,
+        {user}.lastname,
+        {course}.fullname                   AS coursename,
+        {block_supervised_lessontype}.name  AS lessontypename
+
+        FROM {block_supervised_session}
+            JOIN {block_supervised_classroom}
+              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
+            LEFT JOIN {block_supervised_lessontype}
+              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
+            JOIN {user}
+              ON {block_supervised_session}.teacherid    =   {user}.id
+            LEFT JOIN {groups}
+              ON {block_supervised_session}.groupid      =   {groups}.id
+            JOIN {course}
+              ON {block_supervised_session}.courseid     =   {course}.id
+
+        WHERE (:time BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
+            AND {block_supervised_session}.courseid     = :courseid
+            AND {block_supervised_session}.state        = :stateactive
+        ";
+
+        $courseid   = $COURSE->id;
+        $params['time']             = time();
+        $params['courseid']         = $courseid;
+        $params['stateactive']      = StateSession::Active;
+
+        $activesessions = $DB->get_records_sql($select, $params);
+
+        // Filter sessions by user groups
+        $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);
+        $groups = $groupinggroups[0];
+        foreach($activesessions as $id=>$session){
+            if(!in_array($session->groupid, $groups)){
+                unset($activesessions[$id]);
+            }
+        }
+
+        return $activesessions;
+    }
+
+
+
+    private function render_block_for_student(){
+        $activesessions = $this->get_student_active_sessions();
+
+        if(!empty($activesessions)){
+            $sessionstitle = get_string('activesessionsstudenttitle', 'block_supervised', count($activesessions));
+            $blockbody = '';
+        }
+        else{
+            $sessionstitle = get_string('nosessionsstudenttitle', 'block_supervised');
+            $blockbody = '';
+        }
+
+
+
+
+        // Add block body.
+        $this->content         = new stdClass;
+        $this->content->text   = $sessionstitle . $blockbody;
+    }
+
+
 
     public function init() {
         $this->title = get_string('blocktitle', 'block_supervised');
@@ -317,7 +400,20 @@ class block_supervised extends block_base {
         }
 
         // TODO teacher or student?
-        $this->render_block_for_teacher();
+        $context = context_course::instance($COURSE->id);
+        $roles = get_user_roles($context, $USER->id, false);
+        $role = key($roles);
+        $roleid = $roles[$role]->roleid;
+
+        if($roleid == 3 OR $roleid == 4){
+            // Teacher or editing teacher
+            $this->render_block_for_teacher();
+        }
+        else if($roleid == 5){
+            // Student
+            $this->render_block_for_student();
+        }
+
 
 
 
