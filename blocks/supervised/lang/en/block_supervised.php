@@ -97,6 +97,7 @@ $string['notifyteacher_help']       = 'If checked, the teacher will be notified 
 $string['messageforteacher']        = 'Message for teacher';
 $string['timeendvalidationerror']   = 'The session must be active before {$a} at least.';
 $string['durationvalidationerror']  = 'Duration must be greater than zero value.';
+$string['teacherhassession']        = 'Teacher has an other session in this period.';
 $string['plansession']              = '[Plan new session]';
 
 
