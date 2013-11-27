@@ -350,7 +350,8 @@ class block_supervised extends block_base {
         $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);
         $groups = $groupinggroups[0];
         foreach($activesessions as $id=>$session){
-            if(!in_array($session->groupid, $groups)){
+            if(!in_array($session->groupid, $groups) AND $session->groupid != 0){
+                // If user isn't in session->groupid - delete this session
                 unset($activesessions[$id]);
             }
         }
