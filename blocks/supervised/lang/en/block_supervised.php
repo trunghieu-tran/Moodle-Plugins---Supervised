@@ -16,16 +16,24 @@
 
 $string['pluginname']               = 'Supervised block';
 $string['blocktitle']               = 'Supervised';
-$string['supervised:addinstance']   = 'Add a new Supervised block';
-$string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Moodle page';
 
-$string['plannedsessiontitle']      = 'You have a planned session';
-$string['activesessiontitle']       = 'You have an active session';
-$string['nosessionstitle']          = 'You don\'t have any planned or active sessions. You can start new session right now';
-$string['activesessionsstudenttitle']      = 'You have {$a} active session(s)';
-$string['nosessionsstudenttitle']          = 'You don\'t have any active session...';
+$string['plannedsessiontitle']              = 'You have a planned session';
+$string['activesessiontitle']               = 'You have an active session';
+$string['nosessionstitle']                  = 'You don\'t have any planned or active sessions. You can start new session right now';
+$string['activesessionsstudenttitle']       = 'You have {$a} active session(s)';
+$string['nosessionsstudenttitle']           = 'You don\'t have any active session...';
 
 
+// Capabilities description
+$string['supervised:teachermode']       = 'Teacher access mode. Can create sessions for himself';
+$string['supervised:studentmode']       = 'Student access mode';
+$string['supervised:readclassrooms']    = 'View classrooms';
+$string['supervised:writeclassrooms']   = 'Manage classrooms';
+$string['supervised:readlessontypes']   = 'View lessontypes';
+$string['supervised:writelessontypes']  = 'Manage lessontypes';
+$string['supervised:readsessions']      = 'View sessions';
+$string['supervised:writesessions']     = 'Manage sessions. Can create sessions for any teacher';
+$string['supervised:readlogs']          = 'View session\'s logs';
 
 
 $string['classroomsurl']            = '[Classrooms]';
