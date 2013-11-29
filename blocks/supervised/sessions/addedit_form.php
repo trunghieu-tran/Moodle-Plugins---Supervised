@@ -5,7 +5,7 @@ require_once("{$CFG->libdir}/formslib.php");
 class addedit_session_form extends moodleform {
  
     function definition() {
-        global $DB;
+        global $DB, $PAGE, $USER;
 
         $mform =& $this->_form;
 
@@ -46,7 +46,12 @@ class addedit_session_form extends moodleform {
         // add group
         $mform->addElement('header', 'general', get_string('general', 'form'));
         // add teacher combobox
-        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers);
+        $attributes = '';
+        if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
+            // Disable combobox for teachermode (user can create session only for himself).
+            $attributes = 'disabled="disabled"';
+        }
+        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers, $attributes);
         $mform->addRule('teacherid', null, 'required', null, 'client');
         // add send e-mail checkbox
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));

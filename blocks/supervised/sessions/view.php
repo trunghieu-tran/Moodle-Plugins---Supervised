@@ -16,6 +16,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
+require_capability('block/supervised:readsessions', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('sessionspagetitle', 'block_supervised'));

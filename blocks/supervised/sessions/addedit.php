@@ -20,10 +20,10 @@ $PAGE->set_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $c
 $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
 
-
-
-
-
+// Check capabilities.
+if(!  (has_capability('block/supervised:writesessions', $PAGE->context) OR has_capability('block/supervised:teachermode', $PAGE->context))  ){
+    require_capability('block/supervised:teachermode', $PAGE->context);
+}
 
 
 // Initializing variables depending of mode.
