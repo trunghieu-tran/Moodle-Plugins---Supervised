@@ -8,6 +8,7 @@ $id         = required_param('id', PARAM_INT);
 $site = get_site();
 
 require_login($course);
+require_capability('block/supervised:writeclassrooms', $PAGE->context);
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'block_supervised', $courseid);
