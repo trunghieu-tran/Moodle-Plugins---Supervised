@@ -21,9 +21,9 @@ $string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Mood
 
 $string['plannedsessiontitle']      = 'You have a planned session';
 $string['activesessiontitle']       = 'You have an active session';
-$string['nosessionstitle']          = 'You haven\'t any planned or active sessions. You can start new session right now';
+$string['nosessionstitle']          = 'You don\'t have any planned or active sessions. You can start new session right now';
 $string['activesessionsstudenttitle']      = 'You have {$a} active session(s)';
-$string['nosessionsstudenttitle']          = 'You haven\'t any active session...';
+$string['nosessionsstudenttitle']          = 'You don\'t have any active session...';
 
 
 
@@ -78,7 +78,7 @@ $string['addlessontype']           = '[Add lessontype]';
 
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
-$string['sessionsheader']           = 'Sessions in course';
+$string['sessionsheader']           = 'Sessions list';
 $string['invalidsessionid']         = 'You are trying to use an invalid session ID';
 $string['insertsessionerror']       = 'Database error! Can not insert session into database';
 $string['sessionediterror']         = 'You can edit only Planned session';
@@ -111,7 +111,7 @@ $string['state']        = 'State';
 $string['logs']         = 'Logs';
 $string['showlogs']     = '[Show logs]';
 
-$string['allgroups']        = 'All goups';
+$string['allgroups']        = 'All groups';
 $string['notspecified']     = 'Not specified';
 $string['sessioncomment']   = 'Comment';
 $string['sessioninfo']      = 'Session information';
