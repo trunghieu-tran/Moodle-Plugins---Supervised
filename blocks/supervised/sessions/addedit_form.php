@@ -9,10 +9,7 @@ class addedit_session_form extends moodleform {
 
         $mform =& $this->_form;
 
-        // TODO see report_log_print_selector_form function
-
-        // TODO find only teachers
-        if ($cteachers = $DB->get_records('user')) {
+        if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:writesessions', 'block/supervised:teachermode'))) {
             foreach ($cteachers as $cteacher) {
                 $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
             }
