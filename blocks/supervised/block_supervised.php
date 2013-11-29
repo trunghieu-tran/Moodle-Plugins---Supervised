@@ -426,17 +426,14 @@ class block_supervised extends block_base {
         }
 
         // TODO teacher or student?
-        $context = context_course::instance($COURSE->id);
-        $roles = get_user_roles($context, $USER->id, false);
-        $role = key($roles);
-        $roleid = $roles[$role]->roleid;
+        //$contextblock = context_block::instance($this->instance->id);
 
-        if($roleid == 3 OR $roleid == 4){
-            // Teacher or editing teacher
+        if(has_capability('block/supervised:teachermode', $this->context)){
+            // Teacher mode.
             $this->render_block_for_teacher();
         }
-        else if($roleid == 5){
-            // Student
+        else if(has_capability('block/supervised:studentmode', $this->context)){
+            // Student mode.
             $this->render_block_for_student();
         }
 

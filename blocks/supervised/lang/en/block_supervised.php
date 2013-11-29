@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname']               = 'Supervised block';
-$string['blocktitle']               = 'Supervised block';
+$string['blocktitle']               = 'Supervised';
 $string['supervised:addinstance']   = 'Add a new Supervised block';
 $string['supervised:myaddinstance'] = 'Add a new Supervised block to the My Moodle page';
 
