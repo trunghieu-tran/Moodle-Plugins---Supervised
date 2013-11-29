@@ -14,6 +14,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
+require_capability('block/supervised:writelessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
