@@ -419,14 +419,10 @@ class block_supervised extends block_base {
     }
 
     public function get_content() {
-        global $PAGE, $COURSE, $USER, $CFG, $DB;
-        require_once('sessions/sessionstate.php');
+
         if ($this->content !== null) {
             return $this->content;
         }
-
-        // TODO teacher or student?
-        //$contextblock = context_block::instance($this->instance->id);
 
         if(has_capability('block/supervised:teachermode', $this->context)){
             // Teacher mode.
@@ -436,10 +432,6 @@ class block_supervised extends block_base {
             // Student mode.
             $this->render_block_for_student();
         }
-
-
-
-
 
         return $this->content;
     }
