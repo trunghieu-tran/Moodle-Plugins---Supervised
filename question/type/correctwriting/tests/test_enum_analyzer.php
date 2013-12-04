@@ -328,10 +328,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
 
     /**
      * Test for find_enum_orders_in_corrected_string function
-     * Three enumerations. Second contain first and third enumerations.
+     * One enumeration.
      * Enumeration order in corrected student answer:
-     *  friend... , neighbors... , friends... , neighbors...
-     *  Becouse token "my" is include in both of second enumeration.
+     * friend... , neighbors... , friends... , neighbors...
+     * Because token "my" is include in both of enumeration.
      */
     public function testfind_enum_orders_in_corrected_string_two_include_in_other() {
         $correctanswer = array();
