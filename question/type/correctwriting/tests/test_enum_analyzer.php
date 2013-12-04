@@ -370,7 +370,10 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!Two include in other.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, two enumerations without including.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string, two enumerations without including.
+     * Enumeration in correct order. Just one order.
+     */
     public function testfind_all_enum_orders_in_corrected_string_two_without_including() {
         $enumdescription = array();
         $correctanswer = array();
@@ -407,7 +410,13 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in all find orders found!Two without including.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Two enumerations one include in other.
+     * Enumeration order in corrected student answer:
+     * friend... , neighbors... , friends... , neighbors...
+     * Because token "my" is include in both of first enumeration.
+     */
     public function testfind_all_enum_orders_in_corrected_string_one_include_in_other() {
         $enumdescription = array();
         $correctanswer = array();
@@ -442,7 +451,13 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in all find orders found!One include in other.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Three enumerations. First and third include in second.
+     * Enumeration order in corrected student answer:
+     * friend... , neighbors... , friends... , neighbors...
+     * Because token "my" is include in both of second enumeration.
+     */
     public function testfind_all_enum_orders_in_corrected_string_two_include_in_other() {
         $enumdescription = array();
         $correctanswer = array();
@@ -480,7 +495,11 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in all find orders found!Two include in other.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, matrioska.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Three enumerations. First include in second and second include in third.
+     * A lot of orders because token 'and' contains in enumerations elements, and include twice in answer.
+     */
     public function testfind_all_enum_orders_in_corrected_string_matrioska_three_enums() {
         $enumdescription = array();
         $correctanswer = array();
@@ -522,7 +541,13 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in all find orders found!Matrioshka.');
     }
 
-    // Test for find_enum_orders_in_corrected_string, two include in other several orders.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Three enumerations. First include in second and second include in third.
+     * We have several orders: in first enumeration because tokens "my" and ":" is include in both of enumeration,
+     * in second because token "Sam" contains twice in corrected answer, and in third because token "Victoria" contains
+     * twice in corrected answer.
+     */
     public function testfind_all_enum_orders_in_corrected_string_two_include_in_other_several_orders() {
         $correctanswer = array();
         $correctedanswer = array();
@@ -565,7 +590,13 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in find orders found!Two include in other.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, matrioska.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Three enumerations. First and third include in second.
+     * We have several orders: in first enumeration because token "green" contains twice in corrected answer,
+     * in second because tokens "green" and "overall" contains twice in corrected answer, and in third because
+     * token "women" contains twice in corrected answer.
+     */
     public function testfind_all_enum_orders_in_corrected_string_matrioska_three_enums_several_orders() {
         $enumdescription = array();
         $correctanswer = array();
@@ -628,7 +659,12 @@ class qtype_correctwriting_enum_analyzer_test extends PHPUnit_Framework_TestCase
         $this->assertTrue( $equal, 'Error in all find orders found!Matrioshka with several orders.');
     }
 
-    // Test for find_all_enum_orders_in_corrected_string, two enumerations one include in other, strange elements order.
+    /**
+     * Test for find_all_enum_orders_in_corrected_string.
+     * Two enumerations. Second include in first. Strange elements order.
+     * We have several orders: in first enumeration because element's tokens are mixed,
+     * in second because token "Tom" contains twice in corrected answer.
+     */
     public function testfind_all_enum_orders_in_corrected_string_one_include_in_other_strange_orders() {
         $enumdescription = array();
         $correctanswer = array();
