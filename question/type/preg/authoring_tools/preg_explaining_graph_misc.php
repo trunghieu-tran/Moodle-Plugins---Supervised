@@ -176,6 +176,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public $node        = '';           // Special nodes options.
     public $edge        = '';           // Special edges options.
     public $isexact     = false;
+    public $isselection = false;        // This flag shows
 
     public function __construct($lbl, $id = -1) {
         $this->label = $lbl;
@@ -229,9 +230,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($tmpdnode->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE) {
                 // Find a right neighbor of node.
                 $neighbor = $tmpdnode->find_neighbor_dst($gmain);
-                // If neighbor is simple node with text too and it's a child of the same subgraph AND it has the same register attribute,
+                // If neighbor is simple node with text too and it's a child of the same subgraph,
                 // then we need to join this two nodes.
-                if ($neighbor !== null and $neighbor->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE && $neighbor->owner === $this && $neighbor->style == $tmpdnode->style) {
+                if ($neighbor !== null and $neighbor->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE && $neighbor->owner === $this) {
                     // Create the new joined node.
                     $tmp = new qtype_preg_explaining_graph_tool_node(
                                 array($tmpdnode->label[0] . $neighbor->label[0]),
@@ -241,6 +242,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
                                 $tmpdnode->style,
                                 $tmpdnode->fillcolor
                             );
+
+                    $tmp->type = qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE;
 
                     // Find a link between left neighbor and current node, then change destination to new node.
                     $tmpneighbor = $tmpdnode->find_neighbor_src($gmain);
@@ -282,32 +285,31 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
             $tmpdnode = $iter; // Let copy current node.
 
-            // Assert should has a red color.
+            // If this node is assert...
             if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_ASSERT) {
                 // Find its neighbors (left and right).
-                $neighborr = $tmpdnode->find_neighbor_dst($gmain);
-                $neighborl = $tmpdnode->find_neighbor_src($gmain);
+                $rightneighbor = $tmpdnode->find_neighbor_dst($gmain);
+                $leftneighbor = $tmpdnode->find_neighbor_src($gmain);
 
                 // First case - both neighbors are in same subgraph.
-                if ($neighborr !== null and $neighborr->owner === $neighborl->owner && $neighborl->owner === $this) {
-                    //print 'both neighbors are in same subgraph' . chr(10);
+                if ($rightneighbor !== null and $rightneighbor->owner === $leftneighbor->owner && $leftneighbor->owner === $this) {
                     // Find labels of links between neighbors and assert.
-                    $tmplabel1 = $gmain->find_link($neighborl, $tmpdnode)->label;
-                    $tmplabel2 = $gmain->find_link($tmpdnode, $neighborr)->label;
+                    $tmplabel1 = $gmain->find_link($leftneighbor, $tmpdnode)->label;
+                    $tmplabel2 = $gmain->find_link($tmpdnode, $rightneighbor)->label;
 
                     // Create a new link between neighbors with new label.
                     $this->links[] = new qtype_preg_explaining_graph_tool_link(qtype_preg_explaining_graph_tool_link::compute_label(
-                        qtype_preg_explaining_graph_tool_link::compute_label($tmplabel1, $tmpdnode->label[0]), $tmplabel2), $neighborl, $neighborr, $this);
+                        qtype_preg_explaining_graph_tool_link::compute_label($tmplabel1, $tmpdnode->label[0]), $tmplabel2), $leftneighbor, $rightneighbor, $this);
                     // Second case - neighbors are not in the same subgraphs, but right neighbor is in same as assert.
-                } else if ($neighborr !== null and $neighborr->owner !== $neighborl->owner && $neighborl->owner !== $this && $neighborr->owner === $this) {
+                } else if ($rightneighbor !== null and $rightneighbor->owner !== $leftneighbor->owner && $leftneighbor->owner !== $this && $rightneighbor->owner === $this) {
                     // If left neighbor is not just a point...
-                    if ($neighborr->type == qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
+                    if ($rightneighbor->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                         // Create a new point-node.
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                         // Link left neighbor with it.
                         $gmain->links[] = new qtype_preg_explaining_graph_tool_link(
                             '',
-                            $neighborl,
+                            $leftneighbor,
                             end($this->nodes),
                             $gmain
                         );
@@ -315,61 +317,61 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(
                             $tmpdnode->label[0],
                             end($this->nodes),
-                            $neighborr,
+                            $rightneighbor,
                             $this
                         );
                     } else {
-                        $tmplabel2 = $gmain->find_link($neighborl, $tmpdnode)->label;
+                        $tmplabel2 = $gmain->find_link($leftneighbor, $tmpdnode)->label;
                         // Create new link between left neighbor and right neighbor.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(
                                                 qtype_preg_explaining_graph_tool_link::compute_label($tmpdnode->label[0], $tmplabel2),
-                                                $neighborl,
-                                                $neighborr,
+                                                $leftneighbor,
+                                                $rightneighbor,
                                                 $this
                                             );
                     }
                     // Third case - neighbors are not in the same subgraphs, but left neighbor is in same as assert.
-                } else if ($neighborr !== null and $neighborr->owner !== $neighborl->owner && $neighborl->owner === $this && $neighborr->owner !== $this) {
+                } else if ($rightneighbor !== null and $rightneighbor->owner !== $leftneighbor->owner && $leftneighbor->owner === $this && $rightneighbor->owner !== $this) {
                     // If right neighbor is not just a point...
-                    if ($neighborr->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
+                    if ($rightneighbor->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                             // Create a new point-node.
                             $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                             // Link it with right neighbor.
                             $gmain->links[] = new qtype_preg_explaining_graph_tool_link(
                                 '',
                                 end($this->nodes),
-                                $neighborr,
+                                $rightneighbor,
                                 $gmain
                             );
 
                             // Link it with left neighbor.
                             $this->links[] = new qtype_preg_explaining_graph_tool_link(
                                 $tmpdnode->label[0],
-                                $neighborl,
+                                $leftneighbor,
                                 end($this->nodes),
-                                $neighborr->owner
+                                $rightneighbor->owner
                             );
                         //}
                     } else {
-                        $tmplabel1 = $gmain->find_link($neighborl, $tmpdnode)->label;
+                        $tmplabel1 = $gmain->find_link($leftneighbor, $tmpdnode)->label;
                         // Create new link between left neighbor and right neighbor.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link(
                                                 qtype_preg_explaining_graph_tool_link::compute_label($tmplabel1, $tmpdnode->label[0]),
-                                                $neighborl,
-                                                $neighborr,
+                                                $leftneighbor,
+                                                $rightneighbor,
                                                 $this
                                             );
                     }
                 } else { // Fourth case - neighbors are not in the same subgraphs and no one in current subgraph.
                     // If right neighbor is existing...
-                    if ($neighborr !== null) {
+                    if ($rightneighbor !== null) {
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                         $rightborder = end($this->nodes);   // Now right neighbor of assert is point.
-                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $rightborder, $neighborr, $gmain);
+                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $rightborder, $rightneighbor, $gmain);
 
                         $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                         $leftborder = end($this->nodes);    // Now left neighbor of assert is point.
-                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, $leftborder, $gmain);
+                        $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $leftneighbor, $leftborder, $gmain);
 
                         // Link left and right neighbors with corresponding label.
                         $this->links[] = new qtype_preg_explaining_graph_tool_link($tmpdnode->label[0], $leftborder, $rightborder, $this);
@@ -379,13 +381,13 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $rightborder = end($this->nodes);
 
                         // If left neighbor isn't point-node then create it and link them.
-                        if ($neighborl->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
+                        if ($leftneighbor->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                             $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
-                            $this->links[] = new qtype_preg_explaining_graph_tool_link('', $neighborl, end($this->nodes), $this);
-                            $leftborder = end($neighborl->owner->nodes);    // Now left neighbor of assert is point.
+                            $this->links[] = new qtype_preg_explaining_graph_tool_link('', $leftneighbor, end($this->nodes), $this);
+                            $leftborder = end($leftneighbor->owner->nodes);    // Now left neighbor of assert is point.
                         } else {
-                            $leftborder = $neighborl;
+                            $leftborder = $leftneighbor;
                         }
 
                         // Link left and right neighbors with corresponding label.
@@ -394,12 +396,12 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 }
 
                 // Destroy links between nighbors and assert.
-                $tmplink = $gmain->find_link($neighborl, $tmpdnode);
+                $tmplink = $gmain->find_link($leftneighbor, $tmpdnode);
                 unset($tmplink->owner->links[array_search($tmplink, $tmplink->owner->links)]);
                 $tmplink->owner->links = array_values($tmplink->owner->links);
                 // If right neighbor isn't existing then there is no to destroy.
-                if ($neighborr !== null) {
-                    $tmplink = $gmain->find_link($tmpdnode, $neighborr);
+                if ($rightneighbor !== null) {
+                    $tmplink = $gmain->find_link($tmpdnode, $rightneighbor);
                     unset($tmplink->owner->links[array_search($tmplink, $tmplink->owner->links)]);
                     $tmplink->owner->links = array_values($tmplink->owner->links);
                 }
@@ -419,14 +421,14 @@ class qtype_preg_explaining_graph_tool_subgraph {
      */
     public function process_voids($gmain) {
         foreach ($this->nodes as $iter) {
-            // Void should has an orange color.
+            // If this node is void...
             if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_VOID) {
                 // Find neighbors of void.
                 $neighborl = $iter->find_neighbor_src($gmain);
                 $neighborr = $iter->find_neighbor_dst($gmain);
 
                 if ($iter->type != qtype_preg_explaining_graph_tool_node::TYPE_OPTION) {
-                    if ($this->color != 'darkgreen' || $iter->ismarked) {
+                    if ($this->isselection != true || $iter->ismarked) {
                         // Find a link between left neighbor and void.
                         $tmpneighbor = $gmain->find_link($neighborl, $iter);
                         $tmpneighbor->destination = $neighborr;    // Set a new destination.

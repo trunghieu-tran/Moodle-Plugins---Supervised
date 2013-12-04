@@ -145,6 +145,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
 
         if ($this->is_selected()) {
             $graph->color = 'darkgreen';
+            $graph->isselection = true;
 
             $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
             $marking->style = 'solid';
@@ -185,7 +186,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
             // Escape sequences \cx and \x{ff} produce plain characters for graph.
             if ($ui->is_single_escape_sequence_character_c() || $ui->is_single_escape_sequence_character_hex()) {
                 $code = qtype_preg_lexer::code_of_char_escape_sequence($ui->data);
-                $tmp = new qtype_preg_userinscription(textlib::code2utf8($code));
+                $tmp = new qtype_preg_userinscription(core_text::code2utf8($code));
                 $result[] = qtype_preg_authoring_tool::userinscription_to_string($tmp);
                 continue;
             }
@@ -237,7 +238,7 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
      */
     public function get_type()
     {
-        return $this->get_shape() == 'ellipse' ?
+        return $this->get_shape() == 'ellipse' &&  $this->get_color() == 'black' ?
             qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE : qtype_preg_explaining_graph_tool_node::TYPE_OTHER;
     }
 }
@@ -412,6 +413,7 @@ abstract class qtype_preg_explaining_graph_operator extends qtype_preg_explainin
 
         if ($this->is_selected() /*|| ($id == $this->condid && $id != -1)*/ ) { // TODO: condition->is_selected() ?
             $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
+            $marking->isselection = true;
             $marking->style = 'solid';
             $marking->color = 'darkgreen';
             $marking->assume_subgraph($graph);
@@ -540,6 +542,7 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
                 $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('');
                 $operand->subgraphs[0]->style = 'solid';
                 $operand->subgraphs[0]->color = 'darkgreen';
+                $operand->subgraphs[0]->isselection = true;
                 $operand->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand->subgraphs[0], -1);
                 $operand->entries[] = end($operand->subgraphs[0]->nodes);
                 $operand->exits[] = end($operand->subgraphs[0]->nodes);
