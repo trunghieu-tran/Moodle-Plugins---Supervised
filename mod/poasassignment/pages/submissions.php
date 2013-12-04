@@ -76,7 +76,7 @@ class submissions_page extends abstract_page {
         $row[] = $OUTPUT->user_picture($user);
         
         // Add user's name to the row
-        $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+        $userurl = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $poasmodel->get_course()->id));
         $row[]=html_writer::link($userurl,fullname($user, true));
         
         // Add task info to the row
