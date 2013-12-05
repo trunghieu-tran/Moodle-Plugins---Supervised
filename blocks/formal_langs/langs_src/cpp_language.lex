@@ -28,7 +28,6 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
-require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 class block_formal_langs_language_cpp_language extends block_formal_langs_predefined_language
 {
