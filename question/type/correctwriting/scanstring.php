@@ -45,7 +45,7 @@ if ($language == null) {
     if(count($tokens)) {
         $tokenvalues = array();
         foreach($tokens as $token) {
-            $tokenvalues[] = $token->value();
+            $tokenvalues[] = (string)($token->value());
         }
         echo json_encode($tokenvalues);
     } else {
