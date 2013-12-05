@@ -28,7 +28,11 @@
  */
 require_once('../../../config.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
-
+require_once($CFG->dirroot . '/question/editlib.php');
+require_once($CFG->libdir  . '/filelib.php');
+require_once($CFG->libdir  . '/formslib.php');
+require_once($CFG->dirroot . '/question/type/edit_question_form.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/edit_correctwriting_form.php');
 
 $PAGE->set_context(context_system::instance());
 require_login();
@@ -39,16 +43,20 @@ $text = required_param('scannedtext', PARAM_RAW);
 $language = block_formal_langs::lang_object($langid);
 
 if ($language == null) {
-    echo '[]';
+    echo '{"tokens": [], "errors": ""}';
 } else {
-    $tokens = $language->create_from_string($text)->stream->tokens;
+    $stream = $language->create_from_string($text)->stream;
+    $tokens = $stream->tokens;
     if(count($tokens)) {
         $tokenvalues = array();
         foreach($tokens as $token) {
             $tokenvalues[] = (string)($token->value());
         }
-        echo json_encode($tokenvalues);
+        $form = 'qtype_correctwriting_edit_form';
+        $errormessages = $form::convert_tokenstream_errors_to_formatted_messages($text, $stream);
+        $result = (object)array('tokens' => $tokenvalues, "errors" => $errormessages);
+        echo json_encode($result);
     } else {
-        echo '[]';
+        echo '{"tokens": [], "errors": ""}';
     }
 }
