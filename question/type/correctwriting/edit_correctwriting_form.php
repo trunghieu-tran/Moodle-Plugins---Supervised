@@ -23,10 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-
-
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
+
 /**
  * Correctwriting question editing form definition.
  *
@@ -188,6 +187,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->setType($name, PARAM_FLOAT);
             $mform->setDefault($name, $params['default']);
             $mform->addRule($name, null, 'required', null, 'client'); // TODO - should they be really required?
+
+
+
             $mform->addHelpButton($name, $name, 'qtype_correctwriting');
             if ($params['advanced']) {
                 $mform->setAdvanced($name);
@@ -341,6 +343,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     var labeltextarea = $("label[for=id_lexemedescriptions_" + number + "] textarea");
                     var editabletextarea = $("#id_lexemedescriptions_" + number);
                     var currentlanguage = $("#id_langid").val();
+                    var answerfield = $("textarea[name=\'answer[" + number+ "]\']");
+                    var mistakespanselector = "*[id=\'id_error_answer[" + number + "]\']";
                     $.ajax({
                         "url": question_cw_lexer_url,
                         "type": "POST",
@@ -350,17 +354,28 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         },
                         "dataType": "json",
                         "success": function(data) {
-                            if (data instanceof Array) {
+                            if (typeof(data) ==  "object" && data != null) {
                                 var cols  = 0;
-                                for(var i = 0; i < data.length; i++) {
-                                    cols = Math.max(cols, data[i].length);
+                                for(var i = 0; i < data.tokens.length; i++) {
+                                    cols = Math.max(cols, data.tokens[i].length);
+                                }
+                                // Reset mistakes array accordingly
+                                qf_errorHandler(answerfield[0], "");
+                                if (data.errors.length != 0) {
+                                   // fake label for errors, we need to set text as html,
+                                   // but qf_errorHandler does not allow us to do so
+                                   // we doing it via jQuery. This is so going to be
+                                   // messed up on any kind of form update.
+                                   // But sadly, there is no other way...
+                                   qf_errorHandler(answerfield[0], "fake label");
+                                   $(mistakespanselector).html(data.errors);
                                 }
                                 labeltextarea.removeAttr("style");
                                 labeltextarea.css("display", "inline");
-                                labeltextarea.attr("rows", data.length);
+                                labeltextarea.attr("rows", data.tokens.length);
                                 labeltextarea.attr("cols", cols);
-                                labeltextarea.val(data.join("\n"));
-                                editabletextarea.attr("rows", data.length);
+                                labeltextarea.val(data.tokens.join("\n"));
+                                editabletextarea.attr("rows", data.tokens.length);
                             }
                         }
                     });
@@ -607,6 +622,34 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         return $question;
     }
+    /** Converts errors from the stream to HTML formatted mistakes
+     *  @param string $value a parsed string
+     *  @param block_formal_langs_token_stream  $stream a tokenized stream
+     *  @return string of error representation
+     */
+    static public function convert_tokenstream_errors_to_formatted_messages($value, $stream) {
+        $result = '';
+        $br = html_writer::empty_tag('br');
+        if (count($stream->errors) != 0) {
+            $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
+            foreach($stream->errors as $error) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $stream->tokens[$error->tokenindex];
+                /** @var block_formal_langs_node_position $tokenpos */
+                $tokenpos = $token->position();
+                $emesg = $error->errormessage . $br;
+                $left = $tokenpos->colstart();
+                $emesg .= ($left <= 0) ? '' : textlib::substr($value, 0, $left);
+                $left =  $tokenpos->colend() -  $tokenpos->colstart() + 1;
+                $middlepart = ($left <= 0) ? '' : textlib::substr($value,  $tokenpos->colstart() , $left);
+                $emesg .= '<b>' . $middlepart . '</b>';
+                $emesg .= textlib::substr($value, $tokenpos->colend() + 1);
+                $errormessages[] = $emesg;
+                $result = implode($br, $errormessages);
+            }
+        }
+        return $result;
+    }
 
     public function validation($data, $files) {
 
@@ -630,22 +673,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $stream = $processedstring->stream;
 
             if (count($stream->errors) != 0) {
-                $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
-                foreach($stream->errors as $error) {
-                    /** @var block_formal_langs_token_base $token */
-                    $token = $stream->tokens[$error->tokenindex];
-                    /** @var block_formal_langs_node_position $tokenpos */
-                    $tokenpos = $token->position();
-                    $emesg = $error->errormessage . $br;
-                    $left = $tokenpos->colstart();
-                    $emesg .= ($left <= 0) ? '' : textlib::substr($value, 0, $left);
-                    $left =  $tokenpos->colend() -  $tokenpos->colstart() + 1;
-                    $middlepart = ($left <= 0) ? '' : textlib::substr($value,  $tokenpos->colstart() , $left);
-                    $emesg .= '<b>' . $middlepart . '</b>';
-                    $emesg .= textlib::substr($value, $tokenpos->colend() + 1);
-                    $errormessages[] = $emesg;
-                }
-                $errors["answer[$key]"] = implode($br, $errormessages);
+                $form = 'qtype_correctwriting_edit_form';
+                $errormessages = $form::convert_tokenstream_errors_to_formatted_messages($value, $stream);
+                $errors["answer[$key]"] = $errormessages;
             }
         }
 
