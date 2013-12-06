@@ -25,18 +25,29 @@ require_once('../../config.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
+global $USER;
 
 require_login();
+$contextid = required_param('context', PARAM_INT);
+$context = context::instance_by_id($contextid);
+if ($context !== false) {
+    $PAGE->set_context($context);
+    require_capability('block/formal_langs:addinstance', $context);
+    $action  = optional_param('action', '', PARAM_RAW);
+    $langid = required_param('languageid', PARAM_INT);
+    $lang = $DB->get_record('block_formal_langs', array('id' => $langid));
+    $caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
+    $caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
+    if ($action == 'removeformallanguage' && $lang !== false) {
+        if ($caneditall || ($caneditown && $lang->author == $USER->id)) {
+            $DB->delete_records('block_formal_langs', array('id' => $langid));
+            $DB->delete_records('block_formal_langs_perms', array('languageid' => $langid));
+        }
+    }
+    if ($action == 'flanguagevisibility' && $lang !== false) {
+        $visible = required_param('visible', PARAM_INT);
+        $context = required_param('context', PARAM_INT);
+        block_formal_langs::update_language_visibility($langid, $visible, $context);
+    }
 
-$action  = optional_param('action', '', PARAM_RAW);
-if ($action == 'removeformallanguage') {
-    $langid = required_param('languageid', PARAM_INT);
-    $DB->delete_records('block_formal_langs', array('id' => $langid));
-    $DB->delete_records('block_formal_langs_perms', array('languageid' => $langid));
-}
-if ($action == 'flanguagevisibility') {
-    $langid = required_param('languageid', PARAM_INT);
-    $visible = required_param('visible', PARAM_INT);
-    $context = required_param('context', PARAM_INT);
-    block_formal_langs::update_language_visibility($langid, $visible, $context);
 }
