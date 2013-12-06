@@ -39,7 +39,7 @@ class language_editing_form extends moodleform {
         $mform->addElement('hidden', 'new', 1);
         $mform->setType('new', PARAM_BOOL);
         $mform->addElement('hidden', 'id', 0);
-        $mform->setType('new', PARAM_INT);
+        $mform->setType('id', PARAM_INT);
 
         $textfields = array(
             // Commented, because users don't care about  description

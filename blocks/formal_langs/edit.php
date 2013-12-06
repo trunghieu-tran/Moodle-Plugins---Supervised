@@ -70,10 +70,11 @@ if ($isnew == false) {
 
 $url = new moodle_url('/blocks/formal_langs/edit.php', array('id'=> $languageid));
 
+require_login();
 $PAGE->requires->jquery();
 $PAGE->set_url($url);
-require_login();
 $context = context_system::instance();
+$PAGE->set_context($context);
 if ($contextid > 0) {
     $context = context::instance_by_id($contextid);
 }
