@@ -20,18 +20,38 @@
  * @copyright  2012 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
+$string['addnewlanguage'] = 'Add new language';
+$string['changevisibility'] = 'Change visibility in current context';
 $string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->line}:{$a->col}';
 $string['clanguageunknownsymbol'] = 'There is unknown character "{$a->symbol}" at {$a->line}:{$a->position}';
 $string['clanguageunmatchedquote'] = 'There is unmatched quote at {$a->line}:{$a->col}';
 $string['clanguageunmatchedsquote'] = 'There is unmatched single quote at {$a->line}:{$a->col}';
 $string['defaultlangdescription'] = 'Language selected by default when creating a new {$a}';
 $string['defaultlanglabel'] = 'Default language';
+$string['deletelanguage'] = 'Delete language "{$a}"';
+$string['editlanguage'] = 'Edit language "{$a}"';
+$string['editinglanguage'] = 'Editing language "{$a}"';
+$string['editingnewlanguage'] = 'Editing new language';
+$string['editpermissionslink'] = 'Edit permissions in current context';
+$string['editpermissionspagename'] = 'Edit permissions';
 $string['extraseparatormsg'] = 'there may be an extra separator inside {$a->correct[0]}';
 $string['lang_c_language'] = 'C programming language';
 $string['lang_c_language_help'] = 'C programming language. Scanning only.';
 $string['lang_cpp_language'] = 'C++ programming language';
 $string['lang_cpp_language_help'] = 'C++ programming language. Scanning only.';
+$string['language_editing_field_description'] = 'Description:';
+$string['language_editing_field_name'] = 'Idenrifying  name for a language';
+$string['language_editing_field_lexemname'] = 'Name of token in language';
+$string['language_editing_field_uiname'] = 'Visible name';
+$string['language_editing_field_scanrules'] = 'Lexical rules for language';
+$string['language_editing_field_parserules'] = 'Parsing rules for language';
+$string['language_editing_field_version'] = 'Version';
+$string['language_editing_field_visible'] = 'Visible in global context of site';
+$string['language_editing_submit_add'] = 'Add language and return';
+$string['language_editing_submit_edit'] = 'Edit language and return';
+$string['language_editing_submit_save_as_new'] = 'Save language as new';
+$string['lang_not_found'] = 'Language not found';
 $string['lang_printf_language'] = 'Language for formatting string (C language, like in printf).';
 $string['lang_printf_language_help'] = 'Language for formatting string (C language, like in printf). Scanning only.';
 $string['lang_simple_english'] = 'English';
