@@ -442,7 +442,7 @@ class block_formal_langs extends block_list {
 
             $editlinks = '';
             $caneditlang = $this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0;
-            $caneditlang =  $caneditlang && ($caneditall || ($caneditall && $permission->author == $USER->id));
+            $caneditlang =  $caneditlang && ($caneditall || ($caneditown && $permission->author == $USER->id));
             if ($caneditlang) {
                 $editlink = $CFG->wwwroot . '/blocks/formal_langs/edit.php?id=' . $permission->id . '&context=' . $context->id;
                 $editiconattr =  array('src' => $OUTPUT->pix_url('t/edit'));
@@ -513,7 +513,8 @@ class block_formal_langs extends block_list {
                     "type" : "GET",
                     "data": {
                         "action": "removeformallanguage",
-                        "languageid" : id
+                        "languageid" : id,
+                        "context" : context
                     },
                     "dataType": "text",
                     "success": function() {
