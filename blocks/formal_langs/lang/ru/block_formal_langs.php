@@ -20,7 +20,9 @@
  * @copyright  2012 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
+$string['addnewlanguage'] = 'Добавить новый язык';
+$string['changevisibility'] = 'Изменить видимость в данном контексте';
 $string['lexical_error_message'] = 'Не могу разобрать {$a->symbol} на позиции {$a->line}:{$a->position} ';
 $string['clanguageunmatchedquote'] = 'Не закрыта кавычка на позиции {$a->line}:{$a->col}';
 $string['clanguageunmatchedsquote'] = 'Не закрыта одинарная кавычка на позиции {$a->line}:{$a->col}';
@@ -28,15 +30,33 @@ $string['clanguageunknownsymbol'] = 'Неизвестный символ "{$a->s
 $string['clanguagemulticharliteral'] = 'Символьный литерал из нескольких символов на позиции {$a->line}:{$a->col}';
 $string['defaultlangdescription'] = 'Язык, используемый по умолчанию при создании нового {$a}';
 $string['defaultlanglabel'] = 'Язык, используемый по умолчанию';
+$string['deletelanguage'] = 'Удалить язык "{$a}"';
+$string['editlanguage'] = 'Редактировать язык "{$a}"';
+$string['editinglanguage'] = 'Редактирование языка "{$a}"';
+$string['editingnewlanguage'] = 'Добавление нового языка';
+$string['editpermissionslink'] = 'Редактировать права в текущем контексте';
+$string['editpermissionspagename'] = 'Редактировать права';
 $string['extraseparatormsg'] = '{$a->correct[0]} возможно содержит лишний разделитель';
 $string['lang_c_language'] = 'Язык программирования C';
 $string['lang_c_language_help'] = 'Язык программирования C (только лексический разбор).';
 $string['lang_cpp_language'] = 'Язык программирования C++';
 $string['lang_cpp_language_help'] = 'Язык программирования C++ (только лексический разбор).';
+$string['lang_not_found'] = 'Указанный язык не найден';
 $string['lang_printf_language'] = 'Язык форматированной строки (язык C, используется в printf).';
 $string['lang_printf_language_help'] = 'Язык форматированной строки (язык C, используется в printf, только лекс. разборк).';
 $string['lang_simple_english'] = 'Английский язык';
 $string['lang_simple_english_help'] = 'Простая реализация английского языка (только лексический разбор).';
+$string['language_editing_field_description'] = 'Описание языка';
+$string['language_editing_field_name'] = 'Имя языка';
+$string['language_editing_field_lexemname'] = 'Название лексемы в языке';
+$string['language_editing_field_uiname'] = 'Отображаемое имя в формах';
+$string['language_editing_field_scanrules'] = 'Правила лексического разбора';
+$string['language_editing_field_parserules'] = 'Правила грамматического разбора';
+$string['language_editing_field_version'] = 'Версия';
+$string['language_editing_field_visible'] = 'Видим ли в глобальном контексте';
+$string['language_editing_submit_add'] = 'Добавить язык и продолжить работу';
+$string['language_editing_submit_edit'] = 'Изменить язык и продолжить работу';
+$string['language_editing_submit_save_as_new'] = 'Сохранить язык как новый';
 $string['lexeme'] = 'лексема';
 $string['missingseparatormsg'] = '{$a->correct[0]} и {$a->correct[1]} возможно записаны без разделителя';
 $string['part'] = 'часть';
