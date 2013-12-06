@@ -94,5 +94,13 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         block_formal_langs::sync_contexts_with_config();
     }
 
+    if ($oldversion < 2013120600) {
+        $dbman = $DB->get_manager();
+        $bfl = new xmldb_table('block_formal_langs');
+        $field = new xmldb_field('author');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'lexemname');
+        $dbman->add_field($bfl, $field);
+    }
+
     return true;
 }
