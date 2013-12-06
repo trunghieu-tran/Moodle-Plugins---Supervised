@@ -27,6 +27,7 @@ require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_editing_form.php');
 
+global $USER;
 
 function insert_language_from_form($formdata, $systemcontextid) {
     global $DB;
@@ -87,11 +88,25 @@ $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 $PAGE->navbar->add($heading);
 
-$form = new language_editing_form($languageobject);
+$caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
+$caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
+$cannoteditanything =  !$caneditall && !$caneditown;
+
+if ($cannoteditanything) {
+    redirect($backurl);
+}
+
+$form = new language_editing_form();
 if ($languageobject != null) {
     if (textlib::strlen($languageobject->scanrules) == 0) {
         redirect($backurl);
     }
+
+
+    if (!$caneditall && ($languageobject->author != $USER->id)) {
+        redirect($backurl);
+    }
+
     $form->set_data($languageobject);
 }
 
@@ -100,6 +115,12 @@ if ($formdata = $form->get_data())
     $systemcontextid =  context_system::instance()->id;
     $submit = $formdata->submitbutton;
     unset($formdata->submitbutton);
+
+    if ($formdata->new) {
+        $formdata->author = $USER->id;
+    } else {
+        $formdata->author = $languageobject->author;
+    }
 
     $formdataasarray = (array)$formdata;
     if (array_key_exists('visible', $formdataasarray) == false) {

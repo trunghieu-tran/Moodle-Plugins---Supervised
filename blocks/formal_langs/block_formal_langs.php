@@ -26,6 +26,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/lib/accesslib.php');
 
+
 class block_formal_langs extends block_list {
     //TODO: Implement this
     public function init() {
@@ -377,7 +378,7 @@ class block_formal_langs extends block_list {
 
 
     public function get_content() {
-        global $_REQUEST, $PAGE, $CFG, $OUTPUT, $DB;
+        global $_REQUEST, $PAGE, $CFG, $OUTPUT, $DB, $USER;
 
         $PAGE->requires->jquery();
 
@@ -387,6 +388,8 @@ class block_formal_langs extends block_list {
 
 
         $context  = $this->page->context;
+        $caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
+        $caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
         $contexts = $context->get_parent_context_ids(true);
         array_unshift($contexts, $context->id);
 
@@ -438,7 +441,9 @@ class block_formal_langs extends block_list {
             $visibleicon = html_writer::tag('a', html_writer::empty_tag('img', $viconattr), $viconhref);
 
             $editlinks = '';
-            if ($this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0) {
+            $caneditlang = $this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0;
+            $caneditlang =  $caneditlang && ($caneditall || ($caneditall && $permission->author == $USER->id));
+            if ($caneditlang) {
                 $editlink = $CFG->wwwroot . '/blocks/formal_langs/edit.php?id=' . $permission->id . '&context=' . $context->id;
                 $editiconattr =  array('src' => $OUTPUT->pix_url('t/edit'));
                 $editiconhref =  array('href' => $editlink, 'class' => 'padright', 'title' => get_string('editlanguage', 'block_formal_langs', $permission->uiname));

@@ -32,6 +32,7 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
+    $lang->author = 0;
     
     $id = $DB->insert_record('block_formal_langs',$lang);
     $templatepermission->languageid = $id;
@@ -46,7 +47,8 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
-    
+    $lang->author = 0;
+
     $id = $DB->insert_record('block_formal_langs',$lang);
     $templatepermission->languageid = $id;
     $DB->insert_record('block_formal_langs_perms', $templatepermission);
@@ -59,6 +61,7 @@ function xmldb_block_formal_langs_install() {
     $lang->parserules = null;
     $lang->version='1.0';
     $lang->visible = 1;
+    $lang->author = 0;
 
     $id = $DB->insert_record('block_formal_langs',$lang);
     $templatepermission->languageid = $id;
@@ -73,6 +76,7 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
+    $lang->author = 0;
 
     $id = $DB->insert_record('block_formal_langs',$lang);
     $templatepermission->languageid = $id;

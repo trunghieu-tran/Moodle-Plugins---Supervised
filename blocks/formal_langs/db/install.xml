@@ -14,7 +14,8 @@
             <FIELD NAME="parserules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Parse rules for user-defined language" PREVIOUS="scanrules" NEXT="version" />
             <FIELD NAME="version" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Version of language" PREVIOUS="parserules" NEXT="visible" />
             <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="version" NEXT="lexemname" />
-            <FIELD NAME="lexemname" TYPE="text"  SEQUENCE="false" COMMENT="A name for lexeme in language" PREVIOUS="visible" />
+            <FIELD NAME="lexemname" TYPE="text"  SEQUENCE="false" COMMENT="A name for lexeme in language" PREVIOUS="visible" NEXT="author" />
+            <FIELD NAME="author" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="lexemname"/>
         </FIELDS>
         <KEYS>
             <KEY NAME="primary" TYPE="primary" FIELDS="id" />
