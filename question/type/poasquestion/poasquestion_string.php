@@ -67,7 +67,11 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
     }
 
     public function set_string($str) {
-        $this->fstring = $str;
+        if (is_string($this->fstring)) {
+            $this->fstring = $str;
+        } else {
+            $this->fstring = '';
+        }
         $this->flength = self::strlen($str);
     }
 
