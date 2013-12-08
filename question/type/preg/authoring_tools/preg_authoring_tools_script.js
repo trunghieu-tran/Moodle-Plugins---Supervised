@@ -75,7 +75,12 @@ M.preg_authoring_tools_script = (function ($) {
                     dataType: "text"
                 }).done(function (responseText, textStatus, jqXHR) {
                     var tmpM = M;
-                    $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, true));
+                    var tpage_html = $.parseHTML(responseText, document, false);
+                    $.getScript(self.www_root+'/question/type/poasquestion/jquerypanzoommin.js', function() {// Init panzoom on images
+                        self.panzooms.init();
+                    });
+                    $.getScript(self.www_root+'/question/type/poasquestion/jquery-textrange.js');
+                    $(self.textbutton_widget.dialog).html(tpage_html);
                     M = $.extend(M, tmpM);
 
                     // Remove the "skip to main content" link.
@@ -133,8 +138,7 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
-                    // Init panzoom on images
-                    self.panzooms.init();
+                    
                     options.oneachpresscallback();
                 });
             },
