@@ -355,6 +355,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         "dataType": "json",
                         "success": function(data) {
                             if (typeof(data) ==  "object" && data != null) {
+                                if (!("tokens" in data)) {
+                                    new M.core.ajaxException(data);
+                                    return;
+                                }
                                 var cols  = 0;
                                 for(var i = 0; i < data.tokens.length; i++) {
                                     cols = Math.max(cols, data.tokens[i].length);
