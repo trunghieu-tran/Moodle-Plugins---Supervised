@@ -520,6 +520,14 @@ class block_formal_langs extends block_list {
                     "success": function() {
                     },
                     "error": function(xhr) {
+                        var a = new M.core.ajaxException({
+                            "error": "Cannot remove formal language",
+                            "center": true,
+                            "closeButton": true,
+                            "draggable": true,
+                            "reproductionlink": localpage
+                        });
+                        a.show();
                     }
                     });
                 });
@@ -551,6 +559,14 @@ class block_formal_langs extends block_list {
                     "success": function() {
                     },
                     "error": function(xhr) {
+                       var a = new M.core.ajaxException({
+                            "error": "Cannot change visibility",
+                            "center": true,
+                            "closeButton": true,
+                            "draggable": true,
+                            "reproductionlink": localpage
+                       });
+                       a.show();
                     }
                     });
                 });
