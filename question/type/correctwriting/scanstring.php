@@ -26,6 +26,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+define('AJAX_SCRIPT', true);
 require_once('../../../config.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/editlib.php');
