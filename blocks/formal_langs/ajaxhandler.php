@@ -21,6 +21,7 @@
  * @copyright  2012 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+define('AJAX_SCRIPT', true);
 require_once('../../config.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
