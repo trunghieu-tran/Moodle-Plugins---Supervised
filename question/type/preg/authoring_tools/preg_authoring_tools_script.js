@@ -380,7 +380,7 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        self.regex_input.textrange('set', indfirst, length);
+        $(self.regex_input).textrange('set', indfirst, length);
         $(window).scrollTop(scroll);
     },
 
@@ -458,7 +458,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_selection : function () {
         var scroll = $(window).scrollTop(),
-            selection = self.regex_input.textrange('get'),
+            selection = $(self.regex_input).textrange('get'),
             indfirst = selection.start,
             indlast = selection.end - 1;
         if (indfirst > indlast) {
