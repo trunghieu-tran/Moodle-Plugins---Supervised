@@ -387,14 +387,16 @@ class block_formal_langs extends block_list {
         $this->content->icons  = array();
 
 
+
         $context  = $this->page->context;
-        $caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
-        $caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
+        $caneditall = has_capability('block/formal_langs:editalllanguages', $context);
+        $caneditown = has_capability('block/formal_langs:editownlanguages', $context);
         $contexts = $context->get_parent_context_ids(true);
         array_unshift($contexts, $context->id);
 
-        // Do not add anything, if we cannot edit
-        if (!has_capability('moodle/course:manageactivities', $context)) {
+
+        // If cannot view language list don't do anything
+        if (!has_capability('block/formal_langs:viewlanguagelist', $context)) {
             return null;
         }
 
@@ -405,14 +407,14 @@ class block_formal_langs extends block_list {
             $DB->delete_records('block_formal_langs_perms', array('languageid' => $langid));
         }
         if ($action == 'flanguagevisibility') {
-            $langid = required_param('languageid', PARAM_INT);
+            $langid  = required_param('languageid', PARAM_INT);
             $visible = required_param('visible', PARAM_INT);
             block_formal_langs::update_language_visibility($langid, $visible, $context->id);
         }
 
         $permissions = block_formal_langs::build_visibility_for_all_languages($contexts);
 
-        if ($this->page->user_is_editing()) {
+        if ($this->page->user_is_editing() && has_capability('block/formal_langs:addlanguage', $context)) {
             $link = $CFG->wwwroot . '/blocks/formal_langs/edit.php?new=1&context=' . $context->id;
             $icon =  html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/add')));
             $icona = html_writer::tag('a', $icon, array('href' => $link, 'title' => get_string('addnewlanguage', 'block_formal_langs')));
@@ -438,7 +440,11 @@ class block_formal_langs extends block_list {
                 'data-id' => $permission->id,
                 'data-visible' => $permission->visible
             );
-            $visibleicon = html_writer::tag('a', html_writer::empty_tag('img', $viconattr), $viconhref);
+            if (has_capability('block/formal_langs:changelanguagevisibility', $context)) {
+                $visibleicon = html_writer::tag('a', html_writer::empty_tag('img', $viconattr), $viconhref);
+            } else {
+                $visibleicon = '';
+            }
 
             $editlinks = '';
             $caneditlang = $this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0;
