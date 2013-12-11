@@ -37,6 +37,7 @@ $string['editingnewlanguage'] = 'Добавление нового языка';
 $string['editpermissionslink'] = 'Редактировать права в текущем контексте';
 $string['editpermissionspagename'] = 'Редактировать права';
 $string['extraseparatormsg'] = '{$a->correct[0]} возможно содержит лишний разделитель';
+$string['formallangsglobalsettings'] = 'Глобальные настройки модуля формальных языков';
 $string['formal_langs:addinstance'] = 'Может добавить новый блок формальных языков в текущий модуль';
 $string['formal_langs:addlanguage'] = 'Может добавлять новые формальные языки';
 $string['formal_langs:changelanguagevisibility'] = 'Может менять видимость языков в рамках курса';
