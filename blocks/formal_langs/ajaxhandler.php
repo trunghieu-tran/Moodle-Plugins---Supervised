@@ -37,8 +37,9 @@ if ($context !== false) {
     $action  = optional_param('action', '', PARAM_RAW);
     $langid = required_param('languageid', PARAM_INT);
     $lang = $DB->get_record('block_formal_langs', array('id' => $langid));
-    $caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
-    $caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
+    $caneditall = has_capability('block/formal_langs:editalllanguages', $context);
+    $caneditown = has_capability('block/formal_langs:editownlanguages', $context);
+    $canchagevisibility = has_capability('block/formal_langs:changelanguagevisibility', $context);
     if ($action == 'removeformallanguage' && $lang !== false) {
         if ($caneditall || ($caneditown && $lang->author == $USER->id)) {
             $DB->delete_records('block_formal_langs', array('id' => $langid));
@@ -48,7 +49,9 @@ if ($context !== false) {
     if ($action == 'flanguagevisibility' && $lang !== false) {
         $visible = required_param('visible', PARAM_INT);
         $context = required_param('context', PARAM_INT);
-        block_formal_langs::update_language_visibility($langid, $visible, $context);
+        if ($canchagevisibility) {
+            block_formal_langs::update_language_visibility($langid, $visible, $context);
+        }
     }
 
 }

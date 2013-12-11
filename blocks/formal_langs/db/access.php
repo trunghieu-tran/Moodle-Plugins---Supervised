@@ -38,7 +38,7 @@ $capabilities = array(
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
-    'block/formal_langs:edit_own_languages' => array(
+    'block/formal_langs:editownlanguages' => array(
         'riskbitmask' => RISK_SPAM | RISK_DATALOSS,
 
         'captype' => 'write',
@@ -50,7 +50,7 @@ $capabilities = array(
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
-    'block/formal_langs:edit_all_languages' => array(
+    'block/formal_langs:editalllanguages' => array(
         'riskbitmask' => RISK_SPAM | RISK_DATALOSS,
 
         'captype' => 'write',
@@ -60,6 +60,43 @@ $capabilities = array(
         ),
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
-    )
+    ),
+    'block/formal_langs:addlanguage' => array(
+        'riskbitmask' => RISK_SPAM,
 
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
+    'block/formal_langs:changelanguagevisibility' => array(
+        'riskbitmask' =>  RISK_DATALOSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
+    'block/formal_langs:viewlanguagelist' => array(
+        'riskbitmask' => RISK_DATALOSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
 );
