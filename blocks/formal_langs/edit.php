@@ -82,14 +82,19 @@ if ($contextid > 0) {
 if (!has_capability('moodle/course:manageactivities', $context) && !has_capability('moodle/course:managequestion', $context)) {
     throw new required_capability_exception($context, 'moodle/course:manageactivities', 'nopermissions', '');
 }
+
+if ($isnew && !has_capability('moodle/course:addlanguage', $context)) {
+    throw new required_capability_exception($context, 'moodle/course:addlanguage', 'nopermissions', '');
+}
+
 $PAGE->set_pagelayout('admin');
 
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 $PAGE->navbar->add($heading);
 
-$caneditall = has_capability('block/formal_langs:edit_all_languages', $context);
-$caneditown = has_capability('block/formal_langs:edit_own_languages', $context);
+$caneditall = has_capability('block/formal_langs:editalllanguages', $context);
+$caneditown = has_capability('block/formal_langs:editownlanguages', $context);
 $cannoteditanything =  !$caneditall && !$caneditown;
 
 if ($cannoteditanything) {
