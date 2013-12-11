@@ -82,7 +82,7 @@ $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson t
 $string['cannotdeletelessontype']   = 'You can not delete this lesson type, it\'s used in sessions or quizzes';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lessontype?';
 $string['insertlessontypeerror']    = 'Database error! Can not insert lessontype into database';
-$string['addlessontype']           = '[Add lessontype]';
+$string['addlessontype']            = '[Add lessontype]';
 
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
@@ -109,6 +109,9 @@ $string['teacherhassession']        = 'Teacher has an other session in this peri
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
 $string['plansession']              = '[Plan new session]';
 
+$string['logspagetitle']            = 'Session logs';
+$string['logsview']                 = 'Session logs';
+$string['logsbreadcrumb']           = 'Session logs';
 
 $string['course']       = 'Course';
 $string['group']        = 'Group';
