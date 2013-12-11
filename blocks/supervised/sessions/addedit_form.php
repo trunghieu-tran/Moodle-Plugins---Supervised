@@ -89,6 +89,7 @@ class addedit_session_form extends moodleform {
 
     // Form validation
     function validation($data, $files) {
+        global $PAGE, $USER;
         $errors = array();
 
         // Session must be active at least after 10 minutes from current time.
@@ -107,6 +108,13 @@ class addedit_session_form extends moodleform {
         // Session can not intersect with sessions of this teacher.
         if($this->teacher_session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])){
             $errors["timestart"] = get_string("teacherhassession", "block_supervised");
+        }
+
+        // If current user has only teachermode permission he can create session only for himself.
+        if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
+            if($data["teacherid"] != $USER->id){
+                $errors["teacherid"] = get_string("teachervalidationerror", "block_supervised");
+            }
         }
 
         return $errors;
