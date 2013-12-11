@@ -32,7 +32,7 @@ echo $OUTPUT->heading(get_string("logsview", 'block_supervised'), 3);
 
 
 
-// Prepare form.
+// Prepare session info form.
 $mform = "viewsession_form.php";
 if (file_exists($mform)) {
     require_once($mform);
@@ -54,6 +54,7 @@ $select = "SELECT
         {user}.firstname,
         {user}.lastname,
         {groups}.name                       AS groupname,
+        {groups}.id                         AS groupid,
         {course}.fullname                   AS coursename
 
         FROM {block_supervised_session}
@@ -91,6 +92,30 @@ $mform->display();      // Display view session form.
 
 
 // TODO output select logs form
+/*print_log($session->courseid, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
+    $url="", $modname="", $modid=0, $modaction="", $groupid=0);*/
+
+
+// Prepare logs form.
+$mformlogs = "logs_form.php";
+if (file_exists($mformlogs)) {
+    require_once($mformlogs);
+} else {
+    print_error('noformdesc');
+}
+
+
+if ($fromform = $mform->get_data()) {
+
+} else{
+    $toformlogs['sessionid']    = $sessionid;
+    $toformlogs['courseid']     = $courseid;
+    $mformlogs = new logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid));
+    $mformlogs->set_data($toformlogs);
+    $mformlogs->display();
+}
+
+
 
 
 
