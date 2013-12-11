@@ -83,8 +83,8 @@ if (!has_capability('moodle/course:manageactivities', $context) && !has_capabili
     throw new required_capability_exception($context, 'moodle/course:manageactivities', 'nopermissions', '');
 }
 
-if ($isnew && !has_capability('moodle/course:addlanguage', $context)) {
-    throw new required_capability_exception($context, 'moodle/course:addlanguage', 'nopermissions', '');
+if ($isnew && !has_capability('block/formal_langs:addlanguage', $context)) {
+    throw new required_capability_exception($context, 'block/formal_langs:addlanguage', 'nopermissions', '');
 }
 
 $PAGE->set_pagelayout('admin');
