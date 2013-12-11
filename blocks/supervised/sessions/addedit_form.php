@@ -10,10 +10,19 @@ class addedit_session_form extends moodleform {
         $mform =& $this->_form;
 
         if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:writesessions', 'block/supervised:teachermode'))) {
-            foreach ($cteachers as $cteacher) {
-                $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
+
+            if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
+                // If current user has only teachermode permission he can create session only for himself.
+                $teachers[$USER->id] = $cteachers[$USER->id]->lastname . " " . $cteachers[$USER->id]->firstname;
+            }
+            else{
+                // Just create array with all teachers.
+                foreach ($cteachers as $cteacher) {
+                    $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
+                }
             }
         }
+
 
         // Find all classrooms.
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
@@ -43,12 +52,7 @@ class addedit_session_form extends moodleform {
         // add group
         $mform->addElement('header', 'general', get_string('general', 'form'));
         // add teacher combobox
-        $attributes = '';
-        if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
-            // Disable combobox for teachermode (user can create session only for himself).
-            $attributes = 'disabled="disabled"';
-        }
-        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers, $attributes);
+        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers/*, $attributes*/);
         $mform->addRule('teacherid', null, 'required', null, 'client');
         // add send e-mail checkbox
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));

@@ -20,7 +20,7 @@ if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) 
     print_error(get_string("invalidsessionid", 'block_supervised'));
 }
 // Check permissions.
-if ($session->teqcherid == $USER->id) {
+if ($session->teacherid == $USER->id) {
     require_capability('block/supervised:teachermode', $PAGE->context);
 }
 else{
