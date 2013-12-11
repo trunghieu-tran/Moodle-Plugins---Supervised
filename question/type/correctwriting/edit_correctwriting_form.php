@@ -467,7 +467,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $max = max($max, textlib::strlen($line));
             }
         }
-        if ($max == 0) {
+        if ($max < 80) {
             $max = 80;
         }
         return $max;
