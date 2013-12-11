@@ -1,11 +1,16 @@
 <?php
 require_once('../../../config.php');
 require_once('../lib.php');
+require_once('logslib.php');
 
 global $DB, $OUTPUT, $PAGE;
 
-$courseid   = required_param('courseid',  PARAM_INT);
-$sessionid  = required_param('sessionid', PARAM_INT);
+$courseid    = required_param('courseid',  PARAM_INT);
+$sessionid   = required_param('sessionid', PARAM_INT);
+$page        = optional_param('page', '0', PARAM_INT);     // which page to show
+$perpage     = optional_param('perpage', '3', PARAM_INT); // how many per page
+$userid      = optional_param('userid', '0', PARAM_INT); // current user id
+
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -91,12 +96,8 @@ $mform->display();      // Display view session form.
 
 
 
-// TODO output select logs form
-/*print_log($session->courseid, $user=0, $date=0, $order="l.time ASC", $page=0, $perpage=100,
-    $url="", $modname="", $modid=0, $modaction="", $groupid=0);*/
 
-
-// Prepare logs form.
+// Prepare filter logs form.
 $mformlogs = "logs_form.php";
 if (file_exists($mformlogs)) {
     require_once($mformlogs);
@@ -104,19 +105,19 @@ if (file_exists($mformlogs)) {
     print_error('noformdesc');
 }
 
+$mformlogs = new logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid));
+$toformlogs['sessionid']    = $sessionid;
+$toformlogs['courseid']     = $courseid;
+$toformlogs['userid']       = $userid;
+$mformlogs->set_data($toformlogs);
+$mformlogs->display();
 
-if ($fromform = $mform->get_data()) {
-
-} else{
-    $toformlogs['sessionid']    = $sessionid;
-    $toformlogs['courseid']     = $courseid;
-    $mformlogs = new logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid));
-    $mformlogs->set_data($toformlogs);
-    $mformlogs->display();
+if ($fromform = $mformlogs->get_data()) {
+    $userid = $fromform->userid;
 }
 
-
-
+// Print logs.
+supervisedblock_print_logs($sessionid, $session->timestart, $session->timeend, $userid, $page, $perpage, "view.php?courseid=$courseid&amp;sessionid=$sessionid&amp;userid=$userid");
 
 
 // Display footer.

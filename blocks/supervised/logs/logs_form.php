@@ -41,8 +41,7 @@ class logs_form extends moodleform {
         // hidden elements
         $mform->addElement('hidden', 'sessionid');
         $mform->addElement('hidden', 'courseid');
-        
-        //$this->add_action_buttons();
+
         $mform->addElement('submit', 'submitbutton', get_string('showlogsbutton', "block_supervised"));
     }
 }
