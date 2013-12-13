@@ -40,22 +40,31 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         $shortanswerfeedback = parent::specific_feedback($qa);
         $myfeedback = '';
         $analyzer = $question->matchedanalyzer;
+        $br = html_writer::empty_tag('br');
         if ($analyzer!=null) {
             //Output mistakes messages
             if (count($analyzer->mistakes()) > 0) {
                 $mistakemesgs = array();
-                if (count($analyzer->mistakes()) == 1) {
-                    $mistakemesgs[] = get_string('foundmistake', 'qtype_correctwriting');
+                $mistakescnt = count($analyzer->mistakes());
+                if ($mistakescnt == 1) {
+                    $myfeedback = get_string('foundmistake', 'qtype_correctwriting');
                 } else {
-                    $mistakemesgs[] = get_string('foundmistakes', 'qtype_correctwriting');
+                    $myfeedback = get_string('foundmistakes', 'qtype_correctwriting');
                 }
+                $myfeedback .= $br;
                 $i = 1;
                 foreach($analyzer->mistakes() as $mistake) {
-                   $mistakemesgs[] = $i.') '.$mistake->get_mistake_message();
+                    $msg = $i.') '.$mistake->get_mistake_message();
+                    if ($i < $mistakescnt) {
+                        $msg .= ';';
+                    } else {
+                        $msg .= '.';
+                    }
+                   $myfeedback .= $msg; 
+                   //TODO - insert render hint button code there when found a way to access $options...
+                   $myfeedback .= $br;
                    $i++;
                 }
-                $br = html_writer::empty_tag('br');
-                $myfeedback  = implode(';' . $br, $mistakemesgs) . '.' . $br;
             }
         }
         return $myfeedback . $shortanswerfeedback;
