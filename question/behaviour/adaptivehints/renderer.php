@@ -46,46 +46,60 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     continue;
                 }
 
-                //Render button.
-                $attributes = array(
-                    'type' => 'submit',
-                    'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                    'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                    'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
-                    'class' => 'submit btn',
-                );
-                if ($options->readonly) {
-                    $attributes['disabled'] = 'disabled';
-                }
-                $output .= html_writer::empty_tag('input', $attributes);
-
-                //Cost message
-                if ($hintobj->penalty_response_based()) {//if penalty is response-based
-                    //try to get last response
-                    $response = $qa->get_last_qt_data();
-                    if (empty($response)) {
-                        $response = null;
-                    }
-                    $penalty = $hintobj->penalty_for_specific_hint($response);
-                    if ($penalty != 0) {
-                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Note that reported penalty is approximation since user could change response in adaptive.
-                    }
-                } else {
-                    $penalty = $hintobj->penalty_for_specific_hint(null);
-                    if ($penalty != 0) {
-                        $output .= $this->button_cost('withpenalty', $penalty, $options);
-                    }
-                }
+                $output .= $this->render_hint_button($qa, $options, $hintobj);
                 $output .= html_writer::empty_tag('br');
 
-                if (!$options->readonly) {
-                    $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
-                        array($attributes['id'], $qa->get_slot()));
-                }
             }
         }
 
         return $output;
+    }
+
+    /**
+     * Renders hint button. Could be used by behaviour or question renderer to avoid code duplication while rendering it.
+     * @param hintobj object an object of a child of qtype_specific_hint class
+     */
+    public function render_hint_button(question_attempt $qa, question_display_options $options, $hintobj) {
+        $question = $qa->get_question();
+        $hintkey = $hintobj->hint_key();
+
+        //Render button.
+        $attributes = array(
+            'type' => 'submit',
+            'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
+            'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
+            'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintobj->hint_description()),
+            'class' => 'submit btn',
+        );
+        if ($options->readonly) {
+            $attributes['disabled'] = 'disabled';
+        }
+        $output = html_writer::empty_tag('input', $attributes);
+
+        //Cost message
+        if ($hintobj->penalty_response_based()) {//if penalty is response-based
+            //try to get last response
+            $response = $qa->get_last_qt_data();
+            if (empty($response)) {
+                $response = null;
+            }
+            $penalty = $hintobj->penalty_for_specific_hint($response);
+            if ($penalty != 0) {
+                $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Note that reported penalty is approximation since user could change response in adaptive.
+            }
+        } else {
+            $penalty = $hintobj->penalty_for_specific_hint(null);
+            if ($penalty != 0) {
+                $output .= $this->button_cost('withpenalty', $penalty, $options);
+            }
+        }
+
+        if (!$options->readonly) {
+            $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
+                array($attributes['id'], $qa->get_slot()));
+         }
+
+         return $output;
     }
 
     //Overload penalty_info to show actual penalty

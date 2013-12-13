@@ -82,6 +82,9 @@ abstract class qtype_specific_hint {
     /** @var object Question object, created this hint*/
     protected $question;
 
+    /** @var string Hint key for this hint, useful for choosen miltiple instance hints*/
+    protected $hintkey;
+
     /**
      * Returns one of hint type constants (single instance etc).
      */
@@ -90,9 +93,22 @@ abstract class qtype_specific_hint {
     /**
      * Constructs hint object, remember question to use.
      */
-    public function __construct($question) {
+    public function __construct($question, $hintkey) {
         $this->question = $question;
+        $this->hintkey = $hintkey;
     }
+
+    /**
+     * Returns hint key, passed to the constructor.
+     */
+    public function hint_key() {
+        return $this->hintkey;
+    }
+
+    /**
+     * Returns hint description to show on the hint button etc.
+     */
+    abstract public function hint_description();
 
     /**
      * Is hint based on response or not?

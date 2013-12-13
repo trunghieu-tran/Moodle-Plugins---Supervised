@@ -472,7 +472,7 @@ class qtype_preg_question extends question_graded_automatically
      */
     public function hint_object($hintkey, $response = null) {
         $hintclass = 'qtype_preg_'.$hintkey;
-        return new $hintclass($this);
+        return new $hintclass($this, $hintkey);
     }
 
 }
