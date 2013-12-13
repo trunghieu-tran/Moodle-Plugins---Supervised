@@ -19,6 +19,10 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
     public $correctedresponse;
     // An array of fixed lexemes indexes
     public $correctedresponseindex;
+
+        public function mistake_key() {
+        return '';//TODO - implement actually
+    }
 }
 
 
