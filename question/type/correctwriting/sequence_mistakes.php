@@ -13,7 +13,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 
 // A marker class to indicate errors from sequence_analyzer
-class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
+abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
 
 }
 
@@ -24,6 +24,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
      * @var block_formal_langs_processed_string processed string of answer
      */
     protected $answerstring;
+
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
@@ -49,6 +50,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
         $this->responsemistaken = array();
         $this->responsemistaken[] = $responseindex;
     }
+
     /** Performs a mistake message creation if needed
      */
     public function get_mistake_message() {
@@ -71,6 +73,13 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
             }
         }
         return parent::get_mistake_message();
+    }
+
+    /**
+     * Returns a key, uniquely identifying mistake
+     */
+    public function mistake_key() {
+        return 'movedtoken_'.$this->answermistaken[0].'_'.$this->responsemistaken[0];
     }
 }
 
@@ -119,6 +128,10 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
             $this->mistakemsg = get_string('addedmistakemessage_notexist','qtype_correctwriting',$a);
         }
     }
+
+        public function mistake_key() {
+        return 'addedtoken_'.$this->responsemistaken[0];
+    }
 }
 
 // A mistake, that consists of  skipping a lexeme from answer
@@ -127,6 +140,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
      * @var block_formal_langs_processed_string processed string of answer
      */
     protected $answerstring;
+
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
@@ -171,6 +185,10 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
             }
         }
         return parent::get_mistake_message();
+    }
+
+    public function mistake_key() {
+        return 'absenttoken_'.$this->answermistaken[0];
     }
 }
 
