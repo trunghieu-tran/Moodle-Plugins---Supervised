@@ -64,6 +64,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result[] = 'hintgradeborder';
         // Maximum fraction of mistakes to length of teacher answer in lexemes
         $result[] = 'maxmistakepercentage';
+        //Penalty for "what is" hint.
+        $result[] = 'whatishintpenalty';
         return $result;
     }
     /** Returns a name of foreign key columns for question type

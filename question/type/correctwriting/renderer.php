@@ -35,16 +35,36 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
 
-    public function specific_feedback(question_attempt $qa) {
+    /**
+     * Overloading feedback method to pass options to specific_feedback
+     */
+    public function feedback(question_attempt $qa, question_display_options $options) {
+        $output = '';
+        if ($options->feedback) {
+            $output .= $this->specific_feedback_with_options($qa, $options);
+        }
+
+        $output .= parent::feedback($qa, $options);
+
+        return $output;
+    }
+
+    protected function specific_feedback_with_options(question_attempt $qa, question_display_options $options) {
+        global $PAGE;
         $question = $qa->get_question();
         $shortanswerfeedback = parent::specific_feedback($qa);
         $myfeedback = '';
         $analyzer = $question->matchedanalyzer;
         $br = html_writer::empty_tag('br');
+
+        $currentanswer = $qa->get_last_qt_var('answer');
+        if(!$currentanswer) {
+            $currentanswer = '';
+        }
+        $hints = $question->available_specific_hints(array('answer' => $currentanswer));
         if ($analyzer!=null) {
             //Output mistakes messages
             if (count($analyzer->mistakes()) > 0) {
-                $mistakemesgs = array();
                 $mistakescnt = count($analyzer->mistakes());
                 if ($mistakescnt == 1) {
                     $myfeedback = get_string('foundmistake', 'qtype_correctwriting');
@@ -52,18 +72,34 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     $myfeedback = get_string('foundmistakes', 'qtype_correctwriting');
                 }
                 $myfeedback .= $br;
+
                 $i = 1;
+                $behaviour = $qa->get_behaviour();
+                $behaviourrenderer =$behaviour->get_renderer($PAGE);
                 foreach($analyzer->mistakes() as $mistake) {
+                    //Render mistake message.
                     $msg = $i.') '.$mistake->get_mistake_message();
                     if ($i < $mistakescnt) {
                         $msg .= ';';
                     } else {
                         $msg .= '.';
                     }
-                   $myfeedback .= $msg; 
-                   //TODO - insert render hint button code there when found a way to access $options...
-                   $myfeedback .= $br;
-                   $i++;
+                    //Render "what is" hint button or hint.
+                    $hintkey = 'hintwhatis_' . $mistake->mistake_key();
+                    if (array_key_exists($hintkey, $hints)) {//There is "what is" hint for that mistake.
+                        $hintobj = $question->hint_object($hintkey, array('answer' => $currentanswer));
+
+                        if (is_object($hintobj)) {//There could be no hint object if response was changed in adaptive behaviour.
+                            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
+                                $msg .= $br . $hintobj->render_hint($this, array('answer' => $currentanswer));
+                            } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
+                                $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
+                            }
+                        }
+                    }
+                    $myfeedback .= $msg;
+                    $myfeedback .= $br;
+                    $i++;
                 }
             }
         }
