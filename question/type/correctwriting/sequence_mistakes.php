@@ -20,10 +20,6 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
 
 // A mistake, that consists from moving one lexeme to different position, than original
 class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_sequence_mistake {
-    /**
-     * @var block_formal_langs_processed_string processed string of answer
-     */
-    protected $answerstring;
 
     /**
      * Constructs a new error, filling it with constant message
@@ -58,8 +54,8 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
             //Create a mistake message
             $a = new stdClass();
             $answerindex = $this->answermistaken[0];
-            if ($this->answerstring->has_description($answerindex)) {
-                $a->description = $this->answerstring->node_description($answerindex);
+            $a->description = $this->token_description($answerindex);
+            if ($a->description !== null) {
                 $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
             } else {
                 $data = $this->answer[$answerindex]->value();
@@ -79,7 +75,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
      * Returns a key, uniquely identifying mistake
      */
     public function mistake_key() {
-        return 'movedtoken_'.$this->answermistaken[0].'_'.$this->responsemistaken[0];
+        return 'moved_'.$this->answermistaken[0].'_'.$this->responsemistaken[0];//'movedtoken_' is better, but too long for question_attempt_step_data name column (32)
     }
 }
 
@@ -103,6 +99,8 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         $this->answermistaken = array();
         //Fill response data
         $this->responsemistaken = array($responseindex);
+
+        $this->answerstring = null;
 
         //Find, if such token exists in answer (to call it extraneous) or not (to write that it should not be there)
         $exists = false;
@@ -130,16 +128,12 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
     }
 
         public function mistake_key() {
-        return 'addedtoken_'.$this->responsemistaken[0];
+        return 'added_'.$this->responsemistaken[0];//'addedtoken_' is better, but too long for question_attempt_step_data name column (32)
     }
 }
 
 // A mistake, that consists of  skipping a lexeme from answer
 class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_sequence_mistake {
-    /**
-     * @var block_formal_langs_processed_string processed string of answer
-     */
-    protected $answerstring;
 
     /**
      * Constructs a new error, filling it with constant message
@@ -172,8 +166,8 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
             //Create a mistake message
             $a = new stdClass();
             $answerindex = $this->answermistaken[0];
-            if ($this->answerstring->has_description($answerindex)) {
-                $a->description = $this->answerstring->node_description($answerindex);
+            $a->description = $this->token_description($answerindex);
+            if ($a->description !== null) {
                 $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
             } else {
                 $data = $this->answer[$answerindex]->value();
@@ -188,7 +182,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
     }
 
     public function mistake_key() {
-        return 'absenttoken_'.$this->answermistaken[0];
+        return 'absent_'.$this->answermistaken[0];//'absenttoken_' is better, but too long for question_attempt_step_data name column (32)
     }
 }
 

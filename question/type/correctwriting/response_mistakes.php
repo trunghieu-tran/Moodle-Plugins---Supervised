@@ -36,6 +36,22 @@ abstract class  qtype_correctwriting_response_mistake {
     //Weight of mistake used in mark computation
     public $weight;
 
+    /**
+     * @var block_formal_langs_processed_string processed string of answer
+     */
+    protected $answerstring;
+
+    /**
+     * @param int $answerindex   index of answer token to look for description
+     */
+    public function token_description($answerindex) {
+        $descript = null;
+        if ( is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {
+            $descript = $this->answerstring->node_description($answerindex);
+        }
+        return $descript;
+    }
+
     /** Returns a message for mistakes. Used for lazy message initiallization.
         @return string mistake message
      */

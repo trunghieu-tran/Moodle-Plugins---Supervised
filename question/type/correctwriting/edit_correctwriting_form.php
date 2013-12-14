@@ -97,6 +97,14 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('maxmistakepercentage', PARAM_FLOAT);
         $mform->setDefault('maxmistakepercentage', 0.7);
         $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
+        //Add "what is" hint penalty
+        $mform->addElement('text', 'whatishintpenalty',
+                           get_string('whatishintpenalty', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('whatishintpenalty', PARAM_FLOAT);
+        $mform->setDefault('whatishintpenalty', 1.1);
+        $mform->addRule('whatishintpenalty', null, 'required', null, 'client');
+        $mform->addHelpButton('whatishintpenalty', 'whatishintpenalty', 'qtype_correctwriting');
 
         $mform->setAdvanced('lexicalerrorthreshold');
         $mform->setAdvanced('lexicalerrorweight');

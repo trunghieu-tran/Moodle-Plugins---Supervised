@@ -27,7 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/lexical_analyzer.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/cw_hints.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 
 /**
  * Represents a correctwriting question.
@@ -35,7 +37,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_question extends question_graded_automatically  {
+class qtype_correctwriting_question extends question_graded_automatically
+        implements question_automatically_gradable, question_with_qtype_specific_hints {
     //Fields defining a question
     /** Whether answers should be graded case-sensitively.
      *  @var boolean
@@ -90,6 +93,12 @@ class qtype_correctwriting_question extends question_graded_automatically  {
      *  @var float
      */
     public $maxmistakepercentage = 0.7;
+
+
+    /** Penalty for "what is" hint. Penalties more than 1 will disable hint.
+     *  @var float
+     */
+    public $whatishintpenalty = 1.1;
 
     /** Whether cache is valid
      *  @var boolean
@@ -190,6 +199,10 @@ class qtype_correctwriting_question extends question_graded_automatically  {
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function get_best_fit_answer(array $response) {
+
+        if (!array_key_exists('answer', $response)) {
+            $response = array('answer' => '');
+        }
         // Check, for cache, and make it lowercase to prevent some odd executions
         if (is_a($response['answer'],'qtype_poasquestion_string') == false) {
             $response['answer'] = new qtype_poasquestion_string($response['answer']);
@@ -468,5 +481,76 @@ class qtype_correctwriting_question extends question_graded_automatically  {
 
        return  base64_encode(implode(';;;',$resultsections));
    }
+
+    //////////Specific hints implementation part
+
+    //We need adaptive (TODO interactive) behaviour to use hints
+     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
+        global $CFG;
+
+        if ($preferredbehaviour == 'adaptive' && file_exists($CFG->dirroot.'/question/behaviour/adaptivehints/')) {
+             question_engine::load_behaviour_class('adaptivehints');
+             return new qbehaviour_adaptivehints($qa, $preferredbehaviour);
+        }
+
+        if ($preferredbehaviour == 'adaptivenopenalty' && file_exists($CFG->dirroot.'/question/behaviour/adaptivehintsnopenalties/')) {
+             question_engine::load_behaviour_class('adaptivehintsnopenalties');
+             return new qbehaviour_adaptivehintsnopenalties($qa, $preferredbehaviour);
+        }
+
+        return parent::make_behaviour($qa, $preferredbehaviour);
+     }
+
+    /**
+    * Returns an array of available specific hint types
+    */
+    public function available_specific_hints($response = null) {
+        $hints = array();
+        if ($response !== null) {
+            $this->get_best_fit_answer($response);//Be sure to have correct cached values.
+            if (is_object($this->matchedanalyzer)) {
+                $mistakes = $this->matchedanalyzer->mistakes();
+                foreach ($mistakes as $mistake) {
+                    if (is_a($mistake, 'qtype_correctwriting_lexeme_moved_mistake') || is_a($mistake, 'qtype_correctwriting_lexeme_absent_mistake')) {
+                        //Missing or misplaced tokens have similar hints.
+                        $tokendescr = $mistake->token_description($mistake->answermistaken[0]);
+                        if ($tokendescr !== null) {//No need to show "what is" hint if there was no token description.
+                            $key = 'hintwhatis_' . $mistake->mistake_key();
+                            $hints[$key] = get_string('whatis', 'qtype_correctwriting', $tokendescr);
+                        }
+                    }
+                }
+            }
+        }
+        return $hints;
+    }
+
+    /**
+     * Hint object factory
+     *
+     * Returns a hint object for given type
+     */
+    public function hint_object($hintkey, $response = null) {
+        $classname = substr($hintkey, 0, strpos($hintkey, '_'));//First '_' separates classname from mistake key.
+        $mistakekey = substr($hintkey, strpos($hintkey, '_')+1);
+        $hintclass = 'qtype_correctwriting_'.$classname;
+        if ($response !== null) {
+            $this->get_best_fit_answer($response);//Be sure to have correct cached values.
+            if (is_object($this->matchedanalyzer)) {
+                $mistakes = $this->matchedanalyzer->mistakes();
+                $hintmistake = null;
+                foreach($mistakes as $mistake) {
+                    if ($mistake->mistake_key() == $mistakekey) {
+                        $hintmistake = $mistake;
+                        break;
+                    }
+                }
+
+                return new $hintclass($this, $hintkey, $hintmistake);
+            }
+        }
+        return null;
+    }
+
 }
  ?>
