@@ -480,7 +480,7 @@ class block_formal_langs extends block_list {
         return null;
     }
 
-    protected function formatted_contents($output) {
+    public function formatted_contents($output) {
         global $OUTPUT;
         $result = parent::formatted_contents($output);
         $style = '<style>
