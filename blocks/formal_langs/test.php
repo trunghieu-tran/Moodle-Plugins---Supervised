@@ -255,7 +255,14 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 				'for'              => 'FORKWD',
 				'while'            => 'WHILEKWD',
 				'do'               => 'DOKWD',
-				'return'           => 'RETURNKWD'
+				'return'           => 'RETURNKWD',
+				'friend'           => 'FRIENDKWD',
+				'template'         => 'TEMPLATEKWD',
+				'typename'         => 'TYPENAMEKWD',
+				'class'            => 'CLASSKWD',
+				'struct'           => 'STRUCTKWD',
+				'enum'             => 'ENUMKWD',
+				'union'            => 'UNIONKWD'
 			),			
 			'bracket' =>    array( 
 				'(' => 'LEFTROUNDBRACKET', 
@@ -283,13 +290,29 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 		return $table;
 	}
 	
+	public function is_operator_overload_declaration($token) {
+		$ops = array(
+			'operator+', 'operator-', 'operator*', 'operator/', 'operator\\', 'operator~=', 'operator&', 'operator|',
+			'operator~','operator->','operator+=','operator-=','operator*=','operator/=','operator++','operator--',
+			'operator%','operator%=','operator<<=','operator>>=','operator&=','operator|=','operator!=','operator!',
+			'operator&&=','operator||=','operator=','operator++','operator--','operator<','operator>','operator<=',
+			'operator>=','operator==','operator!=','operator&&','operator||','operator>>','operator<<','operator^','operator^=','operator==',
+			'operator.'
+		);
+		return in_array($token, $ops);
+	}
+	
 	/** Maps token from lexer to parser, returning name of constant to parser
 		@param block_formal_langs_token_base  $token a token name
 	 */
 	public function map($token) {
+		if ($token->type() == 'keyword') {
+			if ($this->is_operator_overload_declaration($token->value())) {
+				return 'OPERATOROVERLOADDECLARATION';
+			}
+		}
 		if ($token->type() == 'identifier') {
 			if ($this->is_type($token->value())) {
-				echo "CUSTOMTYPENAME\n";
 				return 'CUSTOMTYPENAME';
 			}
 		}
@@ -300,7 +323,7 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 
 
 $mapper = new block_formal_langs_lexer_cpp_parser_mapper();
-$result = $mapper->parse('do i--; while(i > 0);');
+$result = $mapper->parse('template<typename _A, typename _B> int operator+(int * b, double f) const { k = k + 1; }');
 
 function print_node($node, $paddingcount)
 {

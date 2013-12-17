@@ -74,6 +74,132 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $result;
 }
 
+stmt_or_defined_macro(R) ::= type(A) possible_function_name(B) formal_args_list_with_or_without_const(C) function_body(D) . {
+	$result = $this->create_node('function', array(A, B, C, D));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= type_with_qualifier(A) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
+	$result = $this->create_node('function', array(A, C, D, E));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= template_def(A) type_with_qualifier(B) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
+	$result = $this->create_node('function', array(A, B, C, D, E));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= template_def(A) type(B) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
+	$result = $this->create_node('function', array(A, B, C, D, E));
+	R = $result;	
+}
+
+template_def(R) ::= TEMPLATEKWD(A) LESSER(B) GREATER(C) . {
+	$result = $this->create_node('template_def', array(A, B, C));
+	R = $result;	
+}
+
+template_def(R) ::= TEMPLATEKWD(A) LESSER(B) template_spec_list(C) GREATER(D) . {
+	$result = $this->create_node('template_def', array(A, B, C, D));
+	R = $result;	
+}
+
+template_spec_list(R) ::= template_spec_list(A) COMMA(B) template_spec(C) . {
+	A->add_child(B);
+	A->add_child(C);
+	R = A;
+}
+
+template_spec_list(R) ::= template_spec(A) . {
+	$result = $this->create_node('template_spec', array(A));
+	R = $result;	
+}
+
+template_spec(R) ::= template_typename(A)  IDENTIFIER(B) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('template_spec', array(A, B));
+	R = $result;	
+}
+
+
+template_typename(R) ::= TYPENAMEKWD(A) . {
+	R = A;
+}
+
+template_typename(R) ::= CLASSKWD(A) . {
+	R = A;
+}
+
+template_typename(R) ::= STRUCTKWD(A) . {
+	R = A;
+}
+
+template_typename(R) ::= ENUMKWD(A) . {
+	R = A;
+}
+
+
+function_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
+	$result = $this->create_node('function_body', array(A, B, C));
+	R = $result;	
+}
+
+function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(C) . {
+	$result = $this->create_node('function_body', array(A, B));
+	R = $result;	
+}
+
+function_body(R) ::= SEMICOLON(A) . {
+	R = A;
+}
+
+
+possible_function_name(R) ::= primitive_or_complex_type(A) . {
+	R = A ;
+}
+
+possible_function_name(R) ::= IDENTIFIER(A) . {
+	R = A ;
+}
+
+possible_function_name(R) ::= OPERATOROVERLOADDECLARATION(A) . {
+	R = A;
+}
+
+formal_args_list_with_or_without_const(R) ::= formal_args_list(A) . {
+	R = A;
+}
+formal_args_list_with_or_without_const(R) ::= formal_args_list(A) CONSTKWD(B) . {
+	$result = $this->create_node('formal_args_with_const', array(A, B));
+	R = $result;	
+}
+
+
+formal_args_list(R) ::= LEFTROUNDBRACKET(A) RIGHTROUNDBRACKET(B) . {
+	$result = $this->create_node('args_list', array(A, B));
+	R = $result;	
+}
+
+formal_args_list(R) ::= LEFTROUNDBRACKET(A) arg_list(B) RIGHTROUNDBRACKET(C) . {
+	$result = $this->create_node('args_list', array(A, B, C));
+	R = $result;	
+}
+
+arg_list(R) ::= arg(A) . {
+	$result = $this->create_node('arg_list', array(A));
+	R = $result;	
+}
+
+arg_list(R) ::= arg_list(A) COMMA(B) arg(C) . {
+	A->add_child(B);
+	A->add_child(C);	
+	R = A;
+}
+
+arg(R) ::= type(A) IDENTIFIER(B) . {
+	$result = $this->create_node('arg', array(A, B));
+	R = $result;	
+}
 
 stmt_or_defined_macro(R) ::=  preprocessor_cond(A) stmt_list(B) PREPROCESSOR_ENDIF(C).  {
 	$result = $this->create_node('preprocessor_ifdef', array(A, B, C));
@@ -386,24 +512,35 @@ varqualifier(R) ::= VOLATILEKWD(A) .  {
 	R = A;
 }
 
+varqualifier(R) ::= FRIENDKWD(A) .  {
+	R = A;
+}
 
-expr_prec_17(R) ::= varqualifier(A) type(B) expr_atom(C) ASSIGN(D) expr_prec_9(E) . {
-	$result = $this->create_node('expr_prec_17', array( A, B, C, D, E ));
+
+
+
+expr_prec_17(R) ::= type_with_qualifier(A) expr_atom(C) ASSIGN(D) expr_prec_9(E) . {
+	$result = $this->create_node('expr_prec_17', array( A,  C, D, E ));
 	R = $result;
 }
 
-expr_prec_17(R) ::= varqualifier(A) type(B) primitive_or_complex_type(C) ASSIGN(D) expr_prec_9(E) . {
-	$result = $this->create_node('expr_prec_17', array( A, B, C, D, E ));
+expr_prec_17(R) ::= type_with_qualifier(A)  primitive_or_complex_type(C) ASSIGN(D) expr_prec_9(E) . {
+	$result = $this->create_node('expr_prec_17', array( A, C, D, E ));
 	R = $result;
 }
 
-expr_prec_17(R) ::= varqualifier(A) type(B) expr_atom(C)  . {
-	$result = $this->create_node('expr_prec_17', array( A, B, C ));
+expr_prec_17(R) ::= type_with_qualifier(A)  expr_atom(C)  . {
+	$result = $this->create_node('expr_prec_17', array( A, C ));
 	R = $result;
 }
 
-expr_prec_17(R) ::= varqualifier(A) type(B) primitive_or_complex_type(C) . {
-	$result = $this->create_node('expr_prec_17', array( A, B, C ));
+expr_prec_17(R) ::= type_with_qualifier(A) primitive_or_complex_type(C) . {
+	$result = $this->create_node('expr_prec_17', array( A, C ));
+	R = $result;
+}
+
+type_with_qualifier(R) ::= varqualifier(A) type(B) . {
+	$result = $this->create_node('type_with_qualifier', array( A, B ));
 	R = $result;
 }
 
