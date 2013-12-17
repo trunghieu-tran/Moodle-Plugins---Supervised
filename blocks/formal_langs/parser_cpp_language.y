@@ -74,6 +74,55 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $result;
 }
 
+stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) SEMICOLON(C) . {
+	$this->mapper->introduce_type(B->value());	
+	$result = $this->create_node('enum', array(A, B, C));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) SEMICOLON(F) . {
+	$this->mapper->introduce_type(B->value());	
+	$result = $this->create_node('enum', array(A, B, C, D, E, F));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= ENUMKWD(A)  LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) SEMICOLON(F) . {
+	$result = $this->create_node('enum', array(A, C, D, E, F));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) IDENTIFIER(F) SEMICOLON(G) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('enum', array(A, B, C, D, E, F, G));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= ENUMKWD(A)  LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) IDENTIFIER(F) SEMICOLON(G) . {
+	$result = $this->create_node('enum', array(A, C, D, E, F, G));
+	R = $result;	
+}
+
+enum_value_list(R) ::= enum_value(A) . {
+	$result = $this->create_node('enum_value_list', array(A));
+	R = $result;	
+}
+
+enum_value_list(R) ::= enum_value_list(A) COMMA(B) enum_value(C) . {
+	A->add_child(B);
+	A->add_child(C);	
+	R = A;	
+}
+
+enum_value(R) ::= IDENTIFIER(A) . {
+	R = A;
+}
+
+enum_value(R) ::= IDENTIFIER(A) ASSIGN(B) expr_atom(C). {
+	$result = $this->create_node('enum_value', array(A, B, C));
+	R = $result;
+}
+
+
 stmt_or_defined_macro(R) ::= type(A) possible_function_name(B) formal_args_list_with_or_without_const(C) function_body(D) . {
 	$result = $this->create_node('function', array(A, B, C, D));
 	R = $result;	
