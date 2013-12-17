@@ -325,7 +325,7 @@ INC = "#include"
 <YYINITIAL> (switch|typedef)                           { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (signals|slots|public|private|protected)   { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (auto|lambda|class|try|catch)              { return $this->create_token('keyword',$this->yytext()); }
-<YYINITIAL> (friend|asm|template|typename)             { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (friend|asm|template|typename|namespace)   { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (const_cast|dynamic_cast|reinterpret_cast) { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (static_cast|foreach)                      { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> operator("+"|"-"|"*"|"/"|\\|"~=")          { return $this->create_token('keyword',$this->yytext()); }
