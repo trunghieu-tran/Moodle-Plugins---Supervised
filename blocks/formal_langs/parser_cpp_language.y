@@ -74,6 +74,20 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $result;
 }
 
+stmt(R) ::= NAMESPACEKWD(A) IDENTIFIER(B) namespace_body(C) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('namespace', array(A, B, C));
+	R = $result;
+}
+
+namespace_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+	R = $this->create_node('namespace_body', array( A, B ));
+}
+
+namespace_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
+	R = $this->create_node('namespace_body', array( A, B, C ));
+}
+
 stmt(R) ::= class_or_union_or_struct(A) . {
 	R = A;
 }
