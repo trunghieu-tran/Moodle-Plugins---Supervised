@@ -277,6 +277,43 @@ stmt_or_defined_macro(R) ::= template_def(A) type(B) possible_function_name(C) f
 	R = $result;	
 }
 
+/*  ==== Constructor definition === */
+stmt_or_defined_macro(R) ::= template_def(A) non_const_type(B) LEFTROUNDBRACKET(C) RIGHTROUNDBRACKET(D) function_body(E) . {
+	$result = $this->create_node('function', array(A, B, C, D));
+	R = $result;	
+}
+
+/* Somehow putting type here allows more than we need, but also solves conflicts */
+stmt_or_defined_macro(R) ::= type(A) LEFTROUNDBRACKET(B) RIGHTROUNDBRACKET(C) function_body(D) . {
+	$result = $this->create_node('function', array(A, B, C, D));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= template_def(A) BINARYNOT(B) CUSTOMTYPENAME(C) LEFTROUNDBRACKET(D) RIGHTROUNDBRACKET(E) function_body(F) . {
+	$result = $this->create_node('function', array(A, B, C, D, E, F));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= template_def(A) primitive_or_complex_type(B) NAMESPACE_RESOLVE(C) BINARYNOT(D) CUSTOMTYPENAME(E) LEFTROUNDBRACKET(F) RIGHTROUNDBRACKET(G) function_body(H) . {
+	$result = $this->create_node('function', array(A, B, C, D, E, F));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= BINARYNOT(B) CUSTOMTYPENAME(C) LEFTROUNDBRACKET(D) RIGHTROUNDBRACKET(E) function_body(F) . {
+	$result = $this->create_node('function', array(B, C, D, E, F));
+	R = $result;	
+}
+
+stmt_or_defined_macro(R) ::= primitive_or_complex_type(B) NAMESPACE_RESOLVE(C) BINARYNOT(D) CUSTOMTYPENAME(E) LEFTROUNDBRACKET(F) RIGHTROUNDBRACKET(G) function_body(H) . {
+	$result = $this->create_node('function', array(B, C, D, E, F));
+	R = $result;	
+}
+
+
+/* Due to imperfect resolution of names, we allow such constructions to make constructors and destructors compilable. 
+   That is weird but it doesn't give us any kind of errors 
+ */
+
 template_def(R) ::= TEMPLATEKWD(A) LESSER(B) GREATER(C) . {
 	$result = $this->create_node('template_def', array(A, B, C));
 	R = $result;	
@@ -327,7 +364,7 @@ function_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
 	R = $result;	
 }
 
-function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(C) . {
+function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(B) . {
 	$result = $this->create_node('function_body', array(A, B));
 	R = $result;	
 }
@@ -669,7 +706,7 @@ expr_prec_17(R) ::= type(A) primitive_or_complex_type(B) ASSIGN(C) expr_prec_9(D
 	R = $result;
 }
 
-expr_prec_17(R) ::= type(A) expr_atom(B) . {
+expr_prec_17(R) ::= type(A) IDENTIFIER(B) . {
 	$result = $this->create_node('expr_prec_17', array( A, B ));
 	R = $result;
 }
@@ -702,7 +739,7 @@ varqualifier(R) ::= FRIENDKWD(A) .  {
 
 
 
-expr_prec_17(R) ::= type_with_qualifier(A) expr_atom(C) ASSIGN(D) expr_prec_9(E) . {
+expr_prec_17(R) ::= type_with_qualifier(A) IDENTIFIER(C) ASSIGN(D) expr_prec_9(E) . {
 	$result = $this->create_node('expr_prec_17', array( A,  C, D, E ));
 	R = $result;
 }
@@ -712,7 +749,7 @@ expr_prec_17(R) ::= type_with_qualifier(A)  primitive_or_complex_type(C) ASSIGN(
 	R = $result;
 }
 
-expr_prec_17(R) ::= type_with_qualifier(A)  expr_atom(C)  . {
+expr_prec_17(R) ::= type_with_qualifier(A)  IDENTIFIER(C)  . {
 	$result = $this->create_node('expr_prec_17', array( A, C ));
 	R = $result;
 }
@@ -1143,31 +1180,47 @@ primitive_or_complex_type(R) ::= CUSTOMTYPENAME(A) LESSER(B) type_list(C) GREATE
 
 
 primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) IDENTIFIER(C)  . {
-	A->add_child(B);
-	A->add_child(C);
-	R = A;
+	$r  = A;
+	if (!is_array($r->childs())) {
+		$r = $this->create_node('primitive_or_complex_type', array( A ));
+	}
+	$r->add_child(B);
+	$r->add_child(C);
+	R = $r;
 }
 primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C)  . {
-	A->add_child(B);
-	A->add_child(C);
-	R = A;
+	$r  = A;
+	if (!is_array($r->childs())) {
+		$r = $this->create_node('primitive_or_complex_type', array( A ));
+	}
+	$r->add_child(B);
+	$r->add_child(C);
+	R = $r;
 }
 
 primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C) LESSER(D) GREATER(E) . {
-	A->add_child(B);
-	A->add_child(C);
-	A->add_child(D);
-	A->add_child(E);
-	R = A;
+	$r  = A;
+	if (!is_array($r->childs())) {
+		$r = $this->create_node('primitive_or_complex_type', array( A ));
+	}
+	$r->add_child(B);
+	$r->add_child(C);
+	$r->add_child(D);
+	$r->add_child(E);	
+	R = $r;
 }
 
 primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C) LESSER(D) type_list(E) GREATER(F) . {
-	A->add_child(B);
-	A->add_child(C);
-	A->add_child(D);
-	A->add_child(E);
-	A->add_child(F);
-	
+	$r  = A;
+	if (!is_array($r->childs())) {
+		$r = $this->create_node('primitive_or_complex_type', array( A ));
+	}
+	$r->add_child(B);
+	$r->add_child(C);
+	$r->add_child(D);
+	$r->add_child(E);	
+	$r->add_child(F);	
+
 	R = A;
 }
 

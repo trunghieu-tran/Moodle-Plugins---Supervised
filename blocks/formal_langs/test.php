@@ -329,7 +329,7 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 
 
 $mapper = new block_formal_langs_lexer_cpp_parser_mapper();
-$result = $mapper->parse('namespace sad { namespace input { } }');
+$result = $mapper->parse('struct A {}; A::~A() {}');
 
 function print_node($node, $paddingcount)
 {
