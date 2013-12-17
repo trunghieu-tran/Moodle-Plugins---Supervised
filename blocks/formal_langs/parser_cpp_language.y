@@ -74,31 +74,151 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $result;
 }
 
+stmt(R) ::= class_or_union_or_struct(A) . {
+	R = A;
+}
+
+class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) IDENTIFIER(B) structure_body(C) IDENTIFIER(D) SEMICOLON(E) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('class_or_union_or_struct', array(A, B, C, D, E));
+	R = $result;
+}
+
+class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) IDENTIFIER(B) structure_body(C) SEMICOLON(D) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('class_or_union_or_struct', array(A, B, C, D));
+	R = $result;
+}
+
+class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) IDENTIFIER(B) SEMICOLON(C) . {
+	$this->mapper->introduce_type(B->value());
+	$result = $this->create_node('class_or_union_or_struct', array(A, B, C));
+	R = $result;
+}
+
+class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) structure_body(B) IDENTIFIER(C) SEMICOLON(D) . {
+	$result = $this->create_node('class_or_union_or_struct', array(A, B, C, D));
+	R = $result;
+}
+
+class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) structure_body(B) SEMICOLON(C) . {
+	$result = $this->create_node('class_or_union_or_struct', array(A, B, C));
+	R = $result;
+}
+
+
+type_meta_specifier_with_template_def(R) ::=  template_def(a) type_meta_specifier(B) . {
+	$result = $this->create_node('type_meta_specifier_with_template_def', array(A, B));
+	R = $result;
+}
+
+
+type_meta_specifier_with_template_def(R) ::= type_meta_specifier(A) . {
+	R = A;
+}
+
+type_meta_specifier(R) ::= CLASSKWD(A) . {
+	R = A;
+}
+
+type_meta_specifier(R) ::= STRUCTKWD(A) . {
+	R = A;
+}
+
+type_meta_specifier(R) ::= UNIONKWD(A) . {
+	R = A;
+}
+
+structure_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+	R = $this->create_node('structure_body', array( A, B ));
+}
+
+structure_body(R) ::= LEFTFIGUREBRACKET(A) stmt_or_visibility_spec_list(B) RIGHTFIGUREBRACKET(C) . {
+	R = $this->create_node('structure_body', array( A, B, C ));
+}
+
+stmt_or_visibility_spec_list(R) ::= stmt_or_visibility_spec(A) . {
+	R = $this->create_node('stmt_or_visibility_spec_list', array( A ));
+}
+
+stmt_or_visibility_spec_list(R) ::= stmt_or_visibility_spec_list(A) stmt_or_visibility_spec(B) . {
+	A->add_child(B);
+	R = A;
+}
+
+
+stmt_or_visibility_spec(R) ::= visibility_spec_full(A) . {
+	R  = A;
+}
+
+stmt_or_visibility_spec(R) ::= stmt_or_defined_macro(A) . {
+	R  = A;
+}
+
+visibility_spec_full(R) ::= visibility_spec(A) COLON(B) . {
+	R = $this->create_node('visibility_spec_full', array( A, B ));
+}
+
+visibility_spec_full(R) ::= visibility_spec(A) signal_slots(B) COLON(C). {
+	R = $this->create_node('visibility_spec_full', array( A, B, C ));
+}
+
+visibility_spec(R) ::= PUBLICKWD(A) . {
+	R = A;
+}
+
+visibility_spec(R) ::= PROTECTEDKWD(A) . {
+	R = A;
+}
+
+visibility_spec(R) ::= PRIVATEKWD(A) . {
+	R = A;
+}
+
+signal_slots(R) ::= SIGNALSKWD(A) . {
+	R = A;
+}
+
+signal_slots(R) ::= SLOTSKWD(A) . {
+	R = A;
+}
+
+
 stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) SEMICOLON(C) . {
 	$this->mapper->introduce_type(B->value());	
 	$result = $this->create_node('enum', array(A, B, C));
 	R = $result;	
 }
 
-stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) SEMICOLON(F) . {
+stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B)  enum_body(C) SEMICOLON(D) . {
 	$this->mapper->introduce_type(B->value());	
-	$result = $this->create_node('enum', array(A, B, C, D, E, F));
+	$result = $this->create_node('enum', array(A, B, C, D));
 	R = $result;	
 }
 
-stmt_or_defined_macro(R) ::= ENUMKWD(A)  LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) SEMICOLON(F) . {
-	$result = $this->create_node('enum', array(A, C, D, E, F));
+stmt_or_defined_macro(R) ::= ENUMKWD(A)  enum_body(B) SEMICOLON(C) . {
+	$result = $this->create_node('enum', array(A, B, C));
 	R = $result;	
 }
 
-stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) IDENTIFIER(F) SEMICOLON(G) . {
+stmt_or_defined_macro(R) ::= ENUMKWD(A) IDENTIFIER(B) enum_body(C) IDENTIFIER(D) SEMICOLON(E) . {
 	$this->mapper->introduce_type(B->value());
-	$result = $this->create_node('enum', array(A, B, C, D, E, F, G));
+	$result = $this->create_node('enum', array(A, B, C, D, E));
 	R = $result;	
 }
 
-stmt_or_defined_macro(R) ::= ENUMKWD(A)  LEFTFIGUREBRACKET(C) enum_value_list(D) RIGHTFIGUREBRACKET(E) IDENTIFIER(F) SEMICOLON(G) . {
-	$result = $this->create_node('enum', array(A, C, D, E, F, G));
+stmt_or_defined_macro(R) ::= ENUMKWD(A)  enum_body(B) IDENTIFIER(C) SEMICOLON(D) . {
+	$result = $this->create_node('enum', array(A, B, C, D));
+	R = $result;	
+}
+
+enum_body(R) ::= LEFTFIGUREBRACKET(A) enum_value_list(B) RIGHTFIGUREBRACKET(C) . {
+	$result = $this->create_node('enum_body', array(A, B, C));
+	R = $result;	
+}
+
+enum_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+	$result = $this->create_node('enum_body', array(A, B));
 	R = $result;	
 }
 
@@ -891,6 +1011,11 @@ expr_prec_2(R) ::= expr_prec_2(A)  LEFTSQUAREBRACKET(B) expr_prec_16(C)  RIGHTSQ
 
 expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) expr_prec_17(C)  RIGHTROUNDBRACKET(D) . [UBRACKET] {
 	$result = $this->create_node('expr_prec_2', array( A, B, C, D));
+	R = $result;
+}
+
+expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) RIGHTROUNDBRACKET(D) . [UBRACKET] {
+	$result = $this->create_node('expr_prec_2', array( A, B, D));
 	R = $result;
 }
 

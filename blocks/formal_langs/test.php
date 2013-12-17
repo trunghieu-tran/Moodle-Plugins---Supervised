@@ -262,7 +262,12 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 				'class'            => 'CLASSKWD',
 				'struct'           => 'STRUCTKWD',
 				'enum'             => 'ENUMKWD',
-				'union'            => 'UNIONKWD'
+				'union'            => 'UNIONKWD',
+				'public'           => 'PUBLICKWD',
+				'private'          => 'PRIVATEKWD',
+				'protected'        => 'PROTECTEDKWD',
+				'signals'          => 'SIGNALSKWD',
+				'slots'            => 'SLOTSKWD'  
 			),			
 			'bracket' =>    array( 
 				'(' => 'LEFTROUNDBRACKET', 
@@ -323,7 +328,7 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 
 
 $mapper = new block_formal_langs_lexer_cpp_parser_mapper();
-$result = $mapper->parse('enum Test { A, B = 0 } ;');
+$result = $mapper->parse('struct TestingItem { int a; public: int lol;} ;');
 
 function print_node($node, $paddingcount)
 {
