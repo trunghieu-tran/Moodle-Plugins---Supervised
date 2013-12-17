@@ -20,7 +20,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $lexem2=new block_formal_langs_token_base(null, 'type', 'map', null, 1);
         $lexem3=new block_formal_langs_token_base(null, 'type', 'game', null, 0);
         $array_other=array($lexem1, $lexem2);
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 1, true, $options))==0, 'Threshold is 100. Pairs for correct token "game" are not found');
+        $this->assertTrue(count($lexem3->look_for_matches_bypass($array_other, 1, true, $options))==0, 'Threshold is 100. Pairs for correct token "game" are not found');
     }
         
     public function test_look_for_matches_2() {
@@ -32,7 +32,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $array_other=array($lexem1, $lexem2);
         $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(0), 0);
         $array_correct=array($pair1);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options), $array_correct));//One pair for correct token "family" found
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches_bypass($array_other, 0.6, true, $options), $array_correct));//One pair for correct token "family" found
     }
     
     public function test_look_for_matches_3() {
@@ -46,7 +46,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(0), 0);
         $pair2=new block_formal_langs_matched_tokens_pair(array(2), array(0), 0);
         $array_correct=array($pair1, $pair2);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options), $array_correct));//Two pairs for correct token "family" found
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches_bypass($array_other, 0.6, true, $options), $array_correct));//Two pairs for correct token "family" found
     }
 
     public function test_look_for_matches_4() {
@@ -63,7 +63,7 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $pair1=new block_formal_langs_matched_tokens_pair(array(1), array(1), 0);
         $pair2=new block_formal_langs_matched_tokens_pair(array(3), array(1), 0);
         $array_correct=array($pair1, $pair2);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem6->look_for_matches($array_other, 0.6, true, $options), $array_correct));
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem6->look_for_matches_bypass($array_other, 0.6, true, $options), $array_correct));
         $this->assertTrue(count($lexem7->look_for_matches($array_other, 1, true, $options))==0);
     }
 }

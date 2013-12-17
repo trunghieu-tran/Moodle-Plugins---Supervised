@@ -526,6 +526,18 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         }
         return $possiblepairs;
     }
+    
+    public function look_for_matches_for_bypass($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
+        $possiblepairs = array();
+        for ($k=0; $k < count($other); $k++) {
+            if($other[$k] == $this->value) {
+                $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+                $possiblepairs[] = $pair;
+            }
+        }
+        return $possiblepairs;
+    }
+    
 
     /**
      * Returns a string caseinsensitive semantic value of token
@@ -746,6 +758,16 @@ class block_formal_langs_token_stream {
         return $bestgroups;
     }
 
+    public function look_for_token_pairs_for_bypass($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+        $allpossiblepairs = array();
+        $bestgroups = array();
+        $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
+        if (count($allpossiblepairs)>0) {
+            $bestgroups = $this->group_matches_for_bypass($allpossiblepairs);
+        }
+        return $bestgroups;
+    }
+    
     /**
      * Creates an array of all possible matched pairs using this stream as correct one.
      *
