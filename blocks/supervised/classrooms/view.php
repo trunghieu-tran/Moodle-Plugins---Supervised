@@ -16,7 +16,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-require_capability('block/supervised:readclassrooms', $PAGE->context);
+require_capability('block/supervised:editclassrooms', $PAGE->context);
 
 $PAGE->set_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');

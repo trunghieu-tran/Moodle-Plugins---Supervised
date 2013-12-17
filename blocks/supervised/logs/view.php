@@ -2,6 +2,7 @@
 require_once('../../../config.php');
 require_once('../lib.php');
 require_once('logslib.php');
+require_once('../sessions/sessionstate.php');
 
 global $DB, $OUTPUT, $PAGE;
 
@@ -54,7 +55,6 @@ else{
         }
     }
 }
-
 if ($session->state == StateSession::Planned) {
     print_error(get_string("sessionlogserror", 'block_supervised'));
 }

@@ -95,6 +95,7 @@ foreach ($sessions as $id=>$session) {
     $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php', array('courseid' => $courseid, 'id' => $id));
     $icondelete     = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
     $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $id, 'courseid' => $courseid));
+    $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
     
 
     // Combine new row.
@@ -109,7 +110,7 @@ foreach ($sessions as $id=>$session) {
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             StateSession::getStateName($session->state),
-                            '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',
+                            ($session->state !=  StateSession::Planned) ? $logslink : (''),
                             ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('') // TODO hide edit/remove icon for users without manage_own(all)_sessions capability
                         );
 
