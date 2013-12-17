@@ -130,7 +130,7 @@ class block_supervised extends block_base {
 
 
 
-    private function render_block_for_teacher(){
+    private function render_supervise_body(){
         global $CFG, $COURSE, $DB, $USER;
         $formbody = '';
         // Planned session: render planned session form.
@@ -284,13 +284,24 @@ class block_supervised extends block_base {
         $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $formbody;
 
-        // Add footer.
-        $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
-        $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
-        $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
-        $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
-        $sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $COURSE->id));
-        $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
+        // Add links to a footer according to user capabilities.
+        if(has_capability('block/supervised:editclassrooms', $this->context)){
+            $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
+        }
+        if(has_capability('block/supervised:editlessontypes', $this->context)){
+            $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
+        }
+        if(has_capability('block/supervised:viewownsessions', $this->context)
+            OR has_capability('block/supervised:viewallsessions', $this->context)
+            OR has_capability('block/supervised:manageownsessions', $this->context)
+            OR has_capability('block/supervised:manageallsessions', $this->context)
+            OR has_capability('block/supervised:managefinishedsessions', $this->context))
+        {
+            $sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
+        }
 
         $this->content->footer = join(' ', $links);
     }
@@ -361,7 +372,7 @@ class block_supervised extends block_base {
 
 
 
-    private function render_block_for_student(){
+    private function render_besupervised_body(){
         global $COURSE, $CFG;
 
         $activesessions = $this->get_student_active_sessions();
@@ -396,9 +407,6 @@ class block_supervised extends block_base {
             $blockbody = '';
         }
 
-
-
-
         // Add block body.
         $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $blockbody;
@@ -425,12 +433,12 @@ class block_supervised extends block_base {
         }
 
         if(has_capability('block/supervised:supervise', $this->context)){
-            // Teacher mode.
-            $this->render_block_for_teacher();
+            // Supervise mode.
+            $this->render_supervise_body();
         }
         else if(has_capability('block/supervised:besupervised', $this->context)){
-            // Student mode.
-            $this->render_block_for_student();
+            // Be supervised mode.
+            $this->render_besupervised_body();
         }
 
         return $this->content;
