@@ -323,7 +323,7 @@ class block_formal_langs_lexer_cpp_parser_mapper extends block_formal_langs_lexe
 
 
 $mapper = new block_formal_langs_lexer_cpp_parser_mapper();
-$result = $mapper->parse('template<typename _A, typename _B> int operator+(int * b, double f) const { k = k + 1; }');
+$result = $mapper->parse('enum Test { A, B = 0 } ;');
 
 function print_node($node, $paddingcount)
 {
