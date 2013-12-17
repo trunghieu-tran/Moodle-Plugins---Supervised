@@ -1058,6 +1058,16 @@ class block_formal_langs_token_stream {
     }
     
     public function bloking_for_bypass(&$place, &$matches, &$status) {
+        $countpairs = count($matches);
+        // -1 if no possible
+        for ($i = $place+1; $i<$countpairs; $i++) {
+            if ($status[$i] != -1) {
+                // 1 indexs
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = -1;
+                }
+            }
+        }
     }
     
     public function unlock(&$place, &$matches, &$status) {
@@ -1110,6 +1120,15 @@ class block_formal_langs_token_stream {
     }
     
     public function unlock_for_bypass(&$place, &$matches, &$status) {
+        $countstatus = count($status)-1;
+        for ($i = $countstatus; $i>$place; $i--) {
+            if ($status[$i] != 0) {
+                // 1 index
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = 0;
+                }
+            }
+        }
     }
     
     /**
@@ -1144,6 +1163,14 @@ class block_formal_langs_token_stream {
     }
     
     public function compare_matches_groups_for_bypass($group1, $group2) {
+        if (count($group1->correctcoverage) + count($group1->comparedcoverage) > count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+            return 1;
+        } 
+        if (count($group1->correctcoverage) + count($group1->comparedcoverage) == count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
     /**
      * Create a copy of this stream and correct mistakes in tokens using given array of matched pairs
