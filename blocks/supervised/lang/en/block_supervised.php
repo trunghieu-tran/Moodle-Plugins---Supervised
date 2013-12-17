@@ -25,15 +25,15 @@ $string['nosessionsstudenttitle']           = 'You don\'t have any active sessio
 
 
 // Capabilities description
-$string['supervised:teachermode']       = 'Teacher access mode. Can create sessions for himself';
-$string['supervised:studentmode']       = 'Student access mode';
-$string['supervised:readclassrooms']    = 'View classrooms';
-$string['supervised:writeclassrooms']   = 'Manage classrooms';
-$string['supervised:readlessontypes']   = 'View lesson types';
-$string['supervised:writelessontypes']  = 'Manage lesson types';
-$string['supervised:readsessions']      = 'View sessions';
-$string['supervised:writesessions']     = 'Manage sessions. Can create sessions for any teacher';
-$string['supervised:readlogs']          = 'View session\'s logs';
+$string['supervised:besupervised']              = 'Student access mode';
+$string['supervised:supervise']                 = 'For own sessions: start planned, start new, edit active, finish active, view logs.';
+$string['supervised:editclassrooms']            = 'Edit classrooms';
+$string['supervised:editlessontypes']           = 'Edit lesson types';
+$string['supervised:viewownsessions']           = 'View own sessions (Planned, Active and Finished) and their logs';
+$string['supervised:viewallsessions']           = 'View all sessions (Planned, Active and Finished) and their logs';
+$string['supervised:manageownsessions']         = 'Manage own sessions: plane/edit/remove (you can\'t start new or planned session)';
+$string['supervised:manageallsessions']         = 'Manage all sessions: plane/edit/remove (you can\'t start new or planned session)';
+$string['supervised:managefinishedsessions']    = 'Remove finished sessions';
 
 
 $string['classroomsurl']            = '[Classrooms]';

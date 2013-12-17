@@ -16,16 +16,7 @@
 
 $capabilities = array(
 
-    'block/supervised:teachermode' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
-        )
-    ),
-
-    'block/supervised:studentmode' => array(
+    'block/supervised:besupervised' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -33,16 +24,7 @@ $capabilities = array(
         )
     ),
 
-    'block/supervised:readclassrooms' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
-        )
-    ),
-
-    'block/supervised:writeclassrooms' => array(
+    'block/supervised:supervise' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -51,48 +33,63 @@ $capabilities = array(
         )
     ),
 
-    'block/supervised:readlessontypes' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
-        )
-    ),
-
-    'block/supervised:writelessontypes' => array(
+    'block/supervised:editclassrooms' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         )
     ),
 
-    'block/supervised:readsessions' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
-        )
-    ),
-
-    'block/supervised:writesessions' => array(
+    'block/supervised:editlessontypes' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         )
     ),
 
-    'block/supervised:readlogs' => array(
+    'block/supervised:viewownsessions' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'teacher' => CAP_ALLOW
+        )
+    ),
+
+    'block/supervised:viewallsessions' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/supervised:manageownsessions' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW
+        )
+    ),
+
+    'block/supervised:manageallsessions' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/supervised:managefinishedsessions' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
         )
     ),
 

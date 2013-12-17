@@ -13,7 +13,8 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 
 $site = get_site();
 require_login($course);
-require_capability('block/supervised:writelessontypes', $PAGE->context);
+// TODO Capabilities
+//require_capability('block/supervised:writelessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/delete.php', array('id' => $id, 'courseid' => $courseid));
 include("breadcrumbs.php");
 

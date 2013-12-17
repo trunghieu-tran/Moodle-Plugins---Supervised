@@ -9,10 +9,10 @@ class addedit_session_form extends moodleform {
 
         $mform =& $this->_form;
 
-        if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:writesessions', 'block/supervised:teachermode'))) {
+        if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:supervise'))) {
 
-            if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
-                // If current user has only teachermode permission he can create session only for himself.
+            if( has_capability('block/supervised:manageownsessions', $PAGE->context) AND !has_capability('block/supervised:manageallsessions', $PAGE->context) ){
+                // If current user has only manageownsessions capability he can plane session only for himself.
                 $teachers[$USER->id] = $cteachers[$USER->id]->lastname . " " . $cteachers[$USER->id]->firstname;
             }
             else{
@@ -111,7 +111,7 @@ class addedit_session_form extends moodleform {
         }
 
         // If current user has only teachermode permission he can create session only for himself.
-        if( has_capability('block/supervised:teachermode', $PAGE->context) AND !has_capability('block/supervised:writesessions', $PAGE->context) ){
+        if( has_capability('block/supervised:manageownsessions', $PAGE->context) AND !has_capability('block/supervised:manageallsessions', $PAGE->context) ){
             if($data["teacherid"] != $USER->id){
                 $errors["teacherid"] = get_string("teachervalidationerror", "block_supervised");
             }

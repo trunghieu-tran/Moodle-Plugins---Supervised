@@ -25,7 +25,8 @@ if (! $session = $DB->get_record("block_supervised_session", array("id"=>$sessio
 }
 
 require_login($course);
-require_capability('block/supervised:readlogs', $PAGE->context);
+// TODO Capabilities
+//require_capability('block/supervised:readlogs', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/logs/view.php', array('courseid' => $courseid, 'sessionid' => $sessionid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('logspagetitle', 'block_supervised'));

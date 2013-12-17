@@ -424,11 +424,11 @@ class block_supervised extends block_base {
             return $this->content;
         }
 
-        if(has_capability('block/supervised:teachermode', $this->context)){
+        if(has_capability('block/supervised:supervise', $this->context)){
             // Teacher mode.
             $this->render_block_for_teacher();
         }
-        else if(has_capability('block/supervised:studentmode', $this->context)){
+        else if(has_capability('block/supervised:besupervised', $this->context)){
             // Student mode.
             $this->render_block_for_student();
         }

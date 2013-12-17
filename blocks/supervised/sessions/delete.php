@@ -20,12 +20,14 @@ if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) 
     print_error(get_string("invalidsessionid", 'block_supervised'));
 }
 // Check permissions.
+// TODO Capabilities
+/*
 if ($session->teacherid == $USER->id) {
     require_capability('block/supervised:teachermode', $PAGE->context);
 }
 else{
     require_capability('block/supervised:writesessions', $PAGE->context);
-}
+}*/
 
 if ($session->state != StateSession::Planned) {
     print_error(get_string("sessiondeleteerror", 'block_supervised'));
