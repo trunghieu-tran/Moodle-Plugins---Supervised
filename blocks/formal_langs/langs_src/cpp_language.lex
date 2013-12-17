@@ -350,7 +350,7 @@ INC = "#include"
 <YYINITIAL> {INC}[" "]*\"[^">"]+\"       { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#"                          { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "##"                         { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#define"                    { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#define"[^\n\r]+([\n\r]|\n\r)  { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#if"                        { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#ifdef"                     { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#elif"                      { return $this->create_token('preprocessor',$this->yytext()); }
