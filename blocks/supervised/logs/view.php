@@ -25,12 +25,39 @@ if (! $session = $DB->get_record("block_supervised_session", array("id"=>$sessio
 }
 
 require_login($course);
-// TODO Capabilities
-//require_capability('block/supervised:readlogs', $PAGE->context);
+
 $PAGE->set_url('/blocks/supervised/logs/view.php', array('courseid' => $courseid, 'sessionid' => $sessionid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('logspagetitle', 'block_supervised'));
 include("breadcrumbs.php");
+
+// Check capabilities.
+if ($session->teacherid != $USER->id) {
+    // User wants view logs of other user's session.
+    require_capability('block/supervised:viewallsessions', $PAGE->context);
+}
+else{
+    // User wants view logs of own session.
+    if ($session->state != StateSession::Active) {
+        // Check capabilities fow own active session.
+        if(!  (has_capability('block/supervised:supervise', $PAGE->context)
+            OR has_capability('block/supervised:viewownsessions', $PAGE->context)
+            OR has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
+            require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
+        }
+    }
+    else{
+        // Check capabilities fow own not active session.
+        if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
+            OR has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
+            require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
+        }
+    }
+}
+
+if ($session->state == StateSession::Planned) {
+    print_error(get_string("sessionlogserror", 'block_supervised'));
+}
 
 // Display header.
 echo $OUTPUT->header();

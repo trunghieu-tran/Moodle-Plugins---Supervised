@@ -13,7 +13,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 
 $site = get_site();
 require_login($course);
-require_capability('block/supervised:writeclassrooms', $PAGE->context);
+require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/delete.php', array('id' => $id, 'courseid' => $courseid));
 include("breadcrumbs.php");
 

@@ -14,7 +14,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-require_capability('block/supervised:writeclassrooms', $PAGE->context);
+require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");

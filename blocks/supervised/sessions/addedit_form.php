@@ -16,7 +16,7 @@ class addedit_session_form extends moodleform {
                 $teachers[$USER->id] = $cteachers[$USER->id]->lastname . " " . $cteachers[$USER->id]->firstname;
             }
             else{
-                // Just create array with all teachers.
+                // User can add/edit session for other users. So add all teachers.
                 foreach ($cteachers as $cteacher) {
                     $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
                 }
@@ -110,7 +110,7 @@ class addedit_session_form extends moodleform {
             $errors["timestart"] = get_string("teacherhassession", "block_supervised");
         }
 
-        // If current user has only teachermode permission he can create session only for himself.
+        // If current user has only manageownsessions capability he can add/edit session only for himself.
         if( has_capability('block/supervised:manageownsessions', $PAGE->context) AND !has_capability('block/supervised:manageallsessions', $PAGE->context) ){
             if($data["teacherid"] != $USER->id){
                 $errors["teacherid"] = get_string("teachervalidationerror", "block_supervised");

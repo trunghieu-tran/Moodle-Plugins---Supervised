@@ -19,20 +19,29 @@ include("breadcrumbs.php");
 if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
     print_error(get_string("invalidsessionid", 'block_supervised'));
 }
-// Check permissions.
-// TODO Capabilities
-/*
-if ($session->teacherid == $USER->id) {
-    require_capability('block/supervised:teachermode', $PAGE->context);
+
+// Check capabilities.
+if ($session->state == StateSession::Finished) {
+    // Only user with managefinishedsessions capability can remove finished sessions.
+    require_capability('block/supervised:managefinishedsessions', $PAGE->context);
 }
 else{
-    require_capability('block/supervised:writesessions', $PAGE->context);
-}*/
-
-if ($session->state != StateSession::Planned) {
-    print_error(get_string("sessiondeleteerror", 'block_supervised'));
+    if ($session->teacherid == $USER->id) {
+        // User wants remove his own session.
+        if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
+            OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+            require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
+        }
+    }
+    else{
+        // User wants remove session of other user.
+        require_capability('block/supervised:manageallsessions', $PAGE->context);
+    }
 }
 
+if ($session->state == StateSession::Active) {
+    print_error(get_string("sessiondeleteerror", 'block_supervised'));
+}
 
 
 

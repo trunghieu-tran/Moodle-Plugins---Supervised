@@ -21,10 +21,10 @@ $PAGE->set_pagelayout('standard');
 include("breadcrumbs.php");
 
 // Check capabilities.
-// TODO Capabilities
-/*if(!  (has_capability('block/supervised:writesessions', $PAGE->context) OR has_capability('block/supervised:teachermode', $PAGE->context))  ){
-    require_capability('block/supervised:teachermode', $PAGE->context);
-}*/
+if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
+        OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+    require_capability('block/supervised:manageownsessions', $PAGE->context);
+}
 
 
 // Initializing variables depending of mode.
@@ -42,13 +42,20 @@ if(!$id){   // Add mode.
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
-    // Check permissions.
+    // Check capabilities for edit mode.
     if ($session->teacherid == $USER->id) {
-        require_capability('block/supervised:teachermode', $PAGE->context);
+        // User wants edit his own session.
+        if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
+            OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+            require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
+        }
     }
     else{
-        require_capability('block/supervised:writesessions', $PAGE->context);
-    }// Check session state.
+        // User wants edit session of other user.
+        require_capability('block/supervised:manageallsessions', $PAGE->context);
+    }
+
+    // Check session state.
     if ($session->state != StateSession::Planned) {
         print_error(get_string("sessionediterror", 'block_supervised'));
     }

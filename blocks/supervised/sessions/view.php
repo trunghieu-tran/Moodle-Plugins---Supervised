@@ -16,12 +16,21 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-// TODO Capabilities
-//require_capability('block/supervised:readsessions', $PAGE->context);
+
 $PAGE->set_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('sessionspagetitle', 'block_supervised'));
 include("breadcrumbs.php");
+
+
+// Check if user has at least one of capabilities for view smth.
+if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
+    OR has_capability('block/supervised:viewallsessions', $PAGE->context)
+    OR has_capability('block/supervised:manageownsessions', $PAGE->context)
+    OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+    require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
+}
+
 
 // Display header.
 echo $OUTPUT->header();
@@ -76,6 +85,7 @@ $params['groupid']      = $groupid;
 */
 $sessions = $DB->get_records_sql($select/*, $params*/);
 
+// Fill table with sessions according to user capabilities.
 $strftimedatetime = get_string("strftimerecent");
 $tabledata = array();
 foreach ($sessions as $id=>$session) {
@@ -88,7 +98,7 @@ foreach ($sessions as $id=>$session) {
     
 
     // Combine new row.
-    $tabledata[] = array(   $session->coursename,
+    $tablerow = array(   $session->coursename,
                             $session->classroomname,
                             $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname,
                             
@@ -100,8 +110,19 @@ foreach ($sessions as $id=>$session) {
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             StateSession::getStateName($session->state),
                             '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>',
-                            ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('')
+                            ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('') // TODO hide edit/remove icon for users without manage_own(all)_sessions capability
                         );
+
+    if($session->teacherid != $USER->id){
+        // Check if user has capability to view other user's sessions.
+        if(   has_capability('block/supervised:viewallsessions', $PAGE->context) OR has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
+            $tabledata[] = $tablerow;
+        }
+    }
+    else{
+        // User can view his own sessions (already checked).
+        $tabledata[] = $tablerow;
+    }
 }
 $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
 echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');
@@ -128,5 +149,3 @@ echo html_writer::table($table);
 
 // Display footer.
 echo $OUTPUT->footer();
-
-?>
