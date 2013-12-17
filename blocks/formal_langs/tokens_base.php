@@ -799,6 +799,20 @@ class block_formal_langs_token_stream {
         return $allpossiblepairs;
     }
 
+    public function look_for_matches_for_bypass($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+        $tokens = $this->tokens;
+        $allpossiblepairs = array();
+        $pairs = array();
+        // search for correct tokens
+        for ($i=0; $i<count($tokens); $i++) {
+            $pairs = $tokens[$i]->look_for_matches_for_bypass($comparedstream->tokens, $threshold, true, $options);
+            for ($j=0; $j<count($pairs); $j++) {
+                $allpossiblepairs[] = $pairs[$j];
+            }
+        }
+        return $allpossiblepairs;
+    }
+    
     /**
      * Generates array of best groups of matches representing possible set of mistakes in tokens.
      *
@@ -840,6 +854,38 @@ class block_formal_langs_token_stream {
         // array of results
         return $arraybestgroupsmatches;
     }
+    
+    public function group_matches_for_bypass($matches) {
+        $status = array();
+        for ($i=0; $i < count($matches); $i++) {
+            $status[] = 0;
+        }
+        $setspairs = array();
+        $arraybestgroupsmatches = array();
+        // recurcive_backtracking
+        $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs);
+        if (count($setspairs)>0) {
+            // first is the best
+            $arraybestgroupsmatches[] = $setspairs[0];
+            // write the best
+            for ($i = 1; $i<count($setspairs); $i++) {
+                // equal
+                if ($this->compare_matches_groups_for_bypass($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
+                    $arraybestgroupsmatches[] = $setspairs[$i];
+                    // new group
+                } else {
+                    if ($this->compare_matches_groups_for_bypass($arraybestgroupsmatches[0], $setspairs[$i]) < 0) {
+                        // clear
+                        $arraybestgroupsmatches = array();
+                        $arraybestgroupsmatches[] = $setspairs[$i];
+                    }
+                }
+            }
+        }
+        // array of results
+        return $arraybestgroupsmatches;
+    }
+    
     public function recurcive_backtracking(&$matches, &$status, &$setspairs) {
         $place = -1;
         // empty set
@@ -900,6 +946,67 @@ class block_formal_langs_token_stream {
             }
         }
     }
+    
+    public function recurcive_backtracking_for_bypass(&$matches, &$status, &$setspairs) {
+        $place = -1;
+        // empty set
+        for ($i=0; $i<count($status); $i++) {
+            if ($status[$i] == 1) {
+                $place = $i;
+            }
+        }
+        $place = $place+1;
+        $countstatus = count($status);
+        for ($i = $place; $i < $countstatus; $i++) {
+            if ($status[$i] == 0) {
+                $status[$i] = 1;
+                // add new pair and bloking
+                $this->bloking_for_bypass($i, $matches, $status);
+                $flag = -1;
+                for ($j= $i; $j<count($status); $j++) {
+                    if ($status[$j]==0) {
+                        $flag=1;
+                    }
+                }
+                // recurcive
+                if ($flag!=-1) {
+                    $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs);
+                } else {
+                    // set is finished
+                    $setpairs = new block_formal_langs_matches_group();
+                    $setpairs->matchedpairs = array();
+                    $setpairs->mistakeweight = 0;
+                    $setpairs->correctcoverage = array();
+                    $setpairs->comparedcoverage = array();
+                    // find used pairs
+                    for ($k=0; $k<count($status); $k++) {
+                        if ($status[$k] == 1) {
+                            array_push($setpairs->matchedpairs, $matches[$k]);
+                            for ($g=0; $g<count($matches[$k]->correcttokens); $g++) {
+                                $setpairs->correctcoverage[] = $matches[$k]->correcttokens[$g];
+                            }
+                            for ($g=0; $g<count($matches[$k]->comparedtokens); $g++) {
+                                $setpairs->comparedcoverage[] = $matches[$k]->comparedtokens[$g];
+                            }
+                        }
+                    }
+                    sort($setpairs->correctcoverage);
+                    sort($setpairs->comparedcoverage);
+                    $setspairs[]=$setpairs;
+                }
+                // unlock
+                $this->unlock_for_bypass($i, $matches, $status);
+                $status[$i] = 0;
+                // bloking
+                for ($j=0; $j<count($status); $j++) {
+                    if ($status[$j]==1) {
+                        $this->bloking_for_bypass($j, $matches, $status);
+                    }
+                }
+            }
+        }
+    }
+    
     public function bloking(&$place, &$matches, &$status) {
         $countpairs = count($matches);
         // -1 if no possible
@@ -949,6 +1056,10 @@ class block_formal_langs_token_stream {
             }
         }
     }
+    
+    public function bloking_for_bypass(&$place, &$matches, &$status) {
+    }
+    
     public function unlock(&$place, &$matches, &$status) {
         $countstatus = count($status)-1;
         for ($i = $countstatus; $i>$place; $i--) {
@@ -997,6 +1108,10 @@ class block_formal_langs_token_stream {
             }
         }
     }
+    
+    public function unlock_for_bypass(&$place, &$matches, &$status) {
+    }
+    
     /**
      * Compares two matches groups.
      *
@@ -1026,6 +1141,9 @@ class block_formal_langs_token_stream {
                 return -1;
             }
         }
+    }
+    
+    public function compare_matches_groups_for_bypass($group1, $group2) {
     }
     /**
      * Create a copy of this stream and correct mistakes in tokens using given array of matched pairs
