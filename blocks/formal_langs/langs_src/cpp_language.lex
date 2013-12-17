@@ -350,10 +350,10 @@ INC = "#include"
 <YYINITIAL> {INC}[" "]*\"[^">"]+\"       { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#"                          { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "##"                         { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#define"[^\n\r]+([\n\r]|\n\r)  { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#if"                        { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#ifdef"                     { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#elif"                      { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#define"([^\n\r]+([\n\r]|\n\r))? { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#if"([^\n\r]+([\n\r]|\n\r))?     { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#ifdef"                          { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#elif"([^\n\r]+([\n\r]|\n\r))?   { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#else"                      { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#endif"                     { return $this->create_token('preprocessor',$this->yytext()); }                              
 <YYINITIAL> {D}+{E}({FS}|{IS})?          { return $this->create_token('numeric',$this->yytext()); }
