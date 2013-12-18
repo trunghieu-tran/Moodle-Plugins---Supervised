@@ -29,7 +29,7 @@ else{
     if ($session->teacherid == $USER->id) {
         // User wants remove his own session.
         if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
-            OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+            || has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
             require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
         }
     }

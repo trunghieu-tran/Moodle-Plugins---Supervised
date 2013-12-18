@@ -42,15 +42,15 @@ else{
     if ($session->state != StateSession::Active) {
         // Check capabilities fow own active session.
         if(!  (has_capability('block/supervised:supervise', $PAGE->context)
-            OR has_capability('block/supervised:viewownsessions', $PAGE->context)
-            OR has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
+            || has_capability('block/supervised:viewownsessions', $PAGE->context)
+            || has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
             require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
         }
     }
     else{
         // Check capabilities fow own not active session.
         if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
-            OR has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
+            || has_capability('block/supervised:viewallsessions', $PAGE->context))  ){
             require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
         }
     }

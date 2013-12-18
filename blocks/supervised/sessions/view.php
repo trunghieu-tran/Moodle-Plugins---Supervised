@@ -25,9 +25,9 @@ include("breadcrumbs.php");
 
 // Check if user has at least one of capabilities for view smth.
 if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
-    OR has_capability('block/supervised:viewallsessions', $PAGE->context)
-    OR has_capability('block/supervised:manageownsessions', $PAGE->context)
-    OR has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+    || has_capability('block/supervised:viewallsessions', $PAGE->context)
+    || has_capability('block/supervised:manageownsessions', $PAGE->context)
+    || has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
     require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
 }
 
@@ -116,7 +116,7 @@ foreach ($sessions as $id=>$session) {
 
     if($session->teacherid != $USER->id){
         // Check if user has capability to view other user's sessions.
-        if(   has_capability('block/supervised:viewallsessions', $PAGE->context) OR has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
+        if(   has_capability('block/supervised:viewallsessions', $PAGE->context) || has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
             $tabledata[] = $tablerow;
         }
     }
