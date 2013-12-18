@@ -238,7 +238,8 @@ class block_supervised extends block_base {
                 if($oldgroupid != $newgroupid){
                     $sessioninfo = new stdClass();
                     $sessioninfo->courseid      = $activesession->courseid;
-                    $sessioninfo->groupid       = $newgroupid;
+                    $sessioninfo->oldgroupid    = $oldgroupid;
+                    $sessioninfo->newgroupid    = $newgroupid;
                     events_trigger('session_updated', $sessioninfo);
                 }
 
