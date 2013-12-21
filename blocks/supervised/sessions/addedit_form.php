@@ -143,12 +143,12 @@ class addedit_session_form extends moodleform {
               ON {block_supervised_session}.courseid     =   {course}.id
 
         WHERE ((:timestart BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
-                OR (:timeend BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
-                OR ( ({block_supervised_session}.timestart BETWEEN :timestart1 AND :timeend1)
+                || (:timeend BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
+                || ( ({block_supervised_session}.timestart BETWEEN :timestart1 AND :timeend1)
                     AND ({block_supervised_session}.timeend BETWEEN :timestart2 AND :timeend2)
                    ))
             AND {block_supervised_session}.teacherid    = :teacherid
-            AND ({block_supervised_session}.state       = :stateactive OR {block_supervised_session}.state  = :stateplanned)
+            AND ({block_supervised_session}.state       = :stateactive || {block_supervised_session}.state  = :stateplanned)
             AND {block_supervised_session}.id           != :sessionid
         ";
 
