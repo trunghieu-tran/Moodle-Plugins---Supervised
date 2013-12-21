@@ -52,7 +52,9 @@ class plannedsession_block_form extends moodleform {
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // add comment
-        $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
+        if($this->_customdata['needcomment']){
+            $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
+        }
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
         // add submit button
