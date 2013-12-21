@@ -320,10 +320,10 @@ class block_supervised extends block_base {
             $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
         }
         if(has_capability('block/supervised:viewownsessions', $this->context)
-            OR has_capability('block/supervised:viewallsessions', $this->context)
-            OR has_capability('block/supervised:manageownsessions', $this->context)
-            OR has_capability('block/supervised:manageallsessions', $this->context)
-            OR has_capability('block/supervised:managefinishedsessions', $this->context))
+            || has_capability('block/supervised:viewallsessions', $this->context)
+            || has_capability('block/supervised:manageownsessions', $this->context)
+            || has_capability('block/supervised:manageallsessions', $this->context)
+            || has_capability('block/supervised:managefinishedsessions', $this->context))
         {
             $sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $COURSE->id));
             $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
