@@ -5,10 +5,14 @@ require_once("{$CFG->libdir}/formslib.php");
 class logs_form extends moodleform {
  
     function definition() {
+        global $DB;
         $mform =& $this->_form;
 
         // Gets array of all groups in current course.
+        $teacher = $DB->get_record('user', array('id'=>$this->_customdata['teacherid']));
         $users[0] = get_string('allusers', 'block_supervised');
+        $users[$teacher->id] = $teacher->firstname . " " . $teacher->lastname;
+
         $groupid = $this->_customdata['groupid'];
         $courseid = $this->_customdata['courseid'];
         if($groupid == 0){

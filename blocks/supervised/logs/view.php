@@ -133,7 +133,7 @@ if (file_exists($mformlogs)) {
     print_error('noformdesc');
 }
 
-$mformlogs = new logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid));
+$mformlogs = new logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid, 'teacherid' => $session->teacherid));
 $toformlogs['sessionid']    = $sessionid;
 $toformlogs['courseid']     = $courseid;
 $toformlogs['userid']       = $userid;
