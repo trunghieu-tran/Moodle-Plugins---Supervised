@@ -143,7 +143,7 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new plannedsession_block_form();
+            $mform = new plannedsession_block_form(null, array('needcomment'=>$plannedsession->sessioncomment!='' ));
             if ($fromform = $mform->get_data()) {
                 // TODO Logging
                 // Start session and update fields that user could edit.
@@ -196,7 +196,7 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new activesession_block_form();
+            $mform = new activesession_block_form(null, array('needcomment'=>$activesession->sessioncomment!='' ));
             if($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields
                 // TODO Logging
