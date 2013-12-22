@@ -28,7 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Surervised block access rule';
 
-$string['checknotrequired'] = 'No';
-$string['checkforall']      = 'Yes, for all lessontypes in this course (include "Not specified" lessontype)';
-$string['customcheck']      = 'Yes, for custom lessontype list:';
-$string['allowcontrol']     = 'Allow supervised control?';
+$string['checknotrequired']         = 'No';
+$string['checkforall']              = 'Yes, for all lessontypes in this course (include "Not specified" lessontype)';
+$string['customcheck']              = 'Yes, for custom lessontype list:';
+$string['allowcontrol']             = 'Allow supervised control?';
+$string['uncheckedlessontypes']     = 'You must check at least one lesson type';
