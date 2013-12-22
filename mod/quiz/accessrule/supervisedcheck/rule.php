@@ -42,7 +42,6 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
         global $DB, $COURSE, $PAGE, $CFG;
 
-
         //Radiobuttons
         $radioarray = array();
         $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
@@ -104,6 +103,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                     $rule->id               = $DB->insert_record('quizaccess_supervisedcheck', $rule);
                 }
                 $rule->lessontypeid         = $lessontypesinquiz[$i];
+                $rule->supervisedmode       = $quiz->supervisedmode; // must be 2
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
             // Delete any remaining old rules.
@@ -149,5 +149,18 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $res['supervisedlessontype_'.$rule->lessontypeid] = 1;
         }
         return $res;
+    }
+
+    public static function validate_settings_form_fields(array $errors,
+                                                         array $data, $files, mod_quiz_mod_form $quizform) {
+        if($data['supervisedmode'] == 2){
+            foreach ($data as $key => $value) {
+                if (substr($key, 0) == 'supervisedlessontype_') {
+                   echo($key . '______' . $value . '<br/>');
+                }
+            }
+        }
+
+        return $errors;
     }
 }
