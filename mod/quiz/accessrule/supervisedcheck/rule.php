@@ -26,8 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
-
-
+require_once($CFG->dirroot . '/blocks/supervised/sessions/sessionstate.php');
 
 /**
  * A rule for supervised block.
@@ -37,6 +36,77 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
  * @author    Andrey Ushakov <andrey200964@yandex.ru>
  */
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
+
+    public function isActiveSessionExist($userid, $courseid, $lessontypes){
+        global $DB, $COURSE, $USER;
+
+        // Select all active sessions with $courseid.
+        $sessions = $DB->get_records('block_supervised_session', array('state' => StateSession::Active, 'courseid'=>$courseid));
+
+        // Filter sessions by lessontype and userid
+        foreach($sessions as $id=>$session){
+            // Check if user is in current session's group.
+            $useringroup = $session->groupid == 0 ? true : groups_is_member($session->groupid, $userid);
+            // Check if current session's lessontype is in passed $lessontypes array.
+            $islessontype = in_array($session->lessontype, $lessontypes);
+            if( !($useringroup && $islessontype) ){
+                // Remove current session.
+                unset($sessions[$id]);
+            }
+        }
+
+        return !empty($sessions);
+    }
+
+
+
+
+    public function prevent_access() {
+        global $DB, $COURSE, $USER;
+        // Check if current user can start the quiz
+        // TODO What if there is no records in q_a_r table?
+        // TODO check permissions - teachers always have an access
+        $lessontypesdb = array();
+        switch($this->quiz->supervisedmode){
+            case 0:     // No check required.
+                return false;
+                break;
+            case 1:     // Check for all lesson types.
+                $lessontypesdb = $DB->get_records('block_supervised_lessontype', array('courseid' => $COURSE->id));
+                // We need to add special lessontype "Not specified" to have really all lesson types.
+                $lessontypesdb[0] = new stdClass();
+                $lessontypesdb[0]->id = 0;
+                break;
+            case 2:     // Check for custom lesson types.
+                $lessontypesdb = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $this->quiz->id), null, 'lessontypeid as id');
+                break;
+        }
+
+        // If we are here, check is required.
+        // Just reorganize $lessontypesdb array.
+        $lessontypes = array();
+        foreach($lessontypesdb as $lessontype){
+            $lessontypes[] = $lessontype->id;
+        }
+
+        $isactivesession = $this->isActiveSessionExist($USER->id, $COURSE->id, $lessontypes);
+
+        if ($isactivesession){
+            return false;
+        }
+        else{
+            return get_string('noaccess', 'quizaccess_supervisedcheck');
+        }
+    }
+
+    public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
+        if (empty($quizobj->get_quiz()->supervisedmode)) {
+            return null;
+        }
+
+        return new self($quizobj, $timenow);
+    }
+
 
     public static function add_settings_form_fields(
         mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
@@ -142,7 +212,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
     public static function get_extra_settings($quizid) {
         global $DB;
-        // Load lessontypes fields.
+        // Load lesson type fields.
         $res = array();
         $rules = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $quizid));
         foreach($rules as $rule){
@@ -153,6 +223,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
     public static function validate_settings_form_fields(array $errors,
                                                          array $data, $files, mod_quiz_mod_form $quizform) {
+        // For custom lesson type selection mode user must check at least one lesson type.
         if($data['supervisedmode'] == 2){
             $isAllUnchecked = true;
             foreach ($data as $key => $value) {
