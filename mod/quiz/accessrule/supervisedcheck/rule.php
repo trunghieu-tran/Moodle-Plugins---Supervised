@@ -154,10 +154,15 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
     public static function validate_settings_form_fields(array $errors,
                                                          array $data, $files, mod_quiz_mod_form $quizform) {
         if($data['supervisedmode'] == 2){
+            $isAllUnchecked = true;
             foreach ($data as $key => $value) {
-                if (substr($key, 0) == 'supervisedlessontype_') {
-                   echo($key . '______' . $value . '<br/>');
+                if (  (substr($key, 0, 21) == 'supervisedlessontype_') && ($value == 1)  ) {
+                    $isAllUnchecked = false;
                 }
+            }
+
+            if($isAllUnchecked){
+                $errors["radioar"] = get_string("uncheckedlessontypes", "quizaccess_supervisedcheck");
             }
         }
 
