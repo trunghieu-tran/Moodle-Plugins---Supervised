@@ -33,4 +33,4 @@ $string['checkforall']              = 'Yes, for all lessontypes in this course (
 $string['customcheck']              = 'Yes, for custom lessontype list:';
 $string['allowcontrol']             = 'Allow supervised control?';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';
-$string['noaccess']                 = 'No active session at this moment. You can\'t start quiz.';
+$string['noaccess']                 = 'No active session at this moment. You can\'t start the quiz.';

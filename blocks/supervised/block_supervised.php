@@ -129,12 +129,10 @@ class block_supervised extends block_base {
     }
 
 
-
-    private function render_supervise_body(){
-        global $CFG, $COURSE, $DB, $USER;
-        $formbody = '';
-        // Planned session: render planned session form.
+    private function render_plannedsession_form(&$sessionstitle, &$formbody){
+        global $CFG, $COURSE, $DB;
         $plannedsession = $this->get_teacher_planned_session();
+
         if( !empty($plannedsession) ){
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/plannedsession_block_form.php";
@@ -147,6 +145,7 @@ class block_supervised extends block_base {
             if ($fromform = $mform->get_data()) {
                 // TODO Logging
                 // Start session and update fields that user could edit.
+
                 $curtime = time();
                 $plannedsession->state          = StateSession::Active;
                 $plannedsession->classroomid    = $fromform->classroomid;
@@ -163,6 +162,7 @@ class block_supervised extends block_base {
                 $sessioninfo = new stdClass();
                 $sessioninfo->courseid      = $plannedsession->courseid;
                 $sessioninfo->groupid       = $plannedsession->groupid;
+                $sessioninfo->lessontypeid  = $plannedsession->lessontypeid;
                 events_trigger('session_started', $sessioninfo);
 
                 unset($plannedsession);
@@ -184,10 +184,14 @@ class block_supervised extends block_base {
             }
         }
 
+        return empty($plannedsession);
+    }
 
 
-        // Active session: render active session form.
+    private function render_activesession_form(&$sessionstitle, &$formbody){
+        global $CFG, $COURSE, $DB;
         $activesession  = $this->get_teacher_active_session();
+
         if( !empty($activesession) ){
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/activesession_block_form.php";
@@ -213,6 +217,7 @@ class block_supervised extends block_base {
                 $sessioninfo = new stdClass();
                 $sessioninfo->courseid      = $activesession->courseid;
                 $sessioninfo->groupid       = $activesession->groupid;
+                $sessioninfo->lessontypeid  = $activesession->lessontypeid;
                 events_trigger('session_finished', $sessioninfo);
 
                 unset($activesession);
@@ -240,6 +245,7 @@ class block_supervised extends block_base {
                     $sessioninfo->courseid      = $activesession->courseid;
                     $sessioninfo->oldgroupid    = $oldgroupid;
                     $sessioninfo->newgroupid    = $newgroupid;
+                    $sessioninfo->lessontypeid  = $activesession->lessontypeid;
                     events_trigger('session_updated', $sessioninfo);
                 }
 
@@ -260,49 +266,65 @@ class block_supervised extends block_base {
                 $formbody = $mform->render();
             }
         }
+        return empty($activesession);
+    }
 
+    private function render_startsession_form(&$sessionstitle, &$formbody){
+        global $CFG, $COURSE, $DB, $USER;
 
+        $sessionstitle = get_string('nosessionstitle', 'block_supervised');
+        // Prepare form.
+        $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
+        if (file_exists($mform)) {
+            require_once($mform);
+        } else {
+            print_error('noformdesc');
+        }
+        $mform = new startsession_block_form();
 
+        if ($fromform = $mform->get_data()) {
+            // TODO Logging
+            // Trigger event (session started).
+            $sessioninfo = new stdClass();
+            $sessioninfo->courseid      = $fromform->courseid;
+            $sessioninfo->groupid       = $fromform->groupid;
+            $sessioninfo->lessontypeid  = $fromform->lessontypeid;
+            events_trigger('session_started', $sessioninfo);
+
+            // Start session
+            $curtime = time();
+            $fromform->state          = StateSession::Active;
+            $fromform->courseid       = $COURSE->id;
+            $fromform->teacherid      = $USER->id;
+            $fromform->timestart      = $curtime;
+            $fromform->timeend        = $curtime + $fromform->duration*60;
+            if (!$DB->insert_record('block_supervised_session', $fromform)) {
+                print_error('insertsessionerror', 'block_supervised');
+            }
+
+            $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+            redirect($url);
+        } else {
+            // Display form.
+            $toform['id']               = $COURSE->id;
+            $toform['duration']         = 90;
+
+            $mform->set_data($toform);
+            $formbody = $mform->render();
+        }
+    }
+
+    private function render_supervise_body(){
+        global $COURSE;
+
+        $formbody = '';
+        // Planned session: render planned session form.
+        $isemptyplanned = $this->render_plannedsession_form($sessionstitle, $formbody);
+        // Active session: render active session form.
+        $isemptyactive = $this->render_activesession_form($sessionstitle, $formbody);
         // No sessions: render start session form.
-        if(empty($plannedsession) && empty($activesession)){
-            $sessionstitle = get_string('nosessionstitle', 'block_supervised');
-
-            // Prepare form.
-            $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
-            if (file_exists($mform)) {
-                require_once($mform);
-            } else {
-                print_error('noformdesc');
-            }
-            $mform = new startsession_block_form();
-            if ($fromform = $mform->get_data()) {
-                // TODO Logging
-                // Start session
-                $curtime = time();
-                $fromform->state          = StateSession::Active;
-                $fromform->courseid       = $COURSE->id;
-                $fromform->teacherid      = $USER->id;
-                $fromform->timestart      = $curtime;
-                $fromform->timeend        = $curtime + $fromform->duration*60;
-                if (!$DB->insert_record('block_supervised_session', $fromform)) {
-                    print_error('insertsessionerror', 'block_supervised');
-                }
-                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id));
-                redirect($url);
-
-                // Trigger event (session started).
-                $sessioninfo = new stdClass();
-                $sessioninfo->courseid      = $fromform->courseid;
-                $sessioninfo->groupid       = $fromform->groupid;
-                events_trigger('session_started', $sessioninfo);
-            } else {
-                // Display form.
-                $toform['id']               = $COURSE->id;
-                $toform['duration']         = 90;
-
-                $mform->set_data($toform);
-                $formbody = $mform->render();
-            }
+        if($isemptyplanned && $isemptyactive){
+            $this->render_startsession_form($sessionstitle, $formbody);
         }
 
 
@@ -445,7 +467,7 @@ class block_supervised extends block_base {
     }
 
     /**
-    */
+     */
     public function applicable_formats() {
         return array(
             'all' => false,
