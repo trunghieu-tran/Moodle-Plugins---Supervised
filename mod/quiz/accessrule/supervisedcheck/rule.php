@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/blocks/supervised/sessions/sessionstate.php');
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
     public function isActiveSessionExist($userid, $courseid, $lessontypes){
-        global $DB, $COURSE, $USER;
+        global $DB;
 
         // Select all active sessions with $courseid.
         $sessions = $DB->get_records('block_supervised_session', array('state' => StateSession::Active, 'courseid'=>$courseid));
@@ -62,10 +62,15 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
 
     public function prevent_access() {
-        global $DB, $COURSE, $USER;
-        // Check if current user can start the quiz
+        global $DB, $COURSE, $USER, $PAGE;
         // TODO What if there is no records in q_a_r table?
-        // TODO check permissions - teachers always have an access
+
+        // TODO Check permissions - teachers always have an access
+        /*if(has_capability('block/supervised:supervised', context_course::instance($COURSE->id))){
+            return false;
+        }*/
+
+        // Check if current user can start the quiz
         $lessontypesdb = array();
         switch($this->quiz->supervisedmode){
             case 0:     // No check required.
