@@ -90,11 +90,6 @@ $sessions = $DB->get_records_sql($select/*, $params*/);
 $strftimedatetime = get_string("strftimerecent");
 $tabledata = array();
 foreach ($sessions as $id=>$session) {
-    // Prepare icons and urls.
-    $editurl        = new moodle_url('/blocks/supervised/sessions/addedit.php', array('id' => $id, 'courseid' => $courseid));
-    $iconedit       = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
-    $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php', array('courseid' => $courseid, 'id' => $id));
-    $icondelete     = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
     $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $id, 'courseid' => $courseid));
     $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
     
@@ -111,10 +106,32 @@ foreach ($sessions as $id=>$session) {
                             $session->duration,
                             userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
                             StateSession::getStateName($session->state),
-                            ($session->state !=  StateSession::Planned) ? $logslink : (''),
-                            ($session->state ==  StateSession::Planned) ? ($iconedit . $icondelete) : ('') // TODO hide edit/remove icon for users without manage_own(all)_sessions capability
+                            ($session->state !=  StateSession::Planned) ? $logslink : ('')
                         );
 
+    // Build edit icon.
+    $iconedit = '';
+    if($session->state ==  StateSession::Planned){
+        if(  ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
+             || has_capability('block/supervised:manageallsessions', $PAGE->context) ){
+            $editurl        = new moodle_url('/blocks/supervised/sessions/addedit.php', array('id' => $id, 'courseid' => $courseid));
+            $iconedit       = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+        }
+    }
+    // Build delete icon.
+    $icondelete = '';
+    if(
+        ($session->state ==  StateSession::Planned && $session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
+        || ($session->state ==  StateSession::Planned && has_capability('block/supervised:manageallsessions', $PAGE->context))
+        || ($session->state ==  StateSession::Finished && has_capability('block/supervised:managefinishedsessions', $PAGE->context))
+    ){
+        $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php', array('courseid' => $courseid, 'id' => $id));
+        $icondelete     = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
+    }
+
+    $tablerow[] = $iconedit . $icondelete;
+
+    // Trying to add created row into table.
     if($session->teacherid != $USER->id){
         // Check if user has capability to view other user's sessions.
         if(   has_capability('block/supervised:viewallsessions', $PAGE->context) || has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
@@ -126,8 +143,14 @@ foreach ($sessions as $id=>$session) {
         $tabledata[] = $tablerow;
     }
 }
-$addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');
+
+// Render "plane new session link".
+if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
+    || has_capability('block/supervised:manageallsessions', $PAGE->context)  ){
+    $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
+    echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');
+}
+
 
 // Build table.
 $table = new html_table();
