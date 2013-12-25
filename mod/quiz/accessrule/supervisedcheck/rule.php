@@ -62,13 +62,11 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
 
     public function prevent_access() {
-        global $DB, $COURSE, $USER, $PAGE;
-        // TODO What if there is no records in q_a_r table?
-
-        // TODO Check permissions - teachers always have an access
-        /*if(has_capability('block/supervised:supervised', context_course::instance($COURSE->id))){
+        global $DB, $COURSE, $USER;
+        // Check capabilities: teachers always have an access
+        if(has_capability('block/supervised:supervise', context_course::instance($COURSE->id))){
             return false;
-        }*/
+        }
 
         // Check if current user can start the quiz
         $lessontypesdb = array();
