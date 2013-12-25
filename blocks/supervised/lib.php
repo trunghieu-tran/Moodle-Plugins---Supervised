@@ -18,9 +18,12 @@ function can_delete_lessontype($lessontypeid) {
 function can_delete_classroom($classroomid) {
     global $DB;
     // Can not remove classroom used in session(s)
-    if($DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid))){
-        return false;
-    }
+    return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid));
+}
 
-    return true;
+function can_showhide_classroom($classroomid) {
+    require_once('sessions/sessionstate.php');
+    global $DB;
+    // Can not showhide classroom used in active session(s)
+    return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid, 'state'=>StateSession::Active));
 }

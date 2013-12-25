@@ -35,21 +35,28 @@ foreach ($classrooms as $id=>$classroom) {
     $editurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('id' => $id, 'courseid' => $courseid));
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $deleteurl = new moodle_url('/blocks/supervised/classrooms/delete.php', array('courseid' => $courseid, 'id' => $id));
-    $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
-    
-    if($classroom->active){
-        $showhide = "hide";
+    $icondelete = '';
+    if(can_delete_classroom($id)){
+        $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
     }
-    else{
-        $showhide = "show";
+
+    $iconshowhide = '';
+    if(can_showhide_classroom($id)){
+        if($classroom->active){
+            $showhide = "hide";
+        }
+        else{
+            $showhide = "show";
+        }
+        $showhideurl = new moodle_url('/blocks/supervised/classrooms/showhide.php', array('courseid' => $courseid, 'id' => $id));
+        $iconshowhide = $OUTPUT->action_icon($showhideurl, new pix_icon('t/'.$showhide, get_string($showhide)));
     }
-    $showhideurl = new moodle_url('/blocks/supervised/classrooms/showhide.php', array('courseid' => $courseid, 'id' => $id));
-    $iconshowhide = $OUTPUT->action_icon($showhideurl, new pix_icon('t/'.$showhide, get_string($showhide)));
+
     // Combine new row.
     $tabledata[] = array(
         $classroom->name,
         $classroom->iplist,
-        can_delete_classroom($id) ? $iconedit . $icondelete . $iconshowhide : $iconedit . $iconshowhide
+        $iconedit . $icondelete . $iconshowhide
     );
 }
 
@@ -67,5 +74,3 @@ echo html_writer::table($table);
 
 // Display footer.
 echo $OUTPUT->footer();
-
-?>
