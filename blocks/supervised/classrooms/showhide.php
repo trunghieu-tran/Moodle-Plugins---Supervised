@@ -7,6 +7,8 @@ $courseid   = required_param('courseid', PARAM_INT);
 $id         = required_param('id', PARAM_INT);
 $site = get_site();
 
+$course = $DB->get_record('course', array('id' => $courseid));
+
 require_login($course);
 require_capability('block/supervised:editclassrooms', $PAGE->context);
 
