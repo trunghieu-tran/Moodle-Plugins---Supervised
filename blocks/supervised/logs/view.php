@@ -8,9 +8,9 @@ global $DB, $OUTPUT, $PAGE;
 
 $courseid    = required_param('courseid',  PARAM_INT);
 $sessionid   = required_param('sessionid', PARAM_INT);
-$page        = optional_param('page', '0', PARAM_INT);     // which page to show
-$perpage     = optional_param('perpage', '3', PARAM_INT); // how many per page
-$userid      = optional_param('userid', '0', PARAM_INT); // current user id
+$page        = optional_param('page', '0', PARAM_INT);      // which page to show
+$perpage     = optional_param('perpage', '50', PARAM_INT);  // how many per page
+$userid      = optional_param('userid', '0', PARAM_INT);    // current user id
 
 $site = get_site();
 
