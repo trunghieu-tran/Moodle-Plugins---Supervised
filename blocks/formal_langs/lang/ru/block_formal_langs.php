@@ -22,6 +22,7 @@
  */
 
 $string['addnewlanguage'] = 'Добавить новый язык';
+$string['affectedcourses'] = 'Затронутые курсы: ';
 $string['changevisibility'] = 'Изменить видимость в данном контексте';
 $string['lexical_error_message'] = 'Не могу разобрать {$a->symbol} на позиции {$a->line}:{$a->position} ';
 $string['clanguageunmatchedquote'] = 'Не закрыта кавычка на позиции {$a->line}:{$a->col}';

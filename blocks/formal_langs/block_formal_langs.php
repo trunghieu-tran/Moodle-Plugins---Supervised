@@ -389,6 +389,7 @@ class block_formal_langs extends block_list {
 
 
         $context  = $this->page->context;
+
         $caneditall = has_capability('block/formal_langs:editalllanguages', $context);
         $caneditown = has_capability('block/formal_langs:editownlanguages', $context);
         $contexts = $context->get_parent_context_ids(true);
@@ -496,9 +497,14 @@ class block_formal_langs extends block_list {
                 .block_formal_langs li {
                     margin-bottom: 5px;
                 }
+                .global-affected-courses {
+                    color: red;
+                    margin-top: 10px;
+                }
             </style>
         ';
         $context  = $this->page->context;
+        $isglobal = $context->id == context_system::instance()->id;
         $icon = new pix_icon('t/show', get_string('hide'));
         $hidesrc = $OUTPUT->pix_url($icon->pix, $icon->component);
         $icon = new pix_icon('t/hide', get_string('hide'));
@@ -510,6 +516,8 @@ class block_formal_langs extends block_list {
             var context = ' .  $context->id .';
             var hidesrc = "' .$hidesrc . '";
             var showsrc = "' .$showsrc . '";
+            var isglobal = ' . (($isglobal) ? 'true' : 'false') . ';
+            var affectedcourseslabel = "' . get_string('affectedcourses', 'block_formal_langs') .  '"
             $("document").ready(function() {
                 $("a.deletelanguage").click(function() {
                     var id = $(this).attr("data-id");
@@ -559,10 +567,16 @@ class block_formal_langs extends block_list {
                         "action": "flanguagevisibility",
                         "languageid" : id,
                         "visible" : visible,
-                        "context" : context
+                        "context" : context,
+                        "global"  : ((isglobal) ? "Y" : "N")
                     },
-                    "dataType": "text",
-                    "success": function() {
+                    "dataType": "json",
+                    "success": function(data) {
+                        var label = affectedcourseslabel + "<br />";
+                        if (isglobal) {
+                            label =  label + data.map(function(o) { return o.shortname }).join("<br />");
+                            $(".global-affected-courses").html(label);
+                        }
                     },
                     "error": function(xhr) {
                        var a = new M.core.ajaxException({
@@ -579,7 +593,11 @@ class block_formal_langs extends block_list {
             });
         ';
         $script = html_writer::tag('script', $js);
-        return $result . $style . $script;
+        $globalaffectdiv = '';
+        if ($isglobal) {
+            $globalaffectdiv = html_writer::tag('div', '', array('class' => 'global-affected-courses'));
+        }
+        return $result . $globalaffectdiv . $style . $script;
     }
 
     public function applicable_formats() {
