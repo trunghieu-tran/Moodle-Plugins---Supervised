@@ -27,7 +27,8 @@ include("breadcrumbs.php");
 if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
     || has_capability('block/supervised:viewallsessions', $PAGE->context)
     || has_capability('block/supervised:manageownsessions', $PAGE->context)
-    || has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+    || has_capability('block/supervised:manageallsessions', $PAGE->context)
+    || has_capability('block/supervised:managefinishedsessions', $PAGE->context))   ) {
     require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
 }
 
