@@ -480,7 +480,7 @@ class block_formal_langs extends block_list {
             $text = $permission->uiname . ' (' . $permission->version . ')';
             // Add inheritance hint
             if ($isglobal == false && $permission->contextid != $context->id) {
-                $text =  get_string('inherited', 'block_formal_langs') . ' ' . $text;
+                $text =  html_writer::tag('span', get_string('inherited', 'block_formal_langs'), array('class' => 'inherited-hint')) . ' ' . $text;
             }
             $text =  html_writer::tag('span',  $text, array('class' => $class, 'data-id' => $permission->id));
             $this->content->items[]  = $text;
@@ -568,6 +568,7 @@ class block_formal_langs extends block_list {
                     }
                     $(this).find("img").attr("src", src);
                     $(this).attr("data-visible", visible);
+                    $(this).parent().parent().parent().find(".inherited-hint").remove();
                     $.ajax({
                     "url": localpage,
                     "type" : "GET",
