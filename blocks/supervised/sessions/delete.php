@@ -26,12 +26,9 @@ if ($session->state == StateSession::Finished) {
     require_capability('block/supervised:managefinishedsessions', $PAGE->context);
 }
 else{
-    if ($session->teacherid == $USER->id) {
-        // User wants remove his own session.
-        if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
-            || has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
-            require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
-        }
+    if ( ! (($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
+            || has_capability('block/supervised:manageallsessions', $PAGE->context))   ){
+        require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
     }
     else{
         // User wants remove session of other user.
