@@ -504,8 +504,6 @@ class block_supervised extends block_base {
 
         mtrace( "Cron script for supervised block is running" );
 
-        //$result = $DB->get_records($table,array('foo' => 'bar' , 'jon' => 'doe'));
-
         // Find all out of date sessions.
         $select = "SELECT * FROM {block_supervised_session}
                     WHERE timeend < :curtime
@@ -516,7 +514,6 @@ class block_supervised extends block_base {
         $sessions = $DB->get_records_sql($select, $params);
         print_object($sessions);
         foreach($sessions as $session){
-            echo($session->id);
             $session->state = StateSession::Finished;
             $DB->update_record('block_supervised_session', $session);
         }
