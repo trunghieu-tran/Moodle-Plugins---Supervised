@@ -44,6 +44,7 @@ $string['formal_langs:editalllanguages'] = 'Can edit all registered formal langu
 $string['formal_langs:editownlanguages'] = 'Can edit only own created formal languages';
 $string['formal_langs:viewlanguagelist']     = 'Can view formal language list';
 $string['extraseparatormsg'] = 'there may be an extra separator inside {$a->correct[0]}';
+$string['inherited'] = '(Inherited)';
 $string['lang_c_language'] = 'C programming language';
 $string['lang_c_language_help'] = 'C programming language. Scanning only.';
 $string['lang_cpp_language'] = 'C++ programming language';

@@ -45,6 +45,7 @@ $string['formal_langs:changelanguagevisibility'] = 'Может менять ви
 $string['formal_langs:editalllanguages'] = 'Может редактировать все формальные языки (кроме системных)';
 $string['formal_langs:editownlanguages'] = 'Может редактировать только те, формальные языки, что создал сам';
 $string['formal_langs:viewlanguagelist']     = 'Может просматривать список формальных языков';
+$string['inherited'] = '(Унаследовано)';
 $string['lang_c_language'] = 'Язык программирования C';
 $string['lang_c_language_help'] = 'Язык программирования C (только лексический разбор).';
 $string['lang_cpp_language'] = 'Язык программирования C++';

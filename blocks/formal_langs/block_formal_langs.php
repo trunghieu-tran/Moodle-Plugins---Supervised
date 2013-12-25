@@ -291,7 +291,9 @@ class block_formal_langs extends block_list {
                 FROM {context}
                 WHERE id ' . $insql;
         $contexts = $DB->get_records_sql($sql, $params);
+        $globalcontextid = context_system::instance()->id;
         foreach($languages as $language) {
+            $language->contextid = $globalcontextid;
             // Fetch permissions for language.
             $permissionsforlanguage = array();
             foreach($contextspermissions as $permission) {
@@ -307,6 +309,7 @@ class block_formal_langs extends block_list {
                     if (array_key_exists($contextid, $contexts)) {
                         $depth = $contexts[$contextid]->depth;
                         if ($depth > $maxdepth) {
+                            $language->contextid = $contextid;
                             $maxdepth = $depth;
                             $maxdepthid = $contextid;
                         }
@@ -422,6 +425,7 @@ class block_formal_langs extends block_list {
             $this->content->icons[] = $icona;
             $this->content->items[] =  html_writer::tag('a', get_string('addnewlanguage', 'block_formal_langs'), array('href' => $link));;
         }
+        $isglobal = $context->id == context_system::instance()->id;
         foreach($permissions as $permission) {
             if ($permission->visible) {
                 $visible = 0;
@@ -474,6 +478,10 @@ class block_formal_langs extends block_list {
             $text =  html_writer::tag('span',  $visibleicon . $editlinks, array('class' => $class, 'data-id' => $permission->id));
             $this->content->icons[] = $text;
             $text = $permission->uiname . ' (' . $permission->version . ')';
+            // Add inheritance hint
+            if ($isglobal == false && $permission->contextid != $context->id) {
+                $text =  get_string('inherited', 'block_formal_langs') . ' ' . $text;
+            }
             $text =  html_writer::tag('span',  $text, array('class' => $class, 'data-id' => $permission->id));
             $this->content->items[]  = $text;
         }
