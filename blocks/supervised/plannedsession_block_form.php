@@ -52,6 +52,8 @@ class plannedsession_block_form extends moodleform {
         $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
+        // add timeend
+        $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         // add comment
         if($this->_customdata['needcomment']){
             $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));

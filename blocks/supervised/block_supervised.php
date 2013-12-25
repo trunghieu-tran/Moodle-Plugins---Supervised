@@ -180,6 +180,7 @@ class block_supervised extends block_base {
                 $toform['lessontypeid']     = $plannedsession->lessontypeid;
                 $toform['duration']         = $plannedsession->duration;
                 $toform['timestart']        = userdate($plannedsession->timestart, $strftimedatetime);
+                $toform['timeend']          = userdate($plannedsession->timeend, $strftimedatetime);
                 $toform['sessioncomment']   = $plannedsession->sessioncomment;
 
                 $mform->set_data($toform);
@@ -258,6 +259,7 @@ class block_supervised extends block_base {
                 $strftimedatetime = get_string("strftimerecent");
                 $toform['lessontypename']   = $activesession->lessontypeid == 0 ? get_string('notspecified', 'block_supervised'): $activesession->lessontypename;
                 $toform['timestart']        = userdate($activesession->timestart, $strftimedatetime);
+                $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
                 $mform->set_data($toform);
                 $formbody = $mform->render();
             }
@@ -272,6 +274,7 @@ class block_supervised extends block_base {
                 $toform['lessontypename']   = $activesession->lessontypeid == 0 ? get_string('notspecified', 'block_supervised'): $activesession->lessontypename;
                 $toform['duration']         = $activesession->duration;
                 $toform['timestart']        = userdate($activesession->timestart, $strftimedatetime);
+                $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
                 $toform['sessioncomment']   = $activesession->sessioncomment;
 
                 $mform->set_data($toform);
