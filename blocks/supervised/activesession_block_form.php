@@ -26,6 +26,11 @@ class activesession_block_form extends moodleform {
 
         // add group
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
+        // Add show logs link.
+        $sessionid = $this->_customdata['sessionid'];
+        $courseid = $this->_customdata['courseid'];
+        $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $sessionid, 'courseid' => $courseid));
+        $mform->addElement('link', 'showlogslink', null, $logsurl->out(false), get_string('showlogs', 'block_supervised'));
         // add classroom
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');

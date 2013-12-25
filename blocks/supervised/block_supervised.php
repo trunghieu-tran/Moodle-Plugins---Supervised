@@ -133,10 +133,7 @@ class block_supervised extends block_base {
         global $CFG, $COURSE, $DB;
         $plannedsession = $this->get_teacher_planned_session();
 
-        //echo('planned sessions empty?: '); var_dump(empty($plannedsession)); echo ('<br/>');
-
         if( !empty($plannedsession) ){
-            //echo('render plannedsession form <br/>');
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/plannedsession_block_form.php";
             if (file_exists($mform)) {
@@ -196,10 +193,7 @@ class block_supervised extends block_base {
         global $CFG, $COURSE, $DB;
         $activesession  = $this->get_teacher_active_session();
 
-        //echo('active sessions empty?: '); var_dump(empty($activesession)); echo ('<br/>');
-
         if( !empty($activesession) ){
-            //echo('render activesession form <br/>');
             // Prepare form.
             $mform = $CFG->dirroot."/blocks/supervised/activesession_block_form.php";
 
@@ -208,7 +202,7 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new activesession_block_form(null, array('needcomment'=>$activesession->sessioncomment!='' ));
+            $mform = new activesession_block_form(null, array('sessionid'=>$activesession->id, 'courseid'=>$activesession->courseid, 'needcomment'=>$activesession->sessioncomment!='' ));
 
             if($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields
@@ -287,7 +281,6 @@ class block_supervised extends block_base {
     private function render_startsession_form(&$sessionstitle, &$formbody){
         global $CFG, $COURSE, $DB, $USER;
 
-        //echo('render start session form <br/>');
         $sessionstitle = get_string('nosessionstitle', 'block_supervised');
         // Prepare form.
         $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
@@ -299,7 +292,6 @@ class block_supervised extends block_base {
         $mform = new startsession_block_form();
 
         if ($fromform = $mform->get_data()) {
-            //echo('session started (from startsession form) <br/>');
             // TODO Logging
             // Trigger event (session started).
             $sessioninfo = new stdClass();
