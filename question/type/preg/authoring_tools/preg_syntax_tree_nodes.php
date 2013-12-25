@@ -67,7 +67,7 @@ abstract class qtype_preg_syntax_tree_node {
      * Returns the name used for all graphs. The name usually follows the "digraph" keyword.
      */
     public static function get_graph_name() {
-        return 'qtype_preg_graph';
+        return 'qtype_preg_tree';
     }
 
     /**

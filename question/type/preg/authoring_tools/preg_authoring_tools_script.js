@@ -25,7 +25,9 @@ M.preg_authoring_tools_script = (function ($) {
 
     STRINGS_KEY : 'regex_test',
 
-    TREE_MAP_ID : '#qtype_preg_graph',
+    TREE_MAP_ID : '#qtype_preg_tree',
+
+    GRAPH_MAP_ID : '#qtype_preg_graph',
 
     /** @var string with moodle root url (smth like 'http://moodle.site.ru/') */
     www_root : null,
@@ -350,6 +352,7 @@ M.preg_authoring_tools_script = (function ($) {
             tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
             graph_img = $('#graph_img'),
+            graph_map = $('#graph_map'),
             desc_hnd = $('#description_handler');
 
         self.invalidate_content();
@@ -363,8 +366,11 @@ M.preg_authoring_tools_script = (function ($) {
             tree_err.html(t);
         }
 
-        if (typeof g != 'undefined' && g.substring(0, 4) == 'data') {
-            graph_img.attr('src', g).css('visibility', 'visible');
+        if (typeof g != 'undefined' && g.img && g.map) {
+            graph_img.attr('src', g.img).css('visibility', 'visible');
+            graph_map.html(g.map);
+            graph_map.click(self.tree_node_misclicked);
+            $(self.GRAPH_MAP_ID + ' > area').click(self.tree_node_clicked);
         } else if (typeof g != 'undefined') {
             graph_err.html(g);
         }

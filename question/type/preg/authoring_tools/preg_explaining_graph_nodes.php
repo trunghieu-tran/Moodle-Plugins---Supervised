@@ -66,6 +66,13 @@ abstract class qtype_preg_explaining_graph_node_abstract {
                 return true;
         }
     }
+
+    /**
+     * Returns the name used for all graphs. The name usually follows the "digraph" keyword.
+     */
+    public static function get_graph_name() {
+        return 'qtype_preg_graph';
+    }
 }
 
 /**
@@ -134,7 +141,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
             $this->get_shape(),
             $this->get_color(),
             $graph,
-            $this->pregnode->id,
+            $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast,
             $this->get_style(),
             $this->get_fillcolor()
         );
