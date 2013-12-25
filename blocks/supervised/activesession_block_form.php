@@ -24,6 +24,8 @@ class activesession_block_form extends moodleform {
             }
         }
 
+        //$mform->registerNoSubmitButton('updatebtn');
+
         // add group
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
         // add classroom
@@ -38,6 +40,7 @@ class activesession_block_form extends moodleform {
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         // add duration
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
+        $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // add comment
@@ -46,10 +49,11 @@ class activesession_block_form extends moodleform {
         }
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
+        $mform->setType('id', PARAM_INT);
         // add submit and cancel buttons
         $buttonarray=array();
-        $buttonarray[] =& $mform->createElement('submit', 'submitbutton', get_string('updatesession', "block_supervised"));
-        $buttonarray[] =& $mform->createElement('cancel', 'cancelbutton', get_string('finishsession', "block_supervised"));
+        $buttonarray[] =& $mform->createElement('submit', 'updatebtn', get_string('updatesession', "block_supervised"));
+        $buttonarray[] =& $mform->createElement('cancel', 'finishbtn', get_string('finishsession', "block_supervised"));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 }
