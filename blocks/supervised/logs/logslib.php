@@ -20,11 +20,13 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     $logs = get_logs($selector, $params);
 
     // Filter logs by classroom ip subnet
-    $logs_filtered = array();
+    $logs_filtered = $logs; // TODO Do we really need this filtering?
+    /*$logs_filtered = array();
     foreach ($logs as $id=>$log) {
+        echo($log->ip);
         if(address_in_subnet($log->ip, $classroom->iplist))
             $logs_filtered[$id] = $log;
-    }
+    }*/
 
     $result['logs'] = array_slice($logs_filtered, $limitfrom, $limitnum);
     $result['totalcount'] = count($logs_filtered);
@@ -32,7 +34,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     return $result;
 }
 
-function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=3, $url=""){
+function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url=""){
     global $OUTPUT;
 
     $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page*$perpage, $perpage);
