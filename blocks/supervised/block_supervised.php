@@ -495,7 +495,32 @@ class block_supervised extends block_base {
             // Be supervised mode.
             $this->render_besupervised_body();
         }
-
         return $this->content;
+    }
+
+    public function cron() {
+        require_once('sessions/sessionstate.php');
+        global $DB;
+
+        mtrace( "Cron script for supervised block is running" );
+
+        //$result = $DB->get_records($table,array('foo' => 'bar' , 'jon' => 'doe'));
+
+        // Find all out of date sessions.
+        $select = "SELECT * FROM {block_supervised_session}
+                    WHERE timeend < :curtime
+                    AND   state   = :state
+                    ";
+        $params['curtime']  = time();
+        $params['state']    = StateSession::Active;
+        $sessions = $DB->get_records_sql($select, $params);
+        print_object($sessions);
+        foreach($sessions as $session){
+            echo($session->id);
+            $session->state = StateSession::Finished;
+            $DB->update_record('block_supervised_session', $session);
+        }
+
+        return true;
     }
 }
