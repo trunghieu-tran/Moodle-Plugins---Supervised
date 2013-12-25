@@ -48,7 +48,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             // Check if user is in current session's group.
             $useringroup = $session->groupid == 0 ? true : groups_is_member($session->groupid, $userid);
             // Check if current session's lessontype is in passed $lessontypes array.
-            $islessontype = in_array($session->lessontype, $lessontypes);
+            $islessontype = in_array($session->lessontypeid, $lessontypes);
             if( !($useringroup && $islessontype) ){
                 // Remove current session.
                 unset($sessions[$id]);
