@@ -347,27 +347,6 @@ class block_supervised extends block_base {
         // Add block body.
         $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $formbody;
-
-        // Add links to a footer according to user capabilities.
-        if(has_capability('block/supervised:editclassrooms', $this->context)){
-            $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
-            $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
-        }
-        if(has_capability('block/supervised:editlessontypes', $this->context)){
-            $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
-            $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
-        }
-        if(has_capability('block/supervised:viewownsessions', $this->context)
-            || has_capability('block/supervised:viewallsessions', $this->context)
-            || has_capability('block/supervised:manageownsessions', $this->context)
-            || has_capability('block/supervised:manageallsessions', $this->context)
-            || has_capability('block/supervised:managefinishedsessions', $this->context))
-        {
-            $sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $COURSE->id));
-            $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
-        }
-
-        $this->content->footer = join(' ', $links);
     }
 
 
@@ -472,7 +451,6 @@ class block_supervised extends block_base {
         }
 
         // Add block body.
-        $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $blockbody;
     }
 
@@ -494,7 +472,52 @@ class block_supervised extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
+        $this->content  = new stdClass;
 
+
+        /////////////////////////////////////////////////////////////////////
+        //Check capabilities
+        has_capability('block/supervised:besupervised', $this->context)    ?
+            $str='besupervised:     yes' : $str='besupervised:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:supervise', $this->context)    ?
+            $str='supervise:     yes' : $str='supervise:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:editclassrooms', $this->context)    ?
+            $str='editclassrooms:     yes' : $str='editclassrooms:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:editlessontypes', $this->context)    ?
+            $str='editlessontypes:     yes' : $str='editlessontypes:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:viewownsessions', $this->context)    ?
+            $str='viewownsessions:     yes' : $str='viewownsessions:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:viewallsessions', $this->context)    ?
+            $str='viewallsessions:     yes' : $str='viewallsessions:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:manageownsessions', $this->context)    ?
+            $str='manageownsessions:     yes' : $str='manageownsessions:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:manageallsessions', $this->context)    ?
+            $str='manageallsessions:     yes' : $str='manageallsessions:     no';
+        echo $str . '<br/>';
+
+        has_capability('block/supervised:managefinishedsessions', $this->context)    ?
+            $str='managefinishedsessions:     yes' : $str='managefinishedsessions:     no';
+        echo $str . '<br/>';
+        /////////////////////////////////////////////////////////////////////
+
+
+
+
+        // Render body.
         if(has_capability('block/supervised:supervise', $this->context)){
             // Supervise mode.
             $this->render_supervise_body();
@@ -503,7 +526,34 @@ class block_supervised extends block_base {
             // Be supervised mode.
             $this->render_besupervised_body();
         }
+        // Render footer.
+        $this->render_footer();
+
         return $this->content;
+    }
+
+    public function render_footer(){
+        global $COURSE;
+        // Add links to a footer according to user capabilities.
+        if(has_capability('block/supervised:editclassrooms', $this->context)){
+            $classroomsurl = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($classroomsurl, get_string('classroomsurl', 'block_supervised'));
+        }
+        if(has_capability('block/supervised:editlessontypes', $this->context)){
+            $lessontypesurl = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($lessontypesurl, get_string('lessontypesurl', 'block_supervised'));
+        }
+        if(has_capability('block/supervised:viewownsessions', $this->context)
+            || has_capability('block/supervised:viewallsessions', $this->context)
+            || has_capability('block/supervised:manageownsessions', $this->context)
+            || has_capability('block/supervised:manageallsessions', $this->context)
+            || has_capability('block/supervised:managefinishedsessions', $this->context))
+        {
+            $sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $COURSE->id));
+            $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
+        }
+
+        $this->content->footer = join(' ', $links);
     }
 
     public function cron() {
