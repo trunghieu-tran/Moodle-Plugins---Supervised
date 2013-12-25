@@ -474,49 +474,6 @@ class block_supervised extends block_base {
         }
         $this->content  = new stdClass;
 
-
-        /////////////////////////////////////////////////////////////////////
-        //Check capabilities
-        has_capability('block/supervised:besupervised', $this->context)    ?
-            $str='besupervised:     yes' : $str='besupervised:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:supervise', $this->context)    ?
-            $str='supervise:     yes' : $str='supervise:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:editclassrooms', $this->context)    ?
-            $str='editclassrooms:     yes' : $str='editclassrooms:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:editlessontypes', $this->context)    ?
-            $str='editlessontypes:     yes' : $str='editlessontypes:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:viewownsessions', $this->context)    ?
-            $str='viewownsessions:     yes' : $str='viewownsessions:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:viewallsessions', $this->context)    ?
-            $str='viewallsessions:     yes' : $str='viewallsessions:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:manageownsessions', $this->context)    ?
-            $str='manageownsessions:     yes' : $str='manageownsessions:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:manageallsessions', $this->context)    ?
-            $str='manageallsessions:     yes' : $str='manageallsessions:     no';
-        echo $str . '<br/>';
-
-        has_capability('block/supervised:managefinishedsessions', $this->context)    ?
-            $str='managefinishedsessions:     yes' : $str='managefinishedsessions:     no';
-        echo $str . '<br/>';
-        /////////////////////////////////////////////////////////////////////
-
-
-
-
         // Render body.
         if(has_capability('block/supervised:supervise', $this->context)){
             // Supervise mode.
