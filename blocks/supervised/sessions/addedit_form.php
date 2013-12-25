@@ -73,6 +73,7 @@ class addedit_session_form extends moodleform {
         $mform->addRule('timestart', null, 'required', null, 'client');
         // add duration
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
+        $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // add comment
@@ -82,7 +83,9 @@ class addedit_session_form extends moodleform {
 
         // hidden elements
         $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
         
         $this->add_action_buttons();
     }

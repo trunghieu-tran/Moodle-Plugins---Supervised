@@ -47,10 +47,12 @@ class startsession_block_form extends moodleform {
         $mform->addRule('lessontypeid', null, 'required', null, 'client');
         // add duration
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
+        $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
+        $mform->setType('id', PARAM_INT);
         // add submit button
         $mform->addElement('submit', 'submitbutton', get_string('startsession', "block_supervised"));
     }
