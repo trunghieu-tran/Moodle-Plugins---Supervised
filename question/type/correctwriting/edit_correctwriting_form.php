@@ -104,7 +104,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
 
-        $currentlanguages = block_formal_langs::available_langs();
+        $currentlanguages = block_formal_langs::available_langs( $PAGE->context->id );
         $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
