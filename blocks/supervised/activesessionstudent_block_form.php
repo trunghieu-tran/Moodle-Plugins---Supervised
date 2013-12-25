@@ -5,8 +5,6 @@ require_once("{$CFG->libdir}/formslib.php");
 class activesessionstudent_block_form extends moodleform {
  
     function definition() {
-        global $DB, $COURSE;
-
         $mform =& $this->_form;
 
         // add group
