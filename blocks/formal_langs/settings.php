@@ -29,5 +29,5 @@ require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 if($ADMIN->fulltree) {
     $string = get_string('formallangsglobalsettings', 'block_formal_langs');
-    $ADMIN->add('root', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
+    $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
 }
