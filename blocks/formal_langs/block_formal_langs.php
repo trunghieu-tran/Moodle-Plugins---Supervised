@@ -58,8 +58,8 @@ class block_formal_langs extends block_list {
 
         $languages = block_formal_langs::all_languages();
         foreach($table as $record) {
-            if ($record->visible == 0 && array_key_exists($record->languageid, $languages)) {
-                unset($languages[$record->languageid]);
+            if ($record->visible == 0 && array_key_exists($record->id, $languages)) {
+                unset($languages[$record->id]);
             }
         }
 
