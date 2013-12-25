@@ -581,4 +581,10 @@ class block_formal_langs extends block_list {
         $script = html_writer::tag('script', $js);
         return $result . $style . $script;
     }
+
+    public function applicable_formats() {
+        return array(
+            'course-view' => true
+        );
+    }
 }
