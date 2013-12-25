@@ -35,6 +35,8 @@ if ($context !== false) {
     $PAGE->set_context($context);
     require_capability('block/formal_langs:addinstance', $context);
     $action  = optional_param('action', '', PARAM_RAW);
+    $isglobal  = optional_param('global', '', PARAM_RAW);
+    $isglobal =  ($isglobal == 'Y');
     $langid = required_param('languageid', PARAM_INT);
     $lang = $DB->get_record('block_formal_langs', array('id' => $langid));
     $caneditall = has_capability('block/formal_langs:editalllanguages', $context);
@@ -51,6 +53,20 @@ if ($context !== false) {
         $context = required_param('context', PARAM_INT);
         if ($canchagevisibility) {
             block_formal_langs::update_language_visibility($langid, $visible, $context);
+
+            if ($isglobal) {
+                $result = $DB->get_records_sql('SELECT  `id` ,  `shortname`   FROM  {course} course  WHERE NOT  EXISTS (
+                                                    SELECT *  FROM  {block_formal_langs_perms} p,  {context} context
+                                                    WHERE p.contextid = context.id
+                                                    AND context.contextlevel = ' . CONTEXT_COURSE . '
+                                                    AND context.instanceid = course.id
+                                                    AND p.languageid = ?
+                                               )',  array($langid)
+                                              );
+                echo json_encode(array_values($result));
+            } else {
+                echo json_encode(null);
+            }
         }
     }
 

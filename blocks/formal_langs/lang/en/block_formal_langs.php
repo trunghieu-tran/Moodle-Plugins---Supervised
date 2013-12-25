@@ -22,6 +22,7 @@
  */
 
 $string['addnewlanguage'] = 'Add new language';
+$string['affectedcourses'] = 'Affected courses: ';
 $string['changevisibility'] = 'Change visibility in current context';
 $string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->line}:{$a->col}';
 $string['clanguageunknownsymbol'] = 'There is unknown character "{$a->symbol}" at {$a->line}:{$a->position}';
