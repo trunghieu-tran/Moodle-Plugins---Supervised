@@ -29,8 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Surervised block access rule';
 
 $string['checknotrequired']         = 'No';
-$string['checkforall']              = 'Yes, for all lessontypes in this course (include "Not specified" lessontype)';
-$string['customcheck']              = 'Yes, for custom lessontype list:';
+$string['checkforall']              = 'Yes, for all lesson types in this course (include "Not specified" lesson type)';
+$string['customcheck']              = 'Yes, for custom lesson types:';
 $string['allowcontrol']             = 'Allow supervised control?';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';
-$string['noaccess']                 = 'No active session at this moment. You can\'t start the quiz.';
+$string['noaccess']                 = 'You can\'t start the quiz. No active session at this moment for appropriate lesson type.';
