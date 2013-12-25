@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/blocks/supervised/sessions/sessionstate.php');
  */
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
-    public function isActiveSessionExist($userid, $courseid, $lessontypes){
+    public function getAppropriatedSessions($userid, $courseid, $lessontypes){
         global $DB;
 
         // Select all active sessions with $courseid.
@@ -55,7 +55,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             }
         }
 
-        return !empty($sessions);
+        return $sessions;
     }
 
 
@@ -92,10 +92,24 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $lessontypes[] = $lessontype->id;
         }
 
-        $isactivesession = $this->isActiveSessionExist($USER->id, $COURSE->id, $lessontypes);
+        $sessions = $this->getAppropriatedSessions($USER->id, $COURSE->id, $lessontypes);
 
-        if ($isactivesession){
-            return false;
+        if (!empty($sessions)){
+            // Ok, we have an active session(s) with appropriate lesson type. Now check an ip address.
+            $isinsubnet = false;
+            foreach($sessions as $session){
+                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$session->classroomid));
+                if(address_in_subnet($USER->lastip, $classroom->iplist)){
+                    $isinsubnet = true;
+                    break;
+                }
+            }
+            if($isinsubnet){
+                return false;
+            }
+            else{
+                return get_string('iperror', 'quizaccess_supervisedcheck');
+            }
         }
         else{
             return get_string('noaccess', 'quizaccess_supervisedcheck');

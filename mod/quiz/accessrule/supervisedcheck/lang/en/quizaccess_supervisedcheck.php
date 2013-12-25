@@ -34,3 +34,4 @@ $string['customcheck']              = 'Yes, for custom lesson types:';
 $string['allowcontrol']             = 'Allow supervised control?';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';
 $string['noaccess']                 = 'You can\'t start the quiz. No active session at this moment for appropriate lesson type.';
+$string['iperror']                  = 'You can\'t start the quiz because your ip isn\'t in classroom subnet.';
