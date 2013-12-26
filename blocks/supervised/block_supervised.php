@@ -517,16 +517,20 @@ class block_supervised extends block_base {
         // Find all out of date sessions.
         $select = "SELECT * FROM {block_supervised_session}
                     WHERE timeend < :curtime
-                    AND   state   = :state
+                    AND   (state   = :stateactive OR state   = :stateplanned)
                     ";
-        $params['curtime']  = time();
-        $params['state']    = StateSession::Active;
+        $params['curtime']      = time();
+        $params['stateactive']  = StateSession::Active;
+        $params['stateplanned'] = StateSession::Planned;
         $sessions = $DB->get_records_sql($select, $params);
+        $sessionscount = count($sessions);
         print_object($sessions);
         foreach($sessions as $session){
             $session->state = StateSession::Finished;
             $DB->update_record('block_supervised_session', $session);
         }
+
+        mtrace( "Updated " . $sessionscount . " records");
 
         return true;
     }
