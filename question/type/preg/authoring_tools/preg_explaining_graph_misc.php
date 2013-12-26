@@ -233,12 +233,17 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 // If neighbor is simple node with text too and it's a child of the same subgraph,
                 // then we need to join this two nodes.
                 if ($neighbor !== null and $neighbor->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE && $neighbor->owner === $this) {
+
+                    $ids_this = explode(',', $tmpdnode->id);
+                    $ids_neighbor = explode(',', $neighbor->id);
+                    $ids_new = $ids_this[0] . ',' . $ids_this[1] . ',' . ($ids_neighbor[2]);
+
                     // Create the new joined node.
                     $tmp = new qtype_preg_explaining_graph_tool_node(
                                 array($tmpdnode->label[0] . $neighbor->label[0]),
                                 $neighbor->shape,
                                 $neighbor->color,
-                                $this, $tmpdnode->id,
+                                $this, $ids_new,
                                 $tmpdnode->style,
                                 $tmpdnode->fillcolor
                             );
