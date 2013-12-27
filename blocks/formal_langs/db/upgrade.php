@@ -48,7 +48,7 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
     if ($oldversion < 2013071900) {
         $dbman = $DB->get_manager();
         $bfl = new xmldb_table('block_formal_langs');
-        $lexemenamefield = new xmldb_field('lexemename', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'visible');
+        $lexemenamefield = new xmldb_field('lexemname', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'visible');
         $dbman->add_field($bfl, $lexemenamefield);
     }
 
@@ -97,6 +97,11 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
     if ($oldversion < 2013120600) {
         $dbman = $DB->get_manager();
         $bfl = new xmldb_table('block_formal_langs');
+        // Rename old buggy update, if somebody applied it
+        if ($dbman->field_exists($bfl, 'lexemename')) {
+            $lexemenamefield = new xmldb_field('lexemename', XMLDB_TYPE_TEXT ,null,null,null, null, null, 'visible');
+            $dbman->rename_field($bfl, $lexemenamefield, 'lexemname');
+        }
         $field = new xmldb_field('author');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'lexemname');
         $dbman->add_field($bfl, $field);
