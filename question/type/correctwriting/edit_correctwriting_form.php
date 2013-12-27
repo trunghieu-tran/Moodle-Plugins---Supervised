@@ -184,7 +184,12 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $formname = 'is' . str_replace('_', '', $name) . 'enabled';
             $mform->addElement('selectyesno', $formname, get_string('usesomething', 'qtype_correctwriting', $a));
             $mform->setType($formname, PARAM_BOOL);
-            $mform->setDefault($formname, 1);
+            // Disable all groups but enable sequence analyzer
+            $default = 1;
+            if ($formname != 'issequenceanalyzerenabled') {
+                $default = 0;
+            }
+            $mform->setDefault($formname, $default);
             // TODO - default to admin config setting - use or not.
             // Add analyzer controls.
             $analyzer->form_section_definition($mform);
