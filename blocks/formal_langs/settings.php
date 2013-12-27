@@ -32,6 +32,6 @@ if(is_object($ADMIN)) {
     // DO NOT UNDER ANY CIRCUMSTANCES REMOVE THIS LINE! THIS IS NOT A DECLARATION!
     $settings = null;
 
-    $string = get_string('formallangsglobalsettings', 'block_formal_langs');
+    $string = get_string('pluginname', 'block_formal_langs');
     $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
 }
