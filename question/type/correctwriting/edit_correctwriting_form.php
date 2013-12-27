@@ -69,7 +69,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      *    @param MoodleQuickForm $mform form data
      */
     protected function definition_inner($mform) {
-        global $CFG, $PAGE;
+        global $CFG, $PAGE, $COURSE, $DB;
 
         $PAGE->requires->jquery();
 
@@ -103,8 +103,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $this->floatfields[$name] = $field;
             }
         }
+        // Fetch course context if can
+        $contextid = null;
+        if ($COURSE != null) {
+            if (is_a($COURSE, 'stdClass')) {
+                $conditions = array('contextlevel' => CONTEXT_COURSE, 'instanceid' => $COURSE->id);
+                $context = $DB->get_record('context', $conditions);
+                $contextid = $context->id;
+            } else {
+                $contextid = $COURSE->get_context()->id;
+            }
+        }
 
-        $currentlanguages = block_formal_langs::available_langs( $PAGE->context->id );
+        $currentlanguages = block_formal_langs::available_langs( $contextid );
         $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
