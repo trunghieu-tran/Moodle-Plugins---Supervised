@@ -7,14 +7,14 @@ $courseid   = required_param('courseid', PARAM_INT);
 $id         = required_param('id', PARAM_INT);
 $site = get_site();
 
-$course = $DB->get_record('course', array('id' => $courseid));
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+    print_error('invalidcourse', 'block_supervised', $courseid);
+}
 
 require_login($course);
 require_capability('block/supervised:editclassrooms', $PAGE->context);
 
-if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('invalidcourse', 'block_supervised', $courseid);
-}
+
 if ($site->id == $course->id) {
     // block can not work in the main course (frontpage)
     print_error("invalidcourseid");
@@ -33,4 +33,3 @@ if (!$DB->update_record('block_supervised_classroom', $classroom)) {
 // Redirect.
 $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
 redirect($url);
-?>
