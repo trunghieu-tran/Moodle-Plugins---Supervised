@@ -29,3 +29,4 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2013100201;                    // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2013051400;                    // Requires this Moodle version
 $plugin->component = 'quizaccess_supervisedcheck';  // Full name of the plugin (used for diagnostics).
+$plugin->dependencies = array('block_supervised' => 2013122604);
