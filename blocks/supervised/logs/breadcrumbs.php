@@ -7,5 +7,3 @@ $PAGE->navbar->add(get_string('sessionsbreadcrumb', 'block_supervised'), $sessio
 
 $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('courseid' => $courseid, 'sessionid' => $sessionid));
 $PAGE->navbar->add(get_string('logsbreadcrumb', 'block_supervised'), $logsurl);
-
-?>

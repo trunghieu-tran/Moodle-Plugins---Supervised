@@ -5,8 +5,6 @@ require_once("{$CFG->libdir}/formslib.php");
 class delete_session_form extends moodleform {
  
     function definition() {
-        global $DB;
-
         $mform =& $this->_form;
 
         $mform->addElement('static', 'coursename', get_string('course', 'block_supervised'));
