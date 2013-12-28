@@ -328,6 +328,8 @@ class block_formal_langs extends block_list {
      * @param int $languageid id of language
      * @param int $visibility visibility of data
      * @param int $contextid id of context for items
+     * @return string either course - new setting for this language  for context will be taken from course
+     *                    or site   - new setting for this language wll be taken  from site
      */
     public static function update_language_visibility($languageid, $visibility, $contextid) {
         global $DB;
@@ -345,6 +347,7 @@ class block_formal_langs extends block_list {
         $existentobject->languageid = $languageid;
         $existentobject->contextid = $contextid;
         $existentobject->visible = $visibility;
+        $result = 'course';
         if (count($contextpermissions) == 0) {
             $DB->insert_record('block_formal_langs_perms', $existentobject);
         } else {
@@ -363,6 +366,7 @@ class block_formal_langs extends block_list {
                 // Otherwise, we could delete data.
                 if ($parentvisibilitymatches  && $currentpermission->visible != $visibility) {
                     $DB->delete_records('block_formal_langs_perms', array('id' => $currentpermission->id));
+                    $result = 'site';
                 } else {
                     if ($currentpermission->visible != $visibility) {
                         $existentobject->id = $currentpermission->id;
@@ -377,6 +381,7 @@ class block_formal_langs extends block_list {
                 }
             }
         }
+        return $result;
     }
 
 
@@ -479,8 +484,14 @@ class block_formal_langs extends block_list {
             $this->content->icons[] = $text;
             $text = $permission->uiname . ' (' . $permission->version . ')';
             // Add inheritance hint
-            if ($isglobal == false && $permission->contextid != $context->id) {
-                $text =  html_writer::tag('span', get_string('inherited', 'block_formal_langs'), array('class' => 'inherited-hint')) . ' ' . $text;
+            if ($isglobal == false) {
+                if ($permission->contextid != $context->id) {
+                    $inheritedtext = get_string('inherited_site', 'block_formal_langs');
+                } else {
+                    $inheritedtext = get_string('inherited_course', 'block_formal_langs');
+                }
+                $inheritedtext = '(' . $inheritedtext . ')';
+                $text =  html_writer::tag('span', $inheritedtext, array('class' => 'inherited-hint')) . ' ' . $text;
             }
             $text =  html_writer::tag('span',  $text, array('class' => $class, 'data-id' => $permission->id));
             $this->content->items[]  = $text;
@@ -568,7 +579,10 @@ class block_formal_langs extends block_list {
                     }
                     $(this).find("img").attr("src", src);
                     $(this).attr("data-visible", visible);
-                    $(this).parent().parent().parent().find(".inherited-hint").remove();
+                    var updateinheritance = function (text) {
+                        $(this).parent().parent().parent().find(".inherited-hint").html(text);
+                    };
+                    var updateinheritancethis = updateinheritance.bind(this);
                     $.ajax({
                     "url": localpage,
                     "type" : "GET",
@@ -585,6 +599,8 @@ class block_formal_langs extends block_list {
                         if (isglobal) {
                             label =  label + data.map(function(o) { return o.shortname }).join("<br />");
                             $(".global-affected-courses").html(label);
+                        } else {
+                            updateinheritancethis(data);
                         }
                     },
                     "error": function(xhr) {

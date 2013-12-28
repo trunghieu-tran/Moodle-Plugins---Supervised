@@ -52,7 +52,7 @@ if ($context !== false) {
         $visible = required_param('visible', PARAM_INT);
         $context = required_param('context', PARAM_INT);
         if ($canchagevisibility) {
-            block_formal_langs::update_language_visibility($langid, $visible, $context);
+            $scope = block_formal_langs::update_language_visibility($langid, $visible, $context);
 
             if ($isglobal) {
                 $result = $DB->get_records_sql('SELECT  `id` ,  `shortname`   FROM  {course} course  WHERE NOT  EXISTS (
@@ -65,7 +65,7 @@ if ($context !== false) {
                                               );
                 echo json_encode(array_values($result));
             } else {
-                echo json_encode(null);
+                echo json_encode('(' . get_string('inherited_' . $scope, 'block_formal_langs') . ')');
             }
         }
     }
