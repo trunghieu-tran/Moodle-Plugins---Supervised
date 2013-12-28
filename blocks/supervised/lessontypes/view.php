@@ -25,7 +25,7 @@ include("breadcrumbs.php");
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 3);
+echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 2);
 
 // Prepare table data
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid), 'name');
@@ -43,8 +43,11 @@ foreach ($lessontypes as $id=>$lessontype) {
     );
 }
 
-$addurl = new moodle_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . get_string('addlessontype', 'block_supervised') . '</a>');
+// Add button "Add lesson type".
+$params['courseid'] = $courseid;
+$url = new moodle_url('/blocks/supervised/lessontypes/addedit.php', $params);
+$caption = get_string('addlessontype', 'block_supervised');
+echo $OUTPUT->single_button($url, $caption, 'get');
 
 // Build table.
 $table = new html_table();

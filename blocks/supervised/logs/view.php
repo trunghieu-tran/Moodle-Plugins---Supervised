@@ -61,7 +61,7 @@ if ($session->state == StateSession::Planned) {
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("logsview", 'block_supervised'), 3);
+echo $OUTPUT->heading(get_string("logsview", 'block_supervised'), 2);
 
 
 

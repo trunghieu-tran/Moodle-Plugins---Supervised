@@ -35,7 +35,7 @@ if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 3);
+echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 2);
 
 
 // Prepare table data 
@@ -144,11 +144,13 @@ foreach ($sessions as $id=>$session) {
     }
 }
 
-// Render "plane new session link".
+// Add "Plan new session" button.
 if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
-    || has_capability('block/supervised:manageallsessions', $PAGE->context)  ){
-    $addurl = new moodle_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
-    echo ('<a href="'.$addurl.'">' . get_string('plansession', 'block_supervised') . '</a>');
+        || has_capability('block/supervised:manageallsessions', $PAGE->context)  ){
+    $params['courseid'] = $courseid;
+    $url = new moodle_url('/blocks/supervised/sessions/addedit.php', $params);
+    $caption = get_string('plansession', 'block_supervised');
+    echo $OUTPUT->single_button($url, $caption, 'get');
 }
 
 

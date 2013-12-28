@@ -25,7 +25,7 @@ include("breadcrumbs.php");
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("classroomsheader", 'block_supervised'), 3);
+echo $OUTPUT->heading(get_string("classroomsheader", 'block_supervised'), 2);
 
 // Prepare table data
 $classrooms = $DB->get_records('block_supervised_classroom', null, 'name');
@@ -60,8 +60,11 @@ foreach ($classrooms as $id=>$classroom) {
     );
 }
 
-$addurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
-echo ('<a href="'.$addurl.'">' . get_string('addclassroom', 'block_supervised') . '</a>');
+// Add button "Add classroom".
+$params['courseid'] = $courseid;
+$url = new moodle_url('/blocks/supervised/classrooms/addedit.php', $params);
+$caption = get_string('addclassroom', 'block_supervised');
+echo $OUTPUT->single_button($url, $caption, 'get');
 
 // Build table.
 $table = new html_table();

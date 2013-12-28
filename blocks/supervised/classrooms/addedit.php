@@ -75,7 +75,7 @@ if($mform->is_cancelled()) {
 } else {
     // form didn't validate or this is the first display
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($heading, 3);
+    echo $OUTPUT->heading($heading, 2);
     $mform->display();
     echo $OUTPUT->footer();
 }
