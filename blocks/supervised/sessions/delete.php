@@ -70,7 +70,7 @@ if($mform->is_cancelled()) {
     $PAGE->navbar->add(get_string("deletesessionnavbar", 'block_supervised'));
     $PAGE->set_title(get_string("sessiondeletetitle", 'block_supervised'));
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string("sessiondeleteheader", 'block_supervised'), 3);
+    echo $OUTPUT->heading(get_string("sessiondeleteheader", 'block_supervised'), 2);
 
     $strftimedatetime = get_string("strftimerecent");
 

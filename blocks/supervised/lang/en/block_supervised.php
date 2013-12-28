@@ -36,9 +36,9 @@ $string['supervised:manageallsessions']         = 'Manage all sessions: plane/ed
 $string['supervised:managefinishedsessions']    = 'Remove finished sessions';
 
 
-$string['classroomsurl']            = '[Classrooms]';
-$string['lessontypesurl']           = '[Lesson types]';
-$string['sessionsurl']              = '[Sessions]';
+$string['classroomsurl']            = 'Classrooms';
+$string['lessontypesurl']           = 'Lesson types';
+$string['sessionsurl']              = 'Sessions';
 
 $string['classroomspagetitle']      = 'Classrooms list';
 $string['classroomsheader']         = 'Classrooms list';
@@ -68,7 +68,7 @@ $string['addclassroompagetitle']    = 'Add classroom';
 $string['addingnewclassroom']       = 'Adding new classroom';
 $string['editclassroompagetitle']   = 'Edit classroom';
 $string['editingclassroom']         = 'Editing classroom';
-$string['addclassroom']             = '[Add classroom]';
+$string['addclassroom']             = 'Add a classroom ...';
 
 $string['lessontypespagetitle']     = 'Lesson types';
 $string['addlessontypepagetitle']   = 'Add lesson type';
@@ -82,7 +82,7 @@ $string['invalidlessontypeid']      = 'You are trying to use an invalid lesson t
 $string['cannotdeletelessontype']   = 'You can not delete this lesson type, it\'s used in sessions or quizzes';
 $string['deletelessontypecheck']    = 'Are you absolutely sure you want to completely delete this lesson type?';
 $string['insertlessontypeerror']    = 'Database error! Can not insert lesson type into database';
-$string['addlessontype']            = '[Add lesson type]';
+$string['addlessontype']            = 'Add a lesson type ...';
 
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
@@ -108,7 +108,7 @@ $string['timeendvalidationerror']   = 'The session must be active before {$a} at
 $string['durationvalidationerror']  = 'Duration must be greater than zero value.';
 $string['teacherhassession']        = 'Teacher has an other session in this period.';
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
-$string['plansession']              = '[Plan new session]';
+$string['plansession']              = 'Plan a new session ...';
 
 $string['logspagetitle']            = 'Session logs';
 $string['logsview']                 = 'Session logs';
@@ -126,7 +126,7 @@ $string['duration']     = 'Duration (min)';
 $string['timeend']      = 'Time end';
 $string['state']        = 'State';
 $string['logs']         = 'Logs';
-$string['showlogs']     = '[Show logs]';
+$string['showlogs']     = 'Show logs';
 
 $string['allgroups']        = 'All groups';
 $string['notspecified']     = 'Not specified';
