@@ -107,9 +107,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $contextid = null;
         if ($COURSE != null) {
             if (is_a($COURSE, 'stdClass')) {
-                $conditions = array('contextlevel' => CONTEXT_COURSE, 'instanceid' => $COURSE->id);
-                $context = $DB->get_record('context', $conditions);
-                $contextid = $context->id;
+                $contextid = context_course::instance($COURSE->id)->id;
             } else {
                 $contextid = $COURSE->get_context()->id;
             }
