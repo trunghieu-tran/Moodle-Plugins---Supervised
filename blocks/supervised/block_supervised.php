@@ -256,6 +256,7 @@ class block_supervised extends block_base {
                 $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
                 $mform->set_data($toform);
                 $formbody = $mform->render();
+                $this->add_countdown_timer($activesession->timeend - time());
             }
             else {
                 $sessionstitle = get_string('activesessiontitle', 'block_supervised');
@@ -273,10 +274,22 @@ class block_supervised extends block_base {
 
                 $mform->set_data($toform);
                 $formbody = $mform->render();
+                $this->add_countdown_timer($activesession->timeend - time());
             }
         }
         return empty($activesession);
     }
+
+
+    private function add_countdown_timer($duration){
+        global $CFG, $PAGE;
+        require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
+
+        $PAGE->requires->js('/blocks/supervised/module.js');
+        $options = array($duration);
+        $PAGE->requires->js_init_call('M.block_supervised.timer.init', $options, false, supervised_get_js_module());
+    }
+
 
     private function render_startsession_form(&$sessionstitle, &$formbody){
         global $CFG, $COURSE, $DB, $USER;
