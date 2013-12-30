@@ -27,3 +27,17 @@ function can_showhide_classroom($classroomid) {
     // Can not showhide classroom used in active session(s)
     return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid, 'state'=>StateSession::Active));
 }
+
+
+/**
+ * Get the information about the supervised JavaScript module.
+ * @return array a standard jsmodule structure.
+ */
+function supervised_get_js_module() {
+    return array(
+        'name' => 'block_quiz',
+        'fullpath' => '/blocks/supervised/module.js',
+        'requires' => array('base', 'dom', 'event-delegate', 'event-key',
+            'core_question_engine', 'moodle-core-formchangechecker'),
+    );
+}
