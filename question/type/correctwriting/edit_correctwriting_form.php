@@ -64,6 +64,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     private $answercount;
 
+    protected $jsmodule = array(
+        'name' => 'question_type_correctwriting',
+        'fullpath' => '/question/type/correctwriting/module.js'
+    );
 
     /**  Fills an inner definition of form fields
      *    @param MoodleQuickForm $mform form data
@@ -298,8 +302,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     } else {
                         //No need to enter token descriptions.
                         // Force element to be hidden
-                        $hidescript = $this->javascript_for_hiding_answer_lexeme_descriptions($key);
-                        $mform->addElement('html', html_writer::tag('script', $hidescript, array('type' => 'text/javascript') ));
+                        $this->hide_answer_lexeme_description($key);
 
                         // Create empty textarea for label
                         $newtext = $this->get_label(array("", ""));
@@ -317,7 +320,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         //Now we should pass empty answers too.
         $answercount = $data['noanswers'];
         $this->answercount = $answercount;
-        $mform->addElement('html', html_writer::tag('script', $this->javascript_handlers_for_text_input($answercount), array('type' => 'text/javascript') ));
+        $this->init_text_input($answercount);
 
         for ($i = 0; $i < $answercount; $i++) {
             if (!array_key_exists('answer', $data) || !array_key_exists($i, $data['answer'])) {//This answer is empty and was not processed by previous loop.
@@ -328,8 +331,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
                 if (!$exists) {
                     $this->hiddendescriptions[] = $i;
-                    $hidescript = $this->javascript_for_hiding_answer_lexeme_descriptions($i);
-                    $mform->addElement('html', html_writer::tag('script', $hidescript, array('type' => 'text/javascript') ));
+                    $this->hide_answer_lexeme_description($i);
 
 
                     // Create empty textarea for label
@@ -346,126 +348,25 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         }
     }
 
-     protected function javascript_handlers_for_text_input($count) {
+     protected function init_text_input($count) {
+         global $PAGE;
          $lexerurl = new moodle_url('/question/type/correctwriting/scanstring.php');
-         return '
-            lasttimefired = {};
-            $(document).ready(function() {
-                var question_cw_answer_count = ' . (string)$count . ';
-                var question_cw_lexer_url =  "' . $lexerurl->out(true) . '";
-                function runRequest(text, number) {
-                    var labeltextarea = $("label[for=id_lexemedescriptions_" + number + "] textarea");
-                    var editabletextarea = $("#id_lexemedescriptions_" + number);
-                    var currentlanguage = $("#id_langid").val();
-                    var answerfield = $("textarea[name=\'answer[" + number+ "]\']");
-                    var mistakespanselector = "*[id=\'id_error_answer[" + number + "]\']";
-                    $.ajax({
-                        "url": question_cw_lexer_url,
-                        "type": "POST",
-                        "data": {
-                            "scannedtext" : text,
-                            "lang" : currentlanguage
-                        },
-                        "dataType": "json",
-                        "success": function(data) {
-                            if (typeof(data) ==  "object" && data != null) {
-                                if (!("tokens" in data)) {
-                                    new M.core.ajaxException(data);
-                                    return;
-                                }
-                                var cols  = 0;
-                                for(var i = 0; i < data.tokens.length; i++) {
-                                    cols = Math.max(cols, data.tokens[i].length);
-                                }
-                                // Reset mistakes array accordingly
-                                qf_errorHandler(answerfield[0], "");
-                                if (data.errors.length != 0) {
-                                   // fake label for errors, we need to set text as html,
-                                   // but qf_errorHandler does not allow us to do so
-                                   // we doing it via jQuery. This is so going to be
-                                   // messed up on any kind of form update.
-                                   // But sadly, there is no other way...
-                                   qf_errorHandler(answerfield[0], "fake label");
-                                   $(mistakespanselector).html(data.errors);
-                                }
-                                labeltextarea.removeAttr("style");
-                                labeltextarea.css("display", "inline");
-                                labeltextarea.attr("rows", data.tokens.length);
-                                labeltextarea.attr("cols", cols);
-                                labeltextarea.val(data.tokens.join("\n"));
-                                editabletextarea.attr("rows", data.tokens.length);
-                            }
-                        }
-                    });
-                }
-                function question_cw_event_handler() {
-                    var ctime = new Date().getTime();
-                    var matches = $(this).attr("name").match("(answer|fraction)\\\\[([0-9]+)\\\\]");
-                    var number = matches[2];
-                    var elementtype = matches[1];
-                    var hintgradeborder = parseFloat($("input[name=hintgradeborder]").val());
-                    var text  = $("textarea[name=\'answer[" + number +"]\']").val();
-                    var descriptions = $("#fitem_id_lexemedescriptions_" + number);
-                    var fraction = parseFloat($("select[name=\'fraction[" + number +"]\']").val());
-                    var shouldrequestdescriptions = false;
-                    if (!isNaN(hintgradeborder)) {
-                        if (text.length == 0 || fraction < hintgradeborder) {
-                            descriptions.css("display", "none");
-                            descriptions.prev().css("display", "none");
-                        } else {
-                            descriptions.css("display", "block");
-                            descriptions.prev().css("display", "block");
-                            shouldrequestdescriptions = true;
-                        }
-                    }
-                    if (ctime - lasttimefired[number] > 50)
-                    {
-                        lasttimefired[number] = ctime;
-                        if (shouldrequestdescriptions) {
-                            runRequest(text, number)
-                        }
-                    }
-                }
-                function question_cw_hintgradeborderchanged() {
-                    var gradeborder = parseFloat($(this).val());
-                    var fraction, descriptions, text;
-                    if (!isNaN(gradeborder)) {
-                        for(var i = 0; i < question_cw_answer_count; i++)
-                        {
-                           text  = $("textarea[name=\'answer[" + i +"]\']").val();
-                           fraction  = parseFloat($("select[name=\'fraction[" + i +"]\']").val());
-                           descriptions = $("#fitem_id_lexemedescriptions_" + i);
-                           if (text.length == 0 || fraction < gradeborder)  {
-                                descriptions.css("display", "none");
-                                descriptions.prev().css("display", "none");
-                           } else {
-                                descriptions.css("display", "block");
-                                descriptions.prev().css("display", "block");
-                                runRequest(text, i);
-                           }
-                        }
-                    }
-                }
-                for(i = 0; i < question_cw_answer_count; i++) {
-                    lasttimefired[i] = new Date().getTime();
-                    $("textarea[name=\'answer[" + i +"]\']").keyup(question_cw_event_handler);
-                    $("select[name=\'fraction[" + i +"]\']").change(question_cw_event_handler);
-                    $("input[name=hintgradeborder]").focusout(question_cw_hintgradeborderchanged);
-                }
-            });
-         ';
+         $PAGE->requires->js_init_call(
+             'M.question_type_correctwriting.form.init_text_input',
+             array( $count, $lexerurl->out(true) ),
+             false,
+             $this->jsmodule
+         );
      }
 
-     protected function javascript_for_hiding_answer_lexeme_descriptions($i) {
-        return '
-            $(document).ready(function() {
-                var i = ' . (string)$i . ';
-                var selector = "#fitem_id_lexemedescriptions_" + i;
-                var element = $(selector);
-                element.prev().css("display", "none");
-                element.css("display", "none");
-            });
-        ';
+     protected function hide_answer_lexeme_description($i) {
+        global $PAGE;
+        $PAGE->requires->js_init_call(
+             'M.question_type_correctwriting.form.hide_description_field',
+             array( (string)$i ),
+             false,
+             $this->jsmodule
+        );
      }
 
      /**
@@ -496,26 +397,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     }
 
      public function print_javascript_for_hiding_and_changing_text() {
-         $jsondescriptions = '[ ]';
-         if (count($this->hiddendescriptions)) {
-             $jsondescriptions = '[' . implode(',', $this->hiddendescriptions) . ']';
-         }
-         echo '
-         <script type="text/javascript">
-            var form_hidden_descriptions = ' . $jsondescriptions . '
-            var form_answer_count = ' . $this->answercount . '
-            $(document).ready(function() {
-                var i, id, el;
-                for( i = 0; i < form_hidden_descriptions.length; i++) {
-                    id = form_hidden_descriptions[i];
-                    el = $("#fitem_id_lexemedescriptions_" + id);
-                    el.css("display", "none");
-                    el.prev().css("display", "none");
-                }
-
-            });
-         </script>
-         ';
+         global $PAGE;
+         $params = array(
+             $this->hiddendescriptions
+         );
+         $PAGE->requires->js_init_call(
+             'M.question_type_correctwriting.form.hide_descriptions',
+             $params,
+             false,
+             $this->jsmodule
+         );
      }
 
     function get_per_answer_fields($mform, $label, $gradeoptions,
