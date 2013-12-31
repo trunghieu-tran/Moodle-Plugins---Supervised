@@ -66,4 +66,18 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
         $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem6->look_for_matches_bypass($array_other, 0.6, true, $options), $array_correct));
         $this->assertTrue(count($lexem7->look_for_matches($array_other, 1, true, $options))==0);
     }
+    
+    public function test_look_for_matches_5() {
+        //family
+        // family milk family
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+        $lexem1=new block_formal_langs_token_base(null, 'type', 'family', null, 0);
+        $lexem2=new block_formal_langs_token_base(null, 'type', 'family', null, 0);
+        $lexem3=new block_formal_langs_token_base(null, 'type', 'milk', null, 1);
+        $lexem4=new block_formal_langs_token_base(null, 'type', 'family', null, 2);
+        $array_other=array($lexem1);
+        $this->assertTrue(count($lexem2->look_for_matches($array_other, 0, false, $options))==0);
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0, false, $options))==0);
+        $this->assertTrue(count($lexem4->look_for_matches($array_other, 0, false, $options))==0);
 }
