@@ -92,7 +92,8 @@ class addedit_session_form extends moodleform {
 
     // Form validation
     function validation($data, $files) {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $CFG;
+        require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
         $errors = array();
 
         // Session must be active at least after 10 minutes from current time.
@@ -109,7 +110,7 @@ class addedit_session_form extends moodleform {
         }
 
         // Session can not intersect with sessions of this teacher.
-        if($this->teacher_session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])){
+        if(teacher_session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])){
             $errors["timestart"] = get_string("teacherhassession", "block_supervised");
         }
 
@@ -121,51 +122,5 @@ class addedit_session_form extends moodleform {
         }
 
         return $errors;
-    }
-
-
-
-    private function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
-        require_once('sessionstate.php');
-        global $DB;
-
-
-        // Find Active session.
-        $select = "SELECT {block_supervised_session}.id
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE ((:timestart BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
-                || (:timeend BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
-                || ( ({block_supervised_session}.timestart BETWEEN :timestart1 AND :timeend1)
-                    AND ({block_supervised_session}.timeend BETWEEN :timestart2 AND :timeend2)
-                   ))
-            AND {block_supervised_session}.teacherid    = :teacherid
-            AND ({block_supervised_session}.state       = :stateactive || {block_supervised_session}.state  = :stateplanned)
-            AND {block_supervised_session}.id           != :sessionid
-        ";
-
-        $params['timestart']        = $timestart;
-        $params['timestart1']       = $timestart;
-        $params['timestart2']       = $timestart;
-        $params['timeend']          = $timeend;
-        $params['timeend1']         = $timeend;
-        $params['timeend2']         = $timeend;
-        $params['teacherid']        = $teacherid;
-        $params['stateactive']      = StateSession::Active;
-        $params['stateplanned']     = StateSession::Planned;
-        $params['sessionid']        = $sessionid;
-
-        return $DB->record_exists_sql($select, $params);
     }
 }

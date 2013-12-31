@@ -105,6 +105,7 @@ $string['notifyteacher']            = 'Notify teacher by e-mail';
 $string['notifyteacher_help']       = 'If checked, the teacher will be notified about session removing. You can add message for teacher';
 $string['messageforteacher']        = 'Message for teacher';
 $string['timeendvalidationerror']   = 'The session must be active before {$a} at least.';
+$string['increaseduration']         = 'You must increase duration.';
 $string['durationvalidationerror']  = 'Duration must be greater than zero value.';
 $string['teacherhassession']        = 'Teacher has an other session in this period.';
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
