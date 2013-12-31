@@ -60,7 +60,31 @@ class plannedsession_block_form extends moodleform {
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
         $mform->setType('id', PARAM_INT);
+
         // add submit button
         $mform->addElement('submit', 'submitbutton', get_string('startsession', "block_supervised"));
+    }
+
+
+    // Form validation
+    function validation($data, $files) {
+        global $PAGE, $USER, $CFG;
+        require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
+        $errors = array();
+
+        $curtime = time();
+        $sessiontimeend = $curtime + $data["duration"]*60;
+
+        // Duration must be greater than zero.
+        if($data["duration"] <= 0){
+            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        }
+
+        // Session time end must be more than current time.
+        /*if($data["duration"] <= 0){
+            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        }*/
+
+        return $errors;
     }
 }

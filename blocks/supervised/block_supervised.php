@@ -262,6 +262,7 @@ class block_supervised extends block_base {
                 $sessionstitle = get_string('activesessiontitle', 'block_supervised');
                 // Display form.
                 $toform['id']               = $COURSE->id;
+                $toform['timestartraw']     = $activesession->timestart;
 
                 $strftimedatetime = get_string("strftimerecent");
                 $toform['classroomid']      = $activesession->classroomid;

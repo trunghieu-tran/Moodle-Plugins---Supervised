@@ -55,4 +55,17 @@ class startsession_block_form extends moodleform {
         // add submit button
         $mform->addElement('submit', 'submitbutton', get_string('startsession', "block_supervised"));
     }
+
+
+    // Form validation
+    function validation($data, $files) {
+        $errors = array();
+
+        // Duration must be greater than zero.
+        if($data["duration"] <= 0){
+            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        }
+
+        return $errors;
+    }
 }

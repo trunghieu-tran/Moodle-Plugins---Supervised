@@ -55,10 +55,26 @@ class activesession_block_form extends moodleform {
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'timestartraw');     // session timestart (in seconds)
+        $mform->setType('timestartraw', PARAM_INT);
+
         // add submit and cancel buttons
         $buttonarray=array();
         $buttonarray[] =& $mform->createElement('submit', 'supervised_updatebtn', get_string('updatesession', "block_supervised"));
         $buttonarray[] =& $mform->createElement('cancel', 'supervised_finishbtn', get_string('finishsession', "block_supervised"));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+    }
+
+
+    // Form validation
+    function validation($data, $files) {
+        $errors = array();
+        $curtime = time();
+
+        if($data['timestartraw'] + $data['duration']*60 <= $curtime+60){
+            $errors["duration"] = get_string("increaseduration", "block_supervised");
+        }
+
+        return $errors;
     }
 }
