@@ -15,7 +15,7 @@
 
 M.block_supervised = M.block_supervised || {};
 
-// Code for updating the countdown timer that is used on timed quizzes.
+// Code for updating the countdown timer that is used for finish out-of-date sessions automatically.
 M.block_supervised.timer = {
     // YUI object.
     Y: null,
@@ -48,17 +48,16 @@ M.block_supervised.timer = {
     },
 
 
-    // Function to update the clock with the current time left, and submit the quiz if necessary.
+    // Function to update the clock with the current time left, and finish the session if necessary.
     update: function() {
         var Y = M.block_supervised.timer.Y;
         var secondsleft = Math.floor((M.block_supervised.timer.endtime - new Date().getTime())/1000);
-
         // If time has expired, finish session simulating mouse click by form button.
         if (secondsleft < 0) {
             M.block_supervised.timer.stop(null);
-            M.core_formchangechecker.set_form_submitted();
             YUI().use('node-event-simulate', function(Y) {
-                Y.one("*[name=supervised_finishbtn]").simulate("click");
+                var button = document.getElementById("id_supervised_finishbtn");
+                button.click();
             });
             return;
         }
