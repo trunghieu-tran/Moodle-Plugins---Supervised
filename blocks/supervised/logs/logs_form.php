@@ -35,8 +35,6 @@ class logs_form extends moodleform {
         }
 
 
-
-
         // add group
         $mform->addElement('header', 'general', get_string('filterlogsgroup', 'block_supervised'));
         // add users combobox
@@ -44,7 +42,9 @@ class logs_form extends moodleform {
 
         // hidden elements
         $mform->addElement('hidden', 'sessionid');
+        $mform->setType('sessionid', PARAM_INT);
         $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('submit', 'submitbutton', get_string('showlogsbutton', "block_supervised"));
     }
