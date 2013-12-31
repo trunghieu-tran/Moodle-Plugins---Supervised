@@ -1650,6 +1650,19 @@ class block_formal_langs_string_pair {
         return $this->correctstring;
     }
 
+    public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
+        $bestgroups = array();
+        $correctstream = $correctstring->stream;
+        $comparedstream = $comparedstring->stream;
+        $bestgroups = $correctstream->look_for_token_pairs_for_bypass($comparedstream, $threshold, $options);
+        $arraystringpairs = array();
+        for ($i = 0; $i < count($bestgroups); $i++) {
+            $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $arraystringpairs[] = $stringpair;
+        }
+        return $arraystringpairs;
+    }
+    
     /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
