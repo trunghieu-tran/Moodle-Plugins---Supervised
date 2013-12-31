@@ -529,10 +529,12 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     
     public function look_for_matches_for_bypass($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
         $possiblepairs = array();
-        for ($k=0; $k < count($other); $k++) {
-            if($other[$k] == $this->value) {
-                $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
-                $possiblepairs[] = $pair;
+        if($option==true){
+            for ($k=0; $k < count($other); $k++) {
+                if($other[$k] == $this->value) {
+                    $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+                    $possiblepairs[] = $pair;
+                }
             }
         }
         return $possiblepairs;
