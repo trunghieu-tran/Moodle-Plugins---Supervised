@@ -55,11 +55,11 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $token_stream=new block_formal_langs_token_stream(array(), array());
         $sets_of_pairs=array();
         $set_of_pairs1=new block_formal_langs_matches_group();
-        $set_of_pairs1->mistakeweight=1;
+        $set_of_pairs1->mistakeweight=0;
         $set_of_pairs1->correctcoverage=array(0);
         $set_of_pairs1->comparedcoverage=array(0);
         $set_of_pairs2=new block_formal_langs_matches_group();
-        $set_of_pairs2->mistakeweight=1;
+        $set_of_pairs2->mistakeweight=0;
         $set_of_pairs2->correctcoverage=array(0);
         $set_of_pairs2->comparedcoverage=array(2);
         array_push($sets_of_pairs, $set_of_pairs1);
@@ -69,5 +69,39 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $this->assertTrue(count($token_stream->group_matches_bypass($matches))==2);
     }
     
-    
+    function test_group_matches_4() {
+        // family milk family milk
+        // family milk tonus
+        $pair1 = new block_formal_langs_matched_tokens_pair(array(0), array(0), 0);
+        $pair2 = new block_formal_langs_matched_tokens_pair(array(2), array(0), 0);
+        $pair3 = new block_formal_langs_matched_tokens_pair(array(1), array(1), 0);
+        $pair4 = new block_formal_langs_matched_tokens_pair(array(3), array(1), 0);
+        // 4 groups
+        $matches = array();
+        array_push($matches,$pair1, $pair2, $pair3, $pair4);
+        $token_stream=new block_formal_langs_token_stream(array(), array());
+        $sets_of_pairs=array();
+        $set_of_pairs1=new block_formal_langs_matches_group();
+        $set_of_pairs1->mistakeweight=0;
+        $set_of_pairs1->correctcoverage=array(0, 1);
+        $set_of_pairs1->comparedcoverage=array(0, 1);
+        $set_of_pairs2=new block_formal_langs_matches_group();
+        $set_of_pairs2->mistakeweight=0;
+        $set_of_pairs2->correctcoverage=array(0, 3);
+        $set_of_pairs2->comparedcoverage=array(0, 1);
+        $set_of_pairs3=new block_formal_langs_matches_group();
+        $set_of_pairs3->mistakeweight=0;
+        $set_of_pairs3->correctcoverage=array(1, 2);
+        $set_of_pairs3->comparedcoverage=array(0, 1);
+        $set_of_pairs4=new block_formal_langs_matches_group();
+        $set_of_pairs4->mistakeweight=0;
+        $set_of_pairs4->correctcoverage=array(2, 3);
+        $set_of_pairs4->comparedcoverage=array(0, 1);
+        array_push($sets_of_pairs, $set_of_pairs1);
+        array_push($sets_of_pairs, $set_of_pairs2);
+        array_push($sets_of_pairs, $set_of_pairs3);
+        array_push($sets_of_pairs, $set_of_pairs4);
+        list($result)=$token_stream->group_matches_bypass($matches);
+        $this->assertTrue(count($token_stream->group_matches_bypass($matches))==4);
+    }
 }
