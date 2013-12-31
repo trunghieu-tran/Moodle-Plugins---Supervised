@@ -53,7 +53,7 @@ class block_supervised extends block_base {
             JOIN {course}
               ON {block_supervised_session}.courseid     =   {course}.id
 
-        WHERE (:time BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
+        WHERE (:time BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend+10)
             AND {block_supervised_session}.courseid     = :courseid
             AND {block_supervised_session}.teacherid    = :teacherid
             AND {block_supervised_session}.state        = :stateactive
