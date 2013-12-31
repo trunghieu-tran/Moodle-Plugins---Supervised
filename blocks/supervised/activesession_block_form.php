@@ -71,6 +71,7 @@ class activesession_block_form extends moodleform {
         $errors = array();
         $curtime = time();
 
+        // Session time end must be greater than current time + 1 minute.
         if($data['timestartraw'] + $data['duration']*60 <= $curtime+60){
             $errors["duration"] = get_string("increaseduration", "block_supervised");
         }
