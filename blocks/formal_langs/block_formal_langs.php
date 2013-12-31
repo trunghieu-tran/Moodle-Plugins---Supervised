@@ -503,126 +503,38 @@ class block_formal_langs extends block_list {
     public function formatted_contents($output) {
         global $OUTPUT;
         $result = parent::formatted_contents($output);
-        $style = '<style>
-                .block_formal_langs .icon.column.c0 {
-                    padding-right: 3px;
-                }
-                .block_formal_langs .column.c1 {
-                    display: inline !important;
-                }
-                .block_formal_langs .padright {
-                    padding-right: 6px;
-                }
-                .block_formal_langs li {
-                    margin-bottom: 5px;
-                }
-                .global-affected-courses {
-                    color: red;
-                    margin-top: 10px;
-                }
-            </style>
-        ';
+        // Somehow CSS was not included, so it was included here manually
+        $this->page->requires->css('/blocks/formal_langs/styles.css');
+
+        // Include related JS
         $context  = $this->page->context;
         $isglobal = $context->id == context_system::instance()->id;
         $icon = new pix_icon('t/show', get_string('hide'));
-        $hidesrc = $OUTPUT->pix_url($icon->pix, $icon->component);
+        $hidesrc = $OUTPUT->pix_url($icon->pix, $icon->component)->out(true);
         $icon = new pix_icon('t/hide', get_string('hide'));
-        $showsrc = $OUTPUT->pix_url($icon->pix, $icon->component);
+        $showsrc = $OUTPUT->pix_url($icon->pix, $icon->component)->out(true);
         $ajaxhandlerurl = new moodle_url('/blocks/formal_langs/ajaxhandler.php');
         $localpage = $ajaxhandlerurl->out();
-        $js = '
-            var localpage="' . $localpage . '";
-            var context = ' .  $context->id .';
-            var hidesrc = "' .$hidesrc . '";
-            var showsrc = "' .$showsrc . '";
-            var isglobal = ' . (($isglobal) ? 'true' : 'false') . ';
-            var affectedcourseslabel = "' . get_string('affectedcourses', 'block_formal_langs') .  '"
-            $("document").ready(function() {
-                $("a.deletelanguage").click(function() {
-                    var id = $(this).attr("data-id");
-                    $("span[data-id=" + id + "]").parent().parent().remove();
-                    $.ajax({
-                    "url": localpage,
-                    "type" : "GET",
-                    "data": {
-                        "action": "removeformallanguage",
-                        "languageid" : id,
-                        "context" : context
-                    },
-                    "dataType": "text",
-                    "success": function() {
-                    },
-                    "error": function(xhr) {
-                        var a = new M.core.ajaxException({
-                            "error": "Cannot remove formal language",
-                            "center": true,
-                            "closeButton": true,
-                            "draggable": true,
-                            "reproductionlink": localpage
-                        });
-                        a.show();
-                    }
-                    });
-                });
-                $("a.changevisibility").click(function() {
-                    var id = $(this).attr("data-id");
-                    var visible = $(this).attr("data-visible");
-                    var src = hidesrc;
-                    if (visible == 1)
-                    {
-                        visible = 0;
-                        $("span[data-id=" + id + "]").addClass("dimmed_text");
-                    } else {
-                        visible = 1;
-                        $("span[data-id=" + id + "]").removeClass("dimmed_text");
-                        src = showsrc;
-                    }
-                    $(this).find("img").attr("src", src);
-                    $(this).attr("data-visible", visible);
-                    var updateinheritance = function (text) {
-                        $(this).parent().parent().parent().find(".inherited-hint").html(text);
-                    };
-                    var updateinheritancethis = updateinheritance.bind(this);
-                    $.ajax({
-                    "url": localpage,
-                    "type" : "GET",
-                    "data": {
-                        "action": "flanguagevisibility",
-                        "languageid" : id,
-                        "visible" : visible,
-                        "context" : context,
-                        "global"  : ((isglobal) ? "Y" : "N")
-                    },
-                    "dataType": "json",
-                    "success": function(data) {
-                        var label = affectedcourseslabel + "<br />";
-                        if (isglobal) {
-                            label =  label + data.map(function(o) { return o.shortname }).join("<br />");
-                            $(".global-affected-courses").html(label);
-                        } else {
-                            updateinheritancethis(data);
-                        }
-                    },
-                    "error": function(xhr) {
-                       var a = new M.core.ajaxException({
-                            "error": "Cannot change visibility",
-                            "center": true,
-                            "closeButton": true,
-                            "draggable": true,
-                            "reproductionlink": localpage
-                       });
-                       a.show();
-                    }
-                    });
-                });
-            });
-        ';
-        $script = html_writer::tag('script', $js);
+        $params = array(
+            $localpage,
+            $context->id,
+            $hidesrc,
+            $showsrc,
+            $isglobal,
+            get_string('affectedcourses', 'block_formal_langs')
+        );
+        $jsmodule = array(
+            'name' => 'block_formal_langs',
+            'fullpath' => '/blocks/formal_langs/module.js'
+        );
+        $this->page->requires->js_init_call('M.block_formal_langs.init', $params, null, $jsmodule);
+
+        // Add a div, if block is shown in global context
         $globalaffectdiv = '';
         if ($isglobal) {
             $globalaffectdiv = html_writer::tag('div', '', array('class' => 'global-affected-courses'));
         }
-        return $result . $globalaffectdiv . $style . $script;
+        return $result . $globalaffectdiv;
     }
 
     public function applicable_formats() {
