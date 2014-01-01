@@ -108,16 +108,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
         // Fetch course context if can
-        $contextid = null;
+        $context = null;
         if ($COURSE != null) {
             if (is_a($COURSE, 'stdClass')) {
-                $contextid = context_course::instance($COURSE->id)->id;
+                $context = context_course::instance($COURSE->id);
             } else {
-                $contextid = $COURSE->get_context()->id;
+                $context = $COURSE->get_context();
             }
         }
 
-        $currentlanguages = block_formal_langs::available_langs( $contextid );
+        $currentlanguages = block_formal_langs::available_langs( $context );
         $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
