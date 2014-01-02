@@ -107,6 +107,7 @@ $string['messageforteacher']        = 'Message for teacher';
 $string['timeendvalidationerror']   = 'The session must be active before {$a} at least.';
 $string['increaseduration']         = 'Session time end must be greater than current time.';
 $string['durationvalidationerror']  = 'Duration must be greater than zero value.';
+$string['pagesizevalidationerror']  = 'Page size must be greater than zero value.';
 $string['teacherhassession']        = 'Teacher has an other session in this period.';
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
 $string['plansession']              = 'Plan a new session ...';
