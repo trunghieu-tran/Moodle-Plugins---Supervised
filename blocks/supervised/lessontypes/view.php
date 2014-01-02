@@ -17,7 +17,6 @@ if ($site->id == $course->id) {
 
 require_login($course);
 // TODO Capabilities
-//require_capability('block/supervised:readlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
@@ -25,7 +24,7 @@ include("breadcrumbs.php");
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("lessontypesview", 'block_supervised'), 2);
+echo $OUTPUT->heading_with_help(get_string("lessontypesview", 'block_supervised'), 'lessontypesdefinition', 'block_supervised');
 
 // Prepare table data
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$courseid), 'name');
