@@ -4,7 +4,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     global $DB;
 
     $session = $DB->get_record('block_supervised_session', array('id'=>$sessionid));
-    $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$session->classroomid));
+    //$classroom = $DB->get_record('block_supervised_classroom', array('id'=>$session->classroomid)); // todo remove with filtering
 
     // Prepare query
     $params = array();
@@ -17,7 +17,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
         $params['userid'] = $userid;
     }
     // Get logs
-    $logs = get_logs($selector, $params);
+    $logs = get_logs($selector, $params, 'l.time DESC', '', '', $totalcount);
 
     // Filter logs by classroom ip subnet
     $logs_filtered = $logs; // TODO Do we really need this filtering?
@@ -29,7 +29,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     }*/
 
     $result['logs'] = array_slice($logs_filtered, $limitfrom, $limitnum);
-    $result['totalcount'] = count($logs_filtered);
+    $result['totalcount'] = $totalcount;
 
     return $result;
 }
