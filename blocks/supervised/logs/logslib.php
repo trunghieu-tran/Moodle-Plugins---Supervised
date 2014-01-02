@@ -102,6 +102,7 @@ function print_session_info_form($sessionid){
         print_error('noformdesc');
     }
     $mform = new viewsession_form();
+    // TODO use get_session from sessions/lib.php
     $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,

@@ -150,3 +150,58 @@ $string['updatesession']            = 'Update';
 $string['finishsession']            = 'Finish session';
 $string['savechanges']              = 'Save changes';
 
+
+$string['emailnewsessionsubject']   = '{$a->sitename}: new session ({$a->timestart})';
+$string['emailnewsession']          = 'Hi {$a->teachername},
+
+A new session has been created for you at \'{$a->sitename}\'.
+Creator:        {$a->creatorname}
+
+Course:         {$a->course}
+Classroom:      {$a->classroom}
+Group:          {$a->group}
+Lesson type:    {$a->lessontype}
+Time start:     {$a->timestart}
+Duration (min): {$a->duration}
+Time end:       {$a->timeend}
+
+{$a->comment}
+
+You can edit this session: {$a->editurl}
+Or you can delete it: {$a->deleteurl}
+
+Have a nice day!';
+
+$string['emailsessioncomment']       = 'Session comment:
+--------------------------------------------------
+{$a}
+--------------------------------------------------
+';
+
+
+$string['emailremovedsessionsubject']   = '{$a->sitename}: session has been removed ({$a->timestart})';
+$string['emailremovedsession']          = 'Hi {$a->teachername},
+
+Your session at \'{$a->sitename}\' has been removed.
+Remover:        {$a->removername}
+
+Session state:  {$a->state}
+Course:         {$a->course}
+Classroom:      {$a->classroom}
+Group:          {$a->group}
+Lesson type:    {$a->lessontype}
+Time start:     {$a->timestart}
+Duration (min): {$a->duration}
+Time end:       {$a->timeend}
+
+{$a->comment}
+
+{$a->custommessage}
+
+Have a nice day!';
+
+$string['emailremovedsessionmsg']       = 'A person who removed this session leaved a message for you:
+--------------------------------------------------
+{$a}
+--------------------------------------------------
+';
