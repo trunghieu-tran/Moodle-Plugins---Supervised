@@ -61,16 +61,21 @@ if($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
     if(!$id){   // Add mode.
-        // TODO Logging
-        if (!$DB->insert_record('block_supervised_classroom', $fromform)) {
+        if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
+        /* TODO Logging.
+            It seems that add_to_log function does not support any block's logging.
+            The problem is in second parameter ($module).
+            See also: https://moodle.org/mod/forum/discuss.php?d=184400.
+        */
+        //add_to_log($courseid, 'blocks', 'add', "supervised/classrooms/addedit.php?id=$newid&courseid=$courseid");
     } else{     // Edit mode.
-        // TODO Logging
+
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-
+        // TODO Logging
     }
     $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
     redirect($url);
