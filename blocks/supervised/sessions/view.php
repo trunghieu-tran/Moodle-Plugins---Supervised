@@ -1,7 +1,7 @@
 <?php
 require_once('../../../config.php');
 require_once('sessionstate.php');
- 
+
 global $DB, $OUTPUT, $PAGE;
 
 $courseid   = required_param('courseid', PARAM_INT);
@@ -35,17 +35,38 @@ if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
 }
 
 
-// Display header.
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 2);
+// Print display options form.
+$mform = "displayoptions_form.php";
+if (file_exists($mform)) {
+    require_once($mform);
+} else {
+    print_error('noformdesc');
+}
+$mform = new displayoptions_sessions_form();
+$toform['courseid'] = $courseid;
+$toform['pagesize'] = $perpage;
 
-// Add "Plan new session" button.
-if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
+if ($fromform = $mform->get_data()) {
+    $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize));
+    redirect($url); // Redirect must be done before $OUTPUT->header().
+} else {
+    // Form didn't validate or this is the first display.
+    // Display header.
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 2);
+
+    // Add "Plan new session" button.
+    if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
         || has_capability('block/supervised:manageallsessions', $PAGE->context)  ){
-    $params['courseid'] = $courseid;
-    $url = new moodle_url('/blocks/supervised/sessions/addedit.php', $params);
-    $caption = get_string('plansession', 'block_supervised');
-    echo $OUTPUT->single_button($url, $caption, 'get');
+        $params['courseid'] = $courseid;
+        $url = new moodle_url('/blocks/supervised/sessions/addedit.php', $params);
+        $caption = get_string('plansession', 'block_supervised');
+        echo $OUTPUT->single_button($url, $caption, 'get');
+    }
+
+    // Print display options form.
+    $mform->set_data($toform);
+    $mform->display();
 }
 
 // Print sessions table.
