@@ -1,6 +1,7 @@
 <?php
 require_once('../../../config.php');
 require_once('sessionstate.php');
+require_once('lib.php');
 global $DB, $PAGE, $OUTPUT, $USER;
 
 $courseid   = required_param('courseid', PARAM_INT);
@@ -95,21 +96,25 @@ if($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
     if(!$id){   // Add mode.
-        // TODO Logging
         $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
         $fromform->state    = StateSession::Planned;
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
 
-        if (!$DB->insert_record('block_supervised_session', $fromform)) {
+        if (!$newid = $DB->insert_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
         }
-    } else{     // Edit mode.
         // TODO Logging
+        // Send e-mail to teacher.
+        if($fromform->sendemail){
+            mail_newsession(get_session($newid), $USER);
+        }
+    } else{     // Edit mode.
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
         if (!$DB->update_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
         }
-
+        // TODO Logging
+        // TODO Send e-mail
     }
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);

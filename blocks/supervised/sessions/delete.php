@@ -63,6 +63,11 @@ if($mform->is_cancelled()) {
     // Delete session.
     // TODO Logging
     $DB->delete_records('block_supervised_session', array('id'=>$id));
+    // Send e-mail to teacher.
+    if($fromform->notifyteacher){
+        $session->messageforteacher = $fromform->messageforteacher;
+        mail_removedsession($session, $USER);
+    }
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
@@ -85,7 +90,7 @@ if($mform->is_cancelled()) {
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
     $toform['sessioncomment']   = $session->sessioncomment;
-    $toform['notifyteacher']    = 1;
+    $toform['notifyteacher']    = ($session->state == StateSession::Finished) ? 0 : 1;
 
     $mform->set_data($toform);
     $mform->display();
