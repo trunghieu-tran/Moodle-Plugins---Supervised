@@ -30,6 +30,7 @@ if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
 // Initializing variables depending of mode.
 $toform['courseid'] = $courseid;
 if(!$id){   // Add mode.
+    $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
     $title = get_string('addsessionpagetitle', 'block_supervised');
     $heading = get_string("addingnewsession", 'block_supervised');
 
@@ -39,6 +40,7 @@ if(!$id){   // Add mode.
     $toform['duration']     = 90;
     $toform['coursename']   = $course->fullname;
 } else{     // Edit mode.
+    $PAGE->navbar->add(get_string("editsessionnavbar", 'block_supervised'));
     if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
@@ -94,6 +96,7 @@ if($mform->is_cancelled()) {
     // Store the submitted data.
     if(!$id){   // Add mode.
         // TODO Logging
+        $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
         $fromform->state    = StateSession::Planned;
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
 
