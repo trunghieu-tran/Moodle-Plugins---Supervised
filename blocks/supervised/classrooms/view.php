@@ -25,7 +25,7 @@ include("breadcrumbs.php");
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("classroomsheader", 'block_supervised'), 2);
+echo $OUTPUT->heading_with_help(get_string("classroomsheader", 'block_supervised'), 'classroomsdefinition', 'block_supervised');
 
 // Prepare table data
 $classrooms = $DB->get_records('block_supervised_classroom', null, 'name');
