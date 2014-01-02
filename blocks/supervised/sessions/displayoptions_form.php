@@ -10,7 +10,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
 
-        $mform->addElement('submit', 'submitbutton', get_string('showreport', 'quiz'));
+        $mform->addElement('submit', 'submitbutton', get_string('showsessions', 'block_supervised'));
 
         // hidden elements
         $mform->addElement('hidden', 'courseid');
