@@ -16,7 +16,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-// TODO Capabilities
+require_capability('block/supervised:editlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
