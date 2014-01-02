@@ -42,7 +42,7 @@ if(!$id){   // Add mode.
     $toform['coursename']   = $course->fullname;
 } else{     // Edit mode.
     $PAGE->navbar->add(get_string("editsessionnavbar", 'block_supervised'));
-    if (! $session = $DB->get_record("block_supervised_session", array("id"=>$id))) {
+    if (! $session = get_session($id)) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
     // Check capabilities for edit mode.
@@ -114,7 +114,20 @@ if($mform->is_cancelled()) {
             print_error('insertsessionerror', 'block_supervised');
         }
         // TODO Logging
-        // TODO Send e-mail
+        // Send e-mail to teacher(s).
+        if($fromform->sendemail){
+            $oldteacherid = $session->teacherid;
+            $newteacherid = $fromform->teacherid;
+            if($oldteacherid != $newteacherid){
+                // Send e-mail to both teachers if teacher has been changed.
+                mail_newsession(get_session($fromform->id), $USER); // new session for new teacher
+                $session->messageforteacher = '';
+                mail_removedsession($session, $USER);               // removed session for old teacher
+            }
+            else{
+                mail_editedsession(get_session($fromform->id), $USER);
+            }
+        }
     }
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
