@@ -119,7 +119,6 @@ $string['logsbreadcrumb']           = 'Session logs';
 $string['filterlogsbyuser']         = 'Filter logs by user';
 $string['allusers']                 = 'All users';
 $string['showlogsbutton']           = 'Show logs';
-$string['filterlogsgroup']          = 'Filter logs';
 
 $string['course']       = 'Course';
 $string['group']        = 'Group';
