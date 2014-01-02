@@ -111,6 +111,7 @@ $string['pagesizevalidationerror']  = 'Page size must be greater than zero value
 $string['teacherhassession']        = 'Teacher has an other session in this period.';
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
 $string['plansession']              = 'Plan a new session ...';
+$string['showsessions']             = 'Show sessions';
 
 $string['logspagetitle']            = 'Session logs';
 $string['logsview']                 = 'Session logs';
