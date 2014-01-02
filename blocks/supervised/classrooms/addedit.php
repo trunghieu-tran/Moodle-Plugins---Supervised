@@ -22,6 +22,7 @@ include("breadcrumbs.php");
 
 // Initializing variables depending of mode.
 if(!$id){   // Add mode.
+    $PAGE->navbar->add(get_string("addclassroomnavbar", 'block_supervised'));
     $title = get_string('addclassroompagetitle', 'block_supervised');
     $heading = get_string("addingnewclassroom", 'block_supervised');
     
@@ -30,6 +31,7 @@ if(!$id){   // Add mode.
     if (! $classroom = $DB->get_record("block_supervised_classroom", array("id"=>$id))) {
         print_error(get_string("invalidclassroomid", 'block_supervised'));
     }
+    $PAGE->navbar->add(get_string("editclassroomnavbar", 'block_supervised'));
     $title = get_string('editclassroompagetitle', 'block_supervised');
     $heading = get_string("editingclassroom", 'block_supervised');
     
