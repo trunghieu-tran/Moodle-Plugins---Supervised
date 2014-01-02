@@ -151,7 +151,7 @@ $string['finishsession']            = 'Finish session';
 $string['savechanges']              = 'Save changes';
 
 
-$string['emailnewsessionsubject']   = '{$a->sitename}: new session ({$a->timestart})';
+$string['emailnewsessionsubject']   = '{$a->sitename}: new session on {$a->timestart}';
 $string['emailnewsession']          = 'Hi {$a->teachername},
 
 A new session has been created for you at \'{$a->sitename}\'.
@@ -179,7 +179,7 @@ $string['emailsessioncomment']       = 'Session comment:
 ';
 
 
-$string['emailremovedsessionsubject']   = '{$a->sitename}: session has been removed ({$a->timestart})';
+$string['emailremovedsessionsubject']   = '{$a->sitename}: session has been removed on {$a->timestart}';
 $string['emailremovedsession']          = 'Hi {$a->teachername},
 
 Your session at \'{$a->sitename}\' has been removed.
@@ -205,3 +205,25 @@ $string['emailremovedsessionmsg']       = 'A person who removed this session lea
 {$a}
 --------------------------------------------------
 ';
+
+$string['emaileditedsessionsubject']   = '{$a->sitename}: session has been edited on {$a->timestart}';
+$string['emaileditedsession']          = 'Hi {$a->teachername},
+
+Your session at \'{$a->sitename}\' has been edited.
+Editor:        {$a->editorname}
+
+Updated session information:
+Course:         {$a->course}
+Classroom:      {$a->classroom}
+Group:          {$a->group}
+Lesson type:    {$a->lessontype}
+Time start:     {$a->timestart}
+Duration (min): {$a->duration}
+Time end:       {$a->timeend}
+
+{$a->comment}
+
+You can edit this session: {$a->editurl}
+Or you can delete it: {$a->deleteurl}
+
+Have a nice day!';
