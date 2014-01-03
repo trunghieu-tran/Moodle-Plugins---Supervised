@@ -18,7 +18,7 @@
 /**
  * @package moodlecore
  * @subpackage backup-moodle2
- * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @copyright
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
