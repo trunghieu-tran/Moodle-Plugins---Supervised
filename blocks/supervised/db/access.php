@@ -83,6 +83,8 @@ $capabilities = array(
     ),
 
     'block/supervised:manageownsessions' => array(
+        'riskbitmask' => RISK_SPAM,
+
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -92,6 +94,8 @@ $capabilities = array(
     ),
 
     'block/supervised:manageallsessions' => array(
+        'riskbitmask' => RISK_SPAM,
+
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -101,6 +105,8 @@ $capabilities = array(
     ),
 
     'block/supervised:managefinishedsessions' => array(
+        'riskbitmask' => RISK_SPAM,
+
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
