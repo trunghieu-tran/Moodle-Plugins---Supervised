@@ -96,7 +96,8 @@ M.preg_authoring_tools_script = (function ($) {
                     var scripts = [
                         self.www_root+'/question/type/poasquestion/jquerypanzoommin.js',
                         self.www_root+'/question/type/poasquestion/jquery-textrange.js',
-                        self.www_root+'/question/type/poasquestion/interface.js'
+                        self.www_root+'/question/type/poasquestion/interface.js',
+                        self.www_root+'/question/type/poasquestion/jquery.mousewheel.js'
                         ];
                     self._loadScripts(scripts, function() {
                         // Remove the "skip to main content" link.
@@ -655,18 +656,30 @@ M.preg_authoring_tools_script = (function ($) {
         init_tree : function() {
             //if($("#id_selection_mode").is(':checked') == false) {
                 var tree_img = $('#tree_img');
-                tree_img.panzoom();
+                var tree_panzoom_obj = $(tree_img).panzoom();
+                $(tree_img).on('mousewheel.focal', this._zoom);
             //}
         },
 
         init_graph : function() {
             var graph_img = $('#graph_img');
-            graph_img.panzoom();
+            var graph_panzoom_obj = $(graph_img).panzoom();
+            $(graph_img).on('mousewheel.focal', this._zoom);
         },
 
         init : function() {
             self.panzooms.init_graph();
             //self.panzooms.init_tree();
+        },
+
+        _zoom : function( e ) {
+            e.preventDefault();
+            var delta = e.delta || e.originalEvent.wheelDelta;
+            var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
+            $(e.target).panzoom().panzoom('zoom', zoomOut, { // TODO - panzoom() may reset options but jquery.mousewheel.js doesnt support passing data throught event O_O
+              increment: 0.1,
+              focal: e
+            });
         }
     },
 
