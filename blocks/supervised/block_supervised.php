@@ -523,8 +523,8 @@ class block_supervised extends block_base {
     }
 
     public function cron() {
-        require_once('sessions/sessionstate.php');
-        global $DB;
+        global $CFG, $DB;
+        require_once("{$CFG->dirroot}/blocks/supervised/sessions/sessionstate.php");
 
         mtrace( "Cron script for supervised block is running" );
 

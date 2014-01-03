@@ -35,7 +35,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
 }
 
 function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url=""){
-    global $OUTPUT;
+    global $OUTPUT, $DB;
 
     $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page*$perpage, $perpage);
     $totalcount = $logs['totalcount'];
@@ -61,6 +61,25 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 
     $strftimedatetime = get_string("strftimerecent");
     foreach ($logs['logs'] as $log) {
+
+        if (isset($ldcache[$log->module][$log->action])) {
+            $ld = $ldcache[$log->module][$log->action];
+        } else {
+            $ld = $DB->get_record('log_display', array('module'=>$log->module, 'action'=>$log->action));
+            $ldcache[$log->module][$log->action] = $ld;
+        }
+        if ($ld && is_numeric($log->info)) {
+            // ugly hack to make sure fullname is shown correctly
+            if ($ld->mtable == 'user' && $ld->field == $DB->sql_concat('firstname', "' '" , 'lastname')) {
+                $log->info = fullname($DB->get_record($ld->mtable, array('id'=>$log->info)), true);
+            } else {
+                $log->info = $DB->get_field($ld->mtable, $ld->field, array('id'=>$log->info));
+            }
+        }
+
+        //Filter log->info
+        $log->info = format_string($log->info);
+
         // If $log->url has been trimmed short by the db size restriction
         // code in add_to_log, keep a note so we don't add a link to a broken url
         $brokenurl=(textlib::strlen($log->url)==100 && textlib::substr($log->url,97)=='...');
