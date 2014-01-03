@@ -52,7 +52,6 @@ class restore_supervised_block_structure_step extends restore_structure_step {
 
         // For any reason (non multiple, dupe detected...) block not restored, return
         if (!$this->task->get_blockid()) {
-            echo "restore not required?";
             return;
         }
 
@@ -68,7 +67,6 @@ class restore_supervised_block_structure_step extends restore_structure_step {
                 $this->set_mapping('classroom', $olditemid, $newitemid);
             }
         }
-
 
         // Restore lessontypes.
         $DB->delete_records('block_supervised_lessontype', array('courseid'=>$this->get_courseid()));
