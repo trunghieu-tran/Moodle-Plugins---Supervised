@@ -82,6 +82,9 @@ M.preg_authoring_tools_script = (function ($) {
                         self.panzooms.init();
                     });
                     $.getScript(self.www_root+'/question/type/poasquestion/jquery-textrange.js');
+                    
+                    $.getScript(self.www_root+'/question/type/poasquestion/interface.js');
+                    
                     $(self.textbutton_widget.dialog).html(tpage_html);
                     M = $.extend(M, tmpM);
 
@@ -140,6 +143,8 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
+                    $('#id_send_select').attr('disabled',true);
+                    $('#id_cancel_select').attr('disabled',true);
                     
                     options.oneachpresscallback();
                 });
@@ -231,16 +236,20 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
-        self.panzooms.reset_tree();
+        //if($("#id_selection_mode").is(':checked') == false) {
+            self.panzooms.reset_tree();
+        //}
     },
 
     tree_node_clicked : function (e) {
-        e.preventDefault();
-        var tmp = e.target.id.split(','),
-            indfirst = tmp[1],
-            indlast = tmp[2];
-        self.load_content(indfirst, indlast);
-        self.load_strings(indfirst, indlast);
+        //if($("#id_selection_mode").is(':checked') == false) {
+            /*e.preventDefault();
+            var tmp = e.target.id.split(','),
+                indfirst = tmp[1],
+                indlast = tmp[2];
+            self.load_content(indfirst, indlast);
+            self.load_strings(indfirst, indlast);*/
+        //}
     },
 
     tree_node_misclicked : function (e) {
@@ -357,11 +366,125 @@ M.preg_authoring_tools_script = (function ($) {
 
         self.invalidate_content();
 
+                    
         if (typeof t != 'undefined' && t.img && t.map) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
-            tree_img.click(self.tree_node_misclicked);
-            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
+            
+            $('#tree_img').mousedown(function(e)
+            {
+                //check is checked check box
+                if($("#id_selection_mode").is(":checked") == true) {
+                    $('#id_selection_mode').attr('disabled',true);
+                    $('#id_send_select').attr('disabled',false);
+                    $('#id_cancel_select').attr('disabled',false);
+
+                    //create new elements
+                    //$('#felement fgroup').append('<input type="submit" id="send_selection" value="Send selection" onclick="selectClick()">');
+                    //$('#felement fgroup').append('<input type="submit" id="cancel_selection" value="Cancel" onclick="cancelClick()">');
+
+                    $('#tree_hnd').append('<div id=\"resizeMe\">'
+                                                +'<div id=\"resizeSE\"></div>'
+                                                +'<div id=\"resizeE\"></div>'
+                                                +'<div id=\"resizeNE\"></div>'
+                                                +'<div id=\"resizeN\"></div>'
+                                                +'<div id=\"resizeNW\"></div>'
+                                                +'<div id=\"resizeW\"></div>'
+                                                +'<div id=\"resizeSW\"></div>'
+                                                +'<div id=\"resizeS\"></div>'
+                                            +'</div>');
+                    
+                    e.preventDefault();
+                    self.CALC_COORD = true;
+                    var br = document.getElementById('tree_img').getBoundingClientRect();
+                    $('#resizeMe').Resizable(
+                        {                
+                            minWidth: 20,
+                            minHeight: 20,
+                            //maxWidth: $('#container').css('width'),
+                            //maxHeight: $('#container').css('height'),
+                            /*minTop: br.top - 1900 - (br.bottom - br.top),
+                            minLeft: br.left - 1.5*(br.right - br.left),
+                            maxRight: br.right - 1.5*(br.right - br.left),
+                            maxBottom: br.bottom - 1900 - (br.bottom - br.top),*/
+                            dragHandle: true,
+                            onDrag: function(x, y)
+                            {
+                                this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
+                            },
+                            handlers: {
+                                se: '#resizeSE',
+                                e: '#resizeE',
+                                ne: '#resizeNE',
+                                n: '#resizeN',
+                                nw: '#resizeNW',
+                                w: '#resizeW',
+                                sw: '#resizeSW',
+                                s: '#resizeS'
+                            },
+                            onResize : function(size, position) {
+                                this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
+                            }
+                        }
+                    );
+                    $('#resizeMe').css({
+                        width : 20,
+                        height : 20,
+                        /*left : e.pageX - $("body").scrollLeft(),
+                        top : e.pageY - $("body").scrollTop(),*/
+                        /*left : e.pageX /*- $("body").scrollLeft()* - 1.5*(br.right - br.left),
+                        top : e.pageY - 1900/*$("body").scrollTop()* - (br.bottom - br.top),*/
+                        left : e.pageX - 1.5*(br.right - br.left),
+                        top : e.pageY - $(window).scrollTop() - (br.bottom - br.top),
+                    });
+                    self.RECTANGLE_WIDTH = e.pageX - 1.5*(br.right - br.left);
+                    self.RECTANGLE_HEIGHT = e.pageY - 1900 - (br.bottom - br.top);
+                }
+            });
+            
+            $('#tree_img').mousemove(function(e){
+                e.preventDefault();
+                if(self.CALC_COORD) {
+                
+                    var br = document.getElementById('tree_img').getBoundingClientRect();
+                    var new_pageX = e.pageX - 1.5*(br.right - br.left);
+                    var new_pageY = e.pageY - 1900 - (br.bottom - br.top);
+                    
+                    if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+                        $('#resizeMe').css({
+                            width : (new_pageX - self.RECTANGLE_WIDTH)-10,
+                            height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
+                        });
+                    } else if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+                        $('#resizeMe').css({
+                            width : (new_pageX - self.RECTANGLE_WIDTH)-10,
+                            height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
+                            top : new_pageY,
+                        });
+                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+                        $('#resizeMe').css({
+                            width : (self.RECTANGLE_WIDTH - new_pageX)-10,
+                            height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
+                            top : new_pageY,
+                            left : new_pageX,
+                        });
+                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+                        $('#resizeMe').css({
+                            width : (self.RECTANGLE_WIDTH - new_pageX)-10,
+                            height : (new_pageY - self.RECTANGLE_HEIGHT)-10,                
+                            left : new_pageX,
+                        });
+                    }
+                }
+            });
+
+            end_rectangle_selection : $(window).mouseup(function(e){
+                e.preventDefault();
+                self.CALC_COORD = false;
+            });
+
+            /*tree_img.click(self.tree_node_misclicked);
+            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);*/
         } else if (typeof t != 'undefined') {
             tree_err.html(t);
         }
@@ -401,8 +524,8 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        $('#tree_img').unbind('click', self.tree_node_misclicked);
-        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);
+        /*$('#tree_img').unbind('click', self.tree_node_misclicked);
+        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);*/
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
@@ -487,8 +610,10 @@ M.preg_authoring_tools_script = (function ($) {
 
     panzooms : {
         reset_tree : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("reset");
+            //if($("#id_selection_mode").is(':checked') == false) {
+                var tree_img = $('#tree_img');
+                tree_img.panzoom("reset");
+            //}
         },
 
         reset_graph : function() {
@@ -504,8 +629,10 @@ M.preg_authoring_tools_script = (function ($) {
         },
 
         reset_tree_dimensions : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("resetDimensions");
+            //if($("#id_selection_mode").is(':checked') == false) {
+                var tree_img = $('#tree_img');
+                tree_img.panzoom("resetDimensions");
+            //}
         },
 
         reset_graph_dimensions : function() {
@@ -514,8 +641,10 @@ M.preg_authoring_tools_script = (function ($) {
         },
 
         init_tree : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom();
+            //if($("#id_selection_mode").is(':checked') == false) {
+                var tree_img = $('#tree_img');
+                tree_img.panzoom();
+            //}
         },
 
         init_graph : function() {
@@ -525,9 +654,135 @@ M.preg_authoring_tools_script = (function ($) {
 
         init : function() {
             self.panzooms.init_graph();
-            self.panzooms.init_tree();
+            //self.panzooms.init_tree();
         }
-    }
+    },
+    
+    //RECTANGLE SELECTION CODE
+    CALC_COORD : false,
+    RECTANGLE_WIDTH: 0,
+    RECTANGLE_HEIGHT : 0/*,
+    
+    start_rectangle_selection : $('#tree_img').mousedown(function(e)
+        {
+        alert('1');
+            //check is checked check box
+            if($("#id_selection_mode").attr("checked") == true) {
+                $('#id_selection_mode').attr('disabled',true);
+                //create new elements
+                $('#felement fgroup').append('<input type="submit" id="send_selection" value="Send selection" onclick="selectClick()">');
+                $('#felement fgroup').append('<input type="submit" id="cancel_selection" value="Cancel" onclick="cancelClick()">');
+
+                $('#tree_hnd').append('<div id=\"resizeMe\">'
+                                            +'<div id=\"resizeSE\"></div>'
+                                            +'<div id=\"resizeE\"></div>'
+                                            +'<div id=\"resizeNE\"></div>'
+                                            +'<div id=\"resizeN\"></div>'
+                                            +'<div id=\"resizeNW\"></div>'
+                                            +'<div id=\"resizeW\"></div>'
+                                            +'<div id=\"resizeSW\"></div>'
+                                            +'<div id=\"resizeS\"></div>'
+                                        +'</div>');
+                
+                e.preventDefault();
+                self.CALC_COORD = true;
+                var br = document.getElementById('tree_hnd').getBoundingClientRect();
+                $('#resizeMe').Resizable(
+                    {                
+                        minWidth: 20,
+                        minHeight: 20,
+                        //maxWidth: $('#container').css('width'),
+                        //maxHeight: $('#container').css('height'),
+                        minTop: br.top,
+                        minLeft: br.left,
+                        maxRight: br.right,
+                        maxBottom: br.bottom,
+                        dragHandle: true,
+                        onDrag: function(x, y)
+                        {
+                            this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
+                        },
+                        handlers: {
+                            se: '#resizeSE',
+                            e: '#resizeE',
+                            ne: '#resizeNE',
+                            n: '#resizeN',
+                            nw: '#resizeNW',
+                            w: '#resizeW',
+                            sw: '#resizeSW',
+                            s: '#resizeS'
+                        },
+                        onResize : function(size, position) {
+                            this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
+                        }
+                    }
+                )
+                $('#resizeMe').css({
+                    width : 20,
+                    height : 20,
+                    left : e.pageX,
+                    top : e.pageY,
+                });
+                self.RECTANGLE_WIDTH = e.pageX;
+                self.RECTANGLE_HEIGHT = e.pageY;
+            }
+        }
+    ),
+
+    resize_rectangle_selection : $('#tree_hnd').mousemove(function(e){
+        e.preventDefault();
+        if(self.CALC_COORD) {
+            if(self.RECTANGLE_WIDTH < e.pageX && self.RECTANGLE_HEIGHT < e.pageY) {
+                $('#resizeMe').css({
+                    width : (e.pageX - self.RECTANGLE_WIDTH)-10,
+                    height : (e.pageY - self.RECTANGLE_HEIGHT)-10,
+                });
+            } else if(self.RECTANGLE_WIDTH < e.pageX && self.RECTANGLE_HEIGHT > e.pageY) {
+                $('#resizeMe').css({
+                    width : (e.pageX - self.RECTANGLE_WIDTH)-10,
+                    height : (self.RECTANGLE_HEIGHT - e.pageY)-10,
+                    top : e.pageY,
+                });
+            } else if(self.RECTANGLE_WIDTH > e.pageX && self.RECTANGLE_HEIGHT > e.pageY) {
+                $('#resizeMe').css({
+                    width : (self.RECTANGLE_WIDTH - e.pageX)-10,
+                    height : (self.RECTANGLE_HEIGHT - e.pageY)-10,
+                    top : e.pageY,
+                    left : e.pageX,
+                });
+            } else if(self.RECTANGLE_WIDTH > e.pageX && self.RECTANGLE_HEIGHT < e.pageY) {
+                $('#resizeMe').css({
+                    width : (self.RECTANGLE_WIDTH - e.pageX)-10,
+                    height : (e.pageY - self.RECTANGLE_HEIGHT)-10,                
+                    left : e.pageX,
+                });
+            }
+        }
+    }),
+
+    end_rectangle_selection : $(window).mouseup(function(e){
+        e.preventDefault();
+        self.CALC_COORD = false;
+    }),
+
+    btn_select_rectangle_selection_click : function selectClick(){
+        //TODO: create ajax request with coordinates
+        self.btn_cancel_rectangle_selection_click();
+    },
+
+    btn_cancel_rectangle_selection_click : function cancelClick(){
+        //remove widgest
+        $('#send_selection').remove();
+        $('#cancel_selection').remove();
+        $('#resizeMe').css({
+                    width : 0,
+                    height : 0,
+                    left : -10,
+                    top : -10,
+                });
+        //set enabled check box
+        $('#id_selection_mode').attr('disabled',false);
+    },*/
 };
 
 return self;

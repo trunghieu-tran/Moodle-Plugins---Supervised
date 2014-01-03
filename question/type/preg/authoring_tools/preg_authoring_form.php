@@ -36,6 +36,9 @@ class qtype_preg_authoring_form extends moodleform {
 
         $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
         $PAGE->requires->js('/question/type/poasquestion/jquerypanzoommin.js');
+        $PAGE->requires->js('/question/type/poasquestion/interface.js');
+        /*$PAGE->requires->css('/question/type/poasquestion/shadow.css');
+        $PAGE->requires->css('/question/type/poasquestion/rect.css');*/
 
         // Create the form.
         $qtype = new qtype_preg();
@@ -95,6 +98,9 @@ class qtype_preg_authoring_form extends moodleform {
         $radiotreeorientationsarray = array();
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('vertical', 'editor'), 'vertical', null);
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('horizontal', 'editor'), 'horizontal', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'selection_mode', '', 'Selection mode', '', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('submit', 'send_select', 'Send select');
+        $radiotreeorientationsarray[] =& $mform->createElement('submit', 'cancel_select', 'Cancel select');
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
