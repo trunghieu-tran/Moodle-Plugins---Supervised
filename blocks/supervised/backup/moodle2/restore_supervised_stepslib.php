@@ -48,47 +48,55 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         global $DB;
 
         $data = (object)$data;
-        print_object($data);
-        //feedsarr = array(); // To accumulate feeds
+        $root = (object)($data->root);
 
         // For any reason (non multiple, dupe detected...) block not restored, return
         if (!$this->task->get_blockid()) {
+            echo "restore not required?";
             return;
         }
 
-        /*// Iterate over all the feed elements, creating them if needed
-        if (isset($data->rss_client['feeds']['feed'])) {
-            foreach ($data->rss_client['feeds']['feed'] as $feed) {
-                $feed = (object)$feed;
-                // Look if the same feed is available by url and (shared or userid)
-                $select = 'url = :url AND (shared = 1 OR userid = :userid)';
-                $params = array('url' => $feed->url, 'userid' => $this->task->get_userid());
-                // The feed already exists, use it
-                if ($feedid = $DB->get_field_select('block_rss_client', 'id', $select, $params, IGNORE_MULTIPLE)) {
-                    $feedsarr[] = $feedid;
-
-                    // The feed doesn't exist, create it
-                } else {
-                    $feed->userid = $this->task->get_userid();
-                    $feedid = $DB->insert_record('block_rss_client', $feed);
-                    $feedsarr[] = $feedid;
-                }
+        // Restore classrooms.
+        $DB->delete_records('block_supervised_classroom');
+        $classrooms = (object)$root->classrooms;
+        $classrooms = $classrooms->classroom;
+        if ($classrooms) {
+            foreach ($classrooms as $classroom) {
+                $classroom = (object)$classroom;
+                $olditemid = $classroom->id;
+                $newitemid = $DB->insert_record('block_supervised_classroom', $classroom);
+                $this->set_mapping('classroom', $olditemid, $newitemid);
             }
         }
 
-        // Adjust the serialized configdata->rssid to the created/mapped feeds
-        // Get the configdata
-        $configdata = $DB->get_field('block_instances', 'configdata', array('id' => $this->task->get_blockid()));
-        // Extract configdata
-        $config = unserialize(base64_decode($configdata));
-        if (empty($config)) {
-            $config = new stdClass();
+
+        // Restore lessontypes.
+        $DB->delete_records('block_supervised_lessontype', array('courseid'=>$this->get_courseid()));
+        $lessontypes = (object)$root->lessontypes;
+        $lessontypes = $lessontypes->lessontype;
+        if ($lessontypes) {
+            foreach ($lessontypes as $lessontype) {
+                $lessontype = (object)$lessontype;
+                $olditemid = $lessontype->id;
+                $lessontype->courseid = $this->get_courseid();
+                $newitemid = $DB->insert_record('block_supervised_lessontype', $lessontype);
+                $this->set_mapping('lessontype', $olditemid, $newitemid);
+            }
         }
-        // Set array of used rss feeds
-        $config->rssid = $feedsarr;
-        // Serialize back the configdata
-        $configdata = base64_encode(serialize($config));
-        // Set the configdata back
-        $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $this->task->get_blockid()));*/
+
+        // Restore sessions.
+        $DB->delete_records('block_supervised_session', array('courseid'=>$this->get_courseid()));
+        $sessions = (object)$root->sessions;
+        $sessions = $sessions->session;
+        if ($sessions) {
+            foreach ($sessions as $session) {
+                $session = (object)$session;
+                $session->courseid = $this->get_courseid();
+                $session->classroomid = $this->get_mappingid('classroom', $session->classroomid);
+                $session->teacherid = $this->get_mappingid('user', $session->teacherid, $session->teacherid);
+                $session->lessontypeid = $this->get_mappingid('lessontype', $session->lessontypeid);
+                $DB->insert_record('block_supervised_session', $session);
+            }
+        }
     }
 }
