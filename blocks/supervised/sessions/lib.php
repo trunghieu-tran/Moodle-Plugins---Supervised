@@ -1,60 +1,9 @@
 <?php
 
 function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
-    global $DB, $USER, $PAGE;
+    global $USER, $PAGE;
 
-    // TODO use get_logs function from sessions/lib.php
-    $select = "SELECT
-        {block_supervised_session}.id,
-        {block_supervised_session}.timestart,
-        {block_supervised_session}.duration,
-        {block_supervised_session}.timeend,
-        {block_supervised_session}.courseid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.state,
-        {block_supervised_classroom}.name   AS classroomname,
-        {block_supervised_lessontype}.name  AS lessontypename,
-        {user}.firstname,
-        {user}.lastname,
-        {groups}.name                       AS groupname,
-        {course}.fullname                   AS coursename
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE {block_supervised_session}.timestart >= :from
-            AND {block_supervised_session}.timeend <= :to
-    ";
-
-    $params['from']         = $from;
-    $params['to']           = $to;
-    if($teacher){
-        $select .= "AND {block_supervised_session}.teacherid = :teacher";
-        $params['teacher']      = $teacher;
-    }
-    if($course){
-        $select .= "AND {block_supervised_session}.courseid = :course";
-        $params['course']       = $course;
-    }
-    if($classroom){
-        $select .= "AND {block_supervised_session}.classroomid = :classroom";
-        $params['classroom']    = $classroom;
-    }
-    if($state){
-        $select .= "AND {block_supervised_session}.state = :state";
-        $params['state']        = $state;
-    }
-
-    $sessions = $DB->get_records_sql($select, $params);
+    $sessions = get_sessions($course, $teacher, $classroom, $state, $from, 0, 0, $to);
 
     // Filter sessions according to user capabilities.
     $sessionsfiltered = array();
@@ -161,8 +110,8 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 }
 
 
-// TODO Improve this function adding additional params for filtering (see a lots of TODO around $select building)
-function get_session($id){
+
+function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0){
     global $DB;
 
     $select = "SELECT
@@ -196,12 +145,62 @@ function get_session($id){
               ON {block_supervised_session}.groupid      =   {groups}.id
             JOIN {course}
               ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE {block_supervised_session}.id      = :id
         ";
-    $params['id']      = $id;
 
-    return $DB->get_record_sql($select, $params);
+    $whereflag = false;
+    if($courseid){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.courseid = :courseid"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.courseid = :courseid";}
+        $params['courseid']      = $courseid;
+    }
+    if($teacherid){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.teacherid = :teacherid"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.teacherid = :teacherid";}
+        $params['teacherid']      = $teacherid;
+    }
+    if($classroomid){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.classroomid = :classroomid"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.classroomid = :classroomid";}
+        $params['classroomid']      = $classroomid;
+    }
+    if($state){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.state = :state"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.state = :state";}
+        $params['state']      = $state;
+    }
+    if($timestart1){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timestart >= :timestart1"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.timestart >= :timestart1";}
+        $params['timestart1']      = $timestart1;
+    }
+    if($timestart2){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timestart <= :timestart2"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.timestart <= :timestart2";}
+        $params['timestart2']      = $timestart2;
+    }
+    if($timeend1){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timeend >= :timeend1"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.timeend >= :timeend1";}
+        $params['timeend1']      = $timeend1;
+    }
+    if($timeend2){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timeend <= :timeend2"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.timeend <= :timeend2";}
+        $params['timeend2']      = $timeend2;
+    }
+    if($id){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.id = :id"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.id = :id";}
+        $params['id']      = $id;
+    }
+
+    return $DB->get_records_sql($select, $params);
+}
+
+
+function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0){
+    $records = get_sessions($courseid, $teacherid, $classroomid, $state, $timestart1, $timestart2, $timeend1, $timeend2, $id);
+    return array_shift($records); // Return the first element.
 }
 
 function mail_newsession($session, $creator){
