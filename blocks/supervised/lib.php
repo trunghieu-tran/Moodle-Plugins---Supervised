@@ -48,6 +48,7 @@ function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NUL
     global $DB;
 
     // Find Active session.
+    // TODO use get_logs function from sessions/lib.php
     $select = "SELECT {block_supervised_session}.id
 
         FROM {block_supervised_session}

@@ -3,6 +3,7 @@
 function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
     global $DB, $USER, $PAGE;
 
+    // TODO use get_logs function from sessions/lib.php
     $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,
@@ -160,7 +161,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 }
 
 
-
+// TODO Improve this function adding additional params for filtering (see a lots of TODO around $select building)
 function get_session($id){
     global $DB;
 
