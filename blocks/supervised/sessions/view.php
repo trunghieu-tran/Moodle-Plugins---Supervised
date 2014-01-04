@@ -5,8 +5,18 @@ require_once('sessionstate.php');
 global $DB, $OUTPUT, $PAGE;
 
 $courseid   = required_param('courseid', PARAM_INT);
-$page       = optional_param('page', '0', PARAM_INT);      // which page to show
-$perpage    = optional_param('perpage', '50', PARAM_INT);  // how many per page
+$page       = optional_param('page', '0', PARAM_INT);       // which page to show
+$perpage    = optional_param('perpage', '50', PARAM_INT);   // how many per page
+$from       = optional_param('f', mktime(0, 0, 0, date('n'), date('j')), PARAM_INT);     // sessions filtering: timestamp from
+$to         = optional_param('t', mktime(23, 55, 0, date('n'), date('j')), PARAM_INT);   // sessions filtering: timestamp to
+$teacher    = optional_param('teacher', '0', PARAM_INT);    // sessions filtering: teacher id
+$coursefilter = optional_param('course', '0', PARAM_INT);     // sessions filtering: course id
+$classroom  = optional_param('classroom', '0', PARAM_INT);  // sessions filtering: classroom id
+$state      = optional_param('state', '0', PARAM_INT);      // sessions filtering: state index
+
+
+
+
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -45,11 +55,17 @@ if (file_exists($mform)) {
 $mform = new displayoptions_sessions_form();
 $toform['courseid'] = $courseid;
 $toform['pagesize'] = $perpage;
-$toform['from'] = mktime(0, 0, 0, date('n'), date('j'));
-$toform['to'] = mktime(0, 0, 0, date('n'), date('j') + 1);
+$toform['from'] = $from;
+$toform['to'] = $to;
+$toform['teacher'] = $teacher;
+$toform['course'] = $coursefilter;
+$toform['classroom'] = $classroom;
+$toform['state'] = $state;
 
 if ($fromform = $mform->get_data()) {
-    $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize));
+    $url = new moodle_url('/blocks/supervised/sessions/view.php',
+        array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize, 'f'=>$fromform->from, 't'=>$fromform->to,
+            'teacher'=>$fromform->teacher, 'course'=>$fromform->course, 'classroom'=>$fromform->classroom, 'state'=>$fromform->state ));
     redirect($url); // Redirect must be done before $OUTPUT->header().
 } else {
     // Form didn't validate or this is the first display.
@@ -72,7 +88,7 @@ if ($fromform = $mform->get_data()) {
 }
 
 // Print sessions table.
-print_sessions($page, $perpage, "view.php?courseid=$courseid");
+print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teacher, $coursefilter, $classroom, $state);
 
 // Display footer.
 echo $OUTPUT->footer();

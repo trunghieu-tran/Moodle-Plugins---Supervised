@@ -47,7 +47,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
         $mform->addElement('select', 'course', get_string('course', 'block_supervised'), $courses);
-        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers);
+        $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
         $mform->addElement('date_time_selector', 'from', get_string('from', ''));
         $mform->addElement('date_time_selector', 'to', get_string('to', ''));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);
