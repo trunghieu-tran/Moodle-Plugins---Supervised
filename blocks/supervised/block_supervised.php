@@ -22,7 +22,6 @@ class block_supervised extends block_base {
         global $DB, $COURSE, $USER;
 
         // Find Active session.
-        // TODO use get_logs function from sessions/lib.php
         $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,
@@ -73,59 +72,18 @@ class block_supervised extends block_base {
         return $activesession;
     }
 
+
     private function get_teacher_planned_session(){
         require_once('sessions/sessionstate.php');
-        global $DB, $COURSE, $USER;
+        require_once('sessions/lib.php');
+        global $COURSE, $USER;
 
-        // Find nearest Planned sessions.
-        // TODO use get_logs function from sessions/lib.php
-        $select = "SELECT
-        {block_supervised_session}.id,
-        {block_supervised_session}.timestart,
-        {block_supervised_session}.duration,
-        {block_supervised_session}.timeend,
-        {block_supervised_session}.courseid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.state,
-        {block_supervised_session}.sessioncomment,
-        {block_supervised_session}.classroomid,
-        {block_supervised_session}.lessontypeid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.sendemail,
-        {block_supervised_session}.groupid,
-        {user}.firstname,
-        {user}.lastname,
-        {course}.fullname                   AS coursename
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE ({block_supervised_session}.timestart BETWEEN :time1 AND :time2)
-            AND {block_supervised_session}.courseid     = :courseid
-            AND {block_supervised_session}.teacherid    = :teacherid
-            AND {block_supervised_session}.state        = :stateplanned
-        ";
-
-        $time1      = time() - 20*60;
-        $time2      = time() + 20*60;
-        $teacherid  = $USER->id;
-        $courseid   = $COURSE->id;
-        $params['time1']            = $time1;
-        $params['time2']            = $time2;
-        $params['courseid']         = $courseid;
-        $params['teacherid']        = $teacherid;
-        $params['stateplanned']     = StateSession::Planned;
-
-        $plannedsession = $DB->get_record_sql($select, $params);
+        $time1          = time() - 20*60;
+        $time2          = time() + 20*60;
+        $teacherid      = $USER->id;
+        $courseid       = $COURSE->id;
+        $stateplanned   = StateSession::Planned;
+        $plannedsession = get_session(0, $courseid, $teacherid, 0, $stateplanned, $time1, $time2);
 
         return $plannedsession;
     }
@@ -363,54 +321,14 @@ class block_supervised extends block_base {
 
     private function get_student_active_sessions(){
         require_once('sessions/sessionstate.php');
-        global $DB, $COURSE, $USER;
+        require_once('sessions/lib.php');
+        global $COURSE, $USER;
 
         // Find Active sessions.
-        // TODO use get_logs function from sessions/lib.php
-        $select = "SELECT
-        {block_supervised_session}.id,
-        {block_supervised_session}.timestart,
-        {block_supervised_session}.duration,
-        {block_supervised_session}.timeend,
-        {block_supervised_session}.courseid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.state,
-        {block_supervised_session}.sessioncomment,
-        {block_supervised_session}.classroomid,
-        {block_supervised_session}.lessontypeid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.sendemail,
-        {block_supervised_session}.groupid,
-        {user}.firstname,
-        {user}.lastname,
-        {block_supervised_classroom}.name   AS classroomname,
-        {groups}.name                       AS groupname,
-        {course}.fullname                   AS coursename,
-        {block_supervised_lessontype}.name  AS lessontypename
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE (:time BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
-            AND {block_supervised_session}.courseid     = :courseid
-            AND {block_supervised_session}.state        = :stateactive
-        ";
-
         $courseid   = $COURSE->id;
-        $params['time']             = time();
-        $params['courseid']         = $courseid;
-        $params['stateactive']      = StateSession::Active;
-
-        $activesessions = $DB->get_records_sql($select, $params);
+        $stateactive = StateSession::Active;
+        $time = time();
+        $activesessions = get_sessions($courseid, 0, 0, $stateactive, 0, $time, $time, 0);
 
         // Filter sessions by user groups
         $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);

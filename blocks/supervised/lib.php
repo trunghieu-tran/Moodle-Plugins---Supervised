@@ -48,21 +48,7 @@ function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NUL
     global $DB;
 
     // Find Active session.
-    // TODO use get_logs function from sessions/lib.php
-    $select = "SELECT {block_supervised_session}.id
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
+    $select = "SELECT * FROM {block_supervised_session}
         WHERE ((:timestart BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
                 || (:timeend BETWEEN {block_supervised_session}.timestart AND {block_supervised_session}.timeend)
                 || ( ({block_supervised_session}.timestart BETWEEN :timestart1 AND :timeend1)
