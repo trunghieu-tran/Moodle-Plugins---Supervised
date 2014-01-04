@@ -1,6 +1,6 @@
 <?php
 
-function build_sessions_array($limitfrom, $limitnum){
+function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
     global $DB, $USER, $PAGE;
 
     $select = "SELECT
@@ -29,26 +29,31 @@ function build_sessions_array($limitfrom, $limitnum){
               ON {block_supervised_session}.groupid      =   {groups}.id
             JOIN {course}
               ON {block_supervised_session}.courseid     =   {course}.id
+
+        WHERE {block_supervised_session}.timestart >= :from
+            AND {block_supervised_session}.timeend <= :to
     ";
-    /*TODO Add WHERE for filtering
-    WHERE ({block_supervised_session}.timestart BETWEEN :time1 AND :time2)
-        AND {block_supervised_session}.courseid     = :courseid
-        AND {block_supervised_session}.teacherid    = :teacherid
-        AND {block_supervised_session}.groupid      = :groupid
 
+    $params['from']         = $from;
+    $params['to']           = $to;
+    if($teacher){
+        $select .= "AND {block_supervised_session}.teacherid = :teacher";
+        $params['teacher']      = $teacher;
+    }
+    if($course){
+        $select .= "AND {block_supervised_session}.courseid = :course";
+        $params['course']       = $course;
+    }
+    if($classroom){
+        $select .= "AND {block_supervised_session}.classroomid = :classroom";
+        $params['classroom']    = $classroom;
+    }
+    if($state){
+        $select .= "AND {block_supervised_session}.state = :state";
+        $params['state']        = $state;
+    }
 
-    // TODO initialize from filter
-    $time1      = 1378024800;
-    $time2      = 1378024890;
-    $teacherid  = 3;
-    $groupid    = 1;
-    $params['time1']        = $time1;
-    $params['time2']        = $time2;
-    $params['courseid']     = $courseid;
-    $params['teacherid']    = $teacherid;
-    $params['groupid']      = $groupid;
-    */
-    $sessions = $DB->get_records_sql($select/*, $params*/);
+    $sessions = $DB->get_records_sql($select, $params);
 
     // Filter sessions according to user capabilities.
     $sessionsfiltered = array();
@@ -73,10 +78,10 @@ function build_sessions_array($limitfrom, $limitnum){
 
 
 
-function print_sessions($pagenum=0, $perpage=50, $url=""){
+function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
     global $OUTPUT, $USER, $PAGE;
 
-    $sessions = build_sessions_array($pagenum*$perpage, $perpage);
+    $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $state);
     $totalcount = $sessions['totalcount'];
 
     echo "<div class=\"info\">\n";
