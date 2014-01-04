@@ -85,3 +85,16 @@ function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NUL
 
     return $DB->record_exists_sql($select, $params);
 }
+
+
+function event_handler_course_deleted($course){
+    global $DB;
+    $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
+    $DB->delete_records('block_supervised_session', array('courseid'=>$course->id));
+}
+
+function event_handler_course_content_removed($course){
+    global $DB;
+    $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
+    $DB->delete_records('block_supervised_session', array('courseid'=>$course->id));
+}
