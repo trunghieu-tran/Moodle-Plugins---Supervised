@@ -98,14 +98,12 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $session->id, 'courseid' => $session->courseid));
         $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
 
-
         // Combine new row.
-        $tablerow = array(   $session->coursename,
+        $tablerow = array(
+            html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename),
             $session->classroomname,
             $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname,
-
             html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session)),
-
             $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename,
             userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime),
             $session->duration,

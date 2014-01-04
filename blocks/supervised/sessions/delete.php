@@ -81,7 +81,7 @@ if($mform->is_cancelled()) {
 
     $toform['id']               = $id;
     $toform['courseid']         = $courseid;
-    $toform['coursename']       = $session->coursename;
+    $toform['coursename']       = html_writer::link(new moodle_url("/course/view.php?id={$courseid}"), $session->coursename);
     $toform['classroomname']    = $session->classroomname;
     $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
     $toform['teachername']      = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));

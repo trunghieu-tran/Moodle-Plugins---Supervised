@@ -39,7 +39,7 @@ if(!$id){   // Add mode.
     $toform['teacherid']    = $USER->id;
     $toform['sendemail']    = 1;
     $toform['duration']     = 90;
-    $toform['coursename']   = $course->fullname;
+    $toform['coursename']   = html_writer::link(new moodle_url("/course/view.php?id={$course->id}"), $course->fullname);
 } else{     // Edit mode.
     $PAGE->navbar->add(get_string("editsessionnavbar", 'block_supervised'));
     if (! $session = get_session($id)) {
