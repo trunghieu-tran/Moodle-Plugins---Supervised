@@ -22,6 +22,7 @@ class block_supervised extends block_base {
         global $DB, $COURSE, $USER;
 
         // Find Active session.
+        // TODO use get_logs function from sessions/lib.php
         $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,
@@ -77,6 +78,7 @@ class block_supervised extends block_base {
         global $DB, $COURSE, $USER;
 
         // Find nearest Planned sessions.
+        // TODO use get_logs function from sessions/lib.php
         $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,
@@ -364,6 +366,7 @@ class block_supervised extends block_base {
         global $DB, $COURSE, $USER;
 
         // Find Active sessions.
+        // TODO use get_logs function from sessions/lib.php
         $select = "SELECT
         {block_supervised_session}.id,
         {block_supervised_session}.timestart,
