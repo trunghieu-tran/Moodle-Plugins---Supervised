@@ -17,8 +17,6 @@
     private $id_counter;
     // Counter of subpatterns.
     private $subpatt_counter;
-    // Max difference (right - left).
-    private $max_finite_quant_borders_difference;   // В принципе это костыль; когда ДКА будет получаться из НКА - удалить это.
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -29,7 +27,6 @@
         $this->handlingoptions = $handlingoptions;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
-        $this->max_finite_quant_borders_difference = 0;
     }
 
     public function get_root() {
@@ -54,10 +51,6 @@
 
     public function get_max_subpatt() {
         return $this->subpatt_counter;
-    }
-
-    public function get_max_finite_quant_borders_difference() {
-        return $this->max_finite_quant_borders_difference;
     }
 
     /**
@@ -179,7 +172,6 @@
             }
         }
         if ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
-            $this->max_finite_quant_borders_difference = max($this->max_finite_quant_borders_difference, $node->rightborder - $node->leftborder);
             if ($node->leftborder == 0 && $node->rightborder == 0) {
                 // Convert x{0} to emptiness.
                 $node = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
