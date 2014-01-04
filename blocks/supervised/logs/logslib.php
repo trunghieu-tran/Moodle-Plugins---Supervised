@@ -112,7 +112,8 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 
 
 function print_session_info_form($sessionid){
-    global $DB;
+    require_once("../sessions/lib.php");
+
     // Prepare session info form.
     $mform = "viewsession_form.php";
     if (file_exists($mform)) {
@@ -121,40 +122,7 @@ function print_session_info_form($sessionid){
         print_error('noformdesc');
     }
     $mform = new viewsession_form();
-    // TODO use get_session from sessions/lib.php
-    $select = "SELECT
-        {block_supervised_session}.id,
-        {block_supervised_session}.timestart,
-        {block_supervised_session}.duration,
-        {block_supervised_session}.timeend,
-        {block_supervised_session}.courseid,
-        {block_supervised_session}.teacherid,
-        {block_supervised_session}.state,
-        {block_supervised_session}.sessioncomment,
-        {block_supervised_classroom}.name   AS classroomname,
-        {block_supervised_lessontype}.name  AS lessontypename,
-        {user}.firstname,
-        {user}.lastname,
-        {groups}.name                       AS groupname,
-        {groups}.id                         AS groupid,
-        {course}.fullname                   AS coursename
-
-        FROM {block_supervised_session}
-            JOIN {block_supervised_classroom}
-              ON {block_supervised_session}.classroomid       =   {block_supervised_classroom}.id
-            LEFT JOIN {block_supervised_lessontype}
-              ON {block_supervised_session}.lessontypeid =   {block_supervised_lessontype}.id
-            JOIN {user}
-              ON {block_supervised_session}.teacherid    =   {user}.id
-            LEFT JOIN {groups}
-              ON {block_supervised_session}.groupid      =   {groups}.id
-            JOIN {course}
-              ON {block_supervised_session}.courseid     =   {course}.id
-
-        WHERE {block_supervised_session}.id      = :sessionid
-        ";
-    $params['sessionid']      = $sessionid;
-    $session = $DB->get_record_sql($select, $params);
+    $session = get_session($sessionid);
 
     $strftimedatetime = get_string("strftimerecent");
     $toform['coursename']       = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
