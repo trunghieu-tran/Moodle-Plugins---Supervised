@@ -11,7 +11,7 @@ class displayoptions_logs_form extends moodleform {
         // Gets array of all groups in current course.
         $teacher = $DB->get_record('user', array('id'=>$this->_customdata['teacherid']));
         $users[0] = get_string('allusers', 'block_supervised');
-        $users[$teacher->id] = $teacher->firstname . " " . $teacher->lastname;
+        $users[$teacher->id] = fullname($teacher);
 
         $groupid = $this->_customdata['groupid'];
         $courseid = $this->_customdata['courseid'];
@@ -21,7 +21,7 @@ class displayoptions_logs_form extends moodleform {
             foreach ($groups as $group) {
                 $cusers = groups_get_members($group->id);
                 foreach ($cusers as $cuser) {
-                    $users[$cuser->id] = "[" . $group->name . "]" . " " . $cuser->lastname . " " . $cuser->firstname;
+                    $users[$cuser->id] = "[" . $group->name . "]" . " " . fullname($cuser);
                 }
             }
         }
@@ -29,7 +29,7 @@ class displayoptions_logs_form extends moodleform {
             // One group in course.
             if ( $cusers = groups_get_members($groupid) ) {
                 foreach ($cusers as $cuser) {
-                    $users[$cuser->id] = $cuser->lastname . " " . $cuser->firstname;
+                    $users[$cuser->id] = fullname($cuser);
                 }
             }
         }

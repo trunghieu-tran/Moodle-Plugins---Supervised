@@ -104,7 +104,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
             $session->classroomname,
             $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname,
 
-            html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), $session->firstname . " " . $session->lastname),
+            html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session)),
 
             $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename,
             userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime),

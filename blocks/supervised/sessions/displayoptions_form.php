@@ -23,7 +23,7 @@ class displayoptions_sessions_form extends moodleform {
                 $coursecontext = context_course::instance($ccourse->id);
                 if ($cteachers = get_users_by_capability($coursecontext, array('block/supervised:supervise'))) {
                     foreach ($cteachers as $cteacher) {
-                        $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
+                        $teachers[$cteacher->id] = fullname($cteacher);
                     }
                 }
             }
