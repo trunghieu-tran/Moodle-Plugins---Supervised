@@ -26,5 +26,6 @@ class activesessionstudent_block_form extends moodleform {
 
         // hidden elements.
         $mform->addElement('hidden', 'id');     // course id
+        $mform->setType('id', PARAM_INT);
     }
 }

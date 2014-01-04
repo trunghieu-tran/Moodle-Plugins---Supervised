@@ -12,12 +12,12 @@ class addedit_session_form extends moodleform {
         if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:supervise'))) {
             if( has_capability('block/supervised:manageownsessions', $PAGE->context) AND !has_capability('block/supervised:manageallsessions', $PAGE->context) ){
                 // If current user has only manageownsessions capability he can plane session only for himself.
-                $teachers[$USER->id] = $cteachers[$USER->id]->lastname . " " . $cteachers[$USER->id]->firstname;
+                $teachers[$USER->id] = fullname($cteachers[$USER->id]);
             }
             else{
                 // User can add/edit session for other users. So add all teachers.
                 foreach ($cteachers as $cteacher) {
-                    $teachers[$cteacher->id] = $cteacher->lastname . " " . $cteacher->firstname;
+                    $teachers[$cteacher->id] = fullname($cteacher);
                 }
             }
         }

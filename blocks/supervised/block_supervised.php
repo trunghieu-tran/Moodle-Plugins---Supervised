@@ -443,7 +443,7 @@ class block_supervised extends block_base {
             foreach($activesessions as $session){
                 $mform = new activesessionstudent_block_form();
                 $toform['id']               = $COURSE->id;
-                $toform['teacher']          = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), $session->firstname . " " . $session->lastname);
+                $toform['teacher']          = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
                 $toform['lessontypename']   = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
                 $toform['classroomname']    = $session->classroomname;
                 $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
@@ -519,7 +519,9 @@ class block_supervised extends block_base {
             $links[] = html_writer::link($sessionsurl, get_string('sessionsurl', 'block_supervised'));
         }
 
-        $this->content->footer = join(' ', $links);
+        if(isset($links)){
+            $this->content->footer = join(' ', $links);
+        }
     }
 
     public function cron() {
