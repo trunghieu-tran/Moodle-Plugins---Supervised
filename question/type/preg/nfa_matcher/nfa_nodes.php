@@ -44,6 +44,9 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // Does this transition start a quantifier?
     public $starts_quantifier;
 
+    // Does this transition end a quantifier?
+    public $ends_quantifier;
+
     // Does this transition make a infinite quantifier loop?
     public $is_loop;
 
@@ -52,6 +55,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         $this->min_subpatt_node = null;
         $this->starts_backrefed_subexprs = false;
         $this->starts_quantifier = false;
+        $this->ends_quantifier = false;
         $this->is_loop = false;
     }
 
@@ -327,10 +331,14 @@ abstract class qtype_preg_nfa_node_quant extends qtype_preg_nfa_operator {
         return true;
     }
 
-    protected function mark_transitions($automaton, $state) {
-        $outgoing = $automaton->get_adjacent_transitions($state, true);
+    protected function mark_transitions($automaton, $startstate, $endstate) {
+        $outgoing = $automaton->get_adjacent_transitions($startstate, true);
+        $incoming = $automaton->get_adjacent_transitions($endstate, false);
         foreach ($outgoing as $transition) {
             $transition->starts_quantifier = true;
+        }
+        foreach ($incoming as $transition) {
+            $transition->ends_quantifier = true;
         }
     }
 }
@@ -413,7 +421,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
             $this->create_brace($automaton, $stack);
         }
         $body = array_pop($stack);
-        $this->mark_transitions($automaton, $body['start']);
+        $this->mark_transitions($automaton, $body['start'], $body['end']);
 
         $stack[] = $body;
         $this->update_automaton($automaton, $stack);
@@ -512,7 +520,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
             $this->create_brace($automaton, $stack);
         }
         $body = array_pop($stack);
-        $this->mark_transitions($automaton, $body['start']);
+        $this->mark_transitions($automaton, $body['start'], $body['end']);
 
         $stack[] = $body;
         $this->update_automaton($automaton, $stack);
