@@ -154,18 +154,9 @@ M.poasquestion_text_and_button = (function() {
             if (received === scripts.length+1)
                 callback();
         };
-        /*$.ajaxSetup({
-            statusCode: {
-                404: function() {
-                  alert( "page not found" );
-                }
-            }
-        });*/
-        //$(self.dialog).load(url, fakeCallback);
         $.ajax({
             url: url,
             type: "GET",
-            global: false,
             dataType: "text"
         }).done(function (responseText, textStatus, jqXHR) {
             var tmpM = M;
