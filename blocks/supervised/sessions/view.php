@@ -45,6 +45,8 @@ if (file_exists($mform)) {
 $mform = new displayoptions_sessions_form();
 $toform['courseid'] = $courseid;
 $toform['pagesize'] = $perpage;
+$toform['from'] = mktime(0, 0, 0, date('n'), date('j'));
+$toform['to'] = mktime(0, 0, 0, date('n'), date('j') + 1);
 
 if ($fromform = $mform->get_data()) {
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize));

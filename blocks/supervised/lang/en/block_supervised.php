@@ -48,6 +48,7 @@ $string['classroomsdefinition_help']            = 'The classroom defines an IP s
 $string['supervisedsettings']                   = 'Supervised settings';
 $string['classroomsbreadcrumb']                 = 'Classrooms';
 $string['classroom']                            = 'Classroom';
+$string['allclassrooms']                        = 'All classrooms';
 $string['iplist']                               = 'IP list';
 $string['iplist_help']                          =
 'IP list is a comma separated string of subnet definitions.
@@ -138,6 +139,7 @@ $string['timestart']                = 'Time start';
 $string['duration']                 = 'Duration (min)';
 $string['timeend']                  = 'Time end';
 $string['state']                    = 'State';
+$string['allstates']                = 'All states';
 $string['logs']                     = 'Logs';
 $string['showlogs']                 = 'Show logs';
 
