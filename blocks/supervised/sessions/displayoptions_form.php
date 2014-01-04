@@ -48,8 +48,8 @@ class displayoptions_sessions_form extends moodleform {
         $mform->setType('pagesize', PARAM_INT);
         $mform->addElement('select', 'course', get_string('course', 'block_supervised'), $courses);
         $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
-        $mform->addElement('date_time_selector', 'from', get_string('from', ''));
-        $mform->addElement('date_time_selector', 'to', get_string('to', ''));
+        $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
+        $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addElement('select', 'state', get_string('state', 'block_supervised'), $states);
 
@@ -69,6 +69,11 @@ class displayoptions_sessions_form extends moodleform {
         // Page size must be greater than zero.
         if($data["pagesize"] <= 0){
             $errors["pagesize"] = get_string("pagesizevalidationerror", "block_supervised");
+        }
+
+        // Time from must be <= than time to .
+        if($data["from"] > $data["to"]){
+            $errors["to"] = get_string("timetovalidationerror", "block_supervised");
         }
 
         return $errors;

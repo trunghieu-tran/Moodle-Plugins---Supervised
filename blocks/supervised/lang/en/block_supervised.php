@@ -124,6 +124,9 @@ $string['teacherhassession']        = 'Teacher has an other session in this peri
 $string['teachervalidationerror']   = 'You can plane session only for yourself.';
 $string['plansession']              = 'Plan a new session ...';
 $string['showsessions']             = 'Show sessions';
+$string['sessionstartsafter']       = 'Session starts after';
+$string['sessionendsbefore']        = 'Session ends before';
+$string['timetovalidationerror']    = 'Session\'s end must be greater or equal session\'s start.';
 
 $string['logspagetitle']            = 'Session logs';
 $string['logsview']                 = 'Session logs';
