@@ -61,20 +61,6 @@ M.preg_authoring_tools_script = (function ($) {
         this.setup_parent_object();
     },
 
-    _loadScripts : function(scripts, callback)
-    {
-        var received = 0;
-        var fakeCallback = function() {
-            received++;
-            if (received === scripts.length)
-                callback();
-        };
-
-        for (var i = 0; i < scripts.length; i++) {
-            $.getScript(scripts[i], fakeCallback);
-        }
-    },
-
     /**
      * Sets up options of M.poasquestion_text_and_button object
      * This method defines onfirstpresscallback method, that calls on very first
@@ -85,81 +71,74 @@ M.preg_authoring_tools_script = (function ($) {
         var options = {
 
             onfirstpresscallback : function () {
-                $.ajax({
-                    url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php',
-                    type: "GET",
-                    dataType: "text"
-                }).done(function (responseText, textStatus, jqXHR) {
-                    var tmpM = M;
-                    var tpage_html = $.parseHTML(responseText, document, false);
-                    $(self.textbutton_widget.dialog).html(tpage_html);
-                    var scripts = [
+                var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
+                var scripts = [
                         self.www_root+'/question/type/poasquestion/jquerypanzoommin.js',
                         self.www_root+'/question/type/poasquestion/jquery-textrange.js',
                         self.www_root+'/question/type/poasquestion/interface.js',
                         self.www_root+'/question/type/poasquestion/jquery.mousewheel.js'
                         ];
-                    self._loadScripts(scripts, function() {
-                        // Remove the "skip to main content" link.
-                        $(self.textbutton_widget.dialog).find('.skiplinks').remove();
+                self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
-                        // Create a clone of the textarea.
-                        var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:both;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
-                        $('#id_regex_text').each(function () {
-                            $.each(this.attributes, function () {
-                                if (this.specified) {
-                                    textarea.attr(this.name, this.value);
-                                }
-                            });
+                    // Remove the "skip to main content" link.
+                    $(self.textbutton_widget.dialog).find('.skiplinks').remove();
+
+                    // Create a clone of the textarea.
+                    var textarea = $('<textarea style="margin:0;padding:0;border:none;resize:both;outline:none;overflow:hidden;width:100%;height:100%"></textarea>');
+                    $('#id_regex_text').each(function () {
+                        $.each(this.attributes, function () {
+                            if (this.specified) {
+                                textarea.attr(this.name, this.value);
+                            }
                         });
-
-                        // Replace the textarea with an iframe.
-                        var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
-                                             '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"></iframe>' +
-                                           '</div>';
-
-                        $('#id_regex_text').replaceWith(iframeMarkup);
-                        $('#id_regex_resizable').resizable();
-
-                        // Deal with iframe.
-                        var iframe = $('#id_regex_text_replacement');
-
-                        setTimeout(function () {
-                            var innerDoc = iframe[0].contentWindow.document,
-                                innerBody = $('body', innerDoc);
-                            innerBody.css('margin', '0').css('padding', '0')
-                                     .append(textarea);
-                        }, 1);
-
-                        // Add handlers for the buttons.
-                        $('#id_regex_show').click(self.btn_show_clicked);
-                        if (!self.textbutton_widget.is_stand_alone()) {
-                            $('#id_regex_save').click(self.btn_save_clicked);
-                        } else {
-                            $('#id_regex_save').hide();
-                        }
-                        $('#id_regex_cancel').click(self.btn_cancel_clicked);
-                        $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
-
-                        // Add handlers for the radiobuttons.
-                        $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
-                        $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
-
-                        // Add handlers for the regex textarea.
-                        self.regex_input = textarea;
-                        self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
-
-                        // Add handlers for the regex testing textarea.
-                        $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
-
-                        // Hide the non-working "displayas".
-                        $('#fgroup_id_charset_process_radioset').hide();
-
-                        $('#id_send_select').attr('disabled',true);
-                        $('#id_cancel_select').attr('disabled',true);
-                        self.panzooms.init();
-                        options.oneachpresscallback();
                     });
+
+                    // Replace the textarea with an iframe.
+                    var iframeMarkup = '<div id="id_regex_resizable" style="border:1px solid black;padding:0;overflow:hidden;width:50%;height:20px">' +
+                                         '<iframe id="id_regex_text_replacement" style="border:none;resize:none;width:100%;height:100%"></iframe>' +
+                                       '</div>';
+
+                    $('#id_regex_text').replaceWith(iframeMarkup);
+                    $('#id_regex_resizable').resizable();
+
+                    // Deal with iframe.
+                    var iframe = $('#id_regex_text_replacement');
+
+                    setTimeout(function () {
+                        var innerDoc = iframe[0].contentWindow.document,
+                            innerBody = $('body', innerDoc);
+                        innerBody.css('margin', '0').css('padding', '0')
+                                 .append(textarea);
+                    }, 1);
+
+                    // Add handlers for the buttons.
+                    $('#id_regex_show').click(self.btn_show_clicked);
+                    if (!self.textbutton_widget.is_stand_alone()) {
+                        $('#id_regex_save').click(self.btn_save_clicked);
+                    } else {
+                        $('#id_regex_save').hide();
+                    }
+                    $('#id_regex_cancel').click(self.btn_cancel_clicked);
+                    $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
+
+                    // Add handlers for the radiobuttons.
+                    $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
+                    $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
+
+                    // Add handlers for the regex textarea.
+                    self.regex_input = textarea;
+                    self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
+
+                    // Add handlers for the regex testing textarea.
+                    $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
+
+                    // Hide the non-working "displayas".
+                    $('#fgroup_id_charset_process_radioset').hide();
+
+                    $('#id_send_select').attr('disabled',true);
+                    $('#id_cancel_select').attr('disabled',true);
+                    self.panzooms.init();
+                    options.oneachpresscallback();
                 });
             },
 
