@@ -160,8 +160,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return true;
     }
 
-    /**********************************************************************/
-
     public function find_dup_subexpr_match($subexpr) {
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
             // Can get here when {0} occurs in the regex.
@@ -228,8 +226,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $result;
     }
 
-    /**********************************************************************/
-
     /**
      * Resets the given subpattern to no match.
      */
@@ -238,7 +234,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return;
         }
 
-        $nodes = array_merge($this->matcher->get_nested_nodes($node->subpattern), array($node));
+        $nodes = array($node);
+        if ($this->matcher->get_options()->capturesubexpressions) {
+            $nodes = array_merge($nodes, $this->matcher->get_nested_nodes($node->subpattern));
+        }
 
         foreach ($nodes as $node) {
             if ($node->subpattern == -1) {
@@ -248,17 +247,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $cur = $this->current_match($node->subpattern);
 
             if ($cur === null) {
-                // Very first iteration.
-                $this->matches[$node->subpattern] = array(self::empty_subpatt_match());
-            } else {
-                // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
-                $skip = !$this->matcher->get_options()->capturesubexpressions;
-                $skip = $skip || ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND);
-                $skip = $skip || ($node->subpattern == $this->root_subpatt_number());
-                if (!$skip) {
-                    $this->matches[$node->subpattern][] = self::empty_subpatt_match();
-                }
+                $this->matches[$node->subpattern] = array(); // Very first iteration.
             }
+
+            if ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                continue;   // The new iteration is already started.
+            }
+
+            $this->matches[$node->subpattern][] = self::empty_subpatt_match();
         }
     }
 
@@ -299,8 +295,8 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
-        $this_subpatt_count = $this->count_captured_subpatters();
-        $other_subpatt_count = $other->count_captured_subpatters();
+        $this_captured_subpatt_count = $this->count_captured_subpatters();
+        $other_captured_subpatt_count = $other->count_captured_subpatters();
 
         // Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
@@ -309,10 +305,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
             // Less number of iterations means that there is a longer match without epsilons.
-            $this_count = count($this_match);
-            $other_count = count($other_match);
+            $this_repetition_count = count($this_match);
+            $other_repetition_count = count($other_match);
 
-            if ($modepcre && $this_count == $other_count + 1) {
+            if ($modepcre && $this_repetition_count == $other_repetition_count + 1) {
                 // PCRE mode selection: if states have N and N + 1 subpattern repetitions, respectively,
                 // and the (N + 1)th repetition is empty, then select the second state. And vice versa.
                 $this_last = $this->last_match($i);
@@ -325,14 +321,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
 
             // POSIX mode selection goes on here.
-            if ($this_subpatt_count >= $other_subpatt_count && $this_count < $other_count) {
+            if ($this_captured_subpatt_count >= $other_captured_subpatt_count && $this_repetition_count < $other_repetition_count) {
                 return true;
-            } else if ($other_subpatt_count >= $this_subpatt_count && $other_count < $this_count) {
+            } else if ($other_captured_subpatt_count >= $this_captured_subpatt_count && $other_repetition_count < $this_repetition_count) {
                 return false;
             }
 
             // Iterate over all repetitions.
-            for ($j = 0; $j < min($this_count, $other_count); $j++) {
+            for ($j = 0; $j < min($this_repetition_count, $other_repetition_count); $j++) {
                 $this_index = $this_match[$j][0];
                 $this_length = $this_match[$j][1];
                 $other_index = $other_match[$j][0];
