@@ -157,7 +157,7 @@ function print_session_info_form($sessionid){
     $session = $DB->get_record_sql($select, $params);
 
     $strftimedatetime = get_string("strftimerecent");
-    $toform['coursename']       = $session->coursename;
+    $toform['coursename']       = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
     $toform['classroomname']    = $session->classroomname;
     $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
     $toform['teachername']      = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
