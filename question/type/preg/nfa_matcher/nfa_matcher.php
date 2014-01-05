@@ -415,9 +415,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
-                // Currently stored state needs replacement if it's null, or if it's not the same as the new state.
-                // In fact, the second check prevents from situations like \b*
-                if ($states[$curstate->state] === null || !$states[$curstate->state]->equals($curstate)) {
+                // Currently stored state needs replacement if it's null, or if it's worse than the new state.
+                if ($states[$curstate->state] === null || $curstate->leftmost_shortest($states[$curstate->state])) {
                     $states[$curstate->state] = $curstate;
                     $curstates[] = $curstate->state;
                 }
@@ -613,9 +612,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
-                // Currently stored state needs replacement if it's null, or if it's not the same as the new state.
-                // In fact, the second check prevents from situations like \b*
-                if ($states[$curstate->state] === null || !$states[$curstate->state]->equals($curstate)) {
+                // Currently stored state needs replacement if it's null, or if it's worse than the new state.
+                if ($states[$curstate->state] === null || $curstate->leftmost_longest($states[$curstate->state])) {
                     $states[$curstate->state] = $curstate;
                     $curstates[] = $curstate->state;
                 }

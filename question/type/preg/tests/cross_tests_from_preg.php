@@ -3680,7 +3680,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_many_quantifiers() {
+    function data_for_test_many_quantifiers_1() {
         $test1 = array( 'str'=>'Circle.Radius = 25; Circle.Center.point2d.X = 5; Circle.Center.point2d.Y = 0;',
                         'is_match'=>true,
                         'full'=>true,
@@ -3695,6 +3695,26 @@ class qtype_preg_cross_tests_from_preg {
                         'next'=>'C');
 
         return array('regex'=>'\s*Circle\s*\.\s*Radius\s*=\s*25\s*;\s*Circle\s*\.\s*Center\s*\.\s*point2d\s*\.\s*X\s*=\s*5;\s*Circle\s*\.\s*Center\s*\.\s*point2d\s*\.\s*Y\s*=\s*0;\s*',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_many_quantifiers_2() {
+        $test1 = array( 'str'=>"char str[][3]={{'д','е','ё'},{'ж','з','и'},{'й','к','л'},{'м','н','о'}};",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>9),
+                        'length'=>array(0=>72,1=>0));
+
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(72),
+                        'next'=>'c');
+
+        return array('regex'=>"char\s+str\s*\[\s*(4|)\s*\]\s*\[\s*3\s*\]\s*=\s*{\s*{\s*'д'\s*,\s*'е'\s*,\s*'ё'\s*}\s*,\s*{\s*'ж'\s*,\s*'з'\s*,\s*'и'\s*}\s*,\s*{\s*'й'\s*,\s*'к'\s*,\s*'л'\s*}\s*,\s*{\s*'м'\s*,\s*'н'\s*,\s*'о'\s*}\s*}\s*;+",
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
