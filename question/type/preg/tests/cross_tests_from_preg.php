@@ -3731,6 +3731,62 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1));
     }
 
+    function data_for_test_brute_force_methods_perfomance_1() {
+        $test1 = array( 'str'=>"aaaa",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>2),
+                        'length'=>array(0=>4,1=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(3),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>"a{1,200}(a{1,200})?\\1a{0,200}",
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_brute_force_methods_perfomance_2() {
+        $test1 = array( 'str'=>"aaaa",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>2),
+                        'length'=>array(0=>4,1=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(160),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>"a{40,80}(a{40,80})?\\1a{40,80}",
+                     'tests'=>array(/*$test1,*/ $test2));   // test1 runs sooooo slooooow
+    }
+
+    function data_for_test_fast_methods_perfomance_1() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(300),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>"a{100,200}(ab){100,200}",
+                     'tests'=>array($test1));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,

@@ -20152,7 +20152,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>4),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'\'',
+                        'next'=>'[\'"]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>"b\"11111",

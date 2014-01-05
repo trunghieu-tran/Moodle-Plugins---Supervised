@@ -664,7 +664,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
                 $tmp = $bruteforce
-                     ? $this->generate_extension_fast($backtrack)       // TODO: generate_extension_brute_force
+                     ? $this->generate_extension_brute_force($backtrack)
                      : $this->generate_extension_fast($backtrack);
 
                 if ($tmp === null) {
