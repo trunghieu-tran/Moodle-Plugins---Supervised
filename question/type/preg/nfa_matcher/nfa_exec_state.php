@@ -145,7 +145,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     }
 
     // Checks if this state equals another
-    public function equals($to) {
+    /*public function equals($to) {
         if ($this->state !== $to->state) {
             return false;
         }
@@ -158,7 +158,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
         }
         return true;
-    }
+    }*/
 
     public function find_dup_subexpr_match($subexpr) {
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
