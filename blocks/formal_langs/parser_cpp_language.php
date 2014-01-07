@@ -96,12 +96,12 @@ class lock_formal_langs_parser_cpp_languageyyStackEntry
 // code external to the class is included here
 
 // declare_class is output here
-#line 2 "parser_cpp_language.y"
-class block_formal_langs_parser_cpp_language#line 102 "parser_cpp_language.php"
+#line 2 "langs_src/parser_cpp_language.y"
+class block_formal_langs_parser_cpp_language#line 102 "langs_src/parser_cpp_language.php"
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 3 "parser_cpp_language.y"
+#line 3 "langs_src/parser_cpp_language.y"
 
     // Root of the Abstract Syntax Tree (AST).
     public $root;
@@ -109,6 +109,8 @@ class block_formal_langs_parser_cpp_language#line 102 "parser_cpp_language.php"
 	public $currentid;
 	// A mapper for parser
 	public $mapper;
+	// Test, whether parsing error occured
+	public $error = false;
 	
 	protected function create_node($type, $children) {
 		$result = new block_formal_langs_ast_node_base($type, null, $this->currentid, false);
@@ -129,7 +131,7 @@ class block_formal_langs_parser_cpp_language#line 102 "parser_cpp_language.php"
 		return $oldmajor;
 	}
 	
-#line 135 "parser_cpp_language.php"
+#line 137 "langs_src/parser_cpp_language.php"
 
 /* Next is all token values, as class constants
 */
@@ -2886,665 +2888,674 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 60 "parser_cpp_language.y"
+#line 78 "langs_src/parser_cpp_language.y"
     function yy_r0(){
-	$result = $this->create_node('program', array( $this->yystack[$this->yyidx + 0]->minor ));
-	$this->root = $result;
+	$stack = array( $this->create_node('program', array( $this->yystack[$this->yyidx + 0]->minor ) ) );
+	if (is_array($this->root)) {
+            if (count($this->root)) {
+                $this->root = array_merge($this->root, $stack);
+            }
+            else {
+                $this->root  = $stack;
+            }
+    } else {
+            $this->root = $stack;
+    }
 	$this->_retvalue = $result;
     }
-#line 2900 "parser_cpp_language.php"
-#line 67 "parser_cpp_language.y"
+#line 2911 "langs_src/parser_cpp_language.php"
+#line 94 "langs_src/parser_cpp_language.y"
     function yy_r1(){
 	$this->yystack[$this->yyidx + -1]->minor->add_child($this->yystack[$this->yyidx + 0]->minor);
 	$this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 2906 "parser_cpp_language.php"
-#line 72 "parser_cpp_language.y"
+#line 2917 "langs_src/parser_cpp_language.php"
+#line 99 "langs_src/parser_cpp_language.y"
     function yy_r2(){
 	$result = $this->create_node('stmt_list', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2912 "parser_cpp_language.php"
-#line 77 "parser_cpp_language.y"
+#line 2923 "langs_src/parser_cpp_language.php"
+#line 104 "langs_src/parser_cpp_language.y"
     function yy_r3(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$result = $this->create_node('namespace', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2919 "parser_cpp_language.php"
-#line 83 "parser_cpp_language.y"
+#line 2930 "langs_src/parser_cpp_language.php"
+#line 110 "langs_src/parser_cpp_language.y"
     function yy_r4(){
 	$this->_retvalue = $this->create_node('namespace_body', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2924 "parser_cpp_language.php"
-#line 87 "parser_cpp_language.y"
+#line 2935 "langs_src/parser_cpp_language.php"
+#line 114 "langs_src/parser_cpp_language.y"
     function yy_r5(){
 	$this->_retvalue = $this->create_node('namespace_body', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2929 "parser_cpp_language.php"
-#line 91 "parser_cpp_language.y"
+#line 2940 "langs_src/parser_cpp_language.php"
+#line 118 "langs_src/parser_cpp_language.y"
     function yy_r6(){
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 2934 "parser_cpp_language.php"
-#line 95 "parser_cpp_language.y"
+#line 2945 "langs_src/parser_cpp_language.php"
+#line 122 "langs_src/parser_cpp_language.y"
     function yy_r7(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -3]->minor->value());
 	$result = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2941 "parser_cpp_language.php"
-#line 101 "parser_cpp_language.y"
+#line 2952 "langs_src/parser_cpp_language.php"
+#line 128 "langs_src/parser_cpp_language.y"
     function yy_r8(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -2]->minor->value());
 	$result = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2948 "parser_cpp_language.php"
-#line 107 "parser_cpp_language.y"
+#line 2959 "langs_src/parser_cpp_language.php"
+#line 134 "langs_src/parser_cpp_language.y"
     function yy_r9(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$result = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2955 "parser_cpp_language.php"
-#line 113 "parser_cpp_language.y"
+#line 2966 "langs_src/parser_cpp_language.php"
+#line 140 "langs_src/parser_cpp_language.y"
     function yy_r10(){
 	$result = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2961 "parser_cpp_language.php"
-#line 118 "parser_cpp_language.y"
+#line 2972 "langs_src/parser_cpp_language.php"
+#line 145 "langs_src/parser_cpp_language.y"
     function yy_r11(){
 	$result = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2967 "parser_cpp_language.php"
-#line 124 "parser_cpp_language.y"
+#line 2978 "langs_src/parser_cpp_language.php"
+#line 151 "langs_src/parser_cpp_language.y"
     function yy_r12(){
 	$result = $this->create_node('type_meta_specifier_with_template_def', array(A, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 2973 "parser_cpp_language.php"
-#line 146 "parser_cpp_language.y"
+#line 2984 "langs_src/parser_cpp_language.php"
+#line 173 "langs_src/parser_cpp_language.y"
     function yy_r17(){
 	$this->_retvalue = $this->create_node('structure_body', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2978 "parser_cpp_language.php"
-#line 150 "parser_cpp_language.y"
+#line 2989 "langs_src/parser_cpp_language.php"
+#line 177 "langs_src/parser_cpp_language.y"
     function yy_r18(){
 	$this->_retvalue = $this->create_node('structure_body', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2983 "parser_cpp_language.php"
-#line 154 "parser_cpp_language.y"
+#line 2994 "langs_src/parser_cpp_language.php"
+#line 181 "langs_src/parser_cpp_language.y"
     function yy_r19(){
 	$this->_retvalue = $this->create_node('stmt_or_visibility_spec_list', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2988 "parser_cpp_language.php"
-#line 164 "parser_cpp_language.y"
+#line 2999 "langs_src/parser_cpp_language.php"
+#line 191 "langs_src/parser_cpp_language.y"
     function yy_r21(){
 	$this->_retvalue  = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 2993 "parser_cpp_language.php"
-#line 172 "parser_cpp_language.y"
+#line 3004 "langs_src/parser_cpp_language.php"
+#line 199 "langs_src/parser_cpp_language.y"
     function yy_r23(){
 	$this->_retvalue = $this->create_node('visibility_spec_full', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 2998 "parser_cpp_language.php"
-#line 176 "parser_cpp_language.y"
+#line 3009 "langs_src/parser_cpp_language.php"
+#line 203 "langs_src/parser_cpp_language.y"
     function yy_r24(){
 	$this->_retvalue = $this->create_node('visibility_spec_full', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3003 "parser_cpp_language.php"
-#line 201 "parser_cpp_language.y"
+#line 3014 "langs_src/parser_cpp_language.php"
+#line 228 "langs_src/parser_cpp_language.y"
     function yy_r30(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());	
 	$result = $this->create_node('enum', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3010 "parser_cpp_language.php"
-#line 207 "parser_cpp_language.y"
+#line 3021 "langs_src/parser_cpp_language.php"
+#line 234 "langs_src/parser_cpp_language.y"
     function yy_r31(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -2]->minor->value());	
 	$result = $this->create_node('enum', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3017 "parser_cpp_language.php"
-#line 213 "parser_cpp_language.y"
+#line 3028 "langs_src/parser_cpp_language.php"
+#line 240 "langs_src/parser_cpp_language.y"
     function yy_r32(){
 	$result = $this->create_node('enum', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3023 "parser_cpp_language.php"
-#line 218 "parser_cpp_language.y"
+#line 3034 "langs_src/parser_cpp_language.php"
+#line 245 "langs_src/parser_cpp_language.y"
     function yy_r33(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -3]->minor->value());
 	$result = $this->create_node('enum', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3030 "parser_cpp_language.php"
-#line 224 "parser_cpp_language.y"
+#line 3041 "langs_src/parser_cpp_language.php"
+#line 251 "langs_src/parser_cpp_language.y"
     function yy_r34(){
 	$result = $this->create_node('enum', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3036 "parser_cpp_language.php"
-#line 229 "parser_cpp_language.y"
+#line 3047 "langs_src/parser_cpp_language.php"
+#line 256 "langs_src/parser_cpp_language.y"
     function yy_r35(){
 	$result = $this->create_node('enum_body', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3042 "parser_cpp_language.php"
-#line 234 "parser_cpp_language.y"
+#line 3053 "langs_src/parser_cpp_language.php"
+#line 261 "langs_src/parser_cpp_language.y"
     function yy_r36(){
 	$result = $this->create_node('enum_body', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3048 "parser_cpp_language.php"
-#line 239 "parser_cpp_language.y"
+#line 3059 "langs_src/parser_cpp_language.php"
+#line 266 "langs_src/parser_cpp_language.y"
     function yy_r37(){
 	$result = $this->create_node('enum_value_list', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3054 "parser_cpp_language.php"
-#line 244 "parser_cpp_language.y"
+#line 3065 "langs_src/parser_cpp_language.php"
+#line 271 "langs_src/parser_cpp_language.y"
     function yy_r38(){
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + -1]->minor);
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + 0]->minor);	
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;	
     }
-#line 3061 "parser_cpp_language.php"
-#line 254 "parser_cpp_language.y"
+#line 3072 "langs_src/parser_cpp_language.php"
+#line 281 "langs_src/parser_cpp_language.y"
     function yy_r40(){
 	$result = $this->create_node('enum_value', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3067 "parser_cpp_language.php"
-#line 260 "parser_cpp_language.y"
+#line 3078 "langs_src/parser_cpp_language.php"
+#line 287 "langs_src/parser_cpp_language.y"
     function yy_r41(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3073 "parser_cpp_language.php"
-#line 270 "parser_cpp_language.y"
+#line 3084 "langs_src/parser_cpp_language.php"
+#line 297 "langs_src/parser_cpp_language.y"
     function yy_r43(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3079 "parser_cpp_language.php"
-#line 281 "parser_cpp_language.y"
+#line 3090 "langs_src/parser_cpp_language.php"
+#line 308 "langs_src/parser_cpp_language.y"
     function yy_r45(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3085 "parser_cpp_language.php"
-#line 292 "parser_cpp_language.y"
+#line 3096 "langs_src/parser_cpp_language.php"
+#line 319 "langs_src/parser_cpp_language.y"
     function yy_r47(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3091 "parser_cpp_language.php"
-#line 297 "parser_cpp_language.y"
+#line 3102 "langs_src/parser_cpp_language.php"
+#line 324 "langs_src/parser_cpp_language.y"
     function yy_r48(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -7]->minor, $this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3097 "parser_cpp_language.php"
-#line 307 "parser_cpp_language.y"
+#line 3108 "langs_src/parser_cpp_language.php"
+#line 334 "langs_src/parser_cpp_language.y"
     function yy_r50(){
 	$result = $this->create_node('function', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3103 "parser_cpp_language.php"
-#line 317 "parser_cpp_language.y"
+#line 3114 "langs_src/parser_cpp_language.php"
+#line 344 "langs_src/parser_cpp_language.y"
     function yy_r51(){
 	$result = $this->create_node('template_def', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3109 "parser_cpp_language.php"
-#line 322 "parser_cpp_language.y"
+#line 3120 "langs_src/parser_cpp_language.php"
+#line 349 "langs_src/parser_cpp_language.y"
     function yy_r52(){
 	$result = $this->create_node('template_def', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3115 "parser_cpp_language.php"
-#line 327 "parser_cpp_language.y"
+#line 3126 "langs_src/parser_cpp_language.php"
+#line 354 "langs_src/parser_cpp_language.y"
     function yy_r53(){
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + -1]->minor);
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + 0]->minor);
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
     }
-#line 3122 "parser_cpp_language.php"
-#line 333 "parser_cpp_language.y"
+#line 3133 "langs_src/parser_cpp_language.php"
+#line 360 "langs_src/parser_cpp_language.y"
     function yy_r54(){
 	$result = $this->create_node('template_spec', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3128 "parser_cpp_language.php"
-#line 338 "parser_cpp_language.y"
+#line 3139 "langs_src/parser_cpp_language.php"
+#line 365 "langs_src/parser_cpp_language.y"
     function yy_r55(){
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + 0]->minor->value());
 	$result = $this->create_node('template_spec', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3135 "parser_cpp_language.php"
-#line 362 "parser_cpp_language.y"
+#line 3146 "langs_src/parser_cpp_language.php"
+#line 389 "langs_src/parser_cpp_language.y"
     function yy_r60(){
 	$result = $this->create_node('function_body', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3141 "parser_cpp_language.php"
-#line 367 "parser_cpp_language.y"
+#line 3152 "langs_src/parser_cpp_language.php"
+#line 394 "langs_src/parser_cpp_language.y"
     function yy_r61(){
 	$result = $this->create_node('function_body', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3147 "parser_cpp_language.php"
-#line 377 "parser_cpp_language.y"
+#line 3158 "langs_src/parser_cpp_language.php"
+#line 404 "langs_src/parser_cpp_language.y"
     function yy_r63(){
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor ;
     }
-#line 3152 "parser_cpp_language.php"
-#line 392 "parser_cpp_language.y"
+#line 3163 "langs_src/parser_cpp_language.php"
+#line 419 "langs_src/parser_cpp_language.y"
     function yy_r67(){
 	$result = $this->create_node('formal_args_with_const', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3158 "parser_cpp_language.php"
-#line 398 "parser_cpp_language.y"
+#line 3169 "langs_src/parser_cpp_language.php"
+#line 425 "langs_src/parser_cpp_language.y"
     function yy_r68(){
 	$result = $this->create_node('args_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3164 "parser_cpp_language.php"
-#line 403 "parser_cpp_language.y"
+#line 3175 "langs_src/parser_cpp_language.php"
+#line 430 "langs_src/parser_cpp_language.y"
     function yy_r69(){
 	$result = $this->create_node('args_list', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3170 "parser_cpp_language.php"
-#line 408 "parser_cpp_language.y"
+#line 3181 "langs_src/parser_cpp_language.php"
+#line 435 "langs_src/parser_cpp_language.y"
     function yy_r70(){
 	$result = $this->create_node('arg_list', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3176 "parser_cpp_language.php"
-#line 413 "parser_cpp_language.y"
+#line 3187 "langs_src/parser_cpp_language.php"
+#line 440 "langs_src/parser_cpp_language.y"
     function yy_r71(){
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + -1]->minor);
 	$this->yystack[$this->yyidx + -2]->minor->add_child($this->yystack[$this->yyidx + 0]->minor);	
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
     }
-#line 3183 "parser_cpp_language.php"
-#line 419 "parser_cpp_language.y"
+#line 3194 "langs_src/parser_cpp_language.php"
+#line 446 "langs_src/parser_cpp_language.y"
     function yy_r72(){
 	$result = $this->create_node('arg', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;	
     }
-#line 3189 "parser_cpp_language.php"
-#line 424 "parser_cpp_language.y"
+#line 3200 "langs_src/parser_cpp_language.php"
+#line 451 "langs_src/parser_cpp_language.y"
     function yy_r73(){
 	$result = $this->create_node('preprocessor_ifdef', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3195 "parser_cpp_language.php"
-#line 429 "parser_cpp_language.y"
+#line 3206 "langs_src/parser_cpp_language.php"
+#line 456 "langs_src/parser_cpp_language.y"
     function yy_r74(){
 	$result = $this->create_node('preprocessor_ifdef', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3201 "parser_cpp_language.php"
-#line 434 "parser_cpp_language.y"
+#line 3212 "langs_src/parser_cpp_language.php"
+#line 461 "langs_src/parser_cpp_language.y"
     function yy_r75(){
 	$result = $this->create_node('preprocessor_else_clauses', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3207 "parser_cpp_language.php"
-#line 452 "parser_cpp_language.y"
+#line 3218 "langs_src/parser_cpp_language.php"
+#line 479 "langs_src/parser_cpp_language.y"
     function yy_r79(){
 	$result = $this->create_node('preprocessor_elif_list', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3213 "parser_cpp_language.php"
-#line 457 "parser_cpp_language.y"
+#line 3224 "langs_src/parser_cpp_language.php"
+#line 484 "langs_src/parser_cpp_language.y"
     function yy_r80(){
 	$result = $this->create_node('preprocessor_elif', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3219 "parser_cpp_language.php"
-#line 462 "parser_cpp_language.y"
+#line 3230 "langs_src/parser_cpp_language.php"
+#line 489 "langs_src/parser_cpp_language.y"
     function yy_r81(){
 	$result = $this->create_node('preprocessor_else', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3225 "parser_cpp_language.php"
-#line 467 "parser_cpp_language.y"
+#line 3236 "langs_src/parser_cpp_language.php"
+#line 494 "langs_src/parser_cpp_language.y"
     function yy_r82(){
 	$result = $this->create_node('preprocessor_cond', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3231 "parser_cpp_language.php"
-#line 477 "parser_cpp_language.y"
+#line 3242 "langs_src/parser_cpp_language.php"
+#line 504 "langs_src/parser_cpp_language.y"
     function yy_r84(){
 	$result = $this->create_node('preprocessor_cond', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3237 "parser_cpp_language.php"
-#line 483 "parser_cpp_language.y"
+#line 3248 "langs_src/parser_cpp_language.php"
+#line 510 "langs_src/parser_cpp_language.y"
     function yy_r85(){
 	$result = $this->create_node('define', array($this->yystack[$this->yyidx + 0]->minor, B));
 	$this->_retvalue = $result;	
     }
-#line 3243 "parser_cpp_language.php"
-#line 489 "parser_cpp_language.y"
+#line 3254 "langs_src/parser_cpp_language.php"
+#line 516 "langs_src/parser_cpp_language.y"
     function yy_r86(){
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;	
     }
-#line 3248 "parser_cpp_language.php"
-#line 502 "parser_cpp_language.y"
+#line 3259 "langs_src/parser_cpp_language.php"
+#line 529 "langs_src/parser_cpp_language.y"
     function yy_r88(){
 	$result = $this->create_node('while', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;			
     }
-#line 3254 "parser_cpp_language.php"
-#line 514 "parser_cpp_language.y"
+#line 3265 "langs_src/parser_cpp_language.php"
+#line 541 "langs_src/parser_cpp_language.y"
     function yy_r89(){
 	$result = $this->create_node('do_while', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;			
     }
-#line 3260 "parser_cpp_language.php"
-#line 527 "parser_cpp_language.y"
+#line 3271 "langs_src/parser_cpp_language.php"
+#line 554 "langs_src/parser_cpp_language.y"
     function yy_r90(){
 	$result = $this->create_node('for', array($this->yystack[$this->yyidx + -8]->minor, $this->yystack[$this->yyidx + -7]->minor, $this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3266 "parser_cpp_language.php"
-#line 533 "parser_cpp_language.y"
+#line 3277 "langs_src/parser_cpp_language.php"
+#line 560 "langs_src/parser_cpp_language.y"
     function yy_r91(){
 	$result = $this->create_node('return', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3272 "parser_cpp_language.php"
-#line 538 "parser_cpp_language.y"
+#line 3283 "langs_src/parser_cpp_language.php"
+#line 565 "langs_src/parser_cpp_language.y"
     function yy_r92(){
 	$result = $this->create_node('continue', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3278 "parser_cpp_language.php"
-#line 543 "parser_cpp_language.y"
+#line 3289 "langs_src/parser_cpp_language.php"
+#line 570 "langs_src/parser_cpp_language.y"
     function yy_r93(){
 	$result = $this->create_node('goto', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3284 "parser_cpp_language.php"
-#line 553 "parser_cpp_language.y"
+#line 3295 "langs_src/parser_cpp_language.php"
+#line 580 "langs_src/parser_cpp_language.y"
     function yy_r95(){
 	$result = $this->create_node('goto_label', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3290 "parser_cpp_language.php"
-#line 562 "parser_cpp_language.y"
+#line 3301 "langs_src/parser_cpp_language.php"
+#line 589 "langs_src/parser_cpp_language.y"
     function yy_r97(){
 	$result = $this->create_node('try_catch', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3296 "parser_cpp_language.php"
-#line 567 "parser_cpp_language.y"
+#line 3307 "langs_src/parser_cpp_language.php"
+#line 594 "langs_src/parser_cpp_language.y"
     function yy_r98(){
 	$result = $this->create_node('try', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3302 "parser_cpp_language.php"
-#line 572 "parser_cpp_language.y"
+#line 3313 "langs_src/parser_cpp_language.php"
+#line 599 "langs_src/parser_cpp_language.y"
     function yy_r99(){
 	$result = $this->create_node('try', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3308 "parser_cpp_language.php"
-#line 577 "parser_cpp_language.y"
+#line 3319 "langs_src/parser_cpp_language.php"
+#line 604 "langs_src/parser_cpp_language.y"
     function yy_r100(){
 	$this->_retvalue = $this->create_node('catch', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3313 "parser_cpp_language.php"
-#line 586 "parser_cpp_language.y"
+#line 3324 "langs_src/parser_cpp_language.php"
+#line 613 "langs_src/parser_cpp_language.y"
     function yy_r102(){
 	$result = $this->create_node('catch', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3319 "parser_cpp_language.php"
-#line 591 "parser_cpp_language.y"
+#line 3330 "langs_src/parser_cpp_language.php"
+#line 618 "langs_src/parser_cpp_language.y"
     function yy_r103(){
 	$result = $this->create_node('catch', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3325 "parser_cpp_language.php"
-#line 609 "parser_cpp_language.y"
+#line 3336 "langs_src/parser_cpp_language.php"
+#line 636 "langs_src/parser_cpp_language.y"
     function yy_r107(){
 	$result = $this->create_node('stmt_list', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3331 "parser_cpp_language.php"
-#line 614 "parser_cpp_language.y"
+#line 3342 "langs_src/parser_cpp_language.php"
+#line 641 "langs_src/parser_cpp_language.y"
     function yy_r108(){
 	$result = $this->create_node('stmt_list', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3337 "parser_cpp_language.php"
-#line 619 "parser_cpp_language.y"
+#line 3348 "langs_src/parser_cpp_language.php"
+#line 646 "langs_src/parser_cpp_language.y"
     function yy_r109(){
 	$this->_retvalue = $this->create_node('switch_case_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3342 "parser_cpp_language.php"
-#line 628 "parser_cpp_language.y"
+#line 3353 "langs_src/parser_cpp_language.php"
+#line 655 "langs_src/parser_cpp_language.y"
     function yy_r111(){
 	$result = $this->create_node('case', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3348 "parser_cpp_language.php"
-#line 633 "parser_cpp_language.y"
+#line 3359 "langs_src/parser_cpp_language.php"
+#line 660 "langs_src/parser_cpp_language.y"
     function yy_r112(){
 	$result = $this->create_node('case', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3354 "parser_cpp_language.php"
-#line 653 "parser_cpp_language.y"
+#line 3365 "langs_src/parser_cpp_language.php"
+#line 680 "langs_src/parser_cpp_language.y"
     function yy_r116(){
 	$result = $this->create_node('if_then', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3360 "parser_cpp_language.php"
-#line 658 "parser_cpp_language.y"
+#line 3371 "langs_src/parser_cpp_language.php"
+#line 685 "langs_src/parser_cpp_language.y"
     function yy_r117(){
 	$result = $this->create_node('stmt', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3366 "parser_cpp_language.php"
-#line 663 "parser_cpp_language.y"
+#line 3377 "langs_src/parser_cpp_language.php"
+#line 690 "langs_src/parser_cpp_language.y"
     function yy_r118(){ 
 	$result = $this->create_node('stmt', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$this->_retvalue = $result;
     }
-#line 3373 "parser_cpp_language.php"
-#line 670 "parser_cpp_language.y"
+#line 3384 "langs_src/parser_cpp_language.php"
+#line 697 "langs_src/parser_cpp_language.y"
     function yy_r119(){
 	$result = $this->create_node('stmt', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3379 "parser_cpp_language.php"
-#line 680 "parser_cpp_language.y"
+#line 3390 "langs_src/parser_cpp_language.php"
+#line 707 "langs_src/parser_cpp_language.y"
     function yy_r121(){
 	$result = $this->create_node('expr_prec_17', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3385 "parser_cpp_language.php"
-#line 685 "parser_cpp_language.y"
+#line 3396 "langs_src/parser_cpp_language.php"
+#line 712 "langs_src/parser_cpp_language.y"
     function yy_r122(){
 	$result = $this->create_node('expr_prec_17', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3391 "parser_cpp_language.php"
-#line 742 "parser_cpp_language.y"
+#line 3402 "langs_src/parser_cpp_language.php"
+#line 769 "langs_src/parser_cpp_language.y"
     function yy_r134(){
 	$result = $this->create_node('expr_prec_17', array( $this->yystack[$this->yyidx + -3]->minor,  $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3397 "parser_cpp_language.php"
-#line 762 "parser_cpp_language.y"
+#line 3408 "langs_src/parser_cpp_language.php"
+#line 789 "langs_src/parser_cpp_language.y"
     function yy_r138(){
 	$result = $this->create_node('type_with_qualifier', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3403 "parser_cpp_language.php"
-#line 778 "parser_cpp_language.y"
+#line 3414 "langs_src/parser_cpp_language.php"
+#line 805 "langs_src/parser_cpp_language.y"
     function yy_r141(){
 	$result = $this->create_node('expr_prec_10', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3409 "parser_cpp_language.php"
-#line 838 "parser_cpp_language.y"
+#line 3420 "langs_src/parser_cpp_language.php"
+#line 865 "langs_src/parser_cpp_language.y"
     function yy_r153(){
 	$result = $this->create_node('expr_prec_9', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3415 "parser_cpp_language.php"
-#line 872 "parser_cpp_language.y"
+#line 3426 "langs_src/parser_cpp_language.php"
+#line 899 "langs_src/parser_cpp_language.y"
     function yy_r160(){
 	$result = $this->create_node('expr_prec_8', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3421 "parser_cpp_language.php"
-#line 896 "parser_cpp_language.y"
+#line 3432 "langs_src/parser_cpp_language.php"
+#line 923 "langs_src/parser_cpp_language.y"
     function yy_r165(){
 	$result = $this->create_node('expr_prec_7', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3427 "parser_cpp_language.php"
-#line 910 "parser_cpp_language.y"
+#line 3438 "langs_src/parser_cpp_language.php"
+#line 937 "langs_src/parser_cpp_language.y"
     function yy_r168(){
 	$result = $this->create_node('expr_prec_6', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3433 "parser_cpp_language.php"
-#line 924 "parser_cpp_language.y"
+#line 3444 "langs_src/parser_cpp_language.php"
+#line 951 "langs_src/parser_cpp_language.y"
     function yy_r171(){
 	$result = $this->create_node('expr_prec_5', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3439 "parser_cpp_language.php"
-#line 944 "parser_cpp_language.y"
+#line 3450 "langs_src/parser_cpp_language.php"
+#line 971 "langs_src/parser_cpp_language.y"
     function yy_r175(){
 	$result = $this->create_node('expr_prec_4', $this->yystack[$this->yyidx + -2]->minor->childs());
 	$result->add_child($this->yystack[$this->yyidx + -1]->minor);
 	$result->add_child($this->yystack[$this->yyidx + 0]->minor);
 	$this->_retvalue = $result;
     }
-#line 3447 "parser_cpp_language.php"
-#line 963 "parser_cpp_language.y"
+#line 3458 "langs_src/parser_cpp_language.php"
+#line 990 "langs_src/parser_cpp_language.y"
     function yy_r178(){
 	$result = $this->create_node('expr_prec_3', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3453 "parser_cpp_language.php"
-#line 973 "parser_cpp_language.y"
+#line 3464 "langs_src/parser_cpp_language.php"
+#line 1000 "langs_src/parser_cpp_language.y"
     function yy_r180(){
 	$result = $this->create_node('expr_prec_3', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3459 "parser_cpp_language.php"
-#line 1012 "parser_cpp_language.y"
+#line 3470 "langs_src/parser_cpp_language.php"
+#line 1039 "langs_src/parser_cpp_language.y"
     function yy_r188(){
 	$result = $this->create_node('expr_prec_2', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
 	$this->_retvalue = $result;
     }
-#line 3465 "parser_cpp_language.php"
-#line 1022 "parser_cpp_language.y"
+#line 3476 "langs_src/parser_cpp_language.php"
+#line 1049 "langs_src/parser_cpp_language.y"
     function yy_r190(){
 	$result = $this->create_node('try_value_access', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
 	$this->_retvalue = $result;
     }
-#line 3471 "parser_cpp_language.php"
-#line 1027 "parser_cpp_language.y"
+#line 3482 "langs_src/parser_cpp_language.php"
+#line 1054 "langs_src/parser_cpp_language.y"
     function yy_r191(){
 	$result = $this->create_node('try_pointer_access', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
 	$this->_retvalue = $result;
     }
-#line 3477 "parser_cpp_language.php"
-#line 1032 "parser_cpp_language.y"
+#line 3488 "langs_src/parser_cpp_language.php"
+#line 1059 "langs_src/parser_cpp_language.y"
     function yy_r192(){
 	$result = $this->create_node('cpp_style_cast', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3483 "parser_cpp_language.php"
-#line 1053 "parser_cpp_language.y"
+#line 3494 "langs_src/parser_cpp_language.php"
+#line 1080 "langs_src/parser_cpp_language.y"
     function yy_r196(){
 	$result = $this->create_node('expr_prec_2', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3489 "parser_cpp_language.php"
-#line 1068 "parser_cpp_language.y"
+#line 3500 "langs_src/parser_cpp_language.php"
+#line 1095 "langs_src/parser_cpp_language.y"
     function yy_r199(){
 	$result = $this->create_node('expr_prec_2', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3495 "parser_cpp_language.php"
-#line 1073 "parser_cpp_language.y"
+#line 3506 "langs_src/parser_cpp_language.php"
+#line 1100 "langs_src/parser_cpp_language.y"
     function yy_r200(){
 	$result = $this->create_node('expr_prec_2', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue = $result;
     }
-#line 3501 "parser_cpp_language.php"
-#line 1103 "parser_cpp_language.y"
+#line 3512 "langs_src/parser_cpp_language.php"
+#line 1130 "langs_src/parser_cpp_language.y"
     function yy_r207(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
     }
-#line 3506 "parser_cpp_language.php"
-#line 1108 "parser_cpp_language.y"
+#line 3517 "langs_src/parser_cpp_language.php"
+#line 1135 "langs_src/parser_cpp_language.y"
     function yy_r208(){
 	$this->_retvalue =  $this->create_node('stringify', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3511 "parser_cpp_language.php"
-#line 1113 "parser_cpp_language.y"
+#line 3522 "langs_src/parser_cpp_language.php"
+#line 1140 "langs_src/parser_cpp_language.y"
     function yy_r209(){
 	$this->_retvalue =  $this->create_node('concat', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3516 "parser_cpp_language.php"
-#line 1117 "parser_cpp_language.y"
+#line 3527 "langs_src/parser_cpp_language.php"
+#line 1144 "langs_src/parser_cpp_language.y"
     function yy_r210(){
 	$result = $this->create_node('typecast', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3522 "parser_cpp_language.php"
-#line 1131 "parser_cpp_language.y"
+#line 3533 "langs_src/parser_cpp_language.php"
+#line 1158 "langs_src/parser_cpp_language.y"
     function yy_r212(){
 	$this->_retvalue = $this->create_node('type_list', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ) );
     }
-#line 3527 "parser_cpp_language.php"
-#line 1135 "parser_cpp_language.y"
+#line 3538 "langs_src/parser_cpp_language.php"
+#line 1162 "langs_src/parser_cpp_language.y"
     function yy_r213(){
 	$result = $this->create_node('type', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;	
     }
-#line 3533 "parser_cpp_language.php"
-#line 1149 "parser_cpp_language.y"
+#line 3544 "langs_src/parser_cpp_language.php"
+#line 1176 "langs_src/parser_cpp_language.y"
     function yy_r216(){
 	$result = $this->create_node('type', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;	
     }
-#line 3539 "parser_cpp_language.php"
-#line 1171 "parser_cpp_language.y"
+#line 3550 "langs_src/parser_cpp_language.php"
+#line 1198 "langs_src/parser_cpp_language.y"
     function yy_r221(){
 	$result = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3545 "parser_cpp_language.php"
-#line 1176 "parser_cpp_language.y"
+#line 3556 "langs_src/parser_cpp_language.php"
+#line 1203 "langs_src/parser_cpp_language.y"
     function yy_r222(){
 	$result = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3551 "parser_cpp_language.php"
-#line 1182 "parser_cpp_language.y"
+#line 3562 "langs_src/parser_cpp_language.php"
+#line 1209 "langs_src/parser_cpp_language.y"
     function yy_r223(){
 	$r  = $this->yystack[$this->yyidx + -2]->minor;
 	if (!is_array($r->childs())) {
@@ -3554,8 +3565,8 @@ static public $yy_action = array(
 	$r->add_child($this->yystack[$this->yyidx + 0]->minor);
 	$this->_retvalue = $r;
     }
-#line 3562 "parser_cpp_language.php"
-#line 1201 "parser_cpp_language.y"
+#line 3573 "langs_src/parser_cpp_language.php"
+#line 1228 "langs_src/parser_cpp_language.y"
     function yy_r225(){
 	$r  = $this->yystack[$this->yyidx + -4]->minor;
 	if (!is_array($r->childs())) {
@@ -3567,8 +3578,8 @@ static public $yy_action = array(
 	$r->add_child($this->yystack[$this->yyidx + 0]->minor);	
 	$this->_retvalue = $r;
     }
-#line 3575 "parser_cpp_language.php"
-#line 1213 "parser_cpp_language.y"
+#line 3586 "langs_src/parser_cpp_language.php"
+#line 1240 "langs_src/parser_cpp_language.y"
     function yy_r226(){
 	$r  = $this->yystack[$this->yyidx + -5]->minor;
 	if (!is_array($r->childs())) {
@@ -3582,13 +3593,13 @@ static public $yy_action = array(
 
 	$this->_retvalue = $this->yystack[$this->yyidx + -5]->minor;
     }
-#line 3590 "parser_cpp_language.php"
-#line 1228 "parser_cpp_language.y"
+#line 3601 "langs_src/parser_cpp_language.php"
+#line 1255 "langs_src/parser_cpp_language.y"
     function yy_r227(){
 	$result = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3596 "parser_cpp_language.php"
+#line 3607 "langs_src/parser_cpp_language.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -3700,9 +3711,27 @@ static public $yy_action = array(
      */
     function yy_syntax_error($yymajor, $TOKEN)
     {
-#line 32 "parser_cpp_language.y"
+#line 34 "langs_src/parser_cpp_language.y"
 
-    echo "Syntax Error on line " . $this->lex->line . ": token '" . 
+    $this->error = true;
+    $stack = array();
+    foreach($this->yystack as $entry) {
+        if ($entry->minor != null) {
+            $stack[] = $entry->minor;
+        }
+    }
+    if (is_array($this->root)) {
+        if (count($this->root)) {
+            $this->root = array_merge($this->root, $stack);
+        }
+        else {
+            $this->root  = $stack;
+        }
+    } else {
+        $this->root = $stack;
+    }
+    /*
+    echo "Syntax Error on line " . $this->lex->line . ": token '" .
         $this->lex->value . "' while parsing rule:\n";
     echo "Stack: ";
 	foreach ($this->yystack as $entry) {
@@ -3712,9 +3741,8 @@ static public $yy_action = array(
         $expect[] = self::$yyTokenName[$token];
     }
 	throw new Exception(implode(',', $expect));
-    //throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN
-    //    . '), expected one of: ' . implode(',', $expect)) . "\n";
-#line 3723 "parser_cpp_language.php"
+	*/
+#line 3751 "langs_src/parser_cpp_language.php"
     }
 
     /**
