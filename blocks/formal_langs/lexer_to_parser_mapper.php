@@ -84,6 +84,20 @@ abstract class block_formal_langs_lexer_to_parser_mapper {
         return $result;
     }
 
+    /**
+     * Creates new parser
+     * @return block_formal_langs_parser_cpp_language|mixed
+     */
+    protected function make_parser() {
+        $parsername = $this->parsername();
+        // Note that this comment added to hint types for IDE.
+        /** @var block_formal_langs_parser_cpp_language $parser */
+        $parser = new $parsername();
+        $parser->mapper = $this;
+        $parser->repeatlookup = true;
+        return $parser;
+    }
+
     /** Parses new string for text parser
      *  @param block_formal_langs_processed_string $processedstring string, which has been tokenized before
      *  @param bool $iscorrect
@@ -92,22 +106,50 @@ abstract class block_formal_langs_lexer_to_parser_mapper {
         // TODO: What should we do with $iscorrect ?
         if (count($processedstring->stream->errors) == 0)
         {
-            $parsername = $this->parsername();
-            // Note that this comment added to hint types for IDE.
-            /** @var block_formal_langs_parser_cpp_language $parser */
-            $parser = new $parsername();
-            $parser->mapper = $this;
-            $parser->repeatlookup = true;
-            $processedstring->set_syntax_tree(null);
+            $parser = $this->make_parser();
+            $result = array();
             $tokens = $processedstring->stream->tokens;
             if (count($tokens))
             {
                 $parser->currentid = count($tokens);
-                foreach($tokens as $token) {
+                $tokens = array_values( $tokens );
+                $stuck = false;
+                for($i = 0; $i < count($tokens); $i++) {
+                    $token = $tokens[$i];
+                    // Parse next token
                     $this->parse_token($token, $parser);
+
+                    // Handle parsing error
+                    if ($parser->error) {
+                        $oldid = $parser->currentid;
+                        $root   = $parser->root;
+                        if ($stuck) {
+                            $root []= $token;
+                        } else {
+                            --$i;
+                            $stuck = true;
+                        }
+                        $parser = $this->make_parser();
+                        $parser->currentid = $oldid;
+                        if (count($result)) {
+                            if (count($root)) {
+                                $result = array_merge($result, $root);
+                            }
+                        } else {
+                            $result = $root;
+                        }
+                    } else {
+                        $stuck = false;
+                    }
                 }
                 $parser->doParse(0, null);
-                $processedstring->set_syntax_tree($parser->root);
+                $root   = $parser->root;
+                if (count($result)) {
+                    $result = array_merge($result, $root);
+                } else {
+                    $result = $root;
+                }
+                $processedstring->set_syntax_tree($result);
             }
         }
     }

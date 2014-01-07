@@ -7,6 +7,8 @@
 	public $currentid;
 	// A mapper for parser
 	public $mapper;
+	// Test, whether parsing error occured
+	public $error = false;
 	
 	protected function create_node($type, $children) {
 		$result = new block_formal_langs_ast_node_base($type, null, $this->currentid, false);
@@ -30,7 +32,25 @@
 }
 
 %syntax_error {
-    echo "Syntax Error on line " . $this->lex->line . ": token '" . 
+    $this->error = true;
+    $stack = array();
+    foreach($this->yystack as $entry) {
+        if ($entry->minor != null) {
+            $stack[] = $entry->minor;
+        }
+    }
+    if (is_array($this->root)) {
+        if (count($this->root)) {
+            $this->root = array_merge($this->root, $stack);
+        }
+        else {
+            $this->root  = $stack;
+        }
+    } else {
+        $this->root = $stack;
+    }
+    /*
+    echo "Syntax Error on line " . $this->lex->line . ": token '" .
         $this->lex->value . "' while parsing rule:\n";
     echo "Stack: ";
 	foreach ($this->yystack as $entry) {
@@ -40,8 +60,7 @@
         $expect[] = self::$yyTokenName[$token];
     }
 	throw new Exception(implode(',', $expect));
-    //throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN
-    //    . '), expected one of: ' . implode(',', $expect)) . "\n";
+	*/
 }
 
 %nonassoc THENKWD .
@@ -58,8 +77,17 @@
 %nonassoc MACROPARAMETERPRIORITY.
 
 program(R) ::= stmt_list(A) .  {
-	$result = $this->create_node('program', array( A ));
-	$this->root = $result;
+	$stack = array( $this->create_node('program', array( A ) ) );
+	if (is_array($this->root)) {
+            if (count($this->root)) {
+                $this->root = array_merge($this->root, $stack);
+            }
+            else {
+                $this->root  = $stack;
+            }
+    } else {
+            $this->root = $stack;
+    }
 	R = $result;
 }
 
