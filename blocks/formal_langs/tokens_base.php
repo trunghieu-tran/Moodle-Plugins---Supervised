@@ -870,7 +870,7 @@ class block_formal_langs_processed_string {
      *  Sets a syntax tree.
      *  @param object $tree syntax tree 
      */
-    protected function set_syntax_tree($tree) {
+    public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
     
@@ -1101,8 +1101,10 @@ class block_formal_langs_processed_string {
      *  @return syntax tree
      */
     protected function get_syntax_tree() {
-        if ($this->syntaxtree == null && $this->language->could_parse())
-            $this->language->parse($this);
+        if ($this->syntaxtree == null && $this->language->could_parse()) {
+            // TODO: Fix this inconsistency
+            $this->language->parse($this, false);
+        }
         return $this->syntaxtree;
     }
     /**
