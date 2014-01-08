@@ -482,65 +482,63 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
-        // TODO: generic mistakes handling
-        $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
-        $str = '';
-        $possiblepairs = array();
-        for ($k=0; $k < count($other); $k++) {
-            // incorrect lexem
-            if ($iscorrect == true) {
-                $max = round($result);
-                // possible pair (typo)
-                $dist = $this->possible_pair($other[$k], $max, $options);
-                if ($dist != -1) {
-                    $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
-                    $possiblepairs[] = $pair;
-                }
-                // possible pair (extra separator)
-                if ($k+1 != count($other)) {
-                    $max = 1;
-                    $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
-                    $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
-                    $dist = $this->possible_pair($lexem, $max, $options);
-                    if ($dist != -1) {
-                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
+        if ($bypass==true) {
+            $possiblepairs = array();
+            if($option==true){
+                for ($k=0; $k < count($other); $k++) {
+                    if($other[$k] == $this->value) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
                         $possiblepairs[] = $pair;
                     }
-                    $str='';
-                }
-            } else {
-                // possible pair (missing separator)
-                if ($k+1 != count($other)) {
-                    $max = 1;
-                    $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
-                    $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
-                    $dist = $this->possible_pair($lexem, $max, $options);
-                    if ($dist != -1) {
-                        $pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), $dist, false, '');
-                        $possiblepairs[] = $pair;
-                    }
-                    $str = '';
                 }
             }
-        }
-        return $possiblepairs;
-    }
-    
-    public function look_for_matches_for_bypass($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
-        $possiblepairs = array();
-        if($option==true){
+        } else {
+            // TODO: generic mistakes handling
+            $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
+            $str = '';
+            $possiblepairs = array();
             for ($k=0; $k < count($other); $k++) {
-                if($other[$k] == $this->value) {
-                    $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
-                    $possiblepairs[] = $pair;
+                // incorrect lexem
+                if ($iscorrect == true) {
+                    $max = round($result);
+                    // possible pair (typo)
+                    $dist = $this->possible_pair($other[$k], $max, $options);
+                    if ($dist != -1) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                    // possible pair (extra separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str='';
+                    }
+                } else {
+                    // possible pair (missing separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str = '';
+                    }
                 }
             }
         }
         return $possiblepairs;
     }
     
-
     /**
      * Returns a string caseinsensitive semantic value of token
      * @return string
@@ -745,7 +743,7 @@ class block_formal_langs_token_stream {
      * @param threshold editing distance threshold (in percents to token length)
      * @return array of block_formal_langs_matches_group objects
      */
-    public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+    public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options, $bypass) {
         // TODO Birukova
         // 1. Find matched pairs (typos, typical errors etc) - Birukova
         //  - look_for_matches function
@@ -753,19 +751,9 @@ class block_formal_langs_token_stream {
         //  - group_matches function, with criteria defined by compare_matches_groups function
         $allpossiblepairs = array();
         $bestgroups = array();
-        $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
+        $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options, $bypass);
         if (count($allpossiblepairs)>0) {
             $bestgroups = $this->group_matches($allpossiblepairs);
-        }
-        return $bestgroups;
-    }
-
-    public function look_for_token_pairs_for_bypass($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
-        $allpossiblepairs = array();
-        $bestgroups = array();
-        $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
-        if (count($allpossiblepairs)>0) {
-            $bestgroups = $this->group_matches_for_bypass($allpossiblepairs);
         }
         return $bestgroups;
     }
@@ -780,20 +768,21 @@ class block_formal_langs_token_stream {
      * @return array array of matched_tokens_pair objects representing all possible pairs within threshold
      */
     public function look_for_matches($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+        $bypass=false;
         // TODO Birukova
         $tokens = $this->tokens;
         $allpossiblepairs = array();
         $pairs = array();
         // search for correct tokens
         for ($i=0; $i<count($tokens); $i++) {
-            $pairs = $tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options);
+            $pairs = $tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options, $bypass);
             for ($j=0; $j<count($pairs); $j++) {
                 $allpossiblepairs[] = $pairs[$j];
             }
         }
         // search for compared tokens
         for ($i=0; $i<count($comparedstream->tokens); $i++) {
-            $pairs=$comparedstream->tokens[$i]->look_for_matches($this->tokens, $threshold, false, $options);
+            $pairs=$comparedstream->tokens[$i]->look_for_matches($this->tokens, $threshold, false, $options, $bypass);
             for ($j=0; $j<count($pairs); $j++) {
                 $allpossiblepairs[] = $pairs[$j];
             }
@@ -802,12 +791,13 @@ class block_formal_langs_token_stream {
     }
 
     public function look_for_matches_for_bypass($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+        $bypass=true;
         $tokens = $this->tokens;
         $allpossiblepairs = array();
         $pairs = array();
         // search for correct tokens
         for ($i=0; $i<count($tokens); $i++) {
-            $pairs = $tokens[$i]->look_for_matches_for_bypass($comparedstream->tokens, $threshold, true, $options);
+            $pairs = $tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options, $bypass);
             for ($j=0; $j<count($pairs); $j++) {
                 $allpossiblepairs[] = $pairs[$j];
             }
