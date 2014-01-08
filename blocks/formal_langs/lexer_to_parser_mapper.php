@@ -81,6 +81,7 @@ abstract class block_formal_langs_lexer_to_parser_mapper {
                 $result = $maps[$any];
             }
         }
+        //echo $result . PHP_EOL;
         return $result;
     }
 
