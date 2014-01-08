@@ -25,11 +25,13 @@ class plannedsession_block_form extends moodleform {
         }
 
         // Find lessontypes in current course.
-        $lessontypes[0] = get_string('notspecified', 'block_supervised');
         if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id))) {
             foreach ($clessontypes as $clessontype) {
                 $lessontypes[$clessontype->id] = $clessontype->name;
             }
+        }
+        else{
+            $lessontypes[0] = get_string('notspecified', 'block_supervised');
         }
 
 
