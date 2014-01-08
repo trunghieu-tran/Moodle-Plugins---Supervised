@@ -39,6 +39,7 @@
             $stack[] = $entry->minor;
         }
     }
+    //var_dump(array_map(function($a) { return $a->type() . ' ';  }, $stack));
     if (is_array($this->root)) {
         if (count($this->root)) {
             $this->root = array_merge($this->root, $stack);
@@ -88,7 +89,7 @@ program(R) ::= stmt_list(A) .  {
     } else {
             $this->root = $stack;
     }
-	R = $result;
+	R = $stack;
 }
 
 
@@ -575,6 +576,12 @@ expr_prec_11_or_ellipsis(R) ::= expr_prec_11(A) . {
 
 expr_prec_11_or_ellipsis(R) ::= ELLIPSIS(A) . {
 	R = $this->create_node('expr_prec_11_or_ellipsis', array( A ));
+}
+
+/* EMPTY OPERATOR */
+
+stmt(R) ::= SEMICOLON(A) .  {
+	R = $this->create_node('stmt', array( A ));
 }
 
 /* SWITCH-CASE-STATEMENTS */
