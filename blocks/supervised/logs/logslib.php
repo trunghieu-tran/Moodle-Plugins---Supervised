@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Returns logs array according to specified conditions
+ *
+ * @param $sessionid int session id
+ * @param $timefrom int logs must be created after this time
+ * @param $timeto int logs must be created before this time
+ * @param $userid int user id
+ * @param $limitfrom int logs from the specified index
+ * @param $limitnum int specified number of logs
+ * @return mixed logs array
+ */
 function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $limitfrom, $limitnum) {
     global $DB;
 
@@ -34,6 +45,18 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     return $result;
 }
 
+
+/**
+ * Output logs with pagination according to specified conditions
+ *
+ * @param $sessionid int session id
+ * @param $timefrom int logs must be created after this time
+ * @param $timeto int logs must be created before this time
+ * @param int $userid int user id
+ * @param int $page int current page
+ * @param int $perpage int logs number per page
+ * @param string $url the url prefix for pages
+ */
 function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url=""){
     global $OUTPUT, $DB;
 
@@ -104,13 +127,16 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
         $table->data[] = $row;
     }
 
-
     echo html_writer::table($table);
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 }
 
 
-
+/**
+ * Outputs the form with information about apecified session
+ *
+ * @param $sessionid int session id
+ */
 function print_session_info_form($sessionid){
     require_once("../sessions/lib.php");
 

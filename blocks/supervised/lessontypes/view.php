@@ -58,5 +58,3 @@ echo html_writer::table($table);
 
 // Display footer.
 echo $OUTPUT->footer();
-
-?>

@@ -1,7 +1,12 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class addedit_session_form
+ *
+ * The form for adding of editing sessions
+ */
 class addedit_session_form extends moodleform {
  
     function definition() {
@@ -21,7 +26,6 @@ class addedit_session_form extends moodleform {
                 }
             }
         }
-
 
         // Find all classrooms.
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
@@ -47,7 +51,6 @@ class addedit_session_form extends moodleform {
         else{
             $lessontypes[0] = get_string('notspecified', 'block_supervised');
         }
-
 
 
         // add group
@@ -111,7 +114,7 @@ class addedit_session_form extends moodleform {
         }
 
         // Session can not intersect with sessions of this teacher.
-        if(teacher_session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])){
+        if(session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])){
             $errors["timestart"] = get_string("teacherhassession", "block_supervised");
         }
 

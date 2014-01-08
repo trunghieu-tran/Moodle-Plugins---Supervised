@@ -1,7 +1,12 @@
 <?php
 
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class addedit_classroom_form
+ *
+ * The form for adding of editing classrooms
+ */
 class addedit_classroom_form extends moodleform {
  
     function definition() {

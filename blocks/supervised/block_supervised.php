@@ -15,8 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
+/**
+ * Class block_supervised
+ *
+ * The main idea of the supervised block is to have an add additional control over your students,
+ * so they will be able to do something only under teacher supervision.
+ * Installed with supervisedcheck (quiz access rules plugin, included out of the box)
+ * allows you to add restrictions to your quizzes.
+ *
+ * @package block_supervised
+ * @copyright
+ * @licence
+ */
 class block_supervised extends block_base {
 
+    /**
+     * Returns an active session for current user ($USER->id) in current course ($COURSE->id).
+     * The current time must be between session's time start and time end. The session's state must be 'Active'.
+     *
+     * @return stdClass
+     */
     private function get_teacher_active_session(){
         require_once('sessions/sessionstate.php');
         global $DB, $COURSE, $USER;
@@ -59,7 +77,6 @@ class block_supervised extends block_base {
             AND {block_supervised_session}.state        = :stateactive
         ";
 
-
         $teacherid  = $USER->id;
         $courseid   = $COURSE->id;
         $params['time']             = time();
@@ -73,6 +90,12 @@ class block_supervised extends block_base {
     }
 
 
+    /**
+     * Returns a planned session for current user ($USER->id) in current course ($COURSE->id).
+     * The session's time start must be around current time (+- 1 minute). The session's state must be 'Planned'.
+     *
+     * @return stdClass
+     */
     private function get_teacher_planned_session(){
         require_once('sessions/sessionstate.php');
         require_once('sessions/lib.php');
@@ -89,7 +112,14 @@ class block_supervised extends block_base {
     }
 
 
-    private function render_plannedsession_form(&$sessionstitle, &$formbody){
+    /**
+     * Generates block's body for planned session.
+     *
+     * @param $title the text on the top of the block (output parameter)
+     * @param $formbody the planned session's form (output parameter)
+     * @return bool true if the planned session exists
+     */
+    private function render_plannedsession_form(&$title, &$formbody){
         global $CFG, $COURSE, $DB;
         $plannedsession = $this->get_teacher_planned_session();
 
@@ -127,7 +157,7 @@ class block_supervised extends block_base {
 
                 unset($plannedsession);
             } else {
-                $sessionstitle = get_string('plannedsessiontitle', 'block_supervised');
+                $title = get_string('plannedsessiontitle', 'block_supervised');
                 // Display form.
                 $toform['id']               = $COURSE->id;
 
@@ -149,7 +179,14 @@ class block_supervised extends block_base {
     }
 
 
-    private function render_activesession_form(&$sessionstitle, &$formbody){
+    /**
+     * Generates block's body for an active session.
+     *
+     * @param $title the text on the top of the block (output parameter)
+     * @param $formbody the active session's form (output parameter)
+     * @return bool true if the active session exists
+     */
+    private function render_activesession_form(&$title, &$formbody){
         global $CFG, $COURSE, $DB;
         $activesession  = $this->get_teacher_active_session();
 
@@ -187,7 +224,7 @@ class block_supervised extends block_base {
             } else if ($fromform = $mform->get_data()) {
                 // Update session
                 // TODO Logging
-                $sessionstitle = get_string('activesessiontitle', 'block_supervised');
+                $title = get_string('activesessiontitle', 'block_supervised');
                 $oldgroupid = $activesession->groupid;
                 $newgroupid = $fromform->groupid;
 
@@ -219,7 +256,7 @@ class block_supervised extends block_base {
                 $this->add_countdown_timer($activesession->timeend - time());
             }
             else {
-                $sessionstitle = get_string('activesessiontitle', 'block_supervised');
+                $title = get_string('activesessiontitle', 'block_supervised');
                 // Display form.
                 $toform['id']               = $COURSE->id;
                 $toform['timestartraw']     = $activesession->timestart;
@@ -241,7 +278,11 @@ class block_supervised extends block_base {
         return empty($activesession);
     }
 
-
+    /**
+     * Adds hidden countdown timer on the page for finish an active session.
+     *
+     * @param $duration time in seconds before current active session will be finished
+     */
     private function add_countdown_timer($duration){
         global $CFG, $PAGE;
         require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
@@ -252,10 +293,16 @@ class block_supervised extends block_base {
     }
 
 
-    private function render_startsession_form(&$sessionstitle, &$formbody){
+    /**
+     * Generates block's body with start new session form.
+     *
+     * @param $title the text on the top of the block (output parameter)
+     * @param $formbody the start new session's form (output parameter)
+     */
+    private function render_startsession_form(&$title, &$formbody){
         global $CFG, $COURSE, $DB, $USER;
 
-        $sessionstitle = get_string('nosessionstitle', 'block_supervised');
+        $title = get_string('nosessionstitle', 'block_supervised');
         // Prepare form.
         $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
         if (file_exists($mform)) {
@@ -285,9 +332,9 @@ class block_supervised extends block_base {
                 print_error('insertsessionerror', 'block_supervised');
             }
             // Refresh block: render active session form.
-            $sessionstitle = '';
+            $title = '';
             $formbody = '';
-            $this->render_activesession_form($sessionstitle, $formbody);
+            $this->render_activesession_form($title, $formbody);
 
         } else {
             // Display form.
@@ -299,9 +346,11 @@ class block_supervised extends block_base {
         }
     }
 
-    private function render_supervise_body(){
-        global $COURSE;
 
+    /**
+     * Renders block's body for user with supervise capability.
+     */
+    private function render_supervise_body(){
         $formbody = '';
         // Planned session: render planned session form.
         $isemptyplanned = $this->render_plannedsession_form($sessionstitle, $formbody);
@@ -312,13 +361,16 @@ class block_supervised extends block_base {
             $this->render_startsession_form($sessionstitle, $formbody);
         }
 
-
         // Add block body.
         $this->content         = new stdClass;
         $this->content->text   = $sessionstitle . $formbody;
     }
 
 
+    /**
+     * Returns all active sessions in current course for current user
+     * @return array active sessions
+     */
     private function get_student_active_sessions(){
         require_once('sessions/sessionstate.php');
         require_once('sessions/lib.php');
@@ -344,7 +396,9 @@ class block_supervised extends block_base {
     }
 
 
-
+    /**
+     * Renders block's body for user with besupervised capability.
+     */
     private function render_besupervised_body(){
         global $COURSE, $CFG;
 
@@ -390,8 +444,6 @@ class block_supervised extends block_base {
         $this->title = get_string('blocktitle', 'block_supervised');
     }
 
-    /**
-     */
     public function applicable_formats() {
         return array(
             'all' => false,
@@ -419,6 +471,9 @@ class block_supervised extends block_base {
         return $this->content;
     }
 
+    /**
+     * Renders block's footer according to user capabilities.
+     */
     public function render_footer(){
         global $COURSE;
         // Add links to a footer according to user capabilities.
@@ -445,6 +500,10 @@ class block_supervised extends block_base {
         }
     }
 
+    /**
+     * Cron function that changes out-of-date session statuses from Planned and Active to Finish
+     * @return bool true
+     */
     public function cron() {
         global $CFG, $DB;
         require_once("{$CFG->dirroot}/blocks/supervised/sessions/sessionstate.php");

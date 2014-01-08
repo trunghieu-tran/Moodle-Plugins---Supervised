@@ -1,7 +1,12 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class viewsession_form
+ *
+ * Information about session
+ */
 class viewsession_form extends moodleform {
  
     function definition() {

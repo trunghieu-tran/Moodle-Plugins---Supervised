@@ -18,6 +18,7 @@
  * Version details
  *
  * @package    block
+ * @subpackage supervised
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Andrey Ushakov <andrey200964@yandex.ru>
  */

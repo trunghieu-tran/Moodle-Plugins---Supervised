@@ -1,7 +1,16 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class activesessionstudent_block_form
+ *
+ * The form for active session (for besupervised capability)
+ *
+ * @package block_supervised
+ * @copyright
+ * @licence
+ */
 class activesessionstudent_block_form extends moodleform {
  
     function definition() {

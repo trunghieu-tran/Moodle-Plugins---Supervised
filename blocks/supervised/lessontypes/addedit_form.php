@@ -1,7 +1,12 @@
 <?php
 
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class addedit_lessontype_form
+ *
+ * The form for adding of editing lesson types
+ */
 class addedit_lessontype_form extends moodleform {
  
     function definition() {
