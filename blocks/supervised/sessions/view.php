@@ -71,7 +71,7 @@ if ($fromform = $mform->get_data()) {
     // Form didn't validate or this is the first display.
     // Display header.
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string("sessionsheader", 'block_supervised'), 2);
+    echo $OUTPUT->heading_with_help(get_string("sessionsheader", 'block_supervised'), 'sessionsdefinition', 'block_supervised');
 
     // Add "Plan new session" button.
     if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
