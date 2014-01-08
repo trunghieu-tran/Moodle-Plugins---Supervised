@@ -1,7 +1,16 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class plannedsession_block_form
+ *
+ * The form for planned session (for supervise capability)
+ *
+ * @package block_supervised
+ * @copyright
+ * @licence
+ */
 class plannedsession_block_form extends moodleform {
  
     function definition() {

@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * Returns the sessions array according to specified conditions
+ *
+ * @param int $limitfrom sessions from the specified index
+ * @param int $limitnum specified number of sessions
+ * @param int $from session starts after this time
+ * @param int $to session ends before this time
+ * @param int $teacher teacher id
+ * @param int $course course id
+ * @param int $classroom classroom id
+ * @param int $state session state
+ * @return mixed array of the sessions
+ */
 function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
     global $USER, $PAGE;
 
@@ -27,7 +40,19 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
 }
 
 
-
+/**
+ * Output sessions with pagination according to specified conditions
+ *
+ * @param int $pagenum current page index
+ * @param int $perpage number of sessions per page
+ * @param string $url the url prefix for pages
+ * @param int $from session starts after this time
+ * @param int $to session ends before this time
+ * @param int $teacher teacher id
+ * @param int $course course id
+ * @param int $classroom classroom id
+ * @param int $state session state
+ */
 function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
     global $OUTPUT, $USER, $PAGE;
 
@@ -110,7 +135,20 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 }
 
 
-
+/**
+ * Returns an array of sessions according to specified conditions
+ *
+ * @param int $courseid course id
+ * @param int $teacherid teacher id
+ * @param int $classroomid classroom id
+ * @param int $state    session state
+ * @param int $timestart1 session must starts after this time
+ * @param int $timestart2 session must starts before this time
+ * @param int $timeend1 session must ends after this time
+ * @param int $timeend2 session must ends before this time
+ * @param int $id session id
+ * @return array sessions
+ */
 function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0){
     global $DB;
 
@@ -197,12 +235,31 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $time
     return $DB->get_records_sql($select, $params);
 }
 
-
+/**
+ * Returns one session according to specified conditions
+ *
+ * @param int $courseid course id
+ * @param int $teacherid teacher id
+ * @param int $classroomid classroom id
+ * @param int $state    session state
+ * @param int $timestart1 session must starts after this time
+ * @param int $timestart2 session must starts before this time
+ * @param int $timeend1 session must ends after this time
+ * @param int $timeend2 session must ends before this time
+ * @param int $id session id
+ * @return stdClass session
+ */
 function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0){
     $records = get_sessions($courseid, $teacherid, $classroomid, $state, $timestart1, $timestart2, $timeend1, $timeend2, $id);
     return array_shift($records); // Return the first element.
 }
 
+/**
+ * Send e-mail to teacher about creation of a new session
+ *
+ * @param $session stdClass created session
+ * @param $creator stdClass user who created the session
+ */
 function mail_newsession($session, $creator){
     global $DB, $CFG;
     $strftimedatetime = get_string("strftimerecent");
@@ -231,13 +288,17 @@ function mail_newsession($session, $creator){
         $data->comment          = '';
     }
 
-
     $message    = get_string('emailnewsession', 'block_supervised', $data);
     $subject    = get_string('emailnewsessionsubject', 'block_supervised', $data);
 
     email_to_user($user, $supportuser, $subject, $message);
 }
 
+/**
+ * Send e-mail to teacher about removing of the session
+ * @param $session stdClass removed session
+ * @param $remover stdClass user who removed this session
+ */
 function mail_removedsession($session, $remover){
     global $DB, $CFG;
     $strftimedatetime = get_string("strftimerecent");
@@ -279,7 +340,11 @@ function mail_removedsession($session, $remover){
 }
 
 
-
+/**
+ * Send e-mail to teacher about editing of the session
+ * @param $updsession stdClass edited session
+ * @param $editor stdClass user who edited this session
+ */
 function mail_editedsession($updsession, $editor){
     global $DB, $CFG;
     $strftimedatetime = get_string("strftimerecent");
@@ -307,7 +372,6 @@ function mail_editedsession($updsession, $editor){
     else{
         $data->comment          = '';
     }
-
 
     $message    = get_string('emaileditedsession', 'block_supervised', $data);
     $subject    = get_string('emaileditedsessionsubject', 'block_supervised', $data);

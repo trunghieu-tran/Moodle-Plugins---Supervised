@@ -1,7 +1,12 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class displayoptions_logs_form
+ *
+ * Logs display options form (logs number per page)
+ */
 class displayoptions_logs_form extends moodleform {
  
     function definition() {

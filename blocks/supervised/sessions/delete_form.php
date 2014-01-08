@@ -1,7 +1,12 @@
 <?php
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
- 
+
+/**
+ * Class delete_session_form
+ *
+ * Delete session form
+ */
 class delete_session_form extends moodleform {
  
     function definition() {

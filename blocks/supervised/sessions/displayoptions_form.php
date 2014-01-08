@@ -2,6 +2,11 @@
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
 
+/**
+ * Class displayoptions_sessions_form
+ *
+ * Session dasplay oprions form (filtering, number of sessions per page, ...)
+ */
 class displayoptions_sessions_form extends moodleform {
     function definition() {
         global $DB, $SITE;

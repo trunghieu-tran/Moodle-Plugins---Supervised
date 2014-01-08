@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * Returns true if the user can safely delete passed lesson type
+ *
+ * @param $lessontypeid integer id of the lesson type
+ * @return bool true if the user can delete lesson type
+ */
 function can_delete_lessontype($lessontypeid) {
     global $DB;
 
@@ -15,12 +22,23 @@ function can_delete_lessontype($lessontypeid) {
     return true;
 }
 
+/**
+ * Returns true if the user can safely delete passed classroom
+ *
+ * @param $classroomid integer id of the classroom
+ * @return bool true if the user can delete classroom
+ */
 function can_delete_classroom($classroomid) {
     global $DB;
     // Can not remove classroom used in session(s)
     return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid));
 }
 
+/**
+ * Returns true if the user can show or hide passed classroom
+ * @param $classroomid integer id of the classroom
+ * @return bool true if the user can show or hide passed classroom
+ */
 function can_showhide_classroom($classroomid) {
     require_once('sessions/sessionstate.php');
     global $DB;
@@ -43,7 +61,16 @@ function supervised_get_js_module() {
 }
 
 
-function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
+/**
+ * Returns true if the session(s) exist
+ *
+ * @param $teacherid integer id of the teacher
+ * @param $timestart integer the session must be started after this time
+ * @param $timeend integer the session must be ended before this time
+ * @param null $sessionid integer the session id
+ * @return bool true if the session(s) exist
+ */
+function session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
     require_once('sessions/sessionstate.php');
     global $DB;
 
@@ -74,12 +101,22 @@ function teacher_session_exists($teacherid, $timestart, $timeend, $sessionid=NUL
 }
 
 
+/**
+ * Delete lesson types and session from the course if the course has been deleted
+ *
+ * @param $course integer course id
+ */
 function event_handler_course_deleted($course){
     global $DB;
     $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
     $DB->delete_records('block_supervised_session', array('courseid'=>$course->id));
 }
 
+/**
+ * Delete lesson types and session from the course if the course content has been deleted
+ *
+ * @param $course integer course id
+ */
 function event_handler_course_content_removed($course){
     global $DB;
     $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
