@@ -127,6 +127,16 @@ $string['showsessions']             = 'Show sessions';
 $string['sessionstartsafter']       = 'Session starts after';
 $string['sessionendsbefore']        = 'Session ends before';
 $string['timetovalidationerror']    = 'Session\'s end must be greater or equal session\'s start.';
+$string['sessionsdefinition']       = 'Sessions definition';
+$string['sessionsdefinition_help']  = 'The course teachers creates sessions specifying the academic group, lesson type (e.g. laboratory work, exam, etc.), classroom and duration. After that students will be able to start quizzes from this course according next conditions:
+
+- the session is active;
+
+- student is in an academic group for which the session was created;
+
+- student is in session\'s classroom (the teacher can specify the ip subnet for each classroom);
+
+- the session was created for the lesson type which is specified for current quiz (go to quiz settings -> Extra restrictions on attempts).';
 
 $string['logspagetitle']            = 'Session logs';
 $string['logsview']                 = 'Session logs';
