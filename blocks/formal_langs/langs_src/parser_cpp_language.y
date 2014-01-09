@@ -39,7 +39,7 @@
             $stack[] = $entry->minor;
         }
     }
-    //var_dump(array_map(function($a) { return $a->type() . ' ';  }, $stack));
+     // var_dump(array_map(function($a) { return $a->type() . ' ';  }, $stack));
     if (is_array($this->root)) {
         if (count($this->root)) {
             $this->root = array_merge($this->root, $stack);
@@ -451,16 +451,16 @@ preprocessor_else(R) ::= PREPROCESSOR_ELSE(A) stmt_list(B) . {
 	R = $this->create_node('preprocessor_else', array(A, B));
 }
 
-preprocessor_cond(R)  ::= PREPROCESSOR_IFDEF(A) IDENTIFIER(B) . {
-	R = $this->create_node('preprocessor_cond', array(A, B));
+preprocessor_cond(R)  ::= PREPROCESSOR_IFDEF(A) IDENTIFIER(B)   . {
+	R = $this->create_node('preprocessor_cond', array(A, B, C));
 }
 
 preprocessor_cond(R)  ::= PREPROCESSOR_IFDEF(A) CUSTOMTYPENAME(B) . {
-	R = $this->create_node('preprocessor_cond', array(A, B));
+	R = $this->create_node('preprocessor_cond', array(A, B, C));
 }
 
 preprocessor_cond(R) ::= PREPROCESSOR_IF(A) . {
-	R = $this->create_node('preprocessor_cond', array(A));
+	R = $this->create_node('preprocessor_cond', array(A, B));
 }
 
 stmt_or_defined_macro(R) ::= PREPROCESSOR_DEFINE(A) . {
@@ -513,8 +513,13 @@ stmt(R) ::= FORKWD(A)
 /* RETURN */
 
 stmt(R) ::= RETURNKWD(A) expr_prec_11(B) SEMICOLON(C) . {
-	R = $this->create_node('return', array(A, B, C));
+	R = $this->create_node('stmt', array(A, B, C));
 }
+
+stmt(R) ::= RETURNKWD(A) SEMICOLON(B) . {
+	R = $this->create_node('stmt', array(A, B));
+}
+
 
 /* CONTINUE */
 
@@ -524,11 +529,11 @@ stmt(R) ::= CONTINUEKWD(A) SEMICOLON(B) . {
 
 /* GOTO-STATEMENTS */
 
-stmt(R) ::= GOTOKWD(A) IDENTIFIER(B) COLON(C) . {
+stmt(R) ::= GOTOKWD(A) IDENTIFIER(B) SEMICOLON(C) . {
 	R = $this->create_node('goto', array(A, B, C));
 }
 
-stmt(R) ::= GOTOKWD(A) CUSTOMTYPENAME(B) COLON(C) . {
+stmt(R) ::= GOTOKWD(A) CUSTOMTYPENAME(B) SEMICOLON(C) . {
 	R = $this->create_node('goto', array(A, B, C));
 }
 
