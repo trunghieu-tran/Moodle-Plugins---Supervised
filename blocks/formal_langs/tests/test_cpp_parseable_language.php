@@ -515,4 +515,514 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         ';
         $this->compare_trees($trees, $result);
     }
+
+    /**
+     * Tests working with goto
+     */
+    public function test_goto() {
+        $trees = self::make_from_string('label: int a = 2; if (b < 0) goto exit; printf("%d", 22); goto label; exit: return 0;');
+        $result = '
+[
+ {
+  {
+   {
+    {
+     {
+      {
+       {
+        label
+        :
+       }
+       {
+        {
+         int
+         a
+         =
+         2
+        }
+        ;
+       }
+      }
+      {
+       if
+       (
+       {
+        b
+        <
+        0
+       }
+       )
+       {
+        goto
+        exit
+        ;
+       }
+      }
+     }
+     {
+      {
+       printf
+       (
+       {
+        "%d"
+        ,
+        22
+       }
+       )
+      }
+      ;
+     }
+    }
+    {
+     goto
+     label
+     ;
+    }
+   }
+   {
+    exit
+    :
+   }
+  }
+  {
+   return
+   0
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Test combination of working with return, break, continue and for
+     */
+    public function test_return_break_continue_for() {
+        $trees = self::make_from_string('for(a = 3; a < 100; a++) { if (a == 25) continue; if (a == b) break; return 22; return; }');
+        $result = '
+[
+ {
+  for
+  (
+  {
+   a
+   =
+   3
+  }
+  ;
+  {
+   a
+   <
+   100
+  }
+  ;
+  {
+   a
+   ++
+  }
+  )
+  {
+   {
+   {
+    {
+     {
+      {
+       if
+       (
+       {
+        a
+        ==
+        25
+       }
+       )
+       {
+        continue
+        ;
+       }
+      }
+      {
+       if
+       (
+       {
+        a
+        ==
+        b
+       }
+       )
+       {
+        break
+        ;
+       }
+      }
+     }
+     {
+      return
+      22
+      ;
+     }
+    }
+    {
+     return
+     ;
+    }
+   }
+   }
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests while loop
+     */
+    public function test_while() {
+        $trees = self::make_from_string('while(!acceptable(a)) perform_random_actions(&a);');
+        $result = '
+[
+ {
+  while
+  (
+  {
+   !
+   {
+    acceptable
+    (
+    a
+    )
+   }
+  }
+  )
+  {
+   {
+    perform_random_actions
+    (
+    {
+     &
+     a
+    }
+    )
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests do-while loop
+     */
+    public function test_do_while() {
+        $trees = self::make_from_string('do perform_random_actions(&a); while(!acceptable(a));');
+        $result = '
+[
+ {
+  do
+  {
+   {
+    perform_random_actions
+    (
+    {
+     &
+     a
+    }
+    )
+   }
+   ;
+  }
+  while
+  (
+  {
+   !
+   {
+    acceptable
+    (
+    a
+    )
+   }
+  }
+  )
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Test function definition
+     */
+    public function test_function_function() {
+        $trees = self::make_from_string('void test() { test(); } void test();');
+        $result = '
+[
+ {
+  {
+   void
+   test
+   {
+    (
+    )
+   }
+   {
+    {
+    {
+     {
+      test
+      (
+      )
+     }
+     ;
+    }
+    }
+   }
+  }
+  {
+   void
+   test
+   {
+    (
+    )
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests definition of class with constructor and destructor without actual code
+     */
+    public function test_class_with_constructor_and_destructor() {
+        $trees = self::make_from_string('class A { A(); ~A(); };');
+        $result = '
+[
+ {
+  class
+  A
+  {
+   {
+   {
+    {
+     {
+      A
+      (
+      )
+     }
+     ;
+    }
+    {
+     {
+      ~
+      {
+       A
+       (
+       )
+      }
+     }
+     ;
+    }
+   }
+   }
+  }
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests definition of class with constructor and destructor */
+    public function test_class_with_outer_definition_of_constructor_and_destructor() {
+        $trees = self::make_from_string('class A { A(); ~A(); }; A::A() { construct(this); } A::~A() { destroy(this); }');
+        $result = '
+[
+ {
+  {
+   {
+    class
+    A
+    {
+     {
+     {
+      {
+       {
+        A
+        (
+        )
+       }
+       ;
+      }
+      {
+       {
+        ~
+        {
+         A
+         (
+         )
+        }
+       }
+       ;
+      }
+     }
+     }
+    }
+    ;
+   }
+   {
+    {
+     A
+     ::
+     A
+    }
+    (
+    )
+    {
+     {
+     {
+      {
+       construct
+       (
+       this
+       )
+      }
+      ;
+     }
+     }
+    }
+   }
+  }
+  {
+   A
+   ::
+   ~
+   A
+   (
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests definition of empty anonymous structure
+     */
+    public function test_empty_anonymous_struct() {
+        $trees = self::make_from_string('struct {} A;');
+        $result = '
+[
+ {
+  struct
+  {
+   {
+   }
+  }
+  A
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Test with struct and one field, using complex defintiions
+     */
+    public function test_struct_with_one_field_and_complex_definition() {
+        $trees = self::make_from_string('struct A { int k; } B;  A k;');
+        $result = '
+[
+ {
+  {
+   struct
+   A
+   {
+    {
+    {
+     {
+      int
+      k
+     }
+     ;
+    }
+    }
+   }
+   B
+   ;
+  }
+  {
+   {
+    A
+    k
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests union
+     */
+    public function test_union() {
+        $trees = self::make_from_string('union A { int k; double k2; char k3; };  A k;');
+        $result = '
+[
+ {
+  {
+   union
+   A
+   {
+    {
+    {
+     {
+      {
+       {
+        int
+        k
+       }
+       ;
+      }
+      {
+       {
+        double
+        k2
+       }
+       ;
+      }
+     }
+     {
+      {
+       char
+       k3
+      }
+      ;
+     }
+    }
+    }
+   }
+   ;
+  }
+  {
+   {
+    A
+    k
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
 }

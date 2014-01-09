@@ -11,42 +11,79 @@ require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 $lang = new block_formal_langs_language_cpp_parseable_language();
-$result = $lang->create_from_string('% 11');
+$result = $lang->create_from_string('union A { int k; double k2; char k3; };  A k;');
 
 function print_node($node, $paddingcount)
 {
+    $result = '';
 	if ($node == null) {
-		echo 'No tree!';
-		return;
+        $result .= 'No tree!';
+		return $result;
 	}
 	$padding = str_repeat(' ', $paddingcount);
     if (is_array($node)) {
-        echo $padding . '[' . PHP_EOL;
+        $result .= $padding . '[' . PHP_EOL;
         foreach($node as $i => $nodechild) {
-            echo $padding . (int)$i . ':';
-            echo $padding;
-            print_node($nodechild, $paddingcount + 1);
-            echo PHP_EOL;
+            $result .= print_node($nodechild, $paddingcount + 1);
+            if ($i != count($node) -1) {
+                $result .= $padding . ',' . PHP_EOL;
+            }
         }
-        echo $padding . ']';
-        return;
+        $result .= $padding . ']';
+        return $result;
     }
 	if (!method_exists($node, 'type')) {
-		var_dump($node);
-        return;
+		$result .= var_export($node, true);
+        return $result;
 	}
     $value = '';
     if (is_a($node, 'block_formal_langs_token_base')) {
-        $value = '(' . $node->value() . ')';
+        $value = $node->value();
     }
-	echo $padding . $node->type() . $value . PHP_EOL;
+    if (textlib::strlen($value)) {
+        $result .= $padding . $value . PHP_EOL;
+    }
+	//echo $padding . $node->type() . $value . PHP_EOL;
 	if (count($node->childs()))  {
-		echo $padding . '{' . PHP_EOL;
+		$result .= $padding . '{' . PHP_EOL;
 		foreach($node->childs() as $child) {
-			print_node($child, $paddingcount + 1);
+			$result .= print_node($child, $paddingcount + 1);
 		}
-		echo $padding . '}' . PHP_EOL;
+		$result .= $padding . '}' . PHP_EOL;
 	}
+    return $result;
 }
-print_node($result->syntaxtree, 0);
+
+function optimize_tree($nodes) {
+    if (is_a($nodes, 'block_formal_langs_processed_string')) {
+        $nodes->set_syntax_tree(optimize_tree($nodes->syntaxtree));
+    }
+    if (is_array($nodes)) {
+        $nodes = array_values($nodes);
+        $changed = true;
+        while($changed) {
+            $changed = false;
+            if (count($nodes)) {
+                /** @var block_formal_langs_ast_node_base $node */
+                foreach($nodes as $key => $node) {
+                    if (count($node->childs()) == 1) {
+                        $children = $node->childs();
+                        /** @var block_formal_langs_ast_node_base $child */
+                        $child = $children[0];
+                        $nodes[$key] = $child;
+                        $changed = true;
+                    }
+                }
+            }
+        }
+        if (count($nodes)) {
+            foreach($nodes as $node) {
+                $node->set_childs(optimize_tree($node->childs()));
+            }
+        }
+    }
+    return $nodes;
+}
+optimize_tree($result);
+echo print_node($result->syntaxtree, 0);
 
