@@ -7745,10 +7745,27 @@ class qtype_preg_unicode extends core_text {
      * @param $charset object of qtype_poasquestion_string.
      * @return a sorted array of trivial ranges corresponding to the given charset.
      */
-    public static function get_ranges_from_charset($charset) {
+    public static function get_ranges_from_charset($charset, $caseless = false) {
         $ords = array();
         for ($i = 0; $i < $charset->length(); $i++) {
-            $ords[] = self::utf8ord($charset[$i]);
+            $char = $charset[$i];
+            if ($caseless) {
+                $lower = self::strtolower($char);
+                $upper = self::strtoupper($char);
+                $lowerord = self::utf8ord($lower);
+                if (!in_array($lowerord, $ords)) {
+                    $upperord = self::utf8ord($upper);
+                    $ords[] = $lowerord;
+                    if ($upperord != $lowerord) {
+                        $ords[] = $upperord;
+                    }
+                }
+            } else {
+                $ord = self::utf8ord($char);
+                if (!in_array($ord, $ords)) {
+                    $ords[] = $ord;
+                }
+            }
         }
         sort($ords, SORT_NUMERIC);
         $prevord = $ords[0];

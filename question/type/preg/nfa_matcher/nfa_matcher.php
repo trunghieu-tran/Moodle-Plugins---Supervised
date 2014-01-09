@@ -296,7 +296,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Generate a next character.
                 //if ($length > 0) {
-                    list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                    $prevpos = $newstate->startpos + $newstate->length - $length;
+                    list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $prevpos, 0, $curstate);
                     if ($newchr != null) {
                         $newstate->str->concatenate($newchr);
                     }
@@ -398,7 +399,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Generate a next character.
                     //if ($length > 0) {
-                        list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                        $prevpos = $newstate->startpos + $newstate->length - $length;
+                        list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $prevpos, 0, $curstate);
                         if ($newchr != null) {
                             $newstate->str->concatenate($newchr);
                         }
