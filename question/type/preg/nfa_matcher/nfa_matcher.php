@@ -177,7 +177,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function get_resume_state($laststate) {
+    protected function get_resume_state($str, $laststate) {
         $endstates = $this->automaton->end_states();
 
         if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
@@ -197,7 +197,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $resumestate->write_subpatt_info($laststate->last_transition, $prevpos, $backref_length);
 
             // Re-write the string with correct characters.
-            list($flag, $newchr) = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
+            list($flag, $newchr) = $laststate->last_transition->pregleaf->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
             if ($newchr != null) {
                 $resumestate->str->concatenate($newchr);
             }
@@ -238,12 +238,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
+     * @param qtype_poasquestion_string str - original string that was matched.
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    protected function generate_extension_brute_force($laststate) {
+    protected function generate_extension_brute_force($str, $laststate) {
         $endstates = $this->automaton->end_states();
-        $resumestate = $this->get_resume_state($laststate);
+        $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
         }
@@ -295,7 +296,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Generate a next character.
                 //if ($length > 0) {
-                    list($flag, $newchr) = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                    list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
                     if ($newchr != null) {
                         $newstate->str->concatenate($newchr);
                     }
@@ -312,12 +313,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
+     * @param qtype_poasquestion_string str - original string that was matched.
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    protected function generate_extension_fast($laststate) {
+    protected function generate_extension_fast($str, $laststate) {
         $endstates = $this->automaton->end_states();
-        $resumestate = $this->get_resume_state($laststate);
+        $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
         }
@@ -396,7 +398,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Generate a next character.
                     //if ($length > 0) {
-                        list($flag, $newchr) = $transition->pregleaf->next_character($newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
+                        list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $newstate->startpos + $newstate->length, 0, $curstate);
                         if ($newchr != null) {
                             $newstate->str->concatenate($newchr);
                         }
@@ -664,8 +666,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
                 $tmp = $bruteforce
-                     ? $this->generate_extension_brute_force($backtrack)
-                     : $this->generate_extension_fast($backtrack);
+                     ? $this->generate_extension_brute_force($str, $backtrack)
+                     : $this->generate_extension_fast($str, $backtrack);
 
                 if ($tmp === null) {
                     continue;
