@@ -5411,6 +5411,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>15),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>11),
                         'left'=>array(1),
                         'next'=>'[^k]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -7892,7 +7894,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'abC',
@@ -7974,7 +7976,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'ABC',
@@ -8240,7 +8242,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'Abc',
@@ -8295,7 +8297,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'Ab',
@@ -8815,7 +8817,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(9),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'blah BLAH',
@@ -9400,7 +9402,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(3),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'abcX',
@@ -9564,7 +9566,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'z',
+                        'next'=>'[Zz]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test8 = array( 'str'=>'aCD',
@@ -9582,7 +9584,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'z',
+                        'next'=>'[Zz]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^(ab|a(?i)[b-c](?m-i)d|x(?i)y|z)',
@@ -11841,7 +11843,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'aaxabxbaxbbx',
@@ -11868,7 +11870,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test8 = array( 'str'=>'ABX',
@@ -11964,7 +11966,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(3),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'ABC',
@@ -11973,7 +11975,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'ABQ',
@@ -11982,7 +11984,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'ABBBBC',
@@ -12043,7 +12045,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(6),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'ABQ',
@@ -12052,7 +12054,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(5),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'ABBBBC',
@@ -12061,7 +12063,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>5),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'ab{4,5}?bc',
@@ -12437,8 +12439,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
                         'left'=>array(2),
-                        'next'=>'[^-bB]',
+                        'next'=>'[^-Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'A-C',
@@ -12447,7 +12451,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[^-bB]',
+                        'next'=>'[^-Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'a[^-b]c',
@@ -13194,7 +13198,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(22),
-                        'next'=>'m',
+                        'next'=>'[Mm]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'AA',
@@ -13203,7 +13207,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(22),
-                        'next'=>'m',
+                        'next'=>'[Mm]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'UH-UH',
@@ -13212,7 +13216,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(22),
-                        'next'=>'m',
+                        'next'=>'[Mm]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'multiple words of text',
@@ -13986,7 +13990,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(1),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'Ab',
@@ -14053,7 +14057,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(1),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'AB',
@@ -14106,7 +14110,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5,1=>5),
                         'length'=>array(0=>2,1=>2),
                         'left'=>array(1),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'AB',
@@ -15945,7 +15949,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'XabcY',
@@ -18223,7 +18227,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'xaabc',
@@ -18232,7 +18236,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[bB]',
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?<!a{2})b',
@@ -20994,7 +20998,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>1,1=>1),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'aB',
@@ -21003,7 +21007,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>1,1=>1),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'Ba',
@@ -21012,7 +21016,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>1,1=>1),
                         'length'=>array(0=>1,1=>1),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test7 = array( 'str'=>'ba',
@@ -21021,7 +21025,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>1,1=>1),
                         'length'=>array(0=>1,1=>1),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?i:([^b]))(?1)',
@@ -21042,7 +21046,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>7),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'aaaaaa',
@@ -21051,7 +21055,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>7),
                         'left'=>array(1),
-                        'next'=>'[^bB]',
+                        'next'=>'[^Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^(?&t)*+(?(DEFINE)(?<t>a))\w$',

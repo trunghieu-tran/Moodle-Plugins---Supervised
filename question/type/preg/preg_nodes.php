@@ -973,15 +973,22 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $key = 'after';
         }
 
-        $desired_chars = array(array(0x21, 0x007F));
-        $desired_whitespaces = array(array(0x20, 0x20));
+        $desired_ranges = array();
+        if ($pos < $originalstr->length()) {
+            $originalchar = $originalstr[$pos];
+            $originalcode = core_text::utf8ord($originalchar);
+            $desired_ranges[] = array(array($originalcode, $originalcode)); // original character
+        }
+
+        $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters
+        $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces
 
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
             $ranges = qtype_preg_unicode::dot_ranges();
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
-                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
                 }
@@ -994,13 +1001,13 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 $ranges = qtype_preg_unicode::negate_ranges($ranges);
             }
 
-            /*$desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_chars);
-            if (empty($desired)) {
-                $desired = qtype_preg_unicode::intersect_ranges($ranges, $desired_whitespaces);
+            foreach ($desired_ranges as $desired) {
+                $tmp = qtype_preg_unicode::intersect_ranges($ranges, $desired);
+                if (!empty($tmp)) {
+                    $ranges = $tmp;
+                    break;
+                }
             }
-            if (!empty($desired)) {
-                $ranges = $desired;
-            }*/
 
             // Check all the returned ranges.
             foreach ($ranges as $range) {
@@ -1085,7 +1092,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             foreach ($flags as $flag) {
                 switch ($flag->type) {
                     case qtype_preg_charset_flag::TYPE_SET:
-                        $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                        $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
                         $neg[] = $flag->negative;
                         break;
                     case qtype_preg_charset_flag::TYPE_FLAG:
@@ -1352,7 +1359,7 @@ class qtype_preg_charset_flag {
 
         switch ($this->type) {
             case self::TYPE_SET:
-                $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data);
+                $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data, $caseless);
                 break;
             case self::TYPE_FLAG:
                 $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
