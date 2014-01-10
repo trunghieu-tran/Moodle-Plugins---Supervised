@@ -122,6 +122,33 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     /**
+     * Updates all fields in the newstate after a transition match
+     */
+    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length) {
+        $endstates = $this->automaton->end_states();
+
+        $newstate->state = $transition->to;
+
+        $newstate->set_full(in_array($newstate->state, $endstates));
+        if ($transition->is_start_anchor()) {
+            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
+        }
+        if ($transition->is_end_anchor()) {
+            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
+        }
+        $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
+        $newstate->last_transition = $transition;
+        $newstate->last_match_len = $length;
+
+        $newstate->length += $length;
+        $newstate->write_subpatt_info($transition, $curpos, $length);
+
+        if ($transition->causes_backtrack()) {
+            $newstate->backtrack_states[] = $curstate;
+        }
+    }
+
+    /**
      * Returns an array of states which can be reached without consuming characters.
      * @param qtype_preg_nfa_exec_state startstates states to go from.
      * @return an array of states (including the start state) which can be reached without consuming characters.
@@ -131,7 +158,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result = array('lazy' => array(),
                         'greedy' => $startstates
                         );
-        $endstates = $this->automaton->end_states();
 
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
@@ -146,20 +172,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $newstate->state = $transition->to;
-
-                $newstate->set_full(in_array($newstate->state, $endstates));    // No need to set another flags
-                $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                $newstate->extendedmatch = null;
-                $newstate->last_transition = $transition;
-                $newstate->last_match_len = $length;
-
-                $newstate->length += $length;
-                $newstate->write_subpatt_info($transition, $curpos, $length);
-
-                if ($transition->causes_backtrack()) {
-                    $newstate->backtrack_states[] = $curstate;
-                }
+                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state;
@@ -186,15 +199,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
 
             $resumestate = clone $laststate;
-            $resumestate->state = $laststate->last_transition->to;
-            $resumestate->set_full(in_array($resumestate->state, $endstates));  // No need to set another flags
-            $resumestate->left = $resumestate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-            $resumestate->extendedmatch = null;
-            $resumestate->last_transition = $laststate->last_transition;
-            $resumestate->last_match_len = $backref_length;
-
-            $resumestate->length += $backref_length - $laststate->last_match_len;
-            $resumestate->write_subpatt_info($laststate->last_transition, $prevpos, $backref_length);
+            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length);
+            $resumestate->length -= $laststate->last_match_len; // Backreference was partially matched
 
             // Re-write the string with correct characters.
             list($flag, $newchr) = $laststate->last_transition->pregleaf->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
@@ -220,20 +226,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if (in_array($curclosure->state, $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
-                    $result->state = $curclosure;
-                    $result->set_full(true);
-                    $result->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
-                    $result->left = 0;
-                    $result->extendedmatch = null;
-                    $result->last_transition = $transition;
-                    $result->last_match_len = 0;
-                    $result->write_subpatt_info($transition, $curpos, 0);
+                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0);
                     return $result;
                 }
             }
         }
 
-        // Well, there were no $ fails at the end. Try the other paths to complete match.
         return $laststate;
     }
 
@@ -286,23 +284,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $newstate->state = $transition->to;
-
-                $newstate->set_full(in_array($newstate->state, $endstates));
-                if ($transition->is_start_anchor()) {
-                    $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
-                }
-                if ($transition->is_end_anchor()) {
-                    $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
-                }
-                $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                $newstate->extendedmatch = null;
-
-                $newstate->last_transition = $transition;
-                $newstate->last_match_len = $length;
-
-                $newstate->length += $length;
-                $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
+                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                 // Generate a next character.
                 //if ($length > 0) {
@@ -398,23 +380,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $newstate->state = $transition->to;
-
-                    $newstate->set_full(in_array($newstate->state, $endstates));
-                    if ($transition->is_start_anchor()) {
-                        $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
-                    }
-                    if ($transition->is_end_anchor()) {
-                        $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
-                    }
-                    $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                    $newstate->extendedmatch = null;
-
-                    $newstate->last_transition = $transition;
-                    $newstate->last_match_len = $length;
-
-                    $newstate->length += $length;
-                    $newstate->write_subpatt_info($transition, $newstate->startpos + $curstate->length, $length);
+                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                     // Generate a next character.
                     //if ($length > 0) {
@@ -455,7 +421,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     protected function match_brute_force($str, $startpos) {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
-        $endstates = $this->automaton->end_states();
 
         $curstates = array();    // States which the automaton is in at the current wave front.
         $lazystates = array();   // States reached lazily.
@@ -476,26 +441,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $newstate->state = $transition->to;
-
-                    $newstate->set_full(in_array($newstate->state, $endstates));
-                    if ($transition->is_start_anchor()) {
-                        $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
-                    }
-                    if ($transition->is_end_anchor()) {
-                        $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
-                    }
-                    $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                    $newstate->extendedmatch = null;
-                    $newstate->last_transition = $transition;
-                    $newstate->last_match_len = $length;
-
-                    $newstate->length += $length;
-                    $newstate->write_subpatt_info($transition, $curpos, $length);
-
-                    if ($transition->causes_backtrack()) {
-                        $newstate->backtrack_states[] = $curstate;
-                    }
+                    $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
 
                     // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
@@ -593,26 +539,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                         // Create a new state.
                         $newstate = clone $curstate;
-                        $newstate->state = $transition->to;
-
-                        $newstate->set_full(in_array($newstate->state, $endstates));
-                        if ($transition->is_start_anchor()) {
-                            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
-                        }
-                        if ($transition->is_end_anchor()) {
-                            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
-                        }
-                        $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-                        $newstate->extendedmatch = null;
-                        $newstate->last_transition = $transition;
-                        $newstate->last_match_len = $length;
-
-                        $newstate->length += $length;
-                        $newstate->write_subpatt_info($transition, $curpos, $length);
-
-                        if ($transition->causes_backtrack()) {
-                            $newstate->backtrack_states[] = $curstate;
-                        }
+                        $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
 
@@ -705,6 +632,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if ($tmp === null) {
                     continue;
                 }
+
                 // Calculate 'left'.
                 $prefixlen = $startpos;
                 while ($prefixlen < $result->str->length() && $prefixlen < $tmp->str->length() &&
