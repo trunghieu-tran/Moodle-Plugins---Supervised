@@ -517,6 +517,50 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
     }
 
+    function data_for_test_anchors_1() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>0,1=>0));
+
+        $test2 = array( 'str'=>'faily days',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>0,1=>0),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'$()^\1',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_anchors_2() {
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>1,1=>0));
+
+        $test2 = array( 'str'=>'faily days',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>1,1=>2),
+                        'ext_length'=>array(0=>1,1=>0),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'a$()\1',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     function data_for_test_assertions_simple_1() {
         $test1 = array( 'str'=>' abc',
                         'is_match'=>true,

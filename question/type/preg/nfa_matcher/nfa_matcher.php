@@ -258,12 +258,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
-                // Check for loops and anchors.
-                // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
-                $assert = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
-                //$anchorstart = $assert && $transition->pregleaf->is_start_anchor() && $curstate->startpos + $curstate->length == 0;
-                $anchorend = $assert && $transition->pregleaf->is_end_anchor() && !in_array($transition->to, $endstates);
-                if ($transition->is_loop /*|| $anchorstart*/ || $anchorend) {
+                // Skip loops.
+                if ($transition->is_loop) {
                     continue;
                 }
 
@@ -354,12 +350,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
-                    // Check for loops and anchors.
-                    // \Z \z and $ are only valid at the end of regex. TODO: what's with eps-closure?
-                    $assert = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
-                    //$anchorstart = $assert && $transition->pregleaf->is_start_anchor() && $curstate->startpos + $curstate->length == 0;
-                    $anchorend = $assert && $transition->pregleaf->is_end_anchor() && !in_array($transition->to, $endstates);
-                    if ($transition->is_loop /*|| $anchorstart*/ || $anchorend) {
+                    // Skip loops.
+                    if ($transition->is_loop) {
                         continue;
                     }
 
