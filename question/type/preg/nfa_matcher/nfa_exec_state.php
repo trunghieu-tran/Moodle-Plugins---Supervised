@@ -33,6 +33,13 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
  */
 class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
+    // Indicates that this state is a full match state.
+    const FLAG_FULL = 0x01;
+    // Indicates that this state had \A or ^ transition.
+    const FLAG_VISITED_START_ANCHOR = 0x02;
+    // Indicates that this state had \Z \z or $ transition.
+    const FLAG_VISITED_END_ANCHOR   = 0x04;
+
     // The nfa being executed.
     public $matcher;
 
@@ -52,8 +59,8 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Array used mostly for disambiguation when there are duplicate subpexpressions numbers.
     public $subexpr_to_subpatt;
 
-    // Is this a full match?
-    public $full;
+    // Bitwise union of the above constants.
+    public $flags;
 
     // How many characters left for full match?
     public $left;
@@ -83,6 +90,31 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
     public static function is_being_captured($index, $length) {
         return ($index != qtype_preg_matching_results::NO_MATCH_FOUND && $length == qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    public function set_flag($flag) {
+        $this->flags = ($this->flags | $flag);
+    }
+
+    public function unset_flag($flag) {
+        $flag = ~$flag;
+        $this->flags = ($this->flags & $flag);
+    }
+
+    public function is_flag_set($flag) {
+        return ($this->flags & $flag) != 0;
+    }
+
+    public function set_full($value) {
+        if ($value) {
+            $this->set_flag(self::FLAG_FULL);
+        } else {
+            $this->unset_flag(self::FLAG_FULL);
+        }
+    }
+
+    public function is_full() {
+        return $this->is_flag_set(self::FLAG_FULL);
     }
 
     public function root_subpatt_number() {
@@ -221,7 +253,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         }
         $index[0] = $this->startpos;
         $length[0] = $this->length;
-        $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
+        $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
         $result->set_source_info($this->str, $this->matcher->automaton->max_subexpr(), $this->matcher->get_subexpr_map());
         return $result;
     }
@@ -283,9 +315,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      */
     public function leftmost_longest($other) {
         // Check for full match.
-        if ($this->full && !$other->full) {
+        if ($this->is_full() && !$other->is_full()) {
             return true;
-        } else if (!$this->full && $other->full) {
+        } else if (!$this->is_full() && $other->is_full()) {
             return false;
         }
 
@@ -362,9 +394,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      */
     public function leftmost_shortest($other) {
         // Check for full match.
-        if ($this->full && !$other->full) {
+        if ($this->is_full() && !$other->is_full()) {
             return true;
-        } else if (!$this->full && $other->full) {
+        } else if (!$this->is_full() && $other->is_full()) {
             return false;
         }
 

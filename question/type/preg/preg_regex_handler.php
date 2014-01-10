@@ -211,7 +211,7 @@ class qtype_preg_handling_options {
     }
 
     public function is_modifier_set($modifier) {
-        return ($this->modifiers & $modifier) == 0 ? false : true;
+        return ($this->modifiers & $modifier) != 0;
     }
 }
 
