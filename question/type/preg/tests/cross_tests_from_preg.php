@@ -775,8 +775,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
     }
 
-    function data_for_test_assertions_simple_15() {
-
+    /*function data_for_test_assertions_simple_15() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -1441,7 +1440,7 @@ class qtype_preg_cross_tests_from_preg {
         return array('regex'=>'(a(\"\\n\")*b)\b\1\B\1',
                      'tests'=>array(),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
-    }
+    }*/
 
     function data_for_test_case_sensitivity1() {
         $test1 = array( 'str'=>'abcd',

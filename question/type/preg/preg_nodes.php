@@ -1531,7 +1531,10 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));  // TODO
+        if ($pos == 0) {
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        }
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
@@ -1623,7 +1626,10 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        if ($pos == 0 || $newstr[$pos - 1] == "\n") {
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        }
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
