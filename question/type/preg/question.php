@@ -172,7 +172,6 @@ class qtype_preg_question extends question_graded_automatically
         }
 
         // fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
-        $full = false;
         foreach ($this->answers as $answer) {
             $hintneeded = ($this->usecharhint || $this->uselexemhint) && $answer->fraction >= $hintgradeborder;
             $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->get_modifiers($this->usecase), $answer->id, $this->notation, $hintneeded);
