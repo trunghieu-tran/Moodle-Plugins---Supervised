@@ -2769,6 +2769,8 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>6,1=>6,2=>3),
+                        'ext_index_first'=>array(0=>0,1=>0,2=>0),
+                        'ext_length'=>array(0=>12,1=>6,2=>3),
                         'left'=>array(6),
                         'next'=>'a');    // Backref #1 not captured at all.
 
@@ -2777,6 +2779,8 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>8,1=>6,2=>3),
+                        'ext_index_first'=>array(0=>0,1=>0,2=>0),
+                        'ext_length'=>array(0=>12,1=>6,2=>3),
                         'left'=>array(4),
                         'next'=>'c');    // Backref #1 captured partially.
 
