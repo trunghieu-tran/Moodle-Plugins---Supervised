@@ -106,7 +106,7 @@ class block_supervised extends block_base {
         $teacherid      = $USER->id;
         $courseid       = $COURSE->id;
         $stateplanned   = StateSession::Planned;
-        $plannedsession = get_session(0, $courseid, $teacherid, 0, $stateplanned, $time1, $time2);
+        $plannedsession = get_session(0, $courseid, $teacherid, 0, -1, $stateplanned, $time1, $time2);
 
         return $plannedsession;
     }
@@ -380,7 +380,7 @@ class block_supervised extends block_base {
         $courseid   = $COURSE->id;
         $stateactive = StateSession::Active;
         $time = time();
-        $activesessions = get_sessions($courseid, 0, 0, $stateactive, 0, $time, $time, 0);
+        $activesessions = get_sessions($courseid, 0, 0, -1, $stateactive, 0, $time, $time, 0);
 
         // Filter sessions by user groups
         $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);

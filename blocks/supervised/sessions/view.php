@@ -11,7 +11,8 @@ $perpage    = optional_param('perpage', '50', PARAM_INT);   // how many per page
 $from       = optional_param('f', mktime(0, 0, 0, date('n'), date('j')), PARAM_INT);     // sessions filtering: timestamp from
 $to         = optional_param('t', mktime(23, 55, 0, date('n'), date('j')), PARAM_INT);   // sessions filtering: timestamp to
 $teacher    = optional_param('teacher', '0', PARAM_INT);    // sessions filtering: teacher id
-$coursefilter = optional_param('course', '0', PARAM_INT);     // sessions filtering: course id
+$coursefilter = optional_param('course', '0', PARAM_INT);   // sessions filtering: course id
+$lessontype = optional_param('lessontype', '-1', PARAM_INT); // sessions filtering: lessontype id
 $classroom  = optional_param('classroom', '0', PARAM_INT);  // sessions filtering: classroom id
 $state      = optional_param('state', '0', PARAM_INT);      // sessions filtering: state index
 
@@ -61,12 +62,13 @@ $toform['to'] = $to;
 $toform['teacher'] = $teacher;
 $toform['course'] = $coursefilter;
 $toform['classroom'] = $classroom;
+$toform['lessontype'] = $lessontype;
 $toform['state'] = $state;
 
 if ($fromform = $mform->get_data()) {
     $url = new moodle_url('/blocks/supervised/sessions/view.php',
         array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize, 'f'=>$fromform->from, 't'=>$fromform->to,
-            'teacher'=>$fromform->teacher, 'course'=>$fromform->course, 'classroom'=>$fromform->classroom, 'state'=>$fromform->state ));
+            'teacher'=>$fromform->teacher, 'course'=>$fromform->course, 'classroom'=>$fromform->classroom, 'lessontype'=>$fromform->lessontype, 'state'=>$fromform->state ));
     redirect($url); // Redirect must be done before $OUTPUT->header().
 } else {
     // Form didn't validate or this is the first display.
@@ -91,7 +93,7 @@ if ($fromform = $mform->get_data()) {
 }
 
 // Print sessions table.
-print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teacher, $coursefilter, $classroom, $state);
+print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teacher, $coursefilter, $classroom, $lessontype, $state);
 
 // Display footer.
 echo $OUTPUT->footer();
@@ -103,7 +105,7 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
 
     $active = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course&classroom=$classroom&state=$state";
 
-    // Without teacher and {lessontype}.
+    // Without teacher and lesson type.
     $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=0&classroom=$classroom&state=$state";
     $urls[$url] = get_string('fulllistofcourses', '');
 

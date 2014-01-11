@@ -10,13 +10,14 @@
  * @param int $teacher teacher id
  * @param int $course course id
  * @param int $classroom classroom id
+ * @param int $lessontype lesson type id (0 for 'not specified', -1 for 'all lesson types')
  * @param int $state session state
  * @return mixed array of the sessions
  */
-function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
+function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $course=0, $classroom=0, $lessontype=-1, $state=0){
     global $USER, $PAGE;
 
-    $sessions = get_sessions($course, $teacher, $classroom, $state, $from, 0, 0, $to);
+    $sessions = get_sessions($course, $teacher, $classroom, $lessontype, $state, $from, 0, 0, $to);
 
     // Filter sessions according to user capabilities.
     $sessionsfiltered = array();
@@ -51,12 +52,13 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
  * @param int $teacher teacher id
  * @param int $course course id
  * @param int $classroom classroom id
+ * @param int $lessontype lesson type id (0 for 'not specified', -1 for 'all lesson types')
  * @param int $state session state
  */
-function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $state=0){
+function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $lessontype=-1, $state=0){
     global $OUTPUT, $USER, $PAGE;
 
-    $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $state);
+    $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $lessontype, $state);
     $totalcount = $sessions['totalcount'];
 
     echo "<div class=\"info\">\n";
@@ -141,6 +143,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
  * @param int $courseid course id
  * @param int $teacherid teacher id
  * @param int $classroomid classroom id
+ * @param int $lessontypeid lessontype id (0 for 'not specified', -1 for 'all lesson types')
  * @param int $state    session state
  * @param int $timestart1 session must starts after this time
  * @param int $timestart2 session must starts before this time
@@ -149,7 +152,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
  * @param int $id session id
  * @return array sessions
  */
-function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0){
+function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0){
     global $DB;
 
     $select = "SELECT
@@ -201,6 +204,11 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $time
         else            {$select .= " AND {block_supervised_session}.classroomid = :classroomid";}
         $params['classroomid']      = $classroomid;
     }
+    if($lessontypeid != -1){
+        if($whereflag)  {$select .= " WHERE {block_supervised_session}.lessontypeid = :lessontypeid"; $whereflag=true;}
+        else            {$select .= " AND {block_supervised_session}.lessontypeid = :lessontypeid";}
+        $params['lessontypeid']      = $lessontypeid;
+    }
     if($state){
         if($whereflag)  {$select .= " WHERE {block_supervised_session}.state = :state"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.state = :state";}
@@ -241,6 +249,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $time
  * @param int $courseid course id
  * @param int $teacherid teacher id
  * @param int $classroomid classroom id
+ * @param int $lessontypeid lesson type id (0 for 'not specified', -1 for 'all lesson types')
  * @param int $state    session state
  * @param int $timestart1 session must starts after this time
  * @param int $timestart2 session must starts before this time
@@ -249,8 +258,8 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $state=0, $time
  * @param int $id session id
  * @return stdClass session
  */
-function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0){
-    $records = get_sessions($courseid, $teacherid, $classroomid, $state, $timestart1, $timestart2, $timeend1, $timeend2, $id);
+function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0){
+    $records = get_sessions($courseid, $teacherid, $classroomid, $lessontypeid, $state, $timestart1, $timestart2, $timeend1, $timeend2, $id);
     return array_shift($records); // Return the first element.
 }
 
