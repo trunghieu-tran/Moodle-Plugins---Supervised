@@ -696,6 +696,8 @@ class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pai
     /**
      * A string with editing operators.
      * @var string
+     * derived from function redaction($str1, $str2)
+     * 'i' - insert, 'm' - no operation, 'd' - deletion, 'r' - replacement
      */
      public $editops='';
 }
@@ -1179,15 +1181,26 @@ class block_formal_langs_token_stream {
  */
 class  block_formal_langs_matches_group {
     /**
-     * Array of matched pairs
+     * Array of matched pairs - set of pairs
      */
     public $matchedpairs;
-    // Sum of mistake weights
+    /**
+     * Sum of mistake weights
+     * @var int
+    */
     public $mistakeweight;
-    // Sorted array of all correct token indexes for tokens, covered by pairs from this group
+    /**
+     * Sorted array of all correct token indexes for tokens, covered by pairs from this group
+     * @var array - array of int indexs
+    */
     public $correctcoverage;
-    // Sorted array of all compared token indexes for tokens, covered by pairs from this group
+    
+    /*
+     * Sorted array of all compared token indexes for tokens, covered by pairs from this group
+     * @var array - array of int indexs
+    */
     public $comparedcoverage;
+    
     /**
      * Returns an array of token indexes from compared string, which matches tokens from correct string
      *
