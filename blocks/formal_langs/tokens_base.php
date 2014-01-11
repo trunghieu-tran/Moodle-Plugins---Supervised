@@ -751,11 +751,20 @@ class block_formal_langs_token_stream {
         //  - look_for_matches function
         // 2. Find best groups of pairs - Birukova
         //  - group_matches function, with criteria defined by compare_matches_groups function
-        $allpossiblepairs = array();
-        $bestgroups = array();
-        $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options, $bypass);
-        if (count($allpossiblepairs)>0) {
-            $bestgroups = $this->group_matches($allpossiblepairs);
+        if($bypass=true){
+            $allpossiblepairs = array();
+            $bestgroups = array();
+            $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
+            if (count($allpossiblepairs)>0) {
+                $bestgroups = $this->group_matches($allpossiblepairs);
+            } 
+        } else {
+            $allpossiblepairs = array();
+            $bestgroups = array();
+            $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
+            if (count($allpossiblepairs)>0) {
+                $bestgroups = $this->group_matches($allpossiblepairs);
+            } 
         }
         return $bestgroups;
     }
@@ -1659,7 +1668,7 @@ class block_formal_langs_string_pair {
         $bestgroups = array();
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
-        $bestgroups = $correctstream->look_for_token_pairs_for_bypass($comparedstream, $threshold, $options);
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
