@@ -53,7 +53,7 @@ if (file_exists($mform)) {
 } else {
     print_error('noformdesc');
 }
-$mform = new displayoptions_sessions_form();
+$mform = new displayoptions_sessions_form(null, array('course' => $coursefilter));
 $toform['courseid'] = $courseid;
 $toform['pagesize'] = $perpage;
 $toform['from'] = $from;
@@ -83,6 +83,8 @@ if ($fromform = $mform->get_data()) {
         echo $OUTPUT->single_button($url, $caption, 'get');
     }
 
+    print_courses_selector($courseid, $coursefilter, $perpage, $from, $to, $classroom, $state);
+
     // Print display options form.
     $mform->set_data($toform);
     $mform->display();
@@ -93,3 +95,28 @@ print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teac
 
 // Display footer.
 echo $OUTPUT->footer();
+
+
+
+function print_courses_selector($courseid, $course, $perpage, $from, $to, $classroom, $state){
+    global $OUTPUT, $SITE;
+
+    $active = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course&classroom=$classroom&state=$state";
+
+    // Without teacher and {lessontype}.
+    $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=0&classroom=$classroom&state=$state";
+    $urls[$url] = get_string('fulllistofcourses', '');
+
+    if ($courses = get_courses()) {
+        foreach ($courses as $course) {
+            if($course->id != $SITE->id){
+                $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course->id&classroom=$classroom&state=$state";
+                $urls[$url] = $course->fullname;
+            }
+        }
+    }
+
+    $select = new url_select($urls, $active, null);
+    $select->set_label(get_string('course', 'block_supervised'));
+    echo $OUTPUT->render($select);
+}
