@@ -599,7 +599,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // Choose the best one.
         $result = null;
         foreach ($possiblematches as $match) {
-            if ($result === null || $match->leftmost_longest($result)) {
+            if ($result === null || $match->leftmost_longest($result, false)) {
                 $result = $match;
             }
         }

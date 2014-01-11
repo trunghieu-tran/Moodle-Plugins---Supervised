@@ -121,22 +121,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $this->matcher->automaton->ast_root()->subpattern;
     }
 
-    public function count_captured_subpatters() {
-        $result = 0;
-        foreach ($this->matches as $subpatt => $repetitions) {
-            if ($subpatt == -2) {
-                continue;
-            }
-            foreach ($repetitions as $repetition) {
-                if ($repetition[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $result++;
-                    break;
-                }
-            }
-        }
-        return $result;
-    }
-
     // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
     public function current_match($subpatt) {
         if (!isset($this->matches[$subpatt])) {
@@ -313,7 +297,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     /**
      * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
-    public function leftmost_longest($other) {
+    public function leftmost_longest($other, $includecapturing = true) {
         // Check for full match.
         if ($this->is_full() && !$other->is_full()) {
             return true;
@@ -327,44 +311,43 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
-        $this_captured_subpatt_count = $this->count_captured_subpatters();
-        $other_captured_subpatt_count = $other->count_captured_subpatters();
-
         // Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
         for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->automaton->max_subpatt(); $i++) {
             $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
             $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
-            // Less number of iterations means that there is a longer match without epsilons.
-            $this_repetition_count = count($this_match);
-            $other_repetition_count = count($other_match);
+            $this_repetitions_count = count($this_match);
+            $other_repetitions_count = count($other_match);
 
-            if ($modepcre && $this_repetition_count == $other_repetition_count + 1) {
+            $repetitions_count_difference = $this_repetitions_count - $other_repetitions_count;
+            if ($modepcre && abs($repetitions_count_difference) == 1) {
                 // PCRE mode selection: if states have N and N + 1 subpattern repetitions, respectively,
                 // and the (N + 1)th repetition is empty, then select the second state. And vice versa.
                 $this_last = $this->last_match($i);
                 $other_last = $other->last_match($i);
-                if ($this_last[1] == 0 && $this_last[0] > $other_last[0]) {
+                if ($repetitions_count_difference == 1 && $this_last[1] == 0 && $this_last[0] > $other_last[0]) {
                     return true;
-                } else if ($other_last[1] == 0 && $other_last[0] > $this_last[0]) {
+                } else if ($repetitions_count_difference == -1 && $other_last[1] == 0 && $other_last[0] > $this_last[0]) {
                     return false;
                 }
             }
 
-            // POSIX mode selection goes on here.
-            if ($this_captured_subpatt_count >= $other_captured_subpatt_count && $this_repetition_count < $other_repetition_count) {
-                return true;
-            } else if ($other_captured_subpatt_count >= $this_captured_subpatt_count && $other_repetition_count < $this_repetition_count) {
-                return false;
-            }
-
             // Iterate over all repetitions.
-            for ($j = 0; $j < min($this_repetition_count, $other_repetition_count); $j++) {
+            for ($j = 0; $j < min($this_repetitions_count, $other_repetitions_count); $j++) {
                 $this_index = $this_match[$j][0];
                 $this_length = $this_match[$j][1];
                 $other_index = $other_match[$j][0];
                 $other_length = $other_match[$j][1];
+                $this_being_captured = self::is_being_captured($this_index, $this_length);
+                $other_being_captured = self::is_being_captured($other_index, $other_length);
+
+                if ($includecapturing && $this_being_captured) {
+                    $this_length = $this->startpos + $this->length - $this_index;
+                }
+                if ($includecapturing && $other_being_captured) {
+                    $other_length = $this->startpos + $other->length - $other_index;
+                }
 
                 // Continue if both iterations have no match.
                 if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND && $other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -386,6 +369,22 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 }
             }
         }
+
+        // Iterate over all subpatterns for the 2nd time to compare numbers of repetitions
+        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->automaton->max_subpatt(); $i++) {
+            $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
+            $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
+
+            $this_repetitions_count = count($this_match);
+            $other_repetitions_count = count($other_match);
+
+            if ($this_repetitions_count < $other_repetitions_count) {
+                return true;
+            } else if ($other_repetitions_count < $this_repetitions_count) {
+                return false;
+            }
+        }
+
         return false;
     }
 
@@ -461,7 +460,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
             $res .= "\n";
         }
-        $res .= "\n";
         return $res;
     }
 
