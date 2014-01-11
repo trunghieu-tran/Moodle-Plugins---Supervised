@@ -218,22 +218,22 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         }
     }
 
-
-    public static function get_settings_sql($quizid) {
-        return array(
-            'supervisedmode',
-            'LEFT JOIN {quizaccess_supervisedcheck} ON {quizaccess_supervisedcheck}.quizid = quiz.id',
-            array());
-    }
-
-
+    /**
+     * We do not use get_settings_sql because we can have more than one rule fur the quiz.
+     *
+     * @param int $quizid the quiz id.
+     * @return array setting value name => value.
+     */
     public static function get_extra_settings($quizid) {
         global $DB;
         // Load lesson type fields.
         $res = array();
         $rules = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $quizid));
         foreach($rules as $rule){
-            $res['supervisedlessontype_'.$rule->lessontypeid] = 1;
+            $res['supervisedmode'] = $rule->supervisedmode;
+            if($rule->supervisedmode == 2){
+                $res['supervisedlessontype_'.$rule->lessontypeid] = 1;
+            }
         }
         return $res;
     }
