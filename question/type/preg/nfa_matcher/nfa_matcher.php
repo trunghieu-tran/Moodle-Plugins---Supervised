@@ -425,12 +425,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
             $curstate = array_pop($curstates);
+            if ($curstate->is_full()) {
+                $fullmatches[] = $curstate;
+            }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
                 if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
-
                     // Create a new state.
                     $newstate = clone $curstate;
                     $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
@@ -441,9 +443,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $lazystates[] = $newstate;
                         } else {
                             $curstates[] = $newstate;
-                        }
-                        if ($newstate->is_full()) {
-                            $fullmatches[] = $newstate;
                         }
                     }
                 } else if (count($fullmatches) == 0) {
