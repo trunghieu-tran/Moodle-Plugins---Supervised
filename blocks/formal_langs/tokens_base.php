@@ -1776,20 +1776,39 @@ class block_formal_langs_string_pair {
             if($this->correctstring()->has_description($nodenumber)) {
                 return $this->correctstring()->node_description($nodenumber, false, true);
             } else {
-                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                $value = $this->comparedstring()->stream->tokens[$index]->value();
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
         // extra separator
         if(count($correctindexs)==1 && count($comparedindexs)==2) {
+            $index = $this->index_pair_from_lexem($nodenumber);
             if($this->correctstring()->has_description($nodenumber)) {
                 return $this->correctstring()->node_description($nodenumber, false, true);
             } else {
-                // TODO
+                $value1 = $this->comparedstring()->stream->tokens[$index]->value();
+                $value2 = $this->comparedstring()->stream->tokens[$index+1]->value();
+                $value = $value1.' and '.$value2;
+                return get_string('quote', 'block_formal_langs', $value);
             }
         }
         if(count($correctindexs)==2 && count($comparedindexs)==1) {
-            // TODO
+            $index = $this->index_pair_from_lexem($nodenumber);
+            if($this->correctstring()->has_description($nodenumber) && !$this->correctstring()->has_description($nodenumber+1)) {
+                $value=$this->comparedstring()->stream->tokens[$index+1]->value();
+                return $this->correctstring()->node_description($nodenumber, false, true).' and '.get_string('quote', 'block_formal_langs', $value);
+            } 
+            if(!$this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
+                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
+            } 
+            if($this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
+                return $this->correctstring()->node_description($nodenumber, false, true).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
+            } 
+            else {
+                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value);
+            }
         }
     
     
