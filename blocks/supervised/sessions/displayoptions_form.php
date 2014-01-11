@@ -27,7 +27,6 @@ class displayoptions_sessions_form extends moodleform {
         else{
             $teachers += $this->teachers_from_course($selectedcourse);
         }
-
         // Classrooms.
         $classrooms[0] = get_string('allclassrooms', 'block_supervised');
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
@@ -46,14 +45,11 @@ class displayoptions_sessions_form extends moodleform {
                 }
             }
         }
-
-
         // States.
         $states[0] = get_string('allstates', 'block_supervised');
         $states[StateSession::Planned] = StateSession::getStateName(StateSession::Planned);
         $states[StateSession::Active] = StateSession::getStateName(StateSession::Active);
         $states[StateSession::Finished] = StateSession::getStateName(StateSession::Finished);
-
 
 
         $mform->addElement('header', 'sessionsoptionsview', get_string('reportdisplayoptions', 'quiz'));
@@ -63,9 +59,14 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
         $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);
-        $mform->addElement('select', 'lessontype', get_string('lessontype', 'block_supervised'), $lessontypes);
+        if($selectedcourse != 0){
+            $mform->addElement('select', 'lessontype', get_string('lessontype', 'block_supervised'), $lessontypes);
+        }
+        else{
+            $mform->addElement('hidden', 'lessontype');
+            $mform->setType('lessontype', PARAM_INT);
+        }
         $mform->addElement('select', 'state', get_string('state', 'block_supervised'), $states);
-
 
 
         $mform->addElement('submit', 'submitbutton', get_string('showsessions', 'block_supervised'));
