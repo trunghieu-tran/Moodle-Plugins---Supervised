@@ -12,27 +12,22 @@ class displayoptions_sessions_form extends moodleform {
         global $DB, $SITE;
         $mform =& $this->_form;
 
-        // Courses.
-        $courses[0] = get_string('fulllistofcourses', '');
-        if ($ccourses = get_courses()) {
-            foreach ($ccourses as $ccourse) {
-                if($ccourse->id != $SITE->id){
-                    $courses[$ccourse->id] = $ccourse->fullname;
-                }
-            }
-        }
-        // Find teachers *from all courses*.
+
+        // Teachers
         $teachers[0] = get_string('allteachers', '');
-        if ($ccourses = get_courses()) {
-            foreach ($ccourses as $ccourse) {
-                $coursecontext = context_course::instance($ccourse->id);
-                if ($cteachers = get_users_by_capability($coursecontext, array('block/supervised:supervise'))) {
-                    foreach ($cteachers as $cteacher) {
-                        $teachers[$cteacher->id] = fullname($cteacher);
-                    }
+        $selectedcourse = $this->_customdata['course'];
+        if($selectedcourse == 0){
+            // Find teachers from all courses.
+            if ($ccourses = get_courses()) {
+                foreach ($ccourses as $ccourse) {
+                    $teachers += $this->teachers_from_course($ccourse->id);
                 }
             }
         }
+        else{
+            $teachers += $this->teachers_from_course($selectedcourse);
+        }
+
         // Classrooms.
         $classrooms[0] = get_string('allclassrooms', 'block_supervised');
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
@@ -51,7 +46,6 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('header', 'sessionsoptionsview', get_string('reportdisplayoptions', 'quiz'));
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
-        $mform->addElement('select', 'course', get_string('course', 'block_supervised'), $courses);
         $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
         $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
         $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
@@ -65,6 +59,8 @@ class displayoptions_sessions_form extends moodleform {
         // hidden elements
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
+        $mform->addElement('hidden', 'course');
+        $mform->setType('course', PARAM_INT);
     }
 
     // Form validation
@@ -82,5 +78,17 @@ class displayoptions_sessions_form extends moodleform {
         }
 
         return $errors;
+    }
+
+    function teachers_from_course($courseid){
+        // Find teachers from selected course.
+        $teachers = array();
+        $coursecontext = context_course::instance($courseid);
+        if ($cteachers = get_users_by_capability($coursecontext, array('block/supervised:supervise'))) {
+            foreach ($cteachers as $cteacher) {
+                $teachers[$cteacher->id] = fullname($cteacher);
+            }
+        }
+        return $teachers;
     }
 }
