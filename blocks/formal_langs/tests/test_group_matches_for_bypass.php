@@ -25,8 +25,8 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $pair3 = new block_formal_langs_matched_tokens_pair(array(1), array(1), 0);
         $matches = array();
         array_push($matches, $pair1,  $pair3);
-        $this->assertTrue(count($token_stream->group_matches_bypass($matches))==1);
-        list($result) = $token_stream->group_matches_bypass($matches);
+        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches))==1);
+        list($result) = $token_stream->group_matches_for_bypass($matches);
         $this->assertTrue($result->mistakeweight==0);
         $this->assertTrue($result->correctcoverage==$correctcoverage);
         $this->assertTrue($result->comparedcoverage==$comparedcoverage);
@@ -41,7 +41,7 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         $token_stream = new block_formal_langs_token_stream(array(), array());
         $matches = array();
 
-        $this->assertTrue(count($token_stream->group_matches_bypass($matches)) == 0);
+        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches)) == 0);
     }
 
     function test_group_matches_3() {
@@ -65,8 +65,8 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         array_push($sets_of_pairs, $set_of_pairs1);
         array_push($sets_of_pairs, $set_of_pairs2);
 
-        list($result)=$token_stream->group_matches_bypass($matches);
-        $this->assertTrue(count($token_stream->group_matches_bypass($matches))==2);
+        list($result)=$token_stream->group_matches_for_bypass($matches);
+        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches))==2);
     }
     
     function test_group_matches_4() {
@@ -101,7 +101,7 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         array_push($sets_of_pairs, $set_of_pairs2);
         array_push($sets_of_pairs, $set_of_pairs3);
         array_push($sets_of_pairs, $set_of_pairs4);
-        list($result)=$token_stream->group_matches_bypass($matches);
-        $this->assertTrue(count($token_stream->group_matches_bypass($matches))==4);
+        list($result)=$token_stream->group_matches_for_bypass($matches);
+        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches))==4);
     }
 }

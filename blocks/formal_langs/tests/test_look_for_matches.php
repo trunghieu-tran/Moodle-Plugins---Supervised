@@ -70,8 +70,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $lexem2=new block_formal_langs_token_base(null, 'type', 'map', null, 1);
         $lexem3=new block_formal_langs_token_base(null, 'type', 'game', null, 0);
         $array_other=array($lexem1, $lexem2);
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 1, true, $options))==0, 'Threshold is 100. Pairs for correct token "game" are not found');
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 1, false, $options))==0, 'Threshold is 100. Pairs for incorrect token "game" are not found');
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 1, true, $options, false))==0, 'Threshold is 100. Pairs for correct token "game" are not found');
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 1, false, $options, false))==0, 'Threshold is 100. Pairs for incorrect token "game" are not found');
     }
     //One pair for correct token and null pairs for incorrect token
     public function test_look_for_matches_2() {
@@ -83,8 +83,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $array_other=array($lexem1, $lexem2);
         $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(0), 1);
         $array_correct=array($pair1);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options), $array_correct));//One pair for correct token "family" found
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.6, false, $options))==0);//Pairs for incorrect token "family" are not found
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options, false), $array_correct));//One pair for correct token "family" found
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.6, false, $options, false))==0);//Pairs for incorrect token "family" are not found
     }
     //Pairs are not found. Words are short
     public function test_look_for_matches_3() {
@@ -94,8 +94,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $lexem2=new block_formal_langs_token_base(null, 'type', 'red', null, 1);
         $lexem3=new block_formal_langs_token_base(null, 'type', 'blue', null, 0);
         $array_other=array($lexem1, $lexem2);
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.5, false, $options))==0,'Pairs are not found');
-        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.5, true, $options))==0,'Pairs are not found');
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.5, false, $options, false))==0,'Pairs are not found');
+        $this->assertTrue(count($lexem3->look_for_matches($array_other, 0.5, true, $options, false))==0,'Pairs are not found');
     }
 
     // Test for correct token
@@ -115,8 +115,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $pair4=new block_formal_langs_matched_tokens_pair(array(3, 4), array(0), 1);
         $array_correct=array($pair1, $pair2, $pair3);
         $array_incorrect=array($pair4);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options), $array_correct), 'Two pairs (a typo and extra separator) for correct token');
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, false, $options), $array_incorrect), 'One pair (missed separator) for incorrect token');
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, true, $options, false), $array_correct), 'Two pairs (a typo and extra separator) for correct token');
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem3->look_for_matches($array_other, 0.6, false, $options, false), $array_incorrect), 'One pair (missed separator) for incorrect token');
    }
 
    // few pairs
@@ -135,8 +135,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $pair3=new block_formal_langs_matched_tokens_pair(array(1, 2), array(1), 1);
         $array_correct=array($pair1,$pair2);
         $array_incorrect=array($pair3);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem5->look_for_matches($array_other, 0.6, true, $options), $array_correct));
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem6->look_for_matches($array_other, 0.6, false, $options), $array_incorrect));
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem5->look_for_matches($array_other, 0.6, true, $options, false), $array_correct));
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem6->look_for_matches($array_other, 0.6, false, $options, false), $array_incorrect));
     }
 
     // one pair
@@ -150,8 +150,8 @@ class blocks_formal_langs_token_base_look_for_matches_test extends UnitTestCase 
         $array_other=array($lexem1, $lexem2, $lexem3);
         $pair1=new block_formal_langs_matched_tokens_pair(array(0), array(0), 1);
         $array_correct=array($pair1);
-        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem4->look_for_matches($array_other, 0.6, true, $options), $array_correct));
-        $this->assertTrue(count($lexem4->look_for_matches($array_other, 0.6, false, $options))==0);
+        $this->assertTrue(blocks_formal_langs_token_base_look_for_matches_test::equal_arrays($lexem4->look_for_matches($array_other, 0.6, true, $options, false), $array_correct));
+        $this->assertTrue(count($lexem4->look_for_matches($array_other, 0.6, false, $options, false))==0);
     }
 }
 
