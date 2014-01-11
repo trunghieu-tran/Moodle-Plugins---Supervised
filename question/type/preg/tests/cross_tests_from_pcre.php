@@ -18938,7 +18938,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>3,1=>3),
-                        'length'=>array(0=>1,1=>1),
+                        'length'=>array(0=>7,1=>7),
+                        'ext_index_first'=>array(0=>3,1=>3),
+                        'ext_length'=>array(0=>4,1=>1),
                         'left'=>array(3),
                         'next'=>':',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -18984,7 +18986,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>3,1=>3),
-                        'length'=>array(0=>1,1=>1),
+                        'length'=>array(0=>7,1=>7),
+                        'ext_index_first'=>array(0=>3,1=>3),
+                        'ext_length'=>array(0=>4,1=>1),
                         'left'=>array(3),
                         'next'=>':',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
