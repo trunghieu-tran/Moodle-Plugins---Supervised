@@ -12,15 +12,15 @@ class displayoptions_sessions_form extends moodleform {
         global $DB, $SITE;
         $mform =& $this->_form;
 
+        $selectedcourse = $this->_customdata['course'];
 
         // Teachers
         $teachers[0] = get_string('allteachers', '');
-        $selectedcourse = $this->_customdata['course'];
         if($selectedcourse == 0){
             // Find teachers from all courses.
-            if ($ccourses = get_courses()) {
-                foreach ($ccourses as $ccourse) {
-                    $teachers += $this->teachers_from_course($ccourse->id);
+            if ($courses = get_courses()) {
+                foreach ($courses as $course) {
+                    $teachers += $this->teachers_from_course($course->id);
                 }
             }
         }
@@ -35,6 +35,19 @@ class displayoptions_sessions_form extends moodleform {
                 $classrooms[$cclassroom->id] = $cclassroom->name;
             }
         }
+        // Lesson types.
+        $lessontypes[-1] = get_string('alllessontypes', 'block_supervised');
+        $lessontypes[0] = get_string('notspecified', 'block_supervised');
+        if($selectedcourse != 0){
+            // Lessontypes in current courses.
+            if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$selectedcourse))) {
+                foreach ($clessontypes as $clessontype) {
+                    $lessontypes[$clessontype->id] = $clessontype->name;
+                }
+            }
+        }
+
+
         // States.
         $states[0] = get_string('allstates', 'block_supervised');
         $states[StateSession::Planned] = StateSession::getStateName(StateSession::Planned);
@@ -50,6 +63,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
         $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);
+        $mform->addElement('select', 'lessontype', get_string('lessontype', 'block_supervised'), $lessontypes);
         $mform->addElement('select', 'state', get_string('state', 'block_supervised'), $states);
 
 

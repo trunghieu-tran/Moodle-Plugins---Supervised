@@ -93,6 +93,7 @@ $string['insertlessontypeerror']                = 'Database error! Can not inser
 $string['addlessontype']                        = 'Add a lesson type ...';
 $string['addlessontypenavbar']                  = 'Add lesson type';
 $string['editlessontypenavbar']                 = 'Edit lesson type';
+$string['alllessontypes']                       = 'All lesson types';
 
 $string['sessionspagetitle']        = 'Sessions';
 $string['sessionsbreadcrumb']       = 'Sessions';
