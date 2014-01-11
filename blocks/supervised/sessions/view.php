@@ -1,6 +1,7 @@
 <?php
 require_once('../../../config.php');
 require_once('sessionstate.php');
+require_once('lib.php');
 
 global $DB, $OUTPUT, $PAGE;
 
