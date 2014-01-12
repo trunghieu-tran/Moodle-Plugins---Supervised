@@ -131,7 +131,7 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new plannedsession_block_form(null, array('needcomment'=>$plannedsession->sessioncomment!='' ));
+            $mform = new plannedsession_block_form(null, array('lessontype'=>$plannedsession->lessontypeid, 'needcomment'=>$plannedsession->sessioncomment!='' ));
             if ($fromform = $mform->get_data()) {
                 // TODO Logging
                 // Start session and update fields that user could edit.

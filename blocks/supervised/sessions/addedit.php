@@ -29,6 +29,7 @@ if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
 
 
 // Initializing variables depending of mode.
+$addnotspecified = 0;
 $toform['courseid'] = $courseid;
 if(!$id){   // Add mode.
     $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
@@ -75,6 +76,11 @@ if(!$id){   // Add mode.
     $toform['timeend']          = $session->timeend;
     $toform['sendemail']        = $session->sendemail;
     $toform['sessioncomment']   = $session->sessioncomment;
+
+    // We should add 'Not specified' lesson type in editing mode if the session was created with this option.
+    if($session->lessontypeid == 0){
+        $addnotspecified = 1;
+    }
 }
 
 $PAGE->set_title($title);
@@ -86,7 +92,7 @@ if (file_exists($mform)) {
 } else {
     print_error('noformdesc');
 }
-$mform = new addedit_session_form(null, array('courseid' => $courseid));
+$mform = new addedit_session_form(null, array('courseid' => $courseid, 'addnotspecified'=>$addnotspecified));
 
 
 

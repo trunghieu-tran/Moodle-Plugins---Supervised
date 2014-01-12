@@ -34,6 +34,11 @@ class plannedsession_block_form extends moodleform {
         }
 
         // Find lessontypes in current course.
+        if($this->_customdata['lessontype'] == 0){
+            // If user planned session for 'Not specified' lesson type,
+            // then added some lesson types - we should show 'Not specified' in select.
+            $lessontypes[0] = get_string('notspecified', 'block_supervised');
+        }
         if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id))) {
             foreach ($clessontypes as $clessontype) {
                 $lessontypes[$clessontype->id] = $clessontype->name;
