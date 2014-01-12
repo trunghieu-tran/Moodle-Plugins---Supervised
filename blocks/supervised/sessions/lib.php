@@ -194,56 +194,57 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
 
     $whereflag = false;
     if($courseid){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.courseid = :courseid"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.courseid = :courseid"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.courseid = :courseid";}
         $params['courseid']      = $courseid;
     }
     if($teacherid){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.teacherid = :teacherid"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.teacherid = :teacherid"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.teacherid = :teacherid";}
         $params['teacherid']      = $teacherid;
     }
     if($classroomid){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.classroomid = :classroomid"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.classroomid = :classroomid"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.classroomid = :classroomid";}
         $params['classroomid']      = $classroomid;
     }
     if($lessontypeid != -1){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.lessontypeid = :lessontypeid"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.lessontypeid = :lessontypeid"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.lessontypeid = :lessontypeid";}
         $params['lessontypeid']      = $lessontypeid;
     }
     if($state){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.state = :state"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.state = :state"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.state = :state";}
         $params['state']      = $state;
     }
     if($timestart1){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timestart >= :timestart1"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.timestart >= :timestart1"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.timestart >= :timestart1";}
         $params['timestart1']      = $timestart1;
     }
     if($timestart2){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timestart <= :timestart2"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.timestart <= :timestart2"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.timestart <= :timestart2";}
         $params['timestart2']      = $timestart2;
     }
     if($timeend1){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timeend >= :timeend1"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.timeend >= :timeend1"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.timeend >= :timeend1";}
         $params['timeend1']      = $timeend1;
     }
     if($timeend2){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.timeend <= :timeend2"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.timeend <= :timeend2"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.timeend <= :timeend2";}
         $params['timeend2']      = $timeend2;
     }
     if($id){
-        if($whereflag)  {$select .= " WHERE {block_supervised_session}.id = :id"; $whereflag=true;}
+        if(!$whereflag)  {$select .= " WHERE {block_supervised_session}.id = :id"; $whereflag=true;}
         else            {$select .= " AND {block_supervised_session}.id = :id";}
         $params['id']      = $id;
     }
 
+    $select .= " ORDER BY timestart";
     return $DB->get_records_sql($select, $params);
 }
 
