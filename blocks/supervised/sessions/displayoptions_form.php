@@ -58,7 +58,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
         $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);
-        if($selectedcourse != 0){
+        if($selectedcourse != 0 && $clessontypes){
             $mform->addElement('select', 'lessontype', get_string('lessontype', 'block_supervised'), $lessontypes);
         }
         else{
