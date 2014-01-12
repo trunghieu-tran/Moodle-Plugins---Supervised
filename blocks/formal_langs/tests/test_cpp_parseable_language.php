@@ -1025,4 +1025,585 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         ';
         $this->compare_trees($trees, $result);
     }
+
+    /**
+     * Tests empty enum
+     */
+    public function test_empty_enum() {
+        $trees = self::make_from_string('enum K {}; K a;');
+        $result = '
+[
+ {
+  {
+   enum
+   K
+   {
+    {
+    }
+   }
+   ;
+  }
+  {
+   {
+    K
+    a
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests enum
+     */
+    public function test_enum_with_one_value() {
+        $trees = self::make_from_string('enum K { MY_VALUE }; K a;');
+        $result = '
+[
+ {
+  {
+   enum
+   K
+   {
+    {
+    MY_VALUE
+    }
+   }
+   ;
+  }
+  {
+   {
+    K
+    a
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests enum
+     */
+    public function test_enum_with_three_values() {
+        $trees = self::make_from_string('enum K { MY_VALUE, test1, test2 }; K a;');
+        $result = '
+[
+ {
+  {
+   enum
+   K
+   {
+    {
+    {
+     {
+      MY_VALUE
+      ,
+      test1
+     }
+     ,
+     test2
+    }
+    }
+   }
+   ;
+  }
+  {
+   {
+    K
+    a
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests enum
+     */
+    public function test_enum_with_numerical_data() {
+        $trees = self::make_from_string('enum K { MY_VALUE = 1, test1, test2 = 2 }; K a;');
+        $result = '
+[
+ {
+  {
+   enum
+   K
+   {
+    {
+    {
+     {
+      {
+       MY_VALUE
+       =
+       1
+      }
+      ,
+      test1
+     }
+     ,
+     {
+      test2
+      =
+      2
+     }
+    }
+    }
+   }
+   ;
+  }
+  {
+   {
+    K
+    a
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests one namespace definition
+     */
+    public function test_one_namespace() {
+        $trees = self::make_from_string('namespace A { class B; }');
+        $result = '
+[
+ {
+  namespace
+  A
+  {
+   {
+   {
+    class
+    B
+    ;
+   }
+   }
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests three namespaces definition
+     */
+    public function test_three_namespaces() {
+        $trees = self::make_from_string('namespace A { class B; } namespace C { } namespace D { }');
+        $result = '
+[
+ {
+  {
+   {
+    namespace
+    A
+    {
+     {
+     {
+      class
+      B
+      ;
+     }
+     }
+    }
+   }
+   {
+    namespace
+    C
+    {
+     {
+     }
+    }
+   }
+  }
+  {
+   namespace
+   D
+   {
+    {
+    }
+   }
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests namespace nesting
+     */
+    public function test_nested_namespaces() {
+        $trees = self::make_from_string('namespace A { namespace B { namespace C  { void main() { return; } }}}');
+        $result = '
+[
+ {
+  namespace
+  A
+  {
+   {
+   {
+    namespace
+    B
+    {
+     {
+     {
+      namespace
+      C
+      {
+       {
+       {
+        void
+        main
+        {
+         (
+         )
+        }
+        {
+         {
+         {
+          return
+          ;
+         }
+         }
+        }
+       }
+       }
+      }
+     }
+     }
+    }
+   }
+   }
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests nested namespaced with variable data
+     */
+    public function test_nested_namespace_with_related_variables() {
+        $trees = self::make_from_string('namespace A { namespace B { namespace C  { class D { }; }}} A::B::C::D k;');
+        $result = '
+[
+ {
+  {
+   namespace
+   A
+   {
+    {
+    {
+     namespace
+     B
+     {
+      {
+      {
+       namespace
+       C
+       {
+        {
+        {
+         class
+         D
+         {
+          {
+          }
+         }
+         ;
+        }
+        }
+       }
+      }
+      }
+     }
+    }
+    }
+   }
+  }
+  {
+   {
+    {
+     {
+      {
+       A
+       ::
+       B
+      }
+      ::
+      C
+     }
+     ::
+     D
+    }
+    k
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests nested classes
+     */
+    public function test_nested_classes() {
+        $trees = self::make_from_string('class A {public: class B  { }; void f() {}  }; A::B k;');
+        $result = '
+[
+ {
+  {
+   class
+   A
+   {
+    {
+    {
+     {
+      {
+       public
+       :
+      }
+      {
+       class
+       B
+       {
+        {
+        }
+       }
+       ;
+      }
+     }
+     {
+      void
+      f
+      {
+       (
+       )
+      }
+      {
+       {
+       }
+      }
+     }
+    }
+    }
+   }
+   ;
+  }
+  {
+   {
+    {
+     A
+     ::
+     B
+    }
+    k
+   }
+   ;
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests long long int
+     */
+    public function test_long_long_int_in_union()  {
+        $trees = self::make_from_string('union Variant { unsigned int A; long long int A;  }; ');
+        $result = '
+[
+ {
+  union
+  Variant
+  {
+   {
+   {
+    {
+     {
+      {
+       unsigned
+       int
+      }
+      A
+     }
+     ;
+    }
+    {
+     {
+      {
+       long
+       long
+       int
+      }
+      A
+     }
+     ;
+    }
+   }
+   }
+  }
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests unsigned long long int
+     */
+    public function test_unsigned_long_long_int_in_union() {
+        $trees = self::make_from_string('union Variant { unsigned int A; unsigned long long int A;  }; ');
+        $result = '
+[
+ {
+  union
+  Variant
+  {
+   {
+   {
+    {
+     {
+      {
+       unsigned
+       int
+      }
+      A
+     }
+     ;
+    }
+    {
+     {
+      {
+       unsigned
+       long
+       long
+       int
+      }
+      A
+     }
+     ;
+    }
+   }
+   }
+  }
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
+
+    /**
+     * Tests parsing simple program, which prints all passed arguments
+     */
+    public function test_print_arguments() {
+        $trees = self::make_from_string('
+        int main(int  argc, char ** argv)
+        {
+            for(i = 0; i < argc; i++)
+                printf("%d", argv[i]);
+            return 0;
+        }
+        ');
+        $result = '
+[
+ {
+  int
+  main
+  {
+   (
+   {
+    {
+     int
+     argc
+    }
+    ,
+    {
+     {
+      {
+       char
+       *
+      }
+      *
+     }
+     argv
+    }
+   }
+   )
+  }
+  {
+   {
+   {
+    {
+     for
+     (
+     {
+      i
+      =
+      0
+     }
+     ;
+     {
+      i
+      <
+      argc
+     }
+     ;
+     {
+      i
+      ++
+     }
+     )
+     {
+      {
+       printf
+       (
+       {
+        "%d"
+        ,
+        {
+         argv
+         [
+         i
+         ]
+        }
+       }
+       )
+      }
+      ;
+     }
+    }
+    {
+     return
+     0
+     ;
+    }
+   }
+   }
+  }
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
 }
