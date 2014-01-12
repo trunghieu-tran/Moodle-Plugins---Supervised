@@ -40,6 +40,11 @@ $string['supervised:managefinishedsessions']    = 'Remove finished sessions';
 $string['classroomsurl']                        = 'Classrooms';
 $string['lessontypesurl']                       = 'Lesson types';
 $string['sessionsurl']                          = 'Sessions';
+$string['plannedstate']                         = 'Planned';
+$string['activestate']                          = 'Active';
+$string['finishedstate']                        = 'Finished';
+$string['unknownstate']                         = 'unknown';
+
 
 $string['classroomspagetitle']                  = 'Classrooms list';
 $string['classroomsheader']                     = 'Classrooms list';

@@ -20,16 +20,16 @@ class StateSession
         //todo use strings from lang file
         switch($val){
             case 1:
-                return "Planned";
+                return get_string('plannedstate', 'block_supervised');
                 break;
             case 2:
-                return "Active";
+                return get_string('activestate', 'block_supervised');
                 break;
             case 3:
-                return "Finished";
+                return get_string('finishedstate', 'block_supervised');
                 break;
             default:
-                return "unknown";
+                return get_string('unknownstate', 'block_supervised');
         }
     }
 }
