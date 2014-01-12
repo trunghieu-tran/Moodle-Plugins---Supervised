@@ -11,7 +11,7 @@ require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 $lang = new block_formal_langs_language_cpp_parseable_language();
-$result = $lang->create_from_string('union A { int k; double k2; char k3; };  A k;');
+$result = $lang->create_from_string('int main(int  argc, char ** argv) { for(i = 0; i < argc; i++) printf("%d", argv[i]); return 0;}');
 
 function print_node($node, $paddingcount)
 {

@@ -1124,6 +1124,14 @@ builtintype(R) ::= LONG(A) TYPENAME(B) . {
 	R = $this->create_node('builtintype', array( A, B ));
 }
 
+builtintype(R) ::= LONG(A) LONG(B) TYPENAME(C) . {
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= UNSIGNED(A) LONG(B) LONG(C) TYPENAME(D) . {
+	R = $this->create_node('builtintype', array( A, B, C, D ));
+}
+
 builtintype(R) ::= TYPENAME(A) . {
 	R = $this->create_node('builtintype', array( A ));
 }
