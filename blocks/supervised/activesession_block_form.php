@@ -47,7 +47,9 @@ class activesession_block_form extends moodleform {
         $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // add lessontype
-        $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
+        if($this->_customdata['needlessontype']){
+            $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
+        }
         // add time start
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         // add duration

@@ -39,9 +39,6 @@ class plannedsession_block_form extends moodleform {
                 $lessontypes[$clessontype->id] = $clessontype->name;
             }
         }
-        else{
-            $lessontypes[0] = get_string('notspecified', 'block_supervised');
-        }
 
 
         // add group
@@ -53,8 +50,14 @@ class plannedsession_block_form extends moodleform {
         $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // add lessontype combobox
-        $mform->addElement('select', 'lessontypeid', get_string('lessontype', 'block_supervised'), $lessontypes);
-        $mform->addRule('lessontypeid', null, 'required', null, 'client');
+        if($clessontypes){
+            $mform->addElement('select', 'lessontypeid', get_string('lessontype', 'block_supervised'), $lessontypes);
+            $mform->addRule('lessontypeid', null, 'required', null, 'client');
+        }
+        else{
+            $mform->addElement('hidden', 'lessontypeid');
+            $mform->setType('lessontypeid', PARAM_INT);
+        }
         // add time start
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         // add duration

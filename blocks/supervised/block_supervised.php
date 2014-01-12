@@ -199,7 +199,7 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new activesession_block_form(null, array('sessionid'=>$activesession->id, 'courseid'=>$activesession->courseid, 'needcomment'=>$activesession->sessioncomment!='' ));
+            $mform = new activesession_block_form(null, array('sessionid'=>$activesession->id, 'courseid'=>$activesession->courseid, 'needcomment'=>$activesession->sessioncomment!='', 'needlessontype'=>$activesession->lessontypeid!=0 ));
 
             if($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields
@@ -248,7 +248,7 @@ class block_supervised extends block_base {
 
                 // Refresh block: render active session form.
                 $strftimedatetime = get_string("strftimerecent");
-                $toform['lessontypename']   = $activesession->lessontypeid == 0 ? get_string('notspecified', 'block_supervised'): $activesession->lessontypename;
+                $toform['lessontypename']   = $activesession->lessontypeid != 0 ? $activesession->lessontypename : '';
                 $toform['timestart']        = userdate($activesession->timestart, $strftimedatetime);
                 $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
                 $mform->set_data($toform);
@@ -264,7 +264,7 @@ class block_supervised extends block_base {
                 $strftimedatetime = get_string("strftimerecent");
                 $toform['classroomid']      = $activesession->classroomid;
                 $toform['groupid']          = $activesession->groupid;
-                $toform['lessontypename']   = $activesession->lessontypeid == 0 ? get_string('notspecified', 'block_supervised'): $activesession->lessontypename;
+                $toform['lessontypename']   = $activesession->lessontypeid != 0 ? $activesession->lessontypename : '';
                 $toform['duration']         = $activesession->duration;
                 $toform['timestart']        = userdate($activesession->timestart, $strftimedatetime);
                 $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
@@ -340,6 +340,7 @@ class block_supervised extends block_base {
             // Display form.
             $toform['id']               = $COURSE->id;
             $toform['duration']         = 90;
+            $toform['lessontypeid']     = 0;
 
             $mform->set_data($toform);
             $formbody = $mform->render();
