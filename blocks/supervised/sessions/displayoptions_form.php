@@ -9,12 +9,15 @@ require_once("{$CFG->libdir}/formslib.php");
  */
 class displayoptions_sessions_form extends moodleform {
     function definition() {
-        global $DB;
+        global $DB, $USER;
         $mform =& $this->_form;
 
         $selectedcourse = $this->_customdata['course'];
+        if($selectedcourse != 0){
+            $coursecontext = context_course::instance($selectedcourse);
+        }
 
-        // Teachers
+        // Teachers. Fill only if user can view other teachers' sessions.
         $teachers[0] = get_string('allteachers', '');
         if($selectedcourse == 0){
             // Find teachers from all courses.
@@ -24,8 +27,11 @@ class displayoptions_sessions_form extends moodleform {
                 }
             }
         }
-        else{
+        else if (has_capability('block/supervised:viewallsessions', $coursecontext)){
             $teachers += $this->teachers_from_course($selectedcourse);
+        }
+        else{
+            // User can see only his own sessions.
         }
         // Classrooms.
         $classrooms[0] = get_string('allclassrooms', 'block_supervised');
@@ -54,7 +60,13 @@ class displayoptions_sessions_form extends moodleform {
 
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
-        $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
+        if($selectedcourse == 0 || has_capability('block/supervised:viewallsessions', $coursecontext)){
+            $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
+        }
+        else{
+            $mform->addElement('hidden', 'teacher');
+            $mform->setType('teacher', PARAM_INT);
+        }
         $mform->addElement('date_time_selector', 'from', get_string('sessionstartsafter', 'block_supervised'));
         $mform->addElement('date_time_selector', 'to', get_string('sessionendsbefore', 'block_supervised'));
         $mform->addElement('select', 'classroom', get_string('classroom', 'block_supervised'), $classrooms);

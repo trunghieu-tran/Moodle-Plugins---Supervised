@@ -3,14 +3,14 @@ require_once('../../../config.php');
 require_once('sessionstate.php');
 require_once('lib.php');
 
-global $DB, $OUTPUT, $PAGE;
+global $DB, $OUTPUT, $PAGE, $USER;
 
 $courseid   = required_param('courseid', PARAM_INT);
 $page       = optional_param('page', '0', PARAM_INT);       // which page to show
 $perpage    = optional_param('perpage', '50', PARAM_INT);   // how many per page
 $from       = optional_param('f', mktime(0, 0, 0, date('n'), date('j')), PARAM_INT);     // sessions filtering: timestamp from
 $to         = optional_param('t', mktime(23, 55, 0, date('n'), date('j')), PARAM_INT);   // sessions filtering: timestamp to
-$teacher    = optional_param('teacher', '0', PARAM_INT);    // sessions filtering: teacher id
+$teacher    = optional_param('teacher', $USER->id, PARAM_INT);    // sessions filtering: teacher id
 $coursefilter = optional_param('course', '0', PARAM_INT);   // sessions filtering: course id
 $lessontype = optional_param('lessontype', '-1', PARAM_INT); // sessions filtering: lessontype id
 $classroom  = optional_param('classroom', '0', PARAM_INT);  // sessions filtering: classroom id
