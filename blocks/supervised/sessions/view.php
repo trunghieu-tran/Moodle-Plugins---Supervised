@@ -122,7 +122,8 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
 
     if ($courses = get_courses()) {
         foreach ($courses as $course) {
-            if($course->id != $SITE->id){
+            $coursecontext = context_course::instance($course->id);
+            if($course->id != $SITE->id && has_capability('block/supervised:supervise', $coursecontext)){
                 $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course->id&classroom=$classroom&state=$state";
                 $urls[$url] = $course->fullname;
             }
