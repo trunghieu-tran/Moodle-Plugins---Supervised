@@ -99,7 +99,18 @@ print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teac
 echo $OUTPUT->footer();
 
 
-
+/**
+ * Outputs selector with courses which one reloads page when a value has been changed.
+ * We do not put it in filtering form because it has its own form.
+ *
+ * @param $courseid
+ * @param $course
+ * @param $perpage
+ * @param $from
+ * @param $to
+ * @param $classroom
+ * @param $state
+ */
 function print_courses_selector($courseid, $course, $perpage, $from, $to, $classroom, $state){
     global $OUTPUT, $SITE;
 
@@ -118,7 +129,7 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
         }
     }
 
-    $select = new url_select($urls, $active, null);
+    $select = new url_select($urls, $active, null, 'supervisedblock_selectcourseform');
     $select->set_label(get_string('course', 'block_supervised'));
     echo $OUTPUT->render($select);
 }
