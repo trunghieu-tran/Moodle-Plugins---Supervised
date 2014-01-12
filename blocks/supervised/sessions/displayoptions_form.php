@@ -9,7 +9,7 @@ require_once("{$CFG->libdir}/formslib.php");
  */
 class displayoptions_sessions_form extends moodleform {
     function definition() {
-        global $DB, $SITE;
+        global $DB;
         $mform =& $this->_form;
 
         $selectedcourse = $this->_customdata['course'];
@@ -52,7 +52,6 @@ class displayoptions_sessions_form extends moodleform {
         $states[StateSession::Finished] = StateSession::getStateName(StateSession::Finished);
 
 
-        $mform->addElement('header', 'sessionsoptionsview', get_string('reportdisplayoptions', 'quiz'));
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
         $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
@@ -95,6 +94,12 @@ class displayoptions_sessions_form extends moodleform {
         return $errors;
     }
 
+    /**
+     * Returns teachers from specified course
+     *
+     * @param $courseid
+     * @return array array of teachers (id=>fullname)
+     */
     function teachers_from_course($courseid){
         // Find teachers from selected course.
         $teachers = array();
