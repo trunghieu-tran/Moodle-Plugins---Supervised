@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Returns the sessions array according to specified conditions
+ * Returns the sessions array according to specified conditions and capabilities of current user
  *
  * @param int $limitfrom sessions from the specified index
  * @param int $limitnum specified number of sessions
@@ -22,16 +22,20 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
     // Filter sessions according to user capabilities.
     $sessionsfiltered = array();
     foreach ($sessions as $session) {
-        // Trying to add created row into table.
-        if($session->teacherid != $USER->id){
-            // Check if user has capability to view other user's sessions.
-            if(   has_capability('block/supervised:viewallsessions', $PAGE->context) || has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
+        // If user can't supervise access to session's course -> miss current session.
+        $coursecontext = context_course::instance($session->courseid);
+        if(has_capability('block/supervised:supervise', $coursecontext)){
+            // Now check if user can view current session
+            if($session->teacherid != $USER->id){
+                // Check if user has capability to view other user's sessions.
+                if(   has_capability('block/supervised:viewallsessions', $PAGE->context) || has_capability('block/supervised:manageallsessions', $PAGE->context)   ){
+                    $sessionsfiltered[] = $session;
+                }
+            }
+            else{
+                // User can view his own sessions (already checked).
                 $sessionsfiltered[] = $session;
             }
-        }
-        else{
-            // User can view his own sessions (already checked).
-            $sessionsfiltered[] = $session;
         }
     }
 
