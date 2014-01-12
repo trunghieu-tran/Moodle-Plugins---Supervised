@@ -43,6 +43,11 @@ class addedit_session_form extends moodleform {
         }
 
         // Find lessontypes in current course.
+        if($this->_customdata['addnotspecified']){
+            // For editing mode: if user created session for 'Not specified' lesson type,
+            // then added some lesson types and now wants edit session - we should show 'Not specified' in select.
+            $lessontypes[0] = get_string('notspecified', 'block_supervised');
+        }
         if ($clessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$this->_customdata['courseid']))) {
             foreach ($clessontypes as $clessontype) {
                 $lessontypes[$clessontype->id] = $clessontype->name;
