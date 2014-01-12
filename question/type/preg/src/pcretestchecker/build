@@ -1,0 +1,3 @@
+# /usr/bin/bash
+
+gcc main.cpp -o pcretestchecker -lstdc++ -lpcre
