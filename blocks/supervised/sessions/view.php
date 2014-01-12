@@ -130,6 +130,6 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
     }
 
     $select = new url_select($urls, $active, null, 'supervisedblock_selectcourseform');
-    $select->set_label(get_string('course', 'block_supervised'));
+    $select->set_label(get_string('course', 'block_supervised'), array("id"=>"supervisedblock_courselabel"));
     echo $OUTPUT->render($select);
 }
