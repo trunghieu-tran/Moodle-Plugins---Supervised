@@ -11,12 +11,10 @@ $perpage    = optional_param('perpage', '50', PARAM_INT);   // how many per page
 $from       = optional_param('f', mktime(0, 0, 0, date('n'), date('j')), PARAM_INT);     // sessions filtering: timestamp from
 $to         = optional_param('t', mktime(23, 55, 0, date('n'), date('j')), PARAM_INT);   // sessions filtering: timestamp to
 $teacher    = optional_param('teacher', $USER->id, PARAM_INT);    // sessions filtering: teacher id
-$coursefilter = optional_param('course', '0', PARAM_INT);   // sessions filtering: course id
+$coursefilter = optional_param('course', $courseid, PARAM_INT);   // sessions filtering: course id
 $lessontype = optional_param('lessontype', '-1', PARAM_INT); // sessions filtering: lessontype id
 $classroom  = optional_param('classroom', '0', PARAM_INT);  // sessions filtering: classroom id
 $state      = optional_param('state', '0', PARAM_INT);      // sessions filtering: state index
-
-
 
 
 $site = get_site();
