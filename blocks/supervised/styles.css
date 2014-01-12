@@ -20,3 +20,12 @@
 .block_supervised .content .mform .fitem .fgroup {
     margin-left: 0;
 }
+
+#supervisedblock_selectcourseform{
+    margin-bottom: -20px;
+}
+
+#supervisedblock_selectcourseform #supervisedblock_courselabel{
+    margin-left: 170px;
+    margin-right: 10px;
+}
