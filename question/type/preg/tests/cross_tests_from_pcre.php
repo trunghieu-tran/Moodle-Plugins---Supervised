@@ -11,6 +11,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once('cross_tester.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_cross_tests_from_pcre {
