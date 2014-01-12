@@ -109,7 +109,9 @@ int main (int argc, char *argv[])
         std::cin >> string_length;
         std::cin.get(tmp);
 
-        std::cin.get(string, string_length + 1, EOF);
+        if (string_length > 0) {
+            std::cin.get(string, string_length + 1, EOF);
+        }
         std::cin.get(tmp);
 
         // Number of subexpressions and offsets
@@ -140,9 +142,12 @@ int main (int argc, char *argv[])
         reset_ovector(ovector);
         int match_options = PCRE_PARTIAL;
         int longest_count = 0;
+        int leftborder = string_length == 0
+                       ? 0
+                       : 1;
 
         // Here be a terrible code beacuse PCRE can't find partial matches if the string contains some unmatched suffix
-        for (int len = string_length; len >= 0; len--) {
+        for (int len = string_length; len >= leftborder; len--) {
             int cur_ovector[1024];
             count = pcre_exec(re, NULL, string, len, 0, match_options, cur_ovector, 1024);
 
