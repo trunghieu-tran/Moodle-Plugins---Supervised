@@ -17559,8 +17559,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(0=>5),
+                        'length'=>array(0=>5),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17569,7 +17569,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17578,7 +17578,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17592,8 +17592,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>5),
+                        'length'=>array(0=>5),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17602,7 +17602,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'length'=>array(0=>2),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -17611,7 +17611,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'length'=>array(0=>2),
                         'left'=>array(1),
                         'next'=>'[xX]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
