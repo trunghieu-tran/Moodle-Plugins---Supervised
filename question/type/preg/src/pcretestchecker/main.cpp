@@ -39,19 +39,19 @@ void compare_match(const char * methodname, const char * regex, int options, con
     std::cout << "options: " << options << "\n";
     std::cout << "string: " << string << "\n";
     std::cout << "expected " << count_expected << " subexpression(s):\n";
-        for (int i = 0; i < 2 * count_expected; i += 2) {
-            if (oexpected[i] != -1) {
-                std::cout << i / 2 << ": (" << oexpected[i] << "," << oexpected[i + 1] - oexpected[i] << ") ";
-            }
+    for (int i = 0; i < 2 * count_expected; i += 2) {
+        if (oexpected[i] != -1) {
+            std::cout << i / 2 << ": (" << oexpected[i] << "," << oexpected[i + 1] - oexpected[i] << ") ";
         }
-        std::cout << "\n";
-        std::cout << "obtained " << count_obtained << " subexpression(s):\n";
-        for (int i = 0; i < 2 * count_obtained; i += 2) {
-            if (oobtained[i] != -1) {
-                std::cout << i / 2 << ": (" << oobtained[i] << "," << oobtained[i + 1] - oobtained[i] << ") ";
-            }
+    }
+    std::cout << "\n";
+    std::cout << "obtained " << count_obtained << " subexpression(s):\n";
+    for (int i = 0; i < 2 * count_obtained; i += 2) {
+        if (oobtained[i] != -1) {
+            std::cout << i / 2 << ": (" << oobtained[i] << "," << oobtained[i + 1] - oobtained[i] << ") ";
         }
-        std::cout << "\n";
+    }
+    std::cout << "\n";
 }
 
 int main (int argc, char *argv[])
