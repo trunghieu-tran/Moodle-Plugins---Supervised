@@ -160,6 +160,11 @@ int main (int argc, char *argv[])
                 std::copy(cur_ovector, cur_ovector + 1024, ovector);
                 longest_count = count;
             }
+
+            if (len == string_length && count > 0) {
+                // A full match found in the whole string, break the loop
+                break;
+            }
         }
 
         if (longest_count == PCRE_ERROR_PARTIAL) {
