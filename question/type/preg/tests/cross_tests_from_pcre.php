@@ -494,8 +494,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test10 = array( 'str'=>'aaac',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>2,1=>1),
                         'left'=>array(1),
                         'next'=>'c',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -503,8 +503,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test11 = array( 'str'=>'abbbbbbbbbbbac',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>12,1=>11),
                         'left'=>array(1),
                         'next'=>'c',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -1294,7 +1294,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'length'=>array(0=>11),
                         'left'=>array(3),
                         'next'=>'[0-9]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
