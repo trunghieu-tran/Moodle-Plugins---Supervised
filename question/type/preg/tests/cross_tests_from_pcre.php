@@ -6007,7 +6007,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>163),
                         'ext_index_first'=>array(0=>0),
-                        'ext_length'=>array(0=>119),
+                        'ext_length'=>array(0=>123),
                         'left'=>array(4),
                         'next'=>'w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
