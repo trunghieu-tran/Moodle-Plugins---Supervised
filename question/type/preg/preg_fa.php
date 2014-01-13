@@ -89,6 +89,13 @@ class qtype_preg_fa_transition {
         $this->subpatt_end = array();
     }
 
+    /**
+     * Return the laziest greedines of two
+     */
+    public static function min_greediness($g1, $g2) {
+        return min($g1, $g2);   // This actually works
+    }
+
     public function get_label_for_dot($index1, $index2) {
         $addedcharacters = '/(), ';
         if (strpbrk($index1, $addedcharacters) !== false) {
