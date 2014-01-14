@@ -2934,6 +2934,8 @@ void print_string(const char * str, int len)
             fprintf(outfile, "\\\\");
         } else if (str[i] == '"') {
             fprintf(outfile, "\\\"");
+        } else if (str[i] == '$') {
+            fprintf(outfile, "\\$");
         } else if (str[i] == '\r') {
             fprintf(outfile, "\\r");
         } else if (str[i] == '\n') {
@@ -3600,7 +3602,8 @@ print_file_header("qtype_preg_cross_tests_from_pcre");
 
 /* Main loop */
 
-int regexnumber = 0;
+int regex_number = 0;
+int regex_length = 0;
 char regex[1024 * 1024];
 
 while (!done)
@@ -4168,6 +4171,7 @@ while (!done)
       }
 
     strcpy(regex, p);
+    regex_length = strlen(regex);
 
     PCRE_COMPILE(re, p, options, &error, &erroroffset, tables);
 
@@ -5367,9 +5371,9 @@ while (!done)
           }
         }
 
-      if (datanumber == 1) {
-          regexnumber++;
-          print_method_header(regexnumber);
+      if (datanumber == 1 && regex_length > 0) {
+          regex_number++;
+          print_method_header(regex_number);
       }
 
       /* Matched */
@@ -5413,7 +5417,9 @@ while (!done)
 
         /* Output the captured substrings */
 
-        print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
+        if (regex_length > 0) {
+          print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
+        }
 
         /*for (i = 0; i < count * 2; i += 2)
           {
@@ -5624,7 +5630,9 @@ while (!done)
           }
         if (verify_jit && jit_was_used) fprintf(outfile, " (JIT)");
         fprintf(outfile, "\n");*/
-        print_test_for_partial_match(datanumber, bptr, len, use_offsets, count);
+        if (regex_length > 0) {
+          print_test_for_partial_match(datanumber, bptr, len, use_offsets, count);
+        }
         break;  /* Out of the /g loop */
         }
 
@@ -5700,7 +5708,9 @@ while (!done)
           switch(count)
             {
             case PCRE_ERROR_NOMATCH:
-            print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
+            if (regex_length > 0) {
+              print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
+            }
             /*if (gmatched == 0)
               {
               if (markptr == NULL)
@@ -5785,7 +5795,7 @@ while (!done)
 
   // Print regex and, options
 
-  if (datanumber > 1) {
+  if (datanumber > 1 && regex_length > 0) {
     print_method_footer(regex, modifiers, datanumber - 1);
   }
   if (done) {
