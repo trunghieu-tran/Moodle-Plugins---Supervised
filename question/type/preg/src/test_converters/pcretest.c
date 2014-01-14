@@ -2946,6 +2946,14 @@ void print_string(const char * str, int len)
 
 void byte_offsets_to_logical_offsets(const char * str, int length, int count, int * byte_offsets, int * logical_offsets)
 {
+    int i;
+    if (!use_utf) {
+        for (i = 0; i < 2 * count; i++) {
+            logical_offsets[i] = byte_offsets[i];
+        }
+        return;
+    }
+
     int byte_offset = 0;
     int logical_offset = 0;
     int offset_map[10000];
@@ -2957,7 +2965,6 @@ void byte_offsets_to_logical_offsets(const char * str, int length, int count, in
         logical_offset++;
     }
 
-    int i;
     for (i = 0; i < 2 * count; i++) {
         if (byte_offsets[i] < 0) {
             logical_offsets[i] = -1;
@@ -2976,13 +2983,8 @@ void print_test_for_full_match(int testnumber, const char * bptr, int len, int *
     int i;
 
     // Convert offsets to logical values
-    int *logical_offsets;
-    if (use_utf) {
-        logical_offsets = (int*)malloc(count * sizeof(int));
-        byte_offsets_to_logical_offsets(bptr, len, count, use_offsets, logical_offsets);
-    } else {
-        logical_offsets = use_offsets;
-    }
+    int logical_offsets[1024];
+    byte_offsets_to_logical_offsets(bptr, len, count, use_offsets, logical_offsets);
 
     fprintf(outfile, "        $test%d = array('str'=>\"", testnumber);
     print_string(bptr, len);
@@ -3022,10 +3024,6 @@ void print_test_for_full_match(int testnumber, const char * bptr, int len, int *
     } else {
         fprintf(outfile, "));\n\n");
     }
-
-    if (use_utf) {
-        free(logical_offsets);
-    }
 }
 
 /*************************************************
@@ -3037,15 +3035,8 @@ void print_test_for_partial_match(int testnumber, const char * bptr, int len, in
 
     int length = use_offsets[1] - use_offsets[0];
 
-    // Convert offsets to logical values
-    int *logical_offsets;
-    if (use_utf) {
-        logical_offsets = (int*)malloc(count * sizeof(int));
-        byte_offsets_to_logical_offsets(bptr, len, count, use_offsets, logical_offsets);
-    } else {
-        logical_offsets = use_offsets;
-    }
-
+    int logical_offsets[1024];
+    byte_offsets_to_logical_offsets(bptr, len, count, use_offsets, logical_offsets);
 
     fprintf(outfile, "        $test%d = array('str'=>\"", testnumber);
     print_string(bptr, len);
@@ -3080,10 +3071,6 @@ void print_test_for_partial_match(int testnumber, const char * bptr, int len, in
     fprintf(outfile, "),\n");
     fprintf(outfile, "                       'left'=>array(0),\n");
     fprintf(outfile, "                       'next'=>'');\n\n");
-
-    if (use_utf) {
-        free(logical_offsets);
-    }
 }
 
 void print_file_header(const char * classname)
