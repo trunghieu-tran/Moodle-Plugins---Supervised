@@ -122,6 +122,3 @@ class qtype_preg_pcre_test_checker extends PHPUnit_Framework_TestCase {
         echo $output;
     }
 }
-
-$checker = new qtype_preg_pcre_test_checker();
-$checker->test();
