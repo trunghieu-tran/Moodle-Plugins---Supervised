@@ -5644,7 +5644,7 @@ TRY_PARTIAL_MATCH:
         if (verify_jit && jit_was_used) fprintf(outfile, " (JIT)");
         fprintf(outfile, "\n");*/
         if (re != NULL /*&& regex_length > 0*/) {
-          print_test_for_partial_match(datanumber, bptr, len, use_offsets, count);
+          print_test_for_partial_match(datanumber, bptr, len, use_offsets, 1);
         }
         break;  /* Out of the /g loop */
         }
