@@ -4061,7 +4061,7 @@ while (!done)
       goto SKIP_DATA;
       }
     }
-  modifiers[modifiers_length - 1] = '\0';
+  modifiers[modifiers_length] = '\0';
 
   /* Handle compiling via the POSIX interface, which doesn't support the
   timing, showing, or debugging options, nor the ability to pass over
