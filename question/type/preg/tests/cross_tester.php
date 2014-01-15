@@ -463,6 +463,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     $notation = $data['notation'];
                 }
 
+                // Skip empty regexes
+                if ($regex == '') {
+                    continue;
+                }
+
                 // Skip regexes with blacklisted tags.
                 if (count(array_intersect($blacklist, $regextags)) > 0) {
                     continue;

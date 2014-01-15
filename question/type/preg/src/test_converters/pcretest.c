@@ -3596,7 +3596,7 @@ pcre32_stack_free = stack_free;
 
 /* Heading line unless quiet */
 
-if (!quiet) fprintf(outfile, "PCRE version %s\n\n", version);
+//if (!quiet) fprintf(outfile, "PCRE version %s\n\n", version);
 
 print_file_header("qtype_preg_cross_tests_from_pcre");
 
@@ -4086,7 +4086,7 @@ while (!done)
     if (rc != 0)
       {
       (void)regerror(rc, &preg, (char *)buffer, buffer_size);
-      fprintf(outfile, "Failed: POSIX code %d: %s\n", rc, buffer);
+      //fprintf(outfile, "Failed: POSIX code %d: %s\n", rc, buffer);
       goto SKIP_DATA;
       }
     }
@@ -4105,18 +4105,18 @@ while (!done)
       switch(to16(FALSE, p, options & PCRE_UTF8, (int)strlen((char *)p)))
         {
         case -1:
-        fprintf(outfile, "**Failed: invalid UTF-8 string cannot be "
-          "converted to UTF-16\n");
+        /*fprintf(outfile, "**Failed: invalid UTF-8 string cannot be "
+          "converted to UTF-16\n");*/
         goto SKIP_DATA;
 
         case -2:
-        fprintf(outfile, "**Failed: character value greater than 0x10ffff "
-          "cannot be converted to UTF-16\n");
+        /*fprintf(outfile, "**Failed: character value greater than 0x10ffff "
+          "cannot be converted to UTF-16\n");*/
         goto SKIP_DATA;
 
         case -3: /* "Impossible error" when to16 is called arg1 FALSE */
-        fprintf(outfile, "**Failed: character value greater than 0xffff "
-          "cannot be converted to 16-bit in non-UTF mode\n");
+        /*fprintf(outfile, "**Failed: character value greater than 0xffff "
+          "cannot be converted to 16-bit in non-UTF mode\n");*/
         goto SKIP_DATA;
 
         default:
@@ -4132,17 +4132,17 @@ while (!done)
       switch(to32(FALSE, p, options & PCRE_UTF32, (int)strlen((char *)p)))
         {
         case -1:
-        fprintf(outfile, "**Failed: invalid UTF-8 string cannot be "
-          "converted to UTF-32\n");
+        /*fprintf(outfile, "**Failed: invalid UTF-8 string cannot be "
+          "converted to UTF-32\n");*/
         goto SKIP_DATA;
 
         case -2:
-        fprintf(outfile, "**Failed: character value greater than 0x10ffff "
-          "cannot be converted to UTF-32\n");
+        /*fprintf(outfile, "**Failed: character value greater than 0x10ffff "
+          "cannot be converted to UTF-32\n");*/
         goto SKIP_DATA;
 
         case -3:
-        fprintf(outfile, "**Failed: character value is ill-formed UTF-32\n");
+        /*fprintf(outfile, "**Failed: character value is ill-formed UTF-32\n");*/
         goto SKIP_DATA;
 
         default:
@@ -4180,7 +4180,7 @@ while (!done)
 
     if (re == NULL)
       {
-      fprintf(outfile, "Failed: %s at offset %d\n", error, erroroffset);
+      //fprintf(outfile, "Failed: %s at offset %d\n", error, erroroffset);
       SKIP_DATA:
       if (infile != stdin)
         {
@@ -4195,7 +4195,7 @@ while (!done)
           while (len > 0 && isspace(buffer[len-1])) len--;
           if (len == 0) break;
           }
-        fprintf(outfile, "\n");
+        //fprintf(outfile, "\n");
         }
       goto CONTINUE;
       }
@@ -4235,8 +4235,8 @@ while (!done)
         real_pcre_size = sizeof(real_pcre32);
 #endif
       new_info(re, NULL, PCRE_INFO_SIZE, &size);
-      fprintf(outfile, "Memory allocation (code space): %d\n",
-        (int)(size - real_pcre_size - name_count * name_entry_size));
+      /*fprintf(outfile, "Memory allocation (code space): %d\n",
+        (int)(size - real_pcre_size - name_count * name_entry_size));*/
       }
 
     /* If -s or /S was present, study the regex to generate additional info to
@@ -5166,7 +5166,14 @@ while (!done)
 
     bptr = dbuffer;
 
-    options = options | PCRE_PARTIAL;   // we always want at least a partial match
+    int trying_full_match = 1;
+
+TRY_PARTIAL_MATCH:
+    if (!trying_full_match) {
+      options = options | PCRE_PARTIAL;   // we always want at least a partial match
+    }
+    trying_full_match = 0;
+
 
 #if !defined NOPOSIX
     if (posix || do_posix)
@@ -5332,7 +5339,6 @@ while (!done)
           }
         extra->flags |= PCRE_EXTRA_CALLOUT_DATA;
         extra->callout_data = &callout_data;
-
         PCRE_EXEC(count, re, extra, bptr, len, start_offset,
           options | g_notempty, use_offsets, use_size_offsets);
         extra->flags &= ~PCRE_EXTRA_CALLOUT_DATA;
@@ -5371,9 +5377,14 @@ while (!done)
           }
         }
 
-      if (datanumber == 1 && regex_length > 0) {
+      if (re != NULL && datanumber == 1 /*&& regex_length > 0*/ && !(options & PCRE_PARTIAL)) { // partial matching means 2nd retry
           regex_number++;
           print_method_header(regex_number);
+      }
+
+      // Try partial matching if full matching failed
+      if (count == PCRE_ERROR_NOMATCH && !(options & PCRE_PARTIAL)) {
+        goto TRY_PARTIAL_MATCH;
       }
 
       /* Matched */
@@ -5417,7 +5428,7 @@ while (!done)
 
         /* Output the captured substrings */
 
-        if (regex_length > 0) {
+        if (re != NULL /*&& regex_length > 0*/) {
           print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
         }
 
@@ -5630,7 +5641,7 @@ while (!done)
           }
         if (verify_jit && jit_was_used) fprintf(outfile, " (JIT)");
         fprintf(outfile, "\n");*/
-        if (regex_length > 0) {
+        if (re != NULL /*&& regex_length > 0*/) {
           print_test_for_partial_match(datanumber, bptr, len, use_offsets, count);
         }
         break;  /* Out of the /g loop */
@@ -5708,7 +5719,7 @@ while (!done)
           switch(count)
             {
             case PCRE_ERROR_NOMATCH:
-            if (regex_length > 0) {
+            if (re != NULL /*&& regex_length > 0*/) {
               print_test_for_full_match(datanumber, bptr, len, use_offsets, count);
             }
             /*if (gmatched == 0)
@@ -5736,11 +5747,21 @@ while (!done)
               fprintf(outfile, " offset=%d reason=%d", use_offsets[0],
                 use_offsets[1]);
             fprintf(outfile, "\n");
+
+            // Additionally print the string
+            fprintf(outfile, "str: ");
+            print_string(bptr, len);
+            fprintf(outfile, "\n");
             break;
 
             case PCRE_ERROR_BADUTF8_OFFSET:
             fprintf(outfile, "Error %d (bad UTF-%d offset)\n", count,
               8 * CHAR_SIZE);
+
+            // Additionally print the string
+            fprintf(outfile, "str: ");
+            print_string(bptr, len);
+            fprintf(outfile, "\n");
             break;
 
             default:
@@ -5749,6 +5770,11 @@ while (!done)
               fprintf(outfile, "Error %d (%s)\n", count, errtexts[-count]);
             else
               fprintf(outfile, "Error %d (Unexpected value)\n", count);
+
+            // Additionally print the string
+            fprintf(outfile, "str: ");
+            print_string(bptr, len);
+            fprintf(outfile, "\n");
             break;
             }
 
@@ -5795,13 +5821,9 @@ while (!done)
 
   // Print regex and, options
 
-  if (datanumber > 1 && regex_length > 0) {
+  if (re != NULL && datanumber > 1 /*&& regex_length > 0*/) {
     print_method_footer(regex, modifiers, datanumber - 1);
   }
-  if (done) {
-    print_file_footer();
-  }
-
 
 #if !defined NOPOSIX
   if (posix || do_posix) regfree(&preg);
@@ -5845,6 +5867,8 @@ if (showtotaltimes)
   }
 
 EXIT:
+
+print_file_footer();
 
 if (infile != NULL && infile != stdin) fclose(infile);
 if (outfile != NULL && outfile != stdout) fclose(outfile);
