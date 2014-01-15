@@ -2243,6 +2243,9 @@ class qtype_preg_node_error extends qtype_preg_operator {
      * Returns a user interface error string for the error, represented by this node.
      */
     public function error_string() {
+        if ($this->subtype == self::SUBTYPE_UNKNOWN_ERROR) {
+            return $this->addinfo;
+        }
         $a = new stdClass;
         $a->linefirst = $this->position->linefirst;
         $a->linelast = $this->position->linelast;

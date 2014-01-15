@@ -6594,9 +6594,9 @@ array(
 							break;
 						case 22:
 							{
-    // TODO: matches new line unicode sequences.
-    // \B, \R, and \X are not special inside a character class.
-    throw new Exception('\R is not implemented yet');
+    // \R matches new line unicode sequences.
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, '\R is not implemented yet');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -23:
 							break;
@@ -6714,16 +6714,17 @@ array(
 							break;
 						case 37:
 							{
-    // TODO: reset start of match.
-    throw new Exception('\K is not implemented yet');
+    // \K resets start of match.
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, '\K is not implemented yet');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -38:
 							break;
 						case 38:
 							{
-    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
-    // \B, \R, and \X are not special inside a character class.
-    throw new Exception('\R is not implemented yet');
+    // \X matches  any number of Unicode characters that form an extended Unicode sequence.
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, '\X is not implemented yet');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
 }
 						case -39:
 							break;
@@ -6942,14 +6943,13 @@ array(
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
         return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     }
-    throw new Exception('Callouts are not implemented yet');
-    $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, 'Callouts are not implemented yet');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    /*$number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
         return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
-    } else {
-        // TODO: for now this code will return either error or exception :)
-    }
+    }*/
 }
 						case -61:
 							break;
@@ -7941,14 +7941,13 @@ array(
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
         return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     }
-    throw new Exception('Callouts are not implemented yet');
-    $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
+    $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, 'Callouts are not implemented yet');
+    return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    /*$number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
         $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
         return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
-    } else {
-        // TODO: for now this code will return either error or exception :)
-    }
+    }*/
 }
 						case -156:
 							break;
