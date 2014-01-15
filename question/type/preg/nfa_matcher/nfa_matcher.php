@@ -569,6 +569,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if ($states[$curstate->state] === null || $curstate->leftmost_longest($states[$curstate->state])) {
                     $states[$curstate->state] = $curstate;
                     $curstates[] = $curstate->state;
+                    $endstatereached = $endstatereached || $curstate->is_full();
                 }
             }
         }
