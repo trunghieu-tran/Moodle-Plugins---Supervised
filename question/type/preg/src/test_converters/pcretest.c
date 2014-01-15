@@ -2962,6 +2962,9 @@ void byte_offsets_to_logical_offsets(const char * str, int length, int count, in
     while (byte_offset <= length) {
         uint value;
         int consumed = utf82ord(str + byte_offset, &value);
+        if (consumed < 1) {
+          consumed = 1;
+        }
         offset_map[byte_offset] = logical_offset;
         byte_offset += consumed;
         logical_offset++;
@@ -3813,7 +3816,7 @@ while (!done)
 
   if (isalnum(delimiter) || delimiter == '\\')
     {
-    fprintf(outfile, "** Delimiter must not be alphanumeric or \\\n");
+    //fprintf(outfile, "** Delimiter must not be alphanumeric or \\\n");
     goto SKIP_DATA;
     }
 
@@ -4297,7 +4300,7 @@ while (!done)
 
     SHOW_INFO:
 
-    if (do_debug)
+    if (0 && do_debug)
       {
       fprintf(outfile, "------------------------------------------------------------------\n");
       PCRE_PRINTINT(re, outfile, debug_lengths);
@@ -4305,7 +4308,7 @@ while (!done)
 
     /* We already have the options in get_options (see above) */
 
-    if (do_showinfo)
+    if (0 && do_showinfo)
       {
       unsigned long int all_options;
       pcre_uint32 first_char, need_char;
@@ -5166,14 +5169,12 @@ while (!done)
 
     bptr = dbuffer;
 
-    int trying_full_match = 1;
+    int attempt_number = 1;
 
 TRY_PARTIAL_MATCH:
-    if (!trying_full_match) {
+    if (attempt_number == 2) {
       options = options | PCRE_PARTIAL;   // we always want at least a partial match
     }
-    trying_full_match = 0;
-
 
 #if !defined NOPOSIX
     if (posix || do_posix)
@@ -5371,19 +5372,20 @@ TRY_PARTIAL_MATCH:
           options | g_notempty, use_offsets, use_size_offsets);
         if (count == 0)
           {
-          fprintf(outfile, "Matched, but too many substrings\n");
+          //fprintf(outfile, "Matched, but too many substrings\n");
           /* 2 is a special case; match can be returned */
-          count = (use_size_offsets == 2)? 1 : use_size_offsets/3;
+          //count = (use_size_offsets == 2)? 1 : use_size_offsets/3;
           }
         }
 
-      if (re != NULL && datanumber == 1 /*&& regex_length > 0*/ && !(options & PCRE_PARTIAL)) { // partial matching means 2nd retry
+      if (re != NULL && datanumber == 1 /*&& regex_length > 0*/ && attempt_number == 1) { // partial matching means 2nd retry
           regex_number++;
           print_method_header(regex_number);
       }
 
       // Try partial matching if full matching failed
       if (count == PCRE_ERROR_NOMATCH && !(options & PCRE_PARTIAL)) {
+        attempt_number = 2;
         goto TRY_PARTIAL_MATCH;
       }
 
