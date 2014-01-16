@@ -60,10 +60,17 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
  * @param int $state session state
  */
 function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $lessontype=-1, $state=0){
-    global $OUTPUT, $USER, $PAGE;
+    global $OUTPUT, $USER, $PAGE, $DB;
 
     $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $lessontype, $state);
     $totalcount = $sessions['totalcount'];
+    // Check if any lesson type exists in course
+    if($course){
+        $lessontypesexist = $DB->record_exists('block_supervised_lessontype', array('courseid'=>$course));
+    }
+    else{
+        $lessontypesexist = $DB->record_exists('block_supervised_lessontype', array());
+    }
 
     echo "<div class=\"info\">\n";
     print_string("displayingrecords", "", $totalcount);
@@ -80,18 +87,19 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
 
         // Combine new row.
-        $tablerow = array(
-            html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename),
-            $session->classroomname,
-            $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname,
-            html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session)),
-            $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename,
-            userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime),
-            $session->duration,
-            userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime),
-            StateSession::getStateName($session->state),
-            ($session->state !=  StateSession::Planned) ? $logslink : ('')
-        );
+        $tablerow = array();
+        $tablerow[] = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
+        $tablerow[] = $session->classroomname;
+        $tablerow[] = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
+        $tablerow[] = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
+        if($lessontypesexist){
+            $tablerow[] = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+        }
+        $tablerow[] = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
+        $tablerow[] = $session->duration;
+        $tablerow[] = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
+        $tablerow[] = StateSession::getStateName($session->state);
+        $tablerow[] = ($session->state !=  StateSession::Planned) ? $logslink : ('');
 
         // Build edit icon.
         $iconedit = '';
@@ -120,21 +128,22 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 
     // Build table.
     $table = new html_table();
-    // Prepare headers.
-    $headcourse         = get_string('course', 'block_supervised');
-    $headclassroom      = get_string('classroom', 'block_supervised');
-    $headgroup          = get_string('group', 'block_supervised');
-    $headteacher        = get_string('teacher', 'block_supervised');
-    $headlessontype     = get_string('lessontype', 'block_supervised');
-    $headtimestart      = get_string('timestart', 'block_supervised');
-    $headduration       = get_string('duration', 'block_supervised');
-    $headtimeend        = get_string('timeend', 'block_supervised');
-    $headstate          = get_string('state', 'block_supervised');
-    $headlogs           = get_string('logs', 'block_supervised');
-    $headedit           = get_string('edit');
+    // Build headers array.
+    $table->head = array();
+    $table->head[] = get_string('course', 'block_supervised');
+    $table->head[] = get_string('classroom', 'block_supervised');
+    $table->head[] = get_string('group', 'block_supervised');
+    $table->head[] = get_string('teacher', 'block_supervised');
+    if($lessontypesexist){
+        $table->head[] = get_string('lessontype', 'block_supervised');
+    }
+    $table->head[] = get_string('timestart', 'block_supervised');
+    $table->head[] = get_string('duration', 'block_supervised');
+    $table->head[] = get_string('timeend', 'block_supervised');
+    $table->head[] = get_string('state', 'block_supervised');
+    $table->head[] = get_string('logs', 'block_supervised');
+    $table->head[] = get_string('edit');
 
-
-    $table->head = array($headcourse, $headclassroom, $headgroup, $headteacher, $headlessontype, $headtimestart, $headduration, $headtimeend, $headstate, $headlogs, $headedit);
     $table->data = $tabledata;
     echo html_writer::table($table);
     echo $OUTPUT->paging_bar($totalcount, $pagenum, $perpage, "$url&perpage=$perpage");
