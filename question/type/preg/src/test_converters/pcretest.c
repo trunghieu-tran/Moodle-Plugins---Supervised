@@ -55,6 +55,7 @@ supported library functions. */
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <libgen.h>
 #include <locale.h>
 #include <errno.h>
 
@@ -2925,7 +2926,7 @@ printf("  -TM      same as -tm, but show total time at the end\n");
 /*************************************************
 *       Function to print a string in PHP        *
 *************************************************/
-void print_string(const char * str, int len)
+void print_string(char * str, int len)
 {
     int i;
     for (i = 0; i < len; i++) {
@@ -2946,7 +2947,7 @@ void print_string(const char * str, int len)
     }
 }
 
-void byte_offsets_to_logical_offsets(const char * str, int length, int count, int * byte_offsets, int * logical_offsets)
+void byte_offsets_to_logical_offsets(char * str, int length, int count, int * byte_offsets, int * logical_offsets)
 {
     int i;
     if (!use_utf) {
@@ -2983,7 +2984,7 @@ void byte_offsets_to_logical_offsets(const char * str, int length, int count, in
 /*************************************************
 *      Function to print data for full match     *
 *************************************************/
-void print_test_for_full_match(int testnumber, const char * bptr, int len, int * use_offsets, int count)
+void print_test_for_full_match(int testnumber, char * bptr, int len, int * use_offsets, int count)
 {
     int i;
 
@@ -3034,7 +3035,7 @@ void print_test_for_full_match(int testnumber, const char * bptr, int len, int *
 /*************************************************
 *      Function to print data for full match     *
 *************************************************/
-void print_test_for_partial_match(int testnumber, const char * bptr, int len, int * use_offsets, int count)
+void print_test_for_partial_match(int testnumber, char * bptr, int len, int * use_offsets, int count)
 {
     int i;
 
@@ -3078,9 +3079,14 @@ void print_test_for_partial_match(int testnumber, const char * bptr, int len, in
     fprintf(outfile, "                       'next'=>'');\n\n");
 }
 
-void print_file_header(const char * classname)
+void print_file_header(char * classnameprefix, char * testinput)
 {
+    char * _testinput = basename(testinput);
     fprintf(outfile, "<?php\n");
+    fprintf(outfile, "\n");
+    fprintf(outfile, "// this file initially was generated automatically using %s\n", _testinput);
+    fprintf(outfile, "// partial match data could be added manually\n");
+    fprintf(outfile, "// note: this file should be encoded in UTF-8\n");
     fprintf(outfile, "\n");
     fprintf(outfile, "defined('MOODLE_INTERNAL') || die();\n");
     fprintf(outfile, "\n");
@@ -3088,7 +3094,7 @@ void print_file_header(const char * classname)
     fprintf(outfile, "require_once('cross_tester.php');\n");
     fprintf(outfile, "require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');\n");
     fprintf(outfile, "\n");
-    fprintf(outfile, "class %s {\n", classname);
+    fprintf(outfile, "class %s%s {\n", classnameprefix, _testinput);
     fprintf(outfile, "\n");
 }
 
@@ -3101,7 +3107,7 @@ void print_method_header(int number) {
     fprintf(outfile, "    function data_for_test_%d() {\n", number);
 }
 
-void print_method_footer(const char * regex, const char * options, int testscount)
+void print_method_footer(char * regex, char * options, int testscount)
 {
     fprintf(outfile, "        return array('regex'=>\"");
     print_string(regex, strlen(regex));
@@ -3136,6 +3142,7 @@ options, followed by a set of test data, terminated by an empty line. */
 int main(int argc, char **argv)
 {
 FILE *infile = stdin;
+char infilename[256] = "stdin";
 const char *version;
 int options = 0;
 int study_options = 0;
@@ -3555,6 +3562,7 @@ if (offsets == NULL)
 if (argc > 1)
   {
   infile = fopen(argv[op], INPUT_MODE);
+  strcpy(infilename, argv[op]);
   if (infile == NULL)
     {
     printf("** Failed to open %s\n", argv[op]);
@@ -3601,7 +3609,7 @@ pcre32_stack_free = stack_free;
 
 //if (!quiet) fprintf(outfile, "PCRE version %s\n\n", version);
 
-print_file_header("qtype_preg_cross_tests_from_pcre");
+print_file_header("qtype_preg_cross_tests_from_pcre_", infilename);
 
 /* Main loop */
 
@@ -3648,7 +3656,7 @@ while (!done)
   debug_lengths = 1;
 
   if (extend_inputline(infile, buffer, "  re> ") == NULL) break;
-  if (infile != stdin) fprintf(outfile, "%s", (char *)buffer);
+  //if (infile != stdin) fprintf(outfile, "%s", (char *)buffer);
   fflush(outfile);
 
   p = buffer;
@@ -3838,7 +3846,7 @@ while (!done)
       done = 1;
       goto CONTINUE;
       }
-    if (infile != stdin) fprintf(outfile, "%s", (char *)pp);
+    //if (infile != stdin) fprintf(outfile, "%s", (char *)pp);
     }
 
   /* The buffer may have moved while being extended; reset the start of data
@@ -4690,7 +4698,7 @@ while (!done)
         done = 1;
         goto CONTINUE;
         }
-      if (infile != stdin) fprintf(outfile, "%s", (char *)buffer);
+      //if (infile != stdin) fprintf(outfile, "%s", (char *)buffer);
       len = (int)strlen((char *)buffer);
       if (buffer[len-1] == '\n') break;
       }
@@ -5870,7 +5878,7 @@ if (showtotaltimes)
 
 EXIT:
 
-print_file_footer();
+if (infile != NULL) print_file_footer();
 
 if (infile != NULL && infile != stdin) fclose(infile);
 if (outfile != NULL && outfile != stdout) fclose(outfile);
