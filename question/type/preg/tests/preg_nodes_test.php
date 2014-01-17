@@ -454,8 +454,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 1);
         $this->assertEquals($ch, 'b');
         // Emptiness matched.
-        $str = new qtype_poasquestion_string('xyz');
-        $matcher->match($str);
+        $matcher->match('');
+        $str = new qtype_poasquestion_string('');
         $res = $backref->match($str, 0, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
