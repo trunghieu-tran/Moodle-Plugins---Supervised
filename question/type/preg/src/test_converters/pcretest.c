@@ -58,6 +58,8 @@ supported library functions. */
 #include <libgen.h>
 #include <locale.h>
 #include <errno.h>
+#include <unicode/utypes.h>
+#include <unicode/ucnv.h>
 
 /* Both libreadline and libedit are optionally supported. The user-supplied
 original patch uses readline/readline.h for libedit, but in at least one system
@@ -2928,21 +2930,47 @@ printf("  -TM      same as -tm, but show total time at the end\n");
 *************************************************/
 void print_string(char * str, int len)
 {
+    if (len == -1) {
+        len = strlen(str);
+    }
+
+    const int capacity = sizeof(char) * len * 4;
+    char utf_buf[4 * len];
+
+    char * real_buf = str;
+    int real_len = len;
+
+    if (!use_utf) {
+        // Convert ANSI to UTF-8 if it's not already in UTF-8
+        UErrorCode errorCode = U_ZERO_ERROR;
+
+
+
+        real_len = ucnv_convert("UTF-8",
+                                "cp1252",
+                                utf_buf,
+                                capacity,
+                                str,
+                                len,
+                                &errorCode);
+        real_buf = utf_buf;
+    }
+
     int i;
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < real_len; i++) {
         // Escape sequences
-        if (str[i] == '\\') {
+        if (real_buf[i] == '\\') {
             fprintf(outfile, "\\\\");
-        } else if (str[i] == '"') {
+        } else if (real_buf[i] == '"') {
             fprintf(outfile, "\\\"");
-        } else if (str[i] == '$') {
+        } else if (real_buf[i] == '$') {
             fprintf(outfile, "\\$");
-        } else if (str[i] == '\r') {
+        } else if (real_buf[i] == '\r') {
             fprintf(outfile, "\\r");
-        } else if (str[i] == '\n') {
+        } else if (real_buf[i] == '\n') {
             fprintf(outfile, "\\n");
         } else {
-            fprintf(outfile, "%c", str[i]);
+            fprintf(outfile, "%c", real_buf[i]);
         }
     }
 }
@@ -3107,14 +3135,14 @@ void print_method_header(int number) {
     fprintf(outfile, "    function data_for_test_%d() {\n", number);
 }
 
-void print_method_footer(char * regex, char * options, int testscount)
+void print_method_footer(char * regex, int regex_length, char * options, int options_length, int testscount)
 {
     fprintf(outfile, "        return array('regex'=>\"");
-    print_string(regex, strlen(regex));
+    print_string(regex, regex_length);
     fprintf(outfile, "\",\n");
-    if (strlen(options) > 0) {
+    if (options_length > 0) {
         fprintf(outfile, "                     'modifiers'=>\"");
-        print_string(options, strlen(options));
+        print_string(options, options_length);
         fprintf(outfile, "\",\n");
     }
 
@@ -5832,7 +5860,7 @@ TRY_PARTIAL_MATCH:
   // Print regex and, options
 
   if (re != NULL && datanumber > 1 /*&& regex_length > 0*/) {
-    print_method_footer(regex, modifiers, datanumber - 1);
+    print_method_footer(regex, regex_length, modifiers, modifiers_length, datanumber - 1);
   }
 
 #if !defined NOPOSIX
