@@ -2218,12 +2218,12 @@ int i, pre_start, post_start, subject_length;
 
 if (callout_extra)
   {
-  fprintf(f, "Callout %d: last capture = %d\n",
-    cb->callout_number, cb->capture_last);
+  /*fprintf(f, "Callout %d: last capture = %d\n",
+    cb->callout_number, cb->capture_last);*/
 
   for (i = 0; i < cb->capture_top * 2; i += 2)
     {
-    if (cb->offset_vector[i] < 0)
+    /*if (cb->offset_vector[i] < 0)
       fprintf(f, "%2d: <unset>\n", i/2);
     else
       {
@@ -2231,7 +2231,7 @@ if (callout_extra)
       PCHARSV(cb->subject, cb->offset_vector[i],
         cb->offset_vector[i+1] - cb->offset_vector[i], f);
       fprintf(f, "\n");
-      }
+      }*/
     }
   }
 
@@ -2239,7 +2239,7 @@ if (callout_extra)
 datails. On subsequent calls in the same match, we use pchars just to find the
 printed lengths of the substrings. */
 
-if (f != NULL) fprintf(f, "--->");
+/*if (f != NULL) fprintf(f, "--->");
 
 PCHARS(pre_start, cb->subject, 0, cb->start_match, f);
 PCHARS(post_start, cb->subject, cb->start_match,
@@ -2250,50 +2250,50 @@ PCHARS(subject_length, cb->subject, 0, cb->subject_length, NULL);
 PCHARSV(cb->subject, cb->current_position,
   cb->subject_length - cb->current_position, f);
 
-if (f != NULL) fprintf(f, "\n");
+if (f != NULL) fprintf(f, "\n");*/
 
 /* Always print appropriate indicators, with callout number if not already
 shown. For automatic callouts, show the pattern offset. */
 
 if (cb->callout_number == 255)
   {
-  fprintf(outfile, "%+3d ", cb->pattern_position);
-  if (cb->pattern_position > 99) fprintf(outfile, "\n    ");
+  /*fprintf(outfile, "%+3d ", cb->pattern_position);
+  if (cb->pattern_position > 99) fprintf(outfile, "\n    ");*/
   }
 else
   {
-  if (callout_extra) fprintf(outfile, "    ");
-    else fprintf(outfile, "%3d ", cb->callout_number);
+  /*if (callout_extra) fprintf(outfile, "    ");
+    else fprintf(outfile, "%3d ", cb->callout_number);*/
   }
 
-for (i = 0; i < pre_start; i++) fprintf(outfile, " ");
-fprintf(outfile, "^");
+/*for (i = 0; i < pre_start; i++) fprintf(outfile, " ");
+fprintf(outfile, "^");*/
 
 if (post_start > 0)
   {
-  for (i = 0; i < post_start - 1; i++) fprintf(outfile, " ");
-  fprintf(outfile, "^");
+  /*for (i = 0; i < post_start - 1; i++) fprintf(outfile, " ");
+  fprintf(outfile, "^");*/
   }
 
-for (i = 0; i < subject_length - pre_start - post_start + 4; i++)
-  fprintf(outfile, " ");
+/*for (i = 0; i < subject_length - pre_start - post_start + 4; i++)
+  fprintf(outfile, " ");*/
 
-fprintf(outfile, "%.*s", (cb->next_item_length == 0)? 1 : cb->next_item_length,
-  pbuffer + cb->pattern_position);
+/*fprintf(outfile, "%.*s", (cb->next_item_length == 0)? 1 : cb->next_item_length,
+  pbuffer + cb->pattern_position);*/
 
-fprintf(outfile, "\n");
+//fprintf(outfile, "\n");
 first_callout = 0;
 
 if (cb->mark != last_callout_mark)
   {
-  if (cb->mark == NULL)
+  /*if (cb->mark == NULL)
     fprintf(outfile, "Latest Mark: <unset>\n");
   else
     {
     fprintf(outfile, "Latest Mark: ");
     PCHARSV(cb->mark, 0, -1, outfile);
     putc('\n', outfile);
-    }
+    }*/
   last_callout_mark = cb->mark;
   }
 
@@ -2302,7 +2302,7 @@ if (cb->callout_data != NULL)
   int callout_data = *((int *)(cb->callout_data));
   if (callout_data != 0)
     {
-    fprintf(outfile, "Callout data = %d\n", callout_data);
+    //fprintf(outfile, "Callout data = %d\n", callout_data);
     return callout_data;
     }
   }
