@@ -9,7 +9,7 @@
 
 bool preg_match(const char * regex, const char * string, int length)
 {
-    int options = PCRE_UTF8/* | PCRE_DOTALL*/;
+    int options = PCRE_UTF8 | PCRE_DOTALL;
     const char * error;
     int erroffset;
     pcre * re = pcre_compile(regex, options, &error, &erroffset, NULL);
@@ -266,15 +266,15 @@ int main()
                 ss >> newnum;
 
                 if (prevdec == -1) {
-                    std::cout << "array(0=0x" << line << ", ";
+                    std::cout << "array(0=>0x" << line << ", ";
                 } else if (newnum != prevdec + 1) {
-                    std::cout << "1=0x" << prevhex << ")," << std::endl;
-                    std::cout << tab2 << "array(0=0x" << line << ", ";
+                    std::cout << "1=>0x" << prevhex << ")," << std::endl;
+                    std::cout << tab2 << "array(0=>0x" << line << ", ";
                 }
                 prevdec = newnum;
                 prevhex = line;
             }
-            std::cout << "1=0x" << prevhex << "));" << std::endl;
+            std::cout << "1=>0x" << prevhex << "));" << std::endl;
         }
         std::cout << tab1 << "}" << std::endl << std::endl;
         //std::cout << "Done with " << funcname << std::endl;

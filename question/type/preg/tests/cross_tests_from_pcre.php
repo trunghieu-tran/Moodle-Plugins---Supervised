@@ -15668,7 +15668,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>1),
-                        'length'=>array(0=>5),
+                        'length'=>array(0=>6),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'[\s]+',
@@ -15680,7 +15680,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>1),
-                        'length'=>array(0=>5),
+                        'length'=>array(0=>6),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\s+',
