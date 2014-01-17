@@ -644,10 +644,12 @@ class block_formal_langs_token_stream {
 class  block_formal_langs_matches_group {
     /**
      * Array of matched pairs
+     * This is main data for the group, other three fields contains agregate information from it.
+     * @var array of block_formal_langs_matched_tokens_pair and it's child classes objects
      */
     public $matchedpairs;
 
-    //Sum of mistake weights
+    //Sum of mistake weights for the group
     public $mistakeweight;
 
     //Sorted array of all correct token indexes for tokens, covered by pairs from this group
