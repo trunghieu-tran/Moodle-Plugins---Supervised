@@ -743,7 +743,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * Returns an array (flag, character) suitable for both this leaf and merged assertions and the previous character.
      * @param originalstr original string passed to the matcher
      * @param newstr string (being) generated so far
-     * @param pos position of the last matched character in the string.
+     * @param pos index where the generated character will be placed.
      * @param length number of characters matched (can be greater than 0 in case of a partial backreference match).
      * @param matcherstateobj an object which implements the qtype_preg_matcher_state interface.
      */
@@ -974,14 +974,17 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
 
         $desired_ranges = array();
-        if ($pos < $originalstr->length()) {
-            $originalchar = $originalstr[$pos];
-            $originalcode = core_text::utf8ord($originalchar);
-            $desired_ranges[] = array(array($originalcode, $originalcode)); // original character
+        $originalchar = $originalstr[$pos];
+        $originalcode = core_text::utf8ord($originalchar);
+        if (!$dollar['before'] /*&& !$capz['before']*/ && !$circumflex['after']) {
+            if ($pos < $originalstr->length()) {
+                $desired_ranges[] = array(array($originalcode, $originalcode)); // original character
+            }
+            $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters
+            $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces
+        } else if ($originalchar == "\n") {
+            $desired_ranges[] = array($originalcode, $originalcode);
         }
-
-        $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters
-        $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces
 
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
