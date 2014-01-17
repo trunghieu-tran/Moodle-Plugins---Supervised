@@ -215,8 +215,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @param MoodleQuickForm $mform the form being built.
      */
     protected function definition_inner($mform) {
-        global $CFG;
-        global $PAGE;
+        global $CFG, $PAGE, $COURSE;
 
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
@@ -247,6 +246,18 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setDefault('lexemhintpenalty', '0.4');
         $mform->setType('lexemhintpenalty', PARAM_NUMBER);
         $mform->addHelpButton('lexemhintpenalty', 'lexemhintpenalty', 'qtype_preg');
+
+        // Fetch course context if it is possible.
+        $context = null;
+        if ($COURSE != null) {
+            if (is_a($COURSE, 'stdClass')) {
+                $context = context_course::instance($COURSE->id);
+            } else {
+                $context = $COURSE->get_context();
+            }
+        }
+
+        $currentlanguages = block_formal_langs::available_langs( $context );
         $langs = block_formal_langs::available_langs();// TODO - add context.
         $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $langs);
         $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
