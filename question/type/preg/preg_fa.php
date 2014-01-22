@@ -435,6 +435,18 @@ abstract class qtype_preg_finite_automaton {
     /** @var array of of int ids of states - end states. */
     public $endstates = array();
 
+    // The AST root node.
+    protected $astroot;
+
+    // Number of subpatterns in the regular expression.
+    protected $maxsubpatt;
+
+    // Number of subexpressions in the regular expression.
+    protected $maxsubexpr;
+
+    // Subexpr references (numbers) existing in the regex.
+    protected $subexpr_ref_numbers;
+
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
      * May be used for optimisation when an NFA object actually stores a DFA.
      */
@@ -452,7 +464,14 @@ abstract class qtype_preg_finite_automaton {
     protected $statelimit;
     protected $transitionlimit;
 
-    public function __construct() {
+    public function __construct($astroot = null, $maxsubpatt = 0, $maxsubexpr = 0, $subexprrefs = array()) {
+        $this->astroot = $astroot;
+        $this->maxsubpatt = $maxsubpatt;
+        $this->maxsubexpr = $maxsubexpr;
+        $this->subexpr_ref_numbers = array();
+        foreach ($subexprrefs as $ref) {
+            $this->subexpr_ref_numbers[] = $ref->number;
+        }
         $this->set_limits();
     }
 
@@ -521,6 +540,65 @@ abstract class qtype_preg_finite_automaton {
      */
     public function get_states() {
         return array_keys($this->adjacencymatrix);
+    }
+
+    /**
+     * Calculates a map where keys are subexpr numbers and values are start and end states
+     */
+    public function calculate_subexpr_borders() {
+        $result = array();
+        $result[0] = array('start'=>array(), 'end'=>array());
+
+        $states = $this->get_states();
+
+        foreach ($states as $state) {
+            $outgoing = $this->get_adjacent_transitions($state, true);
+            foreach ($outgoing as $transition) {
+                foreach ($transition->subpatt_start as $start) {
+                    if ($start->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $start->subpattern != $this->astroot->subpattern) {
+                        continue;
+                    }
+                    $keys = array();
+                    if ($start->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+                        $keys[] = $start->number;
+                    }
+                    if ($start->subpattern == $this->astroot->subpattern) {
+                        $keys[] = 0;
+                    }
+                    foreach ($keys as $key) {
+                        if (!array_key_exists($key, $result)) {
+                            $result[$key] = array('start'=>array(), 'end'=>array());
+                        }
+                        if (!in_array($transition->from, $result[$key]['start'])) {
+                            $result[$key]['start'][] = $transition->from;
+                        }
+                    }
+
+                }
+                foreach ($transition->subpatt_end as $end) {
+                    if ($end->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $end->subpattern != $this->astroot->subpattern) {
+                        continue;
+                    }
+                    $keys = array();
+                    if ($end->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+                        $keys[] = $end->number;
+                    }
+                    if ($end->subpattern == $this->astroot->subpattern) {
+                        $keys[] = 0;
+                    }
+                    foreach ($keys as $key) {
+                        if (!array_key_exists($key, $result)) {
+                            $result[$key] = array('start'=>array(), 'end'=>array());
+                        }
+                        if (!in_array($transition->to, $result[$key]['end'])) {
+                            $result[$key]['end'][] = $transition->to;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

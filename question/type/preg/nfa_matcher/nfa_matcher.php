@@ -690,6 +690,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         try {
             $stack = array();
             $dst_node->create_automaton($result, $stack);
+            $body = array_pop($stack);
+            $result->after_build($body);
+            $map = $result->calculate_subexpr_borders();
         } catch (Exception $e) {
             $result = false;
         }
