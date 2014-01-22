@@ -185,6 +185,10 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
         {block_supervised_lessontype}.name  AS lessontypename,
         {user}.firstname,
         {user}.lastname,
+        {user}.middlename,
+        {user}.lastnamephonetic,
+        {user}.firstnamephonetic,
+        {user}.alternatename,
         {groups}.name                       AS groupname,
         {course}.fullname                   AS coursename
 
