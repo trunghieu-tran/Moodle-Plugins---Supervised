@@ -19,6 +19,7 @@ class startsession_block_form extends moodleform {
         $mform =& $this->_form;
 
         // Find all classrooms.
+        $classrooms = array();
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
             foreach ($cclassrooms as $cclassroom) {
                 $classrooms[$cclassroom->id] = $cclassroom->name;
