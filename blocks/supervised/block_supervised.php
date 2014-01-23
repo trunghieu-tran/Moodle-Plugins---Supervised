@@ -352,6 +352,7 @@ class block_supervised extends block_base {
      * Renders block's body for user with supervise capability.
      */
     private function render_supervise_body(){
+        global $DB;
         $formbody = '';
         // Planned session: render planned session form.
         $isemptyplanned = $this->render_plannedsession_form($sessionstitle, $formbody);
@@ -359,7 +360,13 @@ class block_supervised extends block_base {
         $isemptyactive = $this->render_activesession_form($sessionstitle, $formbody);
         // No sessions: render start session form.
         if($isemptyplanned && $isemptyactive){
-            $this->render_startsession_form($sessionstitle, $formbody);
+            $classroomsexist = $DB->record_exists("block_supervised_classroom", array('active'=>1));
+            if($classroomsexist){
+                $this->render_startsession_form($sessionstitle, $formbody);
+            }
+            else{
+                $formbody .= get_string('createclassroom', 'block_supervised');
+            }
         }
 
         // Add block body.
