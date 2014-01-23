@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 
 /**
  * Returns logs array according to specified conditions
@@ -14,8 +29,8 @@
 function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $limitfrom, $limitnum) {
     global $DB;
 
-    $session = $DB->get_record('block_supervised_session', array('id'=>$sessionid));
-    //$classroom = $DB->get_record('block_supervised_classroom', array('id'=>$session->classroomid)); // todo remove with filtering
+    $session = $DB->get_record('block_supervised_session', array('id' => $sessionid));
+    // todo filtering: $classroom = $DB->get_record('block_supervised_classroom', array('id' => $session->classroomid));
 
     // Prepare query
     $params = array();
@@ -23,7 +38,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     $params['timefrom'] = $timefrom;
     $params['timeto']   = $timeto;
     $params['courseid'] = $session->courseid;
-    if($userid != 0) {
+    if ($userid != 0) {
         $selector .= " AND l.userid = :userid";
         $params['userid'] = $userid;
     }
@@ -31,15 +46,16 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     $logs = get_logs($selector, $params, 'l.time DESC', '', '', $totalcount);
 
     // Filter logs by classroom ip subnet
-    $logs_filtered = $logs; // TODO Do we really need this filtering?
-    /*$logs_filtered = array();
-    foreach ($logs as $id=>$log) {
+    $logsfiltered = $logs;
+    /*todo filtering
+    $logs_filtered = array();
+    foreach ($logs as $id => $log) {
         echo($log->ip);
-        if(address_in_subnet($log->ip, $classroom->iplist))
+        if (address_in_subnet($log->ip, $classroom->iplist))
             $logs_filtered[$id] = $log;
     }*/
 
-    $result['logs'] = array_slice($logs_filtered, $limitfrom, $limitnum);
+    $result['logs'] = array_slice($logsfiltered, $limitfrom, $limitnum);
     $result['totalcount'] = $totalcount;
 
     return $result;
@@ -57,7 +73,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
  * @param int $perpage int logs number per page
  * @param string $url the url prefix for pages
  */
-function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url=""){
+function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url="") {
     global $OUTPUT, $DB;
 
     $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page*$perpage, $perpage);
@@ -70,7 +86,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 
     $table = new html_table();
-    $table->classes = array('logtable','generaltable');
+    $table->classes = array('logtable', 'generaltable');
     $table->align = array('right', 'left', 'left');
     $table->head = array(
         get_string('time'),
@@ -81,31 +97,30 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     );
     $table->data = array();
 
-
     $strftimedatetime = get_string("strftimerecent");
     foreach ($logs['logs'] as $log) {
 
         if (isset($ldcache[$log->module][$log->action])) {
             $ld = $ldcache[$log->module][$log->action];
         } else {
-            $ld = $DB->get_record('log_display', array('module'=>$log->module, 'action'=>$log->action));
+            $ld = $DB->get_record('log_display', array('module' => $log->module, 'action' => $log->action));
             $ldcache[$log->module][$log->action] = $ld;
         }
         if ($ld && is_numeric($log->info)) {
             // ugly hack to make sure fullname is shown correctly
             if ($ld->mtable == 'user' && $ld->field == $DB->sql_concat('firstname', "' '" , 'lastname')) {
-                $log->info = fullname($DB->get_record($ld->mtable, array('id'=>$log->info)), true);
+                $log->info = fullname($DB->get_record($ld->mtable, array('id' => $log->info)), true);
             } else {
-                $log->info = $DB->get_field($ld->mtable, $ld->field, array('id'=>$log->info));
+                $log->info = $DB->get_field($ld->mtable, $ld->field, array('id' => $log->info));
             }
         }
 
-        //Filter log->info
+        // Filter log->info
         $log->info = format_string($log->info);
 
         // If $log->url has been trimmed short by the db size restriction
         // code in add_to_log, keep a note so we don't add a link to a broken url
-        $brokenurl=(textlib::strlen($log->url)==100 && textlib::substr($log->url,97)=='...');
+        $brokenurl=(core_text::strlen($log->url)==100 && core_text::substr($log->url, 97)=='...');
 
         $row = array();
 
@@ -120,7 +135,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
         if ($brokenurl) {
             $row[] = $displayaction;
         } else {
-            $link = make_log_url($log->module,$log->url);
+            $link = make_log_url($log->module, $log->url);
             $row[] = $OUTPUT->action_link($link, $displayaction, new popup_action('click', $link, 'fromloglive'), array('height' => 440, 'width' => 700));
         }
         $row[] = $log->info;
@@ -137,7 +152,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
  *
  * @param $sessionid int session id
  */
-function print_session_info_form($sessionid){
+function print_session_info_form($sessionid) {
     require_once("../sessions/lib.php");
 
     // Prepare session info form.

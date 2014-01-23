@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 require_once('../../../config.php');
 require_once('sessionstate.php');
 require_once('lib.php');
@@ -32,11 +47,11 @@ require_login($course);
 $PAGE->set_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('sessionspagetitle', 'block_supervised'));
-include("breadcrumbs.php");
+require("breadcrumbs.php");
 
 
 // Check if user has at least one of capabilities for view smth.
-if(!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
+if (!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
     || has_capability('block/supervised:viewallsessions', $PAGE->context)
     || has_capability('block/supervised:manageownsessions', $PAGE->context)
     || has_capability('block/supervised:manageallsessions', $PAGE->context)
@@ -65,8 +80,9 @@ $toform['state'] = $state;
 
 if ($fromform = $mform->get_data()) {
     $url = new moodle_url('/blocks/supervised/sessions/view.php',
-        array('courseid'=>$courseid, 'perpage'=>$fromform->pagesize, 'f'=>$fromform->from, 't'=>$fromform->to,
-            'teacher'=>$fromform->teacher, 'course'=>$fromform->course, 'classroom'=>$fromform->classroom, 'lessontype'=>$fromform->lessontype, 'state'=>$fromform->state ));
+        array('courseid' => $courseid, 'perpage' => $fromform->pagesize, 'f' => $fromform->from, 't' => $fromform->to,
+            'teacher' => $fromform->teacher, 'course' => $fromform->course,
+            'classroom' => $fromform->classroom, 'lessontype' => $fromform->lessontype, 'state' => $fromform->state ));
     redirect($url); // Redirect must be done before $OUTPUT->header().
 } else {
     // Form didn't validate or this is the first display.
@@ -75,8 +91,8 @@ if ($fromform = $mform->get_data()) {
     echo $OUTPUT->heading_with_help(get_string("sessionsheader", 'block_supervised'), 'sessionsdefinition', 'block_supervised');
 
     // Add "Plan new session" button.
-    if(  has_capability('block/supervised:manageownsessions', $PAGE->context)
-        || has_capability('block/supervised:manageallsessions', $PAGE->context)  ){
+    if (  has_capability('block/supervised:manageownsessions', $PAGE->context)
+        || has_capability('block/supervised:manageallsessions', $PAGE->context)  ) {
         $params['courseid'] = $courseid;
         $url = new moodle_url('/blocks/supervised/sessions/addedit.php', $params);
         $caption = get_string('plansession', 'block_supervised');
@@ -109,7 +125,7 @@ echo $OUTPUT->footer();
  * @param $classroom
  * @param $state
  */
-function print_courses_selector($courseid, $course, $perpage, $from, $to, $classroom, $state){
+function print_courses_selector($courseid, $course, $perpage, $from, $to, $classroom, $state) {
     global $OUTPUT, $SITE;
 
     $active = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course&classroom=$classroom&state=$state";
@@ -121,7 +137,7 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
     if ($courses = get_courses()) {
         foreach ($courses as $course) {
             $coursecontext = context_course::instance($course->id);
-            if($course->id != $SITE->id && has_capability('block/supervised:supervise', $coursecontext)){
+            if ($course->id != $SITE->id && has_capability('block/supervised:supervise', $coursecontext)) {
                 $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course->id&classroom=$classroom&state=$state";
                 $urls[$url] = $course->fullname;
             }
@@ -129,6 +145,6 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
     }
 
     $select = new url_select($urls, $active, null, 'supervisedblock_selectcourseform');
-    $select->set_label(get_string('course', 'block_supervised'), array("id"=>"supervisedblock_courselabel"));
+    $select->set_label(get_string('course', 'block_supervised'), array("id" => "supervisedblock_courselabel"));
     echo $OUTPUT->render($select);
 }

@@ -1,7 +1,23 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 require_once('../../../config.php');
 require_once('../lib.php');
- 
+
 global $DB, $OUTPUT, $PAGE;
 
 $courseid   = required_param('courseid', PARAM_INT);
@@ -21,7 +37,7 @@ require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('classroomspagetitle', 'block_supervised'));
-include("breadcrumbs.php");
+require("breadcrumbs.php");
 
 // Display header.
 echo $OUTPUT->header();
@@ -30,22 +46,21 @@ echo $OUTPUT->heading_with_help(get_string("classroomsheader", 'block_supervised
 // Prepare table data
 $classrooms = $DB->get_records('block_supervised_classroom', null, 'name');
 $tabledata = array();
-foreach ($classrooms as $id=>$classroom) {
+foreach ($classrooms as $id => $classroom) {
     // Prepare icons.
     $editurl = new moodle_url('/blocks/supervised/classrooms/addedit.php', array('id' => $id, 'courseid' => $courseid));
     $iconedit = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
     $deleteurl = new moodle_url('/blocks/supervised/classrooms/delete.php', array('courseid' => $courseid, 'id' => $id));
     $icondelete = '';
-    if(can_delete_classroom($id)){
+    if (can_delete_classroom($id)) {
         $icondelete = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
     }
 
     $iconshowhide = '';
-    if(can_showhide_classroom($id)){
-        if($classroom->active){
+    if (can_showhide_classroom($id)) {
+        if ($classroom->active) {
             $showhide = "hide";
-        }
-        else{
+        } else {
             $showhide = "show";
         }
         $showhideurl = new moodle_url('/blocks/supervised/classrooms/showhide.php', array('courseid' => $courseid, 'id' => $id));

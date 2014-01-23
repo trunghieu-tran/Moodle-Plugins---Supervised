@@ -1,4 +1,20 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 require_once('../../../config.php');
 require_once('sessionstate.php');
 require_once('lib.php');
@@ -19,11 +35,11 @@ if ($site->id == $course->id) {
 require_login($course);
 $PAGE->set_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-include("breadcrumbs.php");
+require("breadcrumbs.php");
 
 // Check capabilities.
-if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
-       || has_capability('block/supervised:manageallsessions', $PAGE->context))  ){
+if (!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
+       || has_capability('block/supervised:manageallsessions', $PAGE->context))  ) {
     require_capability('block/supervised:manageownsessions', $PAGE->context);
 }
 
@@ -31,7 +47,7 @@ if(!  (has_capability('block/supervised:manageownsessions', $PAGE->context)
 // Initializing variables depending of mode.
 $addnotspecified = 0;
 $toform['courseid'] = $courseid;
-if(!$id){   // Add mode.
+if (!$id) {   // Add mode.
     $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
     $title = get_string('addsessionpagetitle', 'block_supervised');
     $heading = get_string("addingnewsession", 'block_supervised');
@@ -42,29 +58,28 @@ if(!$id){   // Add mode.
     $toform['duration']     = 90;
     $toform['lessontypeid'] = 0;
     $toform['coursename']   = html_writer::link(new moodle_url("/course/view.php?id={$course->id}"), $course->fullname);
-} else{     // Edit mode.
+} else {     // Edit mode.
     $PAGE->navbar->add(get_string("editsessionnavbar", 'block_supervised'));
     if (! $session = get_session($id)) {
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
     // Check capabilities for edit mode.
     if ( ! (($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
-        || has_capability('block/supervised:manageallsessions', $PAGE->context))   ){
+        || has_capability('block/supervised:manageallsessions', $PAGE->context))   ) {
         require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
-    }
-    else{
+    } else {
         // User wants edit session of other user.
         require_capability('block/supervised:manageallsessions', $PAGE->context);
     }
 
     // Check session state.
-    if ($session->state != StateSession::Planned) {
+    if ($session->state != StateSession::PLANNED) {
         print_error(get_string("sessionediterror", 'block_supervised'));
     }
 
     $title = get_string('editsessionpagetitle', 'block_supervised');
     $heading = get_string("editingsession", 'block_supervised');
-    
+
     $toform['id']               = $session->id;
     $toform['coursename']       = $course->fullname;
     $toform['classroomid']      = $session->classroomid;
@@ -78,7 +93,7 @@ if(!$id){   // Add mode.
     $toform['sessioncomment']   = $session->sessioncomment;
 
     // We should add 'Not specified' lesson type in editing mode if the session was created with this option.
-    if($session->lessontypeid == 0){
+    if ($session->lessontypeid == 0) {
         $addnotspecified = 1;
     }
 }
@@ -87,16 +102,16 @@ $PAGE->set_title($title);
 
 // Check if teachers and classrooms exist.
 $teachersexist = (boolean)(get_users_by_capability($PAGE->context, array('block/supervised:supervise')));
-$classroomsexist = $DB->record_exists("block_supervised_classroom", array('active'=>1));
-if(!$teachersexist || !$classroomsexist){
+$classroomsexist = $DB->record_exists("block_supervised_classroom", array('active' => 1));
+if (!$teachersexist || !$classroomsexist) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading($heading, 2);
-    if(!$teachersexist){
+    if (!$teachersexist) {
         echo get_string('enrollteacher', 'block_supervised');
         echo ' ' . html_writer::link(new moodle_url("/enrol/users.php?id={$course->id}"), get_string('gotoenrollment', 'block_supervised'));
         echo '<br/>';
     }
-    if(!$classroomsexist){
+    if (!$classroomsexist) {
         echo get_string('createclassroom', 'block_supervised');
         echo ' ' . html_writer::link(new moodle_url("/blocks/supervised/classrooms/view.php?courseid={$course->id}"), get_string('gotoclassrooms', 'block_supervised'));
         echo '<br/>';
@@ -112,19 +127,19 @@ if (file_exists($mform)) {
 } else {
     print_error('noformdesc');
 }
-$mform = new addedit_session_form(null, array('courseid' => $courseid, 'addnotspecified'=>$addnotspecified));
+$mform = new addedit_session_form(null, array('courseid' => $courseid, 'addnotspecified' => $addnotspecified));
 
 
 
-if($mform->is_cancelled()) {
+if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
-    if(!$id){   // Add mode.
+    if (!$id) {   // Add mode.
         $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
-        $fromform->state    = StateSession::Planned;
+        $fromform->state    = StateSession::PLANNED;
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
 
         if (!$newid = $DB->insert_record('block_supervised_session', $fromform)) {
@@ -132,26 +147,25 @@ if($mform->is_cancelled()) {
         }
         // TODO Logging
         // Send e-mail to teacher.
-        if($fromform->sendemail){
+        if ($fromform->sendemail) {
             mail_newsession(get_session($newid), $USER);
         }
-    } else{     // Edit mode.
+    } else {     // Edit mode.
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
         if (!$DB->update_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
         }
         // TODO Logging
         // Send e-mail to teacher(s).
-        if($fromform->sendemail){
+        if ($fromform->sendemail) {
             $oldteacherid = $session->teacherid;
             $newteacherid = $fromform->teacherid;
-            if($oldteacherid != $newteacherid){
+            if ($oldteacherid != $newteacherid) {
                 // Send e-mail to both teachers if teacher has been changed.
                 mail_newsession(get_session($fromform->id), $USER); // new session for new teacher
                 $session->messageforteacher = '';
                 mail_removedsession($session, $USER);               // removed session for old teacher
-            }
-            else{
+            } else {
                 mail_editedsession(get_session($fromform->id), $USER);
             }
         }

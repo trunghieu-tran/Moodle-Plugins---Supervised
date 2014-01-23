@@ -1,4 +1,20 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 require_once('../../../config.php');
 
 $courseid   = required_param('courseid', PARAM_INT);
@@ -17,24 +33,24 @@ require_login($course);
 require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-include("breadcrumbs.php");
+require("breadcrumbs.php");
 
 
 // Initializing variables depending of mode.
-if(!$id){   // Add mode.
+if (!$id) {   // Add mode.
     $PAGE->navbar->add(get_string("addclassroomnavbar", 'block_supervised'));
     $title = get_string('addclassroompagetitle', 'block_supervised');
     $heading = get_string("addingnewclassroom", 'block_supervised');
-    
+
     $toform['active']   = 1;    // default value
-} else{     // Edit mode.
-    if (! $classroom = $DB->get_record("block_supervised_classroom", array("id"=>$id))) {
+} else {     // Edit mode.
+    if (! $classroom = $DB->get_record("block_supervised_classroom", array("id" => $id))) {
         print_error(get_string("invalidclassroomid", 'block_supervised'));
     }
     $PAGE->navbar->add(get_string("editclassroomnavbar", 'block_supervised'));
     $title = get_string('editclassroompagetitle', 'block_supervised');
     $heading = get_string("editingclassroom", 'block_supervised');
-    
+
     $toform['id']       = $classroom->id;
     $toform['name']     = $classroom->name;
     $toform['iplist']   = $classroom->iplist;
@@ -54,13 +70,13 @@ $mform = new addedit_classroom_form();
 $toform['courseid'] = $courseid;
 $mform->set_data($toform);
 
-if($mform->is_cancelled()) {
+if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
     $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
-    if(!$id){   // Add mode.
+    if (!$id) {   // Add mode.
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
@@ -69,8 +85,7 @@ if($mform->is_cancelled()) {
             The problem is in second parameter ($module).
             See also: https://moodle.org/mod/forum/discuss.php?d=184400.
         */
-        //add_to_log($courseid, 'blocks', 'add', "supervised/classrooms/addedit.php?id=$newid&courseid=$courseid");
-    } else{     // Edit mode.
+    } else {     // Edit mode.
 
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
