@@ -24,9 +24,9 @@ global $DB, $OUTPUT, $PAGE;
 
 $courseid    = required_param('courseid',  PARAM_INT);
 $sessionid   = required_param('sessionid', PARAM_INT);
-$page        = optional_param('page', '0', PARAM_INT);      // which page to show
-$perpage     = optional_param('perpage', '50', PARAM_INT);  // how many per page
-$userid      = optional_param('userid', '0', PARAM_INT);    // current user id
+$page        = optional_param('page', '0', PARAM_INT);      // Which page to show.
+$perpage     = optional_param('perpage', '50', PARAM_INT);  // How many per page.
+$userid      = optional_param('userid', '0', PARAM_INT);    // Current user id.
 
 $site = get_site();
 
@@ -34,7 +34,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage).
     print_error("invalidcourseid");
 }
 if (! $session = $DB->get_record("block_supervised_session", array("id" => $sessionid))) {
@@ -81,7 +81,8 @@ if (file_exists($mform)) {
 } else {
     print_error('noformdesc');
 }
-$mform = new displayoptions_logs_form(null, array('groupid' => $session->groupid, 'courseid' => $courseid, 'teacherid' => $session->teacherid));
+$mform = new displayoptions_logs_form(null, array('groupid' => $session->groupid,
+    'courseid' => $courseid, 'teacherid' => $session->teacherid));
 $toform['sessionid']    = $sessionid;
 $toform['courseid']     = $courseid;
 $toform['userid']       = $userid;
@@ -108,7 +109,8 @@ if ($fromform = $mform->get_data()) {
 }
 
 // Print logs.
-supervisedblock_print_logs($sessionid, $session->timestart, $session->timeend, $userid, $page, $perpage, "view.php?courseid=$courseid&amp;sessionid=$sessionid&amp;userid=$userid");
+supervisedblock_print_logs($sessionid, $session->timestart, $session->timeend, $userid, $page, $perpage,
+    "view.php?courseid=$courseid&amp;sessionid=$sessionid&amp;userid=$userid");
 
 // Display footer.
 echo $OUTPUT->footer();

@@ -24,7 +24,7 @@ $string['activesessionsstudenttitle']           = 'You have {$a} active session(
 $string['nosessionsstudenttitle']               = 'You don\'t have any active session...';
 
 
-// Capabilities description
+// Capabilities description.
 $string['supervised:addinstance']               = 'Add a new Supervised block';
 $string['supervised:besupervised']              = 'Student access mode';
 $string['supervised:supervise']                 = 'For own sessions: start planned, start new, edit active, finish active, view logs.';

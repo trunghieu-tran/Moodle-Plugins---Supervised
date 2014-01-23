@@ -49,43 +49,43 @@ class activesession_block_form extends moodleform {
             }
         }
 
-        // add group
+        // Add group.
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
-        // Add show logs link.
+        // ...show logs link.
         $sessionid = $this->_customdata['sessionid'];
         $courseid = $this->_customdata['courseid'];
         $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $sessionid, 'courseid' => $courseid));
         $mform->addElement('link', 'showlogslink', null, $logsurl->out(false), get_string('showlogs', 'block_supervised'));
-        // add classroom
+        // ...classroom.
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
-        // add group combobox
+        // ...group combobox.
         $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
-        // add lessontype
+        // ...lessontype.
         if ($this->_customdata['needlessontype']) {
             $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
         }
-        // add time start
+        // ...time start.
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
-        // add duration
+        // ...duration.
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
         $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
-        // add timeend
+        // ...timeend.
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
-        // add comment
+        // ...comment.
         if ($this->_customdata['needcomment']) {
             $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
         }
-        // hidden elements.
-        $mform->addElement('hidden', 'id');     // course id
+        // ...hidden elements.
+        $mform->addElement('hidden', 'id');     // course id.
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'timestartraw');     // session timestart (in seconds)
+        $mform->addElement('hidden', 'timestartraw');     // Session timestart (in seconds).
         $mform->setType('timestartraw', PARAM_INT);
 
-        // add submit and cancel buttons
+        // ...submit and cancel buttons.
         $buttonarray=array();
         $buttonarray[] =& $mform->createElement('submit', 'supervised_updatebtn', get_string('updatesession', "block_supervised"));
         $buttonarray[] =& $mform->createElement('cancel', 'supervised_finishbtn', get_string('finishsession', "block_supervised"));
@@ -93,7 +93,7 @@ class activesession_block_form extends moodleform {
     }
 
 
-    // Form validation
+    // Form validation..
     public function validation($data, $files) {
         $errors = array();
         $curtime = time();

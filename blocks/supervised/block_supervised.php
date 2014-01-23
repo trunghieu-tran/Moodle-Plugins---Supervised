@@ -131,7 +131,8 @@ class block_supervised extends block_base {
             } else {
                 print_error('noformdesc');
             }
-            $mform = new plannedsession_block_form(null, array('lessontype' => $plannedsession->lessontypeid, 'needcomment' => $plannedsession->sessioncomment!='' ));
+            $mform = new plannedsession_block_form(null, array('lessontype' => $plannedsession->lessontypeid,
+                'needcomment' => $plannedsession->sessioncomment!='' ));
             if ($fromform = $mform->get_data()) {
                 // TODO Logging
                 // Start session and update fields that user could edit.
@@ -205,7 +206,7 @@ class block_supervised extends block_base {
 
             if ($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields
-                // TODO Logging
+                // TODO Logging.
                 $curtime = time();
                 $activesession->state           = StateSession::FINISHED;
                 $activesession->timeend         = $curtime;
@@ -225,7 +226,7 @@ class block_supervised extends block_base {
                 unset($activesession);
             } else if ($fromform = $mform->get_data()) {
                 // Update session
-                // TODO Logging
+                // TODO Logging.
                 $title = get_string('activesessiontitle', 'block_supervised');
                 $oldgroupid = $activesession->groupid;
                 $newgroupid = $fromform->groupid;
@@ -314,7 +315,7 @@ class block_supervised extends block_base {
         $mform = new startsession_block_form();
 
         if ($fromform = $mform->get_data()) {
-            // TODO Logging
+            // TODO Logging.
             // Trigger event (session started).
             $sessioninfo = new stdClass();
             $sessioninfo->courseid      = $COURSE->id;
@@ -322,7 +323,7 @@ class block_supervised extends block_base {
             $sessioninfo->lessontypeid  = $fromform->lessontypeid;
             events_trigger('session_started', $sessioninfo);
 
-            // Start session
+            // Start session.
             $curtime = time();
             $fromform->state          = StateSession::ACTIVE;
             $fromform->courseid       = $COURSE->id;
@@ -390,12 +391,12 @@ class block_supervised extends block_base {
         $time = time();
         $activesessions = get_sessions($courseid, 0, 0, -1, $stateactive, 0, $time, $time, 0);
 
-        // Filter sessions by user groups
+        // Filter sessions by user groups.
         $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);
         $groups = $groupinggroups[0];
         foreach ($activesessions as $id => $session) {
             if (!in_array($session->groupid, $groups) AND $session->groupid != 0) {
-                // If user isn't in session->groupid - delete this session
+                // If user isn't in session->groupid - delete this session.
                 unset($activesessions[$id]);
             }
         }
@@ -426,10 +427,16 @@ class block_supervised extends block_base {
             foreach ($activesessions as $session) {
                 $mform = new activesessionstudent_block_form();
                 $toform['id']               = $COURSE->id;
-                $toform['teacher']          = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
-                $toform['lessontypename']   = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+                $toform['teacher']          = html_writer::link(
+                    new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
+                    fullname($session));
+                $toform['lessontypename']   = $session->lessontypename == ''
+                    ? get_string('notspecified', 'block_supervised')
+                    : $session->lessontypename;
                 $toform['classroomname']    = $session->classroomname;
-                $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
+                $toform['groupname']        = $session->groupname == ''
+                    ? get_string('allgroups', 'block_supervised')
+                    : $session->groupname;
                 $toform['timestart']        = userdate($session->timestart, $strftimedatetime);
                 $toform['duration']         = $session->duration;
                 $toform['timeend']          = userdate($session->timeend, $strftimedatetime);

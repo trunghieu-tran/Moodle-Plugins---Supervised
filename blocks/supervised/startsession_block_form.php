@@ -57,15 +57,15 @@ class startsession_block_form extends moodleform {
             }
         }
 
-        // add group
+        // ...group.
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
-        // add classroom combobox
+        // ...classroom combobox.
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
-        // add group combobox
+        // ...group combobox.
         $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
-        // add lessontype combobox
+        // ...lessontype combobox.
         if ($clessontypes) {
             $mform->addElement('select', 'lessontypeid', get_string('lessontype', 'block_supervised'), $lessontypes);
             $mform->addRule('lessontypeid', null, 'required', null, 'client');
@@ -73,19 +73,19 @@ class startsession_block_form extends moodleform {
             $mform->addElement('hidden', 'lessontypeid');
             $mform->setType('lessontypeid', PARAM_INT);
         }
-        // add duration
+        // ...duration.
         $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
         $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
-        // hidden elements.
-        $mform->addElement('hidden', 'id');     // course id
+        // ...hidden elements.
+        $mform->addElement('hidden', 'id');     // Course id.
         $mform->setType('id', PARAM_INT);
-        // add submit button
+        // ...submit button.
         $mform->addElement('submit', 'submitbutton', get_string('startsession', "block_supervised"));
     }
 
-    // Form validation
+    // Form validation.
     public function validation($data, $files) {
         $errors = array();
 

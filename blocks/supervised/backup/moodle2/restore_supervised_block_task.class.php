@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/blocks/supervised/backup/moodle2/restore_supervised_stepslib.php'); // We have structure steps
+require_once($CFG->dirroot . '/blocks/supervised/backup/moodle2/restore_supervised_stepslib.php'); // We have structure steps.
 
 /**
  * Specialised restore task for the supervised block
@@ -33,16 +33,16 @@ class restore_supervised_block_task extends restore_block_task {
     }
 
     protected function define_my_steps() {
-        // supervised has one structure step
+        // Supervised has one structure step.
         $this->add_step(new restore_supervised_block_structure_step('supervised_structure', 'supervised.xml'));
     }
 
     public function get_fileareas() {
-        return array(); // No associated fileareas
+        return array(); // No associated fileareas.
     }
 
     public function get_configdata_encoded_attributes() {
-        return array(); // No special handling of configdata
+        return array(); // No special handling of configdata.
     }
 
     static public function define_decode_contents() {

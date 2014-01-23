@@ -21,14 +21,14 @@ require_once('lib.php');
 global $DB, $PAGE, $OUTPUT, $USER;
 
 $courseid   = required_param('courseid', PARAM_INT);
-$id         = optional_param('id', '', PARAM_INT);        // session id (only for edit mode)
+$id         = optional_param('id', '', PARAM_INT);        // Session id (only for edit mode).
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage).
     print_error("invalidcourseid");
 }
 
@@ -52,7 +52,7 @@ if (!$id) {   // Add mode.
     $title = get_string('addsessionpagetitle', 'block_supervised');
     $heading = get_string("addingnewsession", 'block_supervised');
 
-    // Setting default values
+    // Setting default values.
     $toform['teacherid']    = $USER->id;
     $toform['sendemail']    = 1;
     $toform['duration']     = 90;
@@ -108,12 +108,14 @@ if (!$teachersexist || !$classroomsexist) {
     echo $OUTPUT->heading($heading, 2);
     if (!$teachersexist) {
         echo get_string('enrollteacher', 'block_supervised');
-        echo ' ' . html_writer::link(new moodle_url("/enrol/users.php?id={$course->id}"), get_string('gotoenrollment', 'block_supervised'));
+        echo ' ' . html_writer::link(new moodle_url("/enrol/users.php?id={$course->id}"),
+                get_string('gotoenrollment', 'block_supervised'));
         echo '<br/>';
     }
     if (!$classroomsexist) {
         echo get_string('createclassroom', 'block_supervised');
-        echo ' ' . html_writer::link(new moodle_url("/blocks/supervised/classrooms/view.php?courseid={$course->id}"), get_string('gotoclassrooms', 'block_supervised'));
+        echo ' ' . html_writer::link(new moodle_url("/blocks/supervised/classrooms/view.php?courseid={$course->id}"),
+                get_string('gotoclassrooms', 'block_supervised'));
         echo '<br/>';
     }
     echo $OUTPUT->footer();
@@ -162,9 +164,9 @@ if ($mform->is_cancelled()) {
             $newteacherid = $fromform->teacherid;
             if ($oldteacherid != $newteacherid) {
                 // Send e-mail to both teachers if teacher has been changed.
-                mail_newsession(get_session($fromform->id), $USER); // new session for new teacher
+                mail_newsession(get_session($fromform->id), $USER); // New session for new teacher.
                 $session->messageforteacher = '';
-                mail_removedsession($session, $USER);               // removed session for old teacher
+                mail_removedsession($session, $USER);               // Removed session for old teacher.
             } else {
                 mail_editedsession(get_session($fromform->id), $USER);
             }
@@ -173,7 +175,7 @@ if ($mform->is_cancelled()) {
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
-    // form didn't validate or this is the first display
+    // Form didn't validate or this is the first display.
     echo $OUTPUT->header();
     echo $OUTPUT->heading($heading, 2);
 

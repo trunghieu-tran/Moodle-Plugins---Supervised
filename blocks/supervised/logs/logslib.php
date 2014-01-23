@@ -30,9 +30,9 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     global $DB;
 
     $session = $DB->get_record('block_supervised_session', array('id' => $sessionid));
-    // todo filtering: $classroom = $DB->get_record('block_supervised_classroom', array('id' => $session->classroomid));
+    // TODO filtering: $classroom = $DB->get_record('block_supervised_classroom', array('id' => $session->classroomid));
 
-    // Prepare query
+    // Prepare query.
     $params = array();
     $selector = "(l.time BETWEEN :timefrom AND :timeto) AND l.course = :courseid";
     $params['timefrom'] = $timefrom;
@@ -42,12 +42,12 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
         $selector .= " AND l.userid = :userid";
         $params['userid'] = $userid;
     }
-    // Get logs
+    // Get logs.
     $logs = get_logs($selector, $params, 'l.time DESC', '', '', $totalcount);
 
-    // Filter logs by classroom ip subnet
+    // Filter logs by classroom ip subnet.
     $logsfiltered = $logs;
-    /*todo filtering
+    /* TODO filtering
     $logs_filtered = array();
     foreach ($logs as $id => $log) {
         echo($log->ip);
@@ -107,7 +107,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
             $ldcache[$log->module][$log->action] = $ld;
         }
         if ($ld && is_numeric($log->info)) {
-            // ugly hack to make sure fullname is shown correctly
+            // Ugly hack to make sure fullname is shown correctly.
             if ($ld->mtable == 'user' && $ld->field == $DB->sql_concat('firstname', "' '" , 'lastname')) {
                 $log->info = fullname($DB->get_record($ld->mtable, array('id' => $log->info)), true);
             } else {
@@ -115,11 +115,11 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
             }
         }
 
-        // Filter log->info
+        // Filter log->info.
         $log->info = format_string($log->info);
 
         // If $log->url has been trimmed short by the db size restriction
-        // code in add_to_log, keep a note so we don't add a link to a broken url
+        // code in add_to_log, keep a note so we don't add a link to a broken url.
         $brokenurl=(core_text::strlen($log->url)==100 && core_text::substr($log->url, 97)=='...');
 
         $row = array();
@@ -127,16 +127,19 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
         $row[] = userdate($log->time, '%a').' '.userdate($log->time, $strftimedatetime);
 
         $link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
-        $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup', array('height' => 440, 'width' => 700)));
+        $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',
+            array('height' => 440, 'width' => 700)));
 
-        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"), fullname($log));
+        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"),
+            fullname($log));
 
         $displayaction="$log->module $log->action";
         if ($brokenurl) {
             $row[] = $displayaction;
         } else {
             $link = make_log_url($log->module, $log->url);
-            $row[] = $OUTPUT->action_link($link, $displayaction, new popup_action('click', $link, 'fromloglive'), array('height' => 440, 'width' => 700));
+            $row[] = $OUTPUT->action_link($link, $displayaction, new popup_action('click', $link, 'fromloglive'),
+                array('height' => 440, 'width' => 700));
         }
         $row[] = $log->info;
         $table->data[] = $row;
@@ -166,11 +169,19 @@ function print_session_info_form($sessionid) {
     $session = get_session($sessionid);
 
     $strftimedatetime = get_string("strftimerecent");
-    $toform['coursename']       = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
+    $toform['coursename']       = html_writer::link(
+        new moodle_url("/course/view.php?id={$session->courseid}"),
+        $session->coursename);
     $toform['classroomname']    = $session->classroomname;
-    $toform['groupname']        = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
-    $toform['teachername']      = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
-    $toform['lessontypename']   = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+    $toform['groupname']        = $session->groupname == ''
+        ? get_string('allgroups', 'block_supervised')
+        : $session->groupname;
+    $toform['teachername']      = html_writer::link(
+        new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
+        fullname($session));
+    $toform['lessontypename']   = $session->lessontypename == ''
+        ? get_string('notspecified', 'block_supervised')
+        : $session->lessontypename;
     $toform['timestart']        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
