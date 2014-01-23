@@ -1,0 +1,31 @@
+.block_supervised .content {
+    font-size: 11px;
+}
+.block_supervised .content .footer {
+    font-size: 13px;
+}
+
+.block_supervised .content .mform .fitem .felement {
+    margin-left: 35%;
+}
+
+.block_supervised .content .mform .fdescription.required {
+    display: none;
+}
+
+.block_supervised .content select {
+    width: 98px;
+}
+
+.block_supervised .content .mform .fitem .fgroup {
+    margin-left: 0;
+}
+
+#supervisedblock_selectcourseform{
+    margin-bottom: -20px;
+}
+
+#supervisedblock_selectcourseform #supervisedblock_courselabel{
+    margin-left: 170px;
+    margin-right: 10px;
+}
