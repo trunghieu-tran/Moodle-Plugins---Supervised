@@ -5,7 +5,6 @@ require_once('lib.php');
 
 global $DB, $OUTPUT, $PAGE, $USER;
 
-date_default_timezone_set('Europe/Volgograd');
 $courseid   = required_param('courseid', PARAM_INT);
 $page       = optional_param('page', '0', PARAM_INT);       // which page to show
 $perpage    = optional_param('perpage', '50', PARAM_INT);   // how many per page

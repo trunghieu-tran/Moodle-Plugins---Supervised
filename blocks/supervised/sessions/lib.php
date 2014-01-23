@@ -292,7 +292,7 @@ function mail_newsession($session, $creator){
     $strftimedatetime = get_string("strftimerecent");
 
     $site        = get_site();
-    $supportuser = generate_email_supportuser();
+    $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id'=>$session->teacherid));
 
     $data = new stdClass();
@@ -331,7 +331,7 @@ function mail_removedsession($session, $remover){
     $strftimedatetime = get_string("strftimerecent");
 
     $site        = get_site();
-    $supportuser = generate_email_supportuser();
+    $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id'=>$session->teacherid));
 
     $data = new stdClass();
@@ -377,7 +377,7 @@ function mail_editedsession($updsession, $editor){
     $strftimedatetime = get_string("strftimerecent");
 
     $site        = get_site();
-    $supportuser = generate_email_supportuser();
+    $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id'=>$updsession->teacherid));
 
     $data = new stdClass();
