@@ -134,7 +134,7 @@ $string['sessionstartsafter']       = 'Session starts after';
 $string['sessionendsbefore']        = 'Session ends before';
 $string['timetovalidationerror']    = 'Session\'s end must be greater or equal session\'s start.';
 $string['enrollteacher']            = 'For plane session you must enroll at least one teacher to course!';
-$string['createclassroom']          = 'For plane session you must create (or make visible) at least one classroom!';
+$string['createclassroom']          = 'For plane/start session you must create (or make visible) at least one classroom!';
 $string['gotoenrollment']           = 'Go to user enrollment page';
 $string['gotoclassrooms']           = 'Go to classrooms page';
 
