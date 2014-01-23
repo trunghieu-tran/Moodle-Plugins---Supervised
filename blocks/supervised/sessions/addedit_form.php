@@ -14,6 +14,7 @@ class addedit_session_form extends moodleform {
 
         $mform =& $this->_form;
 
+        $teachers = array();
         if ($cteachers = get_users_by_capability($PAGE->context, array('block/supervised:supervise'))) {
             if( has_capability('block/supervised:manageownsessions', $PAGE->context) AND !has_capability('block/supervised:manageallsessions', $PAGE->context) ){
                 // If current user has only manageownsessions capability he can plane session only for himself.
@@ -28,6 +29,7 @@ class addedit_session_form extends moodleform {
         }
 
         // Find all classrooms.
+        $classrooms = array();
         if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
             foreach ($cclassrooms as $cclassroom) {
                 $classrooms[$cclassroom->id] = $cclassroom->name;

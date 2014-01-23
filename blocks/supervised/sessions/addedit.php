@@ -85,6 +85,26 @@ if(!$id){   // Add mode.
 
 $PAGE->set_title($title);
 
+// Check if teachers and classrooms exist.
+$teachersexist = (boolean)(get_users_by_capability($PAGE->context, array('block/supervised:supervise')));
+$classroomsexist = $DB->record_exists("block_supervised_classroom", array('active'=>1));
+if(!$teachersexist || !$classroomsexist){
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading($heading, 2);
+    if(!$teachersexist){
+        echo get_string('enrollteacher', 'block_supervised');
+        echo ' ' . html_writer::link(new moodle_url("/enrol/users.php?id={$course->id}"), get_string('gotoenrollment', 'block_supervised'));
+        echo '<br/>';
+    }
+    if(!$classroomsexist){
+        echo get_string('createclassroom', 'block_supervised');
+        echo ' ' . html_writer::link(new moodle_url("/blocks/supervised/classrooms/view.php?courseid={$course->id}"), get_string('gotoclassrooms', 'block_supervised'));
+        echo '<br/>';
+    }
+    echo $OUTPUT->footer();
+    exit;
+}
+
 // Prepare form.
 $mform = "addedit_form.php";
 if (file_exists($mform)) {

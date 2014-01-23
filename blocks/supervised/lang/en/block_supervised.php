@@ -133,6 +133,11 @@ $string['showsessions']             = 'Show sessions';
 $string['sessionstartsafter']       = 'Session starts after';
 $string['sessionendsbefore']        = 'Session ends before';
 $string['timetovalidationerror']    = 'Session\'s end must be greater or equal session\'s start.';
+$string['enrollteacher']            = 'For plane session you must enroll at least one teacher to course!';
+$string['createclassroom']          = 'For plane session you must create (or make visible) at least one classroom!';
+$string['gotoenrollment']           = 'Go to user enrollment page';
+$string['gotoclassrooms']           = 'Go to classrooms page';
+
 $string['sessionsdefinition']       = 'Sessions definition';
 $string['sessionsdefinition_help']  = 'The course teachers creates sessions specifying the academic group, lesson type (e.g. laboratory work, exam, etc.), classroom and duration. After that students will be able to start quizzes from this course according next conditions:
 
