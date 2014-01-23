@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -69,7 +68,7 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         }
 
         // Restore lessontypes.
-        $DB->delete_records('block_supervised_lessontype', array('courseid'=>$this->get_courseid()));
+        $DB->delete_records('block_supervised_lessontype', array('courseid' => $this->get_courseid()));
         $lessontypes = (object)$root->lessontypes;
         $lessontypes = $lessontypes->lessontype;
         if ($lessontypes) {
@@ -83,7 +82,7 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         }
 
         // Restore sessions.
-        $DB->delete_records('block_supervised_session', array('courseid'=>$this->get_courseid()));
+        $DB->delete_records('block_supervised_session', array('courseid' => $this->get_courseid()));
         $sessions = (object)$root->sessions;
         $sessions = $sessions->session;
         if ($sessions) {

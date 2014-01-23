@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 
 /**
  * Returns true if the user can safely delete passed lesson type
@@ -10,12 +25,12 @@ function can_delete_lessontype($lessontypeid) {
     global $DB;
 
     // Can not remove lessontype used in session(s)
-    if($DB->record_exists('block_supervised_session', array('lessontypeid'=>$lessontypeid))){
+    if ($DB->record_exists('block_supervised_session', array('lessontypeid' => $lessontypeid))) {
         return false;
     }
 
     // Can not remove lessontype used in quiz_access_rules table
-    if($DB->record_exists('quizaccess_supervisedcheck', array('lessontypeid'=>$lessontypeid))){
+    if ($DB->record_exists('quizaccess_supervisedcheck', array('lessontypeid' => $lessontypeid))) {
         return false;
     }
 
@@ -31,7 +46,7 @@ function can_delete_lessontype($lessontypeid) {
 function can_delete_classroom($classroomid) {
     global $DB;
     // Can not remove classroom used in session(s)
-    return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid));
+    return ! $DB->record_exists('block_supervised_session', array('classroomid' => $classroomid));
 }
 
 /**
@@ -43,7 +58,7 @@ function can_showhide_classroom($classroomid) {
     require_once('sessions/sessionstate.php');
     global $DB;
     // Can not showhide classroom used in active session(s)
-    return ! $DB->record_exists('block_supervised_session', array('classroomid'=>$classroomid, 'state'=>StateSession::Active));
+    return ! $DB->record_exists('block_supervised_session', array('classroomid' => $classroomid, 'state' => StateSession::ACTIVE));
 }
 
 
@@ -70,7 +85,7 @@ function supervised_get_js_module() {
  * @param null $sessionid integer the session id
  * @return bool true if the session(s) exist
  */
-function session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
+function session_exists($teacherid, $timestart, $timeend, $sessionid=null) {
     require_once('sessions/sessionstate.php');
     global $DB;
 
@@ -93,8 +108,8 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
     $params['timeend1']         = $timeend;
     $params['timeend2']         = $timeend;
     $params['teacherid']        = $teacherid;
-    $params['stateactive']      = StateSession::Active;
-    $params['stateplanned']     = StateSession::Planned;
+    $params['stateactive']      = StateSession::ACTIVE;
+    $params['stateplanned']     = StateSession::PLANNED;
     $params['sessionid']        = $sessionid;
 
     return $DB->record_exists_sql($select, $params);
@@ -106,10 +121,10 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=NULL){
  *
  * @param $course integer course id
  */
-function event_handler_course_deleted($course){
+function event_handler_course_deleted($course) {
     global $DB;
-    $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
-    $DB->delete_records('block_supervised_session', array('courseid'=>$course->id));
+    $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
+    $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
 }
 
 /**
@@ -117,20 +132,20 @@ function event_handler_course_deleted($course){
  *
  * @param $course integer course id
  */
-function event_handler_course_content_removed($course){
+function event_handler_course_content_removed($course) {
     global $DB;
-    $DB->delete_records('block_supervised_lessontype', array('courseid'=>$course->id));
-    $DB->delete_records('block_supervised_session', array('courseid'=>$course->id));
+    $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
+    $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
 }
 
 
 
-function event_handler_groups_group_deleted($group){
+function event_handler_groups_group_deleted($group) {
     global $DB;
-    $DB->delete_records('block_supervised_session', array('groupid'=>$group->id));
+    $DB->delete_records('block_supervised_session', array('groupid' => $group->id));
 }
 
-function event_handler_groups_groups_deleted($courseid){
+function event_handler_groups_groups_deleted($courseid) {
     global $DB;
-    $DB->delete_records('block_supervised_session', array('courseid'=>$courseid));
+    $DB->delete_records('block_supervised_session', array('courseid' => $courseid));
 }

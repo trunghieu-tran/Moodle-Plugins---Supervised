@@ -1,4 +1,20 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 require_once('../../../config.php');
 require_once('sessionstate.php');
 require_once('lib.php');
@@ -15,29 +31,27 @@ $site = get_site();
 require_login($course);
 $PAGE->set_url('/blocks/supervised/sessions/delete.php', array('id' => $id, 'courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-include("breadcrumbs.php");
+require("breadcrumbs.php");
 
 if (! $session = get_session($id)) {
     print_error(get_string("invalidsessionid", 'block_supervised'));
 }
 
 // Check capabilities.
-if ($session->state == StateSession::Finished) {
+if ($session->state == StateSession::FINISHED) {
     // Only user with managefinishedsessions capability can remove finished sessions.
     require_capability('block/supervised:managefinishedsessions', $PAGE->context);
-}
-else{
+} else {
     if ( ! (($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
-            || has_capability('block/supervised:manageallsessions', $PAGE->context))   ){
+            || has_capability('block/supervised:manageallsessions', $PAGE->context))   ) {
         require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
-    }
-    else{
+    } else {
         // User wants remove session of other user.
         require_capability('block/supervised:manageallsessions', $PAGE->context);
     }
 }
 
-if ($session->state == StateSession::Active) {
+if ($session->state == StateSession::ACTIVE) {
     print_error(get_string("sessiondeleteerror", 'block_supervised'));
 }
 
@@ -55,16 +69,16 @@ $mform = new delete_session_form();
 
 
 
-if($mform->is_cancelled()) {
+if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Delete session.
     // TODO Logging
-    $DB->delete_records('block_supervised_session', array('id'=>$id));
+    $DB->delete_records('block_supervised_session', array('id' => $id));
     // Send e-mail to teacher.
-    if($fromform->notifyteacher){
+    if ($fromform->notifyteacher) {
         $session->messageforteacher = $fromform->messageforteacher;
         mail_removedsession($session, $USER);
     }
@@ -90,7 +104,7 @@ if($mform->is_cancelled()) {
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
     $toform['sessioncomment']   = $session->sessioncomment;
-    $toform['notifyteacher']    = ($session->state == StateSession::Finished) ? 0 : 1;
+    $toform['notifyteacher']    = ($session->state == StateSession::FINISHED) ? 0 : 1;
 
     $mform->set_data($toform);
     $mform->display();

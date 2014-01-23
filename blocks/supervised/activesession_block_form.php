@@ -1,4 +1,20 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 global $CFG;
 require_once("{$CFG->libdir}/formslib.php");
 
@@ -12,14 +28,14 @@ require_once("{$CFG->libdir}/formslib.php");
  * @licence
  */
 class activesession_block_form extends moodleform {
- 
-    function definition() {
+
+    protected function definition() {
         global $DB, $COURSE;
 
         $mform =& $this->_form;
 
         // Find all classrooms.
-        if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active'=>true))) {
+        if ($cclassrooms = $DB->get_records('block_supervised_classroom', array('active' => true))) {
             foreach ($cclassrooms as $cclassroom) {
                 $classrooms[$cclassroom->id] = $cclassroom->name;
             }
@@ -47,7 +63,7 @@ class activesession_block_form extends moodleform {
         $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // add lessontype
-        if($this->_customdata['needlessontype']){
+        if ($this->_customdata['needlessontype']) {
             $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
         }
         // add time start
@@ -60,7 +76,7 @@ class activesession_block_form extends moodleform {
         // add timeend
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         // add comment
-        if($this->_customdata['needcomment']){
+        if ($this->_customdata['needcomment']) {
             $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
         }
         // hidden elements.
@@ -78,12 +94,12 @@ class activesession_block_form extends moodleform {
 
 
     // Form validation
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = array();
         $curtime = time();
 
         // Session time end must be greater than current time + 1 minute.
-        if($data['timestartraw'] + $data['duration']*60 <= $curtime+60){
+        if ($data['timestartraw'] + $data['duration']*60 <= $curtime+60) {
             $errors["duration"] = get_string("increaseduration", "block_supervised");
         }
 
