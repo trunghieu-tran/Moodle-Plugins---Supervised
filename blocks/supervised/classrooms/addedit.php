@@ -18,14 +18,14 @@
 require_once('../../../config.php');
 
 $courseid   = required_param('courseid', PARAM_INT);
-$id         = optional_param('id', '', PARAM_INT);        // classroom id (only for edit mode)
+$id         = optional_param('id', '', PARAM_INT);        // Classroom id (only for edit mode).
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage)..
     print_error("invalidcourseid");
 }
 
@@ -42,7 +42,7 @@ if (!$id) {   // Add mode.
     $title = get_string('addclassroompagetitle', 'block_supervised');
     $heading = get_string("addingnewclassroom", 'block_supervised');
 
-    $toform['active']   = 1;    // default value
+    $toform['active']   = 1;    // Default value.
 } else {     // Edit mode.
     if (! $classroom = $DB->get_record("block_supervised_classroom", array("id" => $id))) {
         print_error(get_string("invalidclassroomid", 'block_supervised'));
@@ -80,22 +80,18 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        /* TODO Logging.
-            It seems that add_to_log function does not support any block's logging.
-            The problem is in second parameter ($module).
-            See also: https://moodle.org/mod/forum/discuss.php?d=184400.
-        */
+        // TODO Logging.
     } else {     // Edit mode.
 
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging
+        // TODO Logging.
     }
     $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
-    // form didn't validate or this is the first display
+    // Form didn't validate or this is the first display.
     echo $OUTPUT->header();
     echo $OUTPUT->heading($heading, 2);
     $mform->display();

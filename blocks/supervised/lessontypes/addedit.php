@@ -18,14 +18,14 @@
 require_once('../../../config.php');
 
 $courseid   = required_param('courseid', PARAM_INT);
-$id         = optional_param('id', '', PARAM_INT);        // lessontype id (only for edit mode)
+$id         = optional_param('id', '', PARAM_INT);        // Lessontype id (only for edit mode).
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage).
     print_error("invalidcourseid");
 }
 
@@ -73,12 +73,12 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
     if (!$id) {   // Add mode.
-        // TODO Logging
+        // TODO Logging.
         if (!$DB->insert_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
     } else {     // Edit mode.
-        // TODO Logging
+        // TODO Logging.
         if (!$DB->update_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
@@ -87,7 +87,7 @@ if ($mform->is_cancelled()) {
     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
-    // form didn't validate or this is the first display
+    // Form didn't validate or this is the first display.
     echo $OUTPUT->header();
     echo $OUTPUT->heading($heading, 2);
     $mform->display();

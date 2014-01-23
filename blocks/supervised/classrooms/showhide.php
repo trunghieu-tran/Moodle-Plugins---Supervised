@@ -32,7 +32,7 @@ require_capability('block/supervised:editclassrooms', $PAGE->context);
 
 
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage).
     print_error("invalidcourseid");
 }
 

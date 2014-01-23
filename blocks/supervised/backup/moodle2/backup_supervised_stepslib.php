@@ -62,7 +62,7 @@ class backup_supervised_block_structure_step extends backup_block_structure_step
 
         // Annotations (none).
 
-        // Return the root element, wrapped into standard block structure
+        // Return the root element, wrapped into standard block structure.
         return $this->prepare_block_structure($root);
     }
 }

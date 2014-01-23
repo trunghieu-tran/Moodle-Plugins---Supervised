@@ -91,14 +91,14 @@ class displayoptions_sessions_form extends moodleform {
 
         $mform->addElement('submit', 'submitbutton', get_string('showsessions', 'block_supervised'));
 
-        // hidden elements
+        // Add hidden elements.
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
         $mform->addElement('hidden', 'course');
         $mform->setType('course', PARAM_INT);
     }
 
-    // Form validation
+    // Form validation.
     public function validation($data, $files) {
         $errors = array();
 

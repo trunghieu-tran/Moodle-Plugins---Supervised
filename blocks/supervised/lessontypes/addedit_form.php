@@ -28,14 +28,14 @@ class addedit_lessontype_form extends moodleform {
 
         $mform =& $this->_form;
 
-        // add group
+        // Add group.
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        // add name element
+        // ...name element.
         $mform->addElement('text', 'name', get_string('name'), array('size' => '48'));
         $mform->setType('name', PARAM_RAW);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        // hidden elements
+        // ...hidden elements.
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
         $mform->addElement('hidden', 'id');

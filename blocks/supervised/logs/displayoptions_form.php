@@ -58,8 +58,7 @@ class displayoptions_logs_form extends moodleform {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
         $mform->addElement('select', 'userid', get_string('filterlogsbyuser', 'block_supervised'), $users);
-
-        // hidden elements
+        // ...hidden elements.
         $mform->addElement('hidden', 'sessionid');
         $mform->setType('sessionid', PARAM_INT);
         $mform->addElement('hidden', 'courseid');
@@ -68,7 +67,7 @@ class displayoptions_logs_form extends moodleform {
         $mform->addElement('submit', 'submitbutton', get_string('showlogsbutton', "block_supervised"));
     }
 
-    // Form validation
+    // Form validation.
     public function validation($data, $files) {
         $errors = array();
 

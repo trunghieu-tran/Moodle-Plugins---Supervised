@@ -38,13 +38,14 @@ class delete_session_form extends moodleform {
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
 
-        // add notify teacher by e-mail checkbox
+        // ...notify teacher by e-mail checkbox.
         $mform->addElement('advcheckbox', 'notifyteacher', get_string("notifyteacher", 'block_supervised'));
         $mform->addHelpButton('notifyteacher', 'notifyteacher', 'block_supervised');
-        // add comment
-        $mform->addElement('textarea', 'messageforteacher', get_string("messageforteacher", "block_supervised"), 'rows="4" cols="30"');
+        // ...comment.
+        $mform->addElement('textarea', 'messageforteacher',
+            get_string("messageforteacher", "block_supervised"), 'rows="4" cols="30"');
 
-        // hidden elements
+        // ...hidden elements.
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'courseid');

@@ -27,7 +27,7 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error("invalidcourseid");
 }
 if ($site->id == $course->id) {
-    // block can not work in the main course (frontpage)
+    // Block can not work in the main course (frontpage).
     print_error("invalidcourseid");
 }
 
@@ -42,7 +42,7 @@ require("breadcrumbs.php");
 echo $OUTPUT->header();
 echo $OUTPUT->heading_with_help(get_string("lessontypesview", 'block_supervised'), 'lessontypesdefinition', 'block_supervised');
 
-// Prepare table data
+// Prepare table data.
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid' => $courseid), 'name');
 $tabledata = array();
 foreach ($lessontypes as $id => $lessontype) {

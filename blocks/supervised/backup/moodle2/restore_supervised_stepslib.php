@@ -49,7 +49,7 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         $data = (object)$data;
         $root = (object)($data->root);
 
-        // For any reason (non multiple, dupe detected...) block not restored, return
+        // For any reason (non multiple, dupe detected...) block not restored, return.
         if (!$this->task->get_blockid()) {
             return;
         }

@@ -40,10 +40,11 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
         // If user can't supervise access to session's course -> miss current session.
         $coursecontext = context_course::instance($session->courseid);
         if (has_capability('block/supervised:supervise', $coursecontext)) {
-            // Now check if user can view current session
+            // Now check if user can view current session.
             if ($session->teacherid != $USER->id) {
                 // Check if user has capability to view other user's sessions.
-                if (   has_capability('block/supervised:viewallsessions', $PAGE->context) || has_capability('block/supervised:manageallsessions', $PAGE->context)   ) {
+                if (   has_capability('block/supervised:viewallsessions', $PAGE->context) ||
+                    has_capability('block/supervised:manageallsessions', $PAGE->context)   ) {
                     $sessionsfiltered[] = $session;
                 }
             } else {
@@ -78,7 +79,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 
     $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $lessontype, $state);
     $totalcount = $sessions['totalcount'];
-    // Check if any lesson type exists in course
+    // Check if any lesson type exists in course.
     if ($course) {
         $lessontypesexist = $DB->record_exists('block_supervised_lessontype', array('courseid' => $course));
     } else {
@@ -95,7 +96,8 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
     $strftimedatetime = get_string("strftimerecent");
     $tabledata = array();
     foreach ($sessions["sessions"] as $session) {
-        $logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('sessionid' => $session->id, 'courseid' => $session->courseid));
+        $logsurl = new moodle_url('/blocks/supervised/logs/view.php',
+            array('sessionid' => $session->id, 'courseid' => $session->courseid));
         $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
 
         // Combine new row.
@@ -103,9 +105,13 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         $tablerow[] = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
         $tablerow[] = $session->classroomname;
         $tablerow[] = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
-        $tablerow[] = html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"), fullname($session));
+        $tablerow[] = html_writer::link(
+            new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
+            fullname($session));
         if ($lessontypesexist) {
-            $tablerow[] = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+            $tablerow[] = $session->lessontypename == ''
+                ? get_string('notspecified', 'block_supervised')
+                : $session->lessontypename;
         }
         $tablerow[] = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
         $tablerow[] = $session->duration;
@@ -118,18 +124,23 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         if ($session->state ==  StateSession::PLANNED) {
             if (  ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
                 || has_capability('block/supervised:manageallsessions', $PAGE->context) ) {
-                $editurl        = new moodle_url('/blocks/supervised/sessions/addedit.php', array('id' => $session->id, 'courseid' => $session->courseid));
-                $iconedit       = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
+                $editurl    = new moodle_url('/blocks/supervised/sessions/addedit.php',
+                    array('id' => $session->id, 'courseid' => $session->courseid));
+                $iconedit   = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
             }
         }
         // Build delete icon.
         $icondelete = '';
         if (
-            ($session->state ==  StateSession::PLANNED && $session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
-            || ($session->state ==  StateSession::PLANNED && has_capability('block/supervised:manageallsessions', $PAGE->context))
-            || ($session->state ==  StateSession::FINISHED && has_capability('block/supervised:managefinishedsessions', $PAGE->context))
+            ($session->state ==  StateSession::PLANNED && $session->teacherid == $USER->id
+                && has_capability('block/supervised:manageownsessions', $PAGE->context))
+            || ($session->state ==  StateSession::PLANNED
+                && has_capability('block/supervised:manageallsessions', $PAGE->context))
+            || ($session->state ==  StateSession::FINISHED
+                && has_capability('block/supervised:managefinishedsessions', $PAGE->context))
         ) {
-            $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php', array('courseid' => $session->courseid, 'id' => $session->id));
+            $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php',
+                array('courseid' => $session->courseid, 'id' => $session->id));
             $icondelete     = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')));
         }
 
@@ -176,7 +187,8 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
  * @param int $id session id
  * @return array sessions
  */
-function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0) {
+function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0,
+                      $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0, $id=0) {
     global $DB;
 
     $select = "SELECT
@@ -326,8 +338,12 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
  * @param int $id session id
  * @return stdClass session
  */
-function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0, $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0) {
-    $records = get_sessions($courseid, $teacherid, $classroomid, $lessontypeid, $state, $timestart1, $timestart2, $timeend1, $timeend2, $id);
+function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-1, $state=0,
+                     $timestart1=0, $timestart2=0, $timeend1=0, $timeend2=0) {
+
+    $records = get_sessions($courseid, $teacherid, $classroomid, $lessontypeid, $state,
+        $timestart1, $timestart2, $timeend1, $timeend2, $id);
+
     return array_shift($records); // Return the first element.
 }
 
@@ -351,8 +367,12 @@ function mail_newsession($session, $creator) {
     $data->creatorname      = fullname($creator);
     $data->course           = $session->coursename;
     $data->classroom        = $session->classroomname;
-    $data->group            = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
-    $data->lessontype       = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+    $data->group            = $session->groupname == ''
+        ? get_string('allgroups', 'block_supervised')
+        : $session->groupname;
+    $data->lessontype       = $session->lessontypename == ''
+        ? get_string('notspecified', 'block_supervised')
+        : $session->lessontypename;
     $data->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $data->duration         = $session->duration;
     $data->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
@@ -390,8 +410,12 @@ function mail_removedsession($session, $remover) {
     $data->state            = StateSession::get_state_name($session->state);
     $data->course           = $session->coursename;
     $data->classroom        = $session->classroomname;
-    $data->group            = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
-    $data->lessontype       = $session->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $session->lessontypename;
+    $data->group            = $session->groupname == ''
+        ? get_string('allgroups', 'block_supervised')
+        : $session->groupname;
+    $data->lessontype       = $session->lessontypename == ''
+        ? get_string('notspecified', 'block_supervised')
+        : $session->lessontypename;
     $data->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $data->duration         = $session->duration;
     $data->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
@@ -433,13 +457,17 @@ function mail_editedsession($updsession, $editor) {
     $data->editorname       = fullname($editor);
     $data->course           = $updsession->coursename;
     $data->classroom        = $updsession->classroomname;
-    $data->group            = $updsession->groupname == '' ? get_string('allgroups', 'block_supervised'): $updsession->groupname;
-    $data->lessontype       = $updsession->lessontypename == '' ? get_string('notspecified', 'block_supervised'): $updsession->lessontypename;
-    $data->timestart        = userdate($updsession->timestart, '%a').' '.userdate($updsession->timestart, $strftimedatetime);
-    $data->duration         = $updsession->duration;
-    $data->timeend          = userdate($updsession->timeend, '%a').' '.userdate($updsession->timeend, $strftimedatetime);
-    $data->editurl          = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
-    $data->deleteurl        = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
+    $data->group            = $updsession->groupname == ''
+        ? get_string('allgroups', 'block_supervised')
+        : $updsession->groupname;
+    $data->lessontype       = $updsession->lessontypename == ''
+        ? get_string('notspecified', 'block_supervised')
+        : $updsession->lessontypename;
+    $data->timestart   = userdate($updsession->timestart, '%a').' '.userdate($updsession->timestart, $strftimedatetime);
+    $data->duration    = $updsession->duration;
+    $data->timeend     = userdate($updsession->timeend, '%a').' '.userdate($updsession->timeend, $strftimedatetime);
+    $data->editurl     = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
+    $data->deleteurl   = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
     if ($updsession->sessioncomment) {
         $data->comment          = get_string('emailsessioncomment', 'block_supervised', $updsession->sessioncomment);
     } else {
