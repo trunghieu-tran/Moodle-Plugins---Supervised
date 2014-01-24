@@ -27,7 +27,7 @@ class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
 
         //Normal question with hinting on and several answers with different grades
         $regular = new qtype_preg_question;
-        $regular->usecase = false;
+        $regular->usecase = true;
         $regular->correctanswer = 'He suspects, but he does not know - not yet.';
         $regular->exactmatch = true;
         $regular->usecharhint = true;
