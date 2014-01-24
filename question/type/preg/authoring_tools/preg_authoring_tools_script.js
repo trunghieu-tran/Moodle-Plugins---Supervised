@@ -419,6 +419,10 @@ M.preg_authoring_tools_script = (function ($) {
                             }
                         }
                     );
+
+                    self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
+                    self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
+                    
                     $('#resizeMe').css({
                         width : 20,
                         height : 20,
@@ -426,11 +430,9 @@ M.preg_authoring_tools_script = (function ($) {
                         top : e.pageY - $("body").scrollTop(),*/
                         /*left : e.pageX /*- $("body").scrollLeft()* - 1.5*(br.right - br.left),
                         top : e.pageY - 1900/*$("body").scrollTop()* - (br.bottom - br.top),*/
-                        left : e.pageX - 1.5*(br.right - br.left),
-                        top : e.pageY - $(window).scrollTop() - (br.bottom - br.top),
+                        left : self.RECTANGLE_WIDTH,
+                        top : self.RECTANGLE_HEIGHT,
                     });
-                    self.RECTANGLE_WIDTH = e.pageX - 1.5*(br.right - br.left);
-                    self.RECTANGLE_HEIGHT = e.pageY - 1900 - (br.bottom - br.top);
                 }
             });
 
