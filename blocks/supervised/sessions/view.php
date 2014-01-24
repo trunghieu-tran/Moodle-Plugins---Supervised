@@ -19,17 +19,17 @@ require_once('sessionstate.php');
 require_once('lib.php');
 
 global $DB, $OUTPUT, $PAGE, $USER;
-
+$date = usergetdate(time());
 $courseid   = required_param('courseid', PARAM_INT);
-$page       = optional_param('page', '0', PARAM_INT);       // Which page to show.
-$perpage    = optional_param('perpage', '50', PARAM_INT);   // How many per page.
-$from       = optional_param('f', mktime(0, 0, 0, date('n'), date('j')), PARAM_INT);     // Sessions filtering: timestamp from.
-$to         = optional_param('t', mktime(23, 55, 0, date('n'), date('j')), PARAM_INT);   // Sessions filtering: timestamp to.
-$teacher    = optional_param('teacher', $USER->id, PARAM_INT);    // Sessions filtering: teacher id.
-$coursefilter = optional_param('course', $courseid, PARAM_INT);   // Sessions filtering: course id.
-$lessontype = optional_param('lessontype', '-1', PARAM_INT); // Sessions filtering: lessontype id.
-$classroom  = optional_param('classroom', '0', PARAM_INT);  // Sessions filtering: classroom id.
-$state      = optional_param('state', '0', PARAM_INT);      // Sessions filtering: state index.
+$page       = optional_param('page', '0', PARAM_INT);           // Which page to show.
+$perpage    = optional_param('perpage', '50', PARAM_INT);       // How many per page.
+$from       = optional_param('f', make_timestamp($date['year'], $date['mon'], $date['mday'], 0, 0, 0), PARAM_INT);
+$to         = optional_param('t', make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0), PARAM_INT);
+$teacher    = optional_param('teacher', $USER->id, PARAM_INT);  // Sessions filtering: teacher id.
+$coursefilter = optional_param('course', $courseid, PARAM_INT); // Sessions filtering: course id.
+$lessontype = optional_param('lessontype', '-1', PARAM_INT);    // Sessions filtering: lessontype id.
+$classroom  = optional_param('classroom', '0', PARAM_INT);      // Sessions filtering: classroom id.
+$state      = optional_param('state', '0', PARAM_INT);          // Sessions filtering: state index.
 
 
 $site = get_site();
