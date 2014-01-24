@@ -567,7 +567,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
      * @param offset position from where to match.
      * @return qtype_preg_matching_results object.
      */
-    public function match_from_pos($str, $offset) {
+    public function match_from_pos($str, $offset, $subexpr = 0, $recursionlevel = 0) {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
     }
 
