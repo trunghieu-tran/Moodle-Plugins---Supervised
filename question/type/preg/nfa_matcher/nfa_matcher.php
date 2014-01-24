@@ -34,6 +34,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     public $automaton = null;          // An NFA corresponding to the given regex.
 
     protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
+    protected $subexprbordersmap = array();
 
     public function name() {
         return 'nfa_matcher';
@@ -52,6 +53,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
+            //case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return 'qtype_preg_nfa_leaf';
         }
 
@@ -82,6 +84,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
+            //case qtype_preg_node::TYPE_LEAF_RECURSION:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -92,9 +95,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Creates a processing state object for the given state filled with "nomatch" values.
      */
-    protected function create_initial_state($state, $str, $startpos) {
+    protected function create_initial_state($state, $str, $startpos, $recursionlevel) {
         $result = new qtype_preg_nfa_exec_state();
         $result->matcher = $this;
+        $result->recursionlevel = $recursionlevel;
         $result->state = $state;
 
         $result->matches = array();
@@ -124,8 +128,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Updates all fields in the newstate after a transition match
      */
-    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length) {
-        $endstates = $this->automaton->end_states();
+    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
+        $endstates = $this->end_states($subexpr);
 
         $newstate->state = $transition->to;
 
@@ -153,7 +157,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_nfa_exec_state startstates states to go from.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
-    protected function epsilon_closure($startstates) {
+    protected function epsilon_closure($startstates, $subexpr = 0) {
         $curstates = $startstates;
         $result = array('lazy' => array(),
                         'greedy' => $startstates
@@ -172,7 +176,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
+                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state;
@@ -190,8 +194,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function get_resume_state($str, $laststate) {
-        $endstates = $this->automaton->end_states();
+    protected function get_resume_state($str, $laststate, $subexpr = 0) {
+        $endstates = $this->end_states($subexpr);
 
         if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             // The last transition was a partially matched backreference; we can only continue from this transition.
@@ -199,7 +203,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
 
             $resumestate = clone $laststate;
-            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length);
+            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length, $subexpr);
             $resumestate->length -= $laststate->last_match_len; // Backreference was partially matched
 
             // Re-write the string with correct characters.
@@ -226,7 +230,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if (in_array($curclosure->state, $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
-                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0);
+                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0, $subexpr);
                     return $result;
                 }
             }
@@ -241,8 +245,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    protected function generate_extension_brute_force($str, $laststate) {
-        $endstates = $this->automaton->end_states();
+    protected function generate_extension_brute_force($str, $laststate, $subexpr = 0) {
+        $endstates = $this->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
@@ -280,7 +284,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
+                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
 
                 // Generate a next character.
                 //if ($length > 0) {
@@ -306,8 +310,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_nfa_exec_state.
      */
-    protected function generate_extension_fast($str, $laststate) {
-        $endstates = $this->automaton->end_states();
+    protected function generate_extension_fast($str, $laststate, $subexpr = 0) {
+        $endstates = $this->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
@@ -372,7 +376,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
+                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
 
                     // Generate a next character.
                     //if ($length > 0) {
@@ -410,15 +414,15 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * This method should be used if there are backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_brute_force($str, $startpos) {
+    protected function match_brute_force($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
 
         $curstates = array();    // States which the automaton is in at the current wave front.
         $lazystates = array();   // States reached lazily.
 
-        foreach ($this->automaton->start_states() as $state) {
-            $curstates[] = $this->create_initial_state($state, $str, $startpos);
+        foreach ($this->start_states($subexpr) as $state) {
+            $curstates[] = $this->create_initial_state($state, $str, $startpos, $recursionlevel);
         }
 
         // Do search.
@@ -435,8 +439,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
-
+                    $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+                    //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $recursionlevel, length is $length!\n";
+                    //echo "total length is {$newstate->length}\n\n";
                     // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
@@ -478,21 +483,21 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * This method should be used if there are no backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_fast($str, $startpos) {
+    protected function match_fast($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
         $states = array();           // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
 
-        $startstates = $this->automaton->start_states();
-        $endstates = $this->automaton->end_states();
+        $startstates = $this->start_states($subexpr);
+        $endstates = $this->end_states($subexpr);
 
         $endstatereached = false;
 
         // Create an array of processing states for all nfa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate] = in_array($curstate, $startstates)
-                               ? $this->create_initial_state($curstate, $str, $startpos)
+                               ? $this->create_initial_state($curstate, $str, $startpos, $recursionlevel)
                                : null;
         }
 
@@ -530,7 +535,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                         // Create a new state.
                         $newstate = clone $curstate;
-                        $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
+                        $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
 
@@ -589,13 +594,18 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    public function match_from_pos($str, $startpos) {
+    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+        //echo "======================== $recursionlevel";
+        if ($recursionlevel > 10) {
+            return $this->create_nomatch_result($str);
+        }
+
         $bruteforce = count($this->get_nodes_with_subexpr_refs()) > 0;
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce
-                         ? $this->match_brute_force($str, $startpos)
-                         : $this->match_fast($str, $startpos);
+                         ? $this->match_brute_force($str, $startpos, $subexpr, $recursionlevel)
+                         : $this->match_fast($str, $startpos, $subexpr, $recursionlevel);
 
         // Choose the best one.
         $result = null;
@@ -618,8 +628,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
                 $tmp = $bruteforce
-                     ? $this->generate_extension_brute_force($str, $backtrack)
-                     : $this->generate_extension_fast($str, $backtrack);
+                     ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
+                     : $this->generate_extension_fast($str, $backtrack, $subexpr);
 
                 if ($tmp === null) {
                     continue;
@@ -677,6 +687,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
     }
 
+    protected function start_states($subexpr = 0) {
+        return $this->subexprbordersmap[$subexpr]['start'];
+    }
+
+    protected function end_states($subexpr = 0) {
+        return $this->subexprbordersmap[$subexpr]['end'];
+    }
+
     /**
      * Constructs an NFA corresponding to the given node.
      * @param $ast_node - object of qtype_preg_node child class.
@@ -692,7 +710,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $dst_node->create_automaton($result, $stack);
             $body = array_pop($stack);
             $result->after_build($body);
-            $map = $result->calculate_subexpr_borders();
         } catch (Exception $e) {
             $result = false;
         }
@@ -711,6 +728,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $this->automaton = $nfa;
             $this->nestingmap = array();
             $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
+            $this->subexprbordersmap = $this->automaton->calculate_subexpr_borders();
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
             // $this->automaton->on_subexpr_added($this->astroot);

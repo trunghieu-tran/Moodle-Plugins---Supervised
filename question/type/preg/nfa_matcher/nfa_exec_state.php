@@ -43,6 +43,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // The nfa being executed.
     public $matcher;
 
+    // Level of recursion
+    public $recursionlevel;
+
     // The corresponding nfa state.
     public $state;
 
@@ -202,6 +205,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function is_subexpr_captured($subexpr) {
         $last = $this->find_dup_subexpr_match($subexpr);
         return $last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
+    }
+
+    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+        return $this->matcher->match_from_pos($str, $startpos, $subexpr, $recursionlevel);
+    }
+
+    public function recursion_level() {
+        return $this->recursionlevel;
     }
 
     public function to_matching_results() {

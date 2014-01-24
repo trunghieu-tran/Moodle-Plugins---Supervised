@@ -239,6 +239,16 @@ interface qtype_preg_matcher_state {
      * Returns whether the given subexpression is captured.
      */
     public function is_subexpr_captured($subexpression);
+
+    /**
+     * Matches the given subexpression with given string from given position.
+     */
+    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0);
+
+    /**
+     * Current recursion level.
+     */
+    public function recursion_level();
 }
 
 /**
@@ -1826,11 +1836,13 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        die ('TODO: implement abstract function match for qtype_preg_leaf_recursion class before use it!');
+        $result = $matcherstateobj->match_from_pos($str, $pos, $this->number, $matcherstateobj->recursion_level() + 1);
+        $length = $result->length($this->number);
+        return $length != qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implement abstract function character for qtype_preg_leaf_recursion class before use it!');
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
