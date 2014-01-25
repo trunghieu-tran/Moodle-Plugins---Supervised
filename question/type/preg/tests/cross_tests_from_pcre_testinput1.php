@@ -42,7 +42,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"the quick brown fox",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -73,7 +73,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"The quick brown fox",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -85,7 +85,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>20));
 
         return array('regex'=>"abcd\\t\\n\\r\\f\\a\\e\\071\\x3b\\\$\\\\\\?caxyz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -327,7 +327,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a*abc?xyz+pqr{3}ab{2,}xy{4,5}pq{0,6}AB{0,}zz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15, $test16, $test17, $test18, $test19, $test20, $test21, $test22, $test23, $test24, $test25, $test26, $test27, $test28, $test29, $test30, $test31, $test32, $test33, $test34, $test35, $test36, $test37));
     }
 
@@ -377,7 +377,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(abc){1,2}zz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -455,7 +455,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(b+?|a){1,2}?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 
@@ -533,7 +533,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(b+|a){1,2}c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 
@@ -545,7 +545,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"^(b+|a){1,2}?bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -593,7 +593,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(b*|ba){1,2}?bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -641,7 +641,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(ba|b*){1,2}?bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -653,7 +653,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"^\\ca\\cA\\c[\\c{\\c:",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -727,7 +727,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[ab\\]cde]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10));
     }
 
@@ -781,7 +781,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[]cde]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -859,7 +859,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[^ab\\]cde]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10));
     }
 
@@ -915,7 +915,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[^]cde]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -927,7 +927,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"^\\",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -939,7 +939,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"^ÿ",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1033,7 +1033,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[0-9]+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14));
     }
 
@@ -1057,7 +1057,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"^.*nter",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -1083,15 +1083,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"xxx",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^xxx[0-9]+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -1115,18 +1115,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         $test4 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"123",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -1137,7 +1137,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"^.+[0-9][0-9][0-9]\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -1161,18 +1161,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         $test4 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"123",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -1183,7 +1183,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"^.+?[0-9][0-9][0-9]\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -1195,10 +1195,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>28,1=>3,2=>3));
 
         $test2 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -1211,31 +1211,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"abc!=apquxz.ixr.zzz.ac.uk",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>25),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"abc!pqr=apquxz:ixr.zzz.ac.uk",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>28),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"abc!pqr=apquxz.ixr.zzz.ac.ukk",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>29),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^([^!]+)!(.+)=apquxz\\.ixr\\.zzz\\.ac\\.uk\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -1255,7 +1255,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>":",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -1350,7 +1350,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([\\da-f:]+)\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13));
     }
 
@@ -1368,39 +1368,39 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10,1=>2,2=>3,3=>1));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>".1.2.3333",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"1.2.3",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"1234.2.3",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>8),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^.*\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -1434,7 +1434,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(\\d+)\\s+IN\\s+SOA\\s+(\\S+)\\s+(\\S+)\\s*\\(\\s*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -1492,7 +1492,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[a-zA-Z\\d][a-zA-Z\\d\\-]*(\\.[a-zA-Z\\d][a-zA-z\\d\\-]*)*\\.\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -1538,18 +1538,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test7 = array('str'=>"*.a-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test8 = array('str'=>"*.a-b.c-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>8),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -1562,7 +1562,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^\\*\\.[a-z]([a-z\\-\\d]*[a-z\\d]+)?(\\.[a-z]([a-z\\-\\d]*[a-z\\d]+)?)*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -1574,7 +1574,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>2,2=>3,3=>1));
 
         return array('regex'=>"^(?=ab(de))(abd)(e)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1586,7 +1586,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,2=>3,3=>1));
 
         return array('regex'=>"^(?!(ab)de|x)(abd)(f)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1598,7 +1598,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>4,2=>2,3=>2));
 
         return array('regex'=>"^(?=(ab(cd)))(ab)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1623,7 +1623,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^[\\da-f](\\.[\\da-f])*\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -1655,15 +1655,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test5 = array('str'=>"\"1234\" : things",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^\\\".*\\\"\\s*(;.*)?\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -1683,7 +1683,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -1720,7 +1720,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"   ^    a   (?# begins with a)  b\\sc (?# then b c) \$ (?# then end)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -1756,7 +1756,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?x)   ^    a   (?# begins with a)  b\\sc (?# then b c) \$ (?# then end)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -1799,7 +1799,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^   a\\ b[c ]d       \$",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -1811,7 +1811,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12,1=>3,2=>2,3=>1,4=>3,5=>2,6=>1,7=>3,8=>2,9=>1,10=>3,11=>2,12=>1));
 
         return array('regex'=>"^(a(b(c)))(d(e(f)))(h(i(j)))(k(l(m)))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1823,7 +1823,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12,1=>2,2=>1,3=>2,4=>1,5=>2,6=>1,7=>2,8=>1));
 
         return array('regex'=>"^(?:a(b(c)))(?:d(e(f)))(?:h(i(j)))(?:k(l(m)))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1835,7 +1835,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10));
 
         return array('regex'=>"^[\\w][\\W][\\s][\\S][\\d][\\D][\\b][\\n][\\c]][\\022]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1847,7 +1847,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>13));
 
         return array('regex'=>"^[.^\$|()*+?{,}]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1901,7 +1901,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^a*\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -1955,7 +1955,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"^a*?\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -1991,7 +1991,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^a+\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2027,7 +2027,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^a+?\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2059,15 +2059,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test5 = array('str'=>"1234567",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^\\d{8}\\w{2,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2113,7 +2113,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[aeiou\\d]{4,5}\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -2149,7 +2149,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"^[aeiou\\d]{4,5}?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2183,7 +2183,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\A(abc|def)=(\\1){2,3}\\Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -2201,7 +2201,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>18,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>2));
 
         return array('regex'=>"^(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\\11*(\\3\\4)\\1(?#)2\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -2225,7 +2225,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>25,1=>11,2=>8,4=>0,5=>1));
 
         return array('regex'=>"(cat(a(ract|tonic)|erpillar)) \\1()2(3)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -2237,7 +2237,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>27,1=>4));
 
         return array('regex'=>"^From +([^ ]+) +[a-zA-Z][a-zA-Z][a-zA-Z] +[a-zA-Z][a-zA-Z][a-zA-Z] +[0-9]?[0-9] +[0-9][0-9]:[0-9][0-9]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2271,7 +2271,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^From\\s+\\S+\\s+([a-zA-Z]{3}\\s+){2}\\d{1,2}\\s+\\d\\d:\\d\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -2290,7 +2290,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^12.34",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -2302,7 +2302,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"\\w+(?=\\t)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2314,7 +2314,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12,1=>9));
 
         return array('regex'=>"foo(?!bar)(.*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2344,7 +2344,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>3));
 
         return array('regex'=>"(?:(?!foo)...|^.{0,2})bar(.*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -2356,10 +2356,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>3));
 
         $test2 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -2372,7 +2372,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(\\D*)(?=\\d)(?!123)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -2384,7 +2384,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"^1234(?# test newlines\n  inside)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2397,7 +2397,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^1234 #comment in extended re\n  ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2410,7 +2410,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"#rhubarb\n  abcd",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2423,7 +2423,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^abcd#rhubarb",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2453,7 +2453,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>1,2=>1));
 
         return array('regex'=>"^(a)\\1{2,3}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -2481,7 +2481,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?!^)abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -2509,7 +2509,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?=^)abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -2521,7 +2521,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"^[ab]{1,3}(ab*|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2533,7 +2533,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>6));
 
         return array('regex'=>"^[ab]{1,3}?(ab*|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2545,7 +2545,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"^[ab]{1,3}?(ab*?|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2557,7 +2557,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"^[ab]{1,3}(ab*?|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2605,24 +2605,24 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>15));
 
         $test8 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test9 = array('str'=>"The quick brown fox",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>19),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                          # optional leading comment\n(?:    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)                    # initial word\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)  )* # further okay, if led by a period\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n# address\n|                     #  or\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)             # one word, optionally followed by....\n(?:\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037]  |  # atom and space parts, or...\n\\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)       |  # comments, or...\n\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n# quoted strings\n)*\n<  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                     # leading <\n(?:  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  ,  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n)* # further okay, if led by comma\n:                                # closing colon\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  )? #       optional route\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)                    # initial word\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)  )* # further okay, if led by a period\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n#       address spec\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  > #                  trailing >\n# name and address\n)  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                       # optional trailing comment\n",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -2670,24 +2670,24 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>15));
 
         $test8 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test9 = array('str'=>"The quick brown fox",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>19),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional leading comment\n(?:\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# additional words\n)*\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n# address\n|                             #  or\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n# leading word\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037] *               # \"normal\" atoms and or spaces\n(?:\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n|\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n) # \"special\" comment or quoted string\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037] *            #  more \"normal\"\n)*\n<\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# <\n(?:\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n(?: ,\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n)*  # additional domains\n:\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)?     #       optional route\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# additional words\n)*\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n#       address spec\n>                    #                 >\n# name and address\n)\n",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -2705,7 +2705,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>19));
 
         return array('regex'=>"abc\\0def\\00pqr\\000xyz\\0000AB",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -2723,7 +2723,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>20));
 
         return array('regex'=>"abc\\x0def\\x00pqr\\x000xyz\\x0000AB",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -2747,7 +2747,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"^[\\000-\\037]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -2759,7 +2759,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"\\0*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2801,7 +2801,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"A\\x0{2,3}Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2835,7 +2835,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(cow|)\\1(bell)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -2887,7 +2887,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^\\s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -2898,9 +2898,9 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3));
 
-        return array('regex'=>"^a	b\n  c",
+        return array('regex'=>"^a	b\n      c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -2940,7 +2940,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a|)\\1*b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -2980,7 +2980,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a|)\\1+b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -3020,7 +3020,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a|)\\1?b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -3070,7 +3070,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a|)\\1{2}b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -3126,7 +3126,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a|)\\1{2,3}b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -3174,7 +3174,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab{1,3}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -3186,7 +3186,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>28,1=>6,2=>5,3=>14));
 
         return array('regex'=>"([^.]*)\\.([^:]*):[T ]+(.*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3199,7 +3199,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([^.]*)\\.([^:]*):[T ]+(.*)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3212,7 +3212,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([^.]*)\\.([^:]*):[t ]+(.*)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3240,7 +3240,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[W-c]+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3259,7 +3259,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^[W-c]+\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -3278,7 +3278,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^[\\x3f-\\x5F]+\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -3309,7 +3309,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^abc\$",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -3353,7 +3353,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^abc\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -3404,7 +3404,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\Aabc\\Z",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -3417,7 +3417,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\A(.)*\\Z",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3438,7 +3438,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\A(.)*\\Z",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -3456,7 +3456,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?:b)|(?::+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -3482,7 +3482,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[-az]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3508,7 +3508,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[az-]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3534,7 +3534,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[a\\-z]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3546,7 +3546,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"[a-z]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3574,7 +3574,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[\\d-]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3602,7 +3602,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[\\d-z]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3614,7 +3614,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\x5c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3642,7 +3642,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\x20Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3667,7 +3667,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(abc)\\1",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3679,7 +3679,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab{3cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3691,7 +3691,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"ab{3,cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3703,7 +3703,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10));
 
         return array('regex'=>"ab{3,4a}cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3715,7 +3715,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8));
 
         return array('regex'=>"{4,5a}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3749,7 +3749,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"abc\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -3761,7 +3761,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(abc)\\123",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3773,7 +3773,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(abc)\\223",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3785,7 +3785,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(abc)\\323",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3803,7 +3803,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(abc)\\100",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -3845,7 +3845,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>3));
 
         return array('regex'=>"(abc)\\1000",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -3873,7 +3873,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^A\\8B\\9C\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3885,7 +3885,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>11,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1));
 
         return array('regex'=>"^(A)(B)(C)(D)(E)(F)(G)(H)(I)\\8\\9\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3913,7 +3913,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[A\\8B\\9C]+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -3925,7 +3925,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>14,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1));
 
         return array('regex'=>"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)\\12\\123",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3937,7 +3937,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>13,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1));
 
         return array('regex'=>"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\\12\\123",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3949,7 +3949,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab\\idef",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3961,7 +3961,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a{0}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3973,7 +3973,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"(a|(bc)){0,0}?xyz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3985,7 +3985,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"abc[\\10]de",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -3997,7 +3997,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"abc[\\1]de",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4009,7 +4009,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>3));
 
         return array('regex'=>"(abc)[\\1]de",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4021,7 +4021,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?s)a.b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4081,7 +4081,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^([^a])([^\\b])([^c]*)([^d]{3,4})",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -4093,7 +4093,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[^a]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4106,7 +4106,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[^a]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4118,7 +4118,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"[^a]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4131,7 +4131,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[^a]+",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4143,7 +4143,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"[^a]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4169,7 +4169,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[^k]\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4207,10 +4207,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test6 = array('str'=>"akb",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -4223,7 +4223,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[^k]{2,3}\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -4249,10 +4249,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"12345678@x.y.uk",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -4265,7 +4265,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^\\d{8,}\\@.+[^k]\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -4291,15 +4291,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"aaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(a)\\1{8,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -4317,7 +4317,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[^a]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -4336,7 +4336,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[^a]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -4354,7 +4354,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[^az]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -4373,7 +4373,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[^az]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -4385,7 +4385,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>256));
 
         return array('regex'=>"\\000\\001\\002\\003\\004\\005\\006\\007\\010\\011\\012\\013\\014\\015\\016\\017\\020\\021\\022\\023\\024\\025\\026\\027\\030\\031\\032\\033\\034\\035\\036\\037\\040\\041\\042\\043\\044\\045\\046\\047\\050\\051\\052\\053\\054\\055\\056\\057\\060\\061\\062\\063\\064\\065\\066\\067\\070\\071\\072\\073\\074\\075\\076\\077\\100\\101\\102\\103\\104\\105\\106\\107\\110\\111\\112\\113\\114\\115\\116\\117\\120\\121\\122\\123\\124\\125\\126\\127\\130\\131\\132\\133\\134\\135\\136\\137\\140\\141\\142\\143\\144\\145\\146\\147\\150\\151\\152\\153\\154\\155\\156\\157\\160\\161\\162\\163\\164\\165\\166\\167\\170\\171\\172\\173\\174\\175\\176\\177\\200\\201\\202\\203\\204\\205\\206\\207\\210\\211\\212\\213\\214\\215\\216\\217\\220\\221\\222\\223\\224\\225\\226\\227\\230\\231\\232\\233\\234\\235\\236\\237\\240\\241\\242\\243\\244\\245\\246\\247\\250\\251\\252\\253\\254\\255\\256\\257\\260\\261\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\\274\\275\\276\\277\\300\\301\\302\\303\\304\\305\\306\\307\\310\\311\\312\\313\\314\\315\\316\\317\\320\\321\\322\\323\\324\\325\\326\\327\\330\\331\\332\\333\\334\\335\\336\\337\\340\\341\\342\\343\\344\\345\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\\360\\361\\362\\363\\364\\365\\366\\367\\370\\371\\372\\373\\374\\375\\376\\377",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4397,7 +4397,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>11));
 
         return array('regex'=>"P[^*]TAIRE[^*]{1,6}?LL",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4409,7 +4409,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>11));
 
         return array('regex'=>"P[^*]TAIRE[^*]{1,}?LL",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4433,7 +4433,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(\\.\\d\\d[1-9]?)\\d+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4459,15 +4459,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"1.235",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(\\.\\d\\d((?=0)|\\d(?=\\d)))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -4479,7 +4479,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4492,7 +4492,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\b(foo)\\s+(\\w+)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4504,7 +4504,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>32,1=>26));
 
         return array('regex'=>"foo(.*)bar",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4516,7 +4516,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>21,1=>15));
 
         return array('regex'=>"foo(.*?)bar",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4528,7 +4528,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>23,2=>0));
 
         return array('regex'=>"(.*)(\\d*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4540,7 +4540,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>22,2=>1));
 
         return array('regex'=>"(.*)(\\d+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4552,7 +4552,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0,2=>0));
 
         return array('regex'=>"(.*?)(\\d*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4564,7 +4564,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>7,2=>1));
 
         return array('regex'=>"(.*?)(\\d+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4576,7 +4576,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>22,2=>1));
 
         return array('regex'=>"(.*)(\\d+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4588,7 +4588,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>18,2=>5));
 
         return array('regex'=>"(.*?)(\\d+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4600,7 +4600,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>18,2=>5));
 
         return array('regex'=>"(.*)\\b(\\d+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4612,7 +4612,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>23,1=>18,2=>5));
 
         return array('regex'=>"(.*\\D)(\\d+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4624,7 +4624,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^\\D*(?!123)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4636,10 +4636,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>3));
 
         $test2 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -4652,7 +4652,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(\\D*)(?=\\d)(?!123)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4718,7 +4718,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[W-]46]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -4796,7 +4796,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[W-\\]46]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 
@@ -4808,7 +4808,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10));
 
         return array('regex'=>"\\d\\d\\/\\d\\d\\/\\d\\d\\d\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4820,29 +4820,29 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>74));
 
         $test2 = array('str'=>"word cat dog elephant mussel cow horse canary baboon snake shark",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>64),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"word (?:[a-zA-Z0-9]+ ){0,10}otherword",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_167() {
         $test1 = array('str'=>"word cat dog elephant mussel cow horse canary baboon snake shark the quick brown fox and the lazy dog and several other words getting close to thirty by now I hope",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>163),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"word (?:[a-zA-Z0-9]+ ){0,300}otherword",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -4866,7 +4866,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0));
 
         return array('regex'=>"^(a){0,0}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4890,7 +4890,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"^(a){0,1}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4914,7 +4914,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"^(a){0,2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -4944,7 +4944,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"^(a){0,3}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -4980,7 +4980,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"^(a){0,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -5006,7 +5006,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"^(a){1,1}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5032,7 +5032,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"^(a){1,2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5064,7 +5064,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"^(a){1,3}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -5102,7 +5102,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"^(a){1,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -5114,7 +5114,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>".*\\.gif",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5126,7 +5126,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>".{0,}\\.gif",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5139,7 +5139,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\\.gif",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5152,7 +5152,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\\.gif",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5165,7 +5165,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\\.gif",
                      'modifiers'=>"ms",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5177,7 +5177,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>".*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5190,7 +5190,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5203,7 +5203,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5216,7 +5216,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"ms",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5228,7 +5228,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>".*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5241,7 +5241,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5254,7 +5254,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5267,7 +5267,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*\$",
                      'modifiers'=>"ms",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5285,23 +5285,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"abcde\nBar",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(.*X|^B)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -5326,7 +5326,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(.*X|^B)",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5344,24 +5344,24 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"abcde\nBar",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(.*X|^B)",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -5386,7 +5386,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(.*X|^B)",
                      'modifiers'=>"ms",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5404,23 +5404,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"abcde\nBar",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?s)(.*X|^B)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -5438,32 +5438,32 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"abcde\nBar",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?s:.*X|^B)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
     function data_for_test_196() {
         $test1 = array('str'=>"**** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>12),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -5476,7 +5476,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^.*B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -5488,7 +5488,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"(?s)^.*B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5500,7 +5500,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?m)^.*B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5512,7 +5512,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"(?ms)^.*B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5524,7 +5524,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?ms)^B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5536,7 +5536,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?s)B\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5548,7 +5548,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12));
 
         return array('regex'=>"^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5560,7 +5560,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12));
 
         return array('regex'=>"^\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5572,7 +5572,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12));
 
         return array('regex'=>"^[\\d][\\d][\\d][\\d][\\d][\\d][\\d][\\d][\\d][\\d][\\d][\\d]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5584,7 +5584,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12));
 
         return array('regex'=>"^[abc]{12}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5596,7 +5596,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12));
 
         return array('regex'=>"^[a-c]{12}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5608,7 +5608,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>12,1=>1));
 
         return array('regex'=>"^(a|b|c){12}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5636,7 +5636,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[abcdefghijklmnopqrstuvwxy0123456789]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5664,7 +5664,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"abcde{0,0}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5692,7 +5692,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab[cd]{0,0}e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5720,7 +5720,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab(c){0,0}d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5758,7 +5758,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a(b*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -5786,7 +5786,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab\\d{0}e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5804,7 +5804,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>25,1=>10));
 
         return array('regex'=>"\"([^\\\\\"]+|\\\\.)*\"",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -5817,7 +5817,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>".*?",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5830,7 +5830,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\b",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5843,7 +5843,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\b",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5856,7 +5856,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5869,7 +5869,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"<tr([\\w\\W\\s\\d][^<>]{0,})><TD([\\w\\W\\s\\d][^<>]{0,})>([\\d]{0,}\\.)(.*)((<BR>([\\w\\W\\s\\d][^<>]{0,})|[\\s]{0,}))<\\/a><\\/TD><TD([\\w\\W\\s\\d][^<>]{0,})>([\\w\\W\\s\\d][^<>]{0,})<\\/TD><TD([\\w\\W\\s\\d][^<>]{0,})>([\\w\\W\\s\\d][^<>]{0,})<\\/TD><\\/TR>",
                      'modifiers'=>"is",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -5887,7 +5887,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[^a]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -5915,7 +5915,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a.b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -5934,7 +5934,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[^a]b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -5953,7 +5953,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -5989,7 +5989,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         return array('regex'=>"^(b+?|a){1,2}?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6025,7 +6025,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         return array('regex'=>"^(b+|a){1,2}?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6046,7 +6046,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?!\\A)x",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -6058,7 +6058,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"\\x0{ab}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6070,7 +6070,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(A|B)*?CD",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6082,7 +6082,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(A|B)*CD",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6094,7 +6094,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>2));
 
         return array('regex'=>"(AB)*?\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6106,7 +6106,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>2));
 
         return array('regex'=>"(AB)*\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6136,31 +6136,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         $test5 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"barfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test7 = array('str'=>"towbarfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<!bar)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -6172,39 +6172,39 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         $test2 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"foo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"barfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"towbarfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\w{3}(?<!bar)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6240,7 +6240,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?<=(foo)a)bar",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -6293,21 +6293,21 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\Aabc\\z",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
     function data_for_test_236() {
         $test1 = array('str'=>"/this/is/a/very/long/line/in/deed/with/very/many/slashes/in/it/you/see/",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>71),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?>.*/)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6319,7 +6319,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>67));
 
         return array('regex'=>"(?>.*/)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6345,15 +6345,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"1.235",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?>(\\.\\d\\d[1-9]?))\\d+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -6381,7 +6381,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^((?>\\w+)|(?>\\s+))*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -6399,7 +6399,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>4,2=>1));
 
         return array('regex'=>"(\\d+)(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -6427,7 +6427,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"((?>\\d+))(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -6439,7 +6439,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"(?>a+)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6451,7 +6451,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>4));
 
         return array('regex'=>"((?>a+)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6463,7 +6463,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(?>(a+))b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6475,7 +6475,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?>b)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6487,7 +6487,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8));
 
         return array('regex'=>"(?>a+|b+|c+)*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6499,7 +6499,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>16,1=>1));
 
         return array('regex'=>"((?>[^()]+)|\\([^()]*\\))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -6533,7 +6533,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\(((?>[^()]+)|\\([^()]+\\))+\\)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -6576,7 +6576,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a(?-i)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6620,7 +6620,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(a (?x)b c)d e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6648,7 +6648,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(a b(?x)c d (?-x)e f)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -6722,7 +6722,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(a(?i)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -6772,7 +6772,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a(?i:b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -6814,7 +6814,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a(?i:b)*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6856,7 +6856,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a(?=b(?i)c)\\w\\wd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -6896,16 +6896,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test6 = array('str'=>"more \n than \n million",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>21),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?s-i:more.*than).*million",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -6945,16 +6945,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test6 = array('str'=>"more \n than \n million",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>21),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?:(?s-i)more.*than).*million",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -7010,7 +7010,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?>a(?i)b+)+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -7060,7 +7060,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?=a(?i)b)\\w\\wc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -7110,7 +7110,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?<=a(?i)b)(\\w\\w)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -7152,7 +7152,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?:(a)|b)(?(1)A|B)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7192,7 +7192,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a)?(?(1)a|b)+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7234,7 +7234,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?(?=abc)\\w{3}:|\\d\\d)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7276,7 +7276,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?(?!abc)\\d\\d|\\w{3}:)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7306,23 +7306,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         $test5 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"foocat",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?(?<=foo)bar|cat)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -7352,23 +7352,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         $test5 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"foocat",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?(?<!foo)cat|bar)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -7399,7 +7399,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"( \\( )? [^()]+ (?(1) \\) |) ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -7430,7 +7430,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"( \\( )? [^()]+ (?(1) \\) ) ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -7470,7 +7470,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?(2)a|(1)(2))+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7508,31 +7508,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test6 = array('str'=>"blah BLAH",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test7 = array('str'=>"Blah blah",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test8 = array('str'=>"blaH blah",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"((?i)blah)\\s+\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -7580,7 +7580,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>9,1=>4));
 
         return array('regex'=>"((?i)blah)\\s+(?i:\\1)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -7604,7 +7604,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"(?>a*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -7634,7 +7634,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(abc|)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -7652,7 +7652,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>0));
 
         return array('regex'=>"([a]*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7688,7 +7688,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>0));
 
         return array('regex'=>"([ab]*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -7712,7 +7712,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([^a]*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -7730,7 +7730,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([^ab]*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7748,7 +7748,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([a]*?)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7778,7 +7778,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([ab]*?)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -7802,7 +7802,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([^a]*?)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -7826,7 +7826,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"([^ab]*?)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -7844,7 +7844,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?>a*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7862,7 +7862,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>"((?>a*))*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7880,7 +7880,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"((?>a*?))*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -7906,16 +7906,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"sep-12-98",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?(?=[^a-z]+[a-z])  \\d{2}-[a-z]{3}-\\d{2}  |  \\d{2}-\\d{2}-\\d{2} ) ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -7941,23 +7941,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"foobar",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"barfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=(foo))bar\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -8005,7 +8005,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"(?i:saturday|sunday)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -8075,7 +8075,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(a(?i)bc|BB)x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -8139,7 +8139,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^([ab](?i)[cd]|[ef])",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -8205,7 +8205,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(ab|a(?i)[b-c](?m-i)d|x(?i)y|z)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
@@ -8242,7 +8242,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?<=foo\\n)^bar",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -8290,7 +8290,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?<=(?<!foo)bar)baz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -8312,32 +8312,32 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"The cases of aaaa and aaaaaa are missed out below because Perl does things",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_294() {
         $test1 = array('str'=>"a",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"aa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -8354,18 +8354,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         $test6 = array('str'=>"aaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>8),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test7 = array('str'=>"aaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -8424,32 +8424,32 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a\\1?){4}\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14));
     }
 
     function data_for_test_295() {
         $test1 = array('str'=>"a",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"aa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -8478,18 +8478,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1,2=>2,3=>3,4=>1));
 
         $test8 = array('str'=>"aaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>8),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test9 = array('str'=>"aaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -8548,7 +8548,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a\\1?)(a\\1?)(a\\2?)(a\\3?)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15, $test16));
     }
 
@@ -8562,7 +8562,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"The following tests are taken from the Perl 5.005 test suite; some of them",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8618,7 +8618,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -8630,7 +8630,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"ab*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8654,7 +8654,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab*bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -8666,7 +8666,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>".{1}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8678,7 +8678,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>".{3,4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8690,7 +8690,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab{0,}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8726,7 +8726,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab+bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -8738,7 +8738,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab+bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8750,7 +8750,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab{1,}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8762,7 +8762,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab{1,3}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8774,7 +8774,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"ab{3,4}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8804,7 +8804,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"ab{4,5}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -8822,7 +8822,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"ab?bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -8834,7 +8834,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"ab{0,1}bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8846,7 +8846,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"ab?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8858,7 +8858,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"ab{0,1}c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8894,7 +8894,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^abc\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -8906,7 +8906,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"^abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8940,7 +8940,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"abc\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -8952,7 +8952,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0));
 
         return array('regex'=>"^",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8964,7 +8964,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0));
 
         return array('regex'=>"\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -8982,7 +8982,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a.c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -8994,7 +8994,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"a.*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9030,7 +9030,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a[bc]d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9042,7 +9042,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[b-d]e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9054,7 +9054,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a[b-d]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9066,7 +9066,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a[-b]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9078,7 +9078,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a[b-]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9090,7 +9090,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9102,7 +9102,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[]]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9138,7 +9138,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a[^bc]d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9150,7 +9150,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[^-b]c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9184,7 +9184,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a[^]b]c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9208,45 +9208,45 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\ba\\b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
     function data_for_test_331() {
         $test1 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>10),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"xy",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"yz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"xyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\by\\b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9258,31 +9258,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         $test2 = array('str'=>"a-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"-a",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"-a-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\Ba\\B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9294,7 +9294,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\By\\b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9306,7 +9306,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\by\\B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9318,7 +9318,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\By\\B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9330,7 +9330,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9362,7 +9362,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\W",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9374,7 +9374,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a\\sb",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9408,7 +9408,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a\\Sb",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9420,7 +9420,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9452,7 +9452,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\D",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9464,7 +9464,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[\\w]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9496,7 +9496,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[\\W]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9508,7 +9508,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[\\s]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9542,7 +9542,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a[\\S]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9554,7 +9554,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[\\d]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9586,7 +9586,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[\\D]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -9604,7 +9604,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"ab|cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -9616,7 +9616,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>"()ef",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9628,7 +9628,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a\\(b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9646,7 +9646,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"a\\(*b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -9660,7 +9660,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a\\\\b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9672,7 +9672,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1,2=>1));
 
         return array('regex'=>"((a))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9684,7 +9684,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>1));
 
         return array('regex'=>"(a)b(c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9696,7 +9696,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a+b+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9708,7 +9708,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a{1,}b{1,}c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9720,7 +9720,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"a.+?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9732,7 +9732,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(a+|b)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9744,7 +9744,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(a+|b){0,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9756,7 +9756,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(a+|b)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9768,7 +9768,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(a+|b){1,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9780,7 +9780,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(a+|b)?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9792,7 +9792,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(a+|b){0,1}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9804,7 +9804,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"[^ab]*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9826,7 +9826,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -9838,7 +9838,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>1));
 
         return array('regex'=>"([abc])*d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9850,7 +9850,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"([abc])*bcd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9862,7 +9862,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"a|b|c|d|e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9874,7 +9874,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(a|b|c|d|e)f",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9886,7 +9886,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"abcd*efg",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9904,7 +9904,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"ab*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -9916,7 +9916,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"(ab|cd)e",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9928,7 +9928,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"[abhgefdc]ij",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9940,7 +9940,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>"(abc|)ef",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9952,7 +9952,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(a|b)c*d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9964,7 +9964,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(ab|ab*)bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9976,7 +9976,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"a([bc]*)c*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -9988,7 +9988,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>2,2=>1));
 
         return array('regex'=>"a([bc]*)(c*d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10000,7 +10000,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>2,2=>1));
 
         return array('regex'=>"a([bc]+)(c*d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10012,7 +10012,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>1,2=>2));
 
         return array('regex'=>"a([bc]*)(c+d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10024,7 +10024,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"a[bcd]*dcdcde",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10054,7 +10054,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a[bcd]+dcdcde",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -10066,7 +10066,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"(ab|a)b*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10078,7 +10078,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3,2=>1,3=>1,4=>1));
 
         return array('regex'=>"((a)(b)c)(d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10090,7 +10090,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5));
 
         return array('regex'=>"[a-zA-Z_][a-zA-Z0-9_]*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10102,7 +10102,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^a(bc+|b[eh])g|.h\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10134,10 +10134,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test5 = array('str'=>"effg",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -10150,7 +10150,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -10162,7 +10162,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1));
 
         return array('regex'=>"((((((((((a))))))))))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10174,7 +10174,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1));
 
         return array('regex'=>"((((((((((a))))))))))\\10",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10186,7 +10186,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1));
 
         return array('regex'=>"(((((((((a)))))))))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10216,7 +10216,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"multiple words of text",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -10228,7 +10228,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>14));
 
         return array('regex'=>"multiple words",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10240,7 +10240,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>2,2=>2));
 
         return array('regex'=>"(.*)c(.*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10252,7 +10252,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>1,2=>1));
 
         return array('regex'=>"\\((.*), (.*)\\)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10264,7 +10264,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"abcd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10276,7 +10276,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>2));
 
         return array('regex'=>"a(bc)d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10288,7 +10288,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a[-]?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10300,7 +10300,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>3));
 
         return array('regex'=>"(abc)\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10312,7 +10312,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>3));
 
         return array('regex'=>"([a-c]*)\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10344,7 +10344,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(a)|\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -10356,7 +10356,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>2,2=>1));
 
         return array('regex'=>"(([a-c])b*?\\2)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10368,7 +10368,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>9,1=>3,2=>1));
 
         return array('regex'=>"(([a-c])b*?\\2){3}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10380,7 +10380,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>4,2=>1,3=>1));
 
         return array('regex'=>"((\\3|b)\\2(a)x)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10392,7 +10392,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>9,1=>3,2=>1,3=>1));
 
         return array('regex'=>"((\\3|b)\\2(a)){2,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10457,7 +10457,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -10470,7 +10470,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab*c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10489,7 +10489,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab*bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -10502,7 +10502,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab*?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10515,7 +10515,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{0,}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10528,7 +10528,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab+?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10559,7 +10559,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab+bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -10572,7 +10572,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab+bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10585,7 +10585,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{1,}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10598,7 +10598,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{1,3}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10611,7 +10611,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{3,4}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10642,7 +10642,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{4,5}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -10661,7 +10661,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab??bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -10674,7 +10674,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{0,1}?bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10687,7 +10687,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab??c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10700,7 +10700,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab{0,1}?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10737,7 +10737,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^abc\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -10750,7 +10750,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^abc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10763,7 +10763,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10776,7 +10776,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10789,7 +10789,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10808,7 +10808,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -10821,16 +10821,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.*?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_428() {
         $test1 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -10841,16 +10841,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         $test3 = array('str'=>"AXYZD",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a.*c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -10863,7 +10863,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[bc]d",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10900,7 +10900,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[b-d]e",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -10913,7 +10913,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[b-d]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10926,7 +10926,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[-b]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10939,7 +10939,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[b-]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10952,7 +10952,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a]",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10965,7 +10965,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[]]b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -10978,7 +10978,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[^bc]d",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11015,7 +11015,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[^-b]c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -11028,7 +11028,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[^]b]c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11047,7 +11047,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab|cd",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -11060,7 +11060,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"()ef",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11091,7 +11091,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\$b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -11104,7 +11104,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a\\(b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11123,22 +11123,22 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a\\(*b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_444() {
         $test1 = array('str'=>"A",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a\\\\b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11151,7 +11151,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((a))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11164,7 +11164,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a)b(c)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11177,7 +11177,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a+b+c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11190,7 +11190,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a{1,}b{1,}c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11203,7 +11203,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.+?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11216,7 +11216,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.*?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11229,7 +11229,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a.{0,5}?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11242,7 +11242,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b)*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11255,7 +11255,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b){0,}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11268,7 +11268,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b)+",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11281,7 +11281,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b){1,}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11294,7 +11294,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b)?",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11307,7 +11307,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b){0,1}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11320,7 +11320,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a+|b){0,1}?",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11333,7 +11333,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[^ab]*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11346,7 +11346,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([abc])*d",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11359,7 +11359,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([abc])*bcd",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11372,7 +11372,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a|b|c|d|e",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11385,7 +11385,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a|b|c|d|e)f",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11398,7 +11398,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abcd*efg",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11417,7 +11417,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -11430,7 +11430,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(ab|cd)e",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11443,7 +11443,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[abhgefdc]ij",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11458,7 +11458,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^(ab|cd)e",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11471,7 +11471,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(abc|)ef",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11484,7 +11484,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(a|b)c*d",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11497,7 +11497,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(ab|ab*)bc",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11510,7 +11510,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a([bc]*)c*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11523,7 +11523,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a([bc]*)(c*d)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11536,7 +11536,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a([bc]+)(c*d)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11549,7 +11549,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a([bc]*)(c+d)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11562,7 +11562,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[bcd]*dcdcde",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11575,7 +11575,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(ab|a)b*c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11588,7 +11588,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((a)(b)c)(d)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11601,7 +11601,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"[a-zA-Z_][a-zA-Z0-9_]*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11614,7 +11614,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^a(bc+|b[eh])g|.h\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11646,18 +11646,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test5 = array('str'=>"ADCDCDE",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"EFFG",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -11671,7 +11671,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -11684,7 +11684,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((((((((((a))))))))))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11697,7 +11697,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((((((((((a))))))))))\\10",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11710,7 +11710,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(((((((((a)))))))))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11723,7 +11723,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?:(?:(?:(?:(?:(?:(?:(?:(a))))))))))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11736,7 +11736,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?:(?:(?:(?:(?:(?:(?:(?:(a|b|c))))))))))",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11767,7 +11767,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"multiple words of text",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -11780,7 +11780,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"multiple words",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11793,7 +11793,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(.*)c(.*)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11806,7 +11806,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\((.*), (.*)\\)",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11819,7 +11819,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abcd",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11832,7 +11832,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a(bc)d",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11845,7 +11845,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a[-]?c",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11858,7 +11858,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(abc)\\1",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11871,7 +11871,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"([a-c]*)\\1",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11883,7 +11883,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?!b).",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11895,7 +11895,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?=d).",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11907,7 +11907,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?=c|d).",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11919,7 +11919,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"a(?:b|c|d)(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11931,7 +11931,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"a(?:b|c|d)*(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11949,7 +11949,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"a(?:b|c|d)+?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -11961,7 +11961,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"a(?:b|c|d)+(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11973,7 +11973,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"a(?:b|c|d){2}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11985,7 +11985,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         return array('regex'=>"a(?:b|c|d){4,5}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -11997,7 +11997,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>1));
 
         return array('regex'=>"a(?:b|c|d){4,5}?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12009,7 +12009,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>3,2=>3,3=>3));
 
         return array('regex'=>"((foo)|(bar))*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12021,7 +12021,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"a(?:b|c|d){6,7}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12033,7 +12033,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"a(?:b|c|d){6,7}?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12045,7 +12045,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"a(?:b|c|d){5,6}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12057,7 +12057,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         return array('regex'=>"a(?:b|c|d){5,6}?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12069,7 +12069,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8,1=>1));
 
         return array('regex'=>"a(?:b|c|d){5,7}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12081,7 +12081,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>1));
 
         return array('regex'=>"a(?:b|c|d){5,7}?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12093,7 +12093,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>1));
 
         return array('regex'=>"a(?:b|(c|e){1,2}?|d)+?(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12105,7 +12105,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"^(.+)?B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12117,7 +12117,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"^([^a-z])|(\\^)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12129,7 +12129,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"^[<>]&",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12157,10 +12157,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"aaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -12173,7 +12173,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a\\1?){4}\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -12193,10 +12193,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test3 = array('str'=>"aaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -12209,7 +12209,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(a(?(1)\\1)){4}\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -12221,7 +12221,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1));
 
         return array('regex'=>"(?:(f)(o)(o)|(b)(a)(r))*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12257,7 +12257,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?<=a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -12281,7 +12281,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<!c)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12293,7 +12293,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?:..)*a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12305,7 +12305,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?:..)*?a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12317,7 +12317,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"^(?:b|a(?=(.)))*\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12329,7 +12329,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"^(){3,5}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12341,7 +12341,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"^(a+)*ax",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12353,7 +12353,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>1));
 
         return array('regex'=>"^((a|b)+)*ax",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12365,7 +12365,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>1));
 
         return array('regex'=>"^((a|bc)+)*ax",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12377,7 +12377,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(a|x)*ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12389,7 +12389,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(a)*ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12401,7 +12401,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?:(?i)a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12413,7 +12413,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?i)a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12425,7 +12425,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?:(?i)a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12437,7 +12437,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?i)a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12467,7 +12467,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?:(?i)a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12479,7 +12479,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?i:a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12491,7 +12491,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?i:a))b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12503,7 +12503,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?i:a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12515,7 +12515,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?i:a))b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12545,7 +12545,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?i:a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12558,7 +12558,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12571,7 +12571,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12584,7 +12584,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12597,7 +12597,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12626,7 +12626,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12639,7 +12639,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12652,7 +12652,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12683,7 +12683,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12696,7 +12696,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12709,7 +12709,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i:a))b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12722,7 +12722,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12735,7 +12735,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i:a))b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12766,7 +12766,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12779,7 +12779,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12792,7 +12792,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i:a))b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12823,7 +12823,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12854,7 +12854,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?-i:a.))b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -12867,7 +12867,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"((?s-i:a.))b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12879,7 +12879,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"(?:c|d)(?:)(?:a(?:)(?:b)(?:b(?:))(?:b(?:)(?:b)))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12891,7 +12891,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>41));
 
         return array('regex'=>"(?:c|d)(?:)(?:aaaaaaaa(?:)(?:bbbbbbbb)(?:bbbbbbbb(?:))(?:bbbbbbbb(?:)(?:bbbbbbbb)))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12910,7 +12910,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(ab)\\d\\1",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -12922,7 +12922,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>13));
 
         return array('regex'=>"foo\\w*\\d{4}baz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12934,7 +12934,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"x(~~)*(?:(?:F)?)?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12946,7 +12946,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"^a(?#xxx){3}c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -12959,37 +12959,37 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"^a (?#xxx) (?#yyy) {3}c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_566() {
         $test1 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>10),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"B\nB",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"dbcb",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<![cd])b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13001,7 +13001,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<![cd])[ab]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13013,7 +13013,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<!(c|d))[ab]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13025,7 +13025,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<!cd)[ab]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13087,7 +13087,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?:a?b?)*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -13099,7 +13099,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2,2=>1,3=>1));
 
         return array('regex'=>"((?s)^a(.))((?m)^b\$)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13111,7 +13111,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"((?m)^b\$)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13123,7 +13123,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?m)^b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13135,7 +13135,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?m)^(b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13147,7 +13147,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"((?m)^b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13159,7 +13159,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"\\n((?m)^b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13177,7 +13177,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?s).)c(?!.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -13195,7 +13195,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"((?s)b.)c(?!.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -13225,7 +13225,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"()^b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13237,7 +13237,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"((?m)^b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13267,7 +13267,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(x)?(?(1)a|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13279,7 +13279,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(x)?(?(1)b|a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13291,7 +13291,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"()?(?(1)b|a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13303,7 +13303,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1,1=>0));
 
         return array('regex'=>"()?(?(1)a|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13345,15 +13345,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test6 = array('str'=>"(blah",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(\\()?blah(?(1)(\\)))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -13387,15 +13387,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test5 = array('str'=>"(blah",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(\\(+)?blah(?(1)(\\)))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -13407,7 +13407,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?(?!a)b|a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13437,7 +13437,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?(?=a)b|a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13449,7 +13449,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?(?=a)a|b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13461,7 +13461,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>3));
 
         return array('regex'=>"(?=(a+?))(\\1ab)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13473,7 +13473,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>4));
 
         return array('regex'=>"(\\w+:)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13485,7 +13485,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>1));
 
         return array('regex'=>"\$(?<=^(a))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13497,7 +13497,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>1,2=>3));
 
         return array('regex'=>"(?=(a+?))(\\1ab)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13527,7 +13527,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?=(a+?))\\1ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13545,7 +13545,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>11,1=>7,2=>4));
 
         return array('regex'=>"([\\w:]+::)?(\\w+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -13557,7 +13557,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>1));
 
         return array('regex'=>"^[^bcd]*(c+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13569,7 +13569,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>2));
 
         return array('regex'=>"(a*)b+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13593,23 +13593,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,2=>7));
 
         $test4 = array('str'=>"abcd:",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"abcd:",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"([\\w:]+::)?(\\w+)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -13621,7 +13621,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>5,1=>1));
 
         return array('regex'=>"^[^bcd]*(c+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13633,7 +13633,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4));
 
         return array('regex'=>"(?>a+)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13645,7 +13645,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"([[:]+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13657,7 +13657,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"([[=]+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13669,7 +13669,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"([[.]+)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13681,7 +13681,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>4));
 
         return array('regex'=>"((?>a+)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13693,7 +13693,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(?>(a+))b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13705,7 +13705,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>16,1=>1));
 
         return array('regex'=>"((?>[^()]+)|\\([^()]*\\))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13735,7 +13735,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a\\Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -13747,7 +13747,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"b\\Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13759,7 +13759,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"b\\Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -13779,7 +13779,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"b\\z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -13871,18 +13871,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test14 = array('str'=>"a-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test15 = array('str'=>"a.",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -13919,18 +13919,18 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test20 = array('str'=>"the.quick.brown.fox-",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>20),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test21 = array('str'=>"the.quick.brown.fox.",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>20),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -13951,7 +13951,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^(?>(?(1)\\.|())[^\\W_](?>[a-z0-9-]*[^\\W_])?)+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15, $test16, $test17, $test18, $test19, $test20, $test21, $test22, $test23));
     }
 
@@ -13969,23 +13969,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10,1=>4));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"a rather long string that doesn't end with one of them",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>54),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?>.*)(?<=(abcd|wxyz))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -13997,29 +13997,29 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>74));
 
         $test2 = array('str'=>"word cat dog elephant mussel cow horse canary baboon snake shark",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>64),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"word (?>(?:(?!otherword)[a-zA-Z0-9]+ ){0,30})otherword",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_614() {
         $test1 = array('str'=>"word cat dog elephant mussel cow horse canary baboon snake shark the quick brown fox and the lazy dog and several other words getting close to thirty by now I hope",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>163),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"word (?>[a-zA-Z0-9]+ ){0,30}otherword",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14053,7 +14053,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?<=\\d{3}(?!999))foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -14071,23 +14071,23 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3));
 
         $test3 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"123abcfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=(?!...999)\\d{3})foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -14113,15 +14113,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"123999foo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=\\d{3}(?!999)...)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -14147,15 +14147,15 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test4 = array('str'=>"123999foo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=\\d{3}...)(?<!999)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -14180,7 +14180,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"<a[\\s]+href[\\s]*=[\\s]*          # find <a href=\n ([\\\"\\'])?                       # find single or double quote\n (?(1) (.*?)\\1 | ([^\\s]+))       # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n",
                      'modifiers'=>"isx",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14205,7 +14205,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"<a\\s+href\\s*=\\s*                # find <a href=\n ([\"'])?                         # find single or double quote\n (?(1) (.*?)\\1 | (\\S+))          # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n",
                      'modifiers'=>"isx",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14230,7 +14230,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"<a\\s+href(?>\\s*)=(?>\\s*)        # find <a href=\n ([\"'])?                         # find single or double quote\n (?(1) (.*?)\\1 | (\\S+))          # if quote found, match up to next matching\n                                 # quote, otherwise match up to next space\n",
                      'modifiers'=>"isx",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14242,7 +14242,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1,2=>1));
 
         return array('regex'=>"((Z)+|A)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14254,7 +14254,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1,2=>0));
 
         return array('regex'=>"(Z()|A)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14266,7 +14266,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1,2=>0,3=>0));
 
         return array('regex'=>"(Z(())|A)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14278,7 +14278,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"((?>Z)+|A)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14290,7 +14290,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"((?>)+|A)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14303,7 +14303,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"a*",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14343,7 +14343,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"^[\\d-a]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -14355,7 +14355,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"[[:space:]]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14367,7 +14367,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>2));
 
         return array('regex'=>"[[:blank:]]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14379,7 +14379,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"[\\s]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14391,7 +14391,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>6));
 
         return array('regex'=>"\\s+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14404,7 +14404,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"ab",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14417,7 +14417,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?!\\A)x",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14432,7 +14432,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(?!^)x",
                      'modifiers'=>"m",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14444,7 +14444,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>9));
 
         return array('regex'=>"abc\\Qabc\\Eabc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14456,7 +14456,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>10));
 
         return array('regex'=>"abc\\Q(*+|\\Eabc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14476,16 +14476,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test3 = array('str'=>"abcabcabc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"   abc\\Q abc\\Eabc",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14498,7 +14498,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc#comment\n    \\Q#not comment\n    literal\\E",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14511,7 +14511,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc#comment\n    \\Q#not comment\n    literal",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14524,7 +14524,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc#comment\n    \\Q#not comment\n    literal\\E #more comment\n    ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14537,7 +14537,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc#comment\n    \\Q#not comment\n    literal\\E #more comment",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14549,7 +14549,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>8));
 
         return array('regex'=>"\\Qabc\\\$xyz\\E",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14561,7 +14561,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7));
 
         return array('regex'=>"\\Qabc\\E\\\$\\Qxyz\\E",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14589,7 +14589,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"\\Gabc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14602,7 +14602,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"\\Gabc.",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14615,7 +14615,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"abc.",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -14643,7 +14643,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"a(?x: b c )d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14661,7 +14661,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"((?x)x y z | a b c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -14689,7 +14689,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"(?i)AB(?-i)C",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -14747,7 +14747,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"((?i)AB(?-i)C|D)E",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -14765,7 +14765,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>2));
 
         return array('regex'=>"(.*)\\d+\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -14784,7 +14784,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
 
         return array('regex'=>"(.*)\\d+\\1",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -14802,7 +14802,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>7,1=>2,2=>2));
 
         return array('regex'=>"((.*))\\d+\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -14852,10 +14852,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test8 = array('str'=>"1:2:3:4:5:6:7:8",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -14892,10 +14892,10 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test13 = array('str'=>"abcd:fee0:123::",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -14908,16 +14908,16 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         $test15 = array('str'=>"1:",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
-        return array('regex'=>"^(?!:)                       # colon disallowed at start\n  (?:                         # start of item\n    (?: [0-9a-f]{1,4} |       # 1-4 hex digits or\n    (?(1)0 | () ) )           # if null previously matched, fail; else null\n    :                         # followed by colon\n  ){1,7}                      # end item; 1-7 of them required\n  [0-9a-f]{1,4} \$             # final hex number at end of string\n  (?(1)|.)                    # check that there was an empty component\n  ",
+        return array('regex'=>"^(?!:)                       # colon disallowed at start\n  (?:                         # start of item\n    (?: [0-9a-f]{1,4} |       # 1-4 hex digits or\n    (?(1)0 | () ) )           # if null previously matched, fail; else null\n    :                         # followed by colon\n  ){1,7}                      # end item; 1-7 of them required               \n  [0-9a-f]{1,4} \$             # final hex number at end of string\n  (?(1)|.)                    # check that there was an empty component\n  ",
                      'modifiers'=>"xi",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15));
     }
 
@@ -14967,7 +14967,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'next'=>'');
 
         return array('regex'=>"[z\\Qa-d]\\E]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -14985,7 +14985,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"[\\z\\C]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -14997,15 +14997,21 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'length'=>array(0=>1));
 
         return array('regex'=>"\\M",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_659() {
-Error -8 (match limit exceeded)
-str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        $test1 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array(),
+                       'left'=>array(0),
+                       'next'=>'');
+
         return array('regex'=>"(a+)*b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15035,7 +15041,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"(?i)reg(?:ul(?:[aä]|ae)r|ex)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -15065,7 +15071,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"Åæåä[à-ÿÀ-ß]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -15077,7 +15083,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?<=Z)X.",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15089,7 +15095,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>10));
 
         return array('regex'=>"ab cd (?x) de fg",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15117,7 +15123,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"ab cd(?x) de fg",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15129,23 +15135,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>3));
 
         $test2 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>7),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"boobarX",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>4),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<![^f]oo)(bar)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15173,7 +15179,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?<![^f])X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15185,23 +15191,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         $test2 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>9),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"offX",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=[^f])X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15220,7 +15226,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^",
                      'modifiers'=>"mg",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15233,7 +15239,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<=C\\n)^",
                      'modifiers'=>"mg",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15245,7 +15251,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"(?:(?(1)a|b)(X))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15263,7 +15269,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(?:(?(1)\\1a|b)(X|Y))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15275,7 +15281,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>1));
 
         return array('regex'=>"()()()()()()()()()(?:(?(10)\\10a|b)(X|Y))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15299,7 +15305,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"[[,abc,]+]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15312,7 +15318,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?-x: )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15340,7 +15346,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?x)(?-x: \\s*#\\s*)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15376,7 +15382,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?x-is)(?:(?-ixs) \\s*#\\s*) include",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -15400,7 +15406,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"a*b*\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15424,7 +15430,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"a*b?\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15448,7 +15454,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"a*b{0,4}\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15472,7 +15478,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"a*b{0,}\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15490,7 +15496,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"a*\\d*\\w",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15503,7 +15509,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a*b *\\w",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15516,7 +15522,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a*b#comment\n  *\\w",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15529,7 +15535,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a* b *\\w",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15541,7 +15547,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>8));
 
         return array('regex'=>"^\\w+=.*(\\\\\\n.*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15553,7 +15559,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>4));
 
         return array('regex'=>"(?=(\\w+))\\1:",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15565,7 +15571,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>4));
 
         return array('regex'=>"^(?=(\\w+))\\1:",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15577,7 +15583,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^\\Eabc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15605,7 +15611,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^[\\Eabc]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15641,7 +15647,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^[a-\\Ec]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -15677,7 +15683,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^[a\\E\\E-\\Ec]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -15705,7 +15711,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^[\\E\\Qa\\E-\\Qz\\E]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15729,7 +15735,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"^[a\\Q]bc\\E]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -15747,7 +15753,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"^[a-\\Q\\E]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15759,7 +15765,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>1,2=>0));
 
         return array('regex'=>"^(a()*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15771,7 +15777,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"^(?:a(?:(?:))*)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15783,7 +15789,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>1,2=>0));
 
         return array('regex'=>"^(a()+)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15795,7 +15801,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"^(?:a(?:(?:))+)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15819,16 +15825,16 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,2=>0));
 
         return array('regex'=>"(a){0,3}(?(1)b|(c|))*D",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
     function data_for_test_700() {
         $test1 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>60),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -15839,16 +15845,16 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>61,1=>0));
 
         return array('regex'=>"(a|)*\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_701() {
         $test1 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>60),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -15859,16 +15865,16 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>61));
 
         return array('regex'=>"(?>a|)*\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_702() {
         $test1 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>60),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -15879,7 +15885,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>61));
 
         return array('regex'=>"(?:a|)*\\d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15892,7 +15898,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"\\Z",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15904,15 +15910,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         $test2 = array('str'=>"abc\n",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(?s)(?>.*)(?<!\\n)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15924,15 +15930,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         $test2 = array('str'=>"abc\n",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(?![^\\n]*\\n\\z)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15952,7 +15958,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"\\z(?<!\\n)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -15964,7 +15970,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>0));
 
         return array('regex'=>"(.*(.)?)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15977,7 +15983,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"( (A | (?(1)0|) )*   )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -15990,7 +15996,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"( ( (?(1)0|) )*   )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16003,7 +16009,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(  (?(1)0|)*   )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16021,7 +16027,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"[[:abcd:xyz]]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16057,21 +16063,21 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"[abc[:x\\]pqr]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
     function data_for_test_713() {
         $test1 = array('str'=>"fooabcfoo",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>".*[op][xyz]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16089,7 +16095,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?(?=.*b)b|^)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16101,15 +16107,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         $test2 = array('str'=>"abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?(?=^.*b)b|^)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16127,7 +16133,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         return array('regex'=>"(?(?=.*b)b|^)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16145,7 +16151,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?(?=.*b)b|^)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16157,7 +16163,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?(?=b).*b|^d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16169,7 +16175,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(?=.*b).*b|^d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16181,7 +16187,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>0));
 
         return array('regex'=>"^%((?(?=[a])[^%])|b)*%\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16221,7 +16227,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?i)a(?-i)b|c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -16233,7 +16239,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"[\\x00-\\xff\\s]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16245,36 +16251,36 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"^\\c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_724() {
         $test1 = array('str'=>"abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(abc)\\1",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_725() {
         $test1 = array('str'=>"abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(abc)\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16293,7 +16299,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]*",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16312,69 +16318,69 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]*+",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_728() {
         $test1 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"12abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"12ABC",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"[^a]*?X",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
     function data_for_test_729() {
         $test1 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>5),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test2 = array('str'=>"12abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"12ABC",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"[^a]+?X",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16399,7 +16405,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]?X",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16424,7 +16430,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]??X",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16449,7 +16455,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]?+X",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16468,7 +16474,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]{2,3}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16487,7 +16493,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]{2,3}?",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16506,7 +16512,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"[^a]{2,3}+",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16518,7 +16524,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>0,2=>0));
 
         return array('regex'=>"((a|)+)+Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16530,7 +16536,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"(a)b|(a)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16542,7 +16548,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"(?>(a))b|(a)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16554,7 +16560,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"(?=(a))ab|(a)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16566,7 +16572,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>2,3=>1));
 
         return array('regex'=>"((?>(a))b|(a)c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16578,7 +16584,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>2,3=>1));
 
         return array('regex'=>"((?>(a))b|(a)c)++",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16590,7 +16596,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"(?:(?>(a))b|(a)c)++",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16602,7 +16608,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1,3=>2));
 
         return array('regex'=>"(?=(?>(a))b|(a)c)(..)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16614,7 +16620,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"(?>(?>(a))b|(a)c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16626,7 +16632,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(?:(?>([ab])))+a=",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16638,7 +16644,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(?>([ab]))+a=",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16650,7 +16656,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>14,1=>14,2=>3,3=>5));
 
         return array('regex'=>"((?>(a+)b)+(aabab))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16664,7 +16670,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?>a+|ab)+?c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16678,7 +16684,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?>a+|ab)+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16690,7 +16696,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"(?:a+|ab)+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16702,7 +16708,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?(?=(a))a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16714,7 +16720,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>1,2=>1));
 
         return array('regex'=>"(?(?=(a))a)(b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16728,7 +16734,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?:a|ab)++c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16742,7 +16748,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?>a|ab)++c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16754,7 +16760,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         return array('regex'=>"^(?:a|ab)+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16782,7 +16788,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=abc){3}abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16810,7 +16816,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=abc)+abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16838,7 +16844,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=abc)++abc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16850,7 +16856,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?=abc){0}xyz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16872,7 +16878,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=abc){1}xyz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16890,7 +16896,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?=(a))?.",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16908,7 +16914,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?=(a))??.",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16926,7 +16932,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"^(?=(?1))?[az]([abc])d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16938,7 +16944,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"^(?!a){0}\\w+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -16956,7 +16962,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?<=(abc))?xyz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -16984,7 +16990,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^[\\g<a>]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -16996,7 +17002,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>8));
 
         return array('regex'=>"^[\\ga]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17008,7 +17014,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>10));
 
         return array('regex'=>"^[:a[:digit:]]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17020,7 +17026,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>13));
 
         return array('regex'=>"^[:a[:digit:]:b]+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17032,7 +17038,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"[:a]xxx[b:]",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17061,7 +17067,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<=a{2})b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -17073,24 +17079,24 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         $test2 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"xaabc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<!a{2})b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -17102,7 +17108,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a\\h)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17120,23 +17126,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         $test3 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"xaabc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=[^a]{2})b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -17148,32 +17154,32 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         $test2 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test3 = array('str'=>"aAAbc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"xaabc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?<=[^a]{2})b",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -17185,7 +17191,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a\\H)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17197,7 +17203,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a\\V)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17209,7 +17215,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a\\v)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17221,7 +17227,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         return array('regex'=>"(?(?=c)c|d)++Y",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17233,7 +17239,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         return array('regex'=>"(?(?=c)c|d)*+Y",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17253,23 +17259,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"aaaaaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>9),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(a{2,3}){2,}+a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -17283,15 +17289,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test2 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(a{2,3})++a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17305,15 +17311,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test2 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(a{2,3})*+a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17325,7 +17331,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"ab\\Cde",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17337,7 +17343,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=ab\\Cde)X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17355,7 +17361,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[\\CD]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17367,7 +17373,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"a[\\C-X]b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17385,23 +17391,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test3 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>9),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"  X\n",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\H\\h\\V\\v",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -17425,23 +17431,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         $test4 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"	  \n",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\H*\\h+\\V?\\v{3,4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -17459,7 +17465,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"\\H{3,4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17471,7 +17477,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         return array('regex'=>".\\h{3,4}.",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17497,10 +17503,10 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test4 = array('str'=>">XYZ",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -17513,7 +17519,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"\\h*X\\h?\\H+Y\\H?Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -17531,7 +17537,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>19));
 
         return array('regex'=>"\\v*X\\v?Y\\v+Z\\V*\\x0a\\V+\\x0b\\V{2,3}\\x0c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17543,7 +17549,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"(foo)\\Kbar",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17561,7 +17567,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6,1=>3,2=>3));
 
         return array('regex'=>"(foo)(\\Kbar|baz)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17573,7 +17579,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6,1=>6));
 
         return array('regex'=>"(foo\\Kbar)baz",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17586,7 +17592,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"abc\\K|def\\K",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17599,7 +17605,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"ab\\Kc|de\\Kf",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17612,7 +17618,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=C)",
                      'modifiers'=>"g",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17640,7 +17646,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^abc\\K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -17652,7 +17658,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>13,1=>2,2=>1));
 
         return array('regex'=>"^(a(b))\\1\\g1\\g{1}\\g-1\\g{-1}\\g{-02}Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17670,7 +17676,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>3));
 
         return array('regex'=>"(?<A>tom|bon)-\\g{A}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17684,7 +17690,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(^(a|b\\g{-1}))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17710,23 +17716,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test4 = array('str'=>"abcxyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"xyzabc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?|(abc)|(xyz))\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -17752,15 +17758,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test4 = array('str'=>"xyzxyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?|(abc)|(xyz))(?1)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -17772,7 +17778,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>1,2=>1,3=>1,4=>1,5=>1));
 
         return array('regex'=>"^X(?5)(a)(?|(b)|(q))(c)(d)(Y)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17784,7 +17790,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>1,2=>1,5=>1,6=>1,7=>1));
 
         return array('regex'=>"^X(?7)(a)(?|(b|(r)(s))|(q))(c)(d)(Y)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17796,7 +17802,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>1,2=>1,5=>1,6=>1,7=>1));
 
         return array('regex'=>"^X(?7)(a)(?|(b|(?|(r)|(t))(s))|(q))(c)(d)(Y)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17814,31 +17820,31 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>2));
 
         $test3 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"a:axyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"ab:abxyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?'abc'\\w+):\\k<abc>{2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -17856,31 +17862,31 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7,1=>2));
 
         $test3 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test4 = array('str'=>"a:axyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>2),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"ab:abxyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>5),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?'abc'\\w+):\\g{abc}{2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -17899,7 +17905,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?<ab>a)? (?(<ab>)b|c) (?('ab')d|e)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -17911,7 +17917,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>2));
 
         return array('regex'=>"^(a.)\\g-1Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17923,7 +17929,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>2));
 
         return array('regex'=>"^(a.)\\g{-1}Z",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17936,7 +17942,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?(DEFINE) (?<A> a) (?<B> b) )  (?&A) (?&B) ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17949,7 +17955,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<NAME>(?&NAME_PAT))\\s+(?<ADDR>(?&ADDRESS_PAT))\n  (?(DEFINE)\n  (?<NAME_PAT>[a-z]+)\n  (?<ADDRESS_PAT>\\d+)\n  )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -17973,31 +17979,31 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>8,2=>2));
 
         $test4 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>9),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"10.6",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"455.3.4.5",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?(DEFINE)(?<byte>2[0-4]\\d|25[0-5]|1\\d\\d|[1-9]?\\d))\\b(?&byte)(\\.(?&byte)){3}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -18021,31 +18027,31 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>8,1=>2));
 
         $test4 = array('str'=>"** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>9),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test5 = array('str'=>"10.6",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"455.3.4.5",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"\\b(?&byte)(\\.(?&byte)){3}(?(DEFINE)(?<byte>2[0-4]\\d|25[0-5]|1\\d\\d|[1-9]?\\d))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -18073,7 +18079,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(\\w++|\\s++)*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -18101,7 +18107,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(\\d++)(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -18113,7 +18119,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"a++b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18125,7 +18131,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>4));
 
         return array('regex'=>"(a++b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18137,7 +18143,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>3));
 
         return array('regex'=>"(a++)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18149,7 +18155,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>16,1=>1));
 
         return array('regex'=>"([^()]++|\\([^()]*\\))+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18183,7 +18189,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"\\(([^()]++|\\([^()]+\\))+\\)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -18215,15 +18221,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test5 = array('str'=>"a(b(c)d",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^([^()]|\\((?1)*\\))*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -18247,7 +18253,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>17,1=>7));
 
         return array('regex'=>"^>abc>([^()]|\\((?1)*\\))*<xyz<\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -18277,24 +18283,24 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>19,3=>19,4=>1));
 
         $test5 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"Thequickbrownfox",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>16),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(?:((.)(?1)\\2|)|((.)(?3)\\4|.))\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -18334,7 +18340,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(\\d+|\\((?1)([+*-])(?1)\\)|-(?1))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -18376,7 +18382,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(x(y|(?1){2})z)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -18426,86 +18432,86 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test8 = array('str'=>"<abc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"((< (?: (?(R) \\d++  | [^<>]*+) | (?2)) * >))",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
     function data_for_test_831() {
         $test1 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^a+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_832() {
         $test1 = array('str'=>"aaabccc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a+b?c+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_833() {
         $test1 = array('str'=>"aaabccc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a+b?(*PRUNE)c+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_834() {
         $test1 = array('str'=>"aaabccc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a+b?(*COMMIT)c+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_835() {
         $test1 = array('str'=>"aaabcccaaabccc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>7),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a+b?(*SKIP)c+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18553,7 +18559,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^(?:aaa(*THEN)\\w{6}|bbb(*THEN)\\w{5}|ccc(*THEN)\\w{4}|\\w{3})",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -18601,21 +18607,21 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"^(aaa(*THEN)\\w{6}|bbb(*THEN)\\w{5}|ccc(*THEN)\\w{4}|\\w{3})",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
     function data_for_test_838() {
         $test1 = array('str'=>"aaabccc",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"a+b?(*THEN)c+(*FAIL)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18662,7 +18668,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(A (A|B(*ACCEPT)|C) D)(E)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -18692,24 +18698,24 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>26,3=>25,4=>1));
 
         $test5 = array('str'=>"*** Failers",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>11),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test6 = array('str'=>"The quick brown fox",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>19),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^\\W*+(?:((.)\\W*+(?1)\\W*+\\2|)|((.)\\W*+(?3)\\W*+\\4|\\W*+.\\W*+))\\W*+\$",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -18751,23 +18757,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>19,1=>19,2=>1));
 
         $test7 = array('str'=>"rhubarb",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>7),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test8 = array('str'=>"the quick brown fox",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>19),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^((.)(?1)\\2|.)\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -18795,7 +18801,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(a)(?<=b(?1))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -18823,7 +18829,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?<=b(?1))(a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -18835,7 +18841,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?<X>a)(?<=b(?&X))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -18877,7 +18883,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?|(abc)|(def))\\1",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -18919,7 +18925,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?|(abc)|(def))(?1)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -18954,7 +18960,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?:a(?<quote> (?<apostrophe>')|(?<realquote>\")) |b(?<quote> (?<apostrophe>')|(?<realquote>\")) ) (?('quote')[a-z]+|[0-9]+)",
                      'modifiers'=>"xJ",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -18988,7 +18994,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?:(?1)|B)(A(*F)|C)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -19038,7 +19044,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?:(?1)|B)(A(*F)|C)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
@@ -19090,15 +19096,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test8 = array('str'=>"ABC",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>2),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?:(?1)|B)(A(*ACCEPT)XX|C)D",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
@@ -19110,7 +19116,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?(DEFINE)(A))B(?1)C",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19122,7 +19128,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"(?(DEFINE)((A)\\2))B(?1)C",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19135,7 +19141,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<pn> \\( ( [^()]++ | (?&pn) )* \\) )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19157,7 +19163,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?=a(*SKIP)b|ac)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19185,7 +19191,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?=a(*PRUNE)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19197,7 +19203,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         return array('regex'=>"^(?=a(*ACCEPT)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19209,7 +19215,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?>a\\Kb)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19221,7 +19227,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>2));
 
         return array('regex'=>"((?>a\\Kb))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19233,7 +19239,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>2));
 
         return array('regex'=>"(a\\Kb)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19245,7 +19251,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^a\\Kcz|ac",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19257,7 +19263,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?>a\\Kbz|ab)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19269,7 +19275,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"^(?&t)(?(DEFINE)(?<t>a\\Kb))\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19287,7 +19293,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>9,1=>1));
 
         return array('regex'=>"^([^()]|\\((?1)*\\))*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19311,7 +19317,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>4,2=>1));
 
         return array('regex'=>"(?P<L1>(?P<L2>0)(?P>L1)|(?P>L2))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19335,7 +19341,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1,2=>1));
 
         return array('regex'=>"(?P<L1>(?P<L2>0)|(?P>L2)(?P>L1))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19349,7 +19355,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"A(*COMMIT)(B|D)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19380,7 +19386,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(A(*PRUNE:A)B|C(*PRUNE:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19401,7 +19407,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*SKIP:B)(C|X)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19424,7 +19430,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19439,7 +19445,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?:A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19454,7 +19460,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?>A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19467,7 +19473,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:A)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19480,7 +19486,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*MARK:B)(*SKIP:A)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19493,7 +19499,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*:A)A+(*SKIP:A)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19508,7 +19514,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*:A)A+(*SKIP:A)(B|Z)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19521,7 +19527,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:B)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19534,7 +19540,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:B)(B|Z) | AC(*:B)",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19562,7 +19568,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(*COMMIT)(A|P)(B|P)(C|P)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19574,21 +19580,21 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"(\\w+)(?>b(*COMMIT))\\w{2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_880() {
         $test1 = array('str'=>"abbb",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(\\w+)b(*COMMIT)\\w{2}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19600,7 +19606,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?&t)(?#()(?(DEFINE)(?<t>a))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19614,7 +19620,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?>(*COMMIT)(?>yes|no)(*THEN)(*F))?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19628,7 +19634,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?>(*COMMIT)(yes|no)(*THEN)(*F))?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19646,7 +19652,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"b?(*SKIP)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19660,7 +19666,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(*SKIP)bc",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19674,7 +19680,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(*SKIP)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19686,7 +19692,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(?P<abn>(?P=abn)xxx|)+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -19726,23 +19732,23 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test6 = array('str'=>"Ba",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         $test7 = array('str'=>"ba",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>1),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?i:([^b]))(?1)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -19762,15 +19768,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>6),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(?&t)*+(?(DEFINE)(?<t>a))\\w\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -19788,7 +19794,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>6));
 
         return array('regex'=>"^(?&t)*(?(DEFINE)(?<t>a))\\w\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19814,15 +19820,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test4 = array('str'=>"aaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(a)*+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -19848,15 +19854,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test4 = array('str'=>"aaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(?:a)*+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -19876,10 +19882,10 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -19892,7 +19898,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(a)++(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -19912,10 +19918,10 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>4),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -19928,7 +19934,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?:a)++(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -19946,7 +19952,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,2=>1));
 
         return array('regex'=>"^(a)?+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19964,7 +19970,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"^(?:a)?+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -19984,10 +19990,10 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -20000,7 +20006,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(a){2,}+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -20020,10 +20026,10 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test3 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
@@ -20036,7 +20042,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(?:a){2,}+(\\w)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -20060,7 +20066,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>0));
 
         return array('regex'=>"(a|)*(?1)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -20090,7 +20096,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(a)++(?1)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -20120,7 +20126,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(a)*+(?1)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -20132,7 +20138,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?1)(?:(b)){0}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20145,7 +20151,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(foo ( \\( ((?:(?> [^()]+ )|(?2))*) \\) ) )",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20158,7 +20164,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(A (A|B(*ACCEPT)|C) D)(E)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20170,7 +20176,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"\\A.*?(a|bc)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20182,7 +20188,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"\\A.*?(?:a|bc)++",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20194,7 +20200,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"\\A.*?(a|bc)++",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20206,7 +20212,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"\\A.*?(?:a|bc|d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20218,7 +20224,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?:(b))++",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20230,7 +20236,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?(?=(a(*ACCEPT)z))a)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20242,7 +20248,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>1));
 
         return array('regex'=>"^(a)(?1)+ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20256,7 +20262,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^(a)(?1)++ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20269,7 +20275,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?=a(*:M))aZ",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20282,7 +20288,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(?!(*:M)b)aZ",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20294,7 +20300,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(DEFINE)(a))?b(?1)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20306,7 +20312,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^\\N+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20318,7 +20324,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^\\N{1,}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20330,7 +20336,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"(?(R)a+|(?R)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20342,7 +20348,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>4));
 
         return array('regex'=>"(?(R)a+|((?R))b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20354,7 +20360,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>5));
 
         return array('regex'=>"((?(R)a+|(?1)b))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20366,7 +20372,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5,1=>5));
 
         return array('regex'=>"((?(R1)a+|(?1)b))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20377,9 +20383,9 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>1));
 
-        return array('regex'=>"a(*:any\nname)",
+        return array('regex'=>"a(*:any \nname)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20403,7 +20409,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?>(?&t)c|(?&t))(?(DEFINE)(?<t>a|b(*PRUNE)c))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -20418,7 +20424,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (a(*THEN)b) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20431,7 +20437,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (a(*THEN)b|(*F)) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20444,7 +20450,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? ( (a(*THEN)b) | (*F) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20459,7 +20465,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? ( (a(*THEN)b) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20474,7 +20480,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?:a(*THEN)b) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20487,7 +20493,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?:a(*THEN)b|(*F)) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20500,7 +20506,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b) | (*F) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20515,7 +20521,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20530,7 +20536,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?>a(*THEN)b) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20543,7 +20549,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?>a(*THEN)b|(*F)) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20556,7 +20562,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?> (?>a(*THEN)b) | (*F) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20571,7 +20577,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?> (?>a(*THEN)b) ) c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20586,7 +20592,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (a(*THEN)b)++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20599,7 +20605,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (a(*THEN)b|(*F))++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20612,7 +20618,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? ( (a(*THEN)b)++ | (*F) )++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20627,7 +20633,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? ( (a(*THEN)b)++ )++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20642,7 +20648,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?:a(*THEN)b)++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20655,7 +20661,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?:a(*THEN)b|(*F))++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20668,7 +20674,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b)++ | (*F) )++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20683,7 +20689,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b)++ )++ c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20695,7 +20701,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^(?(?=a(*THEN)b)ab|ac)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20709,7 +20715,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^.*?(?(?=a)a|b(*THEN)c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20721,7 +20727,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^.*?(?:(?(?=a)a|b(*THEN)c)|d)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20735,7 +20741,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^.*?(?(?=a)a(*THEN)b|c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20747,7 +20753,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"^.*(?=a(*THEN)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20760,7 +20766,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?>a(*:m))",
                      'modifiers'=>"imsxSK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20773,7 +20779,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?>(a)(*:m))",
                      'modifiers'=>"imsxSK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20785,7 +20791,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a(*ACCEPT)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20797,7 +20803,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(?<=(a(*ACCEPT)b))c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20825,7 +20831,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?<=(a(*COMMIT)b))c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -20843,7 +20849,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<!a(*FAIL)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -20856,7 +20862,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<=a(*:N)b)c",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20868,7 +20874,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a(*PRUNE)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20880,7 +20886,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a(*SKIP)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20892,7 +20898,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a(*THEN)b)c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20904,7 +20910,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,1=>1,2=>1));
 
         return array('regex'=>"(a)(?2){2}(.)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -20925,7 +20931,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*PRUNE:B)(C|X)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -20946,7 +20952,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*PRUNE:B)(C|X)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -20967,7 +20973,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -20988,7 +20994,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KSY",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21009,7 +21015,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KS",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21024,7 +21030,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21039,7 +21045,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*MARK:B)(*SKIP:B)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21054,7 +21060,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*:A)A+(*SKIP)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21069,7 +21075,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21128,7 +21134,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*:A)B|XX(*:B)Y",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
@@ -21171,7 +21177,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -21214,7 +21220,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(A(*PRUNE:A)B|C(*PRUNE:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -21233,7 +21239,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^(A(*PRUNE:)B|C(*PRUNE:B)D)",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21246,7 +21252,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*PRUNE:A)B",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21265,7 +21271,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*:A)B|X(*:A)Y",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21294,7 +21300,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"b(*:m)f|a(*:n)w",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21331,7 +21337,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"b(*:m)f|aw",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -21344,7 +21350,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:B)(B|Z) | AAC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21367,7 +21373,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a(*PRUNE:X)bc|qq",
                      'modifiers'=>"KY",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21390,7 +21396,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a(*THEN:X)bc|qq",
                      'modifiers'=>"KY",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21419,7 +21425,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*MARK:A)b)..x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21448,7 +21454,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*MARK:A)b)..(*:Y)x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21477,7 +21483,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*PRUNE:A)b)..x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21506,7 +21512,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*PRUNE:A)b)..(*:Y)x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21535,7 +21541,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*THEN:A)b)..x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21564,7 +21570,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*THEN:A)b)..(*:Y)x",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -21576,7 +21582,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4,2=>0));
 
         return array('regex'=>"(another)?(\\1?)test",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21590,7 +21596,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(another)?(\\1+)test",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21602,7 +21608,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(a(*COMMIT)b){0}a(?1)|aac",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21614,7 +21620,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>0));
 
         return array('regex'=>"((?:a?)*)*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21626,7 +21632,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3,1=>0));
 
         return array('regex'=>"((?>a?)*)*c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21638,7 +21644,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?>.*?a)(?<=ba)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21650,7 +21656,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?:.*?a)(?<=ba)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21662,7 +21668,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>".*?a(*PRUNE)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21675,7 +21681,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>".*?a(*PRUNE)b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21690,7 +21696,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^a(*PRUNE)b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21702,7 +21708,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>".*?a(*SKIP)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21715,7 +21721,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?>.*?a)b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21727,7 +21733,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?>.*?a)b",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21742,7 +21748,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?>^a)b",
                      'modifiers'=>"s",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21760,7 +21766,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0,2=>4));
 
         return array('regex'=>"(?>.*?)(?<=(abcd)|(wxyz))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -21778,21 +21784,21 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>10,2=>4));
 
         return array('regex'=>"(?>.*)(?<=(abcd)|(wxyz))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_1002() {
         $test1 = array('str'=>"abcdfooxyz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>10),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(?>.*)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21804,7 +21810,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?>.*?)foo",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21816,7 +21822,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?:(a(*PRUNE)b)){0}(?:(?1)|ac)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21828,7 +21834,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?:(a(*SKIP)b)){0}(?:(?1)|ac)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21842,7 +21848,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?<=(*SKIP)ac)a",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21855,7 +21861,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:B)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21868,7 +21874,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a(*SKIP:m)x|ac(*:n)(*SKIP:n)d|ac",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21881,7 +21887,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*SKIP:m)x|A(*SKIP:n)x|AB",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21894,7 +21900,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"((*SKIP:r)d){0}a(*SKIP:m)x|ac(*:n)|ac",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21906,7 +21912,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"aaaaa(*PRUNE)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21918,7 +21924,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"aaaaa(*SKIP)(*PRUNE)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21930,7 +21936,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"aaaaa(*SKIP:N)(*PRUNE)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21942,7 +21948,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"aaaa(*:N)a(*SKIP:N)(*PRUNE)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21954,7 +21960,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>5));
 
         return array('regex'=>"aaaaa(*THEN)(*PRUNE)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21966,7 +21972,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"aaaaa(*SKIP)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21978,7 +21984,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"aaaaa(*PRUNE)(*SKIP)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -21990,7 +21996,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"aaaaa(*THEN)(*SKIP)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22002,7 +22008,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"aaaaa(*COMMIT)(*SKIP)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22016,7 +22022,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"aaaaa(*COMMIT)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22028,7 +22034,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"aaaaa(*THEN)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22040,7 +22046,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"aaaaa(*SKIP)(*THEN)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22052,7 +22058,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"aaaaa(*PRUNE)(*THEN)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22064,7 +22070,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>7));
 
         return array('regex'=>"aaaaa(*COMMIT)(*THEN)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22076,7 +22082,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"aaaaa(*:m)(*PRUNE:m)(*SKIP:m)m|a+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22088,7 +22094,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"aaaaa(*:m)(*MARK:m)(*PRUNE)(*SKIP:m)m|a+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22100,7 +22106,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"aaaaa(*:n)(*PRUNE:m)(*SKIP:m)m|a+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22112,7 +22118,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"aaaaa(*:n)(*MARK:m)(*PRUNE)(*SKIP:m)m|a+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22124,7 +22130,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"a(*MARK:A)aa(*PRUNE:A)a(*SKIP:A)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22136,7 +22142,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(*MARK:A)aa(*MARK:A)a(*SKIP:A)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22148,7 +22154,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"aaa(*PRUNE:A)a(*SKIP:A)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22160,7 +22166,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"aaa(*MARK:A)a(*SKIP:A)b|a+c",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22173,7 +22179,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"a(*:m)a(*COMMIT)(*SKIP:m)b|a+c",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22185,7 +22191,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>".?(a|b(*THEN)c)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22205,7 +22211,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(a(*COMMIT)b)c|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22223,7 +22229,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?=a(*COMMIT)b)abc|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22241,7 +22247,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?>a(*COMMIT)b)c|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22261,7 +22267,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?=b(*COMMIT)c)[^d]|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22279,7 +22285,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"a(?=bc).|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22293,7 +22299,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"a(?>b(*COMMIT)c)d|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22305,7 +22311,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"a(?>bc)d|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22317,7 +22323,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?>a(*COMMIT)b)c|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22331,7 +22337,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?>a(*COMMIT)c)d|abd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22343,7 +22349,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,2=>1));
 
         return array('regex'=>"((?=a(*COMMIT)b)ab|ac){0}(?:(?1)|a(c))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22357,15 +22363,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         $test2 = array('str'=>"a",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^(a)?(?(1)a|b)+\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22377,7 +22383,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?=a\\Kb)ab",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22389,7 +22395,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!a\\Kb)ac",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22401,7 +22407,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^abc(?<=b\\Kc)d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22413,7 +22419,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         return array('regex'=>"^abc(?<!b\\Kq)d",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22428,7 +22434,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"A(*PRUNE:A)A+(*SKIP:A)(B|Z) | AC",
                      'modifiers'=>"xK",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22456,7 +22462,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^((abc|abcx)(*THEN)y|abcd)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -22470,187 +22476,187 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"^((yes|no)(*THEN)(*F))?",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1053() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1054() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1055() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) \\s* (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1056() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) \\s* z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1057() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (?:C|) (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1058() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (?:C|) (*THEN)  | A D) z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1059() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C{0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1060() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   C{0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1061() {
         $test1 = array('str'=>"AbcdCEBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>16),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (CE){0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1062() {
         $test1 = array('str'=>"AbcdCEBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>16),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (CE){0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1063() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (CE*){0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
     function data_for_test_1064() {
         $test1 = array('str'=>"AbcdCBefgBhiBqz",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>15),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"(A (.*)   (CE*){0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22664,7 +22670,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=a(*COMMIT)b|ac)ac|ac",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22679,7 +22685,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?=a(*COMMIT)b|(ac)) ac | (a)c",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22691,7 +22697,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(?!b(*THEN)a)bn|bnn)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22703,7 +22709,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!b(*SKIP)a)bn|bnn",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22715,7 +22721,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(?!b(*SKIP)a)bn|bnn)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22727,7 +22733,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!b(*PRUNE)a)bn|bnn",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22739,7 +22745,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(?!b(*PRUNE)a)bn|bnn)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22751,7 +22757,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!b(*COMMIT)a)bn|bnn",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22763,7 +22769,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?(?!b(*COMMIT)a)bn|bnn)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22777,7 +22783,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'next'=>'');
 
         return array('regex'=>"(?=b(*SKIP)a)bn|bnn",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22789,7 +22795,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"(?=b(*THEN)a)bn|bnn",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22801,7 +22807,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         return array('regex'=>"^(?!a(*SKIP)b)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22813,7 +22819,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^(?!a(*SKIP)b)..",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22825,7 +22831,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!a(*SKIP)b)..",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22837,7 +22843,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         return array('regex'=>"^(?(?!a(*SKIP)b))",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22849,7 +22855,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"^(?!a(*PRUNE)b)..",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22861,7 +22867,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!a(*PRUNE)b)..",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22873,7 +22879,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?!a(*COMMIT)b)ac|cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22885,7 +22891,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2));
 
         return array('regex'=>"\\A.*?(?:a|bc)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22897,7 +22903,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"^(A(*THEN)B|C(*THEN)D)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22910,7 +22916,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*:m(m)(?&y)(?(DEFINE)(?<y>b))",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22923,7 +22929,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*PRUNE:m(m)(?&y)(?(DEFINE)(?<y>b))",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22936,7 +22942,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*SKIP:m(m)(?&y)(?(DEFINE)(?<y>b))",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22949,7 +22955,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(*THEN:m(m)(?&y)(?(DEFINE)(?<y>b))",
                      'modifiers'=>"K",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -22961,15 +22967,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test2 = array('str'=>"123",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^\\d*\\w{4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -22981,15 +22987,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test2 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^[^b]*\\w{4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23001,16 +23007,16 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test2 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^[^b]*\\w{4}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23022,15 +23028,15 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test2 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^a*\\w{4}",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23042,16 +23048,16 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>4));
 
         $test2 = array('str'=>"aaa",
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>3),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'left'=>array(0),
                        'next'=>'');
 
         return array('regex'=>"^a*\\w{4}",
                      'modifiers'=>"i",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23069,7 +23075,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>0));
 
         return array('regex'=>"(?(?=ab)ab)",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23088,7 +23094,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?:(?<n>foo)|(?<n>bar))\\k<n>",
                      'modifiers'=>"J",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23131,7 +23137,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"(?<n>A)(?:(?<n>foo)|(?<n>bar))\\k<n>",
                      'modifiers'=>"J",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -23143,7 +23149,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>25,1=>1,2=>7,3=>7));
 
         return array('regex'=>"^(\\d+)\\s+IN\\s+SOA\\s+(\\S+)\\s+(\\S+)\\s*\\(\\s*\$",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23162,7 +23168,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>"^ (?:(?<A>A)|(?'B'B)(?<A>A)) (?('A')x) (?(<B>)y)\$",
                      'modifiers'=>"xJ",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2));
     }
 
@@ -23174,7 +23180,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^A\\xZ",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23186,7 +23192,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>3));
 
         return array('regex'=>"^A\\o{123}B",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23199,7 +23205,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>" ^ a + + b \$ ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23212,7 +23218,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>" ^ a + #comment\n  + b \$ ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23225,7 +23231,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>" ^ a + #comment\n  #comment\n  + b \$ ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23238,7 +23244,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>" ^ (?> a + ) b \$ ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23251,7 +23257,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         return array('regex'=>" ^ ( a + ) + + \\w \$ ",
                      'modifiers'=>"x",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23263,7 +23269,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?:a\\Kb)*+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23275,7 +23281,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?>a\\Kb)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23287,7 +23293,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?:a\\Kb)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23299,7 +23305,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>2));
 
         return array('regex'=>"(a\\Kb)*+",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -23311,7 +23317,7 @@ str: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                        'length'=>array(0=>1,1=>2));
 
         return array('regex'=>"(a\\Kb)*",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 

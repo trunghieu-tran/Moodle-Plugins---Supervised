@@ -3,4 +3,4 @@ Download the pcre library, replace pcretest with this one and configure like thi
 export LIBS=-licuuc
 ./configure --enable-utf --enable-unicode-properties
 
-then you can run ./pcretest testinput1 cross_test_from_pcre_testinput1.php
+then you can run ./pcretest testinput1 cross_tests_from_pcre_testinput1.php
