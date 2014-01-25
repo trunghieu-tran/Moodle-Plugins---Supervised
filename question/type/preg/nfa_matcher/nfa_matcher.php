@@ -53,7 +53,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_RECURSION:
+            case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return 'qtype_preg_nfa_leaf';
         }
 
@@ -84,7 +84,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_RECURSION:
+            case qtype_preg_node::TYPE_LEAF_RECURSION:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -95,10 +95,17 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Creates a processing state object for the given state filled with "nomatch" values.
      */
-    protected function create_initial_state($state, $str, $startpos, $recursionlevel) {
+    protected function create_initial_state($state, $str, $startpos, $prevlevelstate) {
+        if ($prevlevelstate !== null) {
+            $result = clone $prevlevelstate;
+            $result->recursionlevel = $prevlevelstate->recursionlevel + 1;
+            $result->state = $state;
+            return $result;
+        }
+
         $result = new qtype_preg_nfa_exec_state();
         $result->matcher = $this;
-        $result->recursionlevel = $recursionlevel;
+        $result->recursionlevel = 0;
         $result->state = $state;
 
         $result->matches = array();
@@ -427,7 +434,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * This method should be used if there are backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_brute_force($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+    protected function match_brute_force($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
 
@@ -435,7 +442,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $lazystates = array();   // States reached lazily.
 
         foreach ($this->start_states($subexpr) as $state) {
-            $curstates[] = $this->create_initial_state($state, $str, $startpos, $recursionlevel);
+            $curstates[] = $this->create_initial_state($state, $str, $startpos, $prevlevelstate);
         }
 
         // Do search.
@@ -452,11 +459,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 }
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
+                //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
                 if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
                     // Create a new state.
                     $newstate = clone $curstate;
                     $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
-                    //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $recursionlevel, length is $length!\n";
+                    //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
                     //echo "total length is {$newstate->length}\n\n";
                     // Save the current match.
                     if (!($transition->is_loop && $newstate->has_null_iterations())) {
@@ -466,7 +474,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $curstates[] = $newstate;
                         }
                     }
-                } else if (count($fullmatches) == 0) {
+                } else if (count($fullmatches) == 0 && $subexpr == 0) {
+                    //echo "not matched :(\n";
                     // Transition not matched, save the partial match.
                     $partialmatch = clone $curstate;
                     $partialmatch->length += $length;
@@ -499,7 +508,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * This method should be used if there are no backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_fast($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+    protected function match_fast($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         $states = array();           // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
@@ -513,7 +522,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // Create an array of processing states for all nfa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate] = in_array($curstate, $startstates)
-                               ? $this->create_initial_state($curstate, $str, $startpos, $recursionlevel)
+                               ? $this->create_initial_state($curstate, $str, $startpos, $prevlevelstate)
                                : null;
         }
 
@@ -613,9 +622,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+        //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
-        if ($recursionlevel > 3) {
+        if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 3) {
             return $this->create_nomatch_result($str);
         }
 
@@ -623,8 +633,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce
-                         ? $this->match_brute_force($str, $startpos, $subexpr, $recursionlevel)
-                         : $this->match_fast($str, $startpos, $subexpr, $recursionlevel);
+                         ? $this->match_brute_force($str, $startpos, $subexpr, $prevlevelstate)
+                         : $this->match_fast($str, $startpos, $subexpr, $prevlevelstate);
 
         // Choose the best one.
         $result = null;
