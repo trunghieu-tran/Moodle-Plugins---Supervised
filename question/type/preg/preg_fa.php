@@ -36,9 +36,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
  */
 class qtype_preg_fa_transition {
 
-    const GREED_LAZY = 1;
-    const GREED_GREEDY = 2;
-    const GREED_POSSESSIVE = 4;
+    const GREED_ZERO = 1;
+    const GREED_LAZY = 2;
+    const GREED_GREEDY = 4;
+    const GREED_POSSESSIVE = 8;
 
     /** Empty transition. */
     const TYPE_TRANSITION_EPS = 'eps_transition';
