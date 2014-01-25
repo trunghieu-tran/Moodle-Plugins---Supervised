@@ -475,15 +475,21 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
 
     protected function create_automaton_inner(&$automaton, &$stack) {
         if ($this->pregnode->rightborder == 0) {
-            // Repeating 0 times means eps-transition.
-            $start = $automaton->add_state();
-            $end = $automaton->add_state();
+            $this->operands[0]->create_automaton($automaton, $stack);
+            $body = array_pop($stack);
 
-            // Add eps-transition.
+            $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
+            foreach ($outgoing as $transition) {
+                $transition->greediness = qtype_preg_fa_transition::GREED_ZERO;
+            }
+
+            // The body automaton can be skipped by a greedy eps-transition.
+            self::add_ending_eps_transition_if_needed($automaton, $body);
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $automaton->add_transition(new qtype_preg_nfa_transition($start, $epsleaf, $end));
+            $transition = new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']);
+            $automaton->add_transition($transition);
 
-            $stack[] = array('start' => $start, 'end' => $end);
+            $stack[] = $body;
         } else if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
             $this->create_qu($automaton, $stack);
         } else {

@@ -168,6 +168,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $curstate = array_pop($curstates);
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
+                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                }
+
                 $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
                 if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -221,6 +225,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // Check for a \Z \z or $ assertion before the eps-closure of the end state. Then it's possible to remove few characters.
         $transitions = $this->automaton->get_adjacent_transitions($laststate->state, true);
         foreach ($transitions as $transition) {
+            if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+            }
             if ($transition->is_loop || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
             }
@@ -262,6 +269,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
+                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                }
                 // Skip loops.
                 if ($transition->is_loop) {
                     continue;
@@ -351,6 +361,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
+                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                        continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                    }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
@@ -434,6 +447,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
+                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                }
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
                 if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
@@ -526,6 +542,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstate = $states[array_pop($curstates)];
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
+                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                        continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                    }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }

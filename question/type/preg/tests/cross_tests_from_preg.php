@@ -3717,14 +3717,19 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>true,
                         'index_first'=>array(0),
                         'length'=>array(1));
-        $test2 = array( 'str'=>'c',
+        $test2 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0),
+                        'length'=>array(0));
+        $test3 = array( 'str'=>'c',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0),
                         'length'=>array(0));
 
         return array('regex'=>'a|b{0}',
-                     'tests'=>array($test1, $test2),
+                     'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
