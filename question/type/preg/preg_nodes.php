@@ -243,7 +243,12 @@ interface qtype_preg_matcher_state {
     /**
      * Matches the given subexpression with given string from given position.
      */
-    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0);
+    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null);
+
+    /**
+     * Starting position of the match.
+     */
+    public function start_pos();
 
     /**
      * Current recursion level.
@@ -1836,7 +1841,7 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        $result = $matcherstateobj->match_from_pos($str, $pos, $this->number, $matcherstateobj->recursion_level() + 1);
+        $result = $matcherstateobj->match_from_pos($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
         $length = $result->length($this->number);
         return $length != qtype_preg_matching_results::NO_MATCH_FOUND;
     }

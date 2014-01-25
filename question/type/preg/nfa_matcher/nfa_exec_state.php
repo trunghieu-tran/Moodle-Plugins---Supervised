@@ -215,6 +215,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $this->matcher->match_from_pos($str, $startpos, $subexpr, $recursionlevel);
     }
 
+    public function start_pos() {
+        return $this->startpos;
+    }
+
     public function recursion_level() {
         return $this->recursionlevel;
     }
