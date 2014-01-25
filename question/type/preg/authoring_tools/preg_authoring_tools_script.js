@@ -156,6 +156,8 @@ M.preg_authoring_tools_script = (function ($) {
                             this_id = preg_id + '_auth';
                         $(this_id).val($(preg_id).val());
                     });
+                    
+                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
                 }
                 $('#id_regex_show').click();
             },
@@ -363,8 +365,7 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
 
-            $('#tree_img').mousedown(function(e)
-            {
+            $('#tree_img').mousedown(function(e) {
                 //check is checked check box
                 if($("#id_selection_mode").is(":checked") == true) {
                     $('#id_selection_mode').attr('disabled',true);
@@ -432,7 +433,7 @@ M.preg_authoring_tools_script = (function ($) {
                 }
             });
 
-            $('#tree_img').mousemove(function(e){
+            $('#tree_img').mousemove(function(e) {
                 e.preventDefault();
                 if(self.CALC_COORD) {
 
@@ -505,6 +506,53 @@ M.preg_authoring_tools_script = (function ($) {
 
     display_strings : function (s) {
         $('#id_test_regex').html(s);
+    },
+    
+    btn_select_rectangle_selection_click : function (e) {
+        e.preventDefault();
+        
+        var sel = self.get_rect_selection();
+        self.load_content(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);
+
+        $('#resizeMe').css({
+            width : 0,
+            height : 0,
+            left : -10,
+            top : -10,
+        });
+    },
+    
+    get_rect_selection : function (e) {
+        // check ids selected nodes
+        var rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
+        var rect_left_bot_y = $('#resizeMe').prop('offsetHeight');
+        var rect_right_top_x = $('#resizeMe').prop('offsetWidth');
+        var rect_right_top_y = $('#resizeMe').prop('offsetTop');
+        var areas = $('#qtype_preg_tree').children();
+        indfirst = indlast = 0;
+        // check all areas and select indfirst and indlast
+        var i = 0;
+        while(areas[i]) {
+            var tmpID = areas[i].id.split(',');
+            var tmpCoorts = areas[i].coords.split(',');
+            if(rect_left_bot_x < tmpCoorts[0]
+                && rect_right_top_x > tmpCoorts[0]
+                && rect_left_bot_y > tmpCoorts[1]
+                && rect_right_top_y < tmpCoorts[1]) {
+                indfirst = tmpID[1];
+                indlast = tmpID[2];
+            }
+            ++i;
+        }
+        
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        return {
+            indfirst : indfirst,
+            indlast : indlast
+        };
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
