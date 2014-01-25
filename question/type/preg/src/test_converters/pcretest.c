@@ -3146,7 +3146,7 @@ void print_method_footer(char * regex, int regex_length, char * options, int opt
         fprintf(outfile, "\",\n");
     }
 
-    fprintf(outfile, "                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE),\n");
+    fprintf(outfile, "                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),\n");
     fprintf(outfile, "                     'tests'=>array(");
     int i;
     for (i = 1; i <= testscount; i++) {
@@ -5036,8 +5036,8 @@ while (!done)
         continue;
 
         case 'P':
-        options |= ((options & PCRE_PARTIAL_SOFT) == 0)?
-          PCRE_PARTIAL_SOFT : PCRE_PARTIAL_HARD;
+        //options |= ((options & PCRE_PARTIAL_SOFT) == 0)?  // don't want partial matches
+        //  PCRE_PARTIAL_SOFT : PCRE_PARTIAL_HARD;
         continue;
 
         case 'Q':
@@ -5207,10 +5207,10 @@ while (!done)
 
     int attempt_number = 1;
 
-TRY_PARTIAL_MATCH:
+/*TRY_PARTIAL_MATCH:
     if (attempt_number == 2) {
       options = options | PCRE_PARTIAL;   // we always want at least a partial match
-    }
+    }*/
 
 #if !defined NOPOSIX
     if (posix || do_posix)
@@ -5420,10 +5420,10 @@ TRY_PARTIAL_MATCH:
       }
 
       // Try partial matching if full matching failed
-      if (count == PCRE_ERROR_NOMATCH && !(options & PCRE_PARTIAL)) {
+      /*if (count == PCRE_ERROR_NOMATCH && !(options & PCRE_PARTIAL)) {
         attempt_number = 2;
         goto TRY_PARTIAL_MATCH;
-      }
+      }*/
 
       /* Matched */
 
@@ -5680,7 +5680,7 @@ TRY_PARTIAL_MATCH:
         if (verify_jit && jit_was_used) fprintf(outfile, " (JIT)");
         fprintf(outfile, "\n");*/
         if (re != NULL /*&& regex_length > 0*/) {
-          print_test_for_partial_match(datanumber, bptr, len, use_offsets, 1);
+          //print_test_for_partial_match(datanumber, bptr, len, use_offsets, 1);
         }
         break;  /* Out of the /g loop */
         }
