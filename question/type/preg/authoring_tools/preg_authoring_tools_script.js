@@ -393,12 +393,12 @@ M.preg_authoring_tools_script = (function ($) {
                         {
                             minWidth: 20,
                             minHeight: 20,
-                            //maxWidth: $('#container').css('width'),
-                            //maxHeight: $('#container').css('height'),
-                            /*minTop: br.top - 1900 - (br.bottom - br.top),
-                            minLeft: br.left - 1.5*(br.right - br.left),
-                            maxRight: br.right - 1.5*(br.right - br.left),
-                            maxBottom: br.bottom - 1900 - (br.bottom - br.top),*/
+                            maxWidth: (br.right - br.left),
+                            maxHeight: (br.bottom - br.top),
+                            minTop: 1,
+                            minLeft: 1,
+                            maxRight: br.right - br.left,
+                            maxBottom: br.bottom - br.top,
                             dragHandle: true,
                             onDrag: function(x, y)
                             {
@@ -426,10 +426,6 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#resizeMe').css({
                         width : 20,
                         height : 20,
-                        /*left : e.pageX - $("body").scrollLeft(),
-                        top : e.pageY - $("body").scrollTop(),*/
-                        /*left : e.pageX /*- $("body").scrollLeft()* - 1.5*(br.right - br.left),
-                        top : e.pageY - 1900/*$("body").scrollTop()* - (br.bottom - br.top),*/
                         left : self.RECTANGLE_WIDTH,
                         top : self.RECTANGLE_HEIGHT,
                     });
@@ -441,8 +437,8 @@ M.preg_authoring_tools_script = (function ($) {
                 if(self.CALC_COORD) {
 
                     var br = document.getElementById('tree_img').getBoundingClientRect();
-                    var new_pageX = e.pageX - 1.5*(br.right - br.left);
-                    var new_pageY = e.pageY - 1900 - (br.bottom - br.top);
+                    var new_pageX = e.pageX - $(window).prop('scrollX') - br.left;
+                    var new_pageY = e.pageY - $(window).prop('scrollY') - br.top;
 
                     if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                         $('#resizeMe').css({
