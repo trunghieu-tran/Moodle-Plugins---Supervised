@@ -134,6 +134,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
     // Sets the current match for the given subpattern number.
     public function set_current_match($subpatt, $index, $length) {
+        if (!array_key_exists($subpatt, $this->matches)) {
+            // Can get here when matching recursive patterns
+            return;
+        }
         $count = count($this->matches[$subpatt]);
         $this->matches[$subpatt][$count - 1] = array($index, $length);
     }

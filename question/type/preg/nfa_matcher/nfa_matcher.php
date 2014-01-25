@@ -595,8 +595,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
-        //echo "======================== $recursionlevel";
-        if ($recursionlevel > 10) {
+        //echo "======================== $recursionlevel\n";
+        if ($recursionlevel > 3) {
             return $this->create_nomatch_result($str);
         }
 
@@ -688,11 +688,17 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     protected function start_states($subexpr = 0) {
-        return $this->subexprbordersmap[$subexpr]['start'];
+        if (array_key_exists($subexpr, $this->subexprbordersmap)) {
+            return $this->subexprbordersmap[$subexpr]['start'];
+        }
+        return array();
     }
 
     protected function end_states($subexpr = 0) {
-        return $this->subexprbordersmap[$subexpr]['end'];
+        if (array_key_exists($subexpr, $this->subexprbordersmap)) {
+            return $this->subexprbordersmap[$subexpr]['end'];
+        }
+        return array();
     }
 
     /**
