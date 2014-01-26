@@ -156,8 +156,6 @@ M.preg_authoring_tools_script = (function ($) {
                             this_id = preg_id + '_auth';
                         $(this_id).val($(preg_id).val());
                     });
-                    
-                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
                 }
                 $('#id_regex_show').click();
             },
@@ -430,6 +428,8 @@ M.preg_authoring_tools_script = (function ($) {
                         left : self.RECTANGLE_WIDTH,
                         top : self.RECTANGLE_HEIGHT,
                     });
+                    
+                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
                 }
             });
 
@@ -530,7 +530,7 @@ M.preg_authoring_tools_script = (function ($) {
         var rect_right_top_x = $('#resizeMe').prop('offsetWidth');
         var rect_right_top_y = $('#resizeMe').prop('offsetTop');
         var areas = $('#qtype_preg_tree').children();
-        indfirst = indlast = 0;
+        indfirst = indlast = 999;
         // check all areas and select indfirst and indlast
         var i = 0;
         while(areas[i]) {
@@ -540,8 +540,12 @@ M.preg_authoring_tools_script = (function ($) {
                 && rect_right_top_x > tmpCoorts[0]
                 && rect_left_bot_y > tmpCoorts[1]
                 && rect_right_top_y < tmpCoorts[1]) {
-                indfirst = tmpID[1];
-                indlast = tmpID[2];
+                if(tmpID[1] < indfirst) {
+                    indfirst = tmpID[1];
+                }
+                if(tmpID[2] > indlast) {
+                    indlast = tmpID[2];
+                }
             }
             ++i;
         }
