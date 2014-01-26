@@ -430,6 +430,7 @@ M.preg_authoring_tools_script = (function ($) {
                     });
                     
                     $('#id_send_select').click(self.btn_select_rectangle_selection_click);
+                    $('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
                 }
             });
 
@@ -521,6 +522,21 @@ M.preg_authoring_tools_script = (function ($) {
             left : -10,
             top : -10,
         });
+    },
+    
+    btn_cancel_rectangle_selection_click : function cancelClick(){
+        //disable widgest
+        $('#id_send_select').attr('disabled',true);
+        $('#id_cancel_select').attr('disabled',true);
+        $('#resizeMe').css({
+                    width : 0,
+                    height : 0,
+                    left : -10,
+                    top : -10,
+                });
+        //set enabled check box
+        $('#id_selection_mode').attr('disabled',false);
+        $('#id_selection_mode').attr('checked',false);
     },
     
     /*get_area : function(polyPoints) {
