@@ -112,6 +112,16 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                             '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
+                                            '<div id="resizeMe">' .
+                                                '<div id="resizeSE"></div>' .
+                                                '<div id="resizeE"></div>' .
+                                                '<div id="resizeNE"></div>' .
+                                                '<div id="resizeN"></div>' .
+                                                '<div id="resizeNW"></div>' .
+                                                '<div id="resizeW"></div>' .
+                                                '<div id="resizeSW"></div>' .
+                                                '<div id="resizeS"></div>' .
+                                            '</div>' .
                                         '</div></br>');
 
         // Add explaining graph tool.
