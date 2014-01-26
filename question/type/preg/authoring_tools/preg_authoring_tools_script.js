@@ -523,6 +523,70 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
     
+    /*get_area : function(polyPoints) {
+        var n = polyPoints.length;
+        var area = 0;
+        for (var i = 0; i < n; i += 2) {
+            var j = (i + 2) % n;
+            area += polyPoints[i] * polyPoints[j + 1];
+            area -= polyPoints[j] * polyPoints[i + 1];
+        }
+        area /= 2.0;
+        return area;
+    },
+
+    get_center_of_mass : function(polyPoints) {
+        var cx = 0, cy = 0;
+        var area = self.get_area(polyPoints);
+        var n = polyPoints.length;
+        var factor = 0;
+        for (var i = 0; i < n; i += 2) {
+            var j = (i + 2) % n;
+            factor = (polyPoints[i] * polyPoints[j + 1]
+                    - polyPoints[j] * polyPoints[i + 1]);
+            cx += (polyPoints[i] + polyPoints[j]) * factor;
+            cy += (polyPoints[i + 1] + polyPoints[j + 1]) * factor;
+        }
+        area *= 6.0;
+        factor = 1 / area;
+        cx *= factor;
+        cy *= factor;
+        var array = new Array(cx, cy);
+        return array;
+    },*/
+    
+    get_area : function(polyPoints) {
+        var n = polyPoints.length;
+        var area = 0;
+        for (var i = 0; i < n; i++) {
+            var j = (i + 1) % n;
+            area += polyPoints[i][0] * polyPoints[j][1];
+            area -= polyPoints[j][0] * polyPoints[i][1];
+        }
+        area /= 2.0;
+        return area;
+    },
+
+    get_center_of_mass : function(polyPoints) {
+        var cx = 0, cy = 0;
+        var area = self.get_area(polyPoints);
+        var n = polyPoints.length;
+        var factor = 0;
+        for (var i = 0; i < n; i++) {
+            var j = (i + 1) % n;
+            factor = (polyPoints[i][0] * polyPoints[j][1]
+                    - polyPoints[j][0] * polyPoints[i][1]);
+            cx += (polyPoints[i][0] + polyPoints[j][0]) * factor;
+            cy += (polyPoints[i][1] + polyPoints[j][1]) * factor;
+        }
+        area *= 6.0;
+        factor = 1 / area;
+        cx *= factor;
+        cy *= factor;
+        var array = new Array(cx, cy);
+        return array;
+    },
+    
     get_rect_selection : function (e) {
         // check ids selected nodes
         var rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
@@ -530,16 +594,27 @@ M.preg_authoring_tools_script = (function ($) {
         var rect_right_top_x = $('#resizeMe').prop('offsetWidth');
         var rect_right_top_y = $('#resizeMe').prop('offsetTop');
         var areas = $('#qtype_preg_tree').children();
-        indfirst = indlast = 999;
+        var indfirst = 999;
+        var indlast = 999;
         // check all areas and select indfirst and indlast
         var i = 0;
         while(areas[i]) {
             var tmpID = areas[i].id.split(',');
-            var tmpCoorts = areas[i].coords.split(',');
-            if(rect_left_bot_x < tmpCoorts[0]
-                && rect_right_top_x > tmpCoorts[0]
-                && rect_left_bot_y > tmpCoorts[1]
-                && rect_right_top_y < tmpCoorts[1]) {
+            var tmpCoords = areas[i].coords.split(',');
+            var coords = [];
+            for(var j = 0; j < tmpCoords.length; j += 2) {
+            var coord = [];
+                coord[0] = tmpCoords[j];
+                coord[1] = tmpCoords[j+1];
+                coords[coords.length] = coord;
+            }
+            // check selected coords
+            var c_mass = self.get_center_of_mass(coords);
+            if(rect_left_bot_x < c_mass[0]
+                && rect_right_top_x > c_mass[0]
+                && rect_left_bot_y > c_mass[1]
+                && rect_right_top_y < c_mass[1]) {
+                
                 if(tmpID[1] < indfirst) {
                     indfirst = tmpID[1];
                 }
