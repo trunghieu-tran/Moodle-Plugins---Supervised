@@ -234,20 +234,21 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     tree_node_clicked : function (e) {
-        //if($("#id_selection_mode").is(':checked') == false) {
-            /*e.preventDefault();
-            var tmp = e.target.id.split(','),
-                indfirst = tmp[1],
-                indlast = tmp[2];
-            self.load_content(indfirst, indlast);
-            self.load_strings(indfirst, indlast);*/
-        //}
+        e.preventDefault();
+        if ($("#id_selection_mode").is(':checked')) {
+            return;
+        }
+        var tmp = e.target.id.split(','),
+            indfirst = tmp[1],
+            indlast = tmp[2];
+        self.load_content(indfirst, indlast);
+        self.load_strings(indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
-        /*e.preventDefault();
+        e.preventDefault();
         self.load_content();
-        self.load_strings();*/
+        self.load_strings();
     },
 
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -364,28 +365,14 @@ M.preg_authoring_tools_script = (function ($) {
             tree_map.html(t.map);
 
             $('#tree_img').mousedown(function(e) {
+                e.preventDefault();
                 //check is checked check box
                 if($("#id_selection_mode").is(":checked") == true) {
                     $('#id_selection_mode').attr('disabled',true);
                     $('#id_send_select').attr('disabled',false);
                     $('#id_cancel_select').attr('disabled',false);
-
-                    //create new elements
-                    //$('#felement fgroup').append('<input type="submit" id="send_selection" value="Send selection" onclick="selectClick()">');
-                    //$('#felement fgroup').append('<input type="submit" id="cancel_selection" value="Cancel" onclick="cancelClick()">');
-
-                    $('#tree_hnd').append('<div id=\"resizeMe\">'
-                                                +'<div id=\"resizeSE\"></div>'
-                                                +'<div id=\"resizeE\"></div>'
-                                                +'<div id=\"resizeNE\"></div>'
-                                                +'<div id=\"resizeN\"></div>'
-                                                +'<div id=\"resizeNW\"></div>'
-                                                +'<div id=\"resizeW\"></div>'
-                                                +'<div id=\"resizeSW\"></div>'
-                                                +'<div id=\"resizeS\"></div>'
-                                            +'</div>');
-
-                    e.preventDefault();
+                    $('#tree_img').attr("usemap", "");
+                    
                     self.CALC_COORD = true;
                     var br = document.getElementById('tree_img').getBoundingClientRect();
                     $('#resizeMe').Resizable(
@@ -475,8 +462,8 @@ M.preg_authoring_tools_script = (function ($) {
                 self.CALC_COORD = false;
             });
 
-            /*tree_img.click(self.tree_node_misclicked);
-            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);*/
+            tree_img.click(self.tree_node_misclicked);
+            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
         } else if (typeof t != 'undefined') {
             tree_err.html(t);
         }
@@ -528,6 +515,7 @@ M.preg_authoring_tools_script = (function ($) {
         //disable widgest
         $('#id_send_select').attr('disabled',true);
         $('#id_cancel_select').attr('disabled',true);
+        $('#tree_img').attr("usemap", "#qtype_preg_tree");
         $('#resizeMe').css({
                     width : 0,
                     height : 0,
@@ -657,8 +645,8 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        /*$('#tree_img').unbind('click', self.tree_node_misclicked);
-        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);*/
+        $('#tree_img').unbind('click', self.tree_node_misclicked);
+        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
