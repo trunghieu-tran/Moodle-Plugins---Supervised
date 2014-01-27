@@ -103,7 +103,7 @@ class qtype_preg_authoring_form extends moodleform {
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('horizontal', 'editor'), 'horizontal', null);
         $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
         $radiotreeorientationsarray[] =& $mform->createElement('button', 'send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
-        $radiotreeorientationsarray[] =& $mform->createElement('button', 'cancel_select', get_string('authoring_form_rect_selection_cancel', 'qtype_preg'));
+        //$radiotreeorientationsarray[] =& $mform->createElement('button', 'cancel_select', get_string('authoring_form_rect_selection_cancel', 'qtype_preg'));
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
