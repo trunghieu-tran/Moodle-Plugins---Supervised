@@ -220,7 +220,6 @@ $string['authoring_form_testing_textarea'] = 'Введите строки для
 $string['authoring_form_check_strings'] = 'Проверить строку (строки)';
 $string['authoring_form_rect_selection_mode'] =  'Режим выделения прямоугольником';
 $string['authoring_form_rect_selection_select'] =  'Отправить';
-$string['authoring_form_rect_selection_cancel'] =  'Отменить';
 
 // Strings for node description
 $string['description_operand'] = 'операнд';

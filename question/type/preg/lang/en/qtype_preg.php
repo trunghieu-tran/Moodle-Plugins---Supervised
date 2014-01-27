@@ -220,7 +220,6 @@ $string['authoring_form_testing_textarea'] = 'Input strings to match (one per li
 $string['authoring_form_check_strings'] = 'Check the string(s)';
 $string['authoring_form_rect_selection_mode'] =  'Rectangle selection mode';
 $string['authoring_form_rect_selection_select'] =  'Select';
-$string['authoring_form_rect_selection_cancel'] =  'Cancel';
 
 // Strings for node description
 $string['description_operand'] = 'operand';

@@ -121,8 +121,8 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
+                    $("#id_selection_mode").change(self.btn_selection_mode_rectangle_selection_click);
                     $('#id_send_select').click(self.btn_select_rectangle_selection_click);
-                    //$('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
 
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
@@ -139,7 +139,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset').hide();
 
                     $('#id_send_select').attr('disabled',true);
-                    //$('#id_cancel_select').attr('disabled',true);
+                    
                     self.panzooms.init();
                     options.oneachpresscallback();
                 });
@@ -370,11 +370,7 @@ M.preg_authoring_tools_script = (function ($) {
             $('#tree_img').mousedown(function(e) {
                 e.preventDefault();
                 //check is checked check box
-                if($("#id_selection_mode").is(":checked") == true) {
-                    //$('#id_selection_mode').attr('disabled',true);
-                    $('#id_send_select').attr('disabled',false);
-                    //$('#id_cancel_select').attr('disabled',false);
-                    $('#tree_img').attr("usemap", "");
+                if ($("#id_selection_mode").is(":checked") == true) {
 
                     self.CALC_COORD = true;
                     var br = document.getElementById('tree_img').getBoundingClientRect();
@@ -418,15 +414,12 @@ M.preg_authoring_tools_script = (function ($) {
                         left : self.RECTANGLE_WIDTH,
                         top : self.RECTANGLE_HEIGHT,
                     });
-
-
                 }
             });
 
             $('#tree_img').mousemove(function(e) {
                 e.preventDefault();
-                if(self.CALC_COORD) {
-
+                if (self.CALC_COORD) {
                     var br = document.getElementById('tree_img').getBoundingClientRect();
                     var new_pageX = e.pageX - $(window).prop('scrollX') - br.left;
                     var new_pageY = e.pageY - $(window).prop('scrollY') - br.top;
@@ -513,20 +506,21 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
 
-    btn_cancel_rectangle_selection_click : function cancelClick(){
-        //disable widgest
-        $('#id_send_select').attr('disabled',true);
-        //$('#id_cancel_select').attr('disabled',true);
-        $('#tree_img').attr("usemap", "#qtype_preg_tree");
-        $('#resizeMe').css({
-                    width : 0,
-                    height : 0,
-                    left : -10,
-                    top : -10,
-                });
-        //set enabled check box
-        //$('#id_selection_mode').attr('disabled',false);
-        //$('#id_selection_mode').attr('checked',false);
+    btn_selection_mode_rectangle_selection_click : function (e) {
+        e.preventDefault();
+        if ($("#id_selection_mode").is(":checked") == true) {
+            $('#id_send_select').attr('disabled',false);
+            $('#tree_img').attr("usemap", "");
+        } else {
+            $('#id_send_select').attr('disabled',true);
+            $('#tree_img').attr("usemap", "#qtype_preg_tree");
+            $('#resizeMe').css({
+                width : 0,
+                height : 0,
+                left : -10,
+                top : -10,
+            });
+        }
     },
 
     /*get_area : function(polyPoints) {
