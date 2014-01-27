@@ -231,9 +231,7 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
-        //if($("#id_selection_mode").is(':checked') == false) {
-            self.panzooms.reset_tree();
-        //}
+        self.panzooms.reset_tree();
     },
 
     tree_node_clicked : function (e) {
@@ -511,9 +509,13 @@ M.preg_authoring_tools_script = (function ($) {
         if ($("#id_selection_mode").is(":checked") == true) {
             $('#id_send_select').attr('disabled',false);
             $('#tree_img').attr("usemap", "");
+            self.panzooms.reset_tree();
+            self.panzooms.disable_tree();
         } else {
             $('#id_send_select').attr('disabled',true);
             $('#tree_img').attr("usemap", "#qtype_preg_tree");
+            self.panzooms.enable_tree();
+            //self.panzooms.init_tree();
             $('#resizeMe').css({
                 width : 0,
                 height : 0,
@@ -731,12 +733,20 @@ M.preg_authoring_tools_script = (function ($) {
 
     panzooms : {
         reset_tree : function() {
-            //if($("#id_selection_mode").is(':checked') == false) {
-                var tree_img = $('#tree_img');
-                tree_img.panzoom("reset");
-            //}
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("reset");
         },
 
+        disable_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("disable");
+        },
+        
+        enable_tree : function() {
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("enable");
+        },
+        
         reset_graph : function() {
             var graph_img = $('#graph_img');
             graph_img.panzoom("reset");
@@ -750,10 +760,8 @@ M.preg_authoring_tools_script = (function ($) {
         },
 
         reset_tree_dimensions : function() {
-            //if($("#id_selection_mode").is(':checked') == false) {
-                var tree_img = $('#tree_img');
-                tree_img.panzoom("resetDimensions");
-            //}
+            var tree_img = $('#tree_img');
+            tree_img.panzoom("resetDimensions");
         },
 
         reset_graph_dimensions : function() {
@@ -762,11 +770,9 @@ M.preg_authoring_tools_script = (function ($) {
         },
 
         init_tree : function() {
-            //if($("#id_selection_mode").is(':checked') == false) {
-                var tree_img = $('#tree_img');
-                var tree_panzoom_obj = $(tree_img).panzoom();
-                $(tree_img).on('mousewheel.focal', this._zoom);
-            //}
+            var tree_img = $('#tree_img');
+            var tree_panzoom_obj = $(tree_img).panzoom();
+            $(tree_img).on('mousewheel.focal', this._zoom);
         },
 
         init_graph : function() {
@@ -777,7 +783,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         init : function() {
             self.panzooms.init_graph();
-            //self.panzooms.init_tree();
+            self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {
@@ -794,128 +800,7 @@ M.preg_authoring_tools_script = (function ($) {
     //RECTANGLE SELECTION CODE
     CALC_COORD : false,
     RECTANGLE_WIDTH: 0,
-    RECTANGLE_HEIGHT : 0/*,
-
-    start_rectangle_selection : $('#tree_img').mousedown(function(e)
-        {
-        alert('1');
-            //check is checked check box
-            if($("#id_selection_mode").attr("checked") == true) {
-                $('#id_selection_mode').attr('disabled',true);
-                //create new elements
-                $('#felement fgroup').append('<input type="submit" id="send_selection" value="Send selection" onclick="selectClick()">');
-                $('#felement fgroup').append('<input type="submit" id="cancel_selection" value="Cancel" onclick="cancelClick()">');
-
-                $('#tree_hnd').append('<div id=\"resizeMe\">'
-                                            +'<div id=\"resizeSE\"></div>'
-                                            +'<div id=\"resizeE\"></div>'
-                                            +'<div id=\"resizeNE\"></div>'
-                                            +'<div id=\"resizeN\"></div>'
-                                            +'<div id=\"resizeNW\"></div>'
-                                            +'<div id=\"resizeW\"></div>'
-                                            +'<div id=\"resizeSW\"></div>'
-                                            +'<div id=\"resizeS\"></div>'
-                                        +'</div>');
-
-                e.preventDefault();
-                self.CALC_COORD = true;
-                var br = document.getElementById('tree_hnd').getBoundingClientRect();
-                $('#resizeMe').Resizable(
-                    {
-                        minWidth: 20,
-                        minHeight: 20,
-                        //maxWidth: $('#container').css('width'),
-                        //maxHeight: $('#container').css('height'),
-                        minTop: br.top,
-                        minLeft: br.left,
-                        maxRight: br.right,
-                        maxBottom: br.bottom,
-                        dragHandle: true,
-                        onDrag: function(x, y)
-                        {
-                            this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
-                        },
-                        handlers: {
-                            se: '#resizeSE',
-                            e: '#resizeE',
-                            ne: '#resizeNE',
-                            n: '#resizeN',
-                            nw: '#resizeNW',
-                            w: '#resizeW',
-                            sw: '#resizeSW',
-                            s: '#resizeS'
-                        },
-                        onResize : function(size, position) {
-                            this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
-                        }
-                    }
-                )
-                $('#resizeMe').css({
-                    width : 20,
-                    height : 20,
-                    left : e.pageX,
-                    top : e.pageY,
-                });
-                self.RECTANGLE_WIDTH = e.pageX;
-                self.RECTANGLE_HEIGHT = e.pageY;
-            }
-        }
-    ),
-
-    resize_rectangle_selection : $('#tree_hnd').mousemove(function(e){
-        e.preventDefault();
-        if(self.CALC_COORD) {
-            if(self.RECTANGLE_WIDTH < e.pageX && self.RECTANGLE_HEIGHT < e.pageY) {
-                $('#resizeMe').css({
-                    width : (e.pageX - self.RECTANGLE_WIDTH)-10,
-                    height : (e.pageY - self.RECTANGLE_HEIGHT)-10,
-                });
-            } else if(self.RECTANGLE_WIDTH < e.pageX && self.RECTANGLE_HEIGHT > e.pageY) {
-                $('#resizeMe').css({
-                    width : (e.pageX - self.RECTANGLE_WIDTH)-10,
-                    height : (self.RECTANGLE_HEIGHT - e.pageY)-10,
-                    top : e.pageY,
-                });
-            } else if(self.RECTANGLE_WIDTH > e.pageX && self.RECTANGLE_HEIGHT > e.pageY) {
-                $('#resizeMe').css({
-                    width : (self.RECTANGLE_WIDTH - e.pageX)-10,
-                    height : (self.RECTANGLE_HEIGHT - e.pageY)-10,
-                    top : e.pageY,
-                    left : e.pageX,
-                });
-            } else if(self.RECTANGLE_WIDTH > e.pageX && self.RECTANGLE_HEIGHT < e.pageY) {
-                $('#resizeMe').css({
-                    width : (self.RECTANGLE_WIDTH - e.pageX)-10,
-                    height : (e.pageY - self.RECTANGLE_HEIGHT)-10,
-                    left : e.pageX,
-                });
-            }
-        }
-    }),
-
-    end_rectangle_selection : $(window).mouseup(function(e){
-        e.preventDefault();
-        self.CALC_COORD = false;
-    }),
-
-    btn_select_rectangle_selection_click : function selectClick(){
-        //TODO: create ajax request with coordinates
-        self.btn_cancel_rectangle_selection_click();
-    },
-
-    btn_cancel_rectangle_selection_click : function cancelClick(){
-        //remove widgest
-        $('#send_selection').remove();
-        $('#cancel_selection').remove();
-        $('#resizeMe').css({
-                    width : 0,
-                    height : 0,
-                    left : -10,
-                    top : -10,
-                });
-        //set enabled check box
-        $('#id_selection_mode').attr('disabled',false);
-    },*/
+    RECTANGLE_HEIGHT : 0
 };
 
 return self;
