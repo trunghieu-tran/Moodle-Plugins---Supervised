@@ -121,6 +121,9 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
+                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
+                    $('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
+
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
@@ -372,7 +375,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_send_select').attr('disabled',false);
                     $('#id_cancel_select').attr('disabled',false);
                     $('#tree_img').attr("usemap", "");
-                    
+
                     self.CALC_COORD = true;
                     var br = document.getElementById('tree_img').getBoundingClientRect();
                     $('#resizeMe').Resizable(
@@ -408,16 +411,15 @@ M.preg_authoring_tools_script = (function ($) {
 
                     self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
                     self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
-                    
+
                     $('#resizeMe').css({
                         width : 20,
                         height : 20,
                         left : self.RECTANGLE_WIDTH,
                         top : self.RECTANGLE_HEIGHT,
                     });
-                    
-                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
-                    $('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
+
+
                 }
             });
 
@@ -495,10 +497,10 @@ M.preg_authoring_tools_script = (function ($) {
     display_strings : function (s) {
         $('#id_test_regex').html(s);
     },
-    
+
     btn_select_rectangle_selection_click : function (e) {
         e.preventDefault();
-        
+
         var sel = self.get_rect_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
@@ -510,7 +512,7 @@ M.preg_authoring_tools_script = (function ($) {
             top : -10,
         });
     },
-    
+
     btn_cancel_rectangle_selection_click : function cancelClick(){
         //disable widgest
         $('#id_send_select').attr('disabled',true);
@@ -526,7 +528,7 @@ M.preg_authoring_tools_script = (function ($) {
         $('#id_selection_mode').attr('disabled',false);
         $('#id_selection_mode').attr('checked',false);
     },
-    
+
     /*get_area : function(polyPoints) {
         var n = polyPoints.length;
         var area = 0;
@@ -558,10 +560,10 @@ M.preg_authoring_tools_script = (function ($) {
         var array = new Array(cx, cy);
         return array;
     },*/
-    
+
     get_area : function(polyPoints) {
         var n = polyPoints.length;
-        var area = 0;
+        var area = 0.0;
         for (var i = 0; i < n; i++) {
             var j = (i + 1) % n;
             area += polyPoints[i][0] * polyPoints[j][1];
@@ -587,10 +589,9 @@ M.preg_authoring_tools_script = (function ($) {
         factor = 1 / area;
         cx *= factor;
         cy *= factor;
-        var array = new Array(cx, cy);
-        return array;
+        return [cx, cy];
     },
-    
+
     get_rect_selection : function (e) {
         // check ids selected nodes
         var rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
@@ -602,15 +603,20 @@ M.preg_authoring_tools_script = (function ($) {
         var indlast = 999;
         // check all areas and select indfirst and indlast
         var i = 0;
-        while(areas[i]) {
-            var tmpID = areas[i].id.split(',');
-            var tmpCoords = areas[i].coords.split(',');
+        while (areas[i]) {
+            var nodeId = areas[i].id.split(',');
+            var nodeCoords = areas[i].coords.split(',');
+            if (areas[i].shape == "rect") {
+                nodeCoords = [
+                    nodeCoords[0], nodeCoords[1],
+                    nodeCoords[2], nodeCoords[1],
+                    nodeCoords[0], nodeCoords[3],
+                    nodeCoords[2], nodeCoords[3]
+                ];
+            }
             var coords = [];
-            for(var j = 0; j < tmpCoords.length; j += 2) {
-            var coord = [];
-                coord[0] = tmpCoords[j];
-                coord[1] = tmpCoords[j+1];
-                coords[coords.length] = coord;
+            for(var j = 0; j < nodeCoords.length; j += 2) {
+                coords[coords.length] = [nodeCoords[j], nodeCoords[j + 1]];
             }
             // check selected coords
             var c_mass = self.get_center_of_mass(coords);
@@ -618,17 +624,17 @@ M.preg_authoring_tools_script = (function ($) {
                 && rect_right_top_x > c_mass[0]
                 && rect_left_bot_y > c_mass[1]
                 && rect_right_top_y < c_mass[1]) {
-                
-                if(tmpID[1] < indfirst) {
-                    indfirst = tmpID[1];
+
+                if(nodeId[1] < indfirst) {
+                    indfirst = nodeId[1];
                 }
-                if(tmpID[2] > indlast) {
-                    indlast = tmpID[2];
+                if(nodeId[2] > indlast) {
+                    indlast = nodeId[2];
                 }
             }
             ++i;
         }
-        
+
         if (indfirst > indlast) {
             indfirst = indlast = -2;
         }
