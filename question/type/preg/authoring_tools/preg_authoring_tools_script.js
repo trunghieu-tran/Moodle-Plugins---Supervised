@@ -122,7 +122,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
                     $('#id_send_select').click(self.btn_select_rectangle_selection_click);
-                    $('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
+                    //$('#id_cancel_select').click(self.btn_cancel_rectangle_selection_click);
 
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
@@ -139,7 +139,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset').hide();
 
                     $('#id_send_select').attr('disabled',true);
-                    $('#id_cancel_select').attr('disabled',true);
+                    //$('#id_cancel_select').attr('disabled',true);
                     self.panzooms.init();
                     options.oneachpresscallback();
                 });
@@ -371,9 +371,9 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 //check is checked check box
                 if($("#id_selection_mode").is(":checked") == true) {
-                    $('#id_selection_mode').attr('disabled',true);
+                    //$('#id_selection_mode').attr('disabled',true);
                     $('#id_send_select').attr('disabled',false);
-                    $('#id_cancel_select').attr('disabled',false);
+                    //$('#id_cancel_select').attr('disabled',false);
                     $('#tree_img').attr("usemap", "");
 
                     self.CALC_COORD = true;
@@ -516,7 +516,7 @@ M.preg_authoring_tools_script = (function ($) {
     btn_cancel_rectangle_selection_click : function cancelClick(){
         //disable widgest
         $('#id_send_select').attr('disabled',true);
-        $('#id_cancel_select').attr('disabled',true);
+        //$('#id_cancel_select').attr('disabled',true);
         $('#tree_img').attr("usemap", "#qtype_preg_tree");
         $('#resizeMe').css({
                     width : 0,
@@ -525,8 +525,8 @@ M.preg_authoring_tools_script = (function ($) {
                     top : -10,
                 });
         //set enabled check box
-        $('#id_selection_mode').attr('disabled',false);
-        $('#id_selection_mode').attr('checked',false);
+        //$('#id_selection_mode').attr('disabled',false);
+        //$('#id_selection_mode').attr('checked',false);
     },
 
     /*get_area : function(polyPoints) {
