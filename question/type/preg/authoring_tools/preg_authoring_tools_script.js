@@ -590,13 +590,14 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_rect_selection : function (e) {
         // check ids selected nodes
+        var br = document.getElementById('tree_img').getBoundingClientRect();
         var rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
-        var rect_left_bot_y = $('#resizeMe').prop('offsetHeight');
+        var rect_left_bot_y = (br.bottom - br.top) - $('#resizeMe').prop('offsetHeight');
         var rect_right_top_x = $('#resizeMe').prop('offsetWidth');
-        var rect_right_top_y = $('#resizeMe').prop('offsetTop');
+        var rect_right_top_y = /*(br.bottom - br.top) - */$('#resizeMe').prop('offsetTop');
         var areas = $('#qtype_preg_tree').children();
         var indfirst = 999;
-        var indlast = 999;
+        var indlast = -999;
         // check all areas and select indfirst and indlast
         var i = 0;
         while (areas[i]) {
@@ -615,7 +616,7 @@ M.preg_authoring_tools_script = (function ($) {
                 coords[coords.length] = [nodeCoords[j], nodeCoords[j + 1]];
             }
             // check selected coords
-            var c_mass = self.get_center_of_mass(coords);
+            /*var c_mass = self.get_center_of_mass(coords);
             if(rect_left_bot_x < c_mass[0]
                 && rect_right_top_x > c_mass[0]
                 && rect_left_bot_y > c_mass[1]
@@ -627,7 +628,21 @@ M.preg_authoring_tools_script = (function ($) {
                 if(nodeId[2] > indlast) {
                     indlast = nodeId[2];
                 }
+            }*/
+            for (var j = 0; j < coords.length; ++j) {
+                if(rect_left_bot_x < coords[j][0]
+                    && rect_right_top_x > coords[j][0]
+                    && rect_left_bot_y > coords[j][1]
+                    && rect_right_top_y < coords[j][1]) {
+                        if(nodeId[1] < indfirst) {
+                            indfirst = nodeId[1];
+                        }
+                        if(nodeId[2] > indlast) {
+                            indlast = nodeId[2];
+                        }
+                }
             }
+            
             ++i;
         }
 
@@ -783,7 +798,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         init : function() {
             self.panzooms.init_graph();
-            self.panzooms.init_tree();
+            //self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {
