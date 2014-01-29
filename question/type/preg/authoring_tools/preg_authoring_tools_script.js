@@ -591,10 +591,10 @@ M.preg_authoring_tools_script = (function ($) {
     get_rect_selection : function (e) {
         // check ids selected nodes
         var br = document.getElementById('tree_img').getBoundingClientRect();
-        var rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
-        var rect_left_bot_y = (br.bottom - br.top) - $('#resizeMe').prop('offsetHeight');
-        var rect_right_top_x = $('#resizeMe').prop('offsetWidth');
-        var rect_right_top_y = /*(br.bottom - br.top) - */$('#resizeMe').prop('offsetTop');
+        rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
+        rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17;
+        rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth');
+        rect_right_top_y = $('#resizeMe').prop('offsetTop') + 17;
         var areas = $('#qtype_preg_tree').children();
         var indfirst = 999;
         var indlast = -999;
