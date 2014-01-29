@@ -515,7 +515,6 @@ M.preg_authoring_tools_script = (function ($) {
             $('#id_send_select').attr('disabled',true);
             $('#tree_img').attr("usemap", "#qtype_preg_tree");
             self.panzooms.enable_tree();
-            //self.panzooms.init_tree();
             $('#resizeMe').css({
                 width : 0,
                 height : 0,
@@ -523,69 +522,6 @@ M.preg_authoring_tools_script = (function ($) {
                 top : -10,
             });
         }
-    },
-
-    /*get_area : function(polyPoints) {
-        var n = polyPoints.length;
-        var area = 0;
-        for (var i = 0; i < n; i += 2) {
-            var j = (i + 2) % n;
-            area += polyPoints[i] * polyPoints[j + 1];
-            area -= polyPoints[j] * polyPoints[i + 1];
-        }
-        area /= 2.0;
-        return area;
-    },
-
-    get_center_of_mass : function(polyPoints) {
-        var cx = 0, cy = 0;
-        var area = self.get_area(polyPoints);
-        var n = polyPoints.length;
-        var factor = 0;
-        for (var i = 0; i < n; i += 2) {
-            var j = (i + 2) % n;
-            factor = (polyPoints[i] * polyPoints[j + 1]
-                    - polyPoints[j] * polyPoints[i + 1]);
-            cx += (polyPoints[i] + polyPoints[j]) * factor;
-            cy += (polyPoints[i + 1] + polyPoints[j + 1]) * factor;
-        }
-        area *= 6.0;
-        factor = 1 / area;
-        cx *= factor;
-        cy *= factor;
-        var array = new Array(cx, cy);
-        return array;
-    },*/
-
-    get_area : function(polyPoints) {
-        var n = polyPoints.length;
-        var area = 0.0;
-        for (var i = 0; i < n; i++) {
-            var j = (i + 1) % n;
-            area += polyPoints[i][0] * polyPoints[j][1];
-            area -= polyPoints[j][0] * polyPoints[i][1];
-        }
-        area /= 2.0;
-        return area;
-    },
-
-    get_center_of_mass : function(polyPoints) {
-        var cx = 0, cy = 0;
-        var area = self.get_area(polyPoints);
-        var n = polyPoints.length;
-        var factor = 0;
-        for (var i = 0; i < n; i++) {
-            var j = (i + 1) % n;
-            factor = (polyPoints[i][0] * polyPoints[j][1]
-                    - polyPoints[j][0] * polyPoints[i][1]);
-            cx += (polyPoints[i][0] + polyPoints[j][0]) * factor;
-            cy += (polyPoints[i][1] + polyPoints[j][1]) * factor;
-        }
-        area *= 6.0;
-        factor = 1 / area;
-        cx *= factor;
-        cy *= factor;
-        return [cx, cy];
     },
 
     get_rect_selection : function (e) {
@@ -612,25 +548,12 @@ M.preg_authoring_tools_script = (function ($) {
                 ];
             }
             var coords = [];
-            for(var j = 0; j < nodeCoords.length; j += 2) {
+            for (var j = 0; j < nodeCoords.length; j += 2) {
                 coords[coords.length] = [nodeCoords[j], nodeCoords[j + 1]];
             }
             // check selected coords
-            /*var c_mass = self.get_center_of_mass(coords);
-            if(rect_left_bot_x < c_mass[0]
-                && rect_right_top_x > c_mass[0]
-                && rect_left_bot_y > c_mass[1]
-                && rect_right_top_y < c_mass[1]) {
-
-                if(nodeId[1] < indfirst) {
-                    indfirst = nodeId[1];
-                }
-                if(nodeId[2] > indlast) {
-                    indlast = nodeId[2];
-                }
-            }*/
             for (var j = 0; j < coords.length; ++j) {
-                if(rect_left_bot_x < coords[j][0]
+                if (rect_left_bot_x < coords[j][0]
                     && rect_right_top_x > coords[j][0]
                     && rect_left_bot_y > coords[j][1]
                     && rect_right_top_y < coords[j][1]) {
