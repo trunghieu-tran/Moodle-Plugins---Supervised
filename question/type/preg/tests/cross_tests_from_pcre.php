@@ -7737,8 +7737,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'*** Failers',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>2,1=>2,2=>1),
+                        'index_first'=>array(0=>0,3=>0,4=>0),
+                        'length'=>array(0=>3,3=>3,4=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
