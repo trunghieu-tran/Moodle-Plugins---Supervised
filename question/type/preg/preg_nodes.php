@@ -1841,9 +1841,15 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+
         $result = $matcherstateobj->match_from_pos($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
-        $length = $result->length($this->number);
-        return $length != qtype_preg_matching_results::NO_MATCH_FOUND;
+        $tmplength = $result->length($this->number);
+        if ($tmplength != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $length = $tmplength;
+            return true;
+        }
+        return false;
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
