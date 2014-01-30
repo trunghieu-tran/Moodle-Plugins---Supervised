@@ -236,22 +236,27 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        if ($("#id_selection_mode").is(':checked')) {
-            return;
+        if (!self.is_tree_selection_rectangle_visible()) {
+            var tmp = e.target.id.split(','),
+                indfirst = tmp[1],
+                indlast = tmp[2];
+            self.load_content(indfirst, indlast);
+            self.load_strings(indfirst, indlast);
         }
-        var tmp = e.target.id.split(','),
-            indfirst = tmp[1],
-            indlast = tmp[2];
-        self.load_content(indfirst, indlast);
-        self.load_strings(indfirst, indlast);
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        self.load_content();
-        self.load_strings();
+        if (!self.is_tree_selection_rectangle_visible()) {
+            self.load_content();
+            self.load_strings();
+        }
     },
 
+    is_tree_selection_rectangle_visible : function () {
+        return $("#id_selection_mode").is(':checked');
+    },
+    
     cache_key_for_explaining_tools : function (indfirst, indlast) {
         return '' +
                self.regex_input.val() +
@@ -368,7 +373,7 @@ M.preg_authoring_tools_script = (function ($) {
             $('#tree_img').mousedown(function(e) {
                 e.preventDefault();
                 //check is checked check box
-                if ($("#id_selection_mode").is(":checked") == true) {
+                if (self.is_tree_selection_rectangle_visible()) {
 
                     self.CALC_COORD = true;
                     var br = document.getElementById('tree_img').getBoundingClientRect();
@@ -506,7 +511,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
-        if ($("#id_selection_mode").is(":checked") == true) {
+        if (self.is_tree_selection_rectangle_visible()) {
             $('#id_send_select').attr('disabled',false);
             $('#tree_img').attr("usemap", "");
             self.panzooms.reset_tree();
@@ -565,7 +570,6 @@ M.preg_authoring_tools_script = (function ($) {
                         }
                 }
             }
-            
             ++i;
         }
 
