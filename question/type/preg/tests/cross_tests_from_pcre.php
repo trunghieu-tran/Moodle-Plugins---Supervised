@@ -7972,8 +7972,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test7 = array( 'str'=>'rhubarb',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>2,1=>2,2=>1),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>2,2=>1),
                         'left'=>array(1),
                         'next'=>'r',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -7981,8 +7981,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test8 = array( 'str'=>'the quick brown fox',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>2,1=>2,2=>1),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>2,2=>1),
                         'left'=>array(1),
                         'next'=>'t',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
