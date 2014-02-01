@@ -211,8 +211,8 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         return $last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
-    public function match_from_pos($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
-        return $this->matcher->match_from_pos($str, $startpos, $subexpr, $recursionlevel);
+    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
+        return $this->matcher->match_from_pos_internal($str, $startpos, $subexpr, $recursionlevel);
     }
 
     public function start_pos() {

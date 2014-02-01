@@ -226,6 +226,11 @@ class qtype_preg_lexem {
 interface qtype_preg_matcher_state {
 
     /**
+     * Is the match full?
+     */
+    public function is_full();
+
+    /**
      * Returns index of the first character matched for the given subexpression.
      */
     public function index_first($subexpression = 0);
@@ -243,7 +248,7 @@ interface qtype_preg_matcher_state {
     /**
      * Matches the given subexpression with given string from given position.
      */
-    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null);
+    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null);
 
     /**
      * Starting position of the match.
@@ -1842,11 +1847,9 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-
-        $result = $matcherstateobj->match_from_pos($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
-        $tmplength = $result->length($this->number);
-        if ($tmplength != qtype_preg_matching_results::NO_MATCH_FOUND) {
-            $length = $tmplength;
+        $result = $matcherstateobj->match_from_pos_internal($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
+        if ($result->is_full()) {
+            $length = $result->length($this->number);
             return true;
         }
         return false;

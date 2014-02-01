@@ -562,14 +562,18 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     }
                     $curpos = $startpos + $curstate->length;
                     $length = 0;
-                    if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
-
+                    //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
+                    $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_RECURSION
+                                     ? clone $curstate
+                                     : $curstate;
+                    if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
                         // Create a new state.
-                        $newstate = clone $curstate;
+                        $newstate = clone $matcherstateobj;
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
-
+                        //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
+                        //echo "total length is {$newstate->length}\n\n";
                         // Save the current result.
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             $lazystates[] = $newstate;
@@ -579,7 +583,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                 $reached[$number] = $newstate;
                             }
                         }
-                    } else if (!$endstatereached) {
+                    } else if (!$endstatereached && $subexpr == 0) {
+                        //echo "not matched, partial match length is $length :(\n";
                         // Transition not matched, save the partial match.
                         $partialmatch = clone $curstate;
                         $partialmatch->length += $length;
@@ -625,14 +630,20 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
         if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 3) {
-            return $this->create_nomatch_result($str);
+            return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
-        $bruteforce = count($this->get_nodes_with_subexpr_refs()) > 0;
+        $bruteforce = false;
+        foreach ($this->get_nodes_with_subexpr_refs() as $node) {
+            if ($node->type != qtype_preg_node::TYPE_LEAF_RECURSION) {
+                $bruteforce = true;
+                break;
+            }
+        }
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce
@@ -648,7 +659,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
 
         if ($result === null) {
-            return $this->create_nomatch_result($str);
+            return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
         // Generate an extension for partial matches.
@@ -687,7 +698,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 }
             }
         }
+        return $result;
+    }
 
+    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+        $result = $this->match_from_pos_internal($str, $startpos);
         if ($result->extendedmatch !== null) {
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
         }
