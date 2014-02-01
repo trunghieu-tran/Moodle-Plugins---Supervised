@@ -93,7 +93,7 @@ class JLexBase {
                 return $this->YY_EOF;
             }
             $this->yy_buffer->concatenate($data);
-            $this->yy_buffer_read .= textlib::strlen($data);
+            $this->yy_buffer_read += textlib::strlen($data);
         }
         while ($this->yy_buffer_index >= $this->yy_buffer_read) {
             $data = fread($this->yy_reader, 8192);
@@ -101,7 +101,7 @@ class JLexBase {
                 return $this->YY_EOF;
             }
             $this->yy_buffer->concatenate($data);
-            $this->yy_buffer_read .= textlib::strlen($data);
+            $this->yy_buffer_read += textlib::strlen($data);
         }
         $char = $this->yy_buffer[$this->yy_buffer_index++];
         return textlib::utf8ord($char);
