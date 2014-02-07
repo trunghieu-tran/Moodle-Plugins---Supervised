@@ -1488,7 +1488,7 @@ class qtype_preg_cross_tests_from_preg {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>2)),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -1558,7 +1558,7 @@ class qtype_preg_cross_tests_from_preg {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>2)),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
