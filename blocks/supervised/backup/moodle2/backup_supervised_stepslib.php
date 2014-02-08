@@ -31,6 +31,7 @@
 class backup_supervised_block_structure_step extends backup_block_structure_step {
 
     protected function define_structure() {
+        global $DB;
         // Define each element separated.
         $root = new backup_nested_element('root');
 
@@ -45,7 +46,10 @@ class backup_supervised_block_structure_step extends backup_block_structure_step
         $sessions = new backup_nested_element('sessions');
         $session = new backup_nested_element('session', array('id'), array(
             'courseid', 'classroomid', 'groupid', 'teacherid', 'lessontypeid',
-            'timestart', 'duration', 'timeend', 'state', 'sendemail', 'sessioncomment'));
+            'timestart', 'duration', 'timeend', 'state', 'iplist', 'sendemail', 'sessioncomment'));
+
+        $users = new backup_nested_element('users');
+        $user = new backup_nested_element('user', array('id'), array('userid', 'sessionid'));
 
         // Build the tree.
         $root->add_child($classrooms);
@@ -54,11 +58,24 @@ class backup_supervised_block_structure_step extends backup_block_structure_step
         $lessontypes->add_child($lessontype);
         $root->add_child($sessions);
         $sessions->add_child($session);
+        $root->add_child($users);
+        $users->add_child($user);
 
         // Define sources.
         $classroom->set_source_table('block_supervised_classroom', array());
         $lessontype->set_source_table('block_supervised_lessontype', array('courseid' => backup::VAR_COURSEID));
         $session->set_source_table('block_supervised_session', array('courseid' => backup::VAR_COURSEID));
+        $select = "SELECT
+            {block_supervised_user}.id,
+            {block_supervised_user}.userid,
+            {block_supervised_user}.sessionid
+
+            FROM {block_supervised_user}
+              JOIN {block_supervised_session}
+                ON {block_supervised_user}.sessionid = {block_supervised_session}.id
+
+            WHERE {block_supervised_session}.courseid = :courseid";
+        $user->set_source_sql($select, array('courseid'=>backup::VAR_COURSEID));
 
         // Annotations (none).
 
