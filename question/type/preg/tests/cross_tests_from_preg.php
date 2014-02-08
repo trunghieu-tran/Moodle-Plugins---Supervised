@@ -1817,7 +1817,7 @@ class qtype_preg_cross_tests_from_preg {
     function data_for_test_assertions_simple_40() {
 
 
-      $test1 = array( 'str'=>'ab',
+        $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -1851,8 +1851,38 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
-/*
+
     function data_for_test_assertions_simple_41() {
+
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'\A*(ab)',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -1861,12 +1891,72 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_42() {
 
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'Oa',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(1),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'aO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OaO',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
         return array('regex'=>'(\A|a)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
     function data_for_test_assertions_simple_43() {
+
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'Oa',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(1),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'aO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OaO',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(\Z|a)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -1875,6 +1965,30 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_44() {
 
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3));
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3));
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4));
+
         return array('regex'=>'(\A|\Z)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
@@ -1882,19 +1996,139 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_45() {
 
-        return array('regex'=>'\A\b\Z',
+        $test1 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'Oabab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'ababO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OababO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'ab\bab',
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
     function data_for_test_assertions_simple_46() {
 
-        return array('regex'=>'\A\B\Z',
-                     'tests'=>array($test1, $test2, $test3, $test4),
+        $test1 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4));
+
+        $test2 = array( 'str'=>'Oabab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>4),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'ababO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OababO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>4),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test5 = array( 'str'=>'ab ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test6 = array( 'str'=>'Oab ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test7 = array( 'str'=>'ab abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test8 = array( 'str'=>'Oab abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'ab\Bab',
+                     'tests'=>array($test1, $test2, $test3, $test4,
+                                    $test5, $test6, $test7, $test8),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
     function data_for_test_assertions_simple_47() {
+
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(\A|$)*ab(\Z|^)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -1903,12 +2137,68 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_48() {
 
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
         return array('regex'=>'(\A|^)*ab(\Z|$)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
     function data_for_test_assertions_simple_49() {
+
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(\A|\1)*ab(\Z|\2)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -1917,11 +2207,39 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_50() {
 
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test2 = array( 'str'=>'Oab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test3 = array( 'str'=>'abO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test4 = array( 'str'=>'OabO',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
         return array('regex'=>'(^|\1)*ab($|\2)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
-
+/*
     function data_for_test_assertions_simple_51() {
 
         return array('regex'=>'a^b$c',
