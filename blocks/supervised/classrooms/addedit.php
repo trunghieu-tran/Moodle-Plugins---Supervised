@@ -16,6 +16,7 @@
 
 
 require_once('../../../config.php');
+require_once('../sessions/sessionstate.php');
 
 $courseid   = required_param('courseid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // Classroom id (only for edit mode).
@@ -87,6 +88,22 @@ if ($mform->is_cancelled()) {
             print_error('insertclassroomerror', 'block_supervised');
         }
         // TODO Logging.
+
+
+        // Find all Active and Planned sessions and update their ip lists.
+        $select = "SELECT * FROM {block_supervised_session}
+                    WHERE classroomid = :classroomid
+                        AND (state = :plannedstate OR state = :activestate)";
+        $params['activestate']  = StateSession::ACTIVE;
+        $params['plannedstate'] = StateSession::PLANNED;
+        $params['classroomid']  = $fromform->id;
+        $sessions = $DB->get_records_sql($select, $params);
+        foreach ($sessions as $session) {
+            $session->iplist = $fromform->iplist;
+            if (!$DB->update_record('block_supervised_session', $session)) {
+                print_error('insertsessionerror', 'block_supervised');
+            }
+        }
     }
     $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
     redirect($url);
