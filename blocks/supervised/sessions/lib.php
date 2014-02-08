@@ -503,7 +503,6 @@ function update_users_in_session($groupid, $courseid, $sessionid) {
         $users = groups_get_members($groupid);
     }
 
-
     // Update existing records if possible.
     $oldusers = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
     foreach ($users as $user) {
