@@ -56,7 +56,6 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         }
 
         // Restore classrooms.
-        //$DB->delete_records('block_supervised_classroom');
         $classrooms = (object)$root->classrooms;
         $classrooms = $classrooms->classroom;
         if ($classrooms) {
