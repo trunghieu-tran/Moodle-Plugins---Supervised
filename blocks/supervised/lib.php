@@ -137,15 +137,3 @@ function event_handler_course_content_removed($course) {
     $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
     $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
 }
-
-
-
-function event_handler_groups_group_deleted($group) {
-    global $DB;
-    $DB->delete_records('block_supervised_session', array('groupid' => $group->id));
-}
-
-function event_handler_groups_groups_deleted($courseid) {
-    global $DB;
-    $DB->delete_records('block_supervised_session', array('courseid' => $courseid));
-}
