@@ -125,6 +125,8 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=null) {
  */
 function event_handler_course_deleted($course) {
     global $DB;
+    $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $course->id));
+    $DB->delete_records_list('block_supervised_user', 'sessionid', array_keys($sessionids));
     $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
     $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
 }
@@ -136,6 +138,8 @@ function event_handler_course_deleted($course) {
  */
 function event_handler_course_content_removed($course) {
     global $DB;
+    $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $course->id));
+    $DB->delete_records_list('block_supervised_user', 'sessionid', array_keys($sessionids));
     $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
     $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
 }
