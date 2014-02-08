@@ -36,7 +36,7 @@ class displayoptions_logs_form extends moodleform {
         $teacher = $DB->get_record('user', array('id' => $this->_customdata['teacherid']));
         $users[$teacher->id] = fullname($teacher);
 
-        $usersinsession = $DB->get_records('block_supervised_users', array('sessionid' => $sessionid));
+        $usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
         foreach ($usersinsession as $curuser) {
             $userobj = $DB->get_record('user', array('id' => $curuser->userid));
             // TODO Add user groups as string's preffix.
