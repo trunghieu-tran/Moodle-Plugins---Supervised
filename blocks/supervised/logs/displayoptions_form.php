@@ -29,29 +29,18 @@ class displayoptions_logs_form extends moodleform {
         global $DB;
         $mform =& $this->_form;
 
+        $sessionid  = $this->_customdata['sessionid'];
+
         // Gets array of all groups in current course.
-        $teacher = $DB->get_record('user', array('id' => $this->_customdata['teacherid']));
         $users[0] = get_string('allusers', 'block_supervised');
+        $teacher = $DB->get_record('user', array('id' => $this->_customdata['teacherid']));
         $users[$teacher->id] = fullname($teacher);
 
-        $groupid = $this->_customdata['groupid'];
-        $courseid = $this->_customdata['courseid'];
-        if ($groupid == 0) {
-            // All groups in course.
-            $groups = groups_get_all_groups($courseid);
-            foreach ($groups as $group) {
-                $cusers = groups_get_members($group->id);
-                foreach ($cusers as $cuser) {
-                    $users[$cuser->id] = "[" . $group->name . "]" . " " . fullname($cuser);
-                }
-            }
-        } else {
-            // One group in course.
-            if ( $cusers = groups_get_members($groupid) ) {
-                foreach ($cusers as $cuser) {
-                    $users[$cuser->id] = fullname($cuser);
-                }
-            }
+        $usersinsession = $DB->get_records('block_supervised_users', array('sessionid' => $sessionid));
+        foreach ($usersinsession as $curuser) {
+            $userobj = $DB->get_record('user', array('id' => $curuser->userid));
+            // TODO Add user groups as string's preffix.
+            $users[$userobj->id] = fullname($userobj);
         }
 
         $mform->addElement('header', 'sessionsoptionsview', get_string('reportdisplayoptions', 'quiz'));
