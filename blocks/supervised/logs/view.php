@@ -81,7 +81,7 @@ if (file_exists($mform)) {
 } else {
     print_error('noformdesc');
 }
-$mform = new displayoptions_logs_form(null, array('groupid' => $session->groupid,
+$mform = new displayoptions_logs_form(null, array('sessionid' => $session->id,
     'courseid' => $courseid, 'teacherid' => $session->teacherid));
 $toform['sessionid']    = $sessionid;
 $toform['courseid']     = $courseid;

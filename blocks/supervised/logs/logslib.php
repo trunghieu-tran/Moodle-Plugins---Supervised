@@ -30,7 +30,6 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     global $DB;
 
     $session = $DB->get_record('block_supervised_session', array('id' => $sessionid));
-    // TODO filtering: $classroom = $DB->get_record('block_supervised_classroom', array('id' => $session->classroomid));
 
     // Prepare query.
     $params = array();
@@ -45,18 +44,15 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     // Get logs.
     $logs = get_logs($selector, $params, 'l.time DESC', '', '', $totalcount);
 
-    // Filter logs by classroom ip subnet.
-    $logsfiltered = $logs;
-    /* TODO filtering
-    $logs_filtered = array();
+    // Filter logs by classroom's ip subnet.
+    $logsfiltered = array();
     foreach ($logs as $id => $log) {
-        echo($log->ip);
-        if (address_in_subnet($log->ip, $classroom->iplist))
-            $logs_filtered[$id] = $log;
-    }*/
-
+        if (address_in_subnet($log->ip, $session->iplist)) {
+            $logsfiltered[$id] = $log;
+        }
+    }
     $result['logs'] = array_slice($logsfiltered, $limitfrom, $limitnum);
-    $result['totalcount'] = $totalcount;
+    $result['totalcount'] = count($logsfiltered);
 
     return $result;
 }
