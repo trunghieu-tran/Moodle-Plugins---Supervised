@@ -124,11 +124,7 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=null) {
  * @param $course integer course id
  */
 function event_handler_course_deleted($course) {
-    global $DB;
-    $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $course->id));
-    $DB->delete_records_list('block_supervised_user', 'sessionid', array_keys($sessionids));
-    $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
-    $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
+    cleanup($course->id);
 }
 
 /**
@@ -137,9 +133,21 @@ function event_handler_course_deleted($course) {
  * @param $course integer course id
  */
 function event_handler_course_content_removed($course) {
+    cleanup($course->id);
+}
+
+function cleanup($courseid) {
     global $DB;
-    $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $course->id));
+
+    // Delete users.
+    $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $courseid));
     $DB->delete_records_list('block_supervised_user', 'sessionid', array_keys($sessionids));
-    $DB->delete_records('block_supervised_lessontype', array('courseid' => $course->id));
-    $DB->delete_records('block_supervised_session', array('courseid' => $course->id));
+    // Delete lesson types.
+    $DB->delete_records('block_supervised_lessontype', array('courseid' => $courseid));
+    // Delete sessions.
+    $DB->delete_records('block_supervised_session', array('courseid' => $courseid));
+    // Delete access rules.
+    $quizzids = $DB->get_records('quiz', array('course' => $courseid));
+    $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+
 }

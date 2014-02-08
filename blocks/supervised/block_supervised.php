@@ -550,4 +550,13 @@ class block_supervised extends block_base {
 
         return true;
     }
+
+    /**
+     * Cleanup all data associated with the block on deletion.
+     */
+    public function instance_delete() {
+        global $CFG, $COURSE;
+        require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
+        cleanup($COURSE->id);
+    }
 }
