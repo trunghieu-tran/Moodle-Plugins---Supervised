@@ -39,6 +39,7 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         $paths[] = new restore_path_element('classroom', '/block/root/classrooms/classroom');
         $paths[] = new restore_path_element('lessontype', '/block/root/lessontypes/lessontype');
         $paths[] = new restore_path_element('session', '/block/root/sessions/session');
+        $paths[] = new restore_path_element('user', '/block/root/users/user');
 
         return $paths;
     }
@@ -55,14 +56,20 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         }
 
         // Restore classrooms.
-        $DB->delete_records('block_supervised_classroom');
+        //$DB->delete_records('block_supervised_classroom');
         $classrooms = (object)$root->classrooms;
         $classrooms = $classrooms->classroom;
         if ($classrooms) {
             foreach ($classrooms as $classroom) {
                 $classroom = (object)$classroom;
                 $olditemid = $classroom->id;
-                $newitemid = $DB->insert_record('block_supervised_classroom', $classroom);
+                // We don't restore classrooms that we already have in DB.
+                $select = "name='" . $classroom->name . "' AND ". $DB->sql_compare_text('iplist') . "='". $classroom->iplist ."'";
+                if ($DB->record_exists_select('block_supervised_classroom', $select)) {
+                    $newitemid = $olditemid;
+                } else {
+                    $newitemid = $DB->insert_record('block_supervised_classroom', $classroom);
+                }
                 $this->set_mapping('classroom', $olditemid, $newitemid);
             }
         }
@@ -88,11 +95,28 @@ class restore_supervised_block_structure_step extends restore_structure_step {
         if ($sessions) {
             foreach ($sessions as $session) {
                 $session = (object)$session;
+                $olditemid = $session->id;
                 $session->courseid = $this->get_courseid();
                 $session->classroomid = $this->get_mappingid('classroom', $session->classroomid);
                 $session->teacherid = $this->get_mappingid('user', $session->teacherid, $session->teacherid);
                 $session->lessontypeid = $this->get_mappingid('lessontype', $session->lessontypeid);
-                $DB->insert_record('block_supervised_session', $session);
+                $newitemid = $DB->insert_record('block_supervised_session', $session);
+                $this->set_mapping('session', $olditemid, $newitemid);
+            }
+        }
+
+        // Restore users.
+        $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $this->get_courseid()));
+        $DB->delete_records_list('block_supervised_user', 'sessionid', array_keys($sessionids));
+        $users = (object)$root->users;
+        $users = $users->user;
+        if ($users) {
+            foreach ($users as $user) {
+                $user = (object)$user;
+                $user->sessionid = $this->get_mappingid('session', $user->sessionid);
+                $olditemid = $user->id;
+                $newitemid = $DB->insert_record('block_supervised_user', $user);
+                $this->set_mapping('user', $olditemid, $newitemid);
             }
         }
     }
