@@ -145,9 +145,12 @@ class block_supervised extends block_base {
                 $plannedsession->timestart      = $curtime;
                 $plannedsession->duration       = $fromform->duration;
                 $plannedsession->timeend        = $curtime + $fromform->duration*60;
+                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$plannedsession->classroomid));
+                $plannedsession->iplist  = $classroom->iplist;
                 if (!$DB->update_record('block_supervised_session', $plannedsession)) {
                     print_error('insertsessionerror', 'block_supervised');
                 }
+                update_users_in_session($plannedsession->groupid, $plannedsession->courseid, $plannedsession->id);
 
                 // Trigger event (session started).
                 $sessioninfo = new stdClass();
@@ -235,10 +238,13 @@ class block_supervised extends block_base {
                 $activesession->groupid         = $newgroupid;
                 $activesession->duration        = $fromform->duration;
                 $activesession->timeend         = $activesession->timestart  + $fromform->duration*60;
+                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$activesession->classroomid));
+                $activesession->iplist  = $classroom->iplist;
 
                 if (!$DB->update_record('block_supervised_session', $activesession)) {
                     print_error('insertsessionerror', 'block_supervised');
                 }
+                update_users_in_session($activesession->groupid, $activesession->courseid, $activesession->id);
                 // Trigger event (session updated) if group was updated.
                 if ($oldgroupid != $newgroupid) {
                     $sessioninfo = new stdClass();
@@ -330,9 +336,12 @@ class block_supervised extends block_base {
             $fromform->teacherid      = $USER->id;
             $fromform->timestart      = $curtime;
             $fromform->timeend        = $curtime + $fromform->duration*60;
-            if (!$DB->insert_record('block_supervised_session', $fromform)) {
+            $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$fromform->classroomid));
+            $fromform->iplist  = $classroom->iplist;
+            if (!$newid = $DB->insert_record('block_supervised_session', $fromform)) {
                 print_error('insertsessionerror', 'block_supervised');
             }
+            update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
             // Refresh block: render active session form.
             $title = '';
             $formbody = '';
