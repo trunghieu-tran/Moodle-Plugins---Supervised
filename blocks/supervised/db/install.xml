@@ -51,7 +51,7 @@
         <KEY NAME="lessontypeid" TYPE="foreign" FIELDS="lessontypeid" REFTABLE="block_supervised_lessontypes" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_supervised_users" COMMENT="Users in session">
+    <TABLE NAME="block_supervised_user" COMMENT="Users in session">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
