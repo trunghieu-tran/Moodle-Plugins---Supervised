@@ -15,6 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
+global $CFG;
+require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
+
 /**
  * Returns the sessions array according to specified conditions and capabilities of current user
  *
@@ -478,4 +481,45 @@ function mail_editedsession($updsession, $editor) {
     $subject    = get_string('emaileditedsessionsubject', 'block_supervised', $data);
 
     email_to_user($user, $supportuser, $subject, $message);
+}
+
+
+/**
+ * Add users from session into database table
+ * @param $groupid
+ * @param $courseid
+ * @param $sessionid
+ */
+function update_users_in_session($groupid, $courseid, $sessionid) {
+    global $DB;
+    // Prepare users array.
+    $users = array();
+    if ($groupid == ALL_GROUPS) {
+        $groups = groups_get_all_groups($courseid);
+        foreach ($groups as $group) {
+            $users = $users + groups_get_members($group->id);
+        }
+    } else {
+        $users = groups_get_members($groupid);
+    }
+
+
+    // Update existing records if possible.
+    $oldusers = $DB->get_records('block_supervised_users', array('sessionid' => $sessionid));
+    foreach ($users as $user) {
+        $curuser = array_shift($oldusers);
+        if (!$curuser) {
+            $curuser                = new stdClass();
+            $curuser->sessionid     = $sessionid;
+            $curuser->userid        = $user->id;
+            $curuser->id            = $DB->insert_record('block_supervised_users', $curuser);
+        }
+        $curuser->userid        = $user->id;
+        $DB->update_record('block_supervised_users', $curuser);
+    }
+    // Delete any remaining old rules.
+    foreach ($oldusers as $olduser) {
+        $DB->delete_records('block_supervised_users', array('id' => $olduser->id));
+    }
+
 }

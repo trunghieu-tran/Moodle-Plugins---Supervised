@@ -143,10 +143,13 @@ if ($mform->is_cancelled()) {
         $PAGE->navbar->add(get_string("plansessionnavbar", 'block_supervised'));
         $fromform->state    = StateSession::PLANNED;
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
+        $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$fromform->classroomid));
+        $fromform->iplist  = $classroom->iplist;
 
         if (!$newid = $DB->insert_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
         }
+        update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
         // TODO Logging
         // Send e-mail to teacher.
         if ($fromform->sendemail) {
@@ -154,9 +157,12 @@ if ($mform->is_cancelled()) {
         }
     } else {     // Edit mode.
         $fromform->timeend  = $fromform->timestart + ($fromform->duration)*60;
+        $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$fromform->classroomid));
+        $fromform->iplist  = $classroom->iplist;
         if (!$DB->update_record('block_supervised_session', $fromform)) {
             print_error('insertsessionerror', 'block_supervised');
         }
+        update_users_in_session($fromform->groupid, $fromform->courseid, $fromform->id);
         // TODO Logging
         // Send e-mail to teacher(s).
         if ($fromform->sendemail) {

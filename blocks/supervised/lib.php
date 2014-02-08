@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
+define('ALL_GROUPS', 0);
+
 /**
  * Returns true if the user can safely delete passed lesson type
  *
