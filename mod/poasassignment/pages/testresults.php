@@ -139,43 +139,43 @@ class testresults_page extends abstract_page {
         ?>
         <div class="testresults">
             <form action="" method="post">
-                <?if ($_GET['saved'] == 'ok' && has_capability('mod/poasassignment:grade', $this->context)): ?>
+                <?php if ($_GET['saved'] == 'ok' && has_capability('mod/poasassignment:grade', $this->context)): ?>
                     <div class="saved">
-                        <?=get_string('testresultsweresaved', 'poasassignment_remote_autotester')?>
+                        <?php echo get_string('testresultsweresaved', 'poasassignment_remote_autotester') ?>
                     </div>
-                <? endif?>
-                <?if ($this->realassigneeid): ?>
+                <?php endif ?>
+                <?php if ($this->realassigneeid): ?>
                     <div class="report">
-                        <?
+                        <?php
                             $statistics = remote_autotester::get_statistics($attemptsresult, $this->realassigneeid);
                         ?>
                         <table class="poasassignment-table">
-                            <?foreach ($statistics as $key => $value): ?>
-                                <?if ($value !== false): ?>
+                            <?php foreach ($statistics as $key => $value): ?>
+                                <?php if ($value !== false): ?>
                                     <tr>
-                                        <td class="header"><?=get_string($key, 'poasassignment_remote_autotester')?></td>
-                                        <td><?=$value?></td>
+                                        <td class="header"><?php echo get_string($key, 'poasassignment_remote_autotester') ?></td>
+                                        <td><?php echo $value ?></td>
                                     </tr>
-                                <? endif?>
-                            <? endforeach?>
+                                <?php endif ?>
+                            <?php endforeach ?>
                         </table>
                     </div>
-                <? endif?>
-                <span><?=get_string('allattemptsactions', 'poasassignment_remote_autotester')?>:</span>
-                <span class="hideall"><a href="javascript:void(0)">[<?=get_string('hideall', 'poasassignment_remote_autotester')?>]</a></span>
-                <span class="showall"><a href="javascript:void(0)">[<?=get_string('showall', 'poasassignment_remote_autotester')?>]</a></span>
+                <?php endif ?>
+                <span><?php echo get_string('allattemptsactions', 'poasassignment_remote_autotester')?>:</span>
+                <span class="hideall"><a href="javascript:void(0)">[<?php echo get_string('hideall', 'poasassignment_remote_autotester')?>]</a></span>
+                <span class="showall"><a href="javascript:void(0)">[<?php echo get_string('showall', 'poasassignment_remote_autotester')?>]</a></span>
                 <table>
                     <thead>
                     <tr>
                         <td>№</td>
-                        <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
-                        <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
-                        <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
-                        <?$this->get_results_thead_td()?>
+                        <td><?php echo get_string('attemptdate', 'poasassignment_remote_autotester') ?></td>
+                        <td><?php echo get_string('raattemptstatus', 'poasassignment_remote_autotester') ?></td>
+                        <td><?php echo get_string('attemptresult', 'poasassignment_remote_autotester') ?></td>
+                        <?php $this->get_results_thead_td() ?>
                     </tr>
                     </thead>
                     <tbody>
-                        <?
+                        <?php
                         $i = count ($attemptsresult);
                         foreach ($attemptsresult as $attemptresult) {
                             $this->show_attempt_html($attemptresult, $i);
@@ -186,28 +186,28 @@ class testresults_page extends abstract_page {
                     <tfoot>
                         <tr>
                             <td>№</td>
-                            <td><?=get_string('attemptdate', 'poasassignment_remote_autotester')?></td>
-                            <td><?=get_string('raattemptstatus', 'poasassignment_remote_autotester')?></td>
-                            <td><?=get_string('attemptresult', 'poasassignment_remote_autotester')?></td>
-                            <?$this->get_results_thead_td()?>
+                            <td><?php echo get_string('attemptdate', 'poasassignment_remote_autotester') ?></td>
+                            <td><?php echo get_string('raattemptstatus', 'poasassignment_remote_autotester') ?></td>
+                            <td><?php echo get_string('attemptresult', 'poasassignment_remote_autotester') ?></td>
+                            <?php $this->get_results_thead_td() ?>
                         </tr>
                     </tfoot>
                 </table>
-                <?if (has_capability('mod/poasassignment:grade', $this->context)): ?>
+                <?php if (has_capability('mod/poasassignment:grade', $this->context)): ?>
                     <div class="submit">
-                        <?foreach ($_GET as $k => $v): ?>
-                            <? if ($_GET['saved']): ?>
-                                <?continue;?>
-                            <? endif ?>
-                            <input type="hidden" name="<?=$k?>" value="<?=htmlspecialchars($v)?>"/>
-                        <? endforeach?>
-                        <input type="hidden" name="sesskey" value="<?=$USER->sesskey?>"/>
-                        <input type="submit" name="save" value="<?=get_string('submittestresult', 'poasassignment_remote_autotester')?>"/>
+                        <?php foreach ($_GET as $k => $v): ?>
+                            <?php if ($_GET['saved']): ?>
+                                <?php continue; ?>
+                            <?php endif ?>
+                            <input type="hidden" name="<?php echo $k ?>" value="<?php echo htmlspecialchars($v) ?>"/>
+                        <?php endforeach ?>
+                        <input type="hidden" name="sesskey" value="<?php echo $USER->sesskey ?>"/>
+                        <input type="submit" name="save" value="<?php echo get_string('submittestresult', 'poasassignment_remote_autotester') ?>"/>
                     </div>
-                <? endif?>
+                <?php endif ?>
             </form>
         </div>
-        <?
+        <?php
         return;
     }
 
@@ -218,15 +218,15 @@ class testresults_page extends abstract_page {
     private function get_results_thead_td() {
         if (has_capability('mod/poasassignment:grade', $this->context)) {
             ?>
-            <td class="fail"><?=get_string('attemptfail', 'poasassignment_remote_autotester')?></td>
-            <td class="ignor"><?=get_string('attemptignore', 'poasassignment_remote_autotester')?></td>
-            <td class="ok"><?=get_string('attemptok', 'poasassignment_remote_autotester')?></td>
-            <?
+            <td class="fail"><?php echo get_string('attemptfail', 'poasassignment_remote_autotester') ?></td>
+            <td class="ignor"><?php echo get_string('attemptignore', 'poasassignment_remote_autotester') ?></td>
+            <td class="ok"><?php echo get_string('attemptok', 'poasassignment_remote_autotester') ?></td>
+            <?php
         }
         else {
             ?>
-            <td colspan="3"><?=get_string('finaldecision', 'poasassignment_remote_autotester')?></td>
-            <?
+            <td colspan="3"><?php echo get_string('finaldecision', 'poasassignment_remote_autotester') ?></td>
+            <?php
         }
     }
 
@@ -258,12 +258,12 @@ class testresults_page extends abstract_page {
                 $graderesult = POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL;
         }
         ?>
-        <tr attemptinfo data-attempt="<?=$i?>">
-            <td><a name="att<?=$i?>"></a><?=$i?></td>
-            <td><?=date("d.m.Y H:i:s", $attemptresult->attemptdate)?></td>
-            <td><?=remote_autotester::get_attempt_status($attemptresult)->status?></td>
+        <tr attemptinfo data-attempt="<?php echo $i ?>">
+            <td><a name="att<?php echo $i ?>"></a><?php echo $i ?></td>
+            <td><?php echo date("d.m.Y H:i:s", $attemptresult->attemptdate) ?></td>
+            <td><?php echo remote_autotester::get_attempt_status($attemptresult)->status ?></td>
             <td>
-                <?
+                <?php
                     if ($totaltests !== FALSE) {
                         echo $oktest . ' / ' . $totaltests;
                     }
@@ -272,43 +272,43 @@ class testresults_page extends abstract_page {
                     }
                 ?>
             </td>
-            <?$this->get_results_attempt_td($graderesult, $attemptresult->attemptid)?>
+            <?php $this->get_results_attempt_td($graderesult, $attemptresult->attemptid) ?>
         </tr>
-        <tr class="attemptservice" data-for-attempt="<?=$i?>">
+        <tr class="attemptservice" data-for-attempt="<?php echo $i ?>">
             <td colspan="7">
-                <?if ($attemptresult->compilemessage): ?>
-                    <span class="showcompileerror"><a href="javascript:void(0)">[<?=get_string('showcompileerror', 'poasassignment_remote_autotester')?>]</a></span>
-                    <span class="hidecompileerror"><a href="javascript:void(0)">[<?=get_string('hidecompileerror', 'poasassignment_remote_autotester')?>]</a></span>
-                <? endif?>
-                <?if (isset($attemptresult->tests) && is_array($attemptresult->tests)): ?>
-                    <span class="showtests"><a href="javascript:void(0)">[<?=get_string('showtests', 'poasassignment_remote_autotester')?>]</a></span>
-                    <span class="hidetests"><a href="javascript:void(0)">[<?=get_string('hidetests', 'poasassignment_remote_autotester')?>]</a></span>
-                    <? if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
-                        <span class="showallinput"><a href="javascript:void(0)">[<?=get_string('showallinput', 'poasassignment_remote_autotester')?>]</a></span>
-                        <span class="hideallinput"><a href="javascript:void(0)">[<?=get_string('hideallinput', 'poasassignment_remote_autotester')?>]</a></span>
-                    <? endif ?>
-                <? endif?>
+                <?php if ($attemptresult->compilemessage): ?>
+                    <span class="showcompileerror"><a href="javascript:void(0)">[<?php echo get_string('showcompileerror', 'poasassignment_remote_autotester')?>]</a></span>
+                    <span class="hidecompileerror"><a href="javascript:void(0)">[<?php echo get_string('hidecompileerror', 'poasassignment_remote_autotester')?>]</a></span>
+                <?php endif ?>
+                <?php if (isset($attemptresult->tests) && is_array($attemptresult->tests)): ?>
+                    <span class="showtests"><a href="javascript:void(0)">[<?php echo get_string('showtests', 'poasassignment_remote_autotester')?>]</a></span>
+                    <span class="hidetests"><a href="javascript:void(0)">[<?php echo get_string('hidetests', 'poasassignment_remote_autotester')?>]</a></span>
+                    <?php if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
+                        <span class="showallinput"><a href="javascript:void(0)">[<?php echo get_string('showallinput', 'poasassignment_remote_autotester')?>]</a></span>
+                        <span class="hideallinput"><a href="javascript:void(0)">[<?php echo get_string('hideallinput', 'poasassignment_remote_autotester')?>]</a></span>
+                    <?php endif ?>
+                <?php endif ?>
             </td>
         </tr>
-        <? if ($attemptresult->compilemessage || (isset($attemptresult->tests) && is_array($attemptresult->tests))): ?>
-            <tr class="other" data-for-attempt="<?=$i?>">
+        <?php if ($attemptresult->compilemessage || (isset($attemptresult->tests) && is_array($attemptresult->tests))): ?>
+            <tr class="other" data-for-attempt="<?php echo $i ?>">
                 <td colspan="7">
-                    <? if ($attemptresult->compilemessage): ?>
+                    <?php if ($attemptresult->compilemessage): ?>
                         <div class="compileerror">
-                            <pre><?=$attemptresult->compilemessage?></pre>
+                            <pre><?php echo $attemptresult->compilemessage ?></pre>
                         </div>
-                    <? endif ?>
-                    <? if (isset($attemptresult->tests) && is_array($attemptresult->tests)): ?>
+                    <?php endif ?>
+                    <?php if (isset($attemptresult->tests) && is_array($attemptresult->tests)): ?>
                         <div class="tests">
-                            <? foreach ($attemptresult->tests as $test): ?>
-                                <?$this->show_test_html($test)?>
-                            <? endforeach ?>
+                            <?php foreach ($attemptresult->tests as $test): ?>
+                                <?php $this->show_test_html($test) ?>
+                            <?php endforeach ?>
                         </div>
-                    <? endif ?>
+                    <?php endif ?>
                 </td>
             </tr>
-        <? endif ?>
-        <?
+        <?php endif ?>
+        <?php
     }
 
     private function get_results_attempt_td($graderesult, $attemptid) {
@@ -318,33 +318,33 @@ class testresults_page extends abstract_page {
                     <input
                         type="radio"
                         value="fail"
-                        title="<?=get_string('attemptfail', 'poasassignment_remote_autotester')?>"
-                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL): ?>
+                        title="<?php echo get_string('attemptfail', 'poasassignment_remote_autotester')?>"
+                        <?php if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_FAIL): ?>
                         checked="checked"
-                    <? endif?>
-                        name="attemptaction[<?=$attemptid?>]"/>
+                    <?php endif?>
+                        name="attemptaction[<?php echo $attemptid?>]"/>
                 </td>
                 <td class="ignor">
                     <input
                         type="radio"
                         value="ignor"
-                        title="<?=get_string('attemptignore', 'poasassignment_remote_autotester')?>"
-                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_IGNORE): ?>
+                        title="<?php echo get_string('attemptignore', 'poasassignment_remote_autotester')?>"
+                        <?php if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_IGNORE): ?>
                         checked="checked"
-                    <? endif?>
-                        name="attemptaction[<?=$attemptid?>]"/>
+                    <?php endif ?>
+                        name="attemptaction[<?php echo $attemptid?>]"/>
                 </td>
                 <td class="ok">
                     <input
                         type="radio"
                         value="ok"
-                        title="<?=get_string('attemptok', 'poasassignment_remote_autotester')?>"
-                        <?if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_OK): ?>
+                        title="<?php echo get_string('attemptok', 'poasassignment_remote_autotester')?>"
+                        <?php if ($graderesult === POASASSIGNMENT_REMOTE_AUTOTESTER_OK): ?>
                         checked="checked"
-                    <? endif?>
-                        name="attemptaction[<?=$attemptid?>]"/>
+                    <?php endif?>
+                        name="attemptaction[<?php echo $attemptid ?>]"/>
                 </td>
-            <?
+            <?php
         }
         else {
             switch($graderesult) {
@@ -362,10 +362,10 @@ class testresults_page extends abstract_page {
                     break;
             }
             ?>
-            <td colspan="3" class="<?=$class?> result-for-student">
-                <?=$message?>
+            <td colspan="3" class="<?php echo $class ?> result-for-student">
+                <?php echo $message?>
             </td>
-            <?
+            <?php
         }
     }
 
@@ -380,35 +380,35 @@ class testresults_page extends abstract_page {
         $poasmodel = poasassignment_model::get_instance();
         ?>
         <div class="test">
-            <div class="testinfo <?=$class?>">
+            <div class="testinfo <?php echo $class?>">
                 <span class="caption">
-                    <?if (has_capability('poasassignment/remote_autotester:seetestnames', $this->context)): ?>
-                        <?=$test->test?>
-                    <? else: ?>
+                    <?php if (has_capability('poasassignment/remote_autotester:seetestnames', $this->context)): ?>
+                        <?php echo $test->test ?>
+                    <?php else: ?>
                         -
-                    <?endif?>
+                    <?php endif ?>
                 </span>
                 <span class="decision">
-                    <?if ($test->testpassed): ?>
-                        <img src="/mod/poasassignment/pix/yes.png" alt=""/> <span><?=get_string('testpassed', 'poasassignment_remote_autotester')?></span>
-                    <? else: ?>
-                        <img src="/mod/poasassignment/pix/no.png" alt=""/> <span><?=get_string('testnotpassed', 'poasassignment_remote_autotester')?></span>
-                    <? endif?>
+                    <?php if ($test->testpassed): ?>
+                        <img src="/mod/poasassignment/pix/yes.png" alt=""/> <span><?php echo get_string('testpassed', 'poasassignment_remote_autotester')?></span>
+                    <?php else: ?>
+                        <img src="/mod/poasassignment/pix/no.png" alt=""/> <span><?php echo get_string('testnotpassed', 'poasassignment_remote_autotester')?></span>
+                    <?php endif ?>
                 </span>
             </div>
             <div class="testservice">
-                <?if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
-                    <span class="showinput"><a href="javascript:void(0)">[<?=get_string('showinput', 'poasassignment_remote_autotester')?>]</a></span>
-                    <span class="hideinput"><a href="javascript:void(0)">[<?=get_string('hideinput', 'poasassignment_remote_autotester')?>]</a></span>
-                <? endif?>
+                <?php if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
+                    <span class="showinput"><a href="javascript:void(0)">[<?php echo get_string('showinput', 'poasassignment_remote_autotester')?>]</a></span>
+                    <span class="hideinput"><a href="javascript:void(0)">[<?php echo get_string('hideinput', 'poasassignment_remote_autotester')?>]</a></span>
+                <?php endif ?>
             </div>
-            <? if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)):?>
+            <?php if (has_capability('poasassignment/remote_autotester:seetestinput', $this->context)): ?>
                 <div class="input">
-                    <div class="caption"><?=get_string('inputdata', 'poasassignment_remote_autotester')?>:</div>
-                    <pre><?=$test->testin?></pre>
+                    <div class="caption"><?php echo get_string('inputdata', 'poasassignment_remote_autotester') ?>:</div>
+                    <pre><?php echo $test->testin ?></pre>
                 </div>
-            <? endif ?>
-            <?
+            <?php endif ?>
+            <?php
                 $diff = FALSE;
                 if ($test->testpassed != 1) {
                     if (isset($test->studentout) && isset($test->testout)) {
@@ -424,29 +424,29 @@ class testresults_page extends abstract_page {
                 }
 
             ?>
-            <? if ($diff && has_capability('poasassignment/remote_autotester:seediff', $this->context)):?>
+            <?php if ($diff && has_capability('poasassignment/remote_autotester:seediff', $this->context)):?>
                 <div class="diff">
-                    <div class="caption"><?=get_string('outdiff', 'poasassignment_remote_autotester')?> <?=remote_autotester::get_diff_comment($diff, $strudentoutarray, $testoutarray)?>:</div>
-                    <?if (is_array($diff)): ?>
-                        <? foreach ($diff as $element): ?>
-                            <? if (is_array($element)): ?>
-                                <? foreach ($element["i"] as $sub): ?>
-                                    <pre class="test"><span>[<?=get_string('difftestsymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$sub?></pre>
-                                <? endforeach ?>
-                                <? foreach ($element["d"] as $sub): ?>
-                                    <pre class="student"><span>[<?=get_string('diffstudentsymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$sub?></pre>
-                                <? endforeach ?>
-                            <? else: ?>
-                                <pre class="same"><span>[<?=get_string('diffsamesymbol', 'poasassignment_remote_autotester')?>]:</span> <?=$element?></pre>
-                            <? endif ?>
-                        <? endforeach ?>
-                    <? else: ?>
-                        <div class="same"><?=get_string('sameout', 'poasassignment_remote_autotester')?></div>
-                    <?endif?>
+                    <div class="caption"><?php echo get_string('outdiff', 'poasassignment_remote_autotester')?> <?php echo remote_autotester::get_diff_comment($diff, $strudentoutarray, $testoutarray)?>:</div>
+                    <?php if (is_array($diff)): ?>
+                        <?php foreach ($diff as $element): ?>
+                            <?php if (is_array($element)): ?>
+                                <?php foreach ($element["i"] as $sub): ?>
+                                    <pre class="test"><span>[<?php echo get_string('difftestsymbol', 'poasassignment_remote_autotester')?>]:</span> <?php echo $sub?></pre>
+                                <?php endforeach ?>
+                                <?php foreach ($element["d"] as $sub): ?>
+                                    <pre class="student"><span>[<?php echo get_string('diffstudentsymbol', 'poasassignment_remote_autotester')?>]:</span> <?php echo $sub?></pre>
+                                <?php endforeach ?>
+                            <?php else: ?>
+                                <pre class="same"><span>[<?php echo get_string('diffsamesymbol', 'poasassignment_remote_autotester')?>]:</span> <?php echo $element?></pre>
+                            <?php endif ?>
+                        <?php endforeach ?>
+                    <?php else: ?>
+                        <div class="same"><?php echo get_string('sameout', 'poasassignment_remote_autotester')?></div>
+                    <?php endif ?>
                 </div>
-            <? endif ?>
+            <?php endif ?>
         </div>
-        <?
+        <?php
     }
 
     private function diff($old, $new){
