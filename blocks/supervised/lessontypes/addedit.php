@@ -73,16 +73,19 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Store the submitted data.
     if (!$id) {   // Add mode.
-        // TODO Logging.
-        if (!$DB->insert_record('block_supervised_lessontype', $fromform)) {
+        if (!$newid = $DB->insert_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-    } else {     // Edit mode.
         // TODO Logging.
+        add_to_log($COURSE->id, 'role', 'add lesson type',
+            "blocks/supervised/lessontypes/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
+    } else {     // Edit mode.
         if (!$DB->update_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-
+        // TODO Logging.
+        add_to_log($COURSE->id, 'role', 'edit lesson type',
+            "blocks/supervised/lessontypes/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
     }
     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);

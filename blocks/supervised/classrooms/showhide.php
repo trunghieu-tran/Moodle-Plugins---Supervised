@@ -46,6 +46,16 @@ $classroom->active = (int)!($classroom->active);
 if (!$DB->update_record('block_supervised_classroom', $classroom)) {
     print_error('insertclassroomerror', 'block_supervised');
 }
+
+// TODO Logging
+if ($classroom->active) {
+    add_to_log($COURSE->id, 'role', 'show classroom',
+        "blocks/supervised/classrooms/addedit.php?id={$classroom->id}&courseid={$COURSE->id}", $classroom->name);
+} else {
+    add_to_log($COURSE->id, 'role', 'hide classroom',
+        "blocks/supervised/classrooms/addedit.php?id={$classroom->id}&courseid={$COURSE->id}", $classroom->name);
+}
+
 // Redirect.
 $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
 redirect($url);

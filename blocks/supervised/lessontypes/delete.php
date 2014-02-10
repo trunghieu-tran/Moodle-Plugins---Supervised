@@ -70,10 +70,12 @@ if (!confirm_sesskey()) {
 }
 
 // OK checks done, delete the lessontype now.
+$DB->delete_records('block_supervised_lessontype', array('id' => $id));
 
 // TODO Logging.
+add_to_log($COURSE->id, 'role', 'delete lesson type',
+    "blocks/supervised/lessontypes/view.php?courseid={$COURSE->id}", $lessontype->name);
 
-$DB->delete_records('block_supervised_lessontype', array('id' => $id));
 // Redirect to lessontypes page.
 $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
 redirect($url);

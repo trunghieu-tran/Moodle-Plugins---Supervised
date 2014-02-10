@@ -81,14 +81,17 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging.
+        // TODO Logging
+        add_to_log($COURSE->id, 'role', 'add classroom',
+            "blocks/supervised/classrooms/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
     } else {     // Edit mode.
 
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
         // TODO Logging.
-
+        add_to_log($COURSE->id, 'role', 'edit classroom',
+            "blocks/supervised/classrooms/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
 
         // Find all Active and Planned sessions and update their ip lists.
         $select = "SELECT * FROM {block_supervised_session}

@@ -151,6 +151,8 @@ if ($mform->is_cancelled()) {
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
         // TODO Logging
+        add_to_log($COURSE->id, 'role', 'plane session',
+            'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
         // Send e-mail to teacher.
         if ($fromform->sendemail) {
             mail_newsession(get_session($newid), $USER);
@@ -164,6 +166,8 @@ if ($mform->is_cancelled()) {
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $fromform->id);
         // TODO Logging
+        add_to_log($COURSE->id, 'role', 'edit session',
+            'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
         // Send e-mail to teacher(s).
         if ($fromform->sendemail) {
             $oldteacherid = $session->teacherid;
