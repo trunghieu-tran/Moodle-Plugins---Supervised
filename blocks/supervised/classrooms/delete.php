@@ -72,6 +72,8 @@ if (!confirm_sesskey()) {
 // OK checks done, delete the classroom now.
 
 // TODO Logging.
+add_to_log($COURSE->id, 'role', 'delete classroom',
+    "blocks/supervised/classrooms/view.php?courseid={$COURSE->id}", $classroom->name);
 
 $DB->delete_records('block_supervised_classroom', array('id' => $id));
 // Redirect to classrooms page.

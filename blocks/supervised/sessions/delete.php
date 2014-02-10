@@ -76,6 +76,8 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     // Delete session.
     // TODO Logging.
+    add_to_log($COURSE->id, 'role', 'delete session',
+        'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
     $DB->delete_records('block_supervised_session', array('id' => $id));
     $DB->delete_records('block_supervised_user', array('sessionid' => $id));
     // Send e-mail to teacher.
