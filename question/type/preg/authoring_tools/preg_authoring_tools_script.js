@@ -543,7 +543,7 @@ M.preg_authoring_tools_script = (function ($) {
         var i = 0;
         while (areas[i]) {
             var nodeId = areas[i].id.split(',');
-            var nodeCoords = areas[i].coords.split(',');
+            var nodeCoords = areas[i].coords.split(/[, ]/);
             if (areas[i].shape == "rect") {
                 nodeCoords = [
                     nodeCoords[0], nodeCoords[1],
