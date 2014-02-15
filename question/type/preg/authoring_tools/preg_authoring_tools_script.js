@@ -381,12 +381,12 @@ M.preg_authoring_tools_script = (function ($) {
                         {
                             minWidth: 20,
                             minHeight: 20,
-                            /*maxWidth: (br.right - br.left),
+                            maxWidth: (br.right - br.left),
                             maxHeight: (br.bottom - br.top),
-                            minTop: 1,
-                            minLeft: 1,
-                            maxRight: br.right - br.left,
-                            maxBottom: br.bottom - br.top,*/
+                            minTop: $('#tree_hnd').prop('offsetTop'),
+                            minLeft: 220,
+                            maxRight: br.right - br.left + 220,
+                            maxBottom: br.bottom - br.top + $('#tree_hnd').prop('offsetTop'),
                             dragHandle: true,
                             onDrag: function(x, y)
                             {
@@ -535,7 +535,7 @@ M.preg_authoring_tools_script = (function ($) {
     get_current_x : function(e) {
         var br = document.getElementById('tree_img').getBoundingClientRect();
         var local_x = e.pageX - $(window).prop('scrollX') - br.left;
-        return local_x + 210;
+        return local_x + 220;
     },
 
     get_current_y : function(e) {
