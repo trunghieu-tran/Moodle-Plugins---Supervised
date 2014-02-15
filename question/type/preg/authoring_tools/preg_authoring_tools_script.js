@@ -381,12 +381,12 @@ M.preg_authoring_tools_script = (function ($) {
                         {
                             minWidth: 20,
                             minHeight: 20,
-                            maxWidth: (br.right - br.left),
+                            /*maxWidth: (br.right - br.left),
                             maxHeight: (br.bottom - br.top),
                             minTop: 1,
                             minLeft: 1,
                             maxRight: br.right - br.left,
-                            maxBottom: br.bottom - br.top,
+                            maxBottom: br.bottom - br.top,*/
                             dragHandle: true,
                             onDrag: function(x, y)
                             {
@@ -408,8 +408,11 @@ M.preg_authoring_tools_script = (function ($) {
                         }
                     );
 
-                    self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
-                    self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
+                    //self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
+                    //self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
+
+                    self.RECTANGLE_WIDTH = self.get_current_x(e);
+                    self.RECTANGLE_HEIGHT = self.get_current_y(e);
 
                     $('#resizeMe').css({
                         width : 20,
@@ -424,8 +427,8 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 if (self.CALC_COORD) {
                     var br = document.getElementById('tree_img').getBoundingClientRect();
-                    var new_pageX = e.pageX - $(window).prop('scrollX') - br.left;
-                    var new_pageY = e.pageY - $(window).prop('scrollY') - br.top;
+                    var new_pageX = self.get_current_x(e);//e.pageX - $(window).prop('scrollX') - br.left;
+                    var new_pageY = self.get_current_y(e);//e.pageY - $(window).prop('scrollY') - br.top;
 
                     if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                         $('#resizeMe').css({
@@ -529,13 +532,25 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
+    get_current_x : function(e) {
+        var br = document.getElementById('tree_img').getBoundingClientRect();
+        var local_x = e.pageX - $(window).prop('scrollX') - br.left;
+        return local_x + 210;
+    },
+
+    get_current_y : function(e) {
+        var br = document.getElementById('tree_img').getBoundingClientRect();
+        var local_y = e.pageY - $(window).prop('scrollY') - br.top;
+        return local_y + $('#tree_hnd').prop('offsetTop');
+    },
+
     get_rect_selection : function (e) {
         // check ids selected nodes
         var br = document.getElementById('tree_img').getBoundingClientRect();
-        rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
-        rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17;
-        rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth');
-        rect_right_top_y = $('#resizeMe').prop('offsetTop') + 17;
+        rect_left_bot_x = $('#resizeMe').prop('offsetLeft') - 210;
+        rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17 - $('#tree_hnd').prop('offsetTop');
+        rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth') - 210;
+        rect_right_top_y = $('#resizeMe').prop('offsetTop') + 17 - $('#tree_hnd').prop('offsetTop');
         var areas = $('#qtype_preg_tree').children();
         var indfirst = 999;
         var indlast = -999;
@@ -725,7 +740,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         init : function() {
             self.panzooms.init_graph();
-            //self.panzooms.init_tree();
+            self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {
