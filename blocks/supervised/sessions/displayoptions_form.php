@@ -73,7 +73,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
         if ($selectedcourse == 0 || has_capability('block/supervised:viewallsessions', $coursecontext)) {
-            $mform->addElement('select', 'teacher', get_string('teacher', 'block_supervised'), $teachers);
+            $mform->addElement('select', 'teacher', get_string('defaultcourseteacher'), $teachers);
         } else {
             $mform->addElement('hidden', 'teacher');
             $mform->setType('teacher', PARAM_INT);
@@ -87,7 +87,7 @@ class displayoptions_sessions_form extends moodleform {
             $mform->addElement('hidden', 'lessontype');
             $mform->setType('lessontype', PARAM_INT);
         }
-        $mform->addElement('select', 'state', get_string('state', 'block_supervised'), $states);
+        $mform->addElement('select', 'state', get_string('state', 'question'), $states);
 
         $mform->addElement('submit', 'submitbutton', get_string('showsessions', 'block_supervised'));
 

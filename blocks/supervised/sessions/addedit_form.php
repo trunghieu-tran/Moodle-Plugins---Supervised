@@ -75,18 +75,18 @@ class addedit_session_form extends moodleform {
         // ...group.
         $mform->addElement('header', 'general', get_string('general', 'form'));
         // ...teacher combobox.
-        $mform->addElement('select', 'teacherid', get_string('teacher', 'block_supervised'), $teachers/*, $attributes*/);
+        $mform->addElement('select', 'teacherid', get_string('defaultcourseteacher'), $teachers);
         $mform->addRule('teacherid', null, 'required', null, 'client');
         // ...send e-mail checkbox.
         $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));
         $mform->addHelpButton('sendemail', 'sendemail', 'block_supervised');
         // ...course label.
-        $mform->addElement('static', 'coursename', get_string('course', 'block_supervised'));
+        $mform->addElement('static', 'coursename', get_string('course'));
         // ...classroom combobox.
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
         // ...group combobox.
-        $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
+        $mform->addElement('select', 'groupid', get_string('group'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // ...lessontype combobox.
         if ($clessontypes) {
@@ -105,7 +105,7 @@ class addedit_session_form extends moodleform {
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
         // ...comment.
-        $mform->addElement('textarea', 'sessioncomment', get_string("sessioncomment", "block_supervised"), 'rows="4" cols="30"');
+        $mform->addElement('textarea', 'sessioncomment', get_string('comment', 'question'), 'rows="4" cols="30"');
 
         // ...hidden elements.
         $mform->addElement('hidden', 'id');

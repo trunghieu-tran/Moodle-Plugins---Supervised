@@ -35,13 +35,13 @@ class activesessionstudent_block_form extends moodleform {
         // Add group.
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
         // ...teacher.
-        $mform->addElement('static', 'teacher', get_string('teacher', 'block_supervised'));
+        $mform->addElement('static', 'teacher', get_string('defaultcourseteacher'));
         // ...lessontype.
         $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
         // ...classroom.
         $mform->addElement('static', 'classroomname', get_string('classroom', 'block_supervised'));
         // ...group.
-        $mform->addElement('static', 'groupname', get_string('group', 'block_supervised'));
+        $mform->addElement('static', 'groupname', get_string('group'));
         // ...timestart.
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         // ...duration.

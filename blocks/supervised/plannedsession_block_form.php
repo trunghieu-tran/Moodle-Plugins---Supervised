@@ -67,7 +67,7 @@ class plannedsession_block_form extends moodleform {
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
         // ...group combobox.
-        $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
+        $mform->addElement('select', 'groupid', get_string('group'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // ...lessontype combobox.
         if ($clessontypes) {
@@ -88,7 +88,7 @@ class plannedsession_block_form extends moodleform {
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         // ...comment.
         if ($this->_customdata['needcomment']) {
-            $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
+            $mform->addElement('static', 'sessioncomment', get_string('comment', 'question'));
         }
         // ...hidden elements.
         $mform->addElement('hidden', 'id');     // Course id.
