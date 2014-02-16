@@ -78,8 +78,8 @@ class addedit_session_form extends moodleform {
         $mform->addElement('select', 'teacherid', get_string('defaultcourseteacher'), $teachers);
         $mform->addRule('teacherid', null, 'required', null, 'client');
         // ...send e-mail checkbox.
-        $mform->addElement('advcheckbox', 'sendemail', get_string("sendemail", 'block_supervised'));
-        $mform->addHelpButton('sendemail', 'sendemail', 'block_supervised');
+        $mform->addElement('advcheckbox', 'sendemail', get_string("notifyteacher", 'block_supervised'));
+        $mform->addHelpButton('sendemail', 'notifyteacher', 'block_supervised');
         // ...course label.
         $mform->addElement('static', 'coursename', get_string('course'));
         // ...classroom combobox.
