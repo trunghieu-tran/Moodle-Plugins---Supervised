@@ -28,15 +28,15 @@ class delete_session_form extends moodleform {
     protected function definition() {
         $mform =& $this->_form;
 
-        $mform->addElement('static', 'coursename', get_string('course', 'block_supervised'));
+        $mform->addElement('static', 'coursename', get_string('course'));
         $mform->addElement('static', 'classroomname', get_string('classroom', 'block_supervised'));
         $mform->addElement('static', 'groupname', get_string('group', 'block_supervised'));
-        $mform->addElement('static', 'teachername', get_string('teacher', 'block_supervised'));
+        $mform->addElement('static', 'teachername', get_string('defaultcourseteacher'));
         $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         $mform->addElement('static', 'duration', get_string('duration', 'block_supervised'));
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
-        $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
+        $mform->addElement('static', 'sessioncomment', get_string('comment', 'question'));
 
         // ...notify teacher by e-mail checkbox.
         $mform->addElement('advcheckbox', 'notifyteacher', get_string("notifyteacher", 'block_supervised'));

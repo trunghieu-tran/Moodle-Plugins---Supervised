@@ -38,13 +38,13 @@ class StateSession
                 return get_string('plannedstate', 'block_supervised');
                 break;
             case 2:
-                return get_string('activestate', 'block_supervised');
+                return get_string('active');
                 break;
             case 3:
                 return get_string('finishedstate', 'block_supervised');
                 break;
             default:
-                return get_string('unknownstate', 'block_supervised');
+                return get_string('unknown', 'question');
         }
     }
 }

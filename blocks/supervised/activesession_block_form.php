@@ -60,7 +60,7 @@ class activesession_block_form extends moodleform {
         $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
         // ...group combobox.
-        $mform->addElement('select', 'groupid', get_string('group', 'block_supervised'), $groups);
+        $mform->addElement('select', 'groupid', get_string('group'), $groups);
         $mform->addRule('groupid', null, 'required', null, 'client');
         // ...lessontype.
         if ($this->_customdata['needlessontype']) {
@@ -77,7 +77,7 @@ class activesession_block_form extends moodleform {
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         // ...comment.
         if ($this->_customdata['needcomment']) {
-            $mform->addElement('static', 'sessioncomment', get_string('sessioncomment', 'block_supervised'));
+            $mform->addElement('static', 'sessioncomment', get_string('comment', 'question'));
         }
         // ...hidden elements.
         $mform->addElement('hidden', 'id');     // course id.
@@ -87,8 +87,8 @@ class activesession_block_form extends moodleform {
 
         // ...submit and cancel buttons.
         $buttonarray=array();
-        $buttonarray[] =& $mform->createElement('submit', 'supervised_updatebtn', get_string('updatesession', "block_supervised"));
-        $buttonarray[] =& $mform->createElement('cancel', 'supervised_finishbtn', get_string('finishsession', "block_supervised"));
+        $buttonarray[] =& $mform->createElement('submit', 'supervised_updatebtn', get_string('update'));
+        $buttonarray[] =& $mform->createElement('cancel', 'supervised_finishbtn', get_string('finishsession', 'block_supervised'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 
@@ -100,7 +100,7 @@ class activesession_block_form extends moodleform {
 
         // Session time end must be greater than current time + 1 minute.
         if ($data['timestartraw'] + $data['duration']*60 <= $curtime+60) {
-            $errors["duration"] = get_string("increaseduration", "block_supervised");
+            $errors["duration"] = get_string('increaseduration', 'block_supervised');
         }
 
         return $errors;

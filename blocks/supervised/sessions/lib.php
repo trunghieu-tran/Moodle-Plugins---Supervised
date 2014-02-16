@@ -155,18 +155,18 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
     $table = new html_table();
     // Build headers array.
     $table->head = array();
-    $table->head[] = get_string('course', 'block_supervised');
+    $table->head[] = get_string('course');
     $table->head[] = get_string('classroom', 'block_supervised');
-    $table->head[] = get_string('group', 'block_supervised');
-    $table->head[] = get_string('teacher', 'block_supervised');
+    $table->head[] = get_string('group');
+    $table->head[] = get_string('defaultcourseteacher');
     if ($lessontypesexist) {
         $table->head[] = get_string('lessontype', 'block_supervised');
     }
     $table->head[] = get_string('timestart', 'block_supervised');
     $table->head[] = get_string('duration', 'block_supervised');
     $table->head[] = get_string('timeend', 'block_supervised');
-    $table->head[] = get_string('state', 'block_supervised');
-    $table->head[] = get_string('logs', 'block_supervised');
+    $table->head[] = get_string('state', 'question');
+    $table->head[] = get_string('logs');
     $table->head[] = get_string('edit');
 
     $table->data = $tabledata;
