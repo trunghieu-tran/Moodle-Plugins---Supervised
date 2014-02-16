@@ -64,7 +64,7 @@ class plannedsession_block_form extends moodleform {
         // Add group.
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
         // ...classroom combobox.
-        $mform->addElement('select', 'classroomid', get_string('classroom', 'block_supervised'), $classrooms);
+        $mform->addElement('select', 'classroomid', shorten_text(get_string('classroom', 'block_supervised'), 8), $classrooms);
         $mform->addRule('classroomid', null, 'required', null, 'client');
         // ...group combobox.
         $mform->addElement('select', 'groupid', get_string('group'), $groups);
@@ -80,7 +80,7 @@ class plannedsession_block_form extends moodleform {
         // ...time start.
         $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
         // ...duration.
-        $mform->addElement('text', 'duration', get_string('duration', 'block_supervised'), 'size="4"');
+        $mform->addElement('text', 'duration', shorten_text(get_string('duration', 'block_supervised'), 10), 'size="4"');
         $mform->setType('duration', PARAM_INT);
         $mform->addRule('duration', null, 'required', null, 'client');
         $mform->addRule('duration', null, 'numeric', null, 'client');
@@ -88,7 +88,7 @@ class plannedsession_block_form extends moodleform {
         $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
         // ...comment.
         if ($this->_customdata['needcomment']) {
-            $mform->addElement('static', 'sessioncomment', get_string('comment', 'question'));
+            $mform->addElement('static', 'sessioncomment', shorten_text(get_string('comment', 'question'), 9));
         }
         // ...hidden elements.
         $mform->addElement('hidden', 'id');     // Course id.
