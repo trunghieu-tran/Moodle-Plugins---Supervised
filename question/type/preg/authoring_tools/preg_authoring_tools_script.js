@@ -408,11 +408,8 @@ M.preg_authoring_tools_script = (function ($) {
                         }
                     );
 
-                    //self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
-                    //self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
-
-                    self.RECTANGLE_WIDTH = self.get_current_x(e);
-                    self.RECTANGLE_HEIGHT = self.get_current_y(e);
+                    self.RECTANGLE_WIDTH = self.get_current_x(e, br);
+                    self.RECTANGLE_HEIGHT = self.get_current_y(e, br);
 
                     $('#resizeMe').css({
                         width : 20,
@@ -427,8 +424,8 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 if (self.CALC_COORD) {
                     var br = document.getElementById('tree_img').getBoundingClientRect();
-                    var new_pageX = self.get_current_x(e);//e.pageX - $(window).prop('scrollX') - br.left;
-                    var new_pageY = self.get_current_y(e);//e.pageY - $(window).prop('scrollY') - br.top;
+                    var new_pageX = self.get_current_x(e, br);
+                    var new_pageY = self.get_current_y(e, br);
 
                     if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                         $('#resizeMe').css({
@@ -532,21 +529,23 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    get_current_x : function(e) {
-        var br = document.getElementById('tree_img').getBoundingClientRect();
-        var local_x = e.pageX - $(window).prop('scrollX') - br.left;
-        return local_x + 220;
+    get_current_x : function(e, br) {
+        //var br = document.getElementById('tree_img').getBoundingClientRect();
+        //var local_x = e.pageX - $(window).prop('scrollX') - br.left;
+        return e.pageX - $(window).prop('scrollX') - br.left + 220;
     },
 
-    get_current_y : function(e) {
-        var br = document.getElementById('tree_img').getBoundingClientRect();
-        var local_y = e.pageY - $(window).prop('scrollY') - br.top;
-        return local_y + $('#tree_hnd').prop('offsetTop');
+    get_current_y : function(e, br) {
+        //var br = document.getElementById('tree_hnd').getBoundingClientRect();
+        //var local_y = e.pageY - $(window).prop('scrollY') - br.top;
+        return e.pageY - $(window).prop('scrollY') 
+        		- document.getElementById('tree_hnd').getBoundingClientRect().top 
+        		+ $('#tree_img').prop('offsetTop');// - br.top + $('#tree_hnd').prop('offsetTop');
     },
 
     get_rect_selection : function (e) {
-        // check ids selected nodes
-        var br = document.getElementById('tree_img').getBoundingClientRect();
+        // Check ids selected nodes
+        //var br = document.getElementById('tree_img').getBoundingClientRect();
         rect_left_bot_x = $('#resizeMe').prop('offsetLeft') - 210;
         rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17 - $('#tree_hnd').prop('offsetTop');
         rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth') - 210;
