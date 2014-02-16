@@ -364,31 +364,41 @@ function mail_newsession($session, $creator) {
     $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id' => $session->teacherid));
 
-    $data = new stdClass();
-    $data->teachername      = fullname($user);
-    $data->sitename         = format_string($site->fullname);
-    $data->creatorname      = fullname($creator);
-    $data->course           = $session->coursename;
-    $data->classroom        = $session->classroomname;
-    $data->group            = $session->groupname == ''
+    $sessioninfo = new stdClass();
+    $sessioninfo->course           = $session->coursename;
+    $sessioninfo->classroom        = $session->classroomname;
+    $sessioninfo->group            = $session->groupname == ''
         ? get_string('allgroups', 'block_supervised')
         : $session->groupname;
-    $data->lessontype       = $session->lessontypename == ''
+    $sessioninfo->lessontype       = $session->lessontypename == ''
         ? get_string('notspecified', 'block_supervised')
         : $session->lessontypename;
-    $data->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
-    $data->duration         = $session->duration;
-    $data->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
-    $data->editurl          = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
-    $data->deleteurl        = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
+    $sessioninfo->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
+    $sessioninfo->duration         = $session->duration;
+    $sessioninfo->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
     if ($session->sessioncomment) {
-        $data->comment          = get_string('emailsessioncomment', 'block_supervised', $session->sessioncomment);
+        $sessioninfo->comment          = get_string('emailsessioncomment', 'block_supervised', $session->sessioncomment);
     } else {
-        $data->comment          = '';
+        $sessioninfo->comment          = '';
     }
 
+    $data = new stdClass();
+    $data->sitename         = format_string($site->fullname);
+    $data->teachername      = fullname($user);
+    $data->creatorname      = fullname($creator);
+    $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
+    $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
+    $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
+    $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
+    $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
+    $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
+
+    $subjectfields = new stdClass();
+    $subjectfields->sitename  = $data->sitename;
+    $subjectfields->timestart = $sessioninfo->timestart;
+
     $message    = get_string('emailnewsession', 'block_supervised', $data);
-    $subject    = get_string('emailnewsessionsubject', 'block_supervised', $data);
+    $subject    = get_string('emailnewsessionsubject', 'block_supervised', $subjectfields);
 
     email_to_user($user, $supportuser, $subject, $message);
 }
@@ -406,36 +416,48 @@ function mail_removedsession($session, $remover) {
     $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id' => $session->teacherid));
 
+    $sessioninfo = new stdClass();
+    $sessioninfo->course           = $session->coursename;
+    $sessioninfo->classroom        = $session->classroomname;
+    $sessioninfo->group            = $session->groupname == ''
+        ? get_string('allgroups', 'block_supervised')
+        : $session->groupname;
+    $sessioninfo->lessontype       = $session->lessontypename == ''
+        ? get_string('notspecified', 'block_supervised')
+        : $session->lessontypename;
+    $sessioninfo->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
+    $sessioninfo->duration         = $session->duration;
+    $sessioninfo->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
+    if ($session->sessioncomment) {
+        $sessioninfo->comment          = get_string('emailsessioncomment', 'block_supervised', $session->sessioncomment);
+    } else {
+        $sessioninfo->comment          = '';
+    }
+
     $data = new stdClass();
+    $data->sitename         = format_string($site->fullname);
     $data->teachername      = fullname($user);
     $data->sitename         = format_string($site->fullname);
     $data->removername      = fullname($remover);
     $data->state            = StateSession::get_state_name($session->state);
-    $data->course           = $session->coursename;
-    $data->classroom        = $session->classroomname;
-    $data->group            = $session->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $session->groupname;
-    $data->lessontype       = $session->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $session->lessontypename;
-    $data->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
-    $data->duration         = $session->duration;
-    $data->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
-    $data->comment          = $session->sessioncomment;
-    if ($session->sessioncomment) {
-        $data->comment          = get_string('emailsessioncomment', 'block_supervised', $session->sessioncomment);
-    } else {
-        $data->comment          = '';
-    }
+    $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
+    $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
     if ($session->messageforteacher) {
         $data->custommessage    = get_string('emailremovedsessionmsg', 'block_supervised', $session->messageforteacher);
     } else {
         $data->custommessage    = '';
     }
 
+    $subject = new stdClass();
+    $subject->sitename  = $data->sitename;
+    $subject->timestart = $sessioninfo->timestart;
+
+    $subjectfields = new stdClass();
+    $subjectfields->sitename  = $data->sitename;
+    $subjectfields->timestart = $sessioninfo->timestart;
+
     $message    = get_string('emailremovedsession', 'block_supervised', $data);
-    $subject    = get_string('emailremovedsessionsubject', 'block_supervised', $data);
+    $subject    = get_string('emailremovedsessionsubject', 'block_supervised', $subjectfields);
 
     email_to_user($user, $supportuser, $subject, $message);
 }
@@ -454,31 +476,41 @@ function mail_editedsession($updsession, $editor) {
     $supportuser = core_user::get_support_user();
     $user        = $DB->get_record('user', array('id' => $updsession->teacherid));
 
-    $data = new stdClass();
-    $data->teachername      = fullname($user);
-    $data->sitename         = format_string($site->fullname);
-    $data->editorname       = fullname($editor);
-    $data->course           = $updsession->coursename;
-    $data->classroom        = $updsession->classroomname;
-    $data->group            = $updsession->groupname == ''
+    $sessioninfo = new stdClass();
+    $sessioninfo->course           = $updsession->coursename;
+    $sessioninfo->classroom        = $updsession->classroomname;
+    $sessioninfo->group            = $updsession->groupname == ''
         ? get_string('allgroups', 'block_supervised')
         : $updsession->groupname;
-    $data->lessontype       = $updsession->lessontypename == ''
+    $sessioninfo->lessontype       = $updsession->lessontypename == ''
         ? get_string('notspecified', 'block_supervised')
         : $updsession->lessontypename;
-    $data->timestart   = userdate($updsession->timestart, '%a').' '.userdate($updsession->timestart, $strftimedatetime);
-    $data->duration    = $updsession->duration;
-    $data->timeend     = userdate($updsession->timeend, '%a').' '.userdate($updsession->timeend, $strftimedatetime);
-    $data->editurl     = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
-    $data->deleteurl   = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
+    $sessioninfo->timestart        = userdate($updsession->timestart, '%a').' '.userdate($updsession->timestart, $strftimedatetime);
+    $sessioninfo->duration         = $updsession->duration;
+    $sessioninfo->timeend          = userdate($updsession->timeend, '%a').' '.userdate($updsession->timeend, $strftimedatetime);
     if ($updsession->sessioncomment) {
-        $data->comment          = get_string('emailsessioncomment', 'block_supervised', $updsession->sessioncomment);
+        $sessioninfo->comment          = get_string('emailsessioncomment', 'block_supervised', $updsession->sessioncomment);
     } else {
-        $data->comment          = '';
+        $sessioninfo->comment          = '';
     }
 
+    $data = new stdClass();
+    $data->sitename         = format_string($site->fullname);
+    $data->teachername      = fullname($user);
+    $data->editorname       = fullname($editor);
+    $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
+    $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
+    $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
+    $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
+    $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
+    $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
+
+    $subjectfields = new stdClass();
+    $subjectfields->sitename  = $data->sitename;
+    $subjectfields->timestart = $sessioninfo->timestart;
+
     $message    = get_string('emaileditedsession', 'block_supervised', $data);
-    $subject    = get_string('emaileditedsessionsubject', 'block_supervised', $data);
+    $subject    = get_string('emaileditedsessionsubject', 'block_supervised', $subjectfields);
 
     email_to_user($user, $supportuser, $subject, $message);
 }

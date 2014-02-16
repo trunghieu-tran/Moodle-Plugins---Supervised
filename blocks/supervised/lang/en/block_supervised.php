@@ -58,66 +58,43 @@ $string['editlessontypenavbar']                 = 'Edit lesson type';
 $string['editlessontypepagetitle']              = 'Edit lesson type';
 $string['editsessionnavbar']                    = 'Edit session';
 $string['editsessionpagetitle']                 = 'Edit planned session';
+$string['emaildeletesessionurl']                = 'You can delete this session: {$a}';
 $string['emaileditedsession']                   = 'Hi {$a->teachername},
 
 Your session at \'{$a->sitename}\' has been edited.
 Editor:        {$a->editorname}
 
 Updated session information:
-Course:         {$a->course}
-Classroom:      {$a->classroom}
-Group:          {$a->group}
-Lesson type:    {$a->lessontype}
-Time start:     {$a->timestart}
-Duration (min): {$a->duration}
-Time end:       {$a->timeend}
+{$a->sessioninfo}
 
-{$a->comment}
+{$a->editsession}
+{$a->deletesession}
 
-You can edit this session: {$a->editurl}
-Or you can delete it: {$a->deleteurl}
-
-Have a nice day!';
+{$a->haveaniceday}';
 $string['emaileditedsessionsubject']            = '{$a->sitename}: session has been edited on {$a->timestart}';
+$string['emaileditsessionurl']                  = 'You can edit this session: {$a}';
 $string['emailnewsession']                      = 'Hi {$a->teachername},
 
 A new session has been created for you at \'{$a->sitename}\'.
 Creator:        {$a->creatorname}
 
-Course:         {$a->course}
-Classroom:      {$a->classroom}
-Group:          {$a->group}
-Lesson type:    {$a->lessontype}
-Time start:     {$a->timestart}
-Duration (min): {$a->duration}
-Time end:       {$a->timeend}
+{$a->sessioninfo}
 
-{$a->comment}
+{$a->editsession}
+{$a->deletesession}
 
-You can edit this session: {$a->editurl}
-Or you can delete it: {$a->deleteurl}
-
-Have a nice day!';
+{$a->haveaniceday}';
 $string['emailnewsessionsubject']               = '{$a->sitename}: new session on {$a->timestart}';
 $string['emailremovedsession']                  = 'Hi {$a->teachername},
 
 Your session at \'{$a->sitename}\' has been removed.
 Remover:        {$a->removername}
 
-Session state:  {$a->state}
-Course:         {$a->course}
-Classroom:      {$a->classroom}
-Group:          {$a->group}
-Lesson type:    {$a->lessontype}
-Time start:     {$a->timestart}
-Duration (min): {$a->duration}
-Time end:       {$a->timeend}
-
-{$a->comment}
+{$a->sessioninfo}
 
 {$a->custommessage}
 
-Have a nice day!';
+{$a->haveaniceday}';
 $string['emailremovedsessionmsg']               = 'A person who removed this session leaved a message for you:
 --------------------------------------------------
 {$a}
@@ -129,12 +106,22 @@ $string['emailsessioncomment']                  = 'Session comment:
 {$a}
 --------------------------------------------------
 ';
+$string['emailsessioninfo']                     = 'Course:         {$a->course}
+Classroom:      {$a->classroom}
+Group:          {$a->group}
+Lesson type:    {$a->lessontype}
+Time start:     {$a->timestart}
+Duration (min): {$a->duration}
+Time end:       {$a->timeend}
+
+{$a->comment}';
 $string['enrollteacher']                        = 'To plan a session you must enroll at least one user with ability to supervise sessions to the course!';
 $string['filterlogsbyuser']                     = 'Filter logs by user';
 $string['finishedstate']                        = 'Finished';
 $string['finishsession']                        = 'Finish session';
 $string['gotoclassrooms']                       = 'Go to classrooms page';
 $string['gotoenrollment']                       = 'Go to user enrollment page';
+$string['haveaniceday']                         = 'Have a nice day!';
 $string['increaseduration']                     = 'Session time end must be greater than current time.';
 $string['insertclassroomerror']                 = 'Database error! Can not insert classroom into database';
 $string['insertlessontypeerror']                = 'Database error! Can not insert lesson type into database';
