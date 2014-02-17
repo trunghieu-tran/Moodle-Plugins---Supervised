@@ -64,8 +64,8 @@ if (!$id) {   // Add mode.
         print_error(get_string("invalidsessionid", 'block_supervised'));
     }
     // Check capabilities for edit mode.
-    if ( ! (($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
-        || has_capability('block/supervised:manageallsessions', $PAGE->context))   ) {
+    if ( ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
+        || has_capability('block/supervised:manageallsessions', $PAGE->context)   ) {
         require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
     } else {
         // User wants edit session of other user.

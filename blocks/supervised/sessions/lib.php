@@ -386,12 +386,16 @@ function mail_newsession($session, $creator) {
     $data->sitename         = format_string($site->fullname);
     $data->teachername      = fullname($user);
     $data->creatorname      = fullname($creator);
-    $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
-    $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
-    $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
-    $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
     $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
     $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
+    $coursecontext = context_course::instance($session->courseid);
+    if(has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
+        has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
+        $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
+        $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
+        $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
+        $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
+    }
 
     $subjectfields = new stdClass();
     $subjectfields->sitename  = $data->sitename;
@@ -498,12 +502,16 @@ function mail_editedsession($updsession, $editor) {
     $data->sitename         = format_string($site->fullname);
     $data->teachername      = fullname($user);
     $data->editorname       = fullname($editor);
-    $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
-    $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
-    $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
-    $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
     $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
     $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
+    $coursecontext = context_course::instance($updsession->courseid);
+    if(has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
+        has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
+        $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
+        $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
+        $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
+        $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
+    }
 
     $subjectfields = new stdClass();
     $subjectfields->sitename  = $data->sitename;
