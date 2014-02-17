@@ -42,8 +42,8 @@ if ($session->state == StateSession::FINISHED) {
     // Only user with managefinishedsessions capability can remove finished sessions.
     require_capability('block/supervised:managefinishedsessions', $PAGE->context);
 } else {
-    if ( ! (($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
-            || has_capability('block/supervised:manageallsessions', $PAGE->context))   ) {
+    if ( ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
+            || has_capability('block/supervised:manageallsessions', $PAGE->context)  ) {
         require_capability('block/supervised:manageownsessions', $PAGE->context);   // Print error.
     } else {
         // User wants remove session of other user.
