@@ -52,6 +52,7 @@ See the "Matching engines" section for more information.
 In order to get Authoring tools to work, you should also install Graphviz package and make it accessible from Moodle, using the admin setting
 "Path to Dot" at Administration > Server > System Paths. It is necessary for drawing Syntax Tree and Explaining Graph for regular expression.
 Graphviz is a well-known and respected open source package for drawing graphs and should not cause any trouble to you server.
+Be sure to use Graphviz 2.36 or newer (earlier versions had a bug in svg output which led to incorrect pictures).
 
 ==========
 3. Hinting
