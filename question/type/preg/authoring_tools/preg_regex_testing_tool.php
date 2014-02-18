@@ -52,7 +52,6 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         // Creating query matcher will require necessary matcher code.
         $regular->get_query_matcher($engine);
 
-
         // Create matcher to use for testing regexes.
         // Do not use qtype_preg_question::get_matcher to pass selection to the options.
         $this->question = $regular;
@@ -70,16 +69,16 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         } else {
             $this->matcher = $matcher;
         }
-
     }
 
     public function json_key() {
         return 'regex_test';
     }
 
-    public function generate_json(&$json) {
+    public function generate_json() {
         $selectednode = $this->matcher !== null ? $this->matcher->get_selected_node() : null;
 
+        $json = array();
         $json['regex'] = $this->regex;
         $json['engine'] = $this->engine;
         $json['notation'] = $this->notation;
@@ -90,15 +89,26 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $json['strings'] = $this->strings;
 
         if ($this->regex == '') {
-            $this->generate_json_for_empty_regex($json);
+            $json[$this->json_key()] = $this->data_for_empty_regex();
         } else if ($this->errormsgs !== null) {
-            $this->generate_json_for_unaccepted_regex($json);
+            $json[$this->json_key()] = $this->data_for_unaccepted_regex();
         } else {
-            $this->generate_json_for_accepted_regex($json);
+            $json[$this->json_key()] = $this->data_for_accepted_regex();
         }
+
+        return $json;
     }
 
-    public function generate_json_for_accepted_regex(&$json) {
+    public function generate_html() {
+        if ($this->regex->string() == '') {
+            return $this->data_for_empty_regex();
+        } else if ($this->errormsgs !== null) {
+            return $this->data_for_unaccepted_regex();
+        }
+        return $this->data_for_accepted_regex();
+    }
+
+    public function data_for_accepted_regex() {
         global $PAGE;
         // Generate colored string showing matched and non-matched parts of response.
         $renderer = $PAGE->get_renderer('qtype_preg');
@@ -109,18 +119,14 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
             $matchresults = $this->matcher->match($string);
             $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true) . '<br />';
         }
-        $json[$this->json_key()] = $result;
+        return $result;
     }
 
-    public function generate_json_for_unaccepted_regex(&$json) {
-        $result = '';
-        foreach ($this->errormsgs as $error) {
-            $result .= '<br />' . $error;
-        }
-        $json[$this->json_key()] = $result;
+    public function data_for_unaccepted_regex() {
+        return '<br />' . implode('<br />', $this->errormsgs);
     }
 
-    public function generate_json_for_empty_regex(&$json) {
-        $json[$this->json_key()] = '';
+    public function data_for_empty_regex() {
+        return '';
     }
 }

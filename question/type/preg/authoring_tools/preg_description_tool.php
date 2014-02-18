@@ -164,13 +164,20 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
         return 'description';
     }
 
+    public function generate_html() {
+        if ($this->regex->string() == '') {
+            return $this->data_for_empty_regex();
+        } else if ($this->errors_exist() || $this->get_ast_root() == null) {
+            return $this->data_for_unaccepted_regex();
+        }
+        return $this->data_for_accepted_regex();
+    }
+
     /**
-     * Generate description
-     *
-     * @param array $json contains text of description
+     * Overloaded from qtype_preg_authoring_tool.
      */
-    public function generate_json_for_accepted_regex(&$json) {
-        $json[$this->json_key()] = $this->default_description();
+    public function data_for_accepted_regex() {
+        return $this->default_description();
     }
 
     public function options() {
