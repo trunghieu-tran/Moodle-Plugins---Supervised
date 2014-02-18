@@ -558,13 +558,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * Tests, whether other lexeme is the same as this lexeme
      *  
      * @param block_formal_langs_token_base $other other lexeme
-     * @param bool $casesensitive whether we should care about for case sensitive
+     * @param block_formal_langs_comparing_options $options options for comparing lexmes
      * @return boolean - if the same lexeme
      */
-    public function is_same($other, $casesensitive = true) {
+    public function is_same($other, $options ) {
         $result = false;
         if ($this->type == $other->type) {
-            if ($casesensitive) {
+            if ($options->usecase) {
                 $result = $this->value == $other->value;
             } else {
                 $cellleft = $this->string_caseinsensitive_value();
@@ -724,8 +724,20 @@ class block_formal_langs_token_stream {
     public $errors;
 
     public function __clone() {
-        $this->tokens = clone $this->tokens;
-        $this->errors = clone $this->errors;
+        // PHP 5.3.3, which is required by Moodle 2.5, supports anonymous functions
+        // so we go for that
+        $clonearray = function($array) {
+            $clone = function($o) {
+                return clone $o;
+            };
+            $result = array();
+            if (is_array($array)) {
+                $result = array_map($clone, $array);
+            }
+            return $result;
+        };
+        $this->tokens = $clonearray($this->tokens);
+        $this->errors = $clonearray($this->errors);
     }
 
     /**
@@ -1191,6 +1203,8 @@ class block_formal_langs_token_stream {
 class  block_formal_langs_matches_group {
     /**
      * Array of matched pairs - set of pairs
+     * This is main data for the group, other three fields contains agregate information from it.
+     * @var array of block_formal_langs_matched_tokens_pair and it's child classes objects
      */
     public $matchedpairs;
     /**
@@ -1218,6 +1232,7 @@ class  block_formal_langs_matches_group {
     public function get_relevant_compared_tokens($correcttokens) {
     }
 }
+
 /**
  * Represents a lexical error in the token
  *
@@ -1225,12 +1240,15 @@ class  block_formal_langs_matches_group {
  * and can not be interpreted.
  */
 class  block_formal_langs_lexical_error {
+
     public $tokenindex;
+
     /**
      * User interface string (i.e. received using get_string) describing error to the user
      * @var string
      */
     public $errormessage;
+
     /**
      * Corrected token object if possible, null otherwise
      * @var block_formal_langs_token_base
@@ -1244,10 +1262,12 @@ class  block_formal_langs_lexical_error {
      */
     public $errorkind = null;
 }
+
 /**
  * A special class for error for scanning
  */
 class block_formal_langs_scanning_error extends block_formal_langs_lexical_error {
+
 }
 
 /**
@@ -1258,6 +1278,7 @@ class block_formal_langs_scanning_error extends block_formal_langs_lexical_error
  * language, lexer and parser objects stateless.
  */
 class block_formal_langs_processed_string {
+   
     /**
      * @var string table, where string belongs
      */
@@ -1266,26 +1287,32 @@ class block_formal_langs_processed_string {
      * @var integer an id to load/store user descriptions
      */
     protected $tableid;
+    
     /**
      * @var string a string to process
      */
     protected $string='';
+
     /**
      * @var object a link to the language object
      */
     protected $language;
+
     /**
      * @var object a token stream if the string is tokenized
      */
     protected $tokenstream=null;
+
     /**
      * @var object a syntax tree if the string is parsed
      */
     protected $syntaxtree=null;
+
     /**
      * @var array strings of token descriptions
      */
     protected $descriptions=null;
+    
     /**
      * Sets a language for a string
      * @param block_formal_langs_abstract_language $lang  language
@@ -1293,6 +1320,7 @@ class block_formal_langs_processed_string {
     public function __construct($lang) {
         $this->language = $lang;
     }
+    
     /**
      * Called, when user assigns field to a class
      * @param string $name   name of field
@@ -1301,6 +1329,7 @@ class block_formal_langs_processed_string {
     public function __set($name, $value) {
         $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
         $settertable['descriptions'] = 'set_descriptions';
+        
         if (array_key_exists($name, $settertable)) {
             $method = $settertable[$name];
             $this->$method($value);
@@ -1309,6 +1338,7 @@ class block_formal_langs_processed_string {
             $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
             trigger_error($error, E_USER_NOTICE);
         }
+        
     }
     /**
      * Called when need to determine, whether field exists
@@ -1337,6 +1367,8 @@ class block_formal_langs_processed_string {
             trigger_error($error, E_USER_NOTICE);
         }
     }
+    
+    
     /** Removes a descriptions from a DB
      * @param string $tablename  name of source table
      * @param mixed $tableid    id or ids in table      
@@ -1353,6 +1385,7 @@ class block_formal_langs_processed_string {
         }
         return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
     }
+    
     /** Returns a descriptions from a DB
      * @param string $tablename  name of source table
      * @param mixed $tableid     ids in table
@@ -1375,6 +1408,7 @@ class block_formal_langs_processed_string {
         }
         return $result;
     }
+    
     /**
      * Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
      * @param string $string inner string
@@ -1406,7 +1440,7 @@ class block_formal_langs_processed_string {
      * Sets a syntax tree.
      * @param object $tree syntax tree 
      */
-    protected function set_syntax_tree($tree) {
+    public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
 
@@ -1424,6 +1458,38 @@ class block_formal_langs_processed_string {
     public function single_line_string() {
         return strpos($this->string, "\n") === false;
     }
+
+    /**
+     * Returns true, if there is token, equal to given one from the student's viewpoint (i.e. node_description without position).
+     *
+     * Two tokens are equal if they have equal description, or if they values are same if the have no description.
+     */
+    public function token_has_equal_to_student($tokenindex) {
+        $result = false;
+        $tokens = $this->get_stream(); // Make sure string is tokenized.
+        $tokencount = count($this->tokenstream->tokens);
+        if($this->has_description($tokenindex)) {
+            $givendescription = $this->node_description($tokenindex);
+            // There is description of the given token.
+            for ($i = 0; $i < $tokencount; $i++) {
+                if ($i != $tokenindex && $this->has_description($i) && $givendescription == $this->node_description($i)) {
+                    $result = true;
+                }
+            }
+        } else {
+            // There is no description, compare the values instead.
+            $options = new block_formal_langs_comparing_options();
+            $options->usecase = true;
+            for ($i = 0; $i < $tokencount; $i++) {
+                // Use case-sensitive search, since user could see case in the message.
+                if ($i != $tokenindex && !$this->has_description($i) && $this->tokenstream->tokens[$tokenindex]->is_same($this->tokenstream->tokens[$i], $options)) {
+                    $result = true;
+                }
+            }
+        }
+        return $result;
+    }
+
     /**
      * Sets a descriptions for a string. Also saves it to database (table parameters must be set).
      * @param array $descriptions descriptions array
@@ -1456,6 +1522,7 @@ class block_formal_langs_processed_string {
             $index = $index + 1;
         }
         // If some old descriptions cellleft - delete it
+        // If some old descriptions left - delete it.
         if ($oldrecords != null) {
             $oldrecordids = array();
             foreach ($oldrecords as $oldrecord) {
@@ -1511,7 +1578,7 @@ class block_formal_langs_processed_string {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
-        // $this->node_descriptions_list(); // Not needed, since has_description will call node_descriptions_list anyway.
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         $result = '';
         if ($this->has_description($nodenumber)) {
             return $this->descriptions[$nodenumber];
@@ -1533,7 +1600,7 @@ class block_formal_langs_processed_string {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {// Just quote
+            } else {//Just quote 
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
@@ -1559,6 +1626,21 @@ class block_formal_langs_processed_string {
             }
         }
         return $this->descriptions;
+    }
+
+    /**
+     * A unit-testing method for setting descriptions from associative array
+     *
+     * An example for such array is
+     * array(0 => 'A description for first lexeme',
+     *       1 => 'A description for second lexeme')
+     *
+     * DO NOT USE THIS FUNCTION IN PRODUCTION, USE FOR UNIT-TESTING ONLY.
+     *
+     * @param array $descriptions descriptions for lexemes
+     */
+    public function set_descriptions_from_array($descriptions) {
+        $this->descriptions = $descriptions;
     }
     /** Test, whether we have a lexeme descriptions for token with specified index
      * @param int $index index of token
@@ -1586,7 +1668,8 @@ class block_formal_langs_processed_string {
      */
     protected function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse()) {
-            $this->language->parse($this);
+            // TODO: Fix this inconsistency
+     $this->language->parse(this);
         }
         return $this->syntaxtree;
     }
@@ -1639,6 +1722,21 @@ class block_formal_langs_string_pair {
      * @var block_formal_langs_processed_string, created from token_array.
      */
     protected $correctedstring;
+
+
+    public function __clone() {
+        $this->correctstring = clone $this->correctstring;
+        if (is_object($this->correctedstring)) {
+             $this->correctedstring = clone $this->correctedstring;
+        }
+        if (is_object($this->comparedstring)) {
+            $this->comparedstring = clone $this->comparedstring;
+        }
+        if (is_object($this->matches)) {
+            $this->matches = clone $this->matches;
+        }
+    }
+
     // TODO - anyone -  access functions
     // TODO - functions for the lexical and sequence analyzers, and mistake classes.
     /**
@@ -1662,6 +1760,15 @@ class block_formal_langs_string_pair {
      */
     public function correctstring() {
         return $this->correctstring;
+    }
+
+    /**
+     *  Returns a compared string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
+    public function comparedstring() {
+        return $this->comparedstring;
     }
 
     public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {

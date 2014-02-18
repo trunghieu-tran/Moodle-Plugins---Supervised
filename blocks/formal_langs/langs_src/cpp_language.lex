@@ -28,7 +28,6 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
-require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 class block_formal_langs_language_cpp_language extends block_formal_langs_predefined_language
 {
@@ -326,7 +325,7 @@ INC = "#include"
 <YYINITIAL> (switch|typedef)                           { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (signals|slots|public|private|protected)   { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (auto|lambda|class|try|catch)              { return $this->create_token('keyword',$this->yytext()); }
-<YYINITIAL> (friend|asm|template|typename)             { return $this->create_token('keyword',$this->yytext()); }
+<YYINITIAL> (friend|asm|template|typename|namespace)   { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (const_cast|dynamic_cast|reinterpret_cast) { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (static_cast|foreach)                      { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> operator("+"|"-"|"*"|"/"|\\|"~=")          { return $this->create_token('keyword',$this->yytext()); }
@@ -351,10 +350,10 @@ INC = "#include"
 <YYINITIAL> {INC}[" "]*\"[^">"]+\"       { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#"                          { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "##"                         { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#define"                    { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#if"                        { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#ifdef"                     { return $this->create_token('preprocessor',$this->yytext()); }
-<YYINITIAL> "#elif"                      { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#define"([^\n\r]+([\n\r]|\n\r))? { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#if"([^\n\r]+([\n\r]|\n\r))?     { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#ifdef"                          { return $this->create_token('preprocessor',$this->yytext()); }
+<YYINITIAL> "#elif"([^\n\r]+([\n\r]|\n\r))?   { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#else"                      { return $this->create_token('preprocessor',$this->yytext()); }
 <YYINITIAL> "#endif"                     { return $this->create_token('preprocessor',$this->yytext()); }                              
 <YYINITIAL> {D}+{E}({FS}|{IS})?          { return $this->create_token('numeric',$this->yytext()); }
@@ -407,6 +406,7 @@ INC = "#include"
 <YYINITIAL> '                            { $this->enterbufferedstate(self::CHARACTER); break; }
 <YYINITIAL> L\"                          { $this->enterbufferedstate(self::STRING); break; }
 <YYINITIAL> \"                           { $this->enterbufferedstate(self::STRING); break; }
+<YYINITIAL> [\n\r]                       { }
 <YYINITIAL> .                            { if (!$this->is_white_space($this->yytext())) { $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext()); } break; }
 <MULTILINE_COMMENT>   \*/                { return $this->leavebufferedstate('multiline_comment');  }
 <MULTILINE_COMMENT>   .                  { $this->append($this->yytext()); break;  }
