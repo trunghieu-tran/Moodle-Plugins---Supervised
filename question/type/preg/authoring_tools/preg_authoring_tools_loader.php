@@ -50,9 +50,8 @@ function qtype_preg_get_json_array() {
     // Fill the json array.
     $json = array();
     foreach($tools as $tool) {
-        $tool->generate_json($json);
+        $json = array_merge($json, $tool->generate_json());
     }
-
     return $json;
 }
 

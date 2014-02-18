@@ -23,16 +23,20 @@ interface qtype_preg_i_authoring_tool {
     public function json_key();
 
     /**
-     * Generates a json array with this tool's data. Should call the methods below.
-     * @param json - output JSON array.
+     * Generates a json array with this tool's data.
      */
-    public function generate_json(&$json);
+    public function generate_json();
 
-    public function generate_json_for_accepted_regex(&$json);
+    /**
+     * Generates html with this tool's data.
+     */
+    public function generate_html();
 
-    public function generate_json_for_unaccepted_regex(&$json);
+    public function data_for_accepted_regex();
 
-    public function generate_json_for_empty_regex(&$json);
+    public function data_for_unaccepted_regex();
+
+    public function data_for_empty_regex();
 }
 
 class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
@@ -173,7 +177,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         return $data->string();
     }
 
-    public function generate_json(&$json) {
+    public function generate_json() {
+        $json = array();
         $json['regex'] = $this->regex->string();
         $json['engine'] = $this->options->engine;
         $json['notation'] = $this->options->notation;
@@ -185,36 +190,37 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['displayas'] = $this->options->displayas;
 
         if ($this->regex->string() == '') {
-            $this->generate_json_for_empty_regex($json);
+            $json[$this->json_key()] = $this->data_for_empty_regex();
         } else if ($this->errors_exist() || $this->get_ast_root() == null) {
-            $this->generate_json_for_unaccepted_regex($json);
+            $json[$this->json_key()] = $this->data_for_unaccepted_regex();
         } else {
-            $this->generate_json_for_accepted_regex($json);
+            $json[$this->json_key()] = $this->data_for_accepted_regex();
         }
+
+        return $json;
     }
 
-    public function generate_json_for_empty_regex(&$json) {
-        $json[$this->json_key()] = '';
+    public function data_for_empty_regex() {
+        return '';
     }
 
-    public function generate_json_for_unaccepted_regex(&$json) {
+    public function data_for_unaccepted_regex() {
         $a =  core_text::strtolower(get_string($this->name(), 'qtype_preg'));
         $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
-        foreach ($this->get_error_messages(true) as $error) {
-            $result .= '<br />' . $error;
-        }
-        $json[$this->json_key()] = $result;
+        $result .= implode('<br />', $this->get_error_messages(true));
+        return $result;
     }
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
     // Overloaded for some exceptions handling.
-    public function generate_json(&$json) {
+    public function generate_json() {
         try {
-            parent::generate_json($json);
+            return parent::generate_json();
         } catch (Exception $e) {
             // Something is wrong with graphviz.
+            $json = array();
             $a = new stdClass;
             $a->name = core_text::strtolower(get_string($this->name(), 'qtype_preg'));
             if (is_a($e, 'qtype_preg_pathtodot_empty')) {
@@ -228,6 +234,7 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
                 // It's not our exception, let it go.
                 throw $e;
             }
+            return $json;
         }
     }
 }

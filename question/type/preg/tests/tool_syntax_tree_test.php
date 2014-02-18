@@ -275,8 +275,7 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
     function test_syntax_errors() {
         $tree = new qtype_preg_syntax_tree_tool('a(');
-        /*$json = array();
-        $tree->generate_json($json);*/
+        //$json = $tree->generate_json($json);
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
     }
  }
