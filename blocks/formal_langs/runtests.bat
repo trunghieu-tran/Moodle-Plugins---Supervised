@@ -12,3 +12,5 @@ call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_c
 
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_group_matches_for_bypass.php
 call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_look_for_matches_for_bypass.php
+
+call phpunit block_formal_langs_token_base_test blocks/formal_langs/tests/test_compared_corrected.php
