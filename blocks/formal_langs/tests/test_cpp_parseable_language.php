@@ -1606,4 +1606,66 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         ';
         $this->compare_trees($trees, $result);
     }
+
+    /**
+     * Tests some visibility problems
+     */
+    public function test_visibility()  {
+        $trees = self::make_from_string('class Test { public: void k(); private: protected:  private slots: public signals: };');
+        $result = '
+        [
+ {
+  class
+  Test
+  {
+   {
+   {
+    {
+     {
+      {
+       {
+        {
+         public
+         :
+        }
+        {
+         void
+         k
+         {
+          (
+          )
+         }
+         ;
+        }
+       }
+       {
+        private
+        :
+       }
+      }
+      {
+       protected
+       :
+      }
+     }
+     {
+      private
+      slots
+      :
+     }
+    }
+    {
+     public
+     signals
+     :
+    }
+   }
+   }
+  }
+  ;
+ }
+]
+        ';
+        $this->compare_trees($trees, $result);
+    }
 }
