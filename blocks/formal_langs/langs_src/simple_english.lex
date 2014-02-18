@@ -118,6 +118,7 @@ A = ('|\u2019)
 ({A}t|t{A}|th{A}|{A}tis|{A}twas|{A}tween|{A}twere|{A}twill|{A}twould|{A}um|{A}ve|{A}em)                                                                                                                     { return $this->create_token('word',$this->yytext()); }
 [a-zA-Z]+([\u2019'\-][a-zA-Z]+)*([sS]{A}|[oO]{A}|[hH]{A})?                                                                                                                                                  { return $this->create_token('word',$this->yytext()); }
 [0-9]+                                                                                                                                      { return $this->create_token('numeric',$this->yytext()); }
-("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                       { return $this->create_token('punctuation',$this->yytext()); }
+("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                              { return $this->create_token('punctuation',$this->yytext()); }
 ("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*"|"$")                                                                                           { return $this->create_token('typographic_mark',$this->yytext()); }
+[\n\r]                                                                                                                                      { }
 .                                                                                                                                           { if (!$this->is_white_space($this->yytext())) return $this->create_token('other',$this->yytext());}

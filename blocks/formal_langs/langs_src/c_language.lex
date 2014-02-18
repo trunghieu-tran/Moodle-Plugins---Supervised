@@ -28,7 +28,6 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
-require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
 {
@@ -390,6 +389,7 @@ INC = "#include"
 <YYINITIAL> '                            { $this->enterbufferedstate(self::CHARACTER); break; }
 <YYINITIAL> L\"                          { $this->enterbufferedstate(self::STRING); break; }
 <YYINITIAL> \"                           { $this->enterbufferedstate(self::STRING); break; }
+<YYINITIAL> [\n\r]                       { }
 <YYINITIAL> .                            { if (!$this->is_white_space($this->yytext())) { $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext()); } break; }
 <MULTILINE_COMMENT>   \*/                { return $this->leavebufferedstate('multiline_comment');  }
 <MULTILINE_COMMENT>   .                  { $this->append($this->yytext()); break;  }

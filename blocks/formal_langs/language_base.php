@@ -31,7 +31,7 @@ abstract class block_formal_langs_abstract_language {
      * Id in language table.
      * @var integer
      */
-    private $id;
+    protected $id;
 
     /**
      * Language version (for user-defined languages mainly).
@@ -152,19 +152,13 @@ abstract class block_formal_langs_abstract_language {
  */
 abstract class block_formal_langs_predefined_language extends block_formal_langs_abstract_language {
 
-    
+    /**
+     * Создает новый язык
+     * @param int $id ID записи из БД
+     * @param stdClass $langdbrecord запись из БД
+     */
     public function __construct($id, $langdbrecord = NULL) {
         $this->id = $id;
-
-        if ($langdbrecord) {
-            // get all info from it
-        } else {
-            // TODO: via DB get $name, $techname, $isparserenabled, $version
-        } 
-        if ($this->could_parse()) {
-            $parserclass = 'block_formal_langs_predefined_' . $this->name() . '_parser';
-            $this->parser = new $parserclass();
-        }
     }
     /** Preprocesses a string before scanning. This can be used for simplifying analyze
         and some other purposes, like merging some different variations of  same character
@@ -174,6 +168,14 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
      */
     protected function preprocess_for_scan($string) {
         return $string;
+    }
+
+    /**
+     * Returns name for lexer class
+     * @return string
+     */
+    protected function lexername() {
+        return 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
     }
     /**
      * Fills token stream field of the processed string objects
@@ -185,7 +187,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
     public function scan(&$processedstring) {
         // Lexer must be a valid JLexPHP class, or implement next_token() and get_errors()
         // Also it can implement find_errors for seeking of deferred errors
-        $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
+        $scanerclass = $this->lexername();
         $string = $processedstring->string;
         if (is_a($string,'qtype_poasquestion_string') == true) {
             $string = $string->string();
@@ -210,6 +212,29 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
 
         $processedstring->stream = $stream;
 
+    }
+
+    /**
+     * Returns name for parser class
+     * @return string
+     */
+    protected function parsername() {
+        return 'block_formal_langs_predefined_' . $this->name() . '_parser';
+    }
+    /**
+     * Fills syntax tree field of the processed string objects.
+     *
+     * Add errors for answer parsing
+     * @param $processedstring - block_formal_langs_processed_string object with string filled
+     * @param $iscorrect boolean true if we need to reduce to start symbol (correct text parsing), false if not (compared text parts parsing)
+     */
+    public function parse($processedstring, $iscorrect) {
+        if ($processedstring->stream == null) {
+            $this->scan($processedstring);
+        }
+        $parsername = $this->parsername();
+        $parser =  new $parsername();
+        $parser->parse($processedstring, $iscorrect);
     }
     
     /**
@@ -266,7 +291,11 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
      * @var string
      */
     private $description;
-
+    /**
+     * Names for lexemes, serialized in base
+     * @var string names
+     */
+    private $lexemenames;
     /**
      * True if parser enabled, false otherwise.
      * @var boolean.
@@ -276,7 +305,7 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
     public function __construct($id, $version=1, $langdbrecord = NULL) {
 
         $this->id = $id;
-
+        $this->lexemenames = $langdbrecord->lexemename;
         if ($langdbrecord) {
             // get all info from it            
         } else {
@@ -330,7 +359,9 @@ class block_formal_langs_userdefined_language extends block_formal_langs_abstrac
     }
 
     public function lexem_name() {
-        return '';//TODO - implement when implementing language
+        $lang  = current_language();
+        $names  = (array)json_decode($this->lexemenames);
+        return  $names[$lang];
     }
 
 }

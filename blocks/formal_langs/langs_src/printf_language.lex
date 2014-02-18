@@ -115,5 +115,8 @@ class block_formal_langs_language_printf_language extends block_formal_langs_pre
 <STRING> "\""       {  $this->yybegin(self::YYINITIAL); return $this->create_token('quote',$this->yytext()); }
 <STRING> "%%"     { return $this->create_token('text',$this->yytext()); }
 <STRING> "%"("-"|"+"|#|0)?([0-9]+|"*")?("."([0-9]+|"*"))?(hh|h|l|ll|j|z|t|l|L)?[diuoxXfFeEgGaAcspn]    { return $this->create_token('specifier',$this->yytext()); }
-<STRING> ([^"\"""%"\\]|\\.)+     { return $this->create_token('text',($this->yytext())); }
-<STRING> .               { return $this->create_token('text',$this->yytext()); }
+<STRING> \\x[0-9A-F]+               { return $this->create_token('text',($this->yytext())); }
+<STRING> \\[0-7]+               { return $this->create_token('text',($this->yytext())); }
+<STRING> \\[ab\\fnrtv"'""\""?\-]  { return $this->create_token('text',($this->yytext())); }
+<STRING> ([^"\"""%"\\])+        { return $this->create_token('text',($this->yytext())); }
+<STRING> .                      { return $this->create_token('text',$this->yytext()); }
