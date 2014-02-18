@@ -1700,6 +1700,44 @@ class block_formal_langs_string_pair {
         $this->correctedstring = $this->correct_mistakes();
     }
 
+    public function pairs_between_corrected_compared() {
+    $arraysets = array();
+    // $i - compared
+    // $j - corrected
+    $j=0;
+    for($n=0; $n<count($this->matches); $n++) {
+        //создать отдельный массив для каждого набора
+        $arraypairs = array();
+        for($i=0; $i<count($this->comparedstring->stream->tokens); $i++) {
+            if(array_search($this->matches[$n]->comparedtokens)==1) {
+                //поиск набора где лексема
+                for($k=0; $k<count($this->matches[$n]->matchedpairs); $k++) {
+                //пропущенный разделитель
+                if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==2 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->comparedtokens[1]==$i)) {
+                    $arraypairs[]=array($i, array($j,$j++));
+                    $j++;
+                }
+                //опечатка
+                if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==1 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i)) {
+                    $arraypairs[]=array($i, $j);
+                    $j++;
+                }
+                //лишний разделитель
+                if(count($this->matches[$n]->matchedpairs[$k]->correcttokens)==2) && ($this->matches[$n]->matchedpairs[$k]->correcttokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->correcttokens[1]==$i))
+                    $arraypairs[]=array(array($i, $i++), $j);
+                    $j++;
+                }
+            } else {
+                // нет опечатки
+                $arraypairs[]=array($i, $j);
+                $j++;
+            }
+        }
+        $arraysets[]=$arraypairs;
+    }
+    return $arraysets;
+}
+    
     /**
      * Correct mistakes in compared string using array of matched pairs and correct string.
      *
