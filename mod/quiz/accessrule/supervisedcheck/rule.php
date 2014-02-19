@@ -41,7 +41,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         global $DB;
 
         // Select all active sessions with $courseid.
-        $sessions = $DB->get_records('block_supervised_session', array('state' => StateSession::Active, 'courseid'=>$courseid));
+        $sessions = $DB->get_records('block_supervised_session', array('state' => StateSession::ACTIVE, 'courseid'=>$courseid));
 
         // Filter sessions by lessontype and userid
         foreach($sessions as $id=>$session){
