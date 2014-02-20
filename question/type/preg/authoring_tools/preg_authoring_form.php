@@ -130,8 +130,8 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addHelpButton('regex_graph_header', 'explaining_graph_tool', 'qtype_preg');
 
         $graphselectionarray = array();
-        $graphselectionarray[] =& $mform->createElement('checkbox', 'grapg_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        $graphselectionarray[] =& $mform->createElement('button', 'grapg_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
+        $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
+        $graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $mform->addGroup($graphselectionarray, 'graph_selection', '', array(' '), false);
 
         $mform->addElement('html', '<div id="graph_map" ></div></br>');

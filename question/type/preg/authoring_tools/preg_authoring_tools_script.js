@@ -121,8 +121,11 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
-                    $("#id_selection_mode").change(self.btn_selection_mode_rectangle_selection_click);
-                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
+                    $("#id_selection_mode").change(self.btn_tree_selection_mode_rectangle_selection_click);
+                    $('#id_send_select').click(self.btn_tree_select_rectangle_selection_click);
+
+                    $("#id_graph_selection_mode").change(self.btn_graph_selection_mode_rectangle_selection_click);
+                    $('#id_graph_send_select').click(self.btn_graph_select_rectangle_selection_click);
 
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
@@ -253,8 +256,31 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
+    graph_node_clicked : function (e) {
+        e.preventDefault();
+        if (!self.is_graph_selection_rectangle_visible()) {
+            var tmp = e.target.id.split(','),
+                indfirst = tmp[1],
+                indlast = tmp[2];
+            self.load_content(indfirst, indlast);
+            self.load_strings(indfirst, indlast);
+        }
+    },
+
+    graph_node_misclicked : function (e) {
+        e.preventDefault();
+        if (!self.is_graph_selection_rectangle_visible()) {
+            self.load_content();
+            self.load_strings();
+        }
+    },
+
     is_tree_selection_rectangle_visible : function () {
         return $("#id_selection_mode").is(':checked');
+    },
+
+    is_graph_selection_rectangle_visible : function () {
+        return $("#id_graph_selection_mode").is(':checked');
     },
     
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -383,7 +409,7 @@ M.preg_authoring_tools_script = (function ($) {
                 self.resize_rectangle_selection(e, 'tree_img','resizeMe', 'tree_hnd');
             });
 
-            end_rectangle_selection : $(window).mouseup(function(e){
+            $(window).mouseup(function(e){
                 e.preventDefault();
                 self.CALC_COORD = false;
             });
@@ -397,8 +423,27 @@ M.preg_authoring_tools_script = (function ($) {
         if (typeof g != 'undefined' && g.img && g.map) {
             graph_img.attr('src', g.img).css('visibility', 'visible');
             graph_map.html(g.map);
-            graph_map.click(self.tree_node_misclicked);
-            $(self.GRAPH_MAP_ID + ' > area').click(self.tree_node_clicked);
+
+            $('#graph_img').mousedown(function(e) {
+                e.preventDefault();
+                //check is checked check box
+                if (self.is_graph_selection_rectangle_visible()) {
+               		self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+                }
+            });
+
+            $('#graph_img').mousemove(function(e) {
+                e.preventDefault();
+                self.resize_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+            });
+
+            $(window).mouseup(function(e){
+                e.preventDefault();
+                self.CALC_COORD = false;
+            });
+
+            graph_map.click(self.graph_node_misclicked);
+            $(self.GRAPH_MAP_ID + ' > area').click(self.graph_node_clicked);
         } else if (typeof g != 'undefined') {
             graph_err.html(g);
         }
@@ -512,14 +557,14 @@ M.preg_authoring_tools_script = (function ($) {
                 //+ document.getElementById('tree_hnd').scrollTop;
     },
 
-    get_rect_selection : function (e) {
+    get_rect_selection : function (e, rectangle, img, area) {
         // Check ids selected nodes
         //var br = document.getElementById('tree_img').getBoundingClientRect();
-        rect_left_bot_x = $('#resizeMe').prop('offsetLeft') - 200;
-        rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17 - $('#tree_img').prop('offsetTop');
-        rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth') - 200;
-        rect_right_top_y = $('#resizeMe').prop('offsetTop') + 17 - $('#tree_img').prop('offsetTop');
-        var areas = $('#qtype_preg_tree').children();
+        rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') - 200;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + 17 - $('#' + img).prop('offsetTop');
+        rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') - 200;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + 17 - $('#' + img).prop('offsetTop');
+        var areas = $('#' + area).children();
         var indfirst = 999;
         var indlast = -999;
         // check all areas and select indfirst and indlast
@@ -569,10 +614,10 @@ M.preg_authoring_tools_script = (function ($) {
         $('#id_test_regex').html(s);
     },
 
-    btn_select_rectangle_selection_click : function (e) {
+    btn_tree_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
-        var sel = self.get_rect_selection();
+        var sel = self.get_rect_selection(e, 'resizeMe', 'tree_img', 'qtype_preg_tree');
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
@@ -584,7 +629,22 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
 
-    btn_selection_mode_rectangle_selection_click : function (e) {
+    btn_graph_select_rectangle_selection_click : function (e) {
+        e.preventDefault();
+
+        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img', 'qtype_preg_graph');
+        self.load_content(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);
+
+        $('#resizeGraph').css({
+            width : 0,
+            height : 0,
+            left : -10,
+            top : -10,
+        });
+    },
+
+    btn_tree_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
         if (self.is_tree_selection_rectangle_visible()) {
             $('#id_send_select').attr('disabled',false);
@@ -596,6 +656,26 @@ M.preg_authoring_tools_script = (function ($) {
             $('#tree_img').attr("usemap", "#qtype_preg_tree");
             self.panzooms.enable_tree();
             $('#resizeMe').css({
+                width : 0,
+                height : 0,
+                left : -10,
+                top : -10,
+            });
+        }
+    },
+
+    btn_graph_selection_mode_rectangle_selection_click : function (e) {
+        e.preventDefault();
+        if (self.is_graph_selection_rectangle_visible()) {
+            $('#id_graph_send_select').attr('disabled',false);
+            $('#graph_img').attr("usemap", "");
+            self.panzooms.reset_graph();
+            self.panzooms.disable_graph();
+        } else {
+            $('#id_graph_send_select').attr('disabled',true);
+            $('#graph_img').attr("usemap", "#qtype_preg_graph");
+            self.panzooms.enable_graph();
+            $('#resizeGraph').css({
                 width : 0,
                 height : 0,
                 left : -10,
@@ -701,19 +781,29 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img.panzoom("reset");
         },
 
+        reset_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("reset");
+        },
+
         disable_tree : function() {
             var tree_img = $('#tree_img');
             tree_img.panzoom("disable");
+        },
+
+        disable_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("disable");
         },
         
         enable_tree : function() {
             var tree_img = $('#tree_img');
             tree_img.panzoom("enable");
         },
-        
-        reset_graph : function() {
+
+        enable_graph : function() {
             var graph_img = $('#graph_img');
-            graph_img.panzoom("reset");
+            graph_img.panzoom("enable");
         },
 
         reset_all : function() {
