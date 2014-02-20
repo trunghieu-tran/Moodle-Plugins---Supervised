@@ -50,6 +50,28 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     protected $mistakes = array();
 
+    /**
+     * A token mappings for each of analyzers
+     * as 'analyzer class name' => mappings for tokens of each of lexeme
+     * of transformed by lexer to previous. Order of key creation matters,
+     * A mapping is array of two arrays. First array is indexes of string, corrected
+     * by analyzer and second is array of source indexes of previous analyzed string.
+     *
+     * You can align two arrays as following
+     * array(
+     *   First array - corrected lexemes array( 0, 1 ), array( 2 ), array(3 ),
+     *   Second array - source lexemes   array( 0 )  , array(1, 2), array(3)
+     * )
+     * @var array
+     */
+    public $tokenmappings = array();
+
+    /**
+     * Holds sequence of scanned analyzers to know how far we should go
+     * @var array
+     */
+    public $analyzersequence = array();
+
 
     public function __clone() {
         parent::__clone();

@@ -80,11 +80,13 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             foreach ($alllcs as $lcs) {
                 $pair = $this->basestringpair->copy_with_lcs($lcs);
                 $this->resultstringpairs[] = $pair;
+                $this->fill_matches($pair);
                 $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
             }
         } else {
             $pair = $this->basestringpair->copy_with_lcs(array());
             $this->resultstringpairs[] = $pair;
+            $this->fill_matches($pair);
             $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
         }
     }
@@ -285,9 +287,11 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_moved_mistake($pair, $answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $pair,
+        $result = new qtype_correctwriting_lexeme_moved_mistake($this->language, $pair,
                                                              $answerindex,
                                                              $responseindex);
+        $result->source = get_class($this);
+        return $result;
     }
     /**
      * Creates a new mistake, that represents case, when odd lexeme is insert to index
@@ -296,9 +300,11 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_added_mistake($pair, $responseindex) {
-        return new qtype_correctwriting_lexeme_added_mistake($this->language,
+        $result =  new qtype_correctwriting_lexeme_added_mistake($this->language,
                                                              $pair,
                                                              $responseindex, $this->question->token_comparing_options());
+        $result->source = get_class($this);
+        return $result;
     }
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped
@@ -307,10 +313,28 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_absent_mistake($pair, $answerindex) {
-        return new qtype_correctwriting_lexeme_absent_mistake($this->language,
+        $result = new qtype_correctwriting_lexeme_absent_mistake($this->language,
                                                               $pair,
                                                               $answerindex
                                                              );
+        $result->source = get_class($this);
+        return $result;
+    }
+
+    /**
+     * Creates token matches for analyzer. Since no moving operations
+     * are performed, then matches are filled 1:1
+     * @param qtype_correctwriting_string_pair $pair a resulting pair
+     */
+    protected function fill_matches($pair) {
+        $result = array(array(), array());
+        $response = $pair->correctedstring()->stream->tokens;
+        $responsecount = count($response);
+        for($i = 0; $i < $responsecount; $i++) {
+            $result[0] = array( $i );
+            $result[1] = array( $i );
+        }
+        $pair->tokenmappings[get_class($this)] = $result;
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
