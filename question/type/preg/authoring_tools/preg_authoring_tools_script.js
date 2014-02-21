@@ -539,6 +539,7 @@ M.preg_authoring_tools_script = (function ($) {
             height : 20,
             left : self.RECTANGLE_WIDTH,
             top : self.RECTANGLE_HEIGHT,
+            position : 'absolute',
         });
     },
 

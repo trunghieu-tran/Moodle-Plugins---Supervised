@@ -112,7 +112,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                             '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
-                                            '<div id="resizeMe">' .
+                                            '<div id="resizeMe" style="width : 0px, height : 0px, left : -10px, top : -10px, position : absolute">' .
                                                 '<div id="resizeSE"></div>' .
                                                 '<div id="resizeE"></div>' .
                                                 '<div id="resizeNE"></div>' .
@@ -138,7 +138,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="graph_hnd">' .
                                        '<div id="graph_err"></div>' .
                                        '<img src="" id="graph_img" usemap="#' . qtype_preg_explaining_graph_node_abstract::get_graph_name() . '" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
-                                       '<div id="resizeGraph">' .
+                                       '<div id="resizeGraph" style="width : 0px, height : 0px, left : -10px, top : -10px, position : absolute">' .
                                             '<div id="resizeSE"></div>' .
                                             '<div id="resizeE"></div>' .
                                             '<div id="resizeNE"></div>' .
