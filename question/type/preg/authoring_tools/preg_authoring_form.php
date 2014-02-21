@@ -101,18 +101,18 @@ class qtype_preg_authoring_form extends moodleform {
         $radiotreeorientationsarray = array();
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('vertical', 'editor'), 'vertical', null);
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('horizontal', 'editor'), 'horizontal', null);
-        $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        $radiotreeorientationsarray[] =& $mform->createElement('button', 'send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
+        $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'tree_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('button', 'tree_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         //$radiotreeorientationsarray[] =& $mform->createElement('button', 'cancel_select', get_string('authoring_form_rect_selection_cancel', 'qtype_preg'));
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
         // Add generated map.
         $mform->addElement('html', '<div id="tree_map" ></div></br>');
-        $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="tree_hnd">' .
+        $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                             '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
-                                            '<div id="resizeMe">' .
+                                            '<div id="resizeTree">' .
                                                 '<div id="resizeSE"></div>' .
                                                 '<div id="resizeE"></div>' .
                                                 '<div id="resizeNE"></div>' .
@@ -128,12 +128,28 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('header', 'regex_graph_header', get_string('explaining_graph_tool', 'qtype_preg'));
         $mform->setExpanded('regex_graph_header', (bool)get_user_preferences('qtype_preg_regex_graph_expanded', true));
         $mform->addHelpButton('regex_graph_header', 'explaining_graph_tool', 'qtype_preg');
+
+        $graphselectionarray = array();
+        $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
+        $graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
+        $mform->addGroup($graphselectionarray, 'graph_selection', '', array(' '), false);
+
         $mform->addElement('html', '<div id="graph_map" ></div></br>');
-        $abc = '<div style="max-height:400px;position:relative;overflow:auto !important;width:100%;max-width:100%" id="graph_hnd">' .
-                   '<div id="graph_err"></div>' .
-                   '<img src="" id="graph_img" usemap="#' . qtype_preg_explaining_graph_node_abstract::get_graph_name() . '" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
-               '</div></br>';
-        $mform->addElement('html', $abc);
+        $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="graph_hnd">' .
+                                       '<div id="graph_err"></div>' .
+                                       '<img src="" id="graph_img" usemap="#' . qtype_preg_explaining_graph_node_abstract::get_graph_name() . '" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
+                                       '<div id="resizeGraph">' .
+                                            '<div id="resizeSE"></div>' .
+                                            '<div id="resizeE"></div>' .
+                                            '<div id="resizeNE"></div>' .
+                                            '<div id="resizeN"></div>' .
+                                            '<div id="resizeNW"></div>' .
+                                            '<div id="resizeW"></div>' .
+                                            '<div id="resizeSW"></div>' .
+                                            '<div id="resizeS"></div>' .
+                                        '</div>' .
+                                   '</div></br>');
+        //$mform->addElement('html', $abc);
 
         // Add description tool.
         $mform->addElement('header', 'regex_description_header', get_string('description_tool', 'qtype_preg'));

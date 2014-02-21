@@ -5,20 +5,18 @@ body
     padding: 0;
     height: 100%;
 }
-#resizeMe
+#resizeTree,
+#resizeGraph
 {
     position: absolute;
-    /*width: 200px;
-    height: 300px;
-    left: 240px;
-    top: 70px;*/
     left: -10px;
     top: - 10px;
     cursor: move;
-    /*background-position: -190px -20px ;*/
     background-repeat: no-repeat;
     border:1px solid;
+    visibility: hidden;
 }
+
 #resizeSE,
 #resizeE,
 #resizeNE,
