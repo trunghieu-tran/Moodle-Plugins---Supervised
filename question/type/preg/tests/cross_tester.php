@@ -229,10 +229,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         return $label . $value . "\n";
     }
 
-    function dump_scalar_array($label, $values) {
+    function dump_indexes($label, $values) {
         $result = $label;
         foreach ($values as $key => $value) {
-            $result .= $key . '=>' . $value . ', ';
+            if ($key != -2) {
+                $result .= $key . '=>' . $value . ', ';
+            }
         }
         return $result . "\n";
     }
@@ -380,26 +382,26 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
             // index_first
             if (!$indexfirstpassed) {
-                $obtainedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $obtained->indexfirst);
-                $expectedstr .= $this->dump_scalar_array('INDEX_FIRST:     ', $expected['index_first']);
+                $obtainedstr .= $this->dump_indexes('INDEX_FIRST:     ', $obtained->indexfirst);
+                $expectedstr .= $this->dump_indexes('INDEX_FIRST:     ', $expected['index_first']);
             }
 
             // length
             if (!$lengthpassed) {
-                $obtainedstr .= $this->dump_scalar_array('LENGTH:          ', $obtained->length);
-                $expectedstr .= $this->dump_scalar_array('LENGTH:          ', $expected['length']);
+                $obtainedstr .= $this->dump_indexes('LENGTH:          ', $obtained->length);
+                $expectedstr .= $this->dump_indexes('LENGTH:          ', $expected['length']);
             }
 
             // ext_index_first
             if (!$extindexfirstpassed) {
-                $obtainedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $obtained->extendedmatch->indexfirst);
-                $expectedstr .= $this->dump_scalar_array('EXT_INDEX_FIRST: ', $expected['ext_index_first']);
+                $obtainedstr .= $this->dump_indexes('EXT_INDEX_FIRST: ', $obtained->extendedmatch->indexfirst);
+                $expectedstr .= $this->dump_indexes('EXT_INDEX_FIRST: ', $expected['ext_index_first']);
             }
 
             // ext_length
             if (!$extlengthpassed) {
-                $obtainedstr .= $this->dump_scalar_array('EXT_LENGTH:      ', $obtained->extendedmatch->length);
-                $expectedstr .= $this->dump_scalar_array('EXT_LENGTH:      ', $expected['ext_length']);
+                $obtainedstr .= $this->dump_indexes('EXT_LENGTH:      ', $obtained->extendedmatch->length);
+                $expectedstr .= $this->dump_indexes('EXT_LENGTH:      ', $expected['ext_length']);
             }
 
             // next

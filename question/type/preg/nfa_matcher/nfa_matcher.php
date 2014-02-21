@@ -763,6 +763,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $dst_node->create_automaton($result, $stack);
             $body = array_pop($stack);
             $result->after_build($body);
+            $result->merge_epsilons();
         } catch (Exception $e) {
             $result = false;
         }
