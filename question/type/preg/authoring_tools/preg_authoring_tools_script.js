@@ -142,6 +142,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset').hide();
 
                     $('#id_send_select').attr('disabled',true);
+                    $('#id_graph_send_select').attr('disabled',true);
 
                     self.panzooms.init();
                     options.oneachpresscallback();
