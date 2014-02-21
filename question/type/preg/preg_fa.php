@@ -258,7 +258,8 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        return !empty($this->flattern_tags());
+        $tmp = $this->flattern_tags();
+        return !empty($tmp);
     }
 
     /**
