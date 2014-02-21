@@ -400,13 +400,13 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 //check is checked check box
                 if (self.is_tree_selection_rectangle_visible()) {
-               		self.init_rectangle_selection(e, 'tree_img','resizeMe', 'tree_hnd');
+               		self.init_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
                 }
             });
 
             $('#tree_img').mousemove(function(e) {
                 e.preventDefault();
-                self.resize_rectangle_selection(e, 'tree_img','resizeMe', 'tree_hnd');
+                self.resize_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
             });
 
             $(window).mouseup(function(e){
@@ -539,7 +539,7 @@ M.preg_authoring_tools_script = (function ($) {
             height : 20,
             left : self.RECTANGLE_WIDTH,
             top : self.RECTANGLE_HEIGHT,
-            position : 'absolute',
+            visibility : 'visible',
         });
     },
 
@@ -618,11 +618,11 @@ M.preg_authoring_tools_script = (function ($) {
     btn_tree_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
-        var sel = self.get_rect_selection(e, 'resizeMe', 'tree_img', 'qtype_preg_tree');
+        var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img', 'qtype_preg_tree');
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
-        $('#resizeMe').css({
+        $('#resizeTree').css({
             width : 0,
             height : 0,
             left : -10,
@@ -656,7 +656,7 @@ M.preg_authoring_tools_script = (function ($) {
             $('#id_send_select').attr('disabled',true);
             $('#tree_img').attr("usemap", "#qtype_preg_tree");
             self.panzooms.enable_tree();
-            $('#resizeMe').css({
+            $('#resizeTree').css({
                 width : 0,
                 height : 0,
                 left : -10,
