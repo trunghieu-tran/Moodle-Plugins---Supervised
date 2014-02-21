@@ -471,7 +471,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             8->9[label="[$]"];
                         }';
         $dotresult = 'digraph res {
-            
+
                         }';
 
         $source = new qtype_preg_nfa(0, 0, 0, array());
@@ -1578,7 +1578,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[a-z]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[cd]"];
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
 
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
@@ -1590,7 +1590,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
         $resulttran = $transition1->intersect($transition2);
-        $restran = new qtype_preg_nfa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
 
@@ -1599,10 +1599,10 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf1 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $leaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $leaf2 = $lexer->nextToken()->value;
-        $restran = new qtype_preg_nfa_transition(0, $leaf2, 1);     //0->1[label="[(a-z)]"];
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[a-z]"];
+        $restran = new qtype_preg_fa_transition(0, $leaf2, 1);     //0->1[label="[(a-z)]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1); //0->1[label="[a-z]"];
         $transition1->subpatt_start[] = $leaf;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[()]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1); //0->1[label="[()]"];
         $restran->subpatt_start[] = $leaf;
 
         $resulttran = $transition1->intersect($transition2);
@@ -1614,10 +1614,10 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $subpatt1 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $leaf2 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $subpatt2 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $restran = new qtype_preg_nfa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);//0->1[label="[()]"];
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[(]"];
+        $restran = new qtype_preg_fa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);//0->1[label="[()]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1); //0->1[label="[(]"];
         $transition1->subpatt_start[] = $subpatt1;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[)]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1); //0->1[label="[)]"];
         $transition2->subpatt_end[] = $subpatt2;
         $restran->subpatt_start[] = $subpatt1;
         $restran->subpatt_end[] = $subpatt2;
@@ -1638,7 +1638,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition1->pregleaf->assertionsafter[] = $assert2;
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
         $rescharset->assertionsafter[] = $assert2;
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER); //0->1[label="[\\Aa]"];
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER); //0->1[label="[\\Aa]"];
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -1650,7 +1650,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $assert1 = new qtype_preg_leaf_assert_circumflex;
         $assert2 = new qtype_preg_leaf_assert_dollar;
         $rescharset = $leaf1->intersect_leafs($leaf2, false, false);
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);  //0->1[label="[^$a]"];
         $restran->pregleaf->assertionsafter[] = $assert1;
         $restran->pregleaf->assertionsbefore[] = $assert2;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);   //0->1[label="[^a]"];
@@ -1666,15 +1666,15 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf = $lexer->nextToken()->value;
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $assert = new qtype_preg_leaf_assert_circumflex;
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);//0->1[label="[(^a]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf, 1);//0->1[label="[(^a]"];
         $transition1->pregleaf->assertionsafter[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf, 1);      //0->1[label="[(^a]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);      //0->1[label="[(^a]"];
         $transition2->pregleaf->assertionsafter[] = $assert;
         $transition2->subpatt_start[] = $subpatt;
         $rescharset = $leaf->intersect_leafs($leaf, true, true);
         $rescharset->assertionsafter[] = $assert;
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);   //0->1[label="[(^a]"];
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);   //0->1[label="[(^a]"];
         $restran->subpatt_start[] = $subpatt;
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
@@ -1689,7 +1689,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);   //0->1[label="[a]"];
         $rescharset = $leaf->intersect_leafs($leaf, false, false);
         $rescharset->assertionsafter[] = $assert;
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);        //0->1[label="[^a]"];
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -1699,13 +1699,13 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf = $lexer->nextToken()->value;
         $subpatt = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $assert = new qtype_preg_leaf_assert_circumflex;
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf, 1);  //0->1[label="[(^a]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf, 1);  //0->1[label="[(^a]"];
         $transition1->pregleaf->assertionsafter[] = $assert;
         $transition1->subpatt_start[] = $subpatt;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf, 1);  //0->1[label="[a]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf, 1);  //0->1[label="[a]"];
         $rescharset = $leaf->intersect_leafs($leaf, true, false);
         $rescharset->assertionsafter[] = $assert;
-        $restran = new qtype_preg_nfa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $rescharset, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $restran->subpatt_start[] = $subpatt;                       //0->1[label="[(^a]"];
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
@@ -1716,9 +1716,9 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf1 = $lexer->nextToken()->value;
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1);  //0->1[label="[^a-c]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^a-c]"];
         $leaf2 = new qtype_preg_leaf_assert_circumflex;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1);  //0->1[label="[^]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[^]"];
 
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($transition1, $resulttran, 'Result transition is not equal to expected');
@@ -1729,7 +1729,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = new qtype_preg_leaf_assert_esc_a;
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[\\A]"];
-        $restran = new qtype_preg_nfa_transition(0, $leaf2, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $leaf2, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -1739,7 +1739,7 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1);  //0->1[label="[^]"];
         $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1);  //0->1[label="[]"];
-        $restran = new qtype_preg_nfa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
+        $restran = new qtype_preg_fa_transition(0, $leaf1, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER);
         $resulttran = $transition1->intersect($transition2);
         $this->assertEquals($restran, $resulttran, 'Result transition is not equal to expected');
     }
@@ -1750,10 +1750,10 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $lexer->nextToken()->value;
         $subpatt1 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $subpatt2 = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[(a-c)]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1); //0->1[label="[(a-c)]"];
         $transition1->subpatt_start[] = $subpatt1;
         $transition1->subpatt_end[] = $subpatt2;
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[(g-k)]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1); //0->1[label="[(g-k)]"];
         $transition2->subpatt_start[] = $subpatt1;
         $transition2->subpatt_end[] = $subpatt2;
         $restran = null;
@@ -1769,8 +1769,8 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
         $leaf2->mergedassertions[] = $assert;
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[^01]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1); //0->1[label="[^01]"];
         $restran = null;
 
         $resulttran = $transition1->intersect($transition2);
@@ -1783,8 +1783,8 @@ class qtype_preg_fa_inter_transitions_test extends PHPUnit_Framework_TestCase {
         $leaf2 = $lexer->nextToken()->value;
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf1->mergedassertions[] = $assert;
-        $transition1 = new qtype_preg_nfa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
-        $transition2 = new qtype_preg_nfa_transition(0, $leaf2, 1); //0->1[label="[01]"];
+        $transition1 = new qtype_preg_fa_transition(0, $leaf1, 1); //0->1[label="[^a]"];
+        $transition2 = new qtype_preg_fa_transition(0, $leaf2, 1); //0->1[label="[01]"];
         $restran = null;
 
         $resulttran = $transition1->intersect($transition2);
@@ -1807,7 +1807,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                         2[shape=doublecircle];
                         "0   1"->2[label = "[[0-9]]", color = violet];
                     }';
-        
+
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
@@ -1837,7 +1837,7 @@ class qtype_preg_fa_merge_transitions_test extends PHPUnit_Framework_TestCase {
                         0->1[label="[0-9]"];
                         1->2[label="[(/)/]"];
                     }';
-        
+
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
         $realnumbers = $input->get_state_numbers();
@@ -2393,7 +2393,7 @@ class qtype_preg_fa_merge_uncap_transitions_test extends PHPUnit_Framework_TestC
         $input->read_fa($dotdescription);
         $transitiontype = qtype_preg_fa_transition::TYPE_TRANSITION_BOTH;
         $realnumbers = $input->get_state_numbers();
-        $number = array_search('2', $realnumbers); 
+        $number = array_search('2', $realnumbers);
         $input->merge_uncapturing_transitions($transitiontype, $number);
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
@@ -2431,7 +2431,7 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
 
         $assert2 = new qtype_preg_leaf_assert_small_esc_z;
         $mergedassert2 = new qtype_preg_leaf_assert_small_esc_z;
-        
+
 
         $result = $assert1->intersect_asserts($assert2);
 
@@ -2459,7 +2459,7 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
     public function test_esc_b_and_esc_a() {
         $assert1 = new qtype_preg_leaf_assert_esc_b;
         $assert2 = new qtype_preg_leaf_assert_esc_a;
-        $assertresult = new qtype_preg_leaf_assert_esc_b; 
+        $assertresult = new qtype_preg_leaf_assert_esc_b;
         $assertresult->assertionsafter = array($assert2);
 
         $result = $assert1->intersect_asserts($assert2);

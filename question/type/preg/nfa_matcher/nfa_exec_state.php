@@ -431,40 +431,65 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $pos, $matchlen) {
+        $tagsets = array_reverse($transition->tag_sets);
+        foreach ($tagsets as $tagset) {
+            $this->write_subpatt_info_inner($tagset, $pos, $matchlen);
+        }
+    }
+
+    public function write_subpatt_info_inner($tagset, $pos, $matchlen) {
         // Begin a new iteration of a subpattern. In fact, we can call the method for
         // the subpattern with minimal number; all "bigger" subpatterns will be reset recursively.
-        if ($transition->min_subpatt_node != null) {
-            $this->begin_subpatt_iteration($transition->min_subpatt_node);
+        $min = $tagset->min_open_tag();
+        if ($min !== null) {
+            $this->begin_subpatt_iteration($min->pregnode);
         }
 
         $options = $this->matcher->get_options();
 
         // Set matches to (pos, -1) for the new iteration.
-        foreach ($transition->subpatt_start as $node) {
-            if ($options->capturesubexpressions || $node->subpattern == $this->root_subpatt_number()) {
-                $this->set_current_match($node->subpattern, $pos, qtype_preg_matching_results::NO_MATCH_FOUND);
+        foreach ($tagset->tags as $tag) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN) {
+                continue;
             }
+            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
+                continue;
+            }
+            // Starting indexes are always the same, equal $pos
+            $index = $pos;
+            //echo "opening {$tag->pregnode->subpattern} at pos {$tag->pos}\n";
+            $this->set_current_match($tag->pregnode->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
 
         // Set matches to (pos, length) for the ending iterations.
-        foreach ($transition->subpatt_end as $node) {
-            if ($options->capturesubexpressions || $node->subpattern == $this->root_subpatt_number()) {
-                $current_match = $this->current_match($node->subpattern);
-                $index = $current_match[0];
-                if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $this->set_current_match($node->subpattern, $index, $pos - $index + $matchlen);
-                }
+        foreach ($tagset->tags as $tag) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_CLOSE) {
+                continue;
+            }
+            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
+                continue;
+            }
+            $current_match = $this->current_match($tag->pregnode->subpattern);
+            $index = $current_match[0];
+            $length = $pos - $index;
+            if ($tag->pos == qtype_preg_fa_tag::POS_AT_TRANSITION) {
+                $length += $matchlen;
+            }
+            //echo "closing {$tag->pregnode->subpattern} at pos {$tag->pos}\n";
+            if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $this->set_current_match($tag->pregnode->subpattern, $index, $length);
             }
         }
 
         // Some stuff for subexpressions.
-        foreach ($transition->subpatt_start as $node) {
-            if ($node->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+        foreach ($tagset->tags as $tag) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pregnode->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
                 continue;
             }
-            if ($options->capturesubexpressions || $node->subpattern == $this->root_subpatt_number()) {
-                $this->subexpr_to_subpatt[$node->number] = $node->subpattern;
+            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
+                continue;
             }
+            $this->subexpr_to_subpatt[$tag->pregnode->number] = $tag->pregnode->subpattern;
         }
     }
 
