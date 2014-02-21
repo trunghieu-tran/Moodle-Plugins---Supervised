@@ -121,8 +121,8 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
-                    $("#id_selection_mode").change(self.btn_tree_selection_mode_rectangle_selection_click);
-                    $('#id_send_select').click(self.btn_tree_select_rectangle_selection_click);
+                    $("#id_tree_selection_mode").change(self.btn_tree_selection_mode_rectangle_selection_click);
+                    $('#id_tree_send_select').click(self.btn_tree_select_rectangle_selection_click);
 
                     $("#id_graph_selection_mode").change(self.btn_graph_selection_mode_rectangle_selection_click);
                     $('#id_graph_send_select').click(self.btn_graph_select_rectangle_selection_click);
@@ -141,7 +141,7 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
-                    $('#id_send_select').attr('disabled',true);
+                    $('#id_tree_send_select').attr('disabled',true);
                     $('#id_graph_send_select').attr('disabled',true);
 
                     self.panzooms.init();
@@ -277,7 +277,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     is_tree_selection_rectangle_visible : function () {
-        return $("#id_selection_mode").is(':checked');
+        return $("#id_tree_selection_mode").is(':checked');
     },
 
     is_graph_selection_rectangle_visible : function () {
@@ -649,12 +649,12 @@ M.preg_authoring_tools_script = (function ($) {
     btn_tree_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
         if (self.is_tree_selection_rectangle_visible()) {
-            $('#id_send_select').attr('disabled',false);
+            $('#id_tree_send_select').attr('disabled',false);
             $('#tree_img').attr("usemap", "");
             self.panzooms.reset_tree();
             self.panzooms.disable_tree();
         } else {
-            $('#id_send_select').attr('disabled',true);
+            $('#id_tree_send_select').attr('disabled',true);
             $('#tree_img').attr("usemap", "#qtype_preg_tree");
             self.panzooms.enable_tree();
             $('#resizeTree').css({
