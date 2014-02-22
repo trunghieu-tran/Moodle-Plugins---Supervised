@@ -259,7 +259,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      */
     function do_extra_check($regex, $notation, $modifiers, $obtained) {
         if ($obtained->extendedmatch === null || !$obtained->extendedmatch->full) {
-            return;
+            return true;
         }
 
         $str = $obtained->matched_part() . $obtained->string_extension();

@@ -745,7 +745,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Delete all blind states in automata.
      */
-    public function del_blind_states() {
+    public function remove_unreachable_states() {
         // Pass automata forward.
         $aregoneforward = $this->reachable_states(false);
         // Pass automata backward.
@@ -1128,7 +1128,7 @@ abstract class qtype_preg_finite_automaton {
             $curstates = array_keys($reached);
         }
 
-        $this->del_blind_states();
+        $this->remove_unreachable_states();
     }
 
     /**
@@ -2232,7 +2232,7 @@ abstract class qtype_preg_finite_automaton {
                                 $newfront[] = $outtran->to;
                             }
                             $this->merge_wordbreaks($tran);
-                            $this->del_blind_states();
+                            $this->remove_unreachable_states();
                         } else {
                             $newfront[] = $tran->to;
                         }
@@ -2709,7 +2709,7 @@ abstract class qtype_preg_finite_automaton {
             throw new qtype_preg_exception('intersect error: No state with number' . $stateindex . '.');
         }
         // Prepare automata for intersection.
-        $this->del_blind_states();
+        $this->remove_unreachable_states();
         $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number);
         if ($isstart == 0) {
             $number2 = $anotherfa->start_states();
@@ -2717,10 +2717,10 @@ abstract class qtype_preg_finite_automaton {
             $number2 = $anotherfa->end_states();
         }
         $secnumber = $number2[0];
-        $anotherfa->del_blind_states();
+        $anotherfa->remove_unreachable_states();
         $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $secnumber);
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
-        $result->del_blind_states();
+        $result->remove_unreachable_states();
         $result->lead_to_one_end();
         return $result;
     }
