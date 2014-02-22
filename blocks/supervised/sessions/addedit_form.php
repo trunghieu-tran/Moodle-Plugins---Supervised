@@ -75,10 +75,10 @@ class addedit_session_form extends moodleform {
         // ...group.
         $mform->addElement('header', 'general', get_string('general', 'form'));
         // ...teacher combobox.
-        $mform->addElement('select', 'teacherid', get_string('defaultcourseteacher'), $teachers);
+        $mform->addElement('select', 'teacherid', get_string('superviser', 'block_supervised'), $teachers);
         $mform->addRule('teacherid', null, 'required', null, 'client');
         // ...send e-mail checkbox.
-        $mform->addElement('advcheckbox', 'sendemail', get_string("notifyteacher", 'block_supervised'));
+        $mform->addElement('advcheckbox', 'sendemail', get_string('notifyteacher', 'block_supervised'));
         $mform->addHelpButton('sendemail', 'notifyteacher', 'block_supervised');
         // ...course label.
         $mform->addElement('static', 'coursename', get_string('course'));
@@ -123,28 +123,28 @@ class addedit_session_form extends moodleform {
         $errors = array();
 
         // Session must be active at least after 10 minutes from current time.
-        $sessiontimeend = $data["timestart"] + $data["duration"]*60;
+        $sessiontimeend = $data['timestart'] + $data['duration']*60;
         $minimumtimeend = time() + 10*60;
         if ($sessiontimeend <= $minimumtimeend) {
-            $strftimedatetime = get_string("strftimerecent");
+            $strftimedatetime = get_string('strftimerecent');
             $timeformatted = userdate($minimumtimeend, '%a').' '.userdate($minimumtimeend, $strftimedatetime);
-            $errors["duration"] = get_string("timeendvalidationerror", "block_supervised", $timeformatted);
+            $errors['duration'] = get_string('timeendvalidationerror', 'block_supervised', $timeformatted);
         }
         // Duration must be greater than zero.
-        if ($data["duration"] <= 0) {
-            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        if ($data['duration'] <= 0) {
+            $errors['duration'] = get_string('durationvalidationerror', 'block_supervised');
         }
 
         // Session can not intersect with sessions of this teacher.
-        if (session_exists($data["teacherid"], $data["timestart"], $sessiontimeend, $data["id"])) {
-            $errors["timestart"] = get_string("teacherhassession", "block_supervised");
+        if (session_exists($data['teacherid'], $data['timestart'], $sessiontimeend, $data['id'])) {
+            $errors['timestart'] = get_string('teacherhassession', 'block_supervised');
         }
 
         // If current user has only manageownsessions capability he can add/edit session only for himself.
         if ( has_capability('block/supervised:manageownsessions', $PAGE->context) AND
             !has_capability('block/supervised:manageallsessions', $PAGE->context) ) {
-            if ($data["teacherid"] != $USER->id) {
-                $errors["teacherid"] = get_string("teachervalidationerror", "block_supervised");
+            if ($data['teacherid'] != $USER->id) {
+                $errors['teacherid'] = get_string('teachervalidationerror', 'block_supervised');
             }
         }
 

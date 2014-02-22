@@ -22,32 +22,32 @@ $id         = optional_param('id', '', PARAM_INT);        // Lessontype id (only
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 require_login($course);
 require_capability('block/supervised:editlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 
 // Initializing variables depending of mode.
 if (!$id) {   // Add mode.
-    $PAGE->navbar->add(get_string("addlessontypenavbar", 'block_supervised'));
+    $PAGE->navbar->add(get_string('addlessontypenavbar', 'block_supervised'));
     $title = get_string('addlessontypepagetitle', 'block_supervised');
-    $heading = get_string("addingnewlessontype", 'block_supervised');
+    $heading = get_string('addingnewlessontype', 'block_supervised');
 } else {     // Edit mode.
-    if (! $lessontype = $DB->get_record("block_supervised_lessontype", array("id" => $id, "courseid" => $courseid))) {
-        print_error(get_string("invalidlessontypeid", 'block_supervised'));
+    if (! $lessontype = $DB->get_record('block_supervised_lessontype', array('id' => $id, 'courseid' => $courseid))) {
+        print_error(get_string('invalidlessontypeid', 'block_supervised'));
     }
-    $PAGE->navbar->add(get_string("editlessontypenavbar", 'block_supervised'));
+    $PAGE->navbar->add(get_string('editlessontypenavbar', 'block_supervised'));
     $title = get_string('editlessontypepagetitle', 'block_supervised');
-    $heading = get_string("editinglessontype", 'block_supervised');
+    $heading = get_string('editinglessontype', 'block_supervised');
 
     $toform['id']   = $lessontype->id;
     $toform['name'] = $lessontype->name;
@@ -56,7 +56,7 @@ if (!$id) {   // Add mode.
 $PAGE->set_title($title);
 
 // Prepare form.
-$mform = "addedit_form.php";
+$mform = 'addedit_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {

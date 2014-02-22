@@ -201,6 +201,7 @@ $string['supervised:supervise']                 = 'Ability to supervised session
 $string['supervised:viewallsessions']           = 'View all sessions (planned, active and finished) and their logs';
 $string['supervised:viewownsessions']           = 'View own sessions (planned, active and finished) and their logs';
 $string['supervisedsettings']                   = 'Supervised settings';
+$string['superviser']                           = 'Преподаватель';
 $string['teacherhassession']                    = 'Teacher already has a session in this time.';
 $string['teachervalidationerror']               = 'You can plan session only for yourself.';
 $string['timeend']                              = 'Время окончания';

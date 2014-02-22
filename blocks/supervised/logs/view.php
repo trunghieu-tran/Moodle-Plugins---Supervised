@@ -31,14 +31,14 @@ $userid      = optional_param('userid', '0', PARAM_INT);    // Current user id.
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
-if (! $session = $DB->get_record("block_supervised_session", array("id" => $sessionid))) {
-    print_error(get_string("invalidsessionid", 'block_supervised'));
+if (! $session = $DB->get_record('block_supervised_session', array('id' => $sessionid))) {
+    print_error(get_string('invalidsessionid', 'block_supervised'));
 }
 
 require_login($course);
@@ -46,7 +46,7 @@ require_login($course);
 $PAGE->set_url('/blocks/supervised/logs/view.php', array('courseid' => $courseid, 'sessionid' => $sessionid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('logspagetitle', 'block_supervised'));
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 // Check capabilities.
 if ($session->teacherid != $USER->id) {
@@ -70,12 +70,12 @@ if ($session->teacherid != $USER->id) {
     }
 }
 if ($session->state == StateSession::PLANNED) {
-    print_error(get_string("sessionlogserror", 'block_supervised'));
+    print_error(get_string('sessionlogserror', 'block_supervised'));
 }
 
 
 // Prepare filter logs form.
-$mform = "displayoptions_form.php";
+$mform = 'displayoptions_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {
@@ -99,7 +99,7 @@ if ($fromform = $mform->get_data()) {
     // Form didn't validate or this is the first display.
     // Display header.
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string("logsview", 'block_supervised'), 2);
+    echo $OUTPUT->heading(get_string('logsview', 'block_supervised'), 2);
 
     print_session_info_form($sessionid);
 

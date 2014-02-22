@@ -23,34 +23,34 @@ $id         = optional_param('id', '', PARAM_INT);        // Classroom id (only 
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage)..
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 require_login($course);
 require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 
 // Initializing variables depending of mode.
 if (!$id) {   // Add mode.
-    $PAGE->navbar->add(get_string("addclassroomnavbar", 'block_supervised'));
+    $PAGE->navbar->add(get_string('addclassroomnavbar', 'block_supervised'));
     $title = get_string('addclassroompagetitle', 'block_supervised');
-    $heading = get_string("addingnewclassroom", 'block_supervised');
+    $heading = get_string('addingnewclassroom', 'block_supervised');
 
     $toform['active']   = 1;    // Default value.
 } else {     // Edit mode.
-    if (! $classroom = $DB->get_record("block_supervised_classroom", array("id" => $id))) {
-        print_error(get_string("invalidclassroomid", 'block_supervised'));
+    if (! $classroom = $DB->get_record('block_supervised_classroom', array('id' => $id))) {
+        print_error(get_string('invalidclassroomid', 'block_supervised'));
     }
-    $PAGE->navbar->add(get_string("editclassroomnavbar", 'block_supervised'));
+    $PAGE->navbar->add(get_string('editclassroomnavbar', 'block_supervised'));
     $title = get_string('editclassroompagetitle', 'block_supervised');
-    $heading = get_string("editingclassroom", 'block_supervised');
+    $heading = get_string('editingclassroom', 'block_supervised');
 
     $toform['id']       = $classroom->id;
     $toform['name']     = $classroom->name;
@@ -61,7 +61,7 @@ if (!$id) {   // Add mode.
 $PAGE->set_title($title);
 
 // Prepare form.
-$mform = "addedit_form.php";
+$mform = 'addedit_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {

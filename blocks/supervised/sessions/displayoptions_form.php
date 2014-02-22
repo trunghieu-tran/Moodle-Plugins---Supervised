@@ -73,7 +73,7 @@ class displayoptions_sessions_form extends moodleform {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'quiz'));
         $mform->setType('pagesize', PARAM_INT);
         if ($selectedcourse == 0 || has_capability('block/supervised:viewallsessions', $coursecontext)) {
-            $mform->addElement('select', 'teacher', get_string('defaultcourseteacher'), $teachers);
+            $mform->addElement('select', 'teacher', get_string('superviser', 'block_supervised'), $teachers);
         } else {
             $mform->addElement('hidden', 'teacher');
             $mform->setType('teacher', PARAM_INT);
@@ -103,13 +103,13 @@ class displayoptions_sessions_form extends moodleform {
         $errors = array();
 
         // Page size must be greater than zero.
-        if ($data["pagesize"] <= 0) {
-            $errors["pagesize"] = get_string("pagesizevalidationerror", "block_supervised");
+        if ($data['pagesize'] <= 0) {
+            $errors['pagesize'] = get_string('pagesizevalidationerror', 'block_supervised');
         }
 
         // Time from must be <= than time to .
-        if ($data["from"] > $data["to"]) {
-            $errors["to"] = get_string("timetovalidationerror", "block_supervised");
+        if ($data['from'] > $data['to']) {
+            $errors['to'] = get_string('timetovalidationerror', 'block_supervised');
         }
 
         return $errors;

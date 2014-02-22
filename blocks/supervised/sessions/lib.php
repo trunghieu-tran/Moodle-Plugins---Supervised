@@ -57,8 +57,8 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
         }
     }
 
-    $result["sessions"] = array_slice($sessionsfiltered, $limitfrom, $limitnum);
-    $result["totalcount"] = count($sessionsfiltered);
+    $result['sessions'] = array_slice($sessionsfiltered, $limitfrom, $limitnum);
+    $result['totalcount'] = count($sessionsfiltered);
     return $result;
 }
 
@@ -90,15 +90,15 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
     }
 
     echo "<div class=\"info\">\n";
-    print_string("displayingrecords", "", $totalcount);
+    print_string('displayingrecords', '', $totalcount);
     echo "</div>\n";
 
     echo $OUTPUT->paging_bar($totalcount, $pagenum, $perpage, "$url&perpage=$perpage");
 
     // Fill table with sessions according to user capabilities.
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
     $tabledata = array();
-    foreach ($sessions["sessions"] as $session) {
+    foreach ($sessions['sessions'] as $session) {
         $logsurl = new moodle_url('/blocks/supervised/logs/view.php',
             array('sessionid' => $session->id, 'courseid' => $session->courseid));
         $logslink = '<a href="'.$logsurl.'">' . get_string('showlogs', 'block_supervised') . '</a>';
@@ -158,7 +158,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
     $table->head[] = get_string('course');
     $table->head[] = get_string('classroom', 'block_supervised');
     $table->head[] = get_string('group');
-    $table->head[] = get_string('defaultcourseteacher');
+    $table->head[] = get_string('superviser', 'block_supervised');
     if ($lessontypesexist) {
         $table->head[] = get_string('lessontype', 'block_supervised');
     }
@@ -234,95 +234,95 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     $whereflag = false;
     if ($courseid) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.courseid = :courseid";
+            $select .= ' WHERE {block_supervised_session}.courseid = :courseid';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.courseid = :courseid";
+            $select .= ' AND {block_supervised_session}.courseid = :courseid';
         }
         $params['courseid']      = $courseid;
     }
     if ($teacherid) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.teacherid = :teacherid";
+            $select .= ' WHERE {block_supervised_session}.teacherid = :teacherid';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.teacherid = :teacherid";
+            $select .= ' AND {block_supervised_session}.teacherid = :teacherid';
         }
         $params['teacherid']      = $teacherid;
     }
     if ($classroomid) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.classroomid = :classroomid";
+            $select .= ' WHERE {block_supervised_session}.classroomid = :classroomid';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.classroomid = :classroomid";
+            $select .= ' AND {block_supervised_session}.classroomid = :classroomid';
         }
         $params['classroomid']      = $classroomid;
     }
     if ($lessontypeid != -1) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.lessontypeid = :lessontypeid";
+            $select .= ' WHERE {block_supervised_session}.lessontypeid = :lessontypeid';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.lessontypeid = :lessontypeid";
+            $select .= ' AND {block_supervised_session}.lessontypeid = :lessontypeid';
         }
         $params['lessontypeid']      = $lessontypeid;
     }
     if ($state) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.state = :state";
+            $select .= ' WHERE {block_supervised_session}.state = :state';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.state = :state";
+            $select .= ' AND {block_supervised_session}.state = :state';
         }
         $params['state']      = $state;
     }
     if ($timestart1) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.timestart >= :timestart1";
+            $select .= ' WHERE {block_supervised_session}.timestart >= :timestart1';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.timestart >= :timestart1";
+            $select .= ' AND {block_supervised_session}.timestart >= :timestart1';
         }
         $params['timestart1']      = $timestart1;
     }
     if ($timestart2) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.timestart <= :timestart2"; $whereflag=true;
+            $select .= ' WHERE {block_supervised_session}.timestart <= :timestart2'; $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.timestart <= :timestart2";
+            $select .= ' AND {block_supervised_session}.timestart <= :timestart2';
         }
         $params['timestart2']      = $timestart2;
     }
     if ($timeend1) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.timeend >= :timeend1";
+            $select .= ' WHERE {block_supervised_session}.timeend >= :timeend1';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.timeend >= :timeend1";
+            $select .= ' AND {block_supervised_session}.timeend >= :timeend1';
         }
         $params['timeend1']      = $timeend1;
     }
     if ($timeend2) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.timeend <= :timeend2";
+            $select .= ' WHERE {block_supervised_session}.timeend <= :timeend2';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.timeend <= :timeend2";
+            $select .= ' AND {block_supervised_session}.timeend <= :timeend2';
         }
         $params['timeend2']      = $timeend2;
     }
     if ($id) {
         if (!$whereflag) {
-            $select .= " WHERE {block_supervised_session}.id = :id";
+            $select .= ' WHERE {block_supervised_session}.id = :id';
             $whereflag=true;
         } else {
-            $select .= " AND {block_supervised_session}.id = :id";
+            $select .= ' AND {block_supervised_session}.id = :id';
         }
         $params['id']      = $id;
     }
 
-    $select .= " ORDER BY timestart";
+    $select .= ' ORDER BY timestart';
     return $DB->get_records_sql($select, $params);
 }
 
@@ -358,7 +358,7 @@ function get_session($id=0, $courseid=0, $teacherid=0, $classroomid=0, $lessonty
  */
 function mail_newsession($session, $creator) {
     global $DB, $CFG;
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
 
     $site        = get_site();
     $supportuser = core_user::get_support_user();
@@ -414,7 +414,7 @@ function mail_newsession($session, $creator) {
  */
 function mail_removedsession($session, $remover) {
     global $DB, $CFG;
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
 
     $site        = get_site();
     $supportuser = core_user::get_support_user();
@@ -474,7 +474,7 @@ function mail_removedsession($session, $remover) {
  */
 function mail_editedsession($updsession, $editor) {
     global $DB, $CFG;
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
 
     $site        = get_site();
     $supportuser = core_user::get_support_user();

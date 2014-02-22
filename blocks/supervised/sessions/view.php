@@ -35,11 +35,11 @@ $state      = optional_param('state', '0', PARAM_INT);          // Sessions filt
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 require_login($course);
@@ -47,7 +47,7 @@ require_login($course);
 $PAGE->set_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('sessionspagetitle', 'block_supervised'));
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 
 // Check if user has at least one of capabilities for view smth.
@@ -61,7 +61,7 @@ if (!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
 
 
 // Print display options form.
-$mform = "displayoptions_form.php";
+$mform = 'displayoptions_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {
@@ -88,9 +88,9 @@ if ($fromform = $mform->get_data()) {
     // Form didn't validate or this is the first display.
     // Display header.
     echo $OUTPUT->header();
-    echo $OUTPUT->heading_with_help(get_string("sessionsheader", 'block_supervised'), 'sessionsdefinition', 'block_supervised');
+    echo $OUTPUT->heading_with_help(get_string('sessionsheader', 'block_supervised'), 'sessionsdefinition', 'block_supervised');
 
-    // Add "Plan new session" button.
+    // Add 'Plan new session' button.
     if (  has_capability('block/supervised:manageownsessions', $PAGE->context)
         || has_capability('block/supervised:manageallsessions', $PAGE->context)  ) {
         $params['courseid'] = $courseid;
@@ -146,6 +146,6 @@ function print_courses_selector($courseid, $course, $perpage, $from, $to, $class
     }
 
     $select = new url_select($urls, $active, null, 'supervisedblock_selectcourseform');
-    $select->set_label(get_string('course'), array("id" => "supervisedblock_courselabel"));
+    $select->set_label(get_string('course'), array('id' => 'supervisedblock_courselabel'));
     echo $OUTPUT->render($select);
 }

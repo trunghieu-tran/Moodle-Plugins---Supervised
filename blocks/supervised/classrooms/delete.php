@@ -23,7 +23,7 @@ $courseid   = required_param('courseid', PARAM_INT);
 $delete     = optional_param('delete', '', PARAM_ALPHANUM); // Delete confirmation hash.
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 
@@ -31,20 +31,20 @@ $site = get_site();
 require_login($course);
 require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/delete.php', array('id' => $id, 'courseid' => $courseid));
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
-if (! $classroom = $DB->get_record("block_supervised_classroom", array("id" => $id))) {
-    print_error(get_string("invalidclassroomid", 'block_supervised'));
+if (! $classroom = $DB->get_record('block_supervised_classroom', array('id' => $id))) {
+    print_error(get_string('invalidclassroomid', 'block_supervised'));
 }
 
 if (!can_delete_classroom($id)) {
-    print_error(get_string("cannotdeleteclassroom", 'block_supervised'));
+    print_error(get_string('cannotdeleteclassroom', 'block_supervised'));
 }
 
 // Show form first time.
 if (! $delete) {
-    $strdeletecheck = get_string("deletecheck", "", $classroom->name);
-    $strdeleteclassroomcheck = get_string("deleteclassroomcheck", 'block_supervised');
+    $strdeletecheck = get_string('deletecheck', '', $classroom->name);
+    $strdeleteclassroomcheck = get_string('deleteclassroomcheck', 'block_supervised');
 
     $PAGE->navbar->add($strdeletecheck);
     $PAGE->set_title("$course->shortname: $strdeletecheck");
@@ -62,7 +62,7 @@ if (! $delete) {
 }
 
 if ($delete != md5($classroom->name)) {
-    print_error("invalidmd5");
+    print_error('invalidmd5');
 }
 
 if (!confirm_sesskey()) {

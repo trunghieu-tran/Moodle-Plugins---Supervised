@@ -33,11 +33,11 @@ require_capability('block/supervised:editclassrooms', $PAGE->context);
 
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
-if (! $classroom = $DB->get_record("block_supervised_classroom", array("id" => $id))) {
-    print_error(get_string("invalidclassroomid", 'block_supervised'));
+if (! $classroom = $DB->get_record('block_supervised_classroom', array('id' => $id))) {
+    print_error(get_string('invalidclassroomid', 'block_supervised'));
 }
 
 // Change active field.
