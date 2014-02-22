@@ -84,7 +84,7 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         $outgoing = $this->get_adjacent_transitions($start, true);
         foreach ($outgoing as $transition) {
             if (in_array($pregnode->number, $this->subexpr_ref_numbers)) {
-                $transition->starts_backrefed_subexprs = true;
+                $transition->startsbackrefedsubexprs = true;
             }
         }
     }
@@ -135,7 +135,7 @@ abstract class qtype_preg_nfa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-            $transition->tag_sets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_OPEN, qtype_preg_fa_tag::POS_AT_TRANSITION, $this->pregnode);
+            $transition->tagsets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_OPEN, qtype_preg_fa_tag::POS_AT_TRANSITION, $this->pregnode);
             if ($this->pregnode->subpattern < 0) {
                 continue;
             }
@@ -144,7 +144,7 @@ abstract class qtype_preg_nfa_node {
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
             if ($transition->to === $body['end']) {
-                $transition->tag_sets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_CLOSE, qtype_preg_fa_tag::POS_AT_TRANSITION, $this->pregnode);
+                $transition->tagsets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_CLOSE, qtype_preg_fa_tag::POS_AT_TRANSITION, $this->pregnode);
             }
         }
 
@@ -269,10 +269,10 @@ abstract class qtype_preg_nfa_node_quant extends qtype_preg_nfa_operator {
         $outgoing = $automaton->get_adjacent_transitions($startstate, true);
         $incoming = $automaton->get_adjacent_transitions($endstate, false);
         foreach ($outgoing as $transition) {
-            $transition->starts_quantifier = true;
+            $transition->startsquantifier = true;
         }
         foreach ($incoming as $transition) {
-            $transition->ends_quantifier = true;
+            $transition->endsquantifier = true;
         }
     }
 }
@@ -298,7 +298,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
             $transition->greediness = $realgreediness;        // Set this field for transitions, including original body.
             $newtransition = clone $transition;
             $newtransition->from = $body['end'];
-            $newtransition->is_loop = true;
+            $newtransition->loopsback = true;
             $automaton->add_transition($newtransition);
         }
 
@@ -332,7 +332,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
                     $realgreediness = qtype_preg_fa_transition::min_greediness($newtransition->greediness, $greediness);
                     $newtransition->greediness = $realgreediness; // Set this field only for the last repetition.
                     $newtransition->from = $cur['end'];
-                    $newtransition->is_loop = true;
+                    $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
                 }
             }

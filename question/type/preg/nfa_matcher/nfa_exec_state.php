@@ -431,7 +431,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $pos, $matchlen) {
-        $tagsets = array_reverse($transition->tag_sets);
+        $tagsets = array_reverse($transition->tagsets);
         foreach ($tagsets as $tagset) {
             $this->write_subpatt_info_inner($tagset, $pos, $matchlen);
         }
