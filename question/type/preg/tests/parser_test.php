@@ -298,7 +298,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $handler = $this->run_handler('((ab|cd)ef)');
         $errors = $handler->get_error_nodes();
         $this->assertTrue(empty($errors));
-        $root = $handler->get_ast_root();
     }
     function test_parser_asserts() {
         $handler = $this->run_handler('(?<=\w)(?<!_)a*(?=\w)(?!_)');

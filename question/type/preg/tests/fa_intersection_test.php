@@ -9,6 +9,8 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
+// TODO: 1 class
+
 class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
     public function test_word_starts() {
         $description = 'digraph example {
@@ -1056,7 +1058,7 @@ class qtype_preg_fa_copy_branches_test extends PHPUnit_Framework_TestCase {
     }
 }
 
-class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_fa_remove_unreachable_states_test extends PHPUnit_Framework_TestCase {
 
     public function test_without_blind_states() {
         $dotdescription = 'digraph example {
@@ -1075,7 +1077,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1097,7 +1099,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1120,7 +1122,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1144,7 +1146,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1171,7 +1173,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1198,7 +1200,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1225,7 +1227,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1250,7 +1252,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1276,7 +1278,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');
@@ -1309,7 +1311,7 @@ class qtype_preg_fa_del_blind_states_test extends PHPUnit_Framework_TestCase {
                     }';
         $input = new qtype_preg_nfa(0, 0, 0, array());
         $input->read_fa($dotdescription);
-        $input->del_blind_states();
+        $input->remove_unreachable_states();
         $result = new qtype_preg_nfa(0, 0, 0, array());
         $result->read_fa($dotresult);
         $this->assertEquals($input, $result, 'Result automata is not equal to expected');

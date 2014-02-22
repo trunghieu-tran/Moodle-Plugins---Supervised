@@ -6,8 +6,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 
-
-class preg_fa_read_fa_tests extends PHPUnit_Framework_TestCase {
+class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
 
     public function test_disclosure_tags() {
         $dotdescription = 'digraph example {
