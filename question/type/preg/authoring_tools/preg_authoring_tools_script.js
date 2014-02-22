@@ -240,21 +240,21 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        if (!self.is_tree_selection_rectangle_visible()) {
+        //if (!self.is_tree_selection_rectangle_visible()) {
             var tmp = e.target.id.split(','),
                 indfirst = tmp[1],
                 indlast = tmp[2];
             self.load_content(indfirst, indlast);
             self.load_strings(indfirst, indlast);
-        }
+        //}
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
-        if (!self.is_tree_selection_rectangle_visible()) {
+        //if (!self.is_tree_selection_rectangle_visible()) {
             self.load_content();
             self.load_strings();
-        }
+        //}
     },
 
     graph_node_clicked : function (e) {
@@ -276,9 +276,9 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    is_tree_selection_rectangle_visible : function () {
+    /*is_tree_selection_rectangle_visible : function () {
         return $("#id_tree_selection_mode").is(':checked');
-    },
+    },*/
 
     is_graph_selection_rectangle_visible : function () {
         return $("#id_graph_selection_mode").is(':checked');
@@ -397,7 +397,7 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
 
-            $('#tree_img').mousedown(function(e) {
+            /*$('#tree_img').mousedown(function(e) {
                 e.preventDefault();
                 //check is checked check box
                 if (self.is_tree_selection_rectangle_visible()) {
@@ -413,7 +413,7 @@ M.preg_authoring_tools_script = (function ($) {
             $(window).mouseup(function(e){
                 e.preventDefault();
                 self.CALC_COORD = false;
-            });
+            });*/
 
             tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
@@ -616,7 +616,7 @@ M.preg_authoring_tools_script = (function ($) {
         $('#id_test_regex').html(s);
     },
 
-    btn_tree_select_rectangle_selection_click : function (e) {
+    /*btn_tree_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
         var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img', 'qtype_preg_tree');
@@ -629,7 +629,7 @@ M.preg_authoring_tools_script = (function ($) {
             left : -10,
             top : -10,
         });
-    },
+    },*/
 
     btn_graph_select_rectangle_selection_click : function (e) {
         e.preventDefault();
@@ -646,7 +646,7 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
 
-    btn_tree_selection_mode_rectangle_selection_click : function (e) {
+    /*btn_tree_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
         if (self.is_tree_selection_rectangle_visible()) {
             $('#id_tree_send_select').attr('disabled',false);
@@ -664,7 +664,7 @@ M.preg_authoring_tools_script = (function ($) {
                 top : -10,
             });
         }
-    },
+    },*/
 
     btn_graph_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();

@@ -101,9 +101,8 @@ class qtype_preg_authoring_form extends moodleform {
         $radiotreeorientationsarray = array();
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('vertical', 'editor'), 'vertical', null);
         $radiotreeorientationsarray[] =& $mform->createElement('radio', 'authoring_tools_tree_orientation', '', get_string('horizontal', 'editor'), 'horizontal', null);
-        $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'tree_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        $radiotreeorientationsarray[] =& $mform->createElement('button', 'tree_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
-        //$radiotreeorientationsarray[] =& $mform->createElement('button', 'cancel_select', get_string('authoring_form_rect_selection_cancel', 'qtype_preg'));
+        //$radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'tree_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
+        //$radiotreeorientationsarray[] =& $mform->createElement('button', 'tree_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
@@ -112,7 +111,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                             '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
-                                            '<div id="resizeTree">' .
+                                            /*'<div id="resizeTree">' .
                                                 '<div id="resizeSE"></div>' .
                                                 '<div id="resizeE"></div>' .
                                                 '<div id="resizeNE"></div>' .
@@ -121,7 +120,7 @@ class qtype_preg_authoring_form extends moodleform {
                                                 '<div id="resizeW"></div>' .
                                                 '<div id="resizeSW"></div>' .
                                                 '<div id="resizeS"></div>' .
-                                            '</div>' .
+                                            '</div>' .*/
                                         '</div></br>');
 
         // Add explaining graph tool.
