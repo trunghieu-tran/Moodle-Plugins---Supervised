@@ -30,7 +30,7 @@ $string['pluginname'] = 'Supervised access rule';
 
 $string['checknotrequired']         = 'No';
 $string['checkforall']              = 'Yes, for all lesson types in this course (include "Not specified" lesson type)';
-$string['customcheck']              = 'Yes, for custom lesson types:';
+$string['customcheck']              = 'Yes, for these lesson types:';
 $string['allowcontrol']             = 'Allow only supervised quiz attempts?';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';
 $string['noaccess']                 = 'You can\'t start the quiz now. No active supervised session for you group at this moment with appropriate lesson type.';

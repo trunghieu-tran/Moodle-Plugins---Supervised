@@ -32,8 +32,11 @@ function can_delete_lessontype($lessontypeid) {
     }
 
     // Can not remove lessontype used in quiz_access_rules table.
-    if ($DB->record_exists('quizaccess_supervisedcheck', array('lessontypeid' => $lessontypeid))) {
-        return false;
+    $dbman = $DB->get_manager();
+    if ($dbman->table_exists('quizaccess_supervisedcheck')) {
+        if ($DB->record_exists('quizaccess_supervisedcheck', array('lessontypeid' => $lessontypeid))) {
+            return false;
+        }
     }
 
     return true;
