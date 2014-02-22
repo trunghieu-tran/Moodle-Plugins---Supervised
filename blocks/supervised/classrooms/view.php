@@ -24,11 +24,11 @@ $courseid   = required_param('courseid', PARAM_INT);
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 require_login($course);
@@ -37,11 +37,11 @@ require_capability('block/supervised:editclassrooms', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('classroomspagetitle', 'block_supervised'));
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading_with_help(get_string("classroomsheader", 'block_supervised'), 'classroomsdefinition', 'block_supervised');
+echo $OUTPUT->heading_with_help(get_string('classroomsheader', 'block_supervised'), 'classroomsdefinition', 'block_supervised');
 
 // Prepare table data.
 $classrooms = $DB->get_records('block_supervised_classroom', null, 'name');
@@ -59,9 +59,9 @@ foreach ($classrooms as $id => $classroom) {
     $iconshowhide = '';
     if (can_showhide_classroom($id)) {
         if ($classroom->active) {
-            $showhide = "hide";
+            $showhide = 'hide';
         } else {
-            $showhide = "show";
+            $showhide = 'show';
         }
         $showhideurl = new moodle_url('/blocks/supervised/classrooms/showhide.php', array('courseid' => $courseid, 'id' => $id));
         $iconshowhide = $OUTPUT->action_icon($showhideurl, new pix_icon('t/'.$showhide, get_string($showhide)));
@@ -75,7 +75,7 @@ foreach ($classrooms as $id => $classroom) {
     );
 }
 
-// Add button "Add classroom".
+// Add button 'Add classroom'.
 $params['courseid'] = $courseid;
 $url = new moodle_url('/blocks/supervised/classrooms/addedit.php', $params);
 $caption = get_string('addclassroom', 'block_supervised');

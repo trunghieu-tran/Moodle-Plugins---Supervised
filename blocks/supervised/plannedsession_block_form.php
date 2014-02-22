@@ -95,7 +95,7 @@ class plannedsession_block_form extends moodleform {
         $mform->setType('id', PARAM_INT);
 
         // ...submit button.
-        $mform->addElement('submit', 'submitbutton', get_string('startsession', "block_supervised"));
+        $mform->addElement('submit', 'submitbutton', get_string('startsession', 'block_supervised'));
     }
 
 
@@ -104,8 +104,8 @@ class plannedsession_block_form extends moodleform {
         $errors = array();
 
         // Duration must be greater than zero.
-        if ($data["duration"] <= 0) {
-            $errors["duration"] = get_string("durationvalidationerror", "block_supervised");
+        if ($data['duration'] <= 0) {
+            $errors['duration'] = get_string('durationvalidationerror', 'block_supervised');
         }
 
         return $errors;

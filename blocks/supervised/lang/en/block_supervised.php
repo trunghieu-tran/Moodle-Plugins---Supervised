@@ -115,7 +115,7 @@ Duration (min): {$a->duration}
 Time end:       {$a->timeend}
 
 {$a->comment}';
-$string['enrollteacher']                        = 'To plan a session you must enroll at least one user with ability to supervise sessions to the course!';
+$string['enrollteacher']                        = 'To plan a session you must enroll at least one user with ability to supervise sessions in the course!';
 $string['filterlogsbyuser']                     = 'Filter logs by user';
 $string['finishedstate']                        = 'Finished';
 $string['finishsession']                        = 'Finish session';
@@ -152,11 +152,11 @@ $string['lessontypesview']                      = 'Lesson types in current cours
 $string['logsbreadcrumb']                       = 'Session logs';
 $string['logspagetitle']                        = 'Session logs';
 $string['logsview']                             = 'Session logs';
-$string['messageforteacher']                    = 'Message for the teacher';
+$string['messageforteacher']                    = 'Message for the superviser';
 $string['nosessionsstudenttitle']               = 'You don\'t have any active session...';
 $string['nosessionstitle']                      = 'You don\'t have any planned or active sessions. You can start new session right now';
-$string['notifyteacher']                        = 'Notify teacher by e-mail';
-$string['notifyteacher_help']                   = 'If checked, selected teacher will be notified about creation, removing and any changes in his session. If the teacher will be changed, both will be notified.';
+$string['notifyteacher']                        = 'Notify superviser by e-mail';
+$string['notifyteacher_help']                   = 'If checked, selected superviser will be notified about creation, removing and any changes in his session. If the superviser will be changed, both will be notified.';
 $string['notspecified']                         = 'Not specified';
 $string['pagesizevalidationerror']              = 'Page size must be greater than zero value.';
 $string['plannedsessiontitle']                  = 'You have a planned session';
@@ -173,13 +173,13 @@ $string['sessioninfo']                          = 'Session information';
 $string['sessionlogserror']                     = 'You can\'t view logs of planned session - there is nothing to view';
 $string['sessionsbreadcrumb']                   = 'Sessions';
 $string['sessionsdefinition']                   = 'Sessions definition';
-$string['sessionsdefinition_help']              = 'The course teachers creates sessions specifying the group, lesson type (e.g. laboratory work, exam, etc.), classroom and duration. After that students will be able to start quizzes from this course according next conditions:
+$string['sessionsdefinition_help']              = 'The course superviser creates sessions specifying the group, lesson type (e.g. laboratory work, exam, etc.), classroom and duration. After that students will be able to start quizzes from this course according next conditions:
 
 - the session is active;
 
 - student is in a group for which the session was created;
 
-- student is in session\'s classroom (the teacher can specify the ip subnet for each classroom);
+- student is in session\'s classroom (the superviser can specify the ip subnet for each classroom);
 
 - the session was created for the lesson type which is specified for the quiz (go to quiz settings -> Extra restrictions on attempts).';
 $string['sessionsheader']                       = 'Sessions list';
@@ -201,7 +201,8 @@ $string['supervised:supervise']                 = 'Ability to supervised session
 $string['supervised:viewallsessions']           = 'View all sessions (planned, active and finished) and their logs';
 $string['supervised:viewownsessions']           = 'View own sessions (planned, active and finished) and their logs';
 $string['supervisedsettings']                   = 'Supervised settings';
-$string['teacherhassession']                    = 'Teacher already has a session in this time.';
+$string['superviser']                           = 'Superviser';
+$string['teacherhassession']                    = 'Superviser already has a session in this time.';
 $string['teachervalidationerror']               = 'You can plan session only for yourself.';
 $string['timeend']                              = 'Time end';
 $string['timeendvalidationerror']               = 'The session must be active before {$a} at least.';

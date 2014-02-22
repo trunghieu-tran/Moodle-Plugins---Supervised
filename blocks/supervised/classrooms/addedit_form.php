@@ -35,12 +35,12 @@ class addedit_classroom_form extends moodleform {
         $mform->setType('name', PARAM_RAW);
         $mform->addRule('name', null, 'required', null, 'client');
         // ...iplist element.
-        $mform->addElement('text', 'iplist', get_string("iplist", 'block_supervised'), array('size' => '48'));
+        $mform->addElement('text', 'iplist', get_string('iplist', 'block_supervised'), array('size' => '48'));
         $mform->setType('iplist', PARAM_RAW);
         $mform->addRule('iplist', null, 'required', null, 'client');
         $mform->addHelpButton('iplist', 'iplist', 'block_supervised');
         // ...active checkbox.
-        $mform->addElement('advcheckbox', 'active', get_string("active", 'block_supervised'));
+        $mform->addElement('advcheckbox', 'active', get_string('active', 'block_supervised'));
         $mform->addHelpButton('active', 'active', 'block_supervised');
 
         // ...hidden elements.

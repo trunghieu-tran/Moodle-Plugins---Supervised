@@ -125,7 +125,7 @@ class block_supervised extends block_base {
 
         if ( !empty($plannedsession) ) {
             // Prepare form.
-            $mform = $CFG->dirroot."/blocks/supervised/plannedsession_block_form.php";
+            $mform = $CFG->dirroot.'/blocks/supervised/plannedsession_block_form.php';
             if (file_exists($mform)) {
                 require_once($mform);
             } else {
@@ -165,7 +165,7 @@ class block_supervised extends block_base {
                 // Display form.
                 $toform['id']               = $COURSE->id;
 
-                $strftimedatetime = get_string("strftimerecent");
+                $strftimedatetime = get_string('strftimerecent');
                 $toform['classroomid']      = $plannedsession->classroomid;
                 $toform['groupid']          = $plannedsession->groupid;
                 $toform['lessontypeid']     = $plannedsession->lessontypeid;
@@ -196,7 +196,7 @@ class block_supervised extends block_base {
 
         if ( !empty($activesession) ) {
             // Prepare form.
-            $mform = $CFG->dirroot."/blocks/supervised/activesession_block_form.php";
+            $mform = $CFG->dirroot.'/blocks/supervised/activesession_block_form.php';
 
             if (file_exists($mform)) {
                 require_once($mform);
@@ -260,7 +260,7 @@ class block_supervised extends block_base {
                 }
 
                 // Refresh block: render active session form.
-                $strftimedatetime = get_string("strftimerecent");
+                $strftimedatetime = get_string('strftimerecent');
                 $toform['lessontypename']   = $activesession->lessontypeid != 0 ? $activesession->lessontypename : '';
                 $toform['timestart']        = userdate($activesession->timestart, $strftimedatetime);
                 $toform['timeend']          = userdate($activesession->timeend, $strftimedatetime);
@@ -273,7 +273,7 @@ class block_supervised extends block_base {
                 $toform['id']               = $COURSE->id;
                 $toform['timestartraw']     = $activesession->timestart;
 
-                $strftimedatetime = get_string("strftimerecent");
+                $strftimedatetime = get_string('strftimerecent');
                 $toform['classroomid']      = $activesession->classroomid;
                 $toform['groupid']          = $activesession->groupid;
                 $toform['lessontypename']   = $activesession->lessontypeid != 0 ? $activesession->lessontypename : '';
@@ -377,7 +377,7 @@ class block_supervised extends block_base {
         $isemptyactive = $this->render_activesession_form($sessionstitle, $formbody);
         // No sessions: render start session form.
         if ($isemptyplanned && $isemptyactive) {
-            $classroomsexist = $DB->record_exists("block_supervised_classroom", array('active' => 1));
+            $classroomsexist = $DB->record_exists('block_supervised_classroom', array('active' => 1));
             if ($classroomsexist) {
                 $this->render_startsession_form($sessionstitle, $formbody);
             } else {
@@ -432,13 +432,13 @@ class block_supervised extends block_base {
             $sessionstitle = get_string('activesessionsstudenttitle', 'block_supervised', count($activesessions));
             $blockbody = '';
             // Prepare form.
-            $mform = $CFG->dirroot."/blocks/supervised/activesessionstudent_block_form.php";
+            $mform = $CFG->dirroot.'/blocks/supervised/activesessionstudent_block_form.php';
             if (file_exists($mform)) {
                 require_once($mform);
             } else {
                 print_error('noformdesc');
             }
-            $strftimedatetime = get_string("strftimerecent");
+            $strftimedatetime = get_string('strftimerecent');
             foreach ($activesessions as $session) {
                 $mform = new activesessionstudent_block_form();
                 $toform['id']               = $COURSE->id;
@@ -535,7 +535,7 @@ class block_supervised extends block_base {
         global $CFG, $DB;
         require_once("{$CFG->dirroot}/blocks/supervised/sessions/sessionstate.php");
 
-        mtrace( "Cron script for supervised block is running" );
+        mtrace( 'Cron script for supervised block is running' );
 
         // Find all out of date sessions.
         $select = "SELECT * FROM {block_supervised_session}
@@ -552,7 +552,7 @@ class block_supervised extends block_base {
             $DB->update_record('block_supervised_session', $session);
         }
 
-        mtrace( "Updated " . $sessionscount . " records");
+        mtrace( 'Updated ' . $sessionscount . ' records');
 
         return true;
     }

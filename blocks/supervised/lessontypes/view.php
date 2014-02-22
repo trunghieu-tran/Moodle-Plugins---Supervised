@@ -24,11 +24,11 @@ $courseid   = required_param('courseid', PARAM_INT);
 $site = get_site();
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 if ($site->id == $course->id) {
     // Block can not work in the main course (frontpage).
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 require_login($course);
@@ -36,11 +36,11 @@ require_capability('block/supervised:editlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('lessontypespagetitle', 'block_supervised'));
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 // Display header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading_with_help(get_string("lessontypesview", 'block_supervised'), 'lessontypesdefinition', 'block_supervised');
+echo $OUTPUT->heading_with_help(get_string('lessontypesview', 'block_supervised'), 'lessontypesdefinition', 'block_supervised');
 
 // Prepare table data.
 $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid' => $courseid), 'name');
@@ -58,7 +58,7 @@ foreach ($lessontypes as $id => $lessontype) {
     );
 }
 
-// Add button "Add lesson type".
+// Add button 'Add lesson type'.
 $params['courseid'] = $courseid;
 $url = new moodle_url('/blocks/supervised/lessontypes/addedit.php', $params);
 $caption = get_string('addlessontype', 'block_supervised');

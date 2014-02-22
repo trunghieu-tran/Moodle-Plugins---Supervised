@@ -53,7 +53,7 @@ class displayoptions_logs_form extends moodleform {
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('submit', 'submitbutton', get_string('showlogsbutton', "block_supervised"));
+        $mform->addElement('submit', 'submitbutton', get_string('showlogsbutton', 'block_supervised'));
     }
 
     // Form validation.
@@ -61,8 +61,8 @@ class displayoptions_logs_form extends moodleform {
         $errors = array();
 
         // Page size must be greater than zero.
-        if ($data["pagesize"] <= 0) {
-            $errors["pagesize"] = get_string("pagesizevalidationerror", "block_supervised");
+        if ($data['pagesize'] <= 0) {
+            $errors['pagesize'] = get_string('pagesizevalidationerror', 'block_supervised');
         }
 
         return $errors;

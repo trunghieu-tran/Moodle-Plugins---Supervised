@@ -24,17 +24,17 @@ $id         = required_param('id', PARAM_INT);              // Session id.
 $courseid   = required_param('courseid', PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error("invalidcourseid");
+    print_error('invalidcourseid');
 }
 
 $site = get_site();
 require_login($course);
 $PAGE->set_url('/blocks/supervised/sessions/delete.php', array('id' => $id, 'courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
-require("breadcrumbs.php");
+require('breadcrumbs.php');
 
 if (! $session = get_session($id)) {
-    print_error(get_string("invalidsessionid", 'block_supervised'));
+    print_error(get_string('invalidsessionid', 'block_supervised'));
 }
 
 // Check capabilities.
@@ -52,14 +52,14 @@ if ($session->state == StateSession::FINISHED) {
 }
 
 if ($session->state == StateSession::ACTIVE) {
-    print_error(get_string("sessiondeleteerror", 'block_supervised'));
+    print_error(get_string('sessiondeleteerror', 'block_supervised'));
 }
 
 
 
 
 // Prepare form.
-$mform = "delete_form.php";
+$mform = 'delete_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {
@@ -89,12 +89,12 @@ if ($mform->is_cancelled()) {
     redirect($url);
 } else {
     // The first display.
-    $PAGE->navbar->add(get_string("deletesessionnavbar", 'block_supervised'));
-    $PAGE->set_title(get_string("sessiondeletetitle", 'block_supervised'));
+    $PAGE->navbar->add(get_string('deletesessionnavbar', 'block_supervised'));
+    $PAGE->set_title(get_string('sessiondeletetitle', 'block_supervised'));
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string("sessiondeleteheader", 'block_supervised'), 2);
+    echo $OUTPUT->heading(get_string('sessiondeleteheader', 'block_supervised'), 2);
 
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
 
     $toform['id']               = $id;
     $toform['courseid']         = $courseid;

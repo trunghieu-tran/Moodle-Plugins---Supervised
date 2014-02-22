@@ -33,12 +33,12 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
 
     // Prepare query.
     $params = array();
-    $selector = "(l.time BETWEEN :timefrom AND :timeto) AND l.course = :courseid";
+    $selector = '(l.time BETWEEN :timefrom AND :timeto) AND l.course = :courseid';
     $params['timefrom'] = $timefrom;
     $params['timeto']   = $timeto;
     $params['courseid'] = $session->courseid;
     if ($userid != 0) {
-        $selector .= " AND l.userid = :userid";
+        $selector .= ' AND l.userid = :userid';
         $params['userid'] = $userid;
     }
     // Get logs.
@@ -69,14 +69,14 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
  * @param int $perpage int logs number per page
  * @param string $url the url prefix for pages
  */
-function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url="") {
+function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url='') {
     global $OUTPUT, $DB;
 
     $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page*$perpage, $perpage);
     $totalcount = $logs['totalcount'];
 
     echo "<div class=\"info\">\n";
-    print_string("displayingrecords", "", $totalcount);
+    print_string('displayingrecords', '', $totalcount);
     echo "</div>\n";
 
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
@@ -93,7 +93,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     );
     $table->data = array();
 
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
     foreach ($logs['logs'] as $log) {
 
         if (isset($ldcache[$log->module][$log->action])) {
@@ -152,10 +152,10 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
  * @param $sessionid int session id
  */
 function print_session_info_form($sessionid) {
-    require_once("../sessions/lib.php");
+    require_once('../sessions/lib.php');
 
     // Prepare session info form.
-    $mform = "viewsession_form.php";
+    $mform = 'viewsession_form.php';
     if (file_exists($mform)) {
         require_once($mform);
     } else {
@@ -164,7 +164,7 @@ function print_session_info_form($sessionid) {
     $mform = new viewsession_form();
     $session = get_session($sessionid);
 
-    $strftimedatetime = get_string("strftimerecent");
+    $strftimedatetime = get_string('strftimerecent');
     $toform['coursename']       = html_writer::link(
         new moodle_url("/course/view.php?id={$session->courseid}"),
         $session->coursename);
