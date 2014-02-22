@@ -563,9 +563,9 @@ M.preg_authoring_tools_script = (function ($) {
         // Check ids selected nodes
         //var br = document.getElementById('tree_img').getBoundingClientRect();
         rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') - 200;
-        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + 17 - $('#' + img).prop('offsetTop');
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - $('#' + img).prop('offsetTop');
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') - 200;
-        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + 17 - $('#' + img).prop('offsetTop');
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') - $('#' + img).prop('offsetTop');
         var areas = $('#' + area).children();
         var indfirst = 999;
         var indlast = -999;
