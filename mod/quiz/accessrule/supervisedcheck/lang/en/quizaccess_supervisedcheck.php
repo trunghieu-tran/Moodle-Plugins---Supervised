@@ -29,7 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Supervised access rule';
 
 $string['checknotrequired']         = 'No';
-$string['checkforall']              = 'Yes, for all lesson types in this course (include "Not specified" lesson type)';
+$string['checkforall']              = 'Yes, for all lesson types in this course';
+$string['checkrequired']            = 'Yes';
 $string['customcheck']              = 'Yes, for these lesson types:';
 $string['allowcontrol']             = 'Allow only supervised quiz attempts?';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';

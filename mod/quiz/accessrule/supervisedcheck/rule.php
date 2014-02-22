@@ -134,9 +134,11 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         // Radiobuttons (modes).
         $radioarray = array();
         $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
-        $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
         if (count($lessontypes) > 0) {  // Render 3rd mode only if we have some lesson types in course.
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
             $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('customcheck', 'quizaccess_supervisedcheck'), 2);
+        } else { // No lesson types, so just it's just yes/no.
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkrequired', 'quizaccess_supervisedcheck'), 1);
         }
         $mform->addGroup($radioarray, 'radioar', get_string('allowcontrol', 'quizaccess_supervisedcheck'), '<br/>', false);
 
