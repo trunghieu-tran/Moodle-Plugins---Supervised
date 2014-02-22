@@ -235,7 +235,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                 continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
             }
-            if ($transition->is_loop || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
+            if ($transition->loopsback || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
             }
             $closure = $this->epsilon_closure(array($laststate->state => $laststate));
@@ -280,7 +280,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
                 }
                 // Skip loops.
-                if ($transition->is_loop) {
+                if ($transition->loopsback) {
                     continue;
                 }
 
@@ -375,7 +375,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         continue;
                     }
                     // Skip loops.
-                    if ($transition->is_loop) {
+                    if ($transition->loopsback) {
                         continue;
                     }
 
@@ -470,7 +470,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
                     //echo "total length is {$newstate->length}\n\n";
                     // Save the current match.
-                    if (!($transition->is_loop && $newstate->has_null_iterations())) {
+                    if (!($transition->loopsback && $newstate->has_null_iterations())) {
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             $lazystates[] = $newstate;
                         } else {
