@@ -91,7 +91,22 @@ class grade_form extends moodleform {
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
         require_once('attempts.php');
         $mform->addElement('static',null,null,attempts_page::show_attempt($attempt));
+
+        // Show comments on previous attempts if have.
+        $latestattempt = $poasmodel->get_last_attempt($assignee->id);
+        if ($latestattempt->attemptnumber != 1) {
+            $mform->addElement('header', 'prevcommentsheader', get_string('prevattempts_comments', 'poasassignment'));
+            $attempts = array_reverse($DB->get_records('poasassignment_attempts',
+                array('assigneeid' => $assignee->id), 'attemptnumber'));
+            foreach ($attempts as $curattempt) {
+                if ($curattempt != $latestattempt) {
+                    $mform->addElement('static', null, null, attempts_page::show_comments($curattempt));
+                }
+            }
+        }
+
         $mform->addElement('header','gradeeditheader',get_string('gradeeditheader','poasassignment'));
+        $mform->setExpanded('gradeeditheader');
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$instance['poasassignmentid']));
         for($i=0;$i<101;$i++) 
             $opt[]=$i.'/100';

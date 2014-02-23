@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'POAS assignment';
-$string['modulename_help'] = "The POAS assignment module allows teachers to develop single task or variations of task, collect work from students, review it and provide feedback including multi-criterion grades. Module can distribute multiple task’s variants between students in different ways, using one of distribution strategies.";
+$string['modulename_help'] = "The POAS assignment module allows teachers to develop single task or variations of task, collect work from students, review it and provide feedback including multi-criterion grades. Module can distribute multiple tasks variants between students in different ways, using one of distribution strategies.";
 $string['submissionoptions'] = 'Submission options';
 $string['modulenameplural'] = 'POAS assignments';
 $string['poasassignmentfieldset'] = 'Individual tasks';
@@ -401,3 +401,4 @@ $string['wogroup'] = 'Without groups';
 $string['group'] = 'Group';
 $string['raisnotinstalled'] = 'Remote autotester plugin is not installed';
 $string['nothingtoshow'] = 'Nothing to show';
+$string['prevattempts_comments'] = 'Comments on previous attempts';
