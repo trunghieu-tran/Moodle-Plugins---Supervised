@@ -99,7 +99,7 @@ class qtype_preg_notation_pcreextended extends qtype_preg_notation {
         if ($targetnotation == 'native') {
             return $this->regex;
         }
-        parent::convert_regex($targetnotation);
+        return parent::convert_regex($targetnotation);
     }
 
     public function convert_options($targetnotation) {
@@ -135,6 +135,6 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
             // Put it back together to make the regexp.
             return implode('.*', $excapedbits);
         }
-        parent::convert_regex($targetnotation);
+        return parent::convert_regex($targetnotation);
     }
 }

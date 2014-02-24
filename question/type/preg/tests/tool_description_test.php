@@ -320,9 +320,6 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         );
     }
 
-}
-
-class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider form_provider
      */
@@ -342,10 +339,7 @@ class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
           array('a|bc|','<span style="color:blue">a</span>(form g) or <span style="color:blue">b</span>(form g)<span style="color:blue">c</span>(form g) or nothing(form g)','рус - TODO'),
         );
     }
-}
 
-
-class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
     public function test_vardump()
     {
         $regex = '(?i)[\xff\x00-\x1fA-B\t\n]';

@@ -261,7 +261,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
         $rangestart = 0;
         $prevcode = -1;
         $state = self::FIRST_CHAR;
-        $curcode = -1;
         for ($i = 0; $i < $length; $i++) {
             $curcode = core_text::utf8ord($str[$i]);
             if ($state == self::FIRST_CHAR) {

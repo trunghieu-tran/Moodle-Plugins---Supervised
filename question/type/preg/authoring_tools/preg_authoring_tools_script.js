@@ -121,8 +121,11 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
-                    $("#id_selection_mode").change(self.btn_selection_mode_rectangle_selection_click);
-                    $('#id_send_select').click(self.btn_select_rectangle_selection_click);
+                    $("#id_tree_selection_mode").change(self.btn_tree_selection_mode_rectangle_selection_click);
+                    $('#id_tree_send_select').click(self.btn_tree_select_rectangle_selection_click);
+
+                    $("#id_graph_selection_mode").change(self.btn_graph_selection_mode_rectangle_selection_click);
+                    $('#id_graph_send_select').click(self.btn_graph_select_rectangle_selection_click);
 
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
@@ -138,8 +141,9 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
-                    $('#id_send_select').attr('disabled',true);
-                    
+                    $('#id_tree_send_select').attr('disabled',true);
+                    $('#id_graph_send_select').attr('disabled',true);
+
                     self.panzooms.init();
                     options.oneachpresscallback();
                 });
@@ -209,7 +213,7 @@ M.preg_authoring_tools_script = (function ($) {
                 this_id = preg_id + '_auth';
             $(preg_id).val($(this_id).val());
         });
-        self.textbutton_widget.close_and_set_new_data('');
+        self.textbutton_widget.close_and_set_new_data(self.textbutton_widget.data);
         $('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val($('#id_regex_match_text').val());
         $('#id_test_regex').html('');
         M.form.updateFormState("mform1");
@@ -236,7 +240,26 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        if (!self.is_tree_selection_rectangle_visible()) {
+        //if (!self.is_tree_selection_rectangle_visible()) {
+            var tmp = e.target.id.split(','),
+                indfirst = tmp[1],
+                indlast = tmp[2];
+            self.load_content(indfirst, indlast);
+            self.load_strings(indfirst, indlast);
+        //}
+    },
+
+    tree_node_misclicked : function (e) {
+        e.preventDefault();
+        //if (!self.is_tree_selection_rectangle_visible()) {
+            self.load_content();
+            self.load_strings();
+        //}
+    },
+
+    graph_node_clicked : function (e) {
+        e.preventDefault();
+        if (!self.is_graph_selection_rectangle_visible()) {
             var tmp = e.target.id.split(','),
                 indfirst = tmp[1],
                 indlast = tmp[2];
@@ -245,16 +268,20 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    tree_node_misclicked : function (e) {
+    graph_node_misclicked : function (e) {
         e.preventDefault();
-        if (!self.is_tree_selection_rectangle_visible()) {
+        if (!self.is_graph_selection_rectangle_visible()) {
             self.load_content();
             self.load_strings();
         }
     },
 
-    is_tree_selection_rectangle_visible : function () {
-        return $("#id_selection_mode").is(':checked');
+    /*is_tree_selection_rectangle_visible : function () {
+        return $("#id_tree_selection_mode").is(':checked');
+    },*/
+
+    is_graph_selection_rectangle_visible : function () {
+        return $("#id_graph_selection_mode").is(':checked');
     },
     
     cache_key_for_explaining_tools : function (indfirst, indlast) {
@@ -370,95 +397,23 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img.attr('src', t.img).css('visibility', 'visible');
             tree_map.html(t.map);
 
-            $('#tree_img').mousedown(function(e) {
+            /*$('#tree_img').mousedown(function(e) {
                 e.preventDefault();
                 //check is checked check box
                 if (self.is_tree_selection_rectangle_visible()) {
-
-                    self.CALC_COORD = true;
-                    var br = document.getElementById('tree_img').getBoundingClientRect();
-                    $('#resizeMe').Resizable(
-                        {
-                            minWidth: 20,
-                            minHeight: 20,
-                            maxWidth: (br.right - br.left),
-                            maxHeight: (br.bottom - br.top),
-                            minTop: 1,
-                            minLeft: 1,
-                            maxRight: br.right - br.left,
-                            maxBottom: br.bottom - br.top,
-                            dragHandle: true,
-                            onDrag: function(x, y)
-                            {
-                                this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
-                            },
-                            handlers: {
-                                se: '#resizeSE',
-                                e: '#resizeE',
-                                ne: '#resizeNE',
-                                n: '#resizeN',
-                                nw: '#resizeNW',
-                                w: '#resizeW',
-                                sw: '#resizeSW',
-                                s: '#resizeS'
-                            },
-                            onResize : function(size, position) {
-                                this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
-                            }
-                        }
-                    );
-
-                    self.RECTANGLE_WIDTH = e.pageX - $(window).prop('scrollX') - br.left;
-                    self.RECTANGLE_HEIGHT = e.pageY - $(window).prop('scrollY') - br.top;
-
-                    $('#resizeMe').css({
-                        width : 20,
-                        height : 20,
-                        left : self.RECTANGLE_WIDTH,
-                        top : self.RECTANGLE_HEIGHT,
-                    });
+               		self.init_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
                 }
             });
 
             $('#tree_img').mousemove(function(e) {
                 e.preventDefault();
-                if (self.CALC_COORD) {
-                    var br = document.getElementById('tree_img').getBoundingClientRect();
-                    var new_pageX = e.pageX - $(window).prop('scrollX') - br.left;
-                    var new_pageY = e.pageY - $(window).prop('scrollY') - br.top;
-
-                    if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
-                        $('#resizeMe').css({
-                            width : (new_pageX - self.RECTANGLE_WIDTH)-10,
-                            height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
-                        });
-                    } else if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
-                        $('#resizeMe').css({
-                            width : (new_pageX - self.RECTANGLE_WIDTH)-10,
-                            height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
-                            top : new_pageY,
-                        });
-                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
-                        $('#resizeMe').css({
-                            width : (self.RECTANGLE_WIDTH - new_pageX)-10,
-                            height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
-                            top : new_pageY,
-                            left : new_pageX,
-                        });
-                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
-                        $('#resizeMe').css({
-                            width : (self.RECTANGLE_WIDTH - new_pageX)-10,
-                            height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
-                            left : new_pageX,
-                        });
-                    }
-                }
+                self.resize_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
             });
 
-            end_rectangle_selection : $(window).mouseup(function(e){
+            $(window).mouseup(function(e){
                 e.preventDefault();
                 self.CALC_COORD = false;
-            });
+            });*/
 
             tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
@@ -469,8 +424,27 @@ M.preg_authoring_tools_script = (function ($) {
         if (typeof g != 'undefined' && g.img && g.map) {
             graph_img.attr('src', g.img).css('visibility', 'visible');
             graph_map.html(g.map);
-            graph_map.click(self.tree_node_misclicked);
-            $(self.GRAPH_MAP_ID + ' > area').click(self.tree_node_clicked);
+
+            $('#graph_img').mousedown(function(e) {
+                e.preventDefault();
+                //check is checked check box
+                if (self.is_graph_selection_rectangle_visible()) {
+               		self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+                }
+            });
+
+            $('#graph_img').mousemove(function(e) {
+                e.preventDefault();
+                self.resize_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+            });
+
+            $(window).mouseup(function(e){
+                e.preventDefault();
+                self.CALC_COORD = false;
+            });
+
+            graph_map.click(self.graph_node_misclicked);
+            $(self.GRAPH_MAP_ID + ' > area').click(self.graph_node_clicked);
         } else if (typeof g != 'undefined') {
             graph_err.html(g);
         }
@@ -490,60 +464,116 @@ M.preg_authoring_tools_script = (function ($) {
         $(window).scrollTop(scroll);
     },
 
-    display_strings : function (s) {
-        $('#id_test_regex').html(s);
-    },
 
-    btn_select_rectangle_selection_click : function (e) {
-        e.preventDefault();
+    resize_rectangle_selection : function(e, img, rectangle, hnd) {
+    	if (self.CALC_COORD) {
+            var br = document.getElementById(img).getBoundingClientRect();
+            var new_pageX = self.get_current_x(e, br);
+            var new_pageY = self.get_current_y(e, br, img, hnd);
 
-        var sel = self.get_rect_selection();
-        self.load_content(sel.indfirst, sel.indlast);
-        self.load_strings(sel.indfirst, sel.indlast);
-
-        $('#resizeMe').css({
-            width : 0,
-            height : 0,
-            left : -10,
-            top : -10,
-        });
-    },
-
-    btn_selection_mode_rectangle_selection_click : function (e) {
-        e.preventDefault();
-        if (self.is_tree_selection_rectangle_visible()) {
-            $('#id_send_select').attr('disabled',false);
-            $('#tree_img').attr("usemap", "");
-            self.panzooms.reset_tree();
-            self.panzooms.disable_tree();
-        } else {
-            $('#id_send_select').attr('disabled',true);
-            $('#tree_img').attr("usemap", "#qtype_preg_tree");
-            self.panzooms.enable_tree();
-            $('#resizeMe').css({
-                width : 0,
-                height : 0,
-                left : -10,
-                top : -10,
-            });
+            if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+                $('#' + rectangle).css({
+                    width : (new_pageX - self.RECTANGLE_WIDTH)-10,
+                    height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
+                });
+            } else if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+                $('#' + rectangle).css({
+                    width : (new_pageX - self.RECTANGLE_WIDTH)-10,
+                    height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
+                    top : new_pageY,
+                });
+            } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+                $('#' + rectangle).css({
+                    width : (self.RECTANGLE_WIDTH - new_pageX)-10,
+                    height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
+                    top : new_pageY,
+                    left : new_pageX,
+                });
+            } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+                $('#' + rectangle).css({
+                    width : (self.RECTANGLE_WIDTH - new_pageX)-10,
+                    height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
+                    left : new_pageX,
+                });
+            }
         }
     },
 
-    get_rect_selection : function (e) {
-        // check ids selected nodes
-        var br = document.getElementById('tree_img').getBoundingClientRect();
-        rect_left_bot_x = $('#resizeMe').prop('offsetLeft');
-        rect_left_bot_y = $('#resizeMe').prop('offsetTop') + $('#resizeMe').prop('offsetHeight') + 17;
-        rect_right_top_x = $('#resizeMe').prop('offsetLeft') + $('#resizeMe').prop('offsetWidth');
-        rect_right_top_y = $('#resizeMe').prop('offsetTop') + 17;
-        var areas = $('#qtype_preg_tree').children();
+    init_rectangle_selection : function(e, img, rectangle, hnd) {
+        self.CALC_COORD = true;
+        var br = document.getElementById(img).getBoundingClientRect();
+        $('#' + rectangle).Resizable(
+            {
+                minWidth: 20,
+                minHeight: 20,
+                maxWidth: (br.right - br.left),
+                maxHeight: (br.bottom - br.top),
+                minTop: $('#' + hnd).prop('offsetTop'),
+                minLeft: 220,
+                maxRight: br.right - br.left + 220,
+                maxBottom: br.bottom - br.top + $('#' + hnd).prop('offsetTop'),
+                dragHandle: true,
+                onDrag: function(x, y) {
+                    this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
+                },
+                handlers: {
+                    se: '#resizeSE',
+                    e: '#resizeE',
+                    ne: '#resizeNE',
+                    n: '#resizeN',
+                    nw: '#resizeNW',
+                    w: '#resizeW',
+                    sw: '#resizeSW',
+                    s: '#resizeS'
+                },
+                onResize : function(size, position) {
+                    this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
+                }
+            }
+        );
+
+        self.RECTANGLE_WIDTH = self.get_current_x(e, br);
+        self.RECTANGLE_HEIGHT = self.get_current_y(e, br, img, hnd);
+
+        $('#' + rectangle).css({
+            width : 20,
+            height : 20,
+            left : self.RECTANGLE_WIDTH,
+            top : self.RECTANGLE_HEIGHT,
+            visibility : 'visible',
+        });
+    },
+
+    get_current_x : function(e, br) {
+        //var br = document.getElementById('tree_img').getBoundingClientRect();
+        //var local_x = e.pageX - $(window).prop('scrollX') - br.left;
+        return e.pageX - $(window).prop('scrollX') - br.left + 220;
+    },
+
+    get_current_y : function(e, br, img, hnd) {
+        //var br = document.getElementById('tree_hnd').getBoundingClientRect();
+        //var local_y = e.pageY - $(window).prop('scrollY') - br.top;
+        return e.pageY - $(window).prop('scrollY') 
+                - document.getElementById(hnd).getBoundingClientRect().top
+       	        + $('#' + img).prop('offsetTop');// - br.top + $('#tree_hnd').prop('offsetTop');
+                //+ document.getElementById('tree_hnd').scrollTop;
+    },
+
+    get_rect_selection : function (e, rectangle, img, area) {
+        // Check ids selected nodes
+        //var br = document.getElementById('tree_img').getBoundingClientRect();
+        rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') - 200;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - $('#' + img).prop('offsetTop');
+        rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') - 200;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') - $('#' + img).prop('offsetTop');
+        var areas = $('#' + area).children();
         var indfirst = 999;
         var indlast = -999;
         // check all areas and select indfirst and indlast
         var i = 0;
         while (areas[i]) {
             var nodeId = areas[i].id.split(',');
-            var nodeCoords = areas[i].coords.split(',');
+            var nodeCoords = areas[i].coords.split(/[, ]/);
             if (areas[i].shape == "rect") {
                 nodeCoords = [
                     nodeCoords[0], nodeCoords[1],
@@ -580,6 +610,80 @@ M.preg_authoring_tools_script = (function ($) {
             indfirst : indfirst,
             indlast : indlast
         };
+    },
+
+    display_strings : function (s) {
+        $('#id_test_regex').html(s);
+    },
+
+    /*btn_tree_select_rectangle_selection_click : function (e) {
+        e.preventDefault();
+
+        var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img', 'qtype_preg_tree');
+        self.load_content(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);
+
+        $('#resizeTree').css({
+            width : 0,
+            height : 0,
+            left : -10,
+            top : -10,
+        });
+    },*/
+
+    btn_graph_select_rectangle_selection_click : function (e) {
+        e.preventDefault();
+
+        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img', 'qtype_preg_graph');
+        self.load_content(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);
+
+        $('#resizeGraph').css({
+            width : 0,
+            height : 0,
+            left : -10,
+            top : -10,
+        });
+    },
+
+    /*btn_tree_selection_mode_rectangle_selection_click : function (e) {
+        e.preventDefault();
+        if (self.is_tree_selection_rectangle_visible()) {
+            $('#id_tree_send_select').attr('disabled',false);
+            $('#tree_img').attr("usemap", "");
+            self.panzooms.reset_tree();
+            self.panzooms.disable_tree();
+        } else {
+            $('#id_tree_send_select').attr('disabled',true);
+            $('#tree_img').attr("usemap", "#qtype_preg_tree");
+            self.panzooms.enable_tree();
+            $('#resizeTree').css({
+                width : 0,
+                height : 0,
+                left : -10,
+                top : -10,
+            });
+        }
+    },*/
+
+    btn_graph_selection_mode_rectangle_selection_click : function (e) {
+        e.preventDefault();
+        if (self.is_graph_selection_rectangle_visible()) {
+            $('#id_graph_send_select').attr('disabled',false);
+            $('#graph_img').attr("usemap", "");
+            self.panzooms.reset_graph();
+            self.panzooms.disable_graph();
+        } else {
+            $('#id_graph_send_select').attr('disabled',true);
+            $('#graph_img').attr("usemap", "#qtype_preg_graph");
+            self.panzooms.enable_graph();
+            $('#resizeGraph').css({
+                width : 0,
+                height : 0,
+                left : -10,
+                top : -10,
+            });
+        }
     },
 
     /** Checks for cached data and if it doesn't exist, sends a request to the server */
@@ -679,19 +783,29 @@ M.preg_authoring_tools_script = (function ($) {
             tree_img.panzoom("reset");
         },
 
+        reset_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("reset");
+        },
+
         disable_tree : function() {
             var tree_img = $('#tree_img');
             tree_img.panzoom("disable");
+        },
+
+        disable_graph : function() {
+            var graph_img = $('#graph_img');
+            graph_img.panzoom("disable");
         },
         
         enable_tree : function() {
             var tree_img = $('#tree_img');
             tree_img.panzoom("enable");
         },
-        
-        reset_graph : function() {
+
+        enable_graph : function() {
             var graph_img = $('#graph_img');
-            graph_img.panzoom("reset");
+            graph_img.panzoom("enable");
         },
 
         reset_all : function() {
@@ -725,7 +839,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         init : function() {
             self.panzooms.init_graph();
-            //self.panzooms.init_tree();
+            self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {

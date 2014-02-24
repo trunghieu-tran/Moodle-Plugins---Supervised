@@ -88,14 +88,24 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         return 'graph';
     }
 
+    public function generate_html() {
+        if ($this->regex->string() == '') {
+            return $this->data_for_empty_regex();
+        } else if ($this->errors_exist() || $this->get_ast_root() == null) {
+            return $this->data_for_unaccepted_regex();
+        }
+        $data = $this->data_for_accepted_regex();
+        return '<img src="' . $data['img'] . '">';
+    }
+
     /**
      * Overloaded from qtype_preg_authoring_tool.
      */
-    public function generate_json_for_accepted_regex(&$json) {
+    public function data_for_accepted_regex() {
         $graph = $this->create_graph();
         $dotscript = $graph->create_dot();
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
-        $json[$this->json_key()] = array(
+        return array(
             'img' => 'data:image/svg+xml;base64,' . base64_encode($rawdata),
             'map' => qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx')
         );

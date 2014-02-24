@@ -600,11 +600,11 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         }
     }
 
-    public function accept() {
+    /*public function accept() {
         // Failing conditional subexpressions before finding a good way to show each of them.
         // TODO - remove when consensus will emerge.
         return get_string($this->pregnode->type, 'qtype_preg');
-    }
+    }*/
 
     protected function process_operator($graph) {
         $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id);
@@ -637,14 +637,20 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             $label = array(get_string('explain_define', 'qtype_preg'));
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else {
-            $index = count($this->operands) == 3 ? 2 : 1;
-            $tmp = $this->operands[$index]->create_graph();
+            $tmp = $this->operands[0]->create_graph();
             $condsubexpr->subgraphs[0]->assume_subgraph($tmp);
         }
 
-        $point = count($condsubexpr->subgraphs[0]->nodes) ? $condsubexpr->subgraphs[0]->nodes[0] : $condsubexpr->subgraphs[0]->subgraphs[0]->nodes[0];
-        $condsubexpr->subgraphs[0]->entries[] = $point;
-        $condsubexpr->subgraphs[0]->exits[] = $point;
+        if ($isassert) {
+            $point = $condsubexpr->subgraphs[0]->subgraphs[0]->nodes[0];
+            $condsubexpr->subgraphs[0]->entries[] = $condsubexpr->subgraphs[0]->nodes[0];
+            $condsubexpr->subgraphs[0]->exits[] = $point;
+            $point = $condsubexpr->subgraphs[0]->nodes[0];
+        } else {
+            $point = $condsubexpr->subgraphs[0]->nodes[0];
+            $condsubexpr->subgraphs[0]->entries[] = $point;
+            $condsubexpr->subgraphs[0]->exits[] = $point;
+        }
 
         $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph(
                                             $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? '' : '',
@@ -653,7 +659,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         $condsubexpr->subgraphs[1]->style = 'dashed';
         $condsubexpr->subgraphs[1]->color = 'purple';
 
-        $tmp = $this->operands[0]->create_graph();
+        $tmp = $this->operands[$isassert ? 1 : 0]->create_graph();
         $condsubexpr->subgraphs[1]->assume_subgraph($tmp);
         $condsubexpr->subgraphs[1]->entries[] = end($tmp->entries);
         $condsubexpr->subgraphs[1]->exits[] = end($tmp->exits);
@@ -663,7 +669,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             $condsubexpr->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('', 0.3 + $this->pregnode->id);
             $condsubexpr->subgraphs[2]->style = 'dashed';
             $condsubexpr->subgraphs[2]->color = 'purple';
-            $tmp = $this->operands[1]->create_graph();
+            $tmp = $this->operands[$isassert ? 2 : 1]->create_graph();
             $condsubexpr->subgraphs[2]->assume_subgraph($tmp);
             $condsubexpr->subgraphs[2]->entries[] = end($tmp->entries);
             $condsubexpr->subgraphs[2]->exits[] = end($tmp->exits);
