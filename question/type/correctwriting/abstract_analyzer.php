@@ -50,6 +50,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      */
     protected $basestringpair;
 
+
     /**
      * Best (judging by fitness) string pairs generated as result of analyzer's work.
      *
@@ -59,12 +60,6 @@ abstract class qtype_correctwriting_abstract_analyzer {
      */
     protected $resultstringpairs = array();
 
-    /**
-     * Mistakes for resulting string pairs; for each pair should be corresponding mistakes array with equivalent index.
-     *
-     * @var array of arrays of qtype_correctwriting_response_mistake child classes 
-     */
-    protected $resultmistakes = array();
 
     /**
      * Returns analyzer internal name, which can be used as an argument to get_string().
@@ -77,7 +72,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * You are normally don't want to overload it. Overload analyze() and bypass() instead.
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      * When called without params just creates empty object to call analyzer-dependent functions on.
-     *
+     * @throws moodle_exception if invalid number of string pairs
      * @param qtype_correctwriting_question $question
      * @param qtype_correctwriting_string_pair $basepair a pair, passed as input
      * @param block_formal_langs_abstract_language $language a language
@@ -94,9 +89,9 @@ abstract class qtype_correctwriting_abstract_analyzer {
             $this->bypass();
         } else {
             $this->analyze();
-            if (count($this->resultstringpairs) != count($this->resultmistakes)) {
-                throw new moodle_exception('Invalid number of string pairs or mistake from CorrectWriting question analyzer '// TODO - make a language string and normal exception.
-                                            . get_string($this->name(), 'qtype_correctwriting'));
+            if (count($this->resultstringpairs) == 0) {
+                throw new moodle_exception('There must be at least one output pair in '
+                                           . get_string($this->name(), 'qtype_correctwriting')); // TODO - make a language string and normal exception.
             }
         }
     }
@@ -115,7 +110,6 @@ abstract class qtype_correctwriting_abstract_analyzer {
      * Don't actually analyze something, no mistakes generated: just fill necessary fields in string pair.
      */
     protected function bypass() {
-        $this->resultmistakes[] = array();// Add an empty mistakes array.
         $this->resultstringpairs[] = clone $this->basestringpair; //Clone string pair for future use.
     }
 
@@ -126,22 +120,38 @@ abstract class qtype_correctwriting_abstract_analyzer {
         return $this->resultstringpairs;
     }
 
-    /**
-     * Returns resulting mistakes array.
-     */
-    public function result_mistakes() {
-        return $this->resultmistakes;
-    }
 
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_response_mistake';
+    }
     /**
      * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes.
      * Used to choose best matched answer.
      * Fitness is negative or zero (no errors, full match).
      * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight.
      * Each analyzer will calculate fitness only for it's own mistakes, ignoring mistakes from other analyzers.
-     * @param array of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
+     * Dev. comment: since all mistakes have weight, we can have common algorithm as reduction operation
+     * on this mistakes.
+     * @param array $mistakes of qtype_correctwriting_response_mistake child classes $mistakes Mistakes to calculate fitness from, can be empty array.
+     * @return double
      */
-    abstract public function fitness($mistakes);
+    public function fitness($mistakes) {
+        $result = 0;
+        $mytype =  $this->own_mistake_type();
+        if (count($mistakes)) {
+            /** qtype_correctwriting_response_mistake $mistake */
+            foreach($mistakes as $mistake) {
+                if (is_a($mistake, $mytype)) {
+                    $result += $mistake->weight;
+                }
+            }
+        }
+        return $result * -1;
+    }
 
     /**
      * Returns an array of hint keys, supported by mistakes from this analyzer.
@@ -171,6 +181,7 @@ abstract class qtype_correctwriting_abstract_analyzer {
     /**
      * Called from edit_correctwriting_form::definition_inner() within form section for this analyzer.
      * You will typically call parent, then add other fields.
+     * @param MoodleQuickForm $mform
      */
     public function form_section_definition(&$mform) {
         foreach ($this->float_form_fields() as $params) {
@@ -212,9 +223,55 @@ abstract class qtype_correctwriting_abstract_analyzer {
     /**
      * Returns if the language is compatible with this analyzer.
      * I.e. syntax analyzer compatible only with parser containing languages.
-     * @param $lang a language object from block_formal_langs
+     * @param block_formal_langs_abstract_language $lang a language object from block_formal_langs
+     * @return boolean
      */
     public function is_lang_compatible($lang) {
         return true; // Accept all by default.
+    }
+
+    /**
+     * Allows analyzer to replace mistakes from other analyzer.
+     * For example syntax_analyzer can replace mistakes from sequence_analyzer.
+     *
+     * Types of mistakes should be matched against other with replaces_mistake_types.
+     * @return array
+     */
+    protected function replaces_mistake_types() {
+        return array();
+    }
+
+    /**
+     * Whether we should filter mistake from list of mistakes.
+     * Called if replaces_mistake_types returns one mistake
+     * @param qtype_correctwriting_response_mistake  $mistake
+     * @return boolean
+     */
+    protected function should_mistake_be_removed($mistake) {
+        return false;
+    }
+
+    /**
+     * Analyzer can use this function to filter out all mistakes, thst it does not need
+     * @param qtype_correctwriting_string_pair $pair a string pair
+     * @return array of qtype_correctwriting_response_mistake a mistake set
+     */
+    protected function remove_mistake_types_from_mistake_set($pair) {
+        $types = $this->replaces_mistake_types();
+
+        if (count($types)) {
+            foreach($types as $type) {
+                $mistakes = $pair->mistakes_by_type($type);
+                $resultmistakes = array();
+                if (count($mistakes)) {
+                    foreach($mistakes as $mistake) {
+                        if ($this->should_mistake_be_removed($mistake) == false) {
+                            $resultmistakes[] = $mistake;
+                        }
+                    }
+                }
+                $pair->set_mistakes_by_type($type, $resultmistakes);
+            }
+        }
     }
 }

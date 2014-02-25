@@ -32,7 +32,95 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * LCS for sequence analyzer
      * @var array
      */
-    protected $lcs;
+    protected $lcs = array();
+    /**
+     * Set to true, when two answers are equal
+     *
+     * If two answers are equal, we should not care about results - because a student response is
+     * correct
+     *
+     * @var bool
+     */
+    protected $aretokensequencesequal = false;
+
+    /**
+     * A mistake set for arrays
+     *
+     * @var array
+     */
+    protected $mistakes = array();
+
+
+    public function __clone() {
+        parent::__clone();
+        $oldmistakes = $this->mistakes;
+        if (is_array($oldmistakes)) {
+            foreach($oldmistakes as $type => $mistakes) {
+                $this->mistakes[$type] = array();
+                if (count($mistakes)) {
+                    foreach($mistakes as $mistake) {
+                        $this->mistakes[$type][] = $mistake;
+                    }
+                }
+            }
+        }
+    }
+
+    public function are_strings_equal() {
+        return $this->aretokensequencesequal;
+    }
+
+    public function assert_that_strings_are_equal() {
+        $this->aretokensequencesequal = true;
+    }
+
+    public function mistakes() {
+        $result = array();
+        foreach($this->mistakes as $type => $mistakes) {
+            if (count($result) == 0) {
+                $result = $mistakes;
+            } else {
+                $result = array_merge($result, $mistakes);
+            }
+        }
+        return $result;
+    }
+
+    public function set_mistakes($mistakes) {
+        $this->mistakes = array();
+        $this->append_mistakes($mistakes);
+    }
+
+
+    public function append_mistake($mistake) {
+        $type = get_class($mistake);
+        if (array_key_exists($type, $this->mistakes) == false) {
+            $this->mistakes[$type] = array();
+        }
+        $this->mistakes[$type][] = $mistake;
+    }
+
+    public function append_mistakes($mistakes) {
+        if (count($mistakes) != 0) {
+            foreach($mistakes as $mistake) {
+                $this->append_mistake($mistake);
+            }
+        }
+    }
+
+    public function mistakes_by_type($type) {
+        $totaltype = 'qtype_correctwriting_' . $type;
+        $result = array();
+        if (array_key_exists($totaltype, $this->mistakes)) {
+            $result = $this->mistakes[$totaltype];
+        }
+        return $result;
+    }
+
+    public function set_mistakes_by_type($type, $set) {
+        $totaltype = 'qtype_correctwriting_' . $type;
+        $this->mistakes[$totaltype] = $set;
+    }
 
     /**
      * Array of real indexes for correct answer in table.
@@ -43,10 +131,10 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     /**
      * Creates a new string as a copy of this with a lcs
      * @param array $lcs LCS
-     * @return block_formal_langs_string_pair
+     * @return qtype_correctwriting_string_pair
      */
     public function copy_with_lcs($lcs) {
-        $pair = new qtype_correctwriting_string_pair($this->correctstring, $this->comparedstring, $this->matches);
+        $pair = clone $this;
         $pair->lcs = $lcs;
         return $pair;
     }
