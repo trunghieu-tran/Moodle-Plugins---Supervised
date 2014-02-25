@@ -52,7 +52,10 @@ abstract class  qtype_correctwriting_response_mistake {
     /** @var Weight of mistake used in mark computation. */
     public $weight;
 
-
+    /** @var  A source analyzer to make possible for string to climb to tokens
+     * That has been entered by user
+     */
+    public $source;
 
     /**
      * Return a comma-separated list of token desciprions of these tokens, null if there is none.
