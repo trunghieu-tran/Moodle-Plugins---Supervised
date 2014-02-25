@@ -123,6 +123,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     }
 
     /**
+     * Array of real indexes for correct answer in table.
+     * @var array
+     */
+    protected $indexesintable;
+
+    /**
      * Creates a new string as a copy of this with a lcs
      * @param array $lcs LCS
      * @return qtype_correctwriting_string_pair
@@ -141,4 +147,36 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
         return $this->lcs;
     }    
 
+    /**
+     * Return object of class
+     */
+   public function __construct($correct, $compared, $matches) {
+        block_formal_langs_string_pair::__construct($correct, $compared, $matches);
+        $this->indexesintable = array();
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
+    }
+
+    /**
+    * Set indexes in table  array for correctstring
+    * @param array - array of indexes
+    */
+    public function set_indexes_in_table($newindexes) {
+        $this->indexesintable = $newindexes;
+    }
+
+    /**
+    * Create complete copy of current pair without common references
+    * @return object of qtype_correctwriting_string_pair $pair copy of current pair 
+    */
+    public function __clone() {
+        // Clone answers.
+        $this->correctstring = clone($this->correctstring());
+        $this->correctedstring = clone($this->correctedstring());
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
+    }
 }
+
