@@ -436,6 +436,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         $analyzername = $analyzers[$index];
         $createdanalyzername = 'qtype_correctwriting_' . $analyzername;
         $bypass  = $this->is_analyzer_enabled($analyzername) == false;
+        $string->analyzersequence[] = $createdanalyzername;
         /** @var qtype_correctwriting_abstract_analyzer $analyzer */
         $analyzer = new $createdanalyzername($this, $string, $this->get_used_language(), $bypass);
 
