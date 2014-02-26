@@ -1495,6 +1495,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function go_round_transitions($del) {
         $clonetransitions = array();
+        $tagsets = array();
         if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
@@ -1502,18 +1503,45 @@ abstract class qtype_preg_finite_automaton {
         }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
+            if ($transition->from != $transition->to) {
             $tran = clone($transition);
-            $tran->unite_tags($del);
+            $tagsets = array();
+            $t = clone($tran);
+            // Work with tags.
+            if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) {
+                foreach ($del->tagsets as $set) {
+                    $set->set_tags_position(qtype_preg_fa_tag::POS_AT_TRANSITION);
+                }
+                $tagsets = array_merge($del->tagsets, $transition->tagsets);
+            } else {
+                foreach ($del->tagsets as $set) {
+                    $set->set_tags_position(qtype_preg_fa_tag::POS_BEFORE_TRANSITION);
+                }
+                $tagsets = array_merge($transition->tagsets, $del->tagsets);
+            }
+            //$t = clone($tran);
+            $t->tagsets = $tagsets;
+            //$t->tagsets = $t->flatten_tags();
+            //svar_dump($t->tagsets);
+            //var_dump($t->get_label_for_dot($t->from, $t->to));
+            var_dump($del->get_label_for_dot($del->from, $del->to));
             $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
             $tran->pregleaf = $newleaf;
-            $clonetransitions[] = $tran;
+            $tran->tagsets = $tagsets;
+
+            $clonetransitions[] = $tran;}
         }
         // Has deleting or changing transitions.
         if (count($transitions) !=0) {
             if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor())) {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
+                    //var_dump($tran->get_label_for_dot($tran->from, $tran->to));
+                    //if ($tran->to != $tran->from)
                     $this->add_transition($tran);
+                    print_r($this->fa_to_dot());
+                    //if ($tran->to == $tran->from)
+                        //$this->remove_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as $tran) {
@@ -1523,6 +1551,7 @@ abstract class qtype_preg_finite_automaton {
             }
             $this-> remove_transition($del);
         }
+
     }
 
     /**
@@ -1641,7 +1670,7 @@ abstract class qtype_preg_finite_automaton {
      * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
      * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
      */
-    public function merge_uncapturing_transitions($transitiontype, &$stateindex) {
+    public function merge_uncapturing_transitions($transitiontype) {
         $newfront = array();
         $stateschecked = array();
         // Getting types of uncaptyring transitions.
@@ -1660,55 +1689,59 @@ abstract class qtype_preg_finite_automaton {
                 if (!$waschanged && array_search($state, $stateschecked) === false) {
                     $transitions = $this->get_adjacent_transitions($state, true);
                     // Searching transition of given type.
-                    foreach ($transitions as &$tran) {
+                    foreach ($transitions as $tran) {
                         $tran->set_transition_type();
-                        if ($tran->type == $trantype1 || $tran->type == $trantype2) {
+                        if (($tran->type == $trantype1 || $tran->type == $trantype2)&& $tran->to != $tran->from) {
                             // Choice of merging way.
-                            $intotransitions = $this->get_adjacent_transitions($tran->to, false);
-                            if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
+                            //$intotransitions = $this->get_adjacent_transitions($tran->to, false);
+                            //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
+                            
                                 $this->go_round_transitions($tran);
-                                $waschanged = true;
-                            } else {
-                                if ($tran->to == $stateindex) {
-                                    $stateindex = $tran->from;
-                                }
-                                $waschanged = $this->merge_transitions($tran);
-                            }
+                                //printf($this->fa_to_dot());
+                                //$waschanged = true;
+                            //} else {
+                              //  if ($tran->to == $stateindex) {
+                                //    $stateindex = $tran->from;
+                                //}
+                                //$waschanged = $this->merge_transitions($tran);
+                            //}
                             // Adding changed state to new wavefront.
-                            $newfront[] = $state;
-                            $addedstate = array_search($state, $stateschecked);
-                            if ($addedstate !== false) {
-                                unset($stateschecked[$addedstate]);
-                            }
+                            //$newfront[] = $state;
+                            //$addedstate = array_search($state, $stateschecked);
+                            //if ($addedstate !== false) {
+                              //  unset($stateschecked[$addedstate]);
+                            //}
                             // If nothing changes in automata state is checked.
-                            if (!$waschanged) {
-                                $stateschecked[] = $state;
-                                $newfront[] = $tran->to;
-                            }
-                            $outtransitions = $this->get_adjacent_transitions($state, true);
+                            //if (!$waschanged) {
+                                //$stateschecked[] = $state;
+                                $newfront[] = $state;
+                            //}
+                            //$outtransitions = $this->get_adjacent_transitions($state, true);
                             // Delete cycle of uncapturing transition.
-                            $wasdel = false;
-                            foreach ($outtransitions as $outtran) {
-                                if (!$wasdel) {
-                                    if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
-                                        $this-> remove_transition($outtran);
-                                        unset($newfront[count($newfront)-1]);
-                                        $wasdel = true;
-                                    }
-                                }
-                            }
+                            //$wasdel = false;
+                            //foreach ($outtransitions as $outtran) {
+                                //if (!$wasdel) {
+                                    //if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
+                                        //$this-> remove_transition($outtran);
+                                        //unset($newfront[count($newfront)-1]);
+                                        //$wasdel = true;
+                                    //}
+                                //}
+                            //}
                         } else {
                             $newfront[] = $tran->to;
-                            if (($waschanged && array_search($state, $newfront) === false) || !$waschanged) {
+                            //if (array_search($state, $newfront) === false) {
                                 $stateschecked[] = $state;
-                            }
+                            //}
                         }
                     }
                 }
             }
             $oldfront = $newfront;
+            var_dump($newfront);
             $newfront = array();
         }
+        $this->remove_unreachable_states();
     }
 
     /**

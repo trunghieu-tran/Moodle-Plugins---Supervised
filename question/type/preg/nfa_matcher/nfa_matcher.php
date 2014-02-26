@@ -169,7 +169,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result = array('lazy' => array(),
                         'greedy' => $startstates
                         );
-
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
             $curstate = array_pop($curstates);
@@ -535,6 +534,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstates[] = $state;
             }
         }
+
         $closure = $this->epsilon_closure($curstates);
         $lazystates = array_merge($lazystates, $closure['lazy']);
         $closure = $closure['greedy'];
@@ -603,7 +603,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $reached = $this->epsilon_closure($reached);
             $lazystates = array_merge($lazystates, $reached['lazy']);
             $reached = $reached['greedy'];
-
+                            
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
@@ -633,6 +633,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
+                        
         if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 3) {
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
@@ -652,6 +653,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         // Choose the best one.
         $result = null;
+
         foreach ($possiblematches as $match) {
             if ($result === null || $match->leftmost_longest($result, false)) {
                 $result = $match;
@@ -659,14 +661,17 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
 
         if ($result === null) {
+
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
         // Generate an extension for partial matches.
         $result->extendedmatch = null;
         if (!$result->is_full() /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+
             // Try each backtrack state and choose the shortest one.
             $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
+            
             foreach ($result->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
@@ -697,15 +702,19 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $result->left = $left;
                 }
             }
+
         }
+
         return $result;
     }
 
     public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         $result = $this->match_from_pos_internal($str, $startpos);
+
         if ($result->extendedmatch !== null) {
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
         }
+
         return $result->to_matching_results();
     }
 
@@ -763,7 +772,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $dst_node->create_automaton($result, $stack);
             $body = array_pop($stack);
             $result->after_build($body);
-            $result->merge_epsilons();
+            $t = clone $result;
+            var_dump("\n");
+            printf($result->fa_to_dot());
+            //$result->merge_epsilons();
+            $result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
+            //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
+            //$result = $t;
         } catch (Exception $e) {
             $result = false;
         }
