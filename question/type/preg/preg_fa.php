@@ -144,7 +144,7 @@ class qtype_preg_fa_transition {
     /** @var bool - does this transition make a infinite quantifier loop? */
     public $loopsback;
     /** @var array of qtype_preg_fa_tag - cached value for flatten_tags() method. */
-    private $flattentags;
+    public $flattentags;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
@@ -195,6 +195,9 @@ class qtype_preg_fa_transition {
     }
 
     public function get_label_for_dot($index1, $index2) {
+        $clone= clone $this;
+        $clone->flattentags = null;
+        $clone->flatten_tags();
         $addedcharacters = '/(), ';
         if (strpbrk($index1, $addedcharacters) !== false) {
             $index1 = '"' . $index1 . '"';
@@ -209,8 +212,8 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
-        $open = $this->open_tags_tohr();
-        $close = $this->close_tags_tohr();
+        $open = $clone->open_tags_tohr();
+        $close = $clone->close_tags_tohr();
         $lab = $this->pregleaf->leaf_tohr();
         $lab = '"' . $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close . '"';
 
