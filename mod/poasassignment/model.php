@@ -1532,7 +1532,7 @@ class poasassignment_model {
                 if ($assignee = $this->get_assignee($userid, $this->poasassignment->id)) {
                     $attemptscount = $DB->count_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
                     if ($attempt = $DB->get_record('poasassignment_attempts', array('assigneeid' => $assignee->id, 'attemptnumber' => $attemptscount))) {
-                        if (!$this->attempt_is_checked($attempt)) {
+                        if ($this->attempt_is_grade_needed($attempt)) {
                             $notchecked++;
                         }
                     }
@@ -1552,7 +1552,7 @@ class poasassignment_model {
             foreach ($assignees as $assignee) {
                 $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
                 if ($attempt = $DB->get_record('poasassignment_attempts',array('assigneeid' => $assignee->id,'attemptnumber' => $attemptscount))) {
-                    if (!$this->attempt_is_checked($attempt)) {
+                    if ($this->attempt_is_grade_needed($attempt)) {
                         $notchecked++;
                     }
                 }
@@ -1569,12 +1569,13 @@ class poasassignment_model {
         return "<align='right'>".html_writer::link($submissionsurl,$html);
     }
 
-    function attempt_is_checked($attempt) {
+    function attempt_is_grade_needed($attempt) {
         if ($attempt->draft) {
-            return isset($attempt->ratingdate) && ($attempt->ratingdate > $attempt->attemptdate);
+            return false;
+            //return isset($attempt->ratingdate) && ($attempt->ratingdate > $attempt->attemptdate);
         }
         else {
-            return ($attempt->ratingdate > $attempt->attemptdate)  && isset($attempt->rating);
+            return !($attempt->ratingdate > $attempt->attemptdate) || !isset($attempt->rating);
         }
     }
 
