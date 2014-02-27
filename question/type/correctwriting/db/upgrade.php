@@ -102,10 +102,10 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         }
 
         $record = new stdClass();
-        $record->islexicalanalyzerenabled = 1;
-        $record->isenumanalyzerenabled = 1;
+        $record->islexicalanalyzerenabled = 0;
+        $record->isenumanalyzerenabled = 0;
         $record->issequenceanalyzerenabled = 1;
-        $record->issyntaxanalyzerenabled = 1;
+        $record->issyntaxanalyzerenabled = 0;
         $result = $DB->get_records('qtype_correctwriting', null, 'id', 'id');
         if (count($result)) {
             foreach($result as $id => $object) {
