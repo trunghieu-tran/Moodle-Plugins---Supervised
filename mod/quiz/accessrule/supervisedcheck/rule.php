@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/blocks/supervised/sessions/sessionstate.php');
  */
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
-    public function getAppropriatedSessions($userid, $courseid, $lessontypes){
+    public function get_appropriate_sessions($userid, $courseid, $lessontypes){
         global $DB;
 
         // Select all active sessions with $courseid.
@@ -92,7 +92,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $lessontypes[] = $lessontype->id;
         }
 
-        $sessions = $this->getAppropriatedSessions($USER->id, $COURSE->id, $lessontypes);
+        $sessions = $this->get_appropriate_sessions($USER->id, $COURSE->id, $lessontypes);
 
         if (!empty($sessions)){
             // Ok, we have an active session(s) with appropriate lesson type. Now check an ip address.
@@ -134,9 +134,11 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         // Radiobuttons (modes).
         $radioarray = array();
         $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
-        $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
         if (count($lessontypes) > 0) {  // Render 3rd mode only if we have some lesson types in course.
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
             $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('customcheck', 'quizaccess_supervisedcheck'), 2);
+        } else { // No lesson types, so just it's just yes/no.
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkrequired', 'quizaccess_supervisedcheck'), 1);
         }
         $mform->addGroup($radioarray, 'radioar', get_string('allowcontrol', 'quizaccess_supervisedcheck'), '<br/>', false);
 
@@ -217,7 +219,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
     }
 
     /**
-     * We do not use get_settings_sql because we can have more than one rule fur the quiz.
+     * We do not use get_settings_sql because we can have more than one rule for the quiz.
      *
      * @param int $quizid the quiz id.
      * @return array setting value name => value.
@@ -240,14 +242,14 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                                                          array $data, $files, mod_quiz_mod_form $quizform) {
         // For custom lesson type selection mode user must check at least one lesson type.
         if($data['supervisedmode'] == 2){
-            $isAllUnchecked = true;
+            $isallunchecked = true;
             foreach ($data as $key => $value) {
                 if (  (substr($key, 0, 21) == 'supervisedlessontype_') && ($value == 1)  ) {
-                    $isAllUnchecked = false;
+                    $isallunchecked = false;
                 }
             }
 
-            if($isAllUnchecked){
+            if($isallunchecked){
                 $errors['radioar'] = get_string('uncheckedlessontypes', 'quizaccess_supervisedcheck');
             }
         }
