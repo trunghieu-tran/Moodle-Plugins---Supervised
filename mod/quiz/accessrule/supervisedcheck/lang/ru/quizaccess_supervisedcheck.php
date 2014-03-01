@@ -28,11 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Supervised access rule';
 
-$string['checknotrequired']         = 'No';
-$string['checkforall']              = 'Yes, for all lesson types in this course';
-$string['checkrequired']            = 'Yes';
-$string['customcheck']              = 'Yes, for these lesson types:';
-$string['allowcontrol']             = 'Allow only supervised quiz attempts?';
-$string['uncheckedlessontypes']     = 'You must check at least one lesson type';
-$string['noaccess']                 = 'You can\'t start the quiz now. No active supervised session for you group at this moment with appropriate lesson type.';
-$string['iperror']                  = 'You can\'t start the quiz because your ip isn\'t in classroom subnet.';
+$string['checknotrequired']         = 'Нет';
+$string['checkforall']              = 'Да, для всех типов занятий';
+$string['checkrequired']            = 'Да';
+$string['customcheck']              = 'Да, только на занятиях следующих типов:';
+$string['allowcontrol']             = 'Позволять попытки только на занятиях?';
+$string['uncheckedlessontypes']     = 'Выберите хотя бы один тип занятия';
+$string['noaccess']                 = 'Вы не можете выполнять тест. Дождитесь необходимого занятия в вашей группе.';
+$string['iperror']                  = 'Вы не можете выполнять тест. Вы должны находится в классе, где проходит занятие и работать на компьютерах, с которых разрешено тестирование.';
