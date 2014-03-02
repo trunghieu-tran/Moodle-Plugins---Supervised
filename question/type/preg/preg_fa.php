@@ -1500,7 +1500,7 @@ abstract class qtype_preg_finite_automaton {
     public function go_round_transitions($del) {
         $clonetransitions = array();
         $tagsets = array();
-        if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) {
+        if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && array_search($del->to,$this->end_states()) !== false)) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
             $transitions = $this->get_adjacent_transitions($del->to, true);
@@ -1510,9 +1510,8 @@ abstract class qtype_preg_finite_automaton {
             if ($transition->from != $transition->to) {
             $tran = clone($transition);
             $tagsets = array();
-            $t = clone($tran);
             // Work with tags.
-            if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) {
+            if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && array_search($del->to,$this->end_states()) !== false)) {
                 foreach ($del->tagsets as $set) {
                     $set->set_tags_position(qtype_preg_fa_tag::POS_AT_TRANSITION);
                 }
@@ -1523,12 +1522,6 @@ abstract class qtype_preg_finite_automaton {
                 }
                 $tagsets = array_merge($transition->tagsets, $del->tagsets);
             }
-            //$t = clone($tran);
-            $t->tagsets = $tagsets;
-            //$t->tagsets = $t->flatten_tags();
-            //svar_dump($t->tagsets);
-            //var_dump($t->get_label_for_dot($t->from, $t->to));
-            var_dump($del->get_label_for_dot($del->from, $del->to));
             $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
             $tran->pregleaf = $newleaf;
             $tran->tagsets = $tagsets;
@@ -1537,15 +1530,10 @@ abstract class qtype_preg_finite_automaton {
         }
         // Has deleting or changing transitions.
         if (count($transitions) !=0) {
-            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor())) {
+            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && array_search($del->to,$this->end_states()) !== false)) {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
-                    //var_dump($tran->get_label_for_dot($tran->from, $tran->to));
-                    //if ($tran->to != $tran->from)
                     $this->add_transition($tran);
-                    print_r($this->fa_to_dot());
-                    //if ($tran->to == $tran->from)
-                        //$this->remove_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as $tran) {
@@ -1555,7 +1543,6 @@ abstract class qtype_preg_finite_automaton {
             }
             $this-> remove_transition($del);
         }
-
     }
 
     /**
@@ -1695,12 +1682,13 @@ abstract class qtype_preg_finite_automaton {
                     // Searching transition of given type.
                     foreach ($transitions as $tran) {
                         $tran->set_transition_type();
-                        if (($tran->type == $trantype1 || $tran->type == $trantype2)&& $tran->to != $tran->from) {
-                            // Choice of merging way.
+                        if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
+                            // Choice of merging way
                             //$intotransitions = $this->get_adjacent_transitions($tran->to, false);
                             //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
-                            
+                             $newfront[] = $tran->to;
                                 $this->go_round_transitions($tran);
+                               
                                 //printf($this->fa_to_dot());
                                 //$waschanged = true;
                             //} else {
@@ -1718,7 +1706,8 @@ abstract class qtype_preg_finite_automaton {
                             // If nothing changes in automata state is checked.
                             //if (!$waschanged) {
                                 //$stateschecked[] = $state;
-                                $newfront[] = $state;
+                                   // $newfront[] = $tran->to;
+
                             //}
                             //$outtransitions = $this->get_adjacent_transitions($state, true);
                             // Delete cycle of uncapturing transition.
@@ -1735,6 +1724,7 @@ abstract class qtype_preg_finite_automaton {
                         } else {
                             $newfront[] = $tran->to;
                             //if (array_search($state, $newfront) === false) {
+                                //$newfront[] = $tran->to;
                                 $stateschecked[] = $state;
                             //}
                         }
@@ -1742,10 +1732,19 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
             $oldfront = $newfront;
-            var_dump($newfront);
             $newfront = array();
         }
+        foreach (array_keys($this->adjacencymatrix[0]) as $state) {
+            $outtransitions = $this->get_adjacent_transitions($state, true);
+            foreach ($outtransitions as $t) {
+                $t->set_transition_type();
+                if ($t->to == $t->from && ($t->type == $trantype1 || $t->type == $trantype2)) {
+                    $this->go_round_transitions($t);
+                }
+            }
+        }
         $this->remove_unreachable_states();
+        printf ($this->fa_to_dot());
     }
 
     /**
