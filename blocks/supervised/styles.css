@@ -1,3 +1,4 @@
+/* Styles for block's body */
 .block_supervised .content {
     font-size: 11px;
 }
@@ -5,22 +6,21 @@
     font-size: 13px;
 }
 
-.block_supervised .content .mform .fitem .felement {
-    margin-left: 35%;
-}
-
 .block_supervised .content .mform .fdescription.required {
     display: none;
 }
 
-.block_supervised .content select {
-    width: 98px;
+.block_supervised .content .mform .fitem .fitemtitle {
+    width: auto;
 }
 
-.block_supervised .content .mform .fitem .fgroup {
+.block_supervised .content .mform .fitem .fstatic,
+.block_supervised .content .mform .fitem .fselect,
+.block_supervised .content .mform .fitem .ftext {
     margin-left: 0;
 }
 
+/* Styles for view sessions page */
 #supervisedblock_selectcourseform {
     text-align: center;
     width: 100%;
