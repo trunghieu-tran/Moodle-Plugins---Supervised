@@ -244,6 +244,29 @@ M.preg_authoring_tools_script = (function ($) {
             var tmp = e.target.id.split(','),
                 indfirst = tmp[1],
                 indlast = tmp[2];
+
+            if(self.is_tree_foldind_mode()) {
+                var points = $('input[name=\'tree_fold_node_points\'').val();
+                // if new point not contained
+                if(points.split(',').indexOf(indfirst) == -1 || points.split(',').indexOf(indlast) == -1) {
+                    // add new point
+                    if(points != '') {
+                        points += ',';
+                    }
+                    points += indfirst + ',' + indlast;
+                } else { // if new point already contained
+                    // remove this point
+                    if(points.indexOf(',' + indfirst + ',' + indlast) != -1) {
+                        points = points.replace(',' + indfirst + ',' + indlast, '');
+                    } else if(points.indexOf(indfirst + ',' + indlast + ',') != -1) {
+                        points = points.replace(indfirst + ',' + indlast + ',', '');
+                    } else {
+                        points = points.replace(indfirst + ',' + indlast, '');
+                    }
+                }
+                $('input[name=\'tree_fold_node_points\'').val(points);
+            }
+
             self.load_content(indfirst, indlast);
             self.load_strings(indfirst, indlast);
         //}
@@ -252,9 +275,10 @@ M.preg_authoring_tools_script = (function ($) {
     tree_node_misclicked : function (e) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
+        if(!self.is_tree_foldind_mode()) {
             self.load_content();
             self.load_strings();
-        //}
+        }
     },
 
     graph_node_clicked : function (e) {
@@ -761,7 +785,7 @@ M.preg_authoring_tools_script = (function ($) {
                 indlast: indlast,
                 treeorientation: self.get_orientation(),
                 displayas: self.get_displayas(),
-                treeisfold: $("#id_tree_folding_mode").is(':checked') ? 1 : 0,
+                treeisfold: $('input[name=\'tree_fold_node_points\'').val(),
                 ajax: true
             },
             success: self.upd_content_success
