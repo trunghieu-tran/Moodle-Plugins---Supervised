@@ -203,6 +203,8 @@ M.preg_authoring_tools_script = (function ($) {
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
         self.panzooms.reset_all();
+
+        $('input[name=\'tree_fold_node_points\'').val('');
     },
 
     btn_save_clicked : function (e) {
