@@ -457,6 +457,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             }
             // Starting indexes are always the same, equal $pos
             $index = $pos;
+            if ($tag->pos == qtype_preg_fa_tag::POS_AFTER_TRANSITION) {
+                $index += $matchlen;
+            }
             //echo "opening {$tag->pregnode->subpattern} at pos {$tag->pos}\n";
             $this->set_current_match($tag->pregnode->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
@@ -472,7 +475,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $current_match = $this->current_match($tag->pregnode->subpattern);
             $index = $current_match[0];
             $length = $pos - $index;
-            if ($tag->pos == qtype_preg_fa_tag::POS_AT_TRANSITION) {
+            if ($tag->pos != qtype_preg_fa_tag::POS_BEFORE_TRANSITION) {
                 $length += $matchlen;
             }
             //echo "closing {$tag->pregnode->subpattern} at pos {$tag->pos}\n";

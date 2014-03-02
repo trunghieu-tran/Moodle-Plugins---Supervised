@@ -41,6 +41,7 @@ class qtype_preg_fa_tag {
     // When the tag value should be writted: before or after a character match
     const POS_BEFORE_TRANSITION = 0x0004;
     const POS_AT_TRANSITION = 0x0008;
+    const POS_AFTER_TRANSITION = 0x0010;
 
     public $type;
     public $pos;
@@ -183,7 +184,7 @@ class qtype_preg_fa_transition {
     public function clear_cache() {
         $this->flattentags = null;
     }
-    
+
     /**
      * Returns 1-dimensional array of all tags from all sets in this transition.
      */
@@ -1513,7 +1514,7 @@ abstract class qtype_preg_finite_automaton {
             // Work with tags.
             if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && array_search($del->to,$this->end_states()) !== false)) {
                 foreach ($del->tagsets as $set) {
-                    $set->set_tags_position(qtype_preg_fa_tag::POS_AT_TRANSITION);
+                    $set->set_tags_position(qtype_preg_fa_tag::POS_AFTER_TRANSITION);
                 }
                 $tagsets = array_merge($del->tagsets, $transition->tagsets);
             } else {
@@ -1688,7 +1689,7 @@ abstract class qtype_preg_finite_automaton {
                             //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
                              $newfront[] = $tran->to;
                                 $this->go_round_transitions($tran);
-                               
+
                                 //printf($this->fa_to_dot());
                                 //$waschanged = true;
                             //} else {
