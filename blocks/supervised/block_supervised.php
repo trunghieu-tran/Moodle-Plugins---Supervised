@@ -528,6 +528,36 @@ class block_supervised extends block_base {
     }
 
     /**
+     * Returns active sessions of current user in current course.
+     * User must be in session's group and have an ip address from session classroom's subnet.
+     *
+     * @return array active sessions
+     */
+    public static function user_active_sessions() {
+        require_once('sessions/sessionstate.php');
+        global $USER, $DB, $COURSE;
+
+        // Select all active sessions in current course.
+        $sessions = $DB->get_records('block_supervised_session',
+            array('state' => StateSession::ACTIVE, 'courseid'=>$COURSE->id));
+
+        // Filter sessions by lessontype and userid.
+        foreach($sessions as $id=>$session) {
+            // Check if current user is in current session's group.
+            $useringroup = $DB->record_exists('block_supervised_user', array('sessionid'=>$id, 'userid'=>$USER->id));
+            // Check if the ip of current user is in classroom's subnet.
+            $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
+
+            if( !($useringroup && $userinsubnet) ) {
+                unset($sessions[$id]);  // Remove current session.
+            }
+        }
+
+        print_object($sessions);
+        return $sessions;
+    }
+
+    /**
      * Cron function that changes out-of-date session statuses from Planned and Active to Finish
      * @return bool true
      */
