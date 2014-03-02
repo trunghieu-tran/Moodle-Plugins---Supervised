@@ -603,7 +603,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $reached = $this->epsilon_closure($reached);
             $lazystates = array_merge($lazystates, $reached['lazy']);
             $reached = $reached['greedy'];
-                            
+
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
@@ -633,7 +633,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
-                        
+
         if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 3) {
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
@@ -671,7 +671,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
             // Try each backtrack state and choose the shortest one.
             $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
-            
+
             foreach ($result->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
@@ -773,8 +773,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $body = array_pop($stack);
             $result->after_build($body);
             $t = clone $result;
-            var_dump("\n");
-            printf($result->fa_to_dot());
+            printf($result->fa_to_dot() . "\n");
             //$result->merge_epsilons();
             $result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);

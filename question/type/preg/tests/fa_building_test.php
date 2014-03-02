@@ -5,6 +5,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 
+//$CFG->pathtodot = '/usr/bin/dot';
+
 class qtype_preg_fa_building_test extends PHPUnit_Framework_TestCase {
 
     protected $dir;
