@@ -152,5 +152,33 @@ function cleanup($courseid) {
     // Delete access rules.
     $quizzids = $DB->get_records('quiz', array('course' => $courseid));
     $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+}
 
+/**
+ * Returns active sessions of current user in current course.
+ * User must be in session's group and have an ip address from session classroom's subnet.
+ *
+ * @return array active sessions
+ */
+function user_active_sessions() {
+    require_once('sessions/sessionstate.php');
+    global $USER, $DB, $COURSE;
+
+    // Select all active sessions in current course.
+    $sessions = $DB->get_records('block_supervised_session',
+        array('state' => StateSession::ACTIVE, 'courseid'=>$COURSE->id));
+
+    // Filter sessions by lessontype and userid.
+    foreach($sessions as $id=>$session) {
+        // Check if current user is in current session's group.
+        $useringroup = $DB->record_exists('block_supervised_user', array('sessionid'=>$id, 'userid'=>$USER->id));
+        // Check if the ip of current user is in classroom's subnet.
+        $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
+
+        if( !($useringroup && $userinsubnet) ) {
+            unset($sessions[$id]);  // Remove current session.
+        }
+    }
+
+    return $sessions;
 }

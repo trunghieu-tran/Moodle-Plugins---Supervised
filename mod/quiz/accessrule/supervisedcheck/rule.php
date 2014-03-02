@@ -37,32 +37,10 @@ require_once($CFG->dirroot . '/blocks/supervised/sessions/sessionstate.php');
  */
 class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
-    public function get_appropriate_sessions($userid, $courseid, $lessontypes){
-        global $DB;
-
-        // Select all active sessions with $courseid.
-        $sessions = $DB->get_records('block_supervised_session', array('state' => StateSession::ACTIVE, 'courseid'=>$courseid));
-
-        // Filter sessions by lessontype and userid
-        foreach($sessions as $id=>$session){
-            // Check if user is in current session's group.
-            $useringroup = $session->groupid == 0 ? true : groups_is_member($session->groupid, $userid);
-            // Check if current session's lessontype is in passed $lessontypes array.
-            $islessontype = in_array($session->lessontypeid, $lessontypes);
-            if( !($useringroup && $islessontype) ){
-                // Remove current session.
-                unset($sessions[$id]);
-            }
-        }
-
-        return $sessions;
-    }
-
-
-
-
     public function prevent_access() {
         global $DB, $COURSE, $USER;
+        require_once('../../blocks/supervised/lib.php');
+
         // Check capabilities: teachers always have an access
         if(has_capability('block/supervised:supervise', context_course::instance($COURSE->id))){
             return false;
@@ -86,32 +64,31 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         }
 
         // If we are here, check is required.
-        // Just reorganize $lessontypesdb array.
-        $lessontypes = array();
-        foreach($lessontypesdb as $lessontype){
-            $lessontypes[] = $lessontype->id;
+        // Reorganize $lessontypesdb array.
+        $lessontypes = array_keys($lessontypesdb);
+
+        // Get user's active sessions.
+        $sessions = user_active_sessions();
+        if (empty($sessions)) {
+            // We havn't active sessions with current user ip and group.
+            return get_string('iperror', 'quizaccess_supervisedcheck');
         }
 
-        $sessions = $this->get_appropriate_sessions($USER->id, $COURSE->id, $lessontypes);
-
-        if (!empty($sessions)){
-            // Ok, we have an active session(s) with appropriate lesson type. Now check an ip address.
-            $isinsubnet = false;
-            foreach($sessions as $session){
-                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$session->classroomid));
-                if(address_in_subnet($USER->lastip, $classroom->iplist)){
-                    $isinsubnet = true;
-                    break;
-                }
-            }
-            if($isinsubnet){
-                return false;
-            }
-            else{
-                return get_string('iperror', 'quizaccess_supervisedcheck');
+        // Filter sessions by lessontype and userid
+        foreach($sessions as $id=>$session) {
+            // Check if current session's lessontype is in passed $lessontypes array.
+            $islessontype = in_array($session->lessontypeid, $lessontypes);
+            if( !$islessontype ) {
+                // Remove current session.
+                unset($sessions[$id]);
             }
         }
-        else{
+
+        if (!empty($sessions)) {
+            return false;
+        }
+        else {
+            // We havn't active sessions for quiz's lesson types.
             return get_string('noaccess', 'quizaccess_supervisedcheck');
         }
     }
