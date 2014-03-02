@@ -131,18 +131,21 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Placed outside render_hint to be able to get colored string without real question.
      * You still need a dummy one with 'engine' field set.
-     * @param $withpic bool show by icon whether match is full.
+     *
+     * @param $renderer a qtype_preg_renderer object to render parts of the string.
+     * @param $matchresults matching results to show hint for.
+     * @param $testing bool if true, called from testing - should render icon, also show string even for pure-assert match.
      */
-    public function render_colored_string_by_matchresults($renderer, $matchresults, $withpic = false) {
+    public function render_colored_string_by_matchresults($renderer, $matchresults, $testing = false) {
 
         $wronghead = '';
         $correctpart = '';
         $wrongtail = '';
-        if ($withpic) { // Add icon, showing whether match is full or no.
+        if ($testing) { // Add icon, showing whether match is full or no.
            $wronghead .= $renderer->render_match_icon($matchresults->full);
         }
 
-        if ($this->could_show_hint($matchresults)) {
+        if ($this->could_show_hint($matchresults, $testing)) {
 
             $wronghead .= $renderer->render_unmatched($matchresults->match_heading());
 
@@ -169,11 +172,12 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
          return $wronghead.$correctpart.$wrongtail;
     }
 
-    public function could_show_hint($matchresults) {
+    public function could_show_hint($matchresults, $testing) {
         $queryengine = $this->question->get_query_matcher($this->question->engine);
         // Correctness should be shown if engine support partial matching or a full match is achieved.
-        // Also correctness should be shown if this is not pure-assert match as there is no green part on pure-assert matches.
-        return ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) && $matchresults->length[0] !== 0;
+        /* Also correctness should be shown if this is not pure-assert match as there is no green part on pure-assert matches;
+         unless it's a testing with an icon, showing as that there is match without green part.*/
+        return ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) && ($testing || $matchresults->length[0] !== 0);
     }
 
 }
