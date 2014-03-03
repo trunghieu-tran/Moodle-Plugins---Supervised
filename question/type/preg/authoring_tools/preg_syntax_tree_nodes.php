@@ -258,8 +258,7 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
                     $style .= $tmp[1];
                 }
             } else {
-                $dotscript .= $nodename . "->etc" . $this->pregnode->position->indfirst . $this->pregnode->position->indlast .
-                              ";etc" . $this->pregnode->position->indfirst . $this->pregnode->position->indlast . "[label=\"...\"];\n";
+                $dotscript .= $nodename . "->etc" . $this->pregnode->id . ";etc" . $this->pregnode->id . "[label=\"...\"];\n";
             }
 
             return array($dotscript, $style);
