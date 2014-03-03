@@ -32,15 +32,17 @@ class qtype_preg_dot_node_context {
     public $insideusercluster = false;
     public $insideselectioncluster = false;
 
+    public $foldcoords;
     public $isfold;
 
-    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null, $isfold = false) {
+    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null, $foldcoords = null, $isfold = false) {
         $this->handler = $handler;
         $this->isroot = $isroot;
         $this->rankdirlr = $rankdirlr;
         $this->selection = $selection !== null
                          ? $selection
                          : new qtype_preg_position();
+        $this->foldcoords = $foldcoords;
         $this->isfold = $isfold;
     }
 }
@@ -111,9 +113,13 @@ abstract class qtype_preg_syntax_tree_node {
     public function dot_script($context) {
         $nodename = $this->pregnode->id;
         $dotscript = $nodename . ";\n";
+        $startselectioncluster = false;
 
         $startusercluster = !$context->insideusercluster && !$context->handler->is_node_generated($this->pregnode);
-        $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);// && $this->context->isfold;
+        if($context->isfold === false) {
+            $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);
+        }
+
         $context->insideusercluster = $context->insideusercluster || $startusercluster;
         $context->insideselectioncluster = $context->insideselectioncluster || $startselectioncluster;
         if ($startusercluster) {
@@ -238,11 +244,8 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
             $style = $nodename . self::get_style($context) . ";\n";
             $dotscript = $nodename . ";\n";
 
-            /*if($context->isfold &&
-               $this->pregnode->position->indfirst == $context->selection->indfirst &&
-               $this->pregnode->position->indlast == $context->selection->indlast) {*/
-            $currcoord = $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
-            if(strpos($context->isfold, $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast) === false) {
+            //$currcoord = $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+            if(strpos($context->foldcoords, $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast) === false) {
                 foreach ($this->operands as $operand) {
                     $newcontext = clone $context;
                     $newcontext->isroot = false;
