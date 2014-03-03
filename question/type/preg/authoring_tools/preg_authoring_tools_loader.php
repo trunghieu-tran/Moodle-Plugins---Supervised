@@ -28,7 +28,8 @@ function qtype_preg_get_json_array() {
     $indlast = optional_param('indlast', null, PARAM_INT);
     $treeorientation = optional_param('treeorientation', '', PARAM_TEXT);
     $displayas = optional_param('displayas', '', PARAM_RAW);
-    $treeisfold = optional_param('treeisfold', '', PARAM_RAW);
+    $foldcoords = optional_param('foldcoords', '', PARAM_RAW);
+    $treeisfold = (bool)optional_param('treeisfold', '', PARAM_INT);
 
     // Array with authoring tools
     $options = new qtype_preg_authoring_tools_options();
@@ -47,6 +48,8 @@ function qtype_preg_get_json_array() {
     foreach ($tmppoints as $value) {
         $options->treeisfold[] = (int)$value;
     }*/
+
+    $options->foldcoords = $foldcoords;
     $options->treeisfold = $treeisfold;
 
     $tools = array(

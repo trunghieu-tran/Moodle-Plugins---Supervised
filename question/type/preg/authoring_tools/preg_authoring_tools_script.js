@@ -199,12 +199,11 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
+        $('input[name=\'tree_fold_node_points\'').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
         self.panzooms.reset_all();
-
-        $('input[name=\'tree_fold_node_points\'').val('');
     },
 
     btn_save_clicked : function (e) {
@@ -315,14 +314,14 @@ M.preg_authoring_tools_script = (function ($) {
     },
     
     cache_key_for_explaining_tools : function (indfirst, indlast) {
-        return '' +
+        return ''/* +
                self.regex_input.val() +
                $('#id_notation_auth').val() +
                $('#id_exactmatch_auth').val() +
                $('#id_usecase_auth').val() +
                self.get_orientation() +
                self.get_displayas() +
-               indfirst + ',' + indlast;
+               indfirst + ',' + indlast*/;
     },
 
     cache_key_for_testing_tool : function (indfirst, indlast) {
@@ -787,7 +786,8 @@ M.preg_authoring_tools_script = (function ($) {
                 indlast: indlast,
                 treeorientation: self.get_orientation(),
                 displayas: self.get_displayas(),
-                treeisfold: $('input[name=\'tree_fold_node_points\'').val(),
+                foldcoords: $('input[name=\'tree_fold_node_points\'').val(),
+                treeisfold: $("#id_tree_folding_mode").is(':checked') ? 1 : 0,
                 ajax: true
             },
             success: self.upd_content_success
@@ -912,17 +912,11 @@ M.preg_authoring_tools_script = (function ($) {
             var graph_img = $('#graph_img');
             var graph_panzoom_obj = $(graph_img).panzoom();
             $(graph_img).on('mousewheel.focal', this._zoom);
-
-            /*(graph_img).panzoomchange(e, panzoom, transform) {
-                if(self.is_graph_selection_rectangle_visible) {
-                    $(graph_img).panzoomchange(e, panzoom, transform);
-                }
-            }*/
         },
 
         init : function() {
             self.panzooms.init_graph();
-            //self.panzooms.init_tree();
+            self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {
