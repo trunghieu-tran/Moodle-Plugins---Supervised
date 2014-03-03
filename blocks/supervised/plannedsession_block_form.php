@@ -1,12 +1,12 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Student Access Control Kit - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Student Access Control Kit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Student Access Control Kit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -23,9 +23,11 @@ require_once("{$CFG->libdir}/formslib.php");
  *
  * The form for planned session (for supervise capability)
  *
- * @package block_supervised
- * @copyright
- * @licence
+ * @package     block
+ * @subpackage  supervised
+ * @author      Andrey Ushakov <andrey200964@yandex.ru>
+ * @copyright   2014 Oleg Sychev, Volgograd State Technical University
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plannedsession_block_form extends moodleform {
 
@@ -97,7 +99,6 @@ class plannedsession_block_form extends moodleform {
         // ...submit button.
         $mform->addElement('submit', 'submitbutton', get_string('startsession', 'block_supervised'));
     }
-
 
     // Form validation.
     public function validation($data, $files) {
