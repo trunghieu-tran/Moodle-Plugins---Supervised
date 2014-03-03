@@ -238,12 +238,11 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
             $style = $nodename . self::get_style($context) . ";\n";
             $dotscript = $nodename . ";\n";
 
-            if($context->isfold &&
+            /*if($context->isfold &&
                $this->pregnode->position->indfirst == $context->selection->indfirst &&
-               $this->pregnode->position->indlast == $context->selection->indlast) {
-
-                $dotscript .= $nodename . "->etc;etc[label=\"...\"];\n";
-            } else {
+               $this->pregnode->position->indlast == $context->selection->indlast) {*/
+            $currcoord = $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+            if(strpos($context->isfold, $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast) === false) {
                 foreach ($this->operands as $operand) {
                     $newcontext = clone $context;
                     $newcontext->isroot = false;
@@ -258,6 +257,9 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
                     }
                     $style .= $tmp[1];
                 }
+            } else {
+                $dotscript .= $nodename . "->etc" . $this->pregnode->position->indfirst . $this->pregnode->position->indlast .
+                              ";etc" . $this->pregnode->position->indfirst . $this->pregnode->position->indlast . "[label=\"...\"];\n";
             }
 
             return array($dotscript, $style);
