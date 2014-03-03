@@ -151,7 +151,7 @@ class block_supervised extends block_base {
                     print_error('insertsessionerror', 'block_supervised');
                 }
                 update_users_in_session($plannedsession->groupid, $plannedsession->courseid, $plannedsession->id);
-                // TODO Logging
+                // TODO Logging.
                 add_to_log($COURSE->id, 'role', 'start planned session',
                     'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
                 // Trigger event (session started).
@@ -210,7 +210,7 @@ class block_supervised extends block_base {
                 'needlessontype' => $activesession->lessontypeid!=0 ));
 
             if ($mform->is_cancelled()) {
-                // Finish session and update timeend and duration fields
+                // Finish session and update timeend and duration fields.
                 $curtime = time();
                 $activesession->state           = StateSession::FINISHED;
                 $activesession->timeend         = $curtime;
@@ -219,7 +219,7 @@ class block_supervised extends block_base {
                 if (!$DB->update_record('block_supervised_session', $activesession)) {
                     print_error('insertsessionerror', 'block_supervised');
                 }
-                // TODO Logging
+                // TODO Logging.
                 add_to_log($COURSE->id, 'role', 'finish session',
                     'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
 
@@ -233,7 +233,7 @@ class block_supervised extends block_base {
                 unset($activesession);
             } else if ($fromform = $mform->get_data()) {
                 // Update session
-                // TODO Logging
+                // TODO Logging.
                 add_to_log($COURSE->id, 'role', 'update active session',
                     'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
                 $title = get_string('activesessiontitle', 'block_supervised');

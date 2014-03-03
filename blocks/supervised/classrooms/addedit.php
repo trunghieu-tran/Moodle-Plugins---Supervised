@@ -87,7 +87,7 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging
+        // TODO Logging.
         add_to_log($COURSE->id, 'role', 'add classroom',
             "blocks/supervised/classrooms/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
     } else {     // Edit mode.

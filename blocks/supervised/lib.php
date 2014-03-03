@@ -175,13 +175,13 @@ function user_active_sessions() {
         array('state' => StateSession::ACTIVE, 'courseid'=>$COURSE->id));
 
     // Filter sessions by lessontype and userid.
-    foreach($sessions as $id=>$session) {
+    foreach ($sessions as $id => $session) {
         // Check if current user is in current session's group.
         $useringroup = $DB->record_exists('block_supervised_user', array('sessionid'=>$id, 'userid'=>$USER->id));
         // Check if the ip of current user is in classroom's subnet.
         $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
 
-        if( !($useringroup && $userinsubnet) ) {
+        if ( !($useringroup && $userinsubnet) ) {
             unset($sessions[$id]);  // Remove current session.
         }
     }

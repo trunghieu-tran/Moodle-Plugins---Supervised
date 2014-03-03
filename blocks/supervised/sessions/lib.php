@@ -395,7 +395,7 @@ function mail_newsession($session, $creator) {
     $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
     $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
     $coursecontext = context_course::instance($session->courseid);
-    if(has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
+    if (has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
         has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
         $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
         $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
@@ -511,7 +511,7 @@ function mail_editedsession($updsession, $editor) {
     $data->sessioninfo      = get_string('emailsessioninfo', 'block_supervised', $sessioninfo);
     $data->haveaniceday     = get_string('haveaniceday', 'block_supervised');
     $coursecontext = context_course::instance($updsession->courseid);
-    if(has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
+    if (has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
         has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
         $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
         $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
