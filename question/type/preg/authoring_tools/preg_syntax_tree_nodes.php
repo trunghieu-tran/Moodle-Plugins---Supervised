@@ -116,9 +116,9 @@ abstract class qtype_preg_syntax_tree_node {
         $startselectioncluster = false;
 
         $startusercluster = !$context->insideusercluster && !$context->handler->is_node_generated($this->pregnode);
-        if($context->isfold === false) {
+        //if($context->isfold === false) {
             $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);
-        }
+        //}
 
         $context->insideusercluster = $context->insideusercluster || $startusercluster;
         $context->insideselectioncluster = $context->insideselectioncluster || $startselectioncluster;
