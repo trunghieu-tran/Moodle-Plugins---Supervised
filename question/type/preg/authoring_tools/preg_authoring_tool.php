@@ -43,6 +43,7 @@ class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
     public $treeorientation = null;
     public $displayas = null;
+    public $foldcoords = null;
     public $treeisfold = null;
 }
 
