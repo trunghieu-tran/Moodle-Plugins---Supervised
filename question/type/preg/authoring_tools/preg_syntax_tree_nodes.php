@@ -261,7 +261,10 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
                     $style .= $tmp[1];
                 }
             } else {
-                $dotscript .= $nodename . "->etc" . $this->pregnode->id . ";etc" . $this->pregnode->id . "[label=\"...\"];\n";
+                $tooltip = substr($context->handler->get_regex(),
+                                    $this->pregnode->position->indfirst,
+                                    $this->pregnode->position->indfirst + $this->pregnode->position->indlast);
+                $dotscript .= $nodename . "->etc" . $this->pregnode->id . ";etc" . $this->pregnode->id . "[label=\"...\", tooltip=\"" . $tooltip . "\"];\n";
             }
 
             return array($dotscript, $style);
