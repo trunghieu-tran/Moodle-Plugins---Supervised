@@ -168,11 +168,12 @@ function cleanup($courseid) {
  */
 function user_active_sessions() {
     require_once('sessions/sessionstate.php');
+    require_once('sessions/lib.php');
     global $USER, $DB, $COURSE;
 
     // Select all active sessions in current course.
-    $sessions = $DB->get_records('block_supervised_session',
-        array('state' => StateSession::ACTIVE, 'courseid'=>$COURSE->id));
+    $time = time();
+    $sessions = get_sessions($COURSE->id, 0, 0, -1, StateSession::ACTIVE, 0, $time, $time, 0);
 
     // Filter sessions by lessontype and userid.
     foreach ($sessions as $id => $session) {
