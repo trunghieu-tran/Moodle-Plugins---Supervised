@@ -213,6 +213,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
         {block_supervised_session}.state,
         {block_supervised_session}.sessioncomment,
         {block_supervised_session}.sendemail,
+        {block_supervised_session}.iplist,
         {block_supervised_classroom}.name   AS classroomname,
         {block_supervised_lessontype}.name  AS lessontypename,
         {user}.firstname,

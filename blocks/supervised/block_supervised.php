@@ -394,41 +394,13 @@ class block_supervised extends block_base {
 
 
     /**
-     * Returns all active sessions in current course for current user
-     * @return array active sessions
-     */
-    private function get_student_active_sessions() {
-        require_once('sessions/sessionstate.php');
-        require_once('sessions/lib.php');
-        global $COURSE, $USER;
-
-        // Find Active sessions.
-        $courseid   = $COURSE->id;
-        $stateactive = StateSession::ACTIVE;
-        $time = time();
-        $activesessions = get_sessions($courseid, 0, 0, -1, $stateactive, 0, $time, $time, 0);
-
-        // Filter sessions by user groups.
-        $groupinggroups = groups_get_user_groups($COURSE->id, $USER->id);
-        $groups = $groupinggroups[0];
-        foreach ($activesessions as $id => $session) {
-            if (!in_array($session->groupid, $groups) AND $session->groupid != 0) {
-                // If user isn't in session->groupid - delete this session.
-                unset($activesessions[$id]);
-            }
-        }
-
-        return $activesessions;
-    }
-
-
-    /**
      * Renders block's body for user with besupervised capability.
      */
     private function render_besupervised_body() {
         global $COURSE, $CFG;
+        require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
 
-        $activesessions = $this->get_student_active_sessions();
+        $activesessions = user_active_sessions();
 
         if (!empty($activesessions)) {
             $sessionstitle = get_string('activesessionsstudenttitle', 'block_supervised', count($activesessions));
