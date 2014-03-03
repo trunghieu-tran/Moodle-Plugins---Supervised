@@ -32,13 +32,16 @@ class qtype_preg_dot_node_context {
     public $insideusercluster = false;
     public $insideselectioncluster = false;
 
-    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null) {
+    public $isfold;
+
+    public function __construct($handler, $isroot, $rankdirlr = false, $selection = null, $isfold = false) {
         $this->handler = $handler;
         $this->isroot = $isroot;
         $this->rankdirlr = $rankdirlr;
         $this->selection = $selection !== null
                          ? $selection
                          : new qtype_preg_position();
+        $this->isfold = $isfold;
     }
 }
 
@@ -110,7 +113,7 @@ abstract class qtype_preg_syntax_tree_node {
         $dotscript = $nodename . ";\n";
 
         $startusercluster = !$context->insideusercluster && !$context->handler->is_node_generated($this->pregnode);
-        $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);
+        $startselectioncluster = !$context->insideselectioncluster && $this->is_selected($context);// && $this->context->isfold;
         $context->insideusercluster = $context->insideusercluster || $startusercluster;
         $context->insideselectioncluster = $context->insideselectioncluster || $startselectioncluster;
         if ($startusercluster) {
@@ -230,25 +233,34 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
     }
 
     public function dot_script_inner($context) {
-        // Calculate the node name and style.
-        $nodename = $this->pregnode->id;
-        $style = $nodename . self::get_style($context) . ";\n";
-        $dotscript = $nodename . ";\n";
-        foreach ($this->operands as $operand) {
-            $newcontext = clone $context;
-            $newcontext->isroot = false;
-            $tmp = $operand->dot_script($newcontext);
-            $edgelabel = $this->label_for_edge($operand);
-            if ($edgelabel != '') {
-                $othernodename = $operand->pregnode->id;
-                $dotscript .= $nodename . '->' . $othernodename . "[label=\"$edgelabel\"];\n";
-                $dotscript .= $tmp[0];
+            // Calculate the node name and style.
+            $nodename = $this->pregnode->id;
+            $style = $nodename . self::get_style($context) . ";\n";
+            $dotscript = $nodename . ";\n";
+
+            if($context->isfold &&
+               $this->pregnode->position->indfirst == $context->selection->indfirst &&
+               $this->pregnode->position->indlast == $context->selection->indlast) {
+
+                $dotscript .= $nodename . "->etc;etc[label=\"...\"];\n";
             } else {
-                $dotscript .= $nodename . '->' . $tmp[0];
+                foreach ($this->operands as $operand) {
+                    $newcontext = clone $context;
+                    $newcontext->isroot = false;
+                    $tmp = $operand->dot_script($newcontext);
+                    $edgelabel = $this->label_for_edge($operand);
+                    if ($edgelabel != '') {
+                        $othernodename = $operand->pregnode->id;
+                        $dotscript .= $nodename . '->' . $othernodename . "[label=\"$edgelabel\"];\n";
+                        $dotscript .= $tmp[0];
+                    } else {
+                        $dotscript .= $nodename . '->' . $tmp[0];
+                    }
+                    $style .= $tmp[1];
+                }
             }
-            $style .= $tmp[1];
-        }
-        return array($dotscript, $style);
+
+            return array($dotscript, $style);
     }
 
     public function label() {
