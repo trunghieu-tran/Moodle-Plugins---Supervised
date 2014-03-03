@@ -221,6 +221,17 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
     public static function validate_settings_form_fields(array $errors,
                                                          array $data, $files, mod_quiz_mod_form $quizform) {
+        global $DB, $COURSE;
+        // Teacher can't use supervised access for quiz without supervised block instance in the course.
+        if ($data['supervisedmode'] == 1) {
+            $coursecontext = context_course::instance($COURSE->id);
+            $isblockincourse = $DB->record_exists('block_instances',
+                array('blockname' => 'supervised', 'parentcontextid' => $coursecontext->id));
+            if (! $isblockincourse) {
+                $errors['radioar'] = get_string('noblockinstance', 'quizaccess_supervisedcheck');
+            }
+        }
+
         // For custom lesson type selection mode user must check at least one lesson type.
         if ($data['supervisedmode'] == 2) {
             $isallunchecked = true;
