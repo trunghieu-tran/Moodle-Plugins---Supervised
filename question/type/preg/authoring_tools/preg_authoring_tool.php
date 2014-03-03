@@ -43,6 +43,7 @@ class qtype_preg_authoring_tools_options extends qtype_preg_handling_options {
     public $engine = null;
     public $treeorientation = null;
     public $displayas = null;
+    public $treeisfold = null;
 }
 
 abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implements qtype_preg_i_authoring_tool {
