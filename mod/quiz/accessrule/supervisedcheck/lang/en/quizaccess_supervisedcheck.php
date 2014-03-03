@@ -26,14 +26,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
-$string['pluginname'] = 'Supervised access rule';
-
-$string['checknotrequired']         = 'No';
+$string['allowcontrol']             = 'Allow only supervised quiz attempts?';
 $string['checkforall']              = 'Yes, for all lesson types in this course';
+$string['checknotrequired']         = 'No';
 $string['checkrequired']            = 'Yes';
 $string['customcheck']              = 'Yes, for these lesson types:';
-$string['allowcontrol']             = 'Allow only supervised quiz attempts?';
-$string['uncheckedlessontypes']     = 'You must check at least one lesson type';
-$string['noaccess']                 = 'You can\'t start the quiz now. No active supervised session for your group at this moment with appropriate lesson type.';
 $string['iperror']                  = 'You can\'t start the quiz now. No active supervised session for your group at this moment or your ip isn\'t in the classroom subnet.';
+$string['noaccess']                 = 'You can\'t start the quiz now. No active supervised session for your group at this moment with appropriate lesson type.';
+$string['noblockinstance']          = 'To use supervised access mode for this quiz you should add supervised block instance in the course.';
+$string['pluginname']               = 'Supervised access rule';
+$string['uncheckedlessontypes']     = 'You must check at least one lesson type';
