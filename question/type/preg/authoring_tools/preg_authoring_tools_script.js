@@ -200,6 +200,7 @@ M.preg_authoring_tools_script = (function ($) {
     btn_show_clicked : function (e) {
         e.preventDefault();
         $('input[name=\'tree_fold_node_points\'').val('');
+        $('input[name=\'tree_selected_node_points\'').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
@@ -234,9 +235,11 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        var sel = self.get_selection();
-        self.load_content(sel.indfirst, sel.indlast);
-        self.panzooms.reset_tree();
+        if(e.currentTarget.id != "id_tree_folding_mode") {
+            var sel = self.get_selection();
+            self.load_content(sel.indfirst, sel.indlast);
+            self.panzooms.reset_tree();
+        }
     },
 
     tree_node_clicked : function (e) {
@@ -266,10 +269,23 @@ M.preg_authoring_tools_script = (function ($) {
                     }
                 }
                 $('input[name=\'tree_fold_node_points\'').val(points);
-            }
 
-            self.load_content(indfirst, indlast);
-            self.load_strings(indfirst, indlast);
+                if(typeof $('input[name=\'tree_selected_node_points\'').val() != 'undefined') {
+                    var tmpcoords = $('input[name=\'tree_selected_node_points\'').val().split(',');
+                    indfirst = tmpcoords[0];
+                    indlast = tmpcoords[1];
+
+                    self.load_content(indfirst, indlast);
+                    self.load_strings(indfirst, indlast);
+                } else {
+                    self.load_content();
+                    self.load_strings();
+                }
+            } else {
+                $('input[name=\'tree_selected_node_points\'').val(indfirst + ',' + indlast);
+                self.load_content(indfirst, indlast);
+                self.load_strings(indfirst, indlast);
+            }
         //}
     },
 
@@ -277,6 +293,7 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
         if(!self.is_tree_foldind_mode()) {
+            $('input[name=\'tree_selected_node_points\'').val('');
             self.load_content();
             self.load_strings();
         }
@@ -314,7 +331,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
     
     cache_key_for_explaining_tools : function (indfirst, indlast) {
-        return ''/* +
+        return '' /*+
                self.regex_input.val() +
                $('#id_notation_auth').val() +
                $('#id_exactmatch_auth').val() +
