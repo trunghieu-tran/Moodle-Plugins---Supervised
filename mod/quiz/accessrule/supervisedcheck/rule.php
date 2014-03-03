@@ -42,14 +42,14 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         global $DB, $COURSE, $USER;
         require_once('../../blocks/supervised/lib.php');
 
-        // Check capabilities: teachers always have an access
-        if(has_capability('block/supervised:supervise', context_course::instance($COURSE->id))){
+        // Check capabilities: teachers always have an access.
+        if (has_capability('block/supervised:supervise', context_course::instance($COURSE->id))) {
             return false;
         }
 
-        // Check if current user can start the quiz
+        // Check if current user can start the quiz.
         $lessontypesdb = array();
-        switch($this->quiz->supervisedmode){
+        switch ($this->quiz->supervisedmode) {
             case 0:     // No check required.
                 return false;
                 break;
@@ -60,7 +60,8 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 $lessontypesdb[0]->id = 0;
                 break;
             case 2:     // Check for custom lesson types.
-                $lessontypesdb = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $this->quiz->id), null, 'lessontypeid as id');
+                $lessontypesdb = $DB->get_records('quizaccess_supervisedcheck',
+                    array('quizid' => $this->quiz->id), null, 'lessontypeid as id');
                 break;
         }
 
@@ -75,11 +76,11 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             return get_string('iperror', 'quizaccess_supervisedcheck');
         }
 
-        // Filter sessions by lessontype and userid
-        foreach($sessions as $id=>$session) {
+        // Filter sessions by lessontype and userid.
+        foreach ($sessions as $id => $session) {
             // Check if current session's lessontype is in passed $lessontypes array.
             $islessontype = in_array($session->lessontypeid, $lessontypes);
-            if( !$islessontype ) {
+            if ( !$islessontype ) {
                 // Remove current session.
                 unset($sessions[$id]);
             }
@@ -87,8 +88,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
         if (!empty($sessions)) {
             return false;
-        }
-        else {
+        } else {
             // We havn't active sessions for quiz's lesson types.
             return get_string('noaccess', 'quizaccess_supervisedcheck');
         }
@@ -107,28 +107,32 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
         global $DB, $COURSE, $PAGE, $CFG;
 
-        $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid'=>$COURSE->id));
+        $lessontypes = $DB->get_records('block_supervised_lessontype', array('courseid' => $COURSE->id));
 
         // Radiobuttons (modes).
         $radioarray = array();
-        $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
+        $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '',
+            get_string('checknotrequired', 'quizaccess_supervisedcheck'), 0);
         if (count($lessontypes) > 0) {  // Render 3rd mode only if we have some lesson types in course.
-            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
-            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('customcheck', 'quizaccess_supervisedcheck'), 2);
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '',
+                get_string('checkforall', 'quizaccess_supervisedcheck'), 1);
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '',
+                get_string('customcheck', 'quizaccess_supervisedcheck'), 2);
         } else { // No lesson types, so just it's just yes/no.
-            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '', get_string('checkrequired', 'quizaccess_supervisedcheck'), 1);
+            $radioarray[] =& $mform->createElement('radio', 'supervisedmode', '',
+                get_string('checkrequired', 'quizaccess_supervisedcheck'), 1);
         }
-        $mform->addGroup($radioarray, 'radioar', get_string('allowcontrol', 'quizaccess_supervisedcheck'), '<br/>', false);
+        $mform->addGroup($radioarray, 'radioar',
+            get_string('allowcontrol', 'quizaccess_supervisedcheck'), '<br/>', false);
 
         // Checkboxes with lessontypes for 3rd mode.
         if (count($lessontypes) > 0) {
             $cbarray = array();
-            foreach ($lessontypes as $id=>$lessontype) {
+            foreach ($lessontypes as $id => $lessontype) {
                 $cbarray[] =& $mform->createElement('advcheckbox', 'supervisedlessontype_'.$id, '', $lessontype->name);
             }
             $mform->addGroup($cbarray, 'lessontypesgroup', '', '<br/>', false);
         }
-
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/supervisedcheck/lib.js') );
@@ -145,7 +149,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $lessontypesinquiz = array();
 
             // Checks for all lesson types.
-            foreach ($lessontypesincourse as $id=>$lessontype) {
+            foreach ($lessontypesincourse as $id => $lessontype) {
                 if ($quiz->{'supervisedlessontype_'.$id}) {
                     $lessontypesinquiz[] = $id;
                 }
@@ -153,7 +157,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
             // Update rules.
             if (empty($lessontypesinquiz)) {
-                // If user didn't check any lessontype - add special lessontype with id = -1
+                // If user didn't check any lessontype - add special lessontype with id = -1.
                 $lessontypesinquiz[] = -1;
             }
 
@@ -164,30 +168,29 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                     $rule                   = new stdClass();
                     $rule->quizid           = $quiz->id;
                     $rule->lessontypeid     = -1;
-                    $rule->supervisedmode   = $quiz->supervisedmode; // must be 2
+                    $rule->supervisedmode   = $quiz->supervisedmode; // ...must be 2.
                     $rule->id               = $DB->insert_record('quizaccess_supervisedcheck', $rule);
                 }
                 $rule->lessontypeid         = $lessontypesinquiz[$i];
-                $rule->supervisedmode       = $quiz->supervisedmode; // must be 2
+                $rule->supervisedmode       = $quiz->supervisedmode; // ...must be 2.
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
             // Delete any remaining old rules.
             foreach ($oldrules as $oldrule) {
                 $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
             }
-        }
-        else{
+        } else {
             // Update an existing rule if possible.
             $rule = array_shift($oldrules);
             if (!$rule) {
                 $rule                   = new stdClass();
                 $rule->quizid           = $quiz->id;
                 $rule->lessontypeid     = -1;
-                $rule->supervisedmode   = $quiz->supervisedmode;   // 0 or 1
+                $rule->supervisedmode   = $quiz->supervisedmode;   // ...0 or 1.
                 $rule->id               = $DB->insert_record('quizaccess_supervisedcheck', $rule);
             }
             $rule->lessontypeid         = -1;
-            $rule->supervisedmode       = $quiz->supervisedmode;   // 0 or 1
+            $rule->supervisedmode       = $quiz->supervisedmode;   // ...0 or 1.
             $DB->update_record('quizaccess_supervisedcheck', $rule);
             // Delete any remaining old rules.
             foreach ($oldrules as $oldrule) {
@@ -207,9 +210,9 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         // Load lesson type fields.
         $res = array();
         $rules = $DB->get_records('quizaccess_supervisedcheck', array('quizid' => $quizid));
-        foreach($rules as $rule){
+        foreach ($rules as $rule) {
             $res['supervisedmode'] = $rule->supervisedmode;
-            if($rule->supervisedmode == 2){
+            if ($rule->supervisedmode == 2) {
                 $res['supervisedlessontype_'.$rule->lessontypeid] = 1;
             }
         }
@@ -219,7 +222,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
     public static function validate_settings_form_fields(array $errors,
                                                          array $data, $files, mod_quiz_mod_form $quizform) {
         // For custom lesson type selection mode user must check at least one lesson type.
-        if($data['supervisedmode'] == 2){
+        if ($data['supervisedmode'] == 2) {
             $isallunchecked = true;
             foreach ($data as $key => $value) {
                 if (  (substr($key, 0, 21) == 'supervisedlessontype_') && ($value == 1)  ) {
@@ -227,7 +230,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 }
             }
 
-            if($isallunchecked){
+            if ($isallunchecked) {
                 $errors['radioar'] = get_string('uncheckedlessontypes', 'quizaccess_supervisedcheck');
             }
         }

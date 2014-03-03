@@ -20,7 +20,7 @@
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 /**
  * Removes all supervised access rules for nonexistent quizzes
  */
