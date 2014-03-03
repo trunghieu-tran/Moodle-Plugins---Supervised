@@ -156,7 +156,7 @@ if ($mform->is_cancelled()) {
             print_error('insertsessionerror', 'block_supervised');
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
-        // TODO Logging
+        // TODO Logging.
         add_to_log($COURSE->id, 'role', 'plane session',
             'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
         // Send e-mail to teacher.
@@ -171,7 +171,7 @@ if ($mform->is_cancelled()) {
             print_error('insertsessionerror', 'block_supervised');
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $fromform->id);
-        // TODO Logging
+        // TODO Logging.
         add_to_log($COURSE->id, 'role', 'edit session',
             'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
         // Send e-mail to teacher(s).

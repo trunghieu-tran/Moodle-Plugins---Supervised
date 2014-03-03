@@ -80,7 +80,6 @@ class activesession_block_form extends moodleform {
         $mform->addElement('static', 'timeend', '');
         // ...comment.
         if ($this->_customdata['needcomment']) {
-            //$mform->addElement('static', 'sessioncommentlabel', '', '<b>'.get_string('comment', 'question').'</b>');
             $mform->addElement('static', 'sessioncomment', get_string('comment', 'question'));
         }
         // ...hidden elements.
