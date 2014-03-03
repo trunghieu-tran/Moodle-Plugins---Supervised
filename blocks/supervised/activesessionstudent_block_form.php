@@ -36,20 +36,27 @@ class activesessionstudent_block_form extends moodleform {
 
         // Add group.
         $mform->addElement('header', 'general', get_string('sessioninfo', 'block_supervised'));
-        // ...teacher.
-        $mform->addElement('static', 'teacher', get_string('superviser', 'block_supervised'));
+        // ...superviser.
+        $mform->addElement('static', 'lessontypelabel', '', '<b>'.get_string('superviser', 'block_supervised').'</b>');
+        $mform->addElement('static', 'teacher', '');
         // ...lessontype.
-        $mform->addElement('static', 'lessontypename', get_string('lessontype', 'block_supervised'));
+        $mform->addElement('static', 'lessontypelabel', '', '<b>'.get_string('lessontype', 'block_supervised').'</b>');
+        $mform->addElement('static', 'lessontypename', '');
         // ...classroom.
-        $mform->addElement('static', 'classroomname', shorten_text(get_string('classroom', 'block_supervised'), 8));
+        $mform->addElement('static', 'classroomlabel', '<b>'.get_string('classroom', 'block_supervised').'</b>');
+        $mform->addElement('static', 'classroomname', '');
         // ...group.
-        $mform->addElement('static', 'groupname', get_string('group'));
+        $mform->addElement('static', 'grouplabel', '<b>'.get_string('group').'</b>');
+        $mform->addElement('static', 'groupname', '');
         // ...timestart.
-        $mform->addElement('static', 'timestart', get_string('timestart', 'block_supervised'));
+        $mform->addElement('static', 'timestartlabel', '<b>'.get_string('timestart', 'block_supervised').'</b>');
+        $mform->addElement('static', 'timestart', '');
         // ...duration.
-        $mform->addElement('static', 'duration', shorten_text(get_string('duration', 'block_supervised'), 10));
+        $mform->addElement('static', 'durationlabel', '<b>'.get_string('duration', 'block_supervised').'</b>');
+        $mform->addElement('static', 'duration', '');
         // ...timeend.
-        $mform->addElement('static', 'timeend', get_string('timeend', 'block_supervised'));
+        $mform->addElement('static', 'timeendlabel', '<b>'.get_string('timeend', 'block_supervised').'</b>');
+        $mform->addElement('static', 'timeend', '');
 
         // ...hidden elements.
         $mform->addElement('hidden', 'id');     // course id.
