@@ -105,6 +105,7 @@ class qtype_preg_authoring_form extends moodleform {
         //$radiotreeorientationsarray[] =& $mform->createElement('button', 'tree_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $radiotreeorientationsarray[] =& $mform->createElement('checkbox', 'tree_folding_mode', '', 'Folding mode', '', null);
         $radiotreeorientationsarray[] =& $mform->createElement('hidden', 'tree_fold_node_points', '', '', '', null);
+        $radiotreeorientationsarray[] =& $mform->createElement('hidden', 'tree_selected_node_points', '', '', '', null);
         $mform->addGroup($radiotreeorientationsarray, 'tree_orientation_radioset', '', array(' '), false);
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
