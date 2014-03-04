@@ -341,7 +341,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, $data['exactmatch'],
                         $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
                 if ($matcher->errors_exist()) {// There were errors in the matching process.
-                    $regexerrors = $matcher->get_error_messages(true);// Show no more than max errors.
+                    $regexerrors = $matcher->get_error_messages();// Show no more than max errors.
                     $errors['answer['.$key.']'] = '';
                     foreach ($regexerrors as $regexerror) {
                         $errors['answer['.$key.']'] .= $regexerror.'<br />';

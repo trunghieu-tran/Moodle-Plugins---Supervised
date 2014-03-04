@@ -65,7 +65,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $engineclass = 'qtype_preg_' . $engine;
         $matcher = new $engineclass($regex, $matchingoptions);
         if ($matcher->errors_exist()) {
-            $this->errormsgs = $matcher->get_error_messages(true);
+            $this->errormsgs = $matcher->get_error_messages();
         } else {
             $this->matcher = $matcher;
         }

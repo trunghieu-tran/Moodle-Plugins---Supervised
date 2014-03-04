@@ -359,7 +359,7 @@ class qtype_preg_regex_handler {
 
     /**
      * Was there an error in regex?
-     * @return bool  errors exists.
+     * @return bool errors exists.
      */
     public function errors_exist() {
         return count($this->get_errors()) > 0;
@@ -379,17 +379,17 @@ class qtype_preg_regex_handler {
 
     /**
      * Returns error messages for regex.
-     * @param limit bool limit error messages to the admin option
+     * @param string $limit configuration field name for the maximum number of shown messages.
      * @return array of error messages.
      */
-    public function get_error_messages($limit = false) {
+    public function get_error_messages($limit = 'qtype_preg_maxerrorsshown') {
         global $CFG;
         $res = array();
         $maxerrors = 5;
         if ($limit) {
             // Determine maximum number of errors to show.
-            if (isset($CFG->qtype_preg_maxerrorsshown)) {
-                $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+            if (isset($CFG->$limit)) {
+                $maxerrors = $CFG->$limit;
             }
         }
         $i = 0;

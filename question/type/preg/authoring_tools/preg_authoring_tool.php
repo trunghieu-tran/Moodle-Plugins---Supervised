@@ -208,7 +208,7 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
     public function data_for_unaccepted_regex() {
         $a =  core_text::strtolower(get_string($this->name(), 'qtype_preg'));
         $result = get_string('error_duringauthoringtool', 'qtype_preg', $a);
-        $result .= implode('<br />', $this->get_error_messages(true));
+        $result .= implode('<br />', $this->get_error_messages());
         return $result;
     }
 }
