@@ -28,6 +28,7 @@ function qtype_preg_get_json_array() {
     $indlast = optional_param('indlast', null, PARAM_INT);
     $treeorientation = optional_param('treeorientation', '', PARAM_TEXT);
     $displayas = optional_param('displayas', '', PARAM_RAW);
+    $foldcoords = optional_param('foldcoords', '', PARAM_RAW);
     $treeisfold = (bool)optional_param('treeisfold', '', PARAM_INT);
 
     // Array with authoring tools
@@ -41,6 +42,14 @@ function qtype_preg_get_json_array() {
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_CASELESS);
     }
     $options->selection = new qtype_preg_position($indfirst, $indlast);
+
+    /*$options->treeisfold = array();
+    $tmppoints = split(',', $treeisfold);
+    foreach ($tmppoints as $value) {
+        $options->treeisfold[] = (int)$value;
+    }*/
+
+    $options->foldcoords = $foldcoords;
     $options->treeisfold = $treeisfold;
 
     $tools = array(

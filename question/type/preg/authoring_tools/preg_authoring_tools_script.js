@@ -199,6 +199,8 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
+        $('input[name=\'tree_fold_node_points\'').val('');
+        $('input[name=\'tree_selected_node_points\'').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
@@ -233,9 +235,11 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        var sel = self.get_selection();
-        self.load_content(sel.indfirst, sel.indlast);
-        self.panzooms.reset_tree();
+        if(e.currentTarget.id != "id_tree_folding_mode") {
+            var sel = self.get_selection();
+            self.load_content(sel.indfirst, sel.indlast);
+            self.panzooms.reset_tree();
+        }
     },
 
     tree_node_clicked : function (e) {
@@ -244,17 +248,55 @@ M.preg_authoring_tools_script = (function ($) {
             var tmp = e.target.id.split(','),
                 indfirst = tmp[1],
                 indlast = tmp[2];
-            self.load_content(indfirst, indlast);
-            self.load_strings(indfirst, indlast);
+
+            if(self.is_tree_foldind_mode()) {
+                var points = $('input[name=\'tree_fold_node_points\'').val();
+                // if new point not contained
+                if(points.split(',').indexOf(indfirst) == -1 || points.split(',').indexOf(indlast) == -1) {
+                    // add new point
+                    if(points != '') {
+                        points += ',';
+                    }
+                    points += indfirst + ',' + indlast;
+                } else { // if new point already contained
+                    // remove this point
+                    if(points.indexOf(',' + indfirst + ',' + indlast) != -1) {
+                        points = points.replace(',' + indfirst + ',' + indlast, '');
+                    } else if(points.indexOf(indfirst + ',' + indlast + ',') != -1) {
+                        points = points.replace(indfirst + ',' + indlast + ',', '');
+                    } else {
+                        points = points.replace(indfirst + ',' + indlast, '');
+                    }
+                }
+                $('input[name=\'tree_fold_node_points\'').val(points);
+
+                if(typeof $('input[name=\'tree_selected_node_points\'').val() != 'undefined') {
+                    var tmpcoords = $('input[name=\'tree_selected_node_points\'').val().split(',');
+                    indfirst = tmpcoords[0];
+                    indlast = tmpcoords[1];
+
+                    self.load_content(indfirst, indlast);
+                    self.load_strings(indfirst, indlast);
+                } else {
+                    self.load_content();
+                    self.load_strings();
+                }
+            } else {
+                $('input[name=\'tree_selected_node_points\'').val(indfirst + ',' + indlast);
+                self.load_content(indfirst, indlast);
+                self.load_strings(indfirst, indlast);
+            }
         //}
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
+        if(!self.is_tree_foldind_mode()) {
+            $('input[name=\'tree_selected_node_points\'').val('');
             self.load_content();
             self.load_strings();
-        //}
+        }
     },
 
     graph_node_clicked : function (e) {
@@ -289,14 +331,14 @@ M.preg_authoring_tools_script = (function ($) {
     },
     
     cache_key_for_explaining_tools : function (indfirst, indlast) {
-        return '' +
+        return '' /*+
                self.regex_input.val() +
                $('#id_notation_auth').val() +
                $('#id_exactmatch_auth').val() +
                $('#id_usecase_auth').val() +
                self.get_orientation() +
                self.get_displayas() +
-               indfirst + ',' + indlast;
+               indfirst + ',' + indlast*/;
     },
 
     cache_key_for_testing_tool : function (indfirst, indlast) {
@@ -761,6 +803,7 @@ M.preg_authoring_tools_script = (function ($) {
                 indlast: indlast,
                 treeorientation: self.get_orientation(),
                 displayas: self.get_displayas(),
+                foldcoords: $('input[name=\'tree_fold_node_points\'').val(),
                 treeisfold: $("#id_tree_folding_mode").is(':checked') ? 1 : 0,
                 ajax: true
             },
@@ -886,17 +929,11 @@ M.preg_authoring_tools_script = (function ($) {
             var graph_img = $('#graph_img');
             var graph_panzoom_obj = $(graph_img).panzoom();
             $(graph_img).on('mousewheel.focal', this._zoom);
-
-            /*(graph_img).panzoomchange(e, panzoom, transform) {
-                if(self.is_graph_selection_rectangle_visible) {
-                    $(graph_img).panzoomchange(e, panzoom, transform);
-                }
-            }*/
         },
 
         init : function() {
             self.panzooms.init_graph();
-            //self.panzooms.init_tree();
+            self.panzooms.init_tree();
         },
 
         _zoom : function( e ) {
