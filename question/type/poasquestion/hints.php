@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
 interface question_with_qtype_specific_hints {
 
     /**
-     * Returns an array of available specific hint types depending on question settings
+     * Returns an array of all available specific hint types, that can be used in both student- and teacher-planned behaviours.
      *
      * The values are hint type indentifiers (hintkeys), unique for the qtype.
      * For multiple instance sequential hints hintkeys should end with '#' character.
@@ -49,7 +49,14 @@ interface question_with_qtype_specific_hints {
     public function available_specific_hints($response = null);
 
     /**
-     * Hint object factory
+     * Returns an array of available specific hint types for use in student-choosed behaviours.
+     *
+     * Used from student-choosen behaviours like 
+     */
+    public function hints_available_for_student($response = null);
+
+    /**
+     * Hint object factory.
      *
      * Returns a hint object for given type, for multiple instance choosen hints response may be needed to generate correct object.
      */

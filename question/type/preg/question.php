@@ -459,6 +459,11 @@ class qtype_preg_question extends question_graded_automatically
         return $hinttypes;
     }
 
+    public function hints_available_for_student($response = null) {
+        // TODO - define behaviour when some hint used in interactive, but set to 'No' for adaptive.
+        return $this->available_specific_hints($response);
+    }
+
     /**
      * Hint object factory.
      *
