@@ -61,10 +61,14 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
     protected $stateyyline = 0;
     // @var int column yycol for token
     protected $stateyycol = 0;
+    // @var int column yychar for token
+    protected $stateyychar = 0;
     // @var int end yyline
     protected $endyyline = 0;
     // @var int end yycolumn
     protected $endyycol  = 0;
+    // @var int end yycolumn
+    protected $endyychar  = 0;
     // @var bool state - is a state for returning error
     protected $endstate = false;
     // @var mixed token
@@ -72,6 +76,7 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
     private function startbuffer() {
         $this->stateyyline = $this->yyline;
         $this->stateyycol = $this->yycol;
+		$this->stateyychar = $this->yychar;
         $this->statestring = new qtype_poasquestion_string();
     }
     // Appends a symbol string to a buffer
@@ -90,6 +95,7 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
         $a = new stdClass();
         $a->line = $this->yyline;
         $a->position = $this->yycol;
+		$a->str = $this->yychar;
         $a->symbol = $symbol;
         if (is_object($symbol)) {
             $a->symbol = $symbol->string();
@@ -113,6 +119,7 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
         $a->line = $this->stateyyline;
         $a->position = $this->stateyycol;
         $a->col = $this->stateyycol;
+		$a->str = $this->stateyychar;
         $a->symbol = $symbol->string();
         $errormessage = 'lexical_error_message';
         if ($a->symbol[0] == '\'') {
@@ -184,6 +191,7 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
                 $a = new stdClass();
                 $a->line = $result->position()->linestart();
                 $a->col = $result->position()->colstart();
+				$a->str = $result->position()->stringstart();
                 $a->symbol = $value;
                 $res->errorkind = 'clanguagemulticharliteral';
                 $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
@@ -194,6 +202,8 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
         private function return_pos() {
             $begin_line = $this->yyline;
             $begin_col = $this->yycol;
+			$begin_str  = $this->yychar;
+			$end_str = $begin_str + strlen($this->yytext()) - 1;
             if(strpos($this->yytext(), '\n')) {
                 $lines = explode("\n", $this->yytext());
                 $num_lines = count($lines);
@@ -203,29 +213,30 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
                 $end_line = $begin_line;
                 $end_col = $begin_col + textlib::strlen($this->yytext()) - 1;
             }
-            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col, $begin_str, $end_str);
             return $res;
         }
-        private function return_pos_by_field($blfield, $bcfield, $elfield, $ecfield)  {
+        private function return_pos_by_field($blfield, $bcfield, $yycstart, $elfield, $ecfield, $yycend)  {
             $begin_line = $this->$blfield;
             $begin_col = $this->$bcfield;
             $end_line =  $this->$elfield;
             $end_col =  $this->$ecfield;
-            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+            $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col, $this->$yycstart, $this->$yycend);
             return $res;
         }
         private function return_buffered_pos() {
             $this->endyyline = $this->yyline;
             $this->endyycol = $this->yycol + textlib::strlen($this->yytext()) - 1;
-            return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
+            $this->endyychar = $this->yychar + textlib::strlen($this->yytext()) - 1;			
+            return $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'endyyline', 'endyycol', 'endyychar');
         }
         private function return_error_token_pos() {
-            return $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
+            return $this->return_pos_by_field('stateyyline', 'stateyycol', , 'stateyychar', 'yyline', 'yycol', 'yychar');
         }
         private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
             $pos = $this->return_error_token_pos();
-            $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1);
-            $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1);
+            $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1, $pos->stringstart(), $pos->stringend() + $splitoffset - 1);
+            $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1, $pos->stringstart() + $splitoffset, $pos->stringend());
             $this->endstate = true;
             $realstring = $tokenstring;
             if (is_object($realstring)) {
@@ -5739,7 +5750,7 @@ array(
     if ($this->yy_lexical_state == self::SINGLELINE_COMMENT) {
         $this->yybegin(self::YYINITIAL);
         $this->yycol--;
-        $pos = $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
+        $pos = $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'yyline', 'yycol', 'yychar');
         $this->yycol++;
         $t = $this->create_token_with_position('singleline_comment', $this->statestring, $pos);
         return $t;
