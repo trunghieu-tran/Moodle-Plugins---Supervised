@@ -144,6 +144,9 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_tree_send_select').attr('disabled',true);
                     $('#id_graph_send_select').attr('disabled',true);
 
+                    $('#tree_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 1);
+                    $('#graph_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 1);
+
                     self.panzooms.init();
                     options.oneachpresscallback();
                 });
