@@ -155,9 +155,11 @@ function cleanup($courseid) {
     $DB->delete_records('block_supervised_lessontype', array('courseid' => $courseid));
     // Delete sessions.
     $DB->delete_records('block_supervised_session', array('courseid' => $courseid));
-    // Delete access rules.
-    $quizzids = $DB->get_records('quiz', array('course' => $courseid));
-    $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+    $dbman = $DB->get_manager();
+    if ($dbman->table_exists('quizaccess_supervisedcheck')) { // Delete access rules.
+        $quizzids = $DB->get_records('quiz', array('course' => $courseid));
+        $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+    }
 }
 
 /**
@@ -175,7 +177,7 @@ function user_active_sessions() {
     $time = time();
     $sessions = get_sessions($COURSE->id, 0, 0, -1, StateSession::ACTIVE, 0, $time, $time, 0);
 
-    // Filter sessions by lessontype and userid.
+    // Filter sessions by user's group and ip.
     foreach ($sessions as $id => $session) {
         // Check if current user is in current session's group.
         $useringroup = $DB->record_exists('block_supervised_user', array('sessionid'=>$id, 'userid'=>$USER->id));
