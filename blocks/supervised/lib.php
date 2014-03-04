@@ -156,8 +156,11 @@ function cleanup($courseid) {
     // Delete sessions.
     $DB->delete_records('block_supervised_session', array('courseid' => $courseid));
     // Delete access rules.
-    $quizzids = $DB->get_records('quiz', array('course' => $courseid));
-    $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+    $dbman = $DB->get_manager();
+    if ($dbman->table_exists('quizaccess_supervisedcheck')) {
+        $quizzids = $DB->get_records('quiz', array('course' => $courseid));
+        $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzids));
+    }
 }
 
 /**
