@@ -92,6 +92,14 @@ class block_formal_langs_node_position {
     protected $lineend;
     protected $colstart;
     protected $colend;
+    /** A starting position in string, as sequence of characters
+     *	@var int
+     */	
+    protected $stringstart;
+    /** An end position in string, as sequence of characters
+     *	@var int
+     */	    
+    protected $stringend;
 
     public function linestart(){
         return $this->linestart;
@@ -109,11 +117,21 @@ class block_formal_langs_node_position {
         return $this->colend;
     }
     
-    public function __construct($linestart, $lineend, $colstart, $colend) {
+    public function stringstart() {
+        return $this->stringstart();
+    }
+
+    public function stringend() {
+        return $this->stringend();
+    }
+    
+    public function __construct($linestart, $lineend, $colstart, $colend, $stringstart = 0, $stringend = 0) {
         $this->linestart = $linestart;
         $this->lineend = $lineend;
         $this->colstart = $colstart;
         $this->colend = $colend;
+        $this->stringstart = $stringstart;
+        $this->stringend = $stringend;        
     }
 
     /**
@@ -128,19 +146,32 @@ class block_formal_langs_node_position {
         $maxlineend = $nodepositions[0]->lineend;
         $mincolstart = $nodepositions[0]->colstart;
         $maxcolend = $nodepositions[0]->colend;
+        $minstringstart = $nodepositions[0]->stringstart;
+        $maxstringend = $nodepositions[0]->stringend;
 
         foreach ($nodepositions as $node) {
-            if ($node->linestart < $minlinestart)
+            if ($node->linestart < $minlinestart) {
                 $minlinestart = $node->linestart;
-            if ($node->colstart < $mincolstart)
                 $mincolstart = $node->colstart;
-            if ($node->lineend > $maxlineend)
+            }
+            
+            if ($node->linestart == $minlinestart) {
+                $mincolstart = min($mincolstart, $node->colstart);
+            }
+            if ($node->lineend > $maxlineend) {
                 $maxlineend = $node->lineend;
-            if ($node->colend > $maxcolend)
                 $maxcolend = $node->colend;
+            }
+            
+            if ($node->lineend == $maxlineend) {
+                $maxcolend = max($maxcolend, $node->colend);
+            }
+
+            $minstringstart = min($minstringstart, $node->stringstart);
+            $maxstringend = max($maxstringend, $node->stringend)
         }
 
-        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend);
+        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend, $minstringstart, $maxstringend);
     }
 }
 
