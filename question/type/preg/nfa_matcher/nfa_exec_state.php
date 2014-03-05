@@ -316,7 +316,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     /**
      * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
-    public function leftmost_longest($other, $includecapturing = true) {
+    public function leftmost_longest($other, $matchinginprogress = true) {
         // Check for full match.
         if ($this->is_full() && !$other->is_full()) {
             return true;
@@ -324,13 +324,23 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
+        // Choose the longest match
         if ($this->length > $other->length) {
             return true;
         } else if ($other->length > $this->length) {
             return false;
         }
 
-        // Iterate over all subpatterns skipping the first which is the whole expression.
+        // If both states have partial match, choose one with minimal left
+        if (!$matchinginprogress && !$this->is_full() && !$other->is_full()) {
+            if ($this->left < $other->left) {
+                return true;
+            } else if ($other->left < $this->left) {
+                return false;
+            }
+        }
+
+        // PCRE/POSIX selection goes on below. Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
         for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->automaton->max_subpatt(); $i++) {
             $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
@@ -361,10 +371,10 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this_being_captured = self::is_being_captured($this_index, $this_length);
                 $other_being_captured = self::is_being_captured($other_index, $other_length);
 
-                if ($includecapturing && $this_being_captured) {
+                if ($matchinginprogress && $this_being_captured) {
                     $this_length = $this->startpos + $this->length - $this_index;
                 }
-                if ($includecapturing && $other_being_captured) {
+                if ($matchinginprogress && $other_being_captured) {
                     $other_length = $this->startpos + $other->length - $other_index;
                 }
 

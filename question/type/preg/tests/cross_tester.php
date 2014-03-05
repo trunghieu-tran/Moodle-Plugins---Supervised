@@ -212,7 +212,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             $errors = $matcher->get_errors();
             foreach ($errors as $error) {
                 // Error messages are displayed for parsing errors only.
-                if (is_a($error, 'qtype_preg_parsing_error')) {
+                if (is_a($error, 'qtype_preg_parsing_error') && strpos($error->errormsg, 'not implemented') === false) {
                     echo 'Regex incorrect: ' . $error->errormsg . "\n";
                 }
             }

@@ -53,7 +53,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_LEAF_RECURSION:
+            //case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return 'qtype_preg_nfa_leaf';
         }
 
@@ -84,7 +84,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_LEAF_RECURSION:
+            //case qtype_preg_node::TYPE_LEAF_RECURSION:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -640,6 +640,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $bruteforce = false;
         foreach ($this->get_nodes_with_subexpr_refs() as $node) {
+            // Recursion leafs are kinda subexpr references but they don't cause bruteforce
             if ($node->type != qtype_preg_node::TYPE_LEAF_RECURSION) {
                 $bruteforce = true;
                 break;
@@ -651,58 +652,64 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                          ? $this->match_brute_force($str, $startpos, $subexpr, $prevlevelstate)
                          : $this->match_fast($str, $startpos, $subexpr, $prevlevelstate);
 
-        // Choose the best one.
-        $result = null;
-
-        foreach ($possiblematches as $match) {
-            if ($result === null || $match->leftmost_longest($result, false)) {
-                $result = $match;
-            }
-        }
-
-        if ($result === null) {
-
+        if (empty($possiblematches)) {
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
-        // Generate an extension for partial matches.
-        $result->extendedmatch = null;
-        if (!$result->is_full() /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+        // Check if a full match was found.
+        $fullmatchexists = false;
+        foreach ($possiblematches as $match) {
+            if ($match->is_full()) {
+                $fullmatchexists = true;
+                break;
+            }
+        }
 
-            // Try each backtrack state and choose the shortest one.
-            $result->backtrack_states = array_merge(array($result), $result->backtrack_states);
+        // If there was no full match, generate extensions for each partial match.
+        if (!$fullmatchexists /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+            foreach ($possiblematches as $match) {
+                $match->extendedmatch = null;
+                // Try each backtrack state and choose the shortest one.
+                $match->backtrack_states = array_merge(array($match), $match->backtrack_states);
+                foreach ($match->backtrack_states as $backtrack) {
+                    $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
-            foreach ($result->backtrack_states as $backtrack) {
-                $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
+                    $tmp = $bruteforce
+                         ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
+                         : $this->generate_extension_fast($str, $backtrack, $subexpr);
 
-                $tmp = $bruteforce
-                     ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
-                     : $this->generate_extension_fast($str, $backtrack, $subexpr);
+                    if ($tmp === null) {
+                        continue;
+                    }
 
-                if ($tmp === null) {
-                    continue;
-                }
-
-                // Calculate 'left'.
-                $prefixlen = $startpos;
-                while ($prefixlen < $result->str->length() && $prefixlen < $tmp->str->length() &&
-                       $result->str[$prefixlen] == $tmp->str[$prefixlen]) {
-                    $prefixlen++;
-                }
-                $left = $tmp->str->length() - $prefixlen;
-                // Choose the best one by:
-                // 1) minimizing length of the generated extension
-                // 2) minimizing abs(extension->length - result->length)
-                if ($result->extendedmatch === null) {
-                    $result->extendedmatch = $tmp;
-                    $result->left = $left;
-                } else if (($result->left > $left) ||
-                           ($result->left == $left && abs($result->extendedmatch->length - $result->length) > abs($tmp->length - $result->length))) {
-                    $result->extendedmatch = $tmp;
-                    $result->left = $left;
+                    // Calculate 'left'.
+                    $prefixlen = $startpos;
+                    while ($prefixlen < $match->str->length() && $prefixlen < $tmp->str->length() &&
+                           $match->str[$prefixlen] == $tmp->str[$prefixlen]) {
+                        $prefixlen++;
+                    }
+                    $left = $tmp->str->length() - $prefixlen;
+                    // Choose the best one by:
+                    // 1) minimizing length of the generated extension
+                    // 2) minimizing abs(extension->length - match->length)
+                    if ($match->extendedmatch === null) {
+                        $match->extendedmatch = $tmp;
+                        $match->left = $left;
+                    } else if (($match->left > $left) ||
+                               ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $match->length))) {
+                        $match->extendedmatch = $tmp;
+                        $match->left = $left;
+                    }
                 }
             }
+        }
 
+        // Choose the best one.
+        $result = array_pop($possiblematches);
+        foreach ($possiblematches as $match) {
+            if ($match->leftmost_longest($result, false)) {
+                $result = $match;
+            }
         }
 
         return $result;
@@ -772,12 +779,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $dst_node->create_automaton($result, $stack);
             $body = array_pop($stack);
             $result->after_build($body);
-            $t = clone $result;
-            printf($result->fa_to_dot() . "\n");
+            //printf($result->fa_to_dot() . "\n");
             //$result->merge_epsilons();
-            $result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
-            //$result = $t;
         } catch (Exception $e) {
             $result = false;
         }
