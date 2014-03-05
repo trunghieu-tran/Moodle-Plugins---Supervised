@@ -3830,7 +3830,7 @@ class qtype_preg_cross_tests_from_preg {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>6),
                        'ext_index_first'=>array(0=>0),
-                       'ext_length'=>array(0=>6),
+                       'ext_length'=>array(0=>7),
                        'left'=>array(1),
                        'next'=>'d');
 
