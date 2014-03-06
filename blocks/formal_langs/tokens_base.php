@@ -118,11 +118,11 @@ class block_formal_langs_node_position {
     }
     
     public function stringstart() {
-        return $this->stringstart();
+        return $this->stringstart;
     }
 
     public function stringend() {
-        return $this->stringend();
+        return $this->stringend;
     }
     
     public function __construct($linestart, $lineend, $colstart, $colend, $stringstart = 0, $stringend = 0) {
@@ -140,6 +140,7 @@ class block_formal_langs_node_position {
      * Resulting position is defined from minimum to maximum postion of nodes
      *
      * @param array $nodepositions positions of adjanced nodes
+     * @return block_formal_langs_token_position
      */
     public function summ($nodepositions) {
         $minlinestart = $nodepositions[0]->linestart;
@@ -168,7 +169,7 @@ class block_formal_langs_node_position {
             }
 
             $minstringstart = min($minstringstart, $node->stringstart);
-            $maxstringend = max($maxstringend, $node->stringend)
+            $maxstringend = max($maxstringend, $node->stringend);
         }
 
         return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend, $minstringstart, $maxstringend);

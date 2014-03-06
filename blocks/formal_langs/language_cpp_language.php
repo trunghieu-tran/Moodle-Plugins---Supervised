@@ -231,7 +231,7 @@ class block_formal_langs_predefined_cpp_language_lexer_raw extends JLexBase  {
             return $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'endyyline', 'endyycol', 'endyychar');
         }
         private function return_error_token_pos() {
-            return $this->return_pos_by_field('stateyyline', 'stateyycol', , 'stateyychar', 'yyline', 'yycol', 'yychar');
+            return $this->return_pos_by_field('stateyyline', 'stateyycol','stateyychar', 'yyline', 'yycol', 'yychar');
         }
         private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
             $pos = $this->return_error_token_pos();

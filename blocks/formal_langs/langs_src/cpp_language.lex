@@ -266,7 +266,7 @@ class block_formal_langs_language_cpp_language extends block_formal_langs_predef
 
 
         private function return_error_token_pos() {
-            return $this->return_pos_by_field('stateyyline', 'stateyycol', , 'stateyychar', 'yyline', 'yycol', 'yychar');
+            return $this->return_pos_by_field('stateyyline', 'stateyycol','stateyychar', 'yyline', 'yycol', 'yychar');
         }
 
 
