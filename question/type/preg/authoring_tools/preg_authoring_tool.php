@@ -212,6 +212,10 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $result .= implode('<br />', $this->get_error_messages());
         return $result;
     }
+
+    public function get_regex() {
+        return $this->regex->string();
+    }
 }
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
