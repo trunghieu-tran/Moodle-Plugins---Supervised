@@ -129,6 +129,8 @@ class qtype_preg_explaining_graph_tool_link {
     public $label = '';         // Label of link on image.
     public $style = '';         // Visual style of link (for image).
     public $owner = null;       // Subgraph which has this link.
+    public $id = -1;            // Id of link.
+    public $tooltip = "";       // Tooltip for link.
 
     public function __construct($lbl, $src, $dst, $ownr = null, $stl = 'normal') {
         $this->label = $lbl;
@@ -400,6 +402,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     }
                 }
 
+                // Set an id and a tooltip for new link within destroyed node.
+                $this->links[count($this->links)-1]->tooltip = $this->links[count($this->links)-1]->label;
+                $this->links[count($this->links)-1]->id = $tmpdnode->id;
+
                 // Destroy links between nighbors and assert.
                 $tmplink = $gmain->find_link($leftneighbor, $tmpdnode);
                 unset($tmplink->owner->links[array_search($tmplink, $tmplink->owner->links)]);
@@ -437,6 +443,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         // Find a link between left neighbor and void.
                         $tmpneighbor = $gmain->find_link($neighborl, $iter);
                         $tmpneighbor->destination = $neighborr;    // Set a new destination.
+                        $tmpneighbor->tooltip = "Void";
+                        $tmpneighbor->id = $iter->id;
 
                         if ($neighborr !== null) {
                             // Find a link between void and right neighbor and destroy it.
@@ -463,11 +471,15 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $tmpneighbor->source = $pointr;    // Set a new source.
 
                         $this->links[] = new qtype_preg_explaining_graph_tool_link('', $pointl, $pointr, $this);
+                        $this->links[count($this->links)-1]->tooltip = "Void";
+                        $this->links[count($this->links)-1]->id = $iter->id;
                     }
                 } else {
                     // Find a link between left neighbor and void.
                     $tmpneighbol = $gmain->find_link($neighborl, $iter);
                     $tmpneighbol->destination = $neighborr;    // Set a new destination.
+                    $tmpneighbol->tooltip = "Void";
+                    $tmpneighbol->id = $iter->id;
 
                     $tmpneighbor = $gmain->find_link($iter, $neighborr);
                     if ($tmpneighbor->owner !== $this && !$this->is_parent_for($tmpneighbor->owner)) {
@@ -557,8 +569,13 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($this->links as $iter) {
-            $instr .= '"nd' . $iter->source->id . '" -> "nd' .
-                      $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . "];\n";
+            $instr .= '"nd' . $iter->source->id . '" -> "nd' . $iter->destination->id . '"';
+            $instr .= "[";
+            if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
+            $instr .= "label=\"" . $iter->label . "\", ";
+            $instr .= "arrowhead=\"" . $iter->style . "\", ";
+            if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
+            $instr .= "]\n";
         }
 
         $instr .= "}\n";
@@ -642,8 +659,14 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($gr->links as $iter) {
-            $instr .= '"nd' . $iter->source->id . '" -> "nd' .
-                      $iter->destination->id . '" [label="' . $iter->label . '", arrowhead=' . $iter->style . "];\n";
+            $instr .= '"nd' . $iter->source->id . '" -> "nd' . $iter->destination->id . '"';
+
+            $instr .= "[";
+            if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
+            $instr .= "label=\"" . $iter->label . "\", ";
+            $instr .= "arrowhead=\"" . $iter->style . "\", ";
+            if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
+            $instr .= "]\n";
         }
 
         $instr .= "}\n";
@@ -657,6 +680,15 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $maxid = -1;
         foreach ($this->nodes as $node) {
             $id = $node->id;
+            if (is_string($id)) {
+                $temp = explode(',', $id);
+                $id = (int)$temp[0];
+            }
+            $maxid = max($maxid, $id);
+        }
+
+        foreach ($this->links as $link) {
+            $id = $link->id;
             if (is_string($id)) {
                 $temp = explode(',', $id);
                 $id = (int)$temp[0];
@@ -684,6 +716,14 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if (!is_string($node->id)) {
                 if ($node->id == -1) {
                     $node->id = ++$maxid;
+                }
+            }
+        }
+
+        foreach ($this->links as $link) {
+            if (!is_string($link->id)) {
+                if ($link->id == -1) {
+                    $link->id = ++$maxid;
                 }
             }
         }
