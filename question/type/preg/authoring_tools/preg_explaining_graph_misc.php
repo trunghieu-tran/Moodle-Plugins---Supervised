@@ -130,7 +130,8 @@ class qtype_preg_explaining_graph_tool_link {
     public $style = '';         // Visual style of link (for image).
     public $owner = null;       // Subgraph which has this link.
     public $id = -1;            // Id of link.
-    public $tooltip = "";       // Tooltip for link.
+    public $tooltip = '';       // Tooltip for link.
+    public $color = 'black';    // Color of arrow.
 
     public function __construct($lbl, $src, $dst, $ownr = null, $stl = 'normal') {
         $this->label = $lbl;
@@ -179,6 +180,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public $edge        = '';           // Special edges options.
     public $isexact     = false;
     public $isselection = false;        // This flag shows
+    public $tooltip     = "";           // Tooltip for subgraph.
 
     public function __construct($lbl, $id = -1) {
         $this->label = $lbl;
@@ -574,6 +576,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
+            $instr .= "color=\"" . $iter->color . "\", ";
             if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
             $instr .= "]\n";
         }
@@ -639,6 +642,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $instr .= 'color=' . $gr->color . ';';
         $instr .= 'bgcolor=' . $gr->bgcolor . ';';
         $instr .= 'label="' . $gr->label . '";';
+        $instr .= 'id="' . $gr->id . '";';
+        $instr .= 'tooltip="' . $gr->tooltip . '";';
         $instr .= $gr->edge;
         $instr .= $gr->node;
 
@@ -665,6 +670,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
+            $instr .= "color=\"" . $iter->color . "\", ";
             if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
             $instr .= "]\n";
         }
