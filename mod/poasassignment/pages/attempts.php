@@ -239,15 +239,16 @@ class attempts_page extends abstract_page {
     }
 
     /**
-     * Returns HTML to display comments on all previous attempts.
+     * Returns HTML to display comments on attempt.
      * @param stdObject $attempt
-     * @return string
+     * @param stdObject $criterion
+     * @return string or null if no comments
      */
-    public static function show_comments($attempt) {
-        global $DB, $OUTPUT;
+    public static function show_comments($attempt, $criterion) {
+        global $DB;
         $poasmodel = poasassignment_model::get_instance();
         $context = $poasmodel->get_context();
-        $html = '';
+        $ratingvalue = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id, 'attemptid' => $attempt->id));
 
         $options = new stdClass();
         $options->area    = 'poasassignment_comment';
@@ -256,25 +257,14 @@ class attempts_page extends abstract_page {
         $options->context = $context;
         $options->autostart = true;
         $options->notoggle = true;
+        $options->itemid  = $ratingvalue->id;
 
-        $html .= $OUTPUT->box_start();
-        $html .= '<p><b><i>' . get_string('attempt', 'poasassignment') . ' ' . $attempt->attemptnumber . '</i></b> (' . userdate($attempt->attemptdate) . ')</p>';
+        $comment = new comment($options);
+        $comment->set_post_permission(false);
 
-        $criterions = $DB->get_records('poasassignment_criterions',
-                                       array('poasassignmentid' => $poasmodel->get_poasassignment()->id));
-        foreach ($criterions as $criterion) {
-            $html .= '<p><b>' . $criterion->name . '</b>' . $poasmodel->help_icon($criterion->description) . '</p>';
-
-            $ratingvalue=$DB->get_record('poasassignment_rating_values',
-                                         array('criterionid' => $criterion->id, 'attemptid' => $attempt->id));
-            $options->itemid  = $ratingvalue->id;
-            $comment = new comment($options);
-            $comment->set_post_permission(false);
-            $html .= $comment->output(true);
-        }
-
-        $html .= $OUTPUT->box_end();
-
-        return $html;
+        if ($comment->count() > 0)
+            return $comment->output(true);
+        else
+            return null;
     }
 }

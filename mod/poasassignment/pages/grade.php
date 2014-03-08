@@ -93,14 +93,21 @@ class grade_form extends moodleform {
         $mform->addElement('static',null,null,attempts_page::show_attempt($attempt));
 
         // Show comments on previous attempts if have.
-        $latestattempt = $poasmodel->get_last_attempt($assignee->id);
-        if ($latestattempt->attemptnumber != 1) {
+        if ($attempt->attemptnumber != 1) {
             $mform->addElement('header', 'prevcommentsheader', get_string('prevattempts_comments', 'poasassignment'));
-            $attempts = array_reverse($DB->get_records('poasassignment_attempts',
-                array('assigneeid' => $assignee->id), 'attemptnumber'));
+            $latestattempt = $poasmodel->get_last_attempt($assignee->id);
+            $attempts = array_reverse($DB->get_records('poasassignment_attempts', array('assigneeid' => $assignee->id), 'attemptnumber'));
             foreach ($attempts as $curattempt) {
                 if ($curattempt != $latestattempt) {
-                    $mform->addElement('static', null, null, attempts_page::show_comments($curattempt));
+                    $mform->addElement('html', '<h1>' . get_string('attempt', 'poasassignment') . ' ' . $curattempt->attemptnumber
+                                       . ($curattempt->draft ? ' (' . get_string('draft', 'poasassignment') . ')' : '') . '</h1>');
+                    $mform->addElement('static', null, get_string('submitted', 'assignment'), userdate($attempt->attemptdate));
+                    $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $poasmodel->get_poasassignment()->id));
+                    foreach ($criterions as $criterion) {
+                        $commentshtml = attempts_page::show_comments($curattempt, $criterion);
+                        $mform->addElement('static', null, $criterion->name . $poasmodel->help_icon($criterion->description),
+                                           $commentshtml == null ? get_string('nocomments', 'poasassignment') : $commentshtml);
+                    }
                 }
             }
         }
