@@ -144,8 +144,8 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_tree_send_select').attr('disabled',true);
                     $('#id_graph_send_select').attr('disabled',true);
 
-                    $('#tree_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 1);
-                    $('#graph_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 1);
+                    $('#tree_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 37);
+                    $('#graph_hnd').css('width', $('#mformauthoring').prop('offsetWidth') - 37);
 
                     self.panzooms.init();
                     options.oneachpresscallback();
@@ -464,46 +464,6 @@ M.preg_authoring_tools_script = (function ($) {
                 self.CALC_COORD = false;
             });*/
 
-
-            /*$('#tree_img').mousedown(function(e) {
-                e.preventDefault();
-                // cacl current coord for cursor
-                self.CALC_COORD = true;
-                var br = document.getElementById('tree_img').getBoundingClientRect();
-
-                self.RECTANGLE_WIDTH = self.get_current_x(e, br);
-                self.RECTANGLE_HEIGHT = self.get_current_y(e, br, 'tree_img', 'tree_hnd');
-            });
-
-            $('#tree_img').mousemove(function(e) {
-                e.preventDefault();
-                // move image and cacl new coords
-                if (self.CALC_COORD) {
-                    var br = document.getElementById('tree_img').getBoundingClientRect();
-                    var new_pageX = self.get_current_x(e, br);
-                    var new_pageY = self.get_current_y(e, br, 'tree_img', 'tree_hnd');
-
-                    if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
-                        //(new_pageX - self.RECTANGLE_WIDTH)
-                        document.getElementById('tree_hnd').scrollTop = (new_pageY - self.RECTANGLE_HEIGHT);
-                    } else if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
-                        //(new_pageX - self.RECTANGLE_WIDTH)
-                        document.getElementById('tree_hnd').scrollTop = (self.RECTANGLE_HEIGHT - new_pageY);
-                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
-                        //(self.RECTANGLE_WIDTH - new_pageX)
-                        document.getElementById('tree_hnd').scrollTop = (self.RECTANGLE_HEIGHT - new_pageY);
-                    } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
-                        //(self.RECTANGLE_WIDTH - new_pageX)
-                        document.getElementById('tree_hnd').scrollTop = (new_pageY - self.RECTANGLE_HEIGHT);
-                    }
-                }
-            });
-
-            $(window).mouseup(function(e){
-                e.preventDefault();
-                self.CALC_COORD = false;
-            });*/
-
             tree_img.click(self.tree_node_misclicked);
             $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
         } else if (typeof t != 'undefined') {
@@ -557,8 +517,8 @@ M.preg_authoring_tools_script = (function ($) {
     resize_rectangle_selection : function(e, img, rectangle, hnd) {
     	if (self.CALC_COORD) {
             var br = document.getElementById(img).getBoundingClientRect();
-            var new_pageX = self.get_current_x(e, br);
-            var new_pageY = self.get_current_y(e, br, img, hnd);
+            var new_pageX = self.get_current_x(e, img, hnd);
+            var new_pageY = self.get_current_y(e, img, hnd);
 
             if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                 $('#' + rectangle).css({
@@ -591,16 +551,15 @@ M.preg_authoring_tools_script = (function ($) {
     init_rectangle_selection : function(e, img, rectangle, hnd) {
         self.CALC_COORD = true;
         var br = document.getElementById(img).getBoundingClientRect();
-        $('#' + rectangle).Resizable(
-            {
+        $('#' + rectangle).Resizable({
                 minWidth: 20,
                 minHeight: 20,
-                maxWidth: (br.right - br.left),
+                /*maxWidth: (br.right - br.left),
                 maxHeight: (br.bottom - br.top),
-                minTop: $('#' + hnd).prop('offsetTop'),
-                minLeft: 220,
-                maxRight: br.right - br.left + 220,
-                maxBottom: br.bottom - br.top + $('#' + hnd).prop('offsetTop'),
+                minTop: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
+                minLeft: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
+                maxRight: br.right - br.left + (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),*/
+                maxBottom: br.bottom - br.top,
                 dragHandle: true,
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
@@ -621,8 +580,8 @@ M.preg_authoring_tools_script = (function ($) {
             }
         );
 
-        self.RECTANGLE_WIDTH = self.get_current_x(e, br);
-        self.RECTANGLE_HEIGHT = self.get_current_y(e, br, img, hnd);
+        self.RECTANGLE_WIDTH = self.get_current_x(e, img, hnd);
+        self.RECTANGLE_HEIGHT = self.get_current_y(e, img, hnd);
 
         $('#' + rectangle).css({
             width : 20,
@@ -633,28 +592,26 @@ M.preg_authoring_tools_script = (function ($) {
         });
     },
 
-    get_current_x : function(e, br) {
+    get_current_x : function(e, img, hnd) {
         //var br = document.getElementById('tree_img').getBoundingClientRect();
         //var local_x = e.pageX - $(window).prop('scrollX') - br.left;
-        return e.pageX - $(window).prop('scrollX') - br.left + 220;
+        return e.pageX - $(window).prop('scrollX') - document.getElementById(img).getBoundingClientRect().left
+                - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left);
     },
 
-    get_current_y : function(e, br, img, hnd) {
+    get_current_y : function(e, img, hnd) {
         //var br = document.getElementById('tree_hnd').getBoundingClientRect();
         //var local_y = e.pageY - $(window).prop('scrollY') - br.top;
-        return e.pageY - $(window).prop('scrollY') 
-                - document.getElementById(hnd).getBoundingClientRect().top
-                + $('#' + img).prop('offsetTop');// - br.top + $('#tree_hnd').prop('offsetTop');
-                //+ document.getElementById('tree_hnd').scrollTop;
+        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top 
+                - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top);
     },
 
-    get_rect_selection : function (e, rectangle, img, area) {
+    get_rect_selection : function (e, rectangle, img, area, deltaX, deltaY) {
         // Check ids selected nodes
-        //var br = document.getElementById('tree_img').getBoundingClientRect();
-        rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') - 220;
-        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - $('#' + img).prop('offsetTop');
-        rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') - 220;
-        rect_right_top_y = $('#' + rectangle).prop('offsetTop') - $('#' + img).prop('offsetTop');
+        rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + deltaY;
+        rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + deltaY;
         var areas = $('#' + area).children();
         var indfirst = 999;
         var indlast = -999;
@@ -723,7 +680,9 @@ M.preg_authoring_tools_script = (function ($) {
     btn_graph_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
-        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img', 'qtype_preg_graph');
+        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img', 'qtype_preg_graph', 
+            (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left), 
+            (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top));
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
@@ -760,7 +719,7 @@ M.preg_authoring_tools_script = (function ($) {
         if (self.is_graph_selection_rectangle_visible()) {
             $('#id_graph_send_select').attr('disabled',false);
             $('#graph_img').attr("usemap", "");
-            self.panzooms.reset_graph();
+            //self.panzooms.reset_graph();
             self.panzooms.disable_graph();
         } else {
             $('#id_graph_send_select').attr('disabled',true);
@@ -886,7 +845,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         disable_graph : function() {
             var graph_img = $('#graph_img');
-            graph_img.panzoom("disable");
+            graph_img.panzoom("instance")._unbind();
         },
         
         enable_tree : function() {
@@ -896,12 +855,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         enable_graph : function() {
             var graph_img = $('#graph_img');
-            graph_img.panzoom("enable");
-            /*graph_img.panzoom("resetPan", {
-            animate: false,
-              silent: true
-            });*/
-            //graph_img.panzoom("option", "pan", false);
+            graph_img.panzoom("instance")._bind();
         },
 
         reset_all : function() {
