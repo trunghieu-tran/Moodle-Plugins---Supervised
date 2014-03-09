@@ -1470,7 +1470,7 @@ class poasassignment_model {
         $context = get_context_instance( CONTEXT_COURSE, $COURSE->id );
         $query = '
             SELECT u.id AS id
-            FROM mdl_role_assignments AS a, mdl_user AS u
+            FROM {role_assignments} AS a, {user} AS u
             WHERE contextid=' . $context->id . ' AND roleid<>0 AND a.userid=u.id;';
 
         $rs = $DB->get_recordset_sql($query);
