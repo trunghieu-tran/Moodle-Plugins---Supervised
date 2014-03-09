@@ -54,7 +54,6 @@ class submissions_page extends abstract_page {
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
         groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
-        $context=get_context_instance(CONTEXT_MODULE,$this->cm->id);
 
         $usersid = $poasmodel->get_users_with_active_tasks();
         $indtasks=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;

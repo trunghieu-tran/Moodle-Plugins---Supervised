@@ -23,8 +23,9 @@ class tasks_page extends abstract_page {
 
         $this->userid = optional_param('userid', -1, PARAM_INT);
 
-        $this->hascapmanage = has_capability('mod/poasassignment:managetasks', get_context_instance(CONTEXT_MODULE, $this->cm->id));
-        $this->hascaphavetask = has_capability('mod/poasassignment:havetask', get_context_instance(CONTEXT_MODULE, $this->cm->id));
+        $context = context_module::instance($this->cm->id);
+        $this->hascapmanage = has_capability('mod/poasassignment:managetasks', $context);
+        $this->hascaphavetask = has_capability('mod/poasassignment:havetask', $context);
 
         $this->taskgiver = $DB->get_record('poasassignment_taskgivers', array('id' => $this->poasassignment->taskgiverid));
     }
@@ -119,11 +120,12 @@ class tasks_page extends abstract_page {
                         $columnname = $field->name;
                         $header = $field->name;
                         $columns[] = $columnname;
-                        if (has_capability('mod/poasassignment:seefielddescription', get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+                        $context = context_module::instance($this->cm->id);
+                        if (has_capability('mod/poasassignment:seefielddescription', $context)) {
                             $header .= ' ' . $poasmodel->help_icon($field->description);
                         }
 
-                        if (has_capability('mod/poasassignment:managetasksfields', get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+                        if (has_capability('mod/poasassignment:managetasksfields', $context)) {
                             $updateurl = new moodle_url('view.php',
                                 array('id' => $this->cm->id,
                                     'fieldid' => $field->id,
@@ -150,7 +152,7 @@ class tasks_page extends abstract_page {
         $table->setup();
         // Show all tasks if we can manage tasks
         if(has_capability('mod/poasassignment:managetasks',
-                          get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+                          context_module::instance($this->cm->id))) {
             $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
 
             $availabletasks = $poasmodel->get_available_tasks($USER->id, 1);
@@ -289,7 +291,7 @@ class tasks_page extends abstract_page {
                                             $value = userdate($taskvalue->value);
                                             break;
                                         case FILE:
-                                            $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+                                            $context = context_module::instance($this->cm->id);
                                             $value = $poasmodel->view_files($context->id,'poasassignmenttaskfiles',$taskvalue->id);
                                             break;
                                         default:

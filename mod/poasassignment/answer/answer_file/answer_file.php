@@ -289,7 +289,7 @@ class answer_file extends poasassignment_answer {
                 if($needbox)
                     $html.=$OUTPUT->box_start();
                 $cm = get_coursemodule_from_instance('poasassignment',$poasassignmentid);
-                $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+                $context = context_module::instance($cm->id);
                 $html.= $poasmodel->view_files($context->id,'submissionfiles',$submission->id);
                 if($needbox) 
                     $html.= $OUTPUT->box_end();                
@@ -302,7 +302,7 @@ class answer_file extends poasassignment_answer {
     function get_answer_values($poasassignmentid) {
         global $DB;
         $cm = get_coursemodule_from_instance('poasassignment',$poasassignmentid);
-        $context=get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
         $data = new stdclass();
         $poasmodel=poasassignment_model::get_instance();
         $filemanager_options = array('subdirs'=>0);

@@ -141,7 +141,7 @@ class poasassignment_model {
                                                            $this->course->id,
                                                            false,
                                                            MUST_EXIST);
-                $this->context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
+                $this->context = context_module::instance($this->cm->id);
                 //echo 'change';
             }
         }
@@ -233,7 +233,7 @@ class poasassignment_model {
             }
             unset($this->poasassignment->$gradername);
         }
-        $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
+        $this->context = context_module::instance($this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);
 
         // Create 1 criterion
@@ -299,7 +299,7 @@ class poasassignment_model {
 
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
         $this->delete_files($cm->id, 'poasassignment', 0);
-        $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
+        $this->context = context_module::instance($this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);
         return $this->poasassignment->id;
     }
@@ -365,9 +365,8 @@ class poasassignment_model {
         if (!isset($this->context)) {
             $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
             //echo $this->poasassignment->id;
-            $this->context = get_context_instance(CONTEXT_MODULE, $cm->id);
+            $this->context = context_module::instance($cm->id);
         }
-        //$this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         if ($draftitemid) {
             file_save_draft_area_files(
                 $draftitemid,
@@ -390,7 +389,7 @@ class poasassignment_model {
     function delete_files($cmid,$filearea=false,$itemid=false) {
         global $DB;
         $fs = get_file_storage();
-        $this->context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $this->context = context_module::instance($cmid);
         return $fs->delete_area_files($this->context->id, 'mod_poasassignment', $filearea, $itemid);
     }
 
@@ -409,7 +408,7 @@ class poasassignment_model {
 
     function get_poasassignments_files_urls($cm) {
         $fs = get_file_storage();
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
         $dir =$fs->get_area_tree($context->id, 'mod_poasassignment', 'poasassignmentfiles', 0);
         $files = $fs->get_area_files($context->id, 'mod_poasassignment', 'poasassignmentfiles', 0, 'sortorder');
         if (count($files) >= 1) {
@@ -734,7 +733,7 @@ class poasassignment_model {
         $id = $DB->insert_record('poasassignment_rating_values', $rating);
         // Insert comment
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
 
         $options = new stdClass();
         $options->area    = 'poasassignment_comment';
@@ -782,7 +781,7 @@ class poasassignment_model {
                                        array('poasassignmentid' => $this->poasassignment->id));
         $rating = 0;
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
 
         $options = new stdClass();
         $options->area    = 'poasassignment_comment';
@@ -1467,7 +1466,7 @@ class poasassignment_model {
         global $COURSE, $DB;
         $userids = array();
 
-        $context = get_context_instance( CONTEXT_COURSE, $COURSE->id );
+        $context = context_course::instance($COURSE->id);
         $query = '
             SELECT u.id AS id
             FROM {role_assignments} AS a, {user} AS u
@@ -1490,7 +1489,7 @@ class poasassignment_model {
 
         global $DB;
         if ($usersid = get_enrolled_users(
-            get_context_instance(CONTEXT_MODULE,$this->cm->id),
+            context_module::instance($this->cm->id),
             'mod/poasassignment:havetask',
             groups_get_activity_group($this->cm, true),
             'u.id')) {
@@ -1522,7 +1521,7 @@ class poasassignment_model {
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
         groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id . '&page=view');
-        $context = get_context_instance(CONTEXT_MODULE,$cm->id);
+        $context = context_module::instance($cm->id);
         $notchecked=0;
         $count=0;
 
@@ -1695,7 +1694,7 @@ class poasassignment_model {
     }
     function get_teachers() {
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
+        $context = context_module::instance($cm->id);
         $potgraders = get_users_by_capability($context, 'mod/poasassignment:grade', '', '', '', '', '', '', false, false);
         return $potgraders;
     }
