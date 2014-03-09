@@ -248,25 +248,26 @@ M.preg_authoring_tools_script = (function ($) {
     tree_node_clicked : function (e) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
-            var tmp = e.target.id.split(','),
+            var tmp = e.target.id.split(/[,;]/),
                 indfirst = tmp[1],
                 indlast = tmp[2];
 
             if(self.is_tree_foldind_mode()) {
                 var points = $('input[name=\'tree_fold_node_points\'').val();
                 // if new point not contained
-                if(points.split(',').indexOf(indfirst) == -1 || points.split(',').indexOf(indlast) == -1) {
+                //if(points.split(',').indexOf(indfirst) == -1 || points.split(',').indexOf(indlast) == -1) {
+                if(points.indexOf(indfirst + ',' + indlast) == -1) {
                     // add new point
                     if(points != '') {
-                        points += ',';
+                        points += ';';
                     }
                     points += indfirst + ',' + indlast;
                 } else { // if new point already contained
                     // remove this point
-                    if(points.indexOf(',' + indfirst + ',' + indlast) != -1) {
-                        points = points.replace(',' + indfirst + ',' + indlast, '');
-                    } else if(points.indexOf(indfirst + ',' + indlast + ',') != -1) {
-                        points = points.replace(indfirst + ',' + indlast + ',', '');
+                    if(points.indexOf(';' + indfirst + ',' + indlast) != -1) {
+                        points = points.replace(';' + indfirst + ',' + indlast, '');
+                    } else if(points.indexOf(indfirst + ',' + indlast + ';') != -1) {
+                        points = points.replace(indfirst + ',' + indlast + ';', '');
                     } else {
                         points = points.replace(indfirst + ',' + indlast, '');
                     }
