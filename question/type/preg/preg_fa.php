@@ -146,6 +146,8 @@ class qtype_preg_fa_transition {
     public $loopsback;
     /** @var array of qtype_preg_fa_tag - cached value for flatten_tags() method. */
     private $flattentags;
+    /** @var bool - is the transition result of merging? */
+    private $ismerged;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
@@ -168,6 +170,7 @@ class qtype_preg_fa_transition {
         $this->endsquantifier = false;
         $this->loopsback = false;
         $this->flattentags = null;
+        $this->ismerged = false;
     }
 
     /**
@@ -183,6 +186,14 @@ class qtype_preg_fa_transition {
 
     public function clear_cache() {
         $this->flattentags = null;
+    }
+
+    public function is_merged() {
+        return $this->ismerged;
+    }
+
+    public function make_merged() {
+        $this->ismerged = true;
     }
 
     /**
