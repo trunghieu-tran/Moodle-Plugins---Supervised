@@ -24,19 +24,19 @@
 $observers = array(
     array(
         'eventname'   => '\core\event\course_module_deleted',
-        'callback'    => 'event_handler_course_module_deleted',
+        'callback'    => 'supervisedcheck_course_module_deleted',
         'includefile' => '/mod/quiz/accessrule/supervisedcheck/lib.php',
     ),
 
     array(
         'eventname'   => '\core\event\course_deleted',
-        'callback'    => 'event_handler_course_deleted',
+        'callback'    => 'supervisedcheck_course_deleted',
         'includefile' => '/mod/quiz/accessrule/supervisedcheck/lib.php',
     ),
 
     array(
         'eventname'   => '\core\event\course_content_deleted',
-        'callback'    => 'event_handler_course_content_deleted',
+        'callback'    => 'supervisedcheck_course_content_deleted',
         'includefile' => '/mod/quiz/accessrule/supervisedcheck/lib.php',
     ),
 );

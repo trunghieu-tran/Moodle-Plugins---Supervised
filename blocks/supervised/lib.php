@@ -132,7 +132,7 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=null) {
  *
  * @param $course integer course id
  */
-function event_handler_course_deleted($course) {
+function supervised_course_deleted($course) {
     cleanup($course->id);
 }
 
@@ -141,7 +141,7 @@ function event_handler_course_deleted($course) {
  *
  * @param $course integer course id
  */
-function event_handler_course_content_removed($course) {
+function supervised_course_content_deleted($course) {
     cleanup($course->id);
 }
 
