@@ -35,7 +35,7 @@ function supervisedcheck_cleanup($course) {
  *
  * @param $course int course id
  */
-function event_handler_course_deleted($course) {
+function supervisedcheck_course_deleted($course) {
     supervisedcheck_cleanup($course);
 }
 
@@ -44,11 +44,11 @@ function event_handler_course_deleted($course) {
  *
  * @param $course int course id
  */
-function event_handler_course_content_deleted($course) {
+function supervisedcheck_course_content_deleted($course) {
     supervisedcheck_cleanup($course);
 }
 
-function event_handler_course_module_deleted($cm) {
+function supervisedcheck_course_module_deleted($cm) {
     global $DB;
     if ($cm->other['modulename'] == 'quiz') {
         $DB->delete_records('quizaccess_supervisedcheck', array('quizid' => $cm->other['instanceid']));

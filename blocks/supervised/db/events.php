@@ -21,18 +21,16 @@
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$handlers = array (
-    'course_deleted' => array (
-        'handlerfile'      => '/blocks/supervised/lib.php',
-        'handlerfunction'  => 'event_handler_course_deleted',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+$observers = array(
+    array(
+        'eventname'   => '\core\event\course_deleted',
+        'callback'    => 'supervised_course_deleted',
+        'includefile' => '/blocks/supervised/lib.php',
     ),
 
-    'course_content_removed' => array (
-        'handlerfile'      => '/blocks/supervised/lib.php',
-        'handlerfunction'  => 'event_handler_course_content_removed',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    )
+    array(
+        'eventname'   => '\core\event\course_content_deleted',
+        'callback'    => 'supervised_course_content_deleted',
+        'includefile' => '/blocks/supervised/lib.php',
+    ),
 );
