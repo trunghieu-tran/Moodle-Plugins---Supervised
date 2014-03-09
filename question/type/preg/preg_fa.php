@@ -1754,7 +1754,8 @@ abstract class qtype_preg_finite_automaton {
             $oldfront = $newfront;
             $newfront = array();
         }
-        foreach (array_keys($this->adjacencymatrix[0]) as $state) {
+
+        foreach (array_keys($this->adjacencymatrix) as $state) {
             $outtransitions = $this->get_adjacent_transitions($state, true);
             foreach ($outtransitions as $t) {
                 $t->set_transition_type();
