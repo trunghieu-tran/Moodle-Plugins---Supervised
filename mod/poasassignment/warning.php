@@ -17,7 +17,7 @@ global $OUTPUT,$DB,$PAGE, $CFG;
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 switch ($action) {
     case 'disablepenalty':
         $attemptid=optional_param('attemptid', -1, PARAM_INT);

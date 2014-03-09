@@ -10,7 +10,7 @@ class view_page extends abstract_page {
     function view_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm = $cm;
-        $this->context=get_context_instance(CONTEXT_MODULE, $cm->id);
+        $this->context = context_module::instance($cm->id);
     }
 
     function view() {
