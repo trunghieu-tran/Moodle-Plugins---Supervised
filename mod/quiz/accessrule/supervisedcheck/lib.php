@@ -47,3 +47,10 @@ function event_handler_course_deleted($course) {
 function event_handler_course_content_removed($course) {
     supervisedcheck_cleanup($course);
 }
+
+function event_handler_course_module_deleted($cm) {
+    global $DB;
+    if ($cm->other['modulename'] == 'quiz') {
+        $DB->delete_records('quizaccess_supervisedcheck', array('quizid' => $cm->other['instanceid']));
+    }
+}

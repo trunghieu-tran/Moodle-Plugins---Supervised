@@ -36,3 +36,11 @@ $handlers = array (
         'internal'         => 1,
     )
 );
+
+$observers = array(
+    array(
+        'eventname'   => '\core\event\course_module_deleted',
+        'callback'    => 'event_handler_course_module_deleted',
+        'includefile' => '/mod/quiz/accessrule/supervisedcheck/lib.php',
+    ),
+);
