@@ -26,7 +26,7 @@
  */
 function supervisedcheck_cleanup($course) {
     global $DB;
-    $quizzes = $DB->get_records('quiz', array('course' => $course->id));
+    $quizzes = $DB->get_records('quiz', array('course' => $course->objectid));
     $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzes));
 }
 
@@ -44,7 +44,7 @@ function event_handler_course_deleted($course) {
  *
  * @param $course int course id
  */
-function event_handler_course_content_removed($course) {
+function event_handler_course_content_deleted($course) {
     supervisedcheck_cleanup($course);
 }
 
