@@ -339,3 +339,4 @@ $string['raisnotinstalled'] = 'Удаленный автотестер не по
 $string['nothingtoshow'] = 'Нечего показывать';
 $string['pluginadministration'] = 'Управление плагином';
 $string['prevattempts_comments'] = 'Комментарии к предыдущим попыткам';
+$string['nocomments'] = 'Комментариев нет';
