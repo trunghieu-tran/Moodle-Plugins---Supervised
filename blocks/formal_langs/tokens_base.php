@@ -529,9 +529,9 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
-        if ($bypass==true) {
+        if ($bypass == true) {
             $possiblepairs = array();
-            if($option==true){
+            if($options->usecase == true){
                 for ($k=0; $k < count($other); $k++) {
                     if($other[$k] == $this->value) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
@@ -801,8 +801,10 @@ class block_formal_langs_token_stream {
      * Compares compared stream of tokens with this (correct) stream looking for
      * matches with possible errors in tokens (but not in their placement)
      *
-     * @param comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
-     * @param threshold editing distance threshold (in percents to token length)
+     * @param block_formal_langs_token_stream $comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
+     * @param float $threshold editing distance threshold (in percents to token length)
+     * @param block_formal_langs_comparing_options $options options data
+     * @param bool $bypass bypass for pairs
      * @return array of block_formal_langs_matches_group objects
      */
     public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options, $bypass) {
@@ -811,7 +813,7 @@ class block_formal_langs_token_stream {
         //  - look_for_matches function
         // 2. Find best groups of pairs - Birukova
         //  - group_matches function, with criteria defined by compare_matches_groups function
-        if($bypass=true){
+        if ($bypass == false) {
             $allpossiblepairs = array();
             $bestgroups = array();
             $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
@@ -823,7 +825,7 @@ class block_formal_langs_token_stream {
             $bestgroups = array();
             $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
             if (count($allpossiblepairs)>0) {
-                $bestgroups = $this->group_matches($allpossiblepairs);
+                $bestgroups = $this->group_matches_for_bypass($allpossiblepairs);
             } 
         }
         return $bestgroups;
