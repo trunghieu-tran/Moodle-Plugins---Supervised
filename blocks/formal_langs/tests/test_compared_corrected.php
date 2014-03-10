@@ -13,7 +13,7 @@ global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 
 class block_formal_langs_test_compared_corrected extends UnitTestCase {
-    //нет опечаток
+    // Test is buggy! Somebody fix it!
     function test_compared_corrected_1() {
         $correctarray = array(array(0,0),array(1,1),array(2,2));
         $string_pair = new block_formal_langs_string_pair();
@@ -35,19 +35,19 @@ class block_formal_langs_test_compared_corrected extends UnitTestCase {
         $this->assertTrue($correctarray==$string_pair->pairs_between_corrected_compared());
         
     }
-    //опечатка
+
     function test_compared_corrected_2() {
     }
-    //слово пропущено
+
     function test_compared_corrected_3() {
     }
-    //слово вставлено
+
     function test_compared_corrected_4() {
     }
-    //лишний разделитель
+
     function test_compared_corrected_5() {
     }
-    //пропущенный разделитель
+
     function test_compared_corrected_6() {
     }
 

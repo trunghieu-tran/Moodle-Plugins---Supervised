@@ -1800,12 +1800,15 @@ class block_formal_langs_string_pair {
     public function correctedstring() {
         return $this->correctedstring;
     }
+    /**
+     *  Returns a compared string.
+     *  Used in analyzers, for mistake generation and other
+     *  @return   block_formal_langs_processed_string
+     */
     public function comparedstring() {
         return $this->comparedstring;
     }
-    public function matches() {
-        return $this->matches;
-    }
+
     /**
      * Returns a correct string.
      * Used in analyzers, for mistake generation and other
@@ -1815,13 +1818,8 @@ class block_formal_langs_string_pair {
         return $this->correctstring;
     }
 
-    /**
-     *  Returns a compared string.
-     *  Used in analyzers, for mistake generation and other
-     *  @return   block_formal_langs_processed_string
-     */
-    public function comparedstring() {
-        return $this->comparedstring;
+    public function matches() {
+        return $this->matches;
     }
 
     public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
@@ -1866,29 +1864,24 @@ class block_formal_langs_string_pair {
         // $j - corrected
         $j=0;
         for($n=0; $n<count($this->matches); $n++) {
-            //создать отдельный массив для каждого набора
             $arraypairs = array();
             for($i=0; $i<count($this->comparedstring->stream->tokens); $i++) {
                 if(array_search($this->matches[$n]->comparedtokens)==1) {
-                    //поиск набора где лексема
                     for($k=0; $k<count($this->matches[$n]->matchedpairs); $k++) {
-                    //пропущенный разделитель
                     if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==2 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->comparedtokens[1]==$i)) {
                         $arraypairs[]=array($i, array($j,$j++));
                         $j++;
                     }
-                    //опечатка
                     if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==1 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i)) {
                         $arraypairs[]=array($i, $j);
                         $j++;
                     }
-                    //лишний разделитель
-                    if(count($this->matches[$n]->matchedpairs[$k]->correcttokens)==2) && ($this->matches[$n]->matchedpairs[$k]->correcttokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->correcttokens[1]==$i))
+                    if(count($this->matches[$n]->matchedpairs[$k]->correcttokens)==2
+                        && ($this->matches[$n]->matchedpairs[$k]->correcttokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->correcttokens[1]==$i))
                         $arraypairs[]=array(array($i, $i++), $j);
                         $j++;
                     }
                 } else {
-                    // нет опечатки
                     $arraypairs[]=array($i, $j);
                     $j++;
                 }
