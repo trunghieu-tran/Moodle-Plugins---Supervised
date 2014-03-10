@@ -43,7 +43,9 @@ class block_formal_langs_ast {
      * @param string $condition - initial condition
      */
     public function __construct() {
+        
     }
+    
     private function print_node($node, $args = null) {// TODO - normal printing, maybe using dot
         printf('Node number: %d\n', $node->number());
         printf('Node type: %s\n', $node->type());
@@ -54,9 +56,11 @@ class block_formal_langs_ast {
                $node->position()->colend());
         printf('Node description: %s\n', $node->description());
     }
+
     public function print_tree() {
         traverse($this->root, 'print_node');
     }
+    
     public function traverse($node, $callback) {
         // entering node
         if ($node->is_leaf()) {
@@ -89,24 +93,46 @@ class block_formal_langs_node_position {
     protected $lineend;
     protected $colstart;
     protected $colend;
+    /** A starting position in string, as sequence of characters
+     *	@var int
+     */	
+    protected $stringstart;
+    /** An end position in string, as sequence of characters
+     *	@var int
+     */	    
+    protected $stringend;
 
     public function linestart() {
         return $this->linestart;
     }
-    public function lineend() {
+
+    public function lineend(){
         return $this->lineend;
     }
-    public function colstart() {
+    
+    public function colstart(){
         return $this->colstart;
     }
-    public function colend() {
+    
+    public function colend(){
         return $this->colend;
     }
-    public function __construct($linestart, $lineend, $colstart, $colend) {
+    
+    public function stringstart() {
+        return $this->stringstart;
+    }
+
+    public function stringend() {
+        return $this->stringend;
+    }
+    
+    public function __construct($linestart, $lineend, $colstart, $colend, $stringstart = 0, $stringend = 0) {
         $this->linestart = $linestart;
         $this->lineend = $lineend;
         $this->colstart = $colstart;
         $this->colend = $colend;
+        $this->stringstart = $stringstart;
+        $this->stringend = $stringend;        
     }
 
     /**
@@ -115,28 +141,39 @@ class block_formal_langs_node_position {
      * Resulting position is defined from minimum to maximum postion of nodes
      *
      * @param array $nodepositions positions of adjanced nodes
+     * @return block_formal_langs_token_position
      */
     public function summ($nodepositions) {
         $minlinestart = $nodepositions[0]->linestart;
         $maxlineend = $nodepositions[0]->lineend;
         $mincolstart = $nodepositions[0]->colstart;
         $maxcolend = $nodepositions[0]->colend;
+        $minstringstart = $nodepositions[0]->stringstart;
+        $maxstringend = $nodepositions[0]->stringend;
 
         foreach ($nodepositions as $node) {
             if ($node->linestart < $minlinestart) {
                 $minlinestart = $node->linestart;
-            }
-            if ($node->colstart < $mincolstart) {
                 $mincolstart = $node->colstart;
+            }
+            
+            if ($node->linestart == $minlinestart) {
+                $mincolstart = min($mincolstart, $node->colstart);
             }
             if ($node->lineend > $maxlineend) {
                 $maxlineend = $node->lineend;
-            }
-            if ($node->colend > $maxcolend) {
                 $maxcolend = $node->colend;
             }
+            
+            if ($node->lineend == $maxlineend) {
+                $maxcolend = max($maxcolend, $node->colend);
+            }
+
+            $minstringstart = min($minstringstart, $node->stringstart);
+            $maxstringend = max($maxstringend, $node->stringend);
         }
-        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend);
+
+        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend, $minstringstart, $maxstringend);
     }
 }
 
@@ -195,15 +232,19 @@ class block_formal_langs_ast_node_base {
     public function type() {
         return $this->type;
     }
+
     public function number() {
         return $this->number;
     }
+
     public function position() {
         return $this->position;
     }
+
     public function need_user_description() {
         return $this->needuserdescription;
     }
+
     public function description() {
         if (!$this->needuserdescription) {
             // TODO: calc description
@@ -212,18 +253,23 @@ class block_formal_langs_ast_node_base {
             return $this->description;
         }
     }
+
     public function set_description($str) {
         $this->description = $str;
     }
+
     public function childs() {
         return $this->childs;
     }
+    
     public function set_childs($childs) {
         $this->childs = $childs;
     }
+
     public function add_child($node) {
         array_push($this->childs, $node);
     }
+
     public function is_leaf() {
         if (0 == count($this->childs)) {
             return true;
@@ -672,6 +718,7 @@ class block_formal_langs_matched_tokens_pair {
         if ($this->type == self::TYPE_NO_MISTAKE) {// Full match, no mistake.
             return '';
         }
+
         $a = new stdClass();
         $a->mistakeweight = $this->mistakeweight;
         $i = 0;
@@ -687,6 +734,7 @@ class block_formal_langs_matched_tokens_pair {
             $a->$name = $comparedstring->node_description($index);
             $j++;
         }
+
         return get_string($this->messageid, 'block_formal_langs', $a);
     }
 }
@@ -1507,6 +1555,7 @@ class block_formal_langs_processed_string {
             if ($oldrecords != null) {
                 $record = array_shift($oldrecords);
             }
+            
             if ($record == null) {
                 $record = new stdClass();
             }
@@ -1514,11 +1563,13 @@ class block_formal_langs_processed_string {
             $record->tableid = $this->tableid;
             $record->number = $index;
             $record->description = $description;
+            
             if ($mustinsert) {
                 $DB->insert_record('block_formal_langs_node_dscr', $record);
             } else {
                 $DB->update_record('block_formal_langs_node_dscr', $record);
             }
+            
             $index = $index + 1;
         }
         // If some old descriptions cellleft - delete it
@@ -1532,6 +1583,7 @@ class block_formal_langs_processed_string {
             $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$this->tablename}' ");
         }
     }
+    
     /**
      * Set table parameters for string. Used by language.
      * @param string $tablename source table name
@@ -1541,6 +1593,7 @@ class block_formal_langs_processed_string {
         $this->tablename=$tablename;
         $this->tableid=$tableid;
     }
+    
     /**
      * Returns count of nodes which needs description or special name.
      *

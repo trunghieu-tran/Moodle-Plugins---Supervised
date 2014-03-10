@@ -81,6 +81,8 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
     private function return_pos() {
         $begin_line = $this->yyline;
         $begin_col = $this->yycol;
+		$begin_str  = $this->yychar;
+		$end_str = $begin_str + strlen($this->yytext()) - 1;
         if(strpos($this->yytext(), '\n')) {
             $lines = explode("\n", $this->yytext());
             $num_lines = count($lines);
@@ -90,7 +92,7 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
             $end_line = $begin_line;
             $end_col = $begin_col + strlen($this->yytext()) - 1;
         }
-        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col, $begin_str, $end_str);
         return $res;
     }
 	protected $yy_count_chars = true;
