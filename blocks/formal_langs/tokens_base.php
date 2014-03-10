@@ -1831,7 +1831,7 @@ class block_formal_langs_string_pair {
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
-            $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
             $arraystringpairs[] = $stringpair;
         }
         return $arraystringpairs;
@@ -1847,7 +1847,7 @@ class block_formal_langs_string_pair {
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
-            $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
             $arraystringpairs[] = $stringpair;
         }
         return $arraystringpairs;
