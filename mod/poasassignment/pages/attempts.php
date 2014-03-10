@@ -240,15 +240,12 @@ class attempts_page extends abstract_page {
 
     /**
      * Returns HTML to display comments on attempt.
-     * @param stdObject $attempt
-     * @param stdObject $criterion
+     * @param stdObject $comments_itemid Poasassignment rating value id
      * @return string or null if no comments
      */
-    public static function show_comments($attempt, $criterion) {
-        global $DB;
+    public static function show_comments($comments_itemid) {
         $poasmodel = poasassignment_model::get_instance();
         $context = $poasmodel->get_context();
-        $ratingvalue = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id, 'attemptid' => $attempt->id));
 
         $options = new stdClass();
         $options->area    = 'poasassignment_comment';
@@ -257,7 +254,7 @@ class attempts_page extends abstract_page {
         $options->context = $context;
         $options->autostart = true;
         $options->notoggle = true;
-        $options->itemid  = $ratingvalue->id;
+        $options->itemid  = $comments_itemid;
 
         $comment = new comment($options);
         $comment->set_post_permission(false);

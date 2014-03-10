@@ -401,5 +401,5 @@ $string['wogroup'] = 'Without groups';
 $string['group'] = 'Group';
 $string['raisnotinstalled'] = 'Remote autotester plugin is not installed';
 $string['nothingtoshow'] = 'Nothing to show';
-$string['prevattempts_comments'] = 'Comments on previous attempts';
+$string['prevattempts'] = 'Previous attempts';
 $string['nocomments'] = 'No comments';
