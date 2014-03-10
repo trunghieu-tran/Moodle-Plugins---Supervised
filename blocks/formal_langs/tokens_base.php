@@ -1722,7 +1722,7 @@ class block_formal_langs_processed_string {
     protected function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse()) {
             // TODO: Fix this inconsistency
-     $this->language->parse(this);
+            $this->language->parse(this);
         }
         return $this->syntaxtree;
     }
@@ -1824,6 +1824,7 @@ class block_formal_langs_string_pair {
 
     public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
         $bestgroups = array();
+        /** @var block_formal_langs_token_stream $correctstream */
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
@@ -1863,10 +1864,10 @@ class block_formal_langs_string_pair {
         // $i - compared
         // $j - corrected
         $j=0;
-        for($n=0; $n<count($this->matches); $n++) {
+        for($n = 0; $n < count($this->matches); $n++) {
             $arraypairs = array();
-            for($i=0; $i<count($this->comparedstring->stream->tokens); $i++) {
-                if(array_search($this->matches[$n]->comparedtokens)==1) {
+            for($i = 0; $i < count($this->comparedstring->stream->tokens); $i++) {
+                if(array_search($i, $this->matches[$n]->comparedtokens)==1) {
                     for($k=0; $k<count($this->matches[$n]->matchedpairs); $k++) {
                     if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==2 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->comparedtokens[1]==$i)) {
                         $arraypairs[]=array($i, array($j,$j++));
