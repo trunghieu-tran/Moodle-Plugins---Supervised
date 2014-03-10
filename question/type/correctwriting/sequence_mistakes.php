@@ -34,7 +34,6 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      * @var array
      */
     protected $lcs;
-
     /**
      * Sets an lcs for mistake
      * @param $lcs
@@ -43,6 +42,8 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
         $this->lcs = $lcs;
     }
 
+
+
     /**
      * Returns an lcs, which mistake is based on
      * @return array
@@ -50,6 +51,7 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
     public function lcs() {
         return $this->lcs;
     }
+
 }
 
 
@@ -108,8 +110,9 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
      * @param object $language      a language object
      * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
      * @param int    $responseindex index of response token
+     * @param block_formal_langs_comparing_options $options  options for comparting tokens
      */
-    public function __construct($language, $stringpair, $responseindex) {
+    public function __construct($language, $stringpair, $responseindex, $options) {
         $this->languagename = $language->name();
         $this->stringpair = $stringpair;
         $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
@@ -121,16 +124,18 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         // Find, if such token exists in answer (to call it extraneous) or not (to write that it should not be there).
         $exists = false;
         $answertokens = $stringpair->correctstring()->stream->tokens;
-        $responsemistakenvalue =  $stringpair->correctedstring()->stream->tokens[$responseindex]->value();
+        $responsemistaken =  $stringpair->correctedstring()->stream->tokens[$responseindex];
+        
+
         foreach ($answertokens as $answertoken) {
-            if ($answertoken->value() == $responsemistakenvalue) {
+            if ($responsemistaken->is_same($answertoken, $options)) {
                 $exists = true;
                 break;
             }
         }
 
         // Create a mistake message.
-        $data = $responsemistakenvalue;
+        $data = $responsemistaken->value();
         if (!is_string($data)) {
             $data = $data->string();
         }

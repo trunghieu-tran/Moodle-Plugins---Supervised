@@ -44,23 +44,25 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         @return array extra fields
      */
     public function extra_question_fields() {
-        // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shrtanswer
-        // We unset answers fields, because we do not need them
-        $result = array_diff(parent::extra_question_fields(), array('answers'));
+        // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shortanswer.
+        //$result = array_diff(parent::extra_question_fields(), array('answers'));// We unset answers fields, because we do not need them
+        $result = parent::extra_question_fields();
         // Replace shortanswer table with our table
         $result[0]= 'qtype_correctwriting';
         // Language, which will be used for analysis
         $result[] = 'langid';
         // Penalty for absent lexeme mistake
-        $result[] = 'absentmistakeweight';
-        // Penalty for odd lexeme mistake
-        $result[] = 'addedmistakeweight';
-        // Penalty for moved lexeme mistake
-        $result[] = 'movedmistakeweight';
-        // A threshold for lexical error as fraction to it's length
-        $result[] = 'lexicalerrorthreshold';
-        // A penalty for error in symbol
-        $result[] = 'lexicalerrorweight';
+        foreach($this->analyzers() as $value) {
+            $classname = 'qtype_correctwriting_' . $value;
+            /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+            $analyzer = new $classname();
+            $fields = $analyzer->extra_question_fields();
+            if (count($fields)) {
+                foreach($fields as $field) {
+                    $result[] = $field;
+                }
+            }
+        }
         // Minimal grade for  answer to be approximately matched with student response
         $result[] = 'hintgradeborder';
         // Maximum fraction of mistakes to length of teacher answer in lexemes
@@ -74,6 +76,13 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         //Penalty for "where" picture hint.
         $result[] = 'wherepichintpenalty';
 
+        //Is enabled fields
+        $result[] = 'islexicalanalyzerenabled';
+        $result[] = 'isenumanalyzerenabled';
+        $result[] = 'issequenceanalyzerenabled';
+        $result[] = 'issyntaxanalyzerenabled';
+
+
         return $result;
     }
     /** Returns a name of foreign key columns for question type
@@ -81,6 +90,23 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      */
     public function questionid_column_name() {
         return 'questionid';
+    }
+
+    /**
+     * Returns an array of supported analyzers.
+     * Keys are numerical values, defining the order of execution for analyzers.
+     */
+    public function analyzers() {
+        global $CFG;
+        $analyzers =  array(   0x100 => 'lexical_analyzer',
+                        /*0x200 => 'enum_analyzer',*/
+                        0x300 => 'sequence_analyzer',
+                        0x400 => 'syntax_analyzer'
+                    );
+        foreach ($analyzers as $name) {
+            require_once($CFG->dirroot . '/question/type/correctwriting/' . $name . '.php');
+        }
+        return $analyzers;
     }
 
     /** Loads a question type specific options for  the question
@@ -129,6 +155,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $storage->currentid = 0;
         $storage->lang = block_formal_langs::lang_object($question->langid);
 
+
         $serializator = new qtype_correctwriting_preserving_serializator(
                             $oldanswerunused, $newanswers, $this, $storage
                         );
@@ -145,7 +172,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      * @param array    $oldvalues  Old values of serialized data
      */
     public function save_stored_data($key, $answer, &$storage, $oldvalues) {
-        if ($answer->fraction > $storage->question->hintgradeborder) {
+        if ($answer->fraction >= $storage->question->hintgradeborder) {
             //Check was removed, because if answer was saved
             // it must have a descriptions and all checks are made by shortanswer
             $description = $storage->descriptions[$storage->currentdescription];
@@ -189,13 +216,15 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         $string = $langobj->create_from_db('question_answers', 0);
         $descriptions = $string->get_descriptions_as_array('question_answers', array_keys($question->options->answers));
         foreach ($question->options->answers as $key => $answerdata) {
+            $lang .= '        <answer_description>' . PHP_EOL;
+            if (array_key_exists($key, $descriptions)) {
                 $answerdescriptions = $descriptions[$key];
-                $lang .= '        <answer_description>' . PHP_EOL;
                 foreach($answerdescriptions as $description) {
                     $value = $format->xml_escape(str_replace(array("\n", "\r"),array('', ''), $description));
                     $lang .= '            <description>'. $value .'</description>' . PHP_EOL;
                 }
-                $lang .= '        </answer_description>' . PHP_EOL;
+            }
+            $lang .= '        </answer_description>' . PHP_EOL;
         }
         $lang .= '    </descriptions>' . PHP_EOL;
 
@@ -231,8 +260,10 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
             if (count($answerdescription)) {
                 $descrarray = array();
                 $tokendescriptions  = $format->getpath($answerdescription, array('#', 'description'), '');
-                foreach($tokendescriptions as $description) {
-                    $descrarray[] = $description['#'];
+                if (is_array($tokendescriptions)) {
+                    foreach($tokendescriptions as $description) {
+                        $descrarray[] = $description['#'];
+                    }
                 }
                 if (count($descrarray) != 0) {
                     $stringdescrs = implode(PHP_EOL, $descrarray);

@@ -23,7 +23,7 @@
  * @author Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_plugin.class.php');
 require_once ($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plugin {

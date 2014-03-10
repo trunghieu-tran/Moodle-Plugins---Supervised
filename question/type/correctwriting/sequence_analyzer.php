@@ -37,111 +37,68 @@
 defined('MOODLE_INTERNAL') || die();
 
 //Other necessary requires
-require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/sequence_mistakes.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/abstract_analyzer.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/syntax_analyzer.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/sequence_mistakes.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
+
+
+class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstract_analyzer {
 
 
 
-class  qtype_correctwriting_sequence_analyzer {
-
-    protected $language;             // Language object - contains scaner, parser etc
-    protected $errors;               // Array of error objects - teacher errors when entering answer
-
-    /**
-     * A string pair with best matches, which can be passed to sequence analyzer
-     * @var block_formal_langs_string_pair
-     */
-    protected $bestmatchpair;
-    protected $mistakes;             // Array of mistake objects - student errors (structural errors)
-
-    private   $fitness;              // Fitness for response
-
-    private   $question;             // Used question by analyzer
+    public function name() {
+        return 'sequence_analyzer';
+    }
 
     /**
-     * Do all processing and fill all member variables
+     * Do all processing and fill all member variables.
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
+     * @throws moodle_exception if invalid number of string pairs
+     * @param qtype_correctwriting_question $question
+     * @param qtype_correctwriting_string_pair $basepair a pair, passed as input
+     * @param block_formal_langs_abstract_language $language a language
+     * @param bool $bypass false if analyzer should work, true if it should just allow subsequent analyzers to work.
      */
-    public function __construct($question, $bestmatchpair, $language) {
-        $this->bestmatchpair =  $bestmatchpair;
-        // If question is set null we suppose this is a unit-test mode and don't do stuff
-        if ($question != null) {
-            $this->language = $language;
-            $this->question = $question;
-            if ($this->bestmatchpair->correctedstring() == null) {
-                // Scan errors by syntax_analyzer
-                if ($language->could_parse()) {
-                    $analyzer = new qtype_correctwriting_syntax_analyzer($answer, $language, null, null);
-                    $this->errors = $analyzer->errors();
-                }
-            } else {
-                //Fill weights of sequence errors
-                $weights = new stdClass;
-                $weights->movedweight = $question->movedmistakeweight;
-                $weights->absentweight = $question->absentmistakeweight;
-                $weights->addedweight = $question->addedmistakeweight;
-                // Scan for errors, computing lcs
-                $this->scan_response_mistakes($weights);
-            }
-        }
-        //TODO:
-        //1. Compute LCS - Mamontov
-        //  - lcs function  (done)
-        //2. For each LCS create  qtype_correctwriting_syntax_analyzer object - Mamontov (done)
-        //  - if there is exception thrown, skip syntax analysis
-        //3. Select best fitted syntax_analyzer using their fitness method - Mamontov
-        //4. Set array of mistakes accordingly - Mamontov (done)
-        //  - if syntax analyzer is able to return mistakes, use it's mistakes
-        //  - otherwise generate own mistakes for individual tokens, using lcs_to_mistakes function
-        //NOTE: if response is null just check for errors using syntax analyzer- Mamontov (Done)
-        //NOTE: if some stage create errors, stop processing right there (done?)
+    public function __construct($question = null, $basepair = null, $language = null, $bypass = true) {
+        parent::__construct($question, $basepair, $language, $bypass);
     }
-    /**
-     * Scans for a mistakes in response, computing lcs and
-     * performing syntax analysis
-     * @param object $weights weights of errors
-     */
-    private function scan_response_mistakes($weights) {
-        $answertokens = $this->bestmatchpair->correctstring()->stream;
-        $responsetokens = $this->bestmatchpair->correctedstring()->stream;
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $this->question->usecase);
-        if (count($alllcs) == 0) {
-            // If no LCS found perform searching with empty array
-            $alllcs[] = array();
-        }
 
-        if ($this->language->could_parse()) {
-            //Otherwise scan all of lcs
-            $maxmistakes = array();
-            $maxfitness = 0;
-            $isfirst = true;
-            $haserrors = false;
-            for ($i = 0;$i < count($alllcs) && $haserrors == false;$i++) {
-                $analyzer = new qtype_correctwriting_syntax_analyzer($this->bestmatchpair, $this->language,
-                                                                     $alllcs[$i]);
-                $fitness = $analyzer->fitness();
+    protected function analyze() {
+        $answertokens = $this->basestringpair->correctstring()->stream;
+        $responsetokens = $this->basestringpair->correctedstring()->stream;
+        $options = $this->question->token_comparing_options();
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options);
 
-                //If answer has errors stop processing here
-                $haserrors = $analyzer->has_errors();
-                if ($haserrors == true) {
-                 $this->errors = $analyzer->errors();
-                }
+        $weights = new stdClass;
+        $weights->movedweight = $this->question->movedmistakeweight;
+        $weights->absentweight = $this->question->absentmistakeweight;
+        $weights->addedweight = $this->question->addedmistakeweight;
 
-                if (($isfirst == true || $fitness > $maxfitness) && $haserrors==false) {
-                    $maxmistakes = $analyzer->mistakes();
-                    $maxfitness = $fitness;
-                    $isfirst = false;
-                }
+        if (count($alllcs)) {
+            foreach ($alllcs as $lcs) {
+                $pair = $this->basestringpair->copy_with_lcs($lcs);
+                $this->resultstringpairs[] = $pair;
+                $this->fill_matches($pair);
+                $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
             }
-
-            //Set self-properties to return proper values
-            $this->mistakes = $maxmistakes;
-            $this->fitness = $maxfitness;
         } else {
-            $this->mistakes = $this->matches_to_mistakes($alllcs[0],$weights);
+            $pair = $this->basestringpair->copy_with_lcs(array());
+            $this->resultstringpairs[] = $pair;
+            $this->fill_matches($pair);
+            $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
         }
     }
+
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_sequence_mistake';
+    }
+
     /**
      * Compute and return longest common subsequence (tokenwise) of answer and corrected response.
      *
@@ -149,10 +106,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * There may be more than one lcs for a given pair of strings.
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
      * @param  block_formal_langs_token_stream $responsestream array of response tokens
-     * @param  bool $casesensitive whether comparisons must be case sensitive
+     * @param  block_formal_langs_comparing_options $options options for comparing lexemes
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answerstream, $responsestream, $casesensitive = true) {
+    public static function lcs($answerstream, $responsestream, $options) {
         // Extract data from method
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
@@ -162,7 +119,9 @@ class  qtype_correctwriting_sequence_analyzer {
         // Match is defined as tuple <i,j>
         for ($i = 0; $i < count($answer); $i++) {
             for($j = 0; $j < count($response); $j++) {
-                if ($answer[$i]->is_same($response[$j], $casesensitive)) {
+                /** @var block_formal_langs_token_base $answertoken */
+                $answertoken = $answer[$i];
+                if ($answertoken->is_same($response[$j], $options)) {
                     $matches[] = array($i, $j);
                 }
             }
@@ -194,7 +153,7 @@ class  qtype_correctwriting_sequence_analyzer {
 
         // This is slightly modified Floyd-Warshall algorithm runned for this graph
         // He sets a center node, so restoration of path will be more complicated
-        // An unusual boundaries is set because ther must exist all of element
+        // An unusual boundaries is set because there must exist all of element
         // and due to some fill method the bounds can be deduced.
         for ($k = 0; ($k < count($matches)); $k++) {
 
@@ -322,46 +281,72 @@ class  qtype_correctwriting_sequence_analyzer {
     }
     /**
      * Creates a new mistake, that represents case, when one lexeme moved to other position
+     * @param qtype_correctwriting_string_pair $pair a source pair
      * @param int $answerindex   index of lexeme in answer
      * @param int $responseindex index of lexeme in response
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
-    private function create_moved_mistake($answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->bestmatchpair,
+    private function create_moved_mistake($pair, $answerindex,$responseindex) {
+        $result = new qtype_correctwriting_lexeme_moved_mistake($this->language, $pair,
                                                              $answerindex,
                                                              $responseindex);
+        $result->source = get_class($this);
+        return $result;
     }
     /**
      * Creates a new mistake, that represents case, when odd lexeme is insert to index
+     * @param qtype_correctwriting_string_pair $pair a source pair
      * @param int $responseindex index of lexeme in response
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
-    private function create_added_mistake($responseindex) {
-        return new qtype_correctwriting_lexeme_added_mistake($this->language,
-                                                             $this->bestmatchpair,
-                                                             $responseindex);
+    private function create_added_mistake($pair, $responseindex) {
+        $result =  new qtype_correctwriting_lexeme_added_mistake($this->language,
+                                                             $pair,
+                                                             $responseindex, $this->question->token_comparing_options());
+        $result->source = get_class($this);
+        return $result;
     }
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped
+     * @param qtype_correctwriting_string_pair $pair a source pair
      * @param int $answerindex   index of lexeme in answer
      * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
-    private function create_absent_mistake($answerindex) {
-        return new qtype_correctwriting_lexeme_absent_mistake($this->language,
-                                                              $this->bestmatchpair,
+    private function create_absent_mistake($pair, $answerindex) {
+        $result = new qtype_correctwriting_lexeme_absent_mistake($this->language,
+                                                              $pair,
                                                               $answerindex
                                                              );
+        $result->source = get_class($this);
+        return $result;
+    }
+
+    /**
+     * Creates token matches for analyzer. Since no moving operations
+     * are performed, then matches are filled 1:1
+     * @param qtype_correctwriting_string_pair $pair a resulting pair
+     */
+    protected function fill_matches($pair) {
+        $result = array(array(), array());
+        $response = $pair->correctedstring()->stream->tokens;
+        $responsecount = count($response);
+        for($i = 0; $i < $responsecount; $i++) {
+            $result[0] = array( $i );
+            $result[1] = array( $i );
+        }
+        $pair->tokenmappings[get_class($this)] = $result;
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
      * Also sets fitness to fitness, that computed from function.
-     * @param array $lcs LCS
+     * @param qtype_correctwriting_string_pair $pair a source pair
      * @param object $weights weights of errors
      * @return array array of mistake objects
      */
-    public function matches_to_mistakes($lcs,$weights) {
-        $answer = &$this->bestmatchpair->correctstring()->stream->tokens;
-        $response = &$this->bestmatchpair->correctedstring()->stream->tokens;
+    public function matches_to_mistakes($pair,$weights) {
+        $answer = &$this->basestringpair->correctstring()->stream->tokens;
+        $response = &$this->basestringpair->correctedstring()->stream->tokens;
+        $lcs = $pair->lcs();
         // Determines, whether answer tokens are used in mistake computation
         $answerused = array();
         $answercount = count($answer);
@@ -392,6 +377,9 @@ class  qtype_correctwriting_sequence_analyzer {
             $responseused[$responseindex] = true;
         }
 
+
+        $options = $this->question->token_comparing_options();
+
         // Determine removed and moved lexemes by scanning answer
         for ($i = 0;$i < $answercount;$i++) {
             // If this lexeme is not in LCS
@@ -400,8 +388,10 @@ class  qtype_correctwriting_sequence_analyzer {
                 $ismoved = false;
                 $movedpos = -1;
                 for ($j = 0;$j < $responsecount && $ismoved == false;$j++) {
+                    /** @var block_formal_langs_token_base $answertoken */
+                    $answertoken = $answer[$i];
                     // Check whether lexemes are equal
-                    $isequal = $answer[$i]->is_same($response[$j], $this->question->usecase);
+                    $isequal = $answertoken->is_same($response[$j], $options);
                     if ($isequal == true && $responseused[$j] == false) {
                         $ismoved = true;
                         $movedpos = $j;
@@ -410,13 +400,13 @@ class  qtype_correctwriting_sequence_analyzer {
                 }
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
-                    $mistake = $this->create_moved_mistake($i, $movedpos);
+                    $mistake = $this->create_moved_mistake($pair, $i, $movedpos);
                     $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->movedweight;
                     $result[] = $mistake;
                     $counts->moved  = $counts->moved + 1;
                 } else {
-                    $mistake = $this->create_absent_mistake($i);
+                    $mistake = $this->create_absent_mistake($pair, $i);
                     $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->absentweight;
                     $result[] = $mistake;
@@ -428,7 +418,7 @@ class  qtype_correctwriting_sequence_analyzer {
         //Determine added lexemes from reponse
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
-                $mistake = $this->create_added_mistake($i);
+                $mistake = $this->create_added_mistake($pair, $i);
                 $result[] = $mistake;
                 $mistake->set_lcs($lcs);
                 $mistake->weight = $weights->addedweight;
@@ -436,44 +426,28 @@ class  qtype_correctwriting_sequence_analyzer {
             }
         }
 
-        //Compute fitness-function
-        $this->fitness = $this->compute_fitness($counts,$weights);
         return $result;
     }
-    /**
-     * Computes a fitness for counts of errors
-     * @param object $counts count of errors
-     * @param object $weights weight of errors
-     * @return int fitness
-     */
-    private function compute_fitness($counts,$weights) {
-        $movedmistakesfitness = $weights->movedweight * $counts->moved;
-        $absentmistakesfitness = $weights->absentweight * $counts->absent;
-        $addedmistakesfitness = $weights->addedweight * $counts->added;
-        return  -1 * ($movedmistakesfitness + $absentmistakesfitness + $addedmistakesfitness);
-    }
-    /**
-    * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
-    * Used to choose best matched answer
-    * Fitness is negative or zero (no errors, full match)
-    * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
-    */
-    public function fitness() {
-        return $this->fitness;
-    }
 
-    public function mistakes() {
-        return $this->mistakes;
-    }
+
+
 
     public function has_errors() {
         return !empty($this->errors);
     }
 
-    public function errors() {
-        return $this->errors;
+
+    public function supported_hints() {
+        return array('whatis', 'wheretxt', 'wherepic');
+    }
+    // Form and DB related functions.
+    public function float_form_fields() {
+        return array(array ('name' =>'movedmistakeweight', 'default' => 0.05, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true)    //Moved token mistake weight field
+                    );
     }
 
-    //Other necessary access methods
+    public function extra_question_fields() {
+        return array('absentmistakeweight');
+    }
+
 }
-?>

@@ -30,8 +30,9 @@ require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 
 if($ADMIN->fulltree) {
 
-$settings->add(new admin_setting_heading('questioneditingheading', get_string('questioneditingheading', 'qtype_correctwriting'), ''));
-$settings->add(new block_formal_langs_admin_setting_showable_languages('qtype_correctwriting_showablelangs', get_string('showedlangslabel', 'qtype_correctwriting'), get_string('showedlangsdescription', 'qtype_correctwriting'), array_flip(array('1', '2', '3', '4')), null));
-$settings->add(new block_formal_langs_admin_setting_language('qtype_preg_defaultlang', get_string('defaultlanglabel', 'qtype_preg'), get_string('defaultlangdescription', 'qtype_preg'), '1', null));
+    $settings->add(new admin_setting_heading('questioneditingheading', get_string('questioneditingheading', 'qtype_correctwriting'), ''));
+    $a = get_string('objectname', 'qtype_correctwriting');
+    $settings->add(new block_formal_langs_admin_setting_language('qtype_correctwriting_defaultlang',
+                    get_string('defaultlanglabel', 'block_formal_langs'), get_string('defaultlangdescription', 'block_formal_langs', $a), '1', null));
 
 }
