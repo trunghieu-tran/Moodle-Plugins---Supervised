@@ -370,7 +370,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param $options - comparing options
      */
     public function editing_distance($token, block_formal_langs_comparing_options $options) {
-        if ($this->is_same($token, $options->usecase)) {// If two tokens are identical, return 0.
+        if ($this->is_same($token, $options)) {// If two tokens are identical, return 0.
             return 0;
         }
         if ($this->use_editing_distance()) {// Damerau-Levenshtein distance is default now.
