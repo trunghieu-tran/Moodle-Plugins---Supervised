@@ -30,7 +30,7 @@ class blocks_formal_langs_token_base_look_for_token_pairs_test extends UnitTestC
         $stream1->tokens = array($lexem1,$lexem2);
         $stream2=new block_formal_langs_token_stream();
         $stream2->tokens = array($lexem3, $lexem4);
-        list($result) = $stream1->look_for_token_pairs($stream2, 0.6, $options, true);
+        list($result) = $stream1->look_for_token_pairs($stream2, 0.6, $options, false);
         $this->assertTrue($result->mistakeweight==1);
         $this->assertTrue($result->correctcoverage==$correctcoverage);
         $this->assertTrue($result->comparedcoverage==$comparedcoverage);
