@@ -338,5 +338,5 @@ $string['group'] = 'Группа';
 $string['raisnotinstalled'] = 'Удаленный автотестер не подключен';
 $string['nothingtoshow'] = 'Нечего показывать';
 $string['pluginadministration'] = 'Управление плагином';
-$string['prevattempts_comments'] = 'Комментарии к предыдущим попыткам';
+$string['prevattempts'] = 'Предыдущие попытки';
 $string['nocomments'] = 'Комментариев нет';

@@ -94,19 +94,25 @@ class grade_form extends moodleform {
 
         // Show comments on previous attempts if have.
         if ($attempt->attemptnumber != 1) {
-            $mform->addElement('header', 'prevcommentsheader', get_string('prevattempts_comments', 'poasassignment'));
+            $mform->addElement('header', 'prevattemptsheader', get_string('prevattempts', 'poasassignment'));
+
             $latestattempt = $poasmodel->get_last_attempt($assignee->id);
             $attempts = array_reverse($DB->get_records('poasassignment_attempts', array('assigneeid' => $assignee->id), 'attemptnumber'));
             foreach ($attempts as $curattempt) {
                 if ($curattempt != $latestattempt) {
                     $mform->addElement('html', '<h1>' . get_string('attempt', 'poasassignment') . ' ' . $curattempt->attemptnumber
                                        . ($curattempt->draft ? ' (' . get_string('draft', 'poasassignment') . ')' : '') . '</h1>');
-                    $mform->addElement('static', null, get_string('submitted', 'assignment'), userdate($attempt->attemptdate));
+                    $mform->addElement('static', null, get_string('submitted', 'assignment'), userdate($curattempt->attemptdate));
+                    $mform->addElement('static', null, get_string('gradedate', 'poasassignment'), userdate($curattempt->ratingdate));
+                    $mform->addElement('static', null, get_string('totalratingis', 'poasassignment'), $curattempt->rating);
+                    $mform->addElement('static', null, get_string('penalty','poasassignment'), $poasmodel->get_penalty($curattempt->id));
+
                     $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $poasmodel->get_poasassignment()->id));
                     foreach ($criterions as $criterion) {
-                        $commentshtml = attempts_page::show_comments($curattempt, $criterion);
+                        $ratingvalue = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id, 'attemptid' => $curattempt->id));
+                        $commentshtml = attempts_page::show_comments($ratingvalue->id);
                         $mform->addElement('static', null, $criterion->name . $poasmodel->help_icon($criterion->description),
-                                           $commentshtml == null ? get_string('nocomments', 'poasassignment') : $commentshtml);
+                                           $ratingvalue->value . '<br>' . ($commentshtml == null ? get_string('nocomments', 'poasassignment') : $commentshtml));
                     }
                 }
             }
@@ -182,7 +188,7 @@ class grade_form extends moodleform {
         $mform->setType('assigneeid', PARAM_INT);
         
         $mform->addElement('hidden', 'page', 'grade');
-        $mform->setType('assigneeid', PARAM_TEXT);
+        $mform->setType('page', PARAM_TEXT);
         
         $this->add_action_buttons(true, get_string('savechanges', 'admin'));
     }
