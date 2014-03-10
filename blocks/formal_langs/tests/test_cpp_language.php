@@ -10,7 +10,7 @@
  * @package questions
  */
 global $CFG;
-require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_cpp_language.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 
 
@@ -18,7 +18,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
  /**
   * Tests a simple english language
   */
-class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
+class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
 
     /**
      * Utilities for testing
@@ -27,11 +27,11 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     protected $utils;
 
     public function __construct() {
-        $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_c_language', $this);
+        $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_cpp_language', $this);
     }
     // Tests a lexer of simple english language
     public function test_lexer() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('struct test ; ');
         $result = $processedstring->stream->tokens;
         
@@ -44,7 +44,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
      * Tests numeric positions
      */
     public function test_numeric_positions() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('11 11.1');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -59,7 +59,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
      * Tests singleline comment and identifier position
      */
     public function test_singleline_comment_idenfier_position() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('abc // com');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -74,7 +74,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
      * Test for computing multiple strings position computing
      */
     public function test_multiple_comments() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('/*a*/ /*ab*/ /*c*/');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -91,7 +91,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
      * Test for computing multiple strings position computing
      */
     public function test_multiple_strings() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('"a" "ab" "c"');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -108,7 +108,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
      * Test for computing multiple character literals position computing
      */
     public function test_multiple_characters() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('\'a\' \'\\n\' \'c\'');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -124,7 +124,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
 
     // Tests scanning  errors in beginning
     public function test_scanning_error_in_beginning() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         //Unmatched quote or comments tests
         $processedstring = $lang->create_from_string('\'abc  asv ');
         $errors = $processedstring->stream->errors;
@@ -158,7 +158,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     }
     // Tests scanning errors in the end
     public function test_scanning_error_in_end() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('asv \'abc');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -191,7 +191,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     }
     // Tests scanning errros in middle
     public function test_scanning_error_in_middle() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('asv \'abc 1 + 1');
         $errors = $processedstring->stream->errors;
         $tokens = $processedstring->stream->tokens;
@@ -263,7 +263,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $testsplits = array('/*', '"', '\'');
         $o = 'block_formal_langs_c_token_unknown';
         for($i = 0;$i < count($tests);$i++) {
-            $lang = new block_formal_langs_language_c_language();
+            $lang = new block_formal_langs_language_cpp_language();
             $processedstring = $lang->create_from_string($tests[$i]);
             $result = $processedstring->stream->tokens;
             $this->assertTrue(count($result) == 2, count($result) . ' tokens given in test ');
@@ -283,13 +283,34 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $o = 'block_formal_langs_c_token_operators';
         $this->utils->test_object($tests, $o);
     }
-
+    // Tests operator method declarations
+    public function test_operator_methods() {
+        $tests = array('>>=', '<<=', '=', '+=', '-=', '*=', '/=', '%=', '&=',
+                       '^=', '|=', '>>', '<<', '++', '--', '->', '&&', '||',
+                       '<=', '>=', '==', '!=', '.', '&', '|', '^', '!', '~',
+                       '-', '+', '*', '/', '%', '<', '>', '~=');
+        $o = 'block_formal_langs_c_token_keyword';
+        for($i = 0; $i < count($tests); $i++) {
+            $tests[$i] = 'operator' . $tests[$i];
+        }
+        $this->utils->test_object($tests, $o);
+    }
+    // Tests c++ keywords declarations
+    public function test_cpp_keywords() {
+        $tests = 'signals|slots|public|private|protected|auto|lambda|class|try|catch'
+               . '|friend|asm|template|typename|const_cast|dynamic_cast|reinterpret_cast'
+               . '|static_cast|foreach';
+        $o = 'block_formal_langs_c_token_keyword';
+        $tests = explode('|', $tests);
+        $this->utils->test_object($tests, $o);
+    }
     // Tests various tokens
     public function test_various_tokens() {
         $tests = array('...' => array('...', 'ellipsis'),
                        ';'   => array(';', 'semicolon'),
                        ','   => array(',', 'comma'),
-                       ':'   => array(':', 'colon'),
+                       ':'   => array(':', 'operators'),
+                       '::'   => array('::', 'operators'),
                        '('   => array('(', 'bracket'),
                        ')'   => array(')', 'bracket'),
                        '{'   => array('{', 'bracket'),
@@ -302,7 +323,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
                        ':>'  => array(']', 'bracket'),
                        '?'   => array('?', 'question_mark') );
         $keys = array_keys($tests);
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string(implode(' ', $keys));
         $result = $processedstring->stream->tokens;
         $this->assertTrue(count($result) == count($tests), count($result) . ' tokens given in test ');
@@ -333,7 +354,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
 
     // Tests singleline comments
     public function test_singleline_comment() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $unixstring = "// I love Linux!\n";
         $winstring  = "// I also use Windows! \n\r";
         $macstring  = "// For MAC users \r";
@@ -349,7 +370,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
 
     // Tests full character analysis
     public function test_character_analysis() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $string = "L'' 'a' 'A' '\\'' '\\a' '\\b' '\\f' '\\n' '\\r' '\\t' '\\v' '\\\"' '\\\\' '\\?' '\\1' '\\x1'";
         $processedstring = $lang->create_from_string($string);
         $result = $processedstring->stream->tokens;
@@ -370,7 +391,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
 
     // Tests full string analysis
     public function test_string_analysis() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $string = "L\"\" \"aB\" \"A\" \"\\'\" \"\\a\" \"\\b\" \"\\f\" \"\\n\" \"\\r\" \"\\t\" \"\\v\" \"\\\"\" \"\\\\\" \"\\?\" \"\\1\" \"\\x1\"";
         $processedstring = $lang->create_from_string($string);
         $result = $processedstring->stream->tokens;
@@ -392,7 +413,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     
     // Test a string and character analysis, when they happen in same string
     public function test_string_and_character() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('"\"" \'\\\'\' ');
         $result = $processedstring->stream->tokens;
         $this->assertTrue( count($processedstring->stream->errors) == 0);
@@ -402,7 +423,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     }
     //Test numeric objects
     public function test_numeric() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string(' .22 22.  22.22E+9  ');
         $result = $processedstring->stream->tokens;
         $this->assertTrue( count($processedstring->stream->errors) == 0);
@@ -413,7 +434,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     }
     //Test comments. We wont use line comment, because in Moodle we can enter only one line
     public function test_comments() {
-        $lang = new block_formal_langs_language_c_language();
+        $lang = new block_formal_langs_language_cpp_language();
         $processedstring = $lang->create_from_string('/*  a comment */  ');
         $result = $processedstring->stream->tokens;
         $this->assertTrue( count($processedstring->stream->errors) == 0);
