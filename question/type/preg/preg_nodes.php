@@ -487,6 +487,27 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
+    private static function contains_assert($type, $array) {
+        switch($type) {
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
+                $assert = new qtype_preg_leaf_assert_esc_a;
+                break;
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                $assert = new qtype_preg_leaf_assert_circumflex;
+                break;
+            case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
+                $assert = new qtype_preg_leaf_assert_capital_esc_z;
+                break;
+            case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
+                $assert = new qtype_preg_leaf_assert_small_esc_z;
+                break;
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
+                $assert = new qtype_preg_leaf_assert_dollar;
+                break;
+        }
+        return in_array($assert, $array);
+    }
+
     /**
      * Find intersection of asserts.
      *
@@ -494,25 +515,22 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @return assert, which is intersection of ginen.
      */
     public function intersect_asserts($other) {
-        $esca = new qtype_preg_leaf_assert_esc_a;
-        $escbigz = new qtype_preg_leaf_assert_capital_esc_z;
-        $escz = new qtype_preg_leaf_assert_small_esc_z;
 
         // Adding assert to array.
         if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $thisclone = clone($this);
             if ($this->is_start_anchor()) {
-                array_unshift ($this->assertionsafter, $thisclone);
+                $this->assertionsafter[] = $thisclone;
             } else {
-                array_unshift ($this->assertionsbefore, $thisclone);
+                $this->assertionsbefore[] = $thisclone;
             }
         }
         if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             $otherclone = clone($other);
             if ($other->is_start_anchor()) {
-                array_unshift ($other->assertionsafter, $otherclone);
+                $other->assertionsafter[] = $otherclone;
             } else {
-                array_unshift ($other->assertionsbefore, $otherclone);
+                $other->assertionsbefore[] = $otherclone;
             }
         }
         $resultbefore = array_merge($this->assertionsbefore, $other->assertionsbefore);
@@ -545,7 +563,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $key = array_search($assert, $resultafter);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                 // Searching compatible asserts.
-                if (array_search($esca, $resultafter) !== false) {
+                if (self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $resultafter)) {
                     unset($resultafter[$key]);
                     $resultafter = array_values($resultafter);
                 }
@@ -556,7 +574,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $key = array_search($assert, $resultbefore);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (array_search($escz, $resultbefore) !== false || array_search($escbigz, $resultbefore) !== false) {
+                if (self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
@@ -564,9 +582,9 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         }
 
         // Getting result leaf.
-        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = clone $this;
-        } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+        } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = $other;
         } else {
             if (count($resultbefore) != 0) {
