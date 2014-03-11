@@ -487,25 +487,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return $result;
     }
 
-    private static function contains_assert($type, $array) {
-        switch($type) {
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                $assert = new qtype_preg_leaf_assert_esc_a;
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                $assert = new qtype_preg_leaf_assert_circumflex;
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
-                $assert = new qtype_preg_leaf_assert_capital_esc_z;
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
-                $assert = new qtype_preg_leaf_assert_small_esc_z;
-                break;
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                $assert = new qtype_preg_leaf_assert_dollar;
-                break;
+    private static function contains_node_of_subtype($subtype, $nodesarray) {
+        foreach ($nodesarray as $node) {
+            if ($node->subtype == $subtype) {
+                return true;
+            }
         }
-        return in_array($assert, $array);
+        return false;
     }
 
     /**
@@ -563,7 +551,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $key = array_search($assert, $resultafter);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                 // Searching compatible asserts.
-                if (self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $resultafter)) {
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $resultafter)) {
                     unset($resultafter[$key]);
                     $resultafter = array_values($resultafter);
                 }
@@ -574,7 +562,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
             $key = array_search($assert, $resultbefore);
             if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_assert(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
