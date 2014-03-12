@@ -92,6 +92,17 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
 
     //------------------------------------------------------------------
 
+    public function test_recursion()
+    {
+        $handler = new qtype_preg_description_tool('(?(R)a|b)');
+        //var_dump($handler);
+        $result = $handler->description('%%tests%%','%%tests%%');
+        $expected = 'if the whole pattern is in recursive matching then then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]';
+        $this->assertEquals($expected, $result);
+    }
+
+    //------------------------------------------------------------------
+
     /**
      * @dataProvider concat_provider
      */

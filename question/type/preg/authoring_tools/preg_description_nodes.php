@@ -826,6 +826,10 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         if (count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()) {
             $a->else = self::get_form_string('description_' . $this->pregnode->type . '_else', null, $form);
         }
+        if ($this->pregnode->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+            $a->recursioncond = self::get_form_string($this->pregnode->lang_key(true), $a, $form);
+            return self::get_form_string('description_recursion_node_wrapper', $a, $form);
+        }
         return self::get_form_string($this->pregnode->lang_key(true), $a, $form);
     }
 
