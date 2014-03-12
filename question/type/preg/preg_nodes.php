@@ -573,7 +573,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = clone $this;
         } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
-            $assert = $other;
+            $assert = clone $other;
         } else {
             if (count($resultbefore) != 0) {
                 switch($resultbefore[0]->subtype) {
