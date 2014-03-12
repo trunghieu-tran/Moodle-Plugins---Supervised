@@ -125,7 +125,7 @@ abstract class qtype_preg_description_node {
         //return qtype_poasquestion_string::replace('%s', $s, qtype_poasquestion_string::replace('%n', $this->pregnode->id, $numbering_pattern));
         $result = $s;
         $classes = array();
-        $bgclor = 'white';
+        $bgclor = '';
 
         // Highlight generated and selected nodes.
         if ($this->handler->is_node_generated($this->pregnode)) {
@@ -135,7 +135,7 @@ abstract class qtype_preg_description_node {
             $bgclor = 'orange';
         }
 
-        if ($numbering_pattern !== "%%tests%%" && (count($classes) !== 0 || $bgclor !== null)) {
+        if ($numbering_pattern !== "%%tests%%" && (count($classes) !== 0 || $bgclor !== '')) {
             $classesstr = count($classes) ? ' class="' . implode(' ', $classes) . '"' : '';
             $stylestr = $bgclor!==null ? ' style="background: ' . $bgclor . '"' : '';
             $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
@@ -233,7 +233,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
                 $result = qtype_preg_authoring_tool::char_to_html($char);
             }
             $a = new stdClass;
-            $a->char = $char;
+            $a->char = $result;
             $result = self::get_form_string('description_char', $a, $form);
         }
         return $result;
@@ -821,10 +821,10 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
     public function pattern($node_parent = null, $form = null) {
         $a = new stdClass;
         $a->number = $this->pregnode->number;
+        $a->name = $a->number;
         $a->else = '';
         if (count($this->pregnode->operands) == 2 + (int)$this->pregnode->is_condition_assertion()) {
             $a->else = self::get_form_string('description_' . $this->pregnode->type . '_else', null, $form);
-
         }
         return self::get_form_string($this->pregnode->lang_key(true), $a, $form);
     }
