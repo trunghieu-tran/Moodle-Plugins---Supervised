@@ -1512,6 +1512,8 @@ abstract class qtype_preg_finite_automaton {
     public function go_round_transitions($del) {
         $clonetransitions = array();
         $tagsets = array();
+
+
         if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
@@ -1559,7 +1561,9 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
             $this->remove_transition($del);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -1689,7 +1693,6 @@ abstract class qtype_preg_finite_automaton {
             $trantype1 = $transitiontype;
             $trantype2 = $transitiontype;
         }
-
         $oldfront = $this->startstates;
         while (count($oldfront) != 0) {
             $waschanged = false;
@@ -1706,10 +1709,13 @@ abstract class qtype_preg_finite_automaton {
                             //$intotransitions = $this->get_adjacent_transitions($tran->to, false);
                             //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
                              //$newfront[] = $tran->to;
-                                $this->go_round_transitions($tran);
-                                $newfront[] = $state;
-                                
-                                //printf($this->fa_to_dot());
+                                if ($this->go_round_transitions($tran)) {
+
+                                    $newfront[] = $state;
+                                } else {
+                                    $newfront[] = $tran->to;
+                                }
+                               // printf($this->fa_to_dot());
                                 //$waschanged = true;
                             //} else {
                               //  if ($tran->to == $stateindex) {
