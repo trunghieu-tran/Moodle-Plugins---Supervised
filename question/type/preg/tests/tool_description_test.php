@@ -22,7 +22,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function test_charset($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_description_tool($regex);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
     public function charset_provider()
@@ -49,7 +49,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function test_meta()
     {
         $handler = new qtype_preg_description_tool('a|b|');
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $expected = '<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing';
         $this->assertEquals($expected, $result);
     }
@@ -63,7 +63,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
     public function assert_provider()
@@ -85,7 +85,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool('(a)\1');
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $expected = 'subexpression #1: [<span style="color:blue">a</span>] then back reference to subexpression #1';
         $this->assertEquals($expected, $result);
     }
@@ -99,7 +99,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -125,7 +125,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -147,7 +147,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -174,7 +174,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -202,7 +202,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -237,7 +237,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //if($regex == '(?(?=a)b)' )var_dump($handler->dstroot);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -266,7 +266,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -287,7 +287,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -308,7 +308,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -347,7 +347,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         //var_dump($options);
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%s','%s');
+        $result = $handler->description('%%tests%%','%s');
         $this->assertEquals($expected_en, $result);
     }
 }

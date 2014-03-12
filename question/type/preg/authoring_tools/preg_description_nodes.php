@@ -135,7 +135,7 @@ abstract class qtype_preg_description_node {
             $bgclor = 'orange';
         }
 
-        if (count($classes) !== 0 || $bgclor !== null) {
+        if ($numbering_pattern !== "%%tests%%" && (count($classes) !== 0 || $bgclor !== null)) {
             $classesstr = count($classes) ? ' class="' . implode(' ', $classes) . '"' : '';
             $stylestr = $bgclor!==null ? ' style="background: ' . $bgclor . '"' : '';
             $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
@@ -231,9 +231,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
             // &#38;    &#62;   &#60;   &#34;   &#39;
             if ($escapehtml) {
                 $result = qtype_preg_authoring_tool::char_to_html($char);
-            } else {
-                $result = $char;
             }
+            $a = new stdClass;
+            $a->char = $char;
+            $result = self::get_form_string('description_char', $a, $form);
         }
         return $result;
     }
