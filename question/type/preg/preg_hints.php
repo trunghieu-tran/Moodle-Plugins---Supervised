@@ -60,7 +60,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         if ($response !== null) {
             $bestfit = $this->question->get_best_fit_answer($response);
             $matchresults = $bestfit['match'];
-            return $this->could_show_hint($matchresults);
+            return $this->could_show_hint($matchresults, false);
         }
         return false;
     }
@@ -81,7 +81,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
-        if ($this->could_show_hint($matchresults)) {// Hint could be computed.
+        if ($this->could_show_hint($matchresults, false)) {// Hint could be computed.
             if (!$matchresults->full) {// There is a hint to show.
                 $wronghead = $renderer->render_unmatched($matchresults->match_heading());
                 $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
@@ -294,7 +294,7 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
         //      Lexem hint.
         $langobj = block_formal_langs::lang_object($this->question->langid);
         $extendedmatch = $matchresults->extendedmatch;
-        $endmatchindx = $extendedmatch->index_first() + $matchresults->length();// Index of first non-matched character after match in extended match.
+        $endmatchindx = $matchresults->extensionstart;// Index of first non-matched character after match in extended match.
         $procstr = $langobj->create_from_string($extendedmatch->str());
         $stream = $procstr->stream;
         $tokens = $stream->tokens;

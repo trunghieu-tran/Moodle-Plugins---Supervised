@@ -236,8 +236,8 @@ $string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 // TYPE_LEAF_BACKREF
-$string['description_leaf_backref'] = 'text that matched subpattern #{$a}';
-$string['description_leaf_backref_name'] = 'text that matched subpattern "{$a}"';
+$string['description_leaf_backref'] = 'text that matched by subpattern #{$a}';
+$string['description_leaf_backref_name'] = 'text that matched by subpattern "{$a}"';
 // TYPE_LEAF_RECURSION
 $string['description_leaf_recursion'] = 'recursive match with subpattern #{$a}';
 $string['description_leaf_recursion_all'] = 'recursive match with whole regular expression';
@@ -319,9 +319,10 @@ $string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers f
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
 $string['description_subexpr_node_cond_subexpr'] = 'if the subpattern #{$a->number} has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
 $string['description_subexpr_node_cond_subexpr_name'] = 'if the subpattern "{$a->name}" has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursion_node_cond_subexpr'] = 'if the pattern #{$a->number} is in recursive matching then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursion_node_cond_subexpr_all'] = 'if the whole pattern is in recursive matching then check: [{$a->firstoperand}]{$a->else}';
-$string['description_recursion_node_cond_subexpr_name'] = 'if the pattern "{$a->name}" is in recursive matching then check: [{$a->firstoperand}]{$a->else}';
+$string['description_recursion_node_cond_subexpr'] = 'the pattern #{$a->number} is in recursive matching';
+$string['description_recursion_node_cond_subexpr_all'] = 'the whole pattern is in recursive matching';
+$string['description_recursion_node_cond_subexpr_name'] = 'the pattern "{$a->name}" is in recursive matching';
+$string['description_recursion_node_wrapper'] = 'if {$a->recursioncond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';

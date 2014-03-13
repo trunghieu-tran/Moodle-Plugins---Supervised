@@ -632,13 +632,13 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             $label = array(get_string($key, 'qtype_preg', $this->pregnode->number));
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
-            $key = 'description_leaf_recursion';
+            $key = 'description_recursion_node_cond_subexpr';
             if ($this->pregnode->number === 0) {
                 $key .= '_all';
             } else if (is_string($this->pregnode->number)) {
                 $key .= '_name';
             }
-            $label = array(get_string($key, 'qtype_preg', $this->pregnode->number));
+            $label = array(get_string($key, 'qtype_preg', $this->pregnode));
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
             $label = array(get_string('explain_define', 'qtype_preg'));
@@ -691,7 +691,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             $graph->exits[] = $graph->subgraphs[0]->nodes[0];
             $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
 
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $point, $graph->subgraphs[0]->nodes[1], $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('?', $point, $graph->subgraphs[0]->nodes[1], $condsubexpr);
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $graph->subgraphs[0]->nodes[1], $condsubexpr->subgraphs[1]->entries[0], $condsubexpr);
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[1]->exits[0], $graph->exits[0], $condsubexpr);
 
