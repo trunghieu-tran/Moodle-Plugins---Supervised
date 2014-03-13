@@ -2467,6 +2467,19 @@ class qtype_preg_nodes_inter_asserts_test extends PHPUnit_Framework_TestCase {
         $result = $assert1->intersect_asserts($assert2);
         $this->assertEquals($assertresult, $result, 'Result assert is not equal to expected');
     }
+
+    public function test_assert_with_backref() {
+        $assert1 = new qtype_preg_leaf_assert_esc_a;
+        $backref = new qtype_preg_leaf_backref();
+        $expected = new qtype_preg_leaf_backref;
+        $expected->assertionsafter = array($assert1);
+
+        $result = $assert1->intersect_asserts($backref);
+        $this->assertEquals($expected, $result, 'Result assert is not equal to expected');
+
+        $result = $backref->intersect_asserts($assert1);
+        $this->assertEquals($expected, $result, 'Result assert is not equal to expected');
+    }
 }
 
 class qtype_preg_fa_get_intersection_part_test extends PHPUnit_Framework_TestCase {
