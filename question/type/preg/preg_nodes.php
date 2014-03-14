@@ -577,14 +577,6 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else {
             if (count($resultbefore) != 0) {
                 switch($resultbefore[0]->subtype) {
-                    // TODO delete esc_b from there when it would be made in 4 ways.
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
-                        if ($resultbefore[0]->negative) {
-                            $assert = new qtype_preg_leaf_assert_esc_b(true);
-                        } else {
-                            $assert = new qtype_preg_leaf_assert_esc_b;
-                        }
-                        break;
                     case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
                         $assert = new qtype_preg_leaf_assert_capital_esc_z;
                         break;
