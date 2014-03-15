@@ -40,7 +40,7 @@ class displayoptions_sessions_form extends moodleform {
         }
 
         // Teachers. Fill only if user can view other teachers' sessions.
-        $teachers[0] = get_string('allteachers', '');
+        $teachers[0] = get_string('allsupervisers', 'block_supervised');
         if ($selectedcourse == 0) {
             // Find teachers from all courses.
             if ($courses = get_courses()) {
