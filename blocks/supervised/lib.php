@@ -130,24 +130,23 @@ function session_exists($teacherid, $timestart, $timeend, $sessionid=null) {
 /**
  * Delete lesson types and session from the course if the course has been deleted
  *
- * @param $course integer course id
+ * @param $event object event object
  */
 function supervised_course_deleted($event) {
-    cleanup($event);
+    cleanup($event->objectid);
 }
 
 /**
  * Delete lesson types and session from the course if the course content has been deleted
  *
- * @param $course integer course id
+ * @param $event object event object
  */
 function supervised_course_content_deleted($event) {
-    cleanup($event);
+    cleanup($event->objectid);
 }
 
-function cleanup($event) {
+function cleanup($courseid) {
     global $DB;
-    $courseid = $event->objectid;
 
     // Delete users.
     $sessionids = $DB->get_records('block_supervised_session', array('courseid' => $courseid));
