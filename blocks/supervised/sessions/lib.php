@@ -159,6 +159,7 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
 
     // Build table.
     $table = new html_table();
+    $table->attributes['class'] .= 'flexible generaltable';
     // Build headers array.
     $table->head = array();
     $table->head[] = get_string('course');
@@ -176,7 +177,9 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
     $table->head[] = get_string('edit');
 
     $table->data = $tabledata;
+    echo html_writer::start_tag('div', array('class' => 'no-overflow'));
     echo html_writer::table($table);
+    echo html_writer::end_div();
     echo $OUTPUT->paging_bar($totalcount, $pagenum, $perpage, "$url&perpage=$perpage");
 }
 
