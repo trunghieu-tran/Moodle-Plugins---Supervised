@@ -974,6 +974,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $circumflex = array('before' => false, 'after' => false);
         $dollar = array('before' => false, 'after' => false);
         $capz = array('before' => false, 'after' => false);
+        $condassert = array('before' => false, 'after' => false);
 
         $key = 'before';
         foreach (array($this->assertionsbefore, $this->assertionsafter) as $assertions) {
@@ -986,6 +987,10 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
                 if ($assertion->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
                     $capz[$key] = true;
+                }
+                if ($assertion->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
+                    $condassert[$key] = true;
+                    $condassertindex = array_search($assertion, $assertions);
                 }
             }
             $key = 'after';
@@ -1052,6 +1057,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                         // There are start string assertions.
                         if ($c == "\n") {
                             return array(self::NEXT_CHAR_OK, $c);
+                        
+                        }
+                    } if ($condassert['before']) {
+                        $clone = clone $this;
+                        $clone->assertionsbefore = array();
+                        $list = $this->assertionsbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+                        if ($list[0] === self::NEXT_CHAR_OK) {
+                            return  $clone->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
                         }
                     }
                 }
