@@ -39,6 +39,7 @@ $string['allclassrooms']                        = 'Все аудитории';
 $string['allgroups']                            = 'Все группы';
 $string['alllessontypes']                       = 'Все типы занятий';
 $string['allstates']                            = 'Все состояния';
+$string['allsupervisers']                       = 'Все преподаватели';
 $string['allusers']                             = 'Все пользователи';
 $string['blocktitle']                           = 'Supervised';
 $string['cannotdeleteclassroom']                = 'There were sessions in this classroom. Delete sessions using this classroom first. You can hide classroom';

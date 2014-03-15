@@ -39,6 +39,7 @@ $string['allclassrooms']                        = 'All classrooms';
 $string['allgroups']                            = 'All groups';
 $string['alllessontypes']                       = 'All lesson types';
 $string['allstates']                            = 'All states';
+$string['allsupervisers']                       = 'All supervisers';
 $string['allusers']                             = 'All users';
 $string['blocktitle']                           = 'Supervised';
 $string['cannotdeleteclassroom']                = 'There were sessions in this classroom. Delete sessions using this classroom first. You can hide classroom';
