@@ -309,8 +309,7 @@ class qtype_preg_fa_transition {
      * Returns true if transition is with unmerged assert.
      */
     public function is_unmerged_assert() {
-        return ($this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX 
-                || $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A || $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z || $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z);
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_B  && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_G);
     }
 
     public function is_start_anchor() {
