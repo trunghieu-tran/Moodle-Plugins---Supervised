@@ -567,5 +567,70 @@ function update_users_in_session($groupid, $courseid, $sessionid) {
     foreach ($oldusers as $olduser) {
         $DB->delete_records('block_supervised_user', array('id' => $olduser->id));
     }
+}
 
+
+function get_sessions_filter_user_preferences() {
+    global $USER, $COURSE;
+
+    $date = usergetdate(time());
+    $pref = get_user_preferences();
+
+    if ( !isset($pref['block_supervised_perpage']) ) {
+        $pref['block_supervised_perpage'] = 50;
+    }
+    if ( !isset($pref['block_supervised_page']) ) {
+        $pref['block_supervised_page'] = 0;
+    }
+    if ( !isset($pref['block_supervised_from']) ) {
+        $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'], $date['mday']-7, 0, 0, 0);
+    }
+    if ( !isset($pref['block_supervised_to']) ) {
+        $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0);
+    }
+    if ( !isset($pref['block_supervised_teacher']) ) {
+        $pref['block_supervised_teacher'] = $USER->id;
+    }
+    if ( !isset($pref['block_supervised_course']) ) {
+        $pref['block_supervised_course'] = $COURSE->id;
+    }
+    if ( !isset($pref['block_supervised_lessontype']) ) {
+        $pref['block_supervised_lessontype'] = -1;
+    }
+    if ( !isset($pref['block_supervised_classroom']) ) {
+        $pref['block_supervised_classroom'] = 0;
+    }
+    if ( !isset($pref['block_supervised_state']) ) {
+        $pref['block_supervised_state'] = 0;
+    }
+
+    return $pref;
+}
+
+
+function check_sessions_filter_user_preferences(&$pref) {
+    // Check if there are any session on the current page.
+    $sessions = build_sessions_array(
+        $pref['block_supervised_page'] * $pref['block_supervised_perpage'],
+        $pref['block_supervised_perpage'],      $pref['block_supervised_from'],
+        $pref['block_supervised_to'],           $pref['block_supervised_teacher'],
+        $pref['block_supervised_course'],       $pref['block_supervised_classroom'],
+        $pref['block_supervised_lessontype'],   $pref['block_supervised_state']);
+    if ( $sessions['totalcount'] > 0 && count($sessions['sessions'])==0 ) {
+        // Current page is empty but we have some sessions - decrease current page number to last valid page.
+        $totalpages = floor($sessions['totalcount'] / $pref['block_supervised_perpage']);
+        if ($sessions['totalcount'] % $pref['block_supervised_perpage'] > 0) {
+            $totalpages++;
+        }
+        $pref['block_supervised_page'] = $totalpages - 1;
+    }
+}
+
+
+function save_sessions_filter_user_preferences($pref) {
+    // Remove _lastloaded field.
+    if ( isset($pref['_lastloaded']) ) {
+        unset($pref['_lastloaded']);
+    }
+    set_user_preferences($pref);
 }

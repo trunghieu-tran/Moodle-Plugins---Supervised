@@ -26,18 +26,7 @@ require_once('sessionstate.php');
 require_once('lib.php');
 
 global $DB, $OUTPUT, $PAGE, $USER;
-$date = usergetdate(time());
 $courseid   = required_param('courseid', PARAM_INT);
-$page       = optional_param('page', '0', PARAM_INT);           // Which page to show.
-$perpage    = optional_param('perpage', '50', PARAM_INT);       // How many per page.
-$from       = optional_param('f', make_timestamp($date['year'], $date['mon'], $date['mday']-7, 0, 0, 0), PARAM_INT);
-$to         = optional_param('t', make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0), PARAM_INT);
-$teacher    = optional_param('teacher', $USER->id, PARAM_INT);  // Sessions filtering: teacher id.
-$coursefilter = optional_param('course', $courseid, PARAM_INT); // Sessions filtering: course id.
-$lessontype = optional_param('lessontype', '-1', PARAM_INT);    // Sessions filtering: lessontype id.
-$classroom  = optional_param('classroom', '0', PARAM_INT);      // Sessions filtering: classroom id.
-$state      = optional_param('state', '0', PARAM_INT);          // Sessions filtering: state index.
-
 
 $site = get_site();
 
@@ -66,24 +55,38 @@ if (!  (has_capability('block/supervised:viewownsessions', $PAGE->context)
     require_capability('block/supervised:viewownsessions', $PAGE->context);   // Print error.
 }
 
+// Set sessions filter parameters.
+$pref = get_sessions_filter_user_preferences();
+$pref['block_supervised_page']      = optional_param('page',        $pref['block_supervised_page'],      PARAM_INT);
+$pref['block_supervised_perpage']   = optional_param('perpage',     $pref['block_supervised_perpage'],   PARAM_INT);
+$pref['block_supervised_from']      = optional_param('f',           $pref['block_supervised_from'],      PARAM_INT);
+$pref['block_supervised_to']        = optional_param('t',           $pref['block_supervised_to'],        PARAM_INT);
+$pref['block_supervised_teacher']   = optional_param('teacher',     $pref['block_supervised_teacher'],   PARAM_INT);
+$pref['block_supervised_course']    = optional_param('course',      $pref['block_supervised_course'],    PARAM_INT);
+$pref['block_supervised_lessontype']= optional_param('lessontype',  $pref['block_supervised_lessontype'],PARAM_INT);
+$pref['block_supervised_classroom'] = optional_param('classroom',   $pref['block_supervised_classroom'], PARAM_INT);
+$pref['block_supervised_state']     = optional_param('state',       $pref['block_supervised_state'],     PARAM_INT);
+check_sessions_filter_user_preferences($pref);
+save_sessions_filter_user_preferences($pref);
 
-// Print display options form.
+
+// Output sessions filter.
 $mform = 'displayoptions_form.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {
     print_error('noformdesc');
 }
-$mform = new displayoptions_sessions_form(null, array('course' => $coursefilter));
-$toform['courseid'] = $courseid;
-$toform['pagesize'] = $perpage;
-$toform['from'] = $from;
-$toform['to'] = $to;
-$toform['teacher'] = $teacher;
-$toform['course'] = $coursefilter;
-$toform['classroom'] = $classroom;
-$toform['lessontype'] = $lessontype;
-$toform['state'] = $state;
+$mform = new displayoptions_sessions_form(null, array('course' => $pref['block_supervised_course']));
+$toform['courseid']     = $courseid;
+$toform['pagesize']     = $pref['block_supervised_perpage'];
+$toform['from']         = $pref['block_supervised_from'];
+$toform['to']           = $pref['block_supervised_to'];
+$toform['teacher']      = $pref['block_supervised_teacher'];
+$toform['course']       = $pref['block_supervised_course'];
+$toform['classroom']    = $pref['block_supervised_classroom'];
+$toform['lessontype']   = $pref['block_supervised_lessontype'];
+$toform['state']        = $pref['block_supervised_state'];
 
 if ($fromform = $mform->get_data()) {
     $url = new moodle_url('/blocks/supervised/sessions/view.php',
@@ -106,16 +109,21 @@ if ($fromform = $mform->get_data()) {
         echo $OUTPUT->single_button($url, $caption, 'get');
     }
 
-    print_courses_selector($courseid, $coursefilter, $perpage, $from, $to, $classroom, $state);
+    print_courses_selector($courseid, $pref['block_supervised_course'],
+        $pref['block_supervised_perpage'], $pref['block_supervised_from'],
+        $pref['block_supervised_to'], $pref['block_supervised_classroom'],
+        $pref['block_supervised_state']);
 
     // Print display options form.
     $mform->set_data($toform);
     $mform->display();
 }
 
-// Print sessions table.
-print_sessions($page, $perpage, "view.php?courseid=$courseid", $from, $to, $teacher,
-    $coursefilter, $classroom, $lessontype, $state);
+print_sessions($pref['block_supervised_page'], $pref['block_supervised_perpage'],
+    "view.php?courseid=$courseid", $pref['block_supervised_from'],
+    $pref['block_supervised_to'], $pref['block_supervised_teacher'],
+    $pref['block_supervised_course'], $pref['block_supervised_classroom'],
+    $pref['block_supervised_lessontype'], $pref['block_supervised_state']);
 
 // Display footer.
 echo $OUTPUT->footer();
@@ -134,19 +142,19 @@ echo $OUTPUT->footer();
  * @param $state
  */
 function print_courses_selector($courseid, $course, $perpage, $from, $to, $classroom, $state) {
-    global $OUTPUT, $SITE;
+    global $OUTPUT, $SITE, $USER;
 
-    $active = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course&classroom=$classroom&state=$state";
+    $active = "/blocks/supervised/sessions/view.php?courseid=$courseid&page=0&perpage=$perpage&f=$from&t=$to&course=$course&classroom=$classroom&state=$state&lessontype=-1&teacher=$USER->id";
 
-    // Without teacher and lesson type.
-    $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=0&classroom=$classroom&state=$state";
+    // All courses url.
+    $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&page=0&perpage=$perpage&f=$from&t=$to&course=0&classroom=$classroom&state=$state&lessontype=-1&teacher=$USER->id";
     $urls[$url] = get_string('fulllistofcourses', '');
 
     if ($courses = get_courses()) {
         foreach ($courses as $course) {
             $coursecontext = context_course::instance($course->id);
             if ($course->id != $SITE->id && has_capability('block/supervised:supervise', $coursecontext)) {
-                $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&perpage=$perpage&f=$from&t=$to&course=$course->id&classroom=$classroom&state=$state";
+                $url = "/blocks/supervised/sessions/view.php?courseid=$courseid&page=0&perpage=$perpage&f=$from&t=$to&course=$course->id&classroom=$classroom&state=$state&lessontype=-1&teacher=$USER->id";
                 $urls[$url] = $course->fullname;
             }
         }
