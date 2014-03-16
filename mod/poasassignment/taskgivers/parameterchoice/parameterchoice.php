@@ -231,7 +231,7 @@ class parametersearch_form extends moodleform {
                     if($field->ftype==DATE)
                         $mform->addElement('date_selector','field'.$field->id,$field->name);
                     else {
-                        if(has_capability('mod/poasassignment:seefielddescription',get_context_instance(CONTEXT_MODULE,$instance['id'])))
+                        if(has_capability('mod/poasassignment:seefielddescription', context_module::instance($instance['id'])))
                             $mform->addElement('text','field'.$field->id,$field->name.'('.$poasmodel->ftypes[$field->ftype].')'.$poasmodel->help_icon($field->description));
                         else
                             $mform->addElement('text','field'.$field->id,$field->name.'('.$poasmodel->ftypes[$field->ftype].')');
