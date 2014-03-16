@@ -1658,20 +1658,6 @@ class poasassignment_model {
         }
         return $html;
     }
-    function trigger_poasassignment_event($mode,$assigneeid) {
-        $eventdata = new stdClass();
-        $eventdata->student = $assigneeid;
-        $eventdata->poasassignmentid = $this->poasassignment->id;
-        if ($mode==TASK_RECIEVED) {
-            events_trigger('poasassignment_task_recieved', $eventdata);
-        }
-        if ($mode==ATTEMPT_DONE) {
-            events_trigger('poasassignment_attempt_done', $eventdata);
-        }
-        if ($mode==GRADE_DONE) {
-            events_trigger('poasassignment_grade_done', $eventdata);
-        }
-    }
     function email_teachers($assignee) {
         global $DB;
 
