@@ -607,6 +607,37 @@ M.preg_authoring_tools_script = (function ($) {
                 - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top);
     },
 
+    /**
+     * Detects a rectangle within polygon and adds a center point to it.
+     * @param area Area of map tag.
+     * @returns {boolean} Is polygon a rectangle?
+     */
+    detect_rect : function(area) {
+        // Get list of coordinates as integers.
+        var nodeCoords = area.coords.split(/[, ]/).map(function(item){return parseInt(item);});
+        // If it looks like a rectangle...
+        if (nodeCoords.length == 8) {
+            // Build a list of points for convenience.
+            var points = [];
+            for (var j = 0; j < nodeCoords.length; j += 2) {
+                points[points.length] = {x: nodeCoords[j], y: nodeCoords[j+1]};
+            }
+
+            // Calculate a center point of rectangle.
+            var center = {
+                x: Math.floor(points[0].x + (points[2].x - points[0].x)/2),
+                y: Math.floor(points[0].y + (points[2].y - points[0].y)/2)
+            };
+
+            // Add a center point to coordinates of area.
+            area.coords += ',' + center.x + ',' + center.y;
+
+            return true;
+        } else {
+            return false;
+        }
+    },
+
     get_rect_selection : function (e, rectangle, img, area, deltaX, deltaY) {
         // Check ids selected nodes
         rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
@@ -626,8 +657,12 @@ M.preg_authoring_tools_script = (function ($) {
                     nodeCoords[0], nodeCoords[1],
                     nodeCoords[2], nodeCoords[1],
                     nodeCoords[0], nodeCoords[3],
-                    nodeCoords[2], nodeCoords[3]
+                    nodeCoords[2], nodeCoords[3],
+                    String(Math.min(nodeCoords[0], nodeCoords[2]) + Math.abs(nodeCoords[0]-nodeCoords[2])/2),
+                    String(Math.min(nodeCoords[1], nodeCoords[3]) + Math.abs(nodeCoords[1]-nodeCoords[3])/2)
                 ];
+            } else if (areas[i].shape == "poly") {
+                if (self.detect_rect(areas[i])) nodeCoords = areas[i].coords.split(/[, ]/);
             }
             var coords = [];
             for (var j = 0; j < nodeCoords.length; j += 2) {

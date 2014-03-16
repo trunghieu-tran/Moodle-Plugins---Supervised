@@ -129,7 +129,6 @@ class qtype_preg_explaining_graph_tool_link {
     public $label = '';         // Label of link on image.
     public $style = '';         // Visual style of link (for image).
     public $owner = null;       // Subgraph which has this link.
-    public $id = -1;            // Id of link.
     public $tooltip = '';       // Tooltip for link.
     public $color = 'black';    // Color of arrow.
 
@@ -180,7 +179,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public $edge        = '';           // Special edges options.
     public $isexact     = false;
     public $isselection = false;        // This flag shows
-    public $tooltip     = "";           // Tooltip for subgraph.
+    public $tooltip     = '';           // Tooltip for subgraph.
 
     public function __construct($lbl, $id = -1) {
         $this->label = $lbl;
@@ -665,7 +664,6 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
         foreach ($gr->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd' . $iter->destination->id . '"';
-
             $instr .= "[";
             if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
             $instr .= "label=\"" . $iter->label . "\", ";
