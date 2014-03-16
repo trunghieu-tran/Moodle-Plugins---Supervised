@@ -516,7 +516,7 @@ class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph
         $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
 
         $quant = new qtype_preg_explaining_graph_tool_subgraph($label, $this->pregnode->id .
-            ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
         $quant->tooltip = "quantifier";
         $quant->style = 'dotted';
         $quant->color = 'black';
@@ -613,7 +613,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 
     protected function process_operator($graph) {
         $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id .
-            ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
         $condsubexpr->tooltip = "conditional subexpression";
         $condsubexpr->style = 'solid';
         $condsubexpr->color = 'black';
@@ -710,7 +710,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_graph_operator {
 
     private static $linkoptions = array(
-                                        qtype_preg_node_assert::SUBTYPE_PLA => 'normal',
+        qtype_preg_node_assert::SUBTYPE_PLA => 'normal',
                                         qtype_preg_node_assert::SUBTYPE_NLA => 'normal',
                                         qtype_preg_node_assert::SUBTYPE_PLB => 'inv',
                                         qtype_preg_node_assert::SUBTYPE_NLB => 'inv'
@@ -723,7 +723,7 @@ class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_grap
                     'green' : 'red');
 
         $sub = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id .
-            ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
         $sub->tooltip = "assert";
         $sub->style = 'solid';
         $sub->color = 'grey';
