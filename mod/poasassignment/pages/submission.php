@@ -51,11 +51,15 @@ class submission_page extends abstract_page {
                 }
                 // save attempt as last attempt of this assignee
                 $model->assignee->lastattemptid = $attemptid;
-                //echo '...lastattemptid='.$attemptid;
                 $DB->update_record('poasassignment_assignee', $model->assignee);
                 
-                // trigger poasassignmentevent 
-                $model->trigger_poasassignment_event(ATTEMPT_DONE, $model->assignee->id);
+                // Trigger assessable_submitted event.
+                $params = array(
+                    'context'  => context_module::instance($model->get_cm()->id),
+                    'objectid' => $attemptid
+                );
+                $assessable_submitted_event = \mod_poasassignment\event\assessable_submitted::create($params);
+                $assessable_submitted_event->trigger();
                 
                 //noitify teacher if needed
                 $model->email_teachers($model->assignee);
