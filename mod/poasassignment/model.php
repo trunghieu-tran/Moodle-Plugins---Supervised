@@ -1371,6 +1371,13 @@ class poasassignment_model {
                 $DB->insert_record('poasassignment_task_values',$randrec);
             }
         }
+
+        // Trigger task_selected event
+        $params = array(
+            'context' => context_module::instance(poasassignment_model::get_instance()->get_cm()->id)
+        );
+        $task_selected_event = \mod_poasassignment\event\task_selected::create($params);
+        $task_selected_event->trigger();
     }
 
     /**
