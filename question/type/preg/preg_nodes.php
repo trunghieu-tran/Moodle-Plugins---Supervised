@@ -1819,16 +1819,27 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
+        $result = true;
         // TODO: check for assertions in case of $length == 0
-        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        foreach ($this->assertionsbefore as $beforeassert) {
+            $result = $result && $beforeassert->match($originalstr, $pos, $length, $matcherstateobj) /*&& $pos != $str->length() - 1*/;
         }
-        $start = $matcherstateobj->index_first($this->number);
-        $end = $start + $matcherstateobj->length($this->number);
-        if ($end > $newstr->length()) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        foreach ($this->assertionsafter as $afterassert) {
+            $result = $result && $afterassert->match($originalstr, $pos + $this->consumes(), $length, $matcherstateobj);
         }
-        return array(self::NEXT_CHAR_OK, $newstr->substring($start + $length, $end - $start - $length));
+        if ($result) {
+            if (!$matcherstateobj->is_subexpr_captured($this->number)) {
+                return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            }
+            $start = $matcherstateobj->index_first($this->number);
+            $end = $start + $matcherstateobj->length($this->number);
+            if ($end > $newstr->length()) {
+                return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            }
+
+            return array(self::NEXT_CHAR_OK, $newstr->substring($start + $length, $end - $start - $length));
+        }
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
