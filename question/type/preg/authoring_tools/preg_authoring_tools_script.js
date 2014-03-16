@@ -559,8 +559,8 @@ M.preg_authoring_tools_script = (function ($) {
                 maxHeight: (br.bottom - br.top),
                 minTop: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
                 minLeft: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
-                maxRight: br.right - br.left + (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),*/
-                maxBottom: br.bottom - br.top,
+                maxRight: br.right - br.left + (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
+                maxBottom: br.bottom - br.top,*/
                 dragHandle: true,
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
