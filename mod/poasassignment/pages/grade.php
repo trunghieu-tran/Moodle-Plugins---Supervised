@@ -38,6 +38,21 @@ class grade_page extends abstract_page{
         else {
             if($data = $this->mform->get_data()) {
                 $poasmodel->save_grade($this->assigneeid, $data);
+
+                // Trigger submission_graded event
+                $attemptscount = $DB->count_records('poasassignment_attempts', array('assigneeid' => $this->assigneeid));
+                $attempt = $DB->get_record('poasassignment_attempts', array('assigneeid' => $this->assigneeid, 'attemptnumber' => $attemptscount));
+                $params = array(
+                    'context'       => context_module::instance($cmid),
+                    'objectid'      => $attemptscount,
+                    'relateduserid' => $poasmodel->get_user_by_assigneeid($this->assigneeid)->userid,
+                    'other'         => array(
+                        'isfinal' => $attempt->final
+                    )
+                );
+                $submission_graded_event = \mod_poasassignment\event\submission_graded::create($params);
+                $submission_graded_event->trigger();
+
                 redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
             }
         }
