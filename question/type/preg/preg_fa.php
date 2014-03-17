@@ -309,7 +309,7 @@ class qtype_preg_fa_transition {
      * Returns true if transition is with unmerged assert.
      */
     public function is_unmerged_assert() {
-        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT;
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_B  && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_G);
     }
 
     public function is_start_anchor() {
