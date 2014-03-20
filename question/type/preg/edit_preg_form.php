@@ -258,8 +258,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         $currentlanguages = block_formal_langs::available_langs( $context );
-        $langs = block_formal_langs::available_langs();// TODO - add context.
-        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $langs);
+        //$langs = block_formal_langs::available_langs();// TODO - add context.
+        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $currentlanguages);
         $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
         $mform->addHelpButton('langid', 'langselect', 'qtype_preg');
         $mform->addElement('text', 'lexemusername', get_string('lexemusername', 'qtype_preg'), array('size' => 54));
@@ -378,6 +378,18 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 if (!empty($feedback) && preg_match('/\{\$([1-9][0-9]*|\w+)\}/', $feedback) == 1) {
                     $errors['feedback['.$key.']'] = get_string('nosubexprcapturing', 'qtype_preg', $querymatcher->name());
                 }
+            }
+        }
+
+        // Check that interactive hint settings doesn't contradict overall hint settings.
+        $langobj = block_formal_langs::lang_object($data['langid']);
+        $interactivehints = $data['interactivehint'];
+        foreach($interactivehints as $key => $hint) {
+            if ($hint == 'hintnextchar' && $data['usecharhint'] != true) {
+                $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextchar', 'qtype_preg'));
+            }
+            if ($hint == 'hintnextlexem' && $data['uselexemhint'] != true) {
+                $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()));
             }
         }
 

@@ -74,6 +74,7 @@ $string['toomanyerrors'] = '.......{$a} more errors';
 $string['lazyquant'] = 'Lazy quantifiers';
 $string['greedyquant'] = 'Greedy quantifiers';
 $string['possessivequant'] = 'Possessive quantifiers';
+$string['unallowedhint'] = 'Selected hint not allowed due to restrictions in question settings. Please set "Allow {$a} hinting" to "yes" to allow it. Selected matching engine could affect availability of hints.';
 $string['ungreedyquant'] = 'Ungreedy quantifiers';
 $string['unsupported'] = '{$a->nodename} in position from {$a->linefirst}:{$a->colfirst} to {$a->linelast}:{$a->collast} is not supported by {$a->engine}.';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by the {$a->classname}.';
