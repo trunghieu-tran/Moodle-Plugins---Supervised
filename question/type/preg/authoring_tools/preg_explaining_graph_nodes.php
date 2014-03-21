@@ -683,19 +683,48 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         }
 
         $graph->subgraphs[] = $condsubexpr;
-        $graph->entries[] = $point;
+        if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_NLA
+            || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_NLB
+            || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_PLA
+            || $this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_PLB
+        ) {
+            $condsubexpr->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $condsubexpr, -1);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
+                '?',
+                $condsubexpr->nodes[count($condsubexpr->nodes)-1],
+                $condsubexpr->subgraphs[0]->nodes[0],
+                $condsubexpr
+            );
+            $graph->entries[] = $condsubexpr->nodes[count($condsubexpr->nodes)-1];
+        } else {
+            $graph->entries[] = $point;
+        }
 
         if (((count($this->operands) == 2 && !$isassert) || (count($this->operands) == 3 && $isassert))
             && $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
             $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
-            $graph->exits[] = $graph->subgraphs[0]->nodes[0];
+            $graph->exits[] = $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1];
             $graph->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $graph->subgraphs[0], -1);
 
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('?', $point, $graph->subgraphs[0]->nodes[1], $condsubexpr);
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('true', $graph->subgraphs[0]->nodes[1], $condsubexpr->subgraphs[1]->entries[0], $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
+                '',
+                $point,
+                $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
+                $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
+                'true',
+                $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
+                $condsubexpr->subgraphs[1]->entries[0],
+                $condsubexpr
+            );
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[1]->exits[0], $graph->exits[0], $condsubexpr);
 
-            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('false', $graph->subgraphs[0]->nodes[1], $condsubexpr->subgraphs[2]->entries[0], $condsubexpr);
+            $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
+                'false',
+                $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
+                $condsubexpr->subgraphs[2]->entries[0],
+                $condsubexpr
+            );
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[2]->exits[0], $graph->exits[0], $condsubexpr);
         } else {
             $graph->exits[] = $condsubexpr->subgraphs[1]->exits[0];
