@@ -24,7 +24,7 @@
 require_once('../../../config.php');
 require_once('sessionstate.php');
 require_once('lib.php');
-global $DB, $PAGE, $OUTPUT, $USER;
+global $DB, $PAGE, $OUTPUT, $USER, $CFG;
 
 $courseid   = required_param('courseid', PARAM_INT);
 $id         = optional_param('id', '', PARAM_INT);        // Session id (only for edit mode).
@@ -61,7 +61,7 @@ if (!$id) {   // Add mode.
     // Setting default values.
     $toform['teacherid']    = $USER->id;
     $toform['sendemail']    = 1;
-    $toform['duration']     = 90;
+    $toform['duration']     = $CFG->block_supervised_session_duration;
     $toform['lessontypeid'] = 0;
     $toform['coursename']   = html_writer::link(new moodle_url("/course/view.php?id={$course->id}"), $course->fullname);
 } else {     // Edit mode.
