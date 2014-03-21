@@ -574,7 +574,7 @@ function update_users_in_session($groupid, $courseid, $sessionid) {
 
 
 function get_sessions_filter_user_preferences() {
-    global $USER, $COURSE;
+    global $USER, $COURSE, $CFG;
 
     $date = usergetdate(time());
     $pref = get_user_preferences();
@@ -586,7 +586,7 @@ function get_sessions_filter_user_preferences() {
         $pref['block_supervised_page'] = 0;
     }
     if ( !isset($pref['block_supervised_from']) ) {
-        $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'], $date['mday']-7, 0, 0, 0);
+        $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'], $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
     }
     if ( !isset($pref['block_supervised_to']) ) {
         $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0);

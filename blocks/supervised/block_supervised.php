@@ -358,7 +358,7 @@ class block_supervised extends block_base {
         } else {
             // Display form.
             $toform['id']               = $COURSE->id;
-            $toform['duration']         = 90;
+            $toform['duration']         = $CFG->block_supervised_session_duration;
             $toform['lessontypeid']     = 0;
 
             $mform->set_data($toform);
@@ -538,5 +538,10 @@ class block_supervised extends block_base {
         global $CFG, $COURSE;
         require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
         cleanup($COURSE->id);
+    }
+
+    public function has_config() 
+    {
+        return true;
     }
 }
