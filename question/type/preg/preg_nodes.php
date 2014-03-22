@@ -574,7 +574,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
-                
+
             }
         }
 
@@ -960,9 +960,9 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 $tmp = $this->flags[$i][0]->ranges($this->caseless);
                 $this->cachedranges = qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
             }
-        }
-        if ($this->negative) {
-            $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+            if ($this->negative) {
+                $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+            }
         }
         return $this->cachedranges;
     }
@@ -975,24 +975,17 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             return false;
         }
 
-        foreach ($this->flags as $flags) {
-            // Get intersection of all current flags.
-            $result = !empty($flags);
-            foreach ($flags as $flag) {
-                $result = $result && $flag->match($str, $pos, $this->caseless);
-                if (!$result) {
-                    break;
-                }
-            }
-            $result = ($result xor $this->negative);
-            if ($result) {
-                $length = 1;
-                return true;
-            }
+        $ranges = $this->ranges();
+        $char = $str[$pos];
+        if ($this->caseless) {
+            $charlower = qtype_poasquestion_string::strtolower($char);
+            $charupper = qtype_poasquestion_string::strtoupper($char);
+            $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
+        } else {
+            $result = qtype_preg_unicode::is_in_range($char, $ranges);
         }
-
-        $length = 0;
-        return false;
+        $length = $result ? 1 : 0;
+        return $result;
     }
 
     public function next_character_base($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
@@ -1459,26 +1452,6 @@ class qtype_preg_charset_flag {
             }
         }
         return $this->cachedranges;
-    }
-
-    public function match($str, $pos, $caseless) {
-        if ($pos < 0 || $pos >= $str->length()) {
-            return false;    // String index out of borders.
-        }
-
-        $char = $str[$pos];
-        if ($caseless) {
-            $charlower = qtype_poasquestion_string::strtolower($char);
-            $charupper = qtype_poasquestion_string::strtoupper($char);
-        }
-
-        $ranges = $this->ranges($caseless);
-        if ($caseless) {
-            $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
-        } else {
-            $result = qtype_preg_unicode::is_in_range($char, $ranges);
-        }
-        return $result;
     }
 
     public function tohr() {
