@@ -7812,14 +7812,33 @@ class qtype_preg_unicode extends core_text {
                      array(0=>0xA490, 1=>0xA4C6));
     }
 
+    /**
+     * Comparator function: which of 2 trivial ranges starts 'earlier'?
+     */
     protected static function compare_trivial_ranges($a, $b) {
         if ($a[0] < $b[0]) {
             return -1;
         } else if ($a[0] > $b[0]) {
             return 1;
-        } else {
-            return 0;
         }
+        return 0;
+    }
+
+    /**
+     * Returns the intersection of 2 trivial ranges
+     */
+    protected static function trivial_ranges_intersection($t1, $t2) {
+        if ($t1[0] <= $t2[0] && $t2[0] <= $t1[1]) {
+            // t1:   --------
+            // t2:       --------
+            return array($t2[0], $t1[1]);
+        }
+        if ($t2[0] <= $t1[0] && $t1[0] <= $t2[1]) {
+            // t1:       --------
+            // t2:   --------
+            return array($t1[0], $t2[1]);
+        }
+        return null;
     }
 
     /**
@@ -8085,6 +8104,44 @@ class qtype_preg_unicode extends core_text {
             $done = ($range1 === null && $range2 === null);
         }
         return $result;
+    }
+
+    /**
+     * Check if 2 ranges have intersection, not finding it. Just true or false.
+     */
+    public static function intersects($ranges1, $ranges2) {
+        if ($ranges1 == null || $ranges2 == null) {
+            return false;
+        }
+        $count1 = count($ranges1);
+        $count2 = count($ranges2);
+        $index1 = 0;
+        $index2 = 0;
+        $range1 = $ranges1[$index1];
+        $range2 = $ranges2[$index2];
+        while (true) {
+            // Check for intersection
+            $intersection = self::trivial_ranges_intersection($range1, $range2);
+            if ($intersection !== null) {
+                return true;
+            }
+            // Move to the next trivial ranges
+            if ($range1[1] < $range2[0]) {
+                // t1: --------
+                // t2:           --------
+                ++$index1;
+            } else if ($range2[0] < $range1[0]) {
+                // t1:           --------
+                // t2: --------
+                ++$index2;
+            }
+            if ($index1 == $count1 || $index2 == $count2) {
+                return false;
+            }
+            $range1 = $ranges1[$index1];
+            $range2 = $ranges2[$index2];
+        }
+        return false;
     }
 
     private static function print_range($text, $range) {

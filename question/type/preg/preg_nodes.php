@@ -881,6 +881,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     /** Array of assertion flags (it's impossible to calculate an assertion as a range), each asserts[i] is an array of 0/1/2 asserts as flags; for ranges[i]. */
     protected $asserts = array();
 
+    protected $cachedranges = null;
+
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_LEAF_CHARSET;
     }
@@ -940,6 +942,20 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return count($this->flags) == 1 &&
                $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_FLAG &&
                $this->flags[0][0]->data == qtype_preg_charset_flag::META_DOT;
+    }
+
+    public function ranges() {
+        if ($this->cachedranges === null) {
+            $this->cachedranges = $this->flags[0][0]->ranges($this->caseless);
+            for ($i = 1; $i < count($this->flags); $i++) {
+                $tmp = $this->flags[$i][0]->ranges($this->caseless);
+                $this->cachedranges = qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
+            }
+        }
+        if ($this->negative) {
+            $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+        }
+        return $this->cachedranges;
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
@@ -1048,7 +1064,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $key = 'after';
         }
 
-        
+
 
         // Check all the returned ranges.
         $chars = $this->next_character_base($originalstr, $newstr, $pos, $length, $matcherstateobj,$dollar['before'], $circumflex['after']);
@@ -1072,10 +1088,10 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 // There are start string assertions.
                 foreach ($chars as $c) {
                     if ($c == "\n") {
-                        return array(self::NEXT_CHAR_OK, $c);        
+                        return array(self::NEXT_CHAR_OK, $c);
                     }
                 }
-            } 
+            }
             if ($condassert['before']) {
                 $list = $this->assertionsbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
                 if ($list[0] === self::NEXT_CHAR_OK) {
@@ -1086,7 +1102,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 }
             }
         }
-        
+
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
@@ -1400,6 +1416,8 @@ class qtype_preg_charset_flag {
     /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG correspondingly. */
     public $data;
 
+    private $cachedranges = null;
+
 
     public function __clone() {
         if (is_object($this->data)) {
@@ -1417,6 +1435,23 @@ class qtype_preg_charset_flag {
         $this->data = $data;
     }
 
+    public function ranges($caseless) {
+        if ($this->cachedranges === null) {
+            switch ($this->type) {
+                case self::TYPE_SET:
+                    $this->cachedranges = qtype_preg_unicode::get_ranges_from_charset($this->data, $caseless);
+                    break;
+                case self::TYPE_FLAG:
+                    $this->cachedranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
+                    break;
+            }
+            if ($this->negative) {
+                $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+            }
+        }
+        return $this->cachedranges;
+    }
+
     public function match($str, $pos, $caseless) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
@@ -1428,21 +1463,13 @@ class qtype_preg_charset_flag {
             $charupper = qtype_poasquestion_string::strtoupper($char);
         }
 
-        switch ($this->type) {
-            case self::TYPE_SET:
-                $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data, $caseless);
-                break;
-            case self::TYPE_FLAG:
-                $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
-                break;
-        }
-
+        $ranges = $this->ranges($caseless);
         if ($caseless) {
             $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
         } else {
             $result = qtype_preg_unicode::is_in_range($char, $ranges);
         }
-        return ($result xor $this->negative);
+        return $result;
     }
 
     public function tohr() {
