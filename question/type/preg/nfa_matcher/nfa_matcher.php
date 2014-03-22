@@ -35,6 +35,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
     protected $subexprbordersmap = array();
+    protected $generateextensionforeachmatch = false;
 
     public function name() {
         return 'nfa_matcher';
@@ -630,6 +631,44 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
+    protected function generate_extensions($matches, $bruteforce, $str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+        foreach ($matches as $match) {
+            $match->extendedmatch = null;
+            // Try each backtrack state and choose the shortest one.
+            $match->backtrack_states = array_merge(array($match), $match->backtrack_states);
+            foreach ($match->backtrack_states as $backtrack) {
+                $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
+
+                $tmp = $bruteforce
+                     ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
+                     : $this->generate_extension_fast($str, $backtrack, $subexpr);
+
+                if ($tmp === null) {
+                    continue;
+                }
+
+                // Calculate 'left'.
+                $prefixlen = $startpos;
+                while ($prefixlen < $match->str->length() && $prefixlen < $tmp->str->length() &&
+                       $match->str[$prefixlen] == $tmp->str[$prefixlen]) {
+                    $prefixlen++;
+                }
+                $left = $tmp->str->length() - $prefixlen;
+                // Choose the best one by:
+                // 1) minimizing length of the generated extension
+                // 2) minimizing abs(extension->length - match->length)
+                if ($match->extendedmatch === null) {
+                    $match->extendedmatch = $tmp;
+                    $match->left = $left;
+                } else if (($match->left > $left) ||
+                           ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $match->length))) {
+                    $match->extendedmatch = $tmp;
+                    $match->left = $left;
+                }
+            }
+        }
+    }
+
     public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
@@ -666,42 +705,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
 
         // If there was no full match, generate extensions for each partial match.
-        if (!$fullmatchexists /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
-            foreach ($possiblematches as $match) {
-                $match->extendedmatch = null;
-                // Try each backtrack state and choose the shortest one.
-                $match->backtrack_states = array_merge(array($match), $match->backtrack_states);
-                foreach ($match->backtrack_states as $backtrack) {
-                    $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
-
-                    $tmp = $bruteforce
-                         ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
-                         : $this->generate_extension_fast($str, $backtrack, $subexpr);
-
-                    if ($tmp === null) {
-                        continue;
-                    }
-
-                    // Calculate 'left'.
-                    $prefixlen = $startpos;
-                    while ($prefixlen < $match->str->length() && $prefixlen < $tmp->str->length() &&
-                           $match->str[$prefixlen] == $tmp->str[$prefixlen]) {
-                        $prefixlen++;
-                    }
-                    $left = $tmp->str->length() - $prefixlen;
-                    // Choose the best one by:
-                    // 1) minimizing length of the generated extension
-                    // 2) minimizing abs(extension->length - match->length)
-                    if ($match->extendedmatch === null) {
-                        $match->extendedmatch = $tmp;
-                        $match->left = $left;
-                    } else if (($match->left > $left) ||
-                               ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $match->length))) {
-                        $match->extendedmatch = $tmp;
-                        $match->left = $left;
-                    }
-                }
-            }
+        if (!$fullmatchexists && $this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+            $this->generate_extensions($possiblematches, $bruteforce, $str, $startpos, $subexpr, $prevlevelstate);
         }
 
         // Choose the best one.
@@ -710,6 +715,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             if ($match->leftmost_longest($result, false)) {
                 $result = $match;
             }
+        }
+
+        if (!$fullmatchexists && !$this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+            $this->generate_extensions(array($result), $bruteforce, $str, $startpos, $subexpr, $prevlevelstate);
         }
 
         return $result;
@@ -746,6 +755,57 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
             foreach ($currentkeys as $subpatt) {
                 $this->nestingmap[$subpatt][] = $operand;
+            }
+        }
+    }
+
+    /**
+     * Check if it's necessary to generate extensions for each possible match. For now the only such situation
+     * is when a transition ending a quantifier has non-empty intersection with next transitions.
+     */
+    protected function calculate_generateextensionforeachmatch() {
+        $this->generateextensionforeachmatch = false;
+        $states = $this->automaton->get_states();
+        foreach ($states as $state) {
+            $transitions = $this->automaton->get_adjacent_transitions($state, true);
+            foreach ($transitions as $transition) {
+                if (!$transition->endsquantifier) {
+                    continue;
+                }
+                if ($transition->pregleaf->type != qtype_preg_node::TYPE_LEAF_BACKREF && $transition->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    continue;
+                }
+                if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    $ranges = $transition->pregleaf->ranges();
+                }
+                $nexttransitions = $this->automaton->get_adjacent_transitions($transition->to, true);
+                foreach ($nexttransitions as $nexttransition) {
+                    // Check the following combinations:
+                    // a) backref, backref
+                    // b) backref, charset
+                    // c) charset, backref
+                    // d) charset, charset
+                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF && $nexttransition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+                        $this->generateextensionforeachmatch = true;
+                        return;
+                    }
+                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF && $nexttransition->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                        $this->generateextensionforeachmatch = true;
+                        return;
+                    }
+                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET && $nexttransition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+                        $this->generateextensionforeachmatch = true;
+                        return;
+                    }
+                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET && $nexttransition->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                        // Finally check for an intersection
+                        $nextranges = $nexttransition->pregleaf->ranges();
+                        if (qtype_preg_unicode::intersects($ranges, $nextranges)) {
+                            $this->generateextensionforeachmatch = true;
+                            return;
+                        }
+                    }
+                }
             }
         }
     }
@@ -801,6 +861,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $this->nestingmap = array();
             $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
             $this->subexprbordersmap = $this->automaton->calculate_subexpr_borders();
+            $this->calculate_generateextensionforeachmatch();
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
             // $this->automaton->on_subexpr_added($this->astroot);

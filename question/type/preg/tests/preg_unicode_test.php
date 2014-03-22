@@ -90,7 +90,10 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($range2 === null);
     }
 
-    function test_ranges_kinda_intersection() {
+    /**
+     * Tests kinda_operator() for intersection and intersects()
+     */
+    function test_ranges_kinda_intersection_and_intersect() {
         // Case 1: the first set includes the second.
         $ranges1 = array(array(1, 10));
         $ranges2 = array(array(2, 6), array(8, 9));
@@ -100,6 +103,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[0][1] === 6);
         $this->assertTrue($result[1][0] === 8);
         $this->assertTrue($result[1][1] === 9);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 2: the sets intersect in different ways
         $ranges1 = array(array(0, 10), array(12, 12), array(14, 18), array(24, 30));
@@ -118,6 +122,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[4][1] === 26);
         $this->assertTrue($result[5][0] === 28);
         $this->assertTrue($result[5][1] === 30);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 3: two same sets.
         $ranges1 = array(array($this->mincode, $this->maxcode));
@@ -126,6 +131,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) === 1);
         $this->assertTrue($result[0][0] === $this->mincode);
         $this->assertTrue($result[0][1] === $this->maxcode);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 4: two same sets of the only point.
         $ranges1 = array(array(5, 5));
@@ -134,12 +140,14 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) === 1);
         $this->assertTrue($result[0][0] === 5);
         $this->assertTrue($result[0][1] === 5);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 5: empty sets.
         $ranges1 = array();
         $ranges2 = array();
         $result = qtype_preg_unicode::kinda_operator($ranges1, $ranges2, true, false, false, false);
         $this->assertTrue(count($result) === 0);
+        $this->assertFalse(qtype_preg_unicode::intersects($ranges1, $ranges2));
     }
 
     function test_ranges_kinda_union() {
