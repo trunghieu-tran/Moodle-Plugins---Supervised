@@ -117,7 +117,7 @@ class qtype_preg_userinscription {
         if ($this->is_character_range()) {
             return false;
         }
-        $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', 'x',
+        $allowed = array('a', 'b', 'c', 'e', 'f', 'n', 'r', 't', '0', 'o', 'x',
                          'd', 'D', 'h', 'H', 's', 'S', 'v', 'V', 'w', 'W',
                          'p', 'P');
         return core_text::strlen($this->data) > 1 && $this->data[0] == '\\' &&
@@ -152,7 +152,9 @@ class qtype_preg_userinscription {
         if ($this->isflag !== null || !$this->is_valid_escape_sequence()) {
             return false;
         }
-        return ctype_digit(core_text::substr($this->data, 1));
+        return $this->data[1] == '0' ||
+               (core_text::strlen($this->data) > 2 && $this->data[1] == 'o' && $this->data[2] == '{') ||
+               ctype_digit(core_text::substr($this->data, 1));
     }
 
     /**
