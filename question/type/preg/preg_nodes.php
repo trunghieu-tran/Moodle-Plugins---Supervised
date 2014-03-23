@@ -566,6 +566,15 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
+
+            }
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                // Searching compatible asserts.
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore)) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
+                }
+                
             }
         }
 
