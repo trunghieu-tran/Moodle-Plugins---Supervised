@@ -318,12 +318,12 @@ $string['description_onceonly_node_subexpr_name'] = 'once checked subpattern "{$
 $string['description_grouping_node_subexpr'] = 'grouping: [ {$a->firstoperand} ]';
 $string['description_duplicate_node_subexpr'] = 'grouping (reset group numbers for capturing groups in each alternation): [ {$a->firstoperand} ]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
-$string['description_subexpr_node_cond_subexpr'] = 'if the subpattern #{$a->number} has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
-$string['description_subexpr_node_cond_subexpr_name'] = 'if the subpattern "{$a->name}" has been successfully matched then check: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr'] = 'the subpattern #{$a->number} has been successfully matched';
+$string['description_subexpr_node_cond_subexpr_name'] = 'the subpattern "{$a->name}" has been successfully matched';
 $string['description_recursion_node_cond_subexpr'] = 'the pattern #{$a->number} is in recursive matching';
 $string['description_recursion_node_cond_subexpr_all'] = 'the whole pattern is in recursive matching';
 $string['description_recursion_node_cond_subexpr_name'] = 'the pattern "{$a->name}" is in recursive matching';
-$string['description_recursion_node_wrapper'] = 'if {$a->recursioncond} then check: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr_wrapper'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
