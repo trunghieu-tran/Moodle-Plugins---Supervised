@@ -1564,13 +1564,20 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     }
 
     public function is_start_anchor() {
-        return ($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
-                $this->subtype == self::SUBTYPE_ESC_G);
+        return (($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
+                $this->subtype == self::SUBTYPE_ESC_G) &&  empty($this->assertionsbefore));
     }
 
     public function is_end_anchor() {
-        return ($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
-                $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
+        return (($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
+                $this->subtype == self::SUBTYPE_SMALL_ESC_Z) &&  empty($this->assertionsafter));
+    }
+
+    public function is_both_anchor() {
+        return ((($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
+                $this->subtype == self::SUBTYPE_SMALL_ESC_Z) &&  !empty($this->assertionsafter)) ||
+                (($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
+                $this->subtype == self::SUBTYPE_ESC_G) &&  !empty($this->assertionsbefore)));
     }
 
     public function consumes($matcherstateobj = null) {
