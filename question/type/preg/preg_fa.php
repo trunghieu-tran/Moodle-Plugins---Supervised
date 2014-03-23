@@ -1512,12 +1512,47 @@ abstract class qtype_preg_finite_automaton {
     public function go_round_transitions($del) {
         $clonetransitions = array();
         $tagsets = array();
+        $oppositetransitions = array();
 
 
         if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
             $transitions = $this->get_adjacent_transitions($del->to, true);
+            if ($del->is_unmerged_assert() && $del->pregleaf->is_both_anchor()) {
+                $oppositetransitions = $this->get_adjacent_transitions($del->from, false);
+                if (empty($oppositetransitions)) {
+                    return false;
+                }
+                // Copy after-tags.
+                $sets = array();
+                foreach ($del->tagsets as &$set) {
+                    $copytags = array();
+                    foreach ($set->tags as $tag) {
+                        if ($tag->pos == qtype_preg_fa_tag::POS_AFTER_TRANSITION) {
+                            $copytags[] = $tag;
+                            unset($set->tags[array_search($tag, $set->tags)]); 
+                        }
+                    }
+                    $newset = new qtype_preg_fa_tag_set();
+                    $newset->tags = $copytags;
+                    $sets[] = $newset;
+                    if (empty($set->tags)) {
+                        unset($del->tagsets[array_search($set, $del->tagsets)]);
+                    }
+                }
+                foreach ($oppositetransitions as $opposite) {
+                    // Copy after assertions.
+                    $leaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                    $leaf->assertionsafter = $del->pregleaf->assertionsafter;
+                    $newleaf = $opposite->pregleaf->intersect_asserts($leaf);
+                    $opposite->pregleaf = $newleaf;
+                    $del->pregleaf->assertionsafter = array();
+
+                    $tagsets = array_merge($sets, $opposite->tagsets);
+                    $opposite->tagsets = $tagsets;
+                }
+            }
         }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
