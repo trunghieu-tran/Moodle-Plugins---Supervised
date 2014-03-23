@@ -317,12 +317,12 @@ $string['description_onceonly_node_subexpr_once_name'] = 'однократная
 $string['description_grouping_node_subexpr'] = 'группировка: [ {$a->firstoperand} ]';
 $string['description_duplicate_node_subexpr'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [ {$a->firstoperand} ]';
 // TYPE_NODE_COND_SUBEXPR ({$a->firstoperand} - first option; {$a->secondoperand} - second option; {$a->cond} - condition )
-$string['description_subexpr_node_cond_subexpr'] = 'если подмаска #{$a->number} была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
-$string['description_subexpr_node_cond_subexpr_name'] = 'если подмаска "{$a->name}" была успешно сопоставлена, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr'] = 'подмаска #{$a->number} была успешно сопоставлена';
+$string['description_subexpr_node_cond_subexpr_name'] = 'подмаска "{$a->name}" была успешно сопоставлена';
 $string['description_recursion_node_cond_subexpr'] = 'подмаска #{$a->number} рекурсивно сопоставляется';
 $string['description_recursion_node_cond_subexpr_all'] = 'весь шаблон рекурсивно сопоставляется';
 $string['description_recursion_node_cond_subexpr_name'] = 'подмаска "{$a->name}" рекурсивно сопоставляется';
-$string['description_recursion_node_wrapper'] = 'если {$a->recursioncond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
+$string['description_subexpr_node_cond_subexpr_wrapper'] = 'если {$a->cond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
 $string['description_define_node_cond_subexpr'] = 'описание {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'если {$a->cond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' иначе проверить: [{$a->secondoperand}]';
