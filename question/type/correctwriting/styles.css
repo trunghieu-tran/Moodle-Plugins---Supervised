@@ -1,0 +1,76 @@
+/*.que.shortanswer .answer {
+    padding: 0.3em;
+    width: auto;
+    display: inline;
+}
+.que.shortanswer .answer input {
+    width: 80%;
+}*/
+
+/* Editing form. */
+body#page-question-type-correctwriting div[id^=fitem_id_][id*=answer_] .fitemtitle label{
+    font-weight: bold;
+}
+
+body#page-question-type-correctwriting div[id^=fitem_id_][id*=answer_] {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-bottom: 0;
+}
+
+body#page-question-type-correctwriting div[id^=fitem_id_][id*=fraction_] {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-question-type-correctwriting div[id^=fitem_id_][id*=lexemedescriptions_] {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-question-type-correctwriting div[id^=fitem_id_][id*=feedback_] {
+    background: #EEE;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+}
+
+/*body#page-question-type-correctwriting div .fitem {
+    background: #EEE;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+    border-bottom: 0;
+}*/
+
+body#page-question-type-correctwriting div[id^=fitem_id_fraction_] + .fitem {
+    background: #EEE;
+    border-left: 1px solid #BBB;
+    border-right: 1px solid #BBB;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 5px;
+    padding-bottom: 1px;
+}
