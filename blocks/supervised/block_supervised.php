@@ -358,7 +358,7 @@ class block_supervised extends block_base {
         } else {
             // Display form.
             $toform['id']               = $COURSE->id;
-            $toform['duration']         = $CFG->block_supervised_session_duration;
+            $toform['duration']         = $this->config->duration;
             $toform['lessontypeid']     = 0;
 
             $mform->set_data($toform);
@@ -451,6 +451,19 @@ class block_supervised extends block_base {
         return array(
             'all' => false,
             'course-view' => true);
+    }
+
+    /**
+     * Function sets up duration value for current course if it wasn't saved before.
+     */
+    public function specialization() {
+        global $CFG;
+        if (empty($this->config)) {
+            $this->config = new stdClass();
+        }
+        if (empty($this->config->duration)) {
+            $this->config->duration = $CFG->block_supervised_session_duration;
+        }
     }
 
     public function get_content() {

@@ -58,10 +58,16 @@ if (!$id) {   // Add mode.
     $title = get_string('addsessionpagetitle', 'block_supervised');
     $heading = get_string('addingnewsession', 'block_supervised');
 
+    // Find block instance.
+    $coursecontext = context_course::instance($course->id);
+    $blockrecord = $DB->get_record('block_instances', array('blockname' => 'supervised',
+        'parentcontextid' => $coursecontext->id), '*', MUST_EXIST);
+    $supervisedinstance = block_instance('supervised', $blockrecord);
+
     // Setting default values.
     $toform['teacherid']    = $USER->id;
     $toform['sendemail']    = 1;
-    $toform['duration']     = $CFG->block_supervised_session_duration;
+    $toform['duration']     = $supervisedinstance->config->duration;
     $toform['lessontypeid'] = 0;
     $toform['coursename']   = html_writer::link(new moodle_url("/course/view.php?id={$course->id}"), $course->fullname);
 } else {     // Edit mode.
