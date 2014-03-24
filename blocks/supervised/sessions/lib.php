@@ -585,6 +585,10 @@ function get_sessions_filter_user_preferences() {
     if ( !isset($pref['block_supervised_page']) ) {
         $pref['block_supervised_page'] = 0;
     }
+    if ( !isset($pref['block_supervised_timestamp']) ) {    // Last saved preferences time.
+        $pref['block_supervised_timestamp'] = make_timestamp($date['year'], $date['mon'],
+            $date['mday'], $date['hours'], $date['minutes'], $date['seconds']);
+    }
     if ( !isset($pref['block_supervised_from']) ) {
         $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'], $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
     }
@@ -610,8 +614,14 @@ function get_sessions_filter_user_preferences() {
     return $pref;
 }
 
-
+/**
+ * Function checks user preferences and may do some changes:
+ * If the current page saved in block_supervised_page is empty (no sessions) => decrease current page to last valid page
+ * If last preferences saved earlier than 24h => update preferences to defaults.
+ * @param $pref array user preferences
+ */
 function check_sessions_filter_user_preferences(&$pref) {
+    global $USER, $COURSE, $CFG;
     // Check if there are any session on the current page.
     $sessions = build_sessions_array(
         $pref['block_supervised_page'] * $pref['block_supervised_perpage'],
@@ -619,13 +629,30 @@ function check_sessions_filter_user_preferences(&$pref) {
         $pref['block_supervised_to'],           $pref['block_supervised_teacher'],
         $pref['block_supervised_course'],       $pref['block_supervised_classroom'],
         $pref['block_supervised_lessontype'],   $pref['block_supervised_state']);
-    if ( $sessions['totalcount'] > 0 && count($sessions['sessions'])==0 ) {
+    if ( $sessions['totalcount'] > 0 && count($sessions['sessions']) == 0 ) {
         // Current page is empty but we have some sessions - decrease current page number to last valid page.
         $totalpages = floor($sessions['totalcount'] / $pref['block_supervised_perpage']);
         if ($sessions['totalcount'] % $pref['block_supervised_perpage'] > 0) {
             $totalpages++;
         }
         $pref['block_supervised_page'] = $totalpages - 1;
+    }
+
+    // Check timestamp.
+    $date = usergetdate(time());
+    $curtimestamp = make_timestamp($date['year'], $date['mon'],
+        $date['mday'], $date['hours'], $date['minutes'], $date['seconds']);
+    if($curtimestamp - $pref['block_supervised_timestamp'] > 86400) {
+        // Last preferences saved earlier 24h => update preferences to defaults.
+        $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'],
+            $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
+        $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'],$date['mday'], 23, 55, 0);
+        $pref['block_supervised_page'] = 0;
+        $pref['block_supervised_teacher'] = $USER->id;
+        $pref['block_supervised_course'] = $COURSE->id;
+        $pref['block_supervised_lessontype'] = -1;
+        $pref['block_supervised_classroom'] = 0;
+        $pref['block_supervised_state'] = 0;
     }
 }
 
@@ -635,5 +662,10 @@ function save_sessions_filter_user_preferences($pref) {
     if ( isset($pref['_lastloaded']) ) {
         unset($pref['_lastloaded']);
     }
+    // Update timestamp.
+    $date = usergetdate(time());
+    $pref['block_supervised_timestamp'] = make_timestamp($date['year'], $date['mon'],
+        $date['mday'], $date['hours'], $date['minutes'], $date['seconds']);
+
     set_user_preferences($pref);
 }
