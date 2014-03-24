@@ -625,11 +625,11 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 
         if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
             // TODO: refactor this and below
-            $key = 'description_leaf_backref';
+            $key = 'description_subexpr_node_cond_subexpr';
             if (is_string($this->pregnode->number)) {
                 $key .= '_name';
             }
-            $label = array(get_string($key, 'qtype_preg', $this->pregnode->number));
+            $label = array(get_string($key, 'qtype_preg', $this->pregnode));
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
             $key = 'description_recursion_node_cond_subexpr';
