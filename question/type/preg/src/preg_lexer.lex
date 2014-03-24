@@ -182,7 +182,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\n',
                      '\r',
                      '\t',
+                     '\0',
                      // \ddd
+                     '\o',
                      '\x');
     }
 
@@ -195,7 +197,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\n',
                      '\r',
                      '\t',
+                     '\0',
                      // \ddd
+                     '\o',
                      '\x');
     }
 
@@ -208,7 +212,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      '\n' => 0x0A,
                      '\r' => 0x0D,
                      '\t' => 0x09,
+                     // \0dd
                      // \ddd
+                     // \o
                      // \x
                         );
 
@@ -237,12 +243,27 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
             return $code;
         }
 
+        if ($seq[1] == '0') {
+            if ($len == 2) {
+                return 0;
+            }
+            $start = 2;
+            $end = $len - 1;
+            return octdec(core_text::substr($seq, $start, $end - $start + 1));
+        }
+
+        if ($seq[1] == 'o') {
+            $start = 3;
+            $end = $len - 2;    // always followed by {...}
+            return octdec(core_text::substr($seq, $start, $end - $start + 1));
+        }
+
         if ($seq[1] == 'x') {
             if ($len == 2) {
                 return 0;
             }
             $start = 2;
-            $end = core_text::strlen($seq) - 1;
+            $end = $len - 1;
             if ($seq[2] == '{') {
                 $start++;
                 $end--;
@@ -1536,22 +1557,43 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     }
     return $res;
 }
+<YYINITIAL> \\0[0-9]?[0-9]? {
+    $text = $this->yytext();
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0' . decoct($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0' . decoct($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else {
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+    }
+}
+<YYINITIAL> "\o{"[0-9]+"}" {
+    $text = $this->yytext();
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0' . decoct($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0' . decoct($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else {
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+    }
+}
 <YYINITIAL> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
-    if ($this->yylength() < 2) {
-        $str = qtype_preg_unicode::substr($text, 1);
-        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
     } else {
-        $code = self::code_of_char_escape_sequence($text);
-        if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code));
-            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
-        } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code));
-            return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
-        } else {
-            return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
-        }
+        return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
     }
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
@@ -1806,25 +1848,32 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         }
     }
 }
-<YYCHARSET> \\[0-7][0-7]?[0-7]? {
+<YYCHARSET> \\[0-9][0-9]?[0-9]? {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
+<YYCHARSET> "\o{"[0-9]+"}" {
+    $text = $this->yytext();
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0' . decoct($code), $this->charset);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0' . decoct($code), $this->charset);
+    } else {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
+    }
+}
 <YYCHARSET> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
-    if ($this->yylength() < 2) {
-        $str = qtype_preg_unicode::substr($text, 1);
-        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
+    $code = self::code_of_char_escape_sequence($text);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
+        $this->charset->userinscription[] = new qtype_preg_userinscription($text);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
     } else {
-        $code = self::code_of_char_escape_sequence($text);
-        if ($code > qtype_preg_unicode::max_possible_code()) {
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . dechex($code), $this->charset);
-            $this->charset->userinscription[] = new qtype_preg_userinscription($text);
-        } else if (0xd800 <= $code && $code <= 0xdfff) {
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, '0x' . dechex($code), $this->charset);
-        } else {
-            $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
-        }
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8($code));
     }
 }
 <YYCHARSET> "\x{"[0-9a-fA-F]+"}" {
