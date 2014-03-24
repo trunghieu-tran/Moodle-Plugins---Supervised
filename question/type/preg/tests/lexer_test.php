@@ -1607,7 +1607,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE);
     }
     function test_backslash() {
-        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\>\<\%\a\e\f\n\r\cz\c{\c;\u3f1\U\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}\p{L&}');
+        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\>\<\%\a\e\f\n\r\cz\c{\c;\u3f1\U\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}\p{L&}[\x]');
         $token = $lexer->nextToken();// \\
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -1635,7 +1635,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// \x
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->data->string() === 'x');
+        $this->assertTrue($token->value->flags[0][0]->data->string() === chr(0));
         $token = $lexer->nextToken();// \x23
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -1768,6 +1768,10 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::UPROP_Llut);
         $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();// [\x]
+        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === chr(0));
     }
     function test_anchors() {
         $lexer = $this->create_lexer('^a|b$');
