@@ -128,7 +128,8 @@ class qtype_preg_lexer extends JLexBase  {
                      // \ddd
                      // \x
                         );
-        if (core_text::strlen($seq) < 2) {
+        $len = core_text::strlen($seq);
+        if ($len < 2) {
             return null;
         }
         $octal = core_text::substr($seq, 1);
@@ -148,6 +149,9 @@ class qtype_preg_lexer extends JLexBase  {
             return $code;
         }
         if ($seq[1] == 'x') {
+            if ($len == 2) {
+                return 0;
+            }
             $start = 2;
             $end = core_text::strlen($seq) - 1;
             if ($seq[2] == '{') {
@@ -6527,7 +6531,7 @@ array(
 						case 30:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -7355,7 +7359,7 @@ array(
 						case 114:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -7716,7 +7720,7 @@ array(
 						case 148:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -7997,7 +8001,7 @@ array(
 						case 175:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -8048,7 +8052,7 @@ array(
 						case 179:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -8113,7 +8117,7 @@ array(
 						case 185:
 							{
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {

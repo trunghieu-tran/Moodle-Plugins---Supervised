@@ -212,7 +212,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
                      // \x
                         );
 
-        if (core_text::strlen($seq) < 2) {
+        $len = core_text::strlen($seq);
+
+        if ($len < 2) {
             return null;
         }
 
@@ -236,6 +238,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         }
 
         if ($seq[1] == 'x') {
+            if ($len == 2) {
+                return 0;
+            }
             $start = 2;
             $end = core_text::strlen($seq) - 1;
             if ($seq[2] == '{') {
@@ -1533,7 +1538,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 }
 <YYINITIAL> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         return $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
@@ -1807,7 +1812,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 }
 <YYCHARSET> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
-    if ($this->yylength() < 3) {
+    if ($this->yylength() < 2) {
         $str = qtype_preg_unicode::substr($text, 1);
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, $str);
     } else {
