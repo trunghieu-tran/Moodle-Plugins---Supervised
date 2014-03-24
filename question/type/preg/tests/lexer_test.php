@@ -1605,6 +1605,20 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === qtype_preg_parser::CONDSUBEXPR);
         $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE);
+        $lexer = $this->create_lexer("(?(R)(?'R'(?(R)");
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type === qtype_preg_parser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 0);
+        $token = $lexer->nextToken();   // (?'R'
+        $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->name === 'R');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type === qtype_preg_parser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token[0]->value->number === 'R');
     }
     function test_backslash() {
         $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\223\o{223}\x\x23\x{7ff}\d\s\t\b\B\>\<\%\a\e\f\n\r\cz\c{\c;\u3f1\U\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}\p{L&}[\023][\223][\x]');

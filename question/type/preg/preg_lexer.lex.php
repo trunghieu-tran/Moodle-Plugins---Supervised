@@ -7084,6 +7084,10 @@ array(
 						case 77:
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
+    // Special case: (?(R with existing subpattern named "R"
+    if ($text == '(?(R)' && array_key_exists('R', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, 'R', ')');
+    }
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     return $this->form_recursive_cond_subexpr($text, $number);
 }
@@ -7981,6 +7985,10 @@ array(
 						case 164:
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
+    // Special case: (?(R with existing subpattern named "R"
+    if ($text == '(?(R)' && array_key_exists('R', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, 'R', ')');
+    }
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     return $this->form_recursive_cond_subexpr($text, $number);
 }
@@ -8188,6 +8196,10 @@ array(
 						case 185:
 							{         /* (?(R)... or (?(Rn)...     Conditional subexpression - overall or specific group recursion condition */
     $text = $this->yytext();
+    // Special case: (?(R with existing subpattern named "R"
+    if ($text == '(?(R)' && array_key_exists('R', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, 'R', ')');
+    }
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     return $this->form_recursive_cond_subexpr($text, $number);
 }
