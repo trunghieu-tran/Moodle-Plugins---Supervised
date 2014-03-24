@@ -31,11 +31,12 @@ class qtype_preg_cross_tests_future {
     
     // For asserts with modifiers.
     function data_for_test_assertions_modifier_1() {
-        $test1 = array( 'str'=>"abc\nab",	
+        $test1 = array( 'str'=>"abc\nab",   
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>5));
+
         $test2 = array( 'str'=>"klabc\nab",
                         'is_match'=>false,
                         'full'=>false,
@@ -43,6 +44,7 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(),
                         'left'=>array(5),
                         'next'=>'a');
+        
         $test3 = array( 'str'=>'abcab',
                         'is_match'=>true,
                         'full'=>false,
@@ -63,12 +65,12 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>5));
 
         $test2 = array( 'str'=>"klabc\nab",
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(5),
-                        'next'=>'a');
+                        'index_first'=>array(0=>6),
+                        'length'=>array(0=>2),
+                        'left'=>array(3),
+                        'next'=>'\n');
 
         $test3 = array( 'str'=>"kl\nab\nab\nab\nab",
                         'is_match'=>true,
@@ -199,8 +201,8 @@ class qtype_preg_cross_tests_future {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
-                        'next'=> '\n');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=> 'NEXT_CHAR_CANNOT_GENERATE');
   
         return array('regex'=>'(?m)$a^',
                      'tests'=>array($test1));
@@ -234,7 +236,7 @@ class qtype_preg_cross_tests_future {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'NEXT_CHAR_END_HERE');
 
         return array('regex'=>'(?m)a\nb\Z\n',
@@ -294,40 +296,13 @@ class qtype_preg_cross_tests_future {
                      'tests'=>array($test1, $test2, $test3));
     }
     
-    function data_for_test_assertions_modifier_10() {
-        $test1 = array( 'str'=>"a\nb\n",
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3),
-                        'left'=>array(0),
-                        'next'=>'NEXT_CHAR_END_HERE');
-
-        $test2 = array( 'str'=>"kl\nkl",
-                        'is_match'=>false,
-                        'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(3),
-                        'next'=>'a');
-        
-        $test3 = array( 'str'=>"a\nb",
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3));
-
-        return array('regex'=>'a\nb\z',
-                     'tests'=>array($test1, $test2, $test3));
-    }
-    
     function data_for_test_assertions_modifier_11() {
         $test1 = array( 'str'=>"a\nb\n",
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
-                        'left'=>array(0),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=> 'NEXT_CHAR_CANNOT_GENERATE ');
 
         return array('regex'=>'(?D)a$\n',
@@ -395,10 +370,10 @@ class qtype_preg_cross_tests_future {
     function data_for_test_assertions_modifier_15() {
         $test1 = array( 'str'=>"a\nb\n",
                         'is_match'=>true,
-                        'full'=>true,
+                        'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
-                        'left'=>array(2),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>' NEXT_CHAR_CANNOT_GENERATE ');
 
         return array('regex'=>'(?m)a$[ab0-9]^b',
@@ -497,8 +472,8 @@ class qtype_preg_cross_tests_future {
         $test3 = array( 'str'=>"a\n",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>2, 1=>0),
                         'left'=>array(1),  
                         'next'=>'c');
                         
@@ -539,7 +514,7 @@ class qtype_preg_cross_tests_future {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>10, 1=>9));
+                        'length'=>array(0=>4, 1=>3));
 
         return array('regex'=>'(?m)a(ab\n)?',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -582,8 +557,8 @@ class qtype_preg_cross_tests_future {
         $test1 = array( 'str'=>"ab\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3));
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>3, 1=>3));
 
         $test2 = array( 'str'=>'ab',
                         'is_match'=>true,
@@ -616,13 +591,13 @@ class qtype_preg_cross_tests_future {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>3, 1=>2));
+                        'length'=>array(0=>1, 1=>0));
 
         $test2 = array( 'str'=>"\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1));
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0));
 
         $test3 = array( 'str'=>'',
                         'is_match'=>false,
@@ -634,11 +609,9 @@ class qtype_preg_cross_tests_future {
 
         $test4 = array( 'str'=>"\na",
                         'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
-                        'left'=>array(1),  
-                        'next'=>'\n');
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'(?m)[a-z\n](^a$\n |)',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -654,7 +627,7 @@ class qtype_preg_cross_tests_future {
         $test2 = array( 'str'=>"\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'index_first'=>array(0=>0, 1=>1),
                         'length'=>array(0=>1, 1=>0));
 
 
@@ -669,7 +642,7 @@ class qtype_preg_cross_tests_future {
         $test4 = array( 'str'=>"\na",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'index_first'=>array(0=>0, 1=>1),
                         'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'(?m)\n(^|)',
@@ -686,16 +659,14 @@ class qtype_preg_cross_tests_future {
         $test2 = array( 'str'=>"a\na\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>4));
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>4, 1=>2));
 
         $test3 = array( 'str'=>'',
-                        'is_match'=>false,
-                        'full'=>false,
+                        'is_match'=>true,
+                        'full'=>true,
                         'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(2),  
-                        'next'=>'a');
+                        'length'=>array());
 
         $test4 = array( 'str'=>"\na\na",
                         'is_match'=>true,
@@ -739,21 +710,21 @@ class qtype_preg_cross_tests_future {
         $test5 = array( 'str'=>"ab\n\n\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>2),
-                        'length'=>array(0=>5, 1=>1, 2=>3));
+                        'index_first'=>array(0=>0, 1=>0, 2=>4),
+                        'length'=>array(0=>5, 1=>1, 2=>1));
 
         return array('regex'=>'(?m)\A(^a|)b($\n)*\z',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
     
     function data_for_test_assertions_modifier_26() {
-        $test1 = array( 'str'=>"abc\nab",	
-                        'is_match'=>false,
+        $test1 = array( 'str'=>"abc\nab",   
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(5),  
-                        'next'=>'a');
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),  
+                        'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
         $test2 = array( 'str'=>"klabc\nab",
                         'is_match'=>false,
