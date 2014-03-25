@@ -625,8 +625,8 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Returns the start state for automaton.
      */
-    public function start_states() {
-        return $this->startstates;
+    public function start_states($subpattern = 0) {
+        return $this->startstates[$subpattern];
     }
 
     /**
@@ -634,8 +634,8 @@ abstract class qtype_preg_finite_automaton {
      *
      * TODO - determine, whether we could get automaton with several end states - then return array.
      */
-    public function end_states() {
-        return $this->endstates;
+    public function end_states($subpattern = 0) {
+        return $this->endstates[$subpattern];
     }
 
     public function is_empty() {
