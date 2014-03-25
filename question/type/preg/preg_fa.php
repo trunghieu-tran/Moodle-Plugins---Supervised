@@ -1745,8 +1745,21 @@ abstract class qtype_preg_finite_automaton {
                             //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
                              //$newfront[] = $tran->to;
                                 if ($this->go_round_transitions($tran)) {
+                                    $nexttrans = $this->get_adjacent_transitions($state, true);
+                                    if (empty($nexttrans) && !$this->has_endstate($state)) {
+                                        $newfront = array_merge($newfront, array_keys($this->get_adjacent_transitions($state, false)));
+                                        foreach ($newfront as $newstate) {
+                                            if (in_array($newstate, $stateschecked)) {
+                                                $nexttrans = $this->get_adjacent_transitions($newstate, true);
+                                                foreach ($nexttrans as $newtran) {
+                                                    $newfront[] = $newtran->to;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        $newfront[] = $state;
+                                    }
 
-                                    $newfront[] = $state;
                                 } else {
                                     $newfront[] = $tran->to;
                                 }
