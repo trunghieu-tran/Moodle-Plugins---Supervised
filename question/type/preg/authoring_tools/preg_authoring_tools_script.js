@@ -889,6 +889,7 @@ M.preg_authoring_tools_script = (function ($) {
         disable_graph : function() {
             var graph_img = $('#graph_img');
             graph_img.panzoom("instance")._unbind();
+            graph_img.off('mousewheel.focal', this._zoom);
         },
         
         enable_tree : function() {
@@ -899,6 +900,7 @@ M.preg_authoring_tools_script = (function ($) {
         enable_graph : function() {
             var graph_img = $('#graph_img');
             graph_img.panzoom("instance")._bind();
+            graph_img.on('mousewheel.focal', this._zoom);
         },
 
         reset_all : function() {
