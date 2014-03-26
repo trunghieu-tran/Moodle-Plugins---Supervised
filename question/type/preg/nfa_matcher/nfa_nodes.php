@@ -88,13 +88,6 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
             }
         }
     }
-
-    public function after_build($body) {
-        $this->remove_all_start_states();
-        $this->remove_all_end_states();
-        $this->add_start_state($body['start']);
-        $this->add_end_state($body['end']);
-    }
 }
 
 /**

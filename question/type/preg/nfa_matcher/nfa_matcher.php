@@ -34,7 +34,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     public $automaton = null;          // An NFA corresponding to the given regex.
 
     protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
-    protected $subexprbordersmap = array();
     protected $generateextensionforeachmatch = false;
 
     public function name() {
@@ -137,7 +136,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Updates all fields in the newstate after a transition match
      */
     protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
-        $endstates = $this->end_states($subexpr);
+        $endstates = $this->automaton->end_states($subexpr);
 
         $newstate->state = $transition->to;
 
@@ -206,7 +205,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     protected function get_resume_state($str, $laststate, $subexpr = 0) {
-        $endstates = $this->end_states($subexpr);
+        $endstates = $this->automaton->end_states($subexpr);
 
         if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             // The last transition was a partially matched backreference; we can only continue from this transition.
@@ -260,7 +259,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_nfa_exec_state.
      */
     protected function generate_extension_brute_force($str, $laststate, $subexpr = 0) {
-        $endstates = $this->end_states($subexpr);
+        $endstates = $this->automaton->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
@@ -328,7 +327,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_nfa_exec_state.
      */
     protected function generate_extension_fast($str, $laststate, $subexpr = 0) {
-        $endstates = $this->end_states($subexpr);
+        $endstates = $this->automaton->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state, $endstates)) {
             return $resumestate;
@@ -441,7 +440,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $curstates = array();    // States which the automaton is in at the current wave front.
         $lazystates = array();   // States reached lazily.
 
-        foreach ($this->start_states($subexpr) as $state) {
+        foreach ($this->automaton->start_states($subexpr) as $state) {
             $curstates[] = $this->create_initial_state($state, $str, $startpos, $prevlevelstate);
         }
 
@@ -517,8 +516,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
 
-        $startstates = $this->start_states($subexpr);
-        $endstates = $this->end_states($subexpr);
+        $startstates = $this->automaton->start_states($subexpr);
+        $endstates = $this->automaton->end_states($subexpr);
 
         $endstatereached = false;
 
@@ -810,20 +809,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
     }
 
-    protected function start_states($subexpr = 0) {
-        if (array_key_exists($subexpr, $this->subexprbordersmap)) {
-            return $this->subexprbordersmap[$subexpr]['start'];
-        }
-        return array();
-    }
-
-    protected function end_states($subexpr = 0) {
-        if (array_key_exists($subexpr, $this->subexprbordersmap)) {
-            return $this->subexprbordersmap[$subexpr]['end'];
-        }
-        return array();
-    }
-
     /**
      * Constructs an NFA corresponding to the given node.
      * @param $ast_node - object of qtype_preg_node child class.
@@ -838,7 +823,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $stack = array();
             $dst_node->create_automaton($result, $stack);
             $body = array_pop($stack);
-            $result->after_build($body);
+            $result->calculate_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
             //$result->merge_epsilons();
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
@@ -860,7 +845,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $this->automaton = $nfa;
             $this->nestingmap = array();
             $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
-            $this->subexprbordersmap = $this->automaton->calculate_subexpr_borders();
             $this->calculate_generateextensionforeachmatch();
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.

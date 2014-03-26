@@ -623,16 +623,14 @@ abstract class qtype_preg_finite_automaton {
     abstract public function should_be_deterministic();
 
     /**
-     * Returns the start state for automaton.
+     * Returns the start states for automaton.
      */
     public function start_states($subpattern = 0) {
         return $this->startstates[$subpattern];
     }
 
     /**
-     * Return the end state of the automaton.
-     *
-     * TODO - determine, whether we could get automaton with several end states - then return array.
+     * Return the end states of the automaton.
      */
     public function end_states($subpattern = 0) {
         return $this->endstates[$subpattern];
@@ -650,14 +648,13 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Calculates a map where keys are subexpr numbers and values are start and end states
+     * Calculates where subexprs start and end.
      */
-    public function calculate_subexpr_borders() {
+    public function calculate_start_and_end_states() {
         $result = array();
-        $result[0] = array('start'=>array(), 'end'=>array());
-
+        $this->startstates = array();
+        $this->endstates = array();
         $states = $this->get_states();
-
         foreach ($states as $state) {
             $outgoing = $this->get_adjacent_transitions($state, true);
             foreach ($outgoing as $transition) {
@@ -674,25 +671,22 @@ abstract class qtype_preg_finite_automaton {
                         $keys[] = 0;
                     }
                     foreach ($keys as $key) {
-                        if (!array_key_exists($key, $result)) {
-                            $result[$key] = array('start'=>array(), 'end'=>array());
+                        if (!array_key_exists($key, $this->startstates)) {
+                            $this->startstates[$key] = array();
                         }
-                        if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN) {
-                            if (!in_array($transition->from, $result[$key]['start'])) {
-                                $result[$key]['start'][] = $transition->from;
-                            }
-                        } else {
-                            if (!in_array($transition->to, $result[$key]['end'])) {
-                                $result[$key]['end'][] = $transition->to;
-                            }
+                        if (!array_key_exists($key, $this->endstates)) {
+                            $this->endstates[$key] = array();
+                        }
+                        if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN && !in_array($transition->from, $this->startstates[$key])) {
+                            $this->startstates[$key][] = $transition->from;
+                        }
+                        if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE && !in_array($transition->to, $this->endstates[$key])) {
+                            $this->endstates[$key][] = $transition->to;
                         }
                     }
-
                 }
             }
         }
-
-        return $result;
     }
 
     /**
@@ -740,8 +734,8 @@ abstract class qtype_preg_finite_automaton {
     public function reachable_states($backwards = false) {
         // Initialization wavefront.
         $front = $backwards
-               ? array_values($this->endstates)
-               : array_values($this->startstates);
+               ? array_values($this->end_states())
+               : array_values($this->start_states());
 
         $reached = array();
 
@@ -796,9 +790,9 @@ abstract class qtype_preg_finite_automaton {
                             ? $id
                             : $this->statenumbers[$id];
                 $tmp = '"' . $realnumber . '"';
-                if (in_array($id, $this->startstates)) {
+                if (in_array($id, $this->start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
-                } else if (in_array($id, $this->endstates)) {
+                } else if (in_array($id, $this->end_states())) {
                     $end .= "   {$tmp}[shape=doublecircle];\n";
                 }
 
@@ -828,8 +822,8 @@ abstract class qtype_preg_finite_automaton {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->startstates)) {
-            $this->startstates[] = $state;
+        if (!in_array($state, $this->start_states())) {
+            $this->startstates[0][] = $state;
         }
     }
 
@@ -840,8 +834,8 @@ abstract class qtype_preg_finite_automaton {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->endstates)) {
-            $this->endstates[] = $state;
+        if (!in_array($state, $this->end_states())) {
+            $this->endstates[0][] = $state;
         }
     }
 
@@ -849,16 +843,16 @@ abstract class qtype_preg_finite_automaton {
      * Remove the end state of the automaton.
      */
     public function remove_end_state($state) {
-        unset($this->endstates[array_search($state, $this->endstates)]);
-        $this->endstates = array_values($this->endstates);
+        unset($this->endstates[0][array_search($state, $this->endstates[0])]);
+        $this->endstates[0] = array_values($this->endstates[0]);
     }
 
     /**
      * Remove the start state of the automaton.
      */
     public function remove_start_state($state) {
-        unset($this->startstates[array_search($state, $this->startstates)]);
-        $this->startstates = array_values($this->startstates);
+        unset($this->startstates[0][array_search($state, $this->startstates[0])]);
+        $this->startstates[0] = array_values($this->startstates[0]);
     }
 
     /**
@@ -938,13 +932,17 @@ abstract class qtype_preg_finite_automaton {
         $this->statecount--;
 
         // Remove from start and end states.
-        $key = array_search($stateid, $this->startstates);
-        if ($key !== false) {
-            unset($this->startstates[$key]);
+        foreach ($this->startstates as $subpatt => $states) {
+            $key = array_search($stateid, $states);
+            if ($key !== false) {
+                unset($this->startstates[$subpatt][$key]);
+            }
         }
-        $key = array_search($stateid, $this->endstates);
-        if ($key !== false) {
-            unset($this->endstates[$key]);
+        foreach ($this->endstates as $subpatt => $states) {
+            $key = array_search($stateid, $states);
+            if ($key !== false) {
+                unset($this->endstates[$subpatt][$key]);
+            }
         }
     }
 
@@ -1035,14 +1033,14 @@ abstract class qtype_preg_finite_automaton {
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
-        return array_search($state, $this->startstates) !== false;
+        return array_search($state, $this->start_states()) !== false;
     }
 
     /**
      * Check if such state is in array of end states.
      */
     public function has_endstate($state) {
-        return array_search($state, $this->endstates) !== false;
+        return array_search($state, $this->end_states()) !== false;
     }
 
     /**
@@ -1087,7 +1085,7 @@ abstract class qtype_preg_finite_automaton {
             }
         }
 
-        $curstates = $this->startstates;
+        $curstates = $this->start_states();
         while (!empty($curstates)) {
             $reached = array();
             while (!empty($curstates)) {
@@ -1098,7 +1096,7 @@ abstract class qtype_preg_finite_automaton {
                     if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
-                    if (in_array($transition->to, $this->endstates)) {
+                    if (in_array($transition->to, $this->end_states())) {
                         continue;
                     }
                     $nexttransitions = $this->get_adjacent_transitions($transition->to, true);
@@ -1160,9 +1158,9 @@ abstract class qtype_preg_finite_automaton {
         $startstates = explode(";", $dotstring[1]);
         // Append start states in automata.
         for ($i = 0; $i < count($startstates) - 1; $i++) {
-            $startstates[$i] = trim($startstates[$i]);
-            $startstates[$i] = trim($startstates[$i], '"');
-            $this->add_state($startstates[$i]);
+            $startstates[0][$i] = trim($startstates[$i]);
+            $startstates[0][$i] = trim($startstates[$i], '"');
+            $this->add_state($startstates[0][$i]);
             $this->add_start_state(($this->statecount) - 1);
         }
         // String of end states split into an array of end states.
@@ -1461,12 +1459,12 @@ abstract class qtype_preg_finite_automaton {
             // Analysis if the end state of intersection includes one of end states of given automata.
             $fastates = $fa->end_states();
             $anotherfastates = $anotherfa->end_states();
-            $states = $this->endstates;
+            $states = $this->end_states();
         } else {
             // Analysis if the start state of intersection includes one of start states of given automata.
             $fastates = $fa->start_states();
             $anotherfastates = $anotherfa->start_states();
-            $states = $this->startstates;
+            $states = $this->start_states();
         }
         // Get real numbers.
         $numbers = $fa->get_state_numbers();
@@ -1531,7 +1529,7 @@ abstract class qtype_preg_finite_automaton {
                     foreach ($set->tags as $tag) {
                         if ($tag->pos == qtype_preg_fa_tag::POS_AFTER_TRANSITION) {
                             $copytags[] = $tag;
-                            unset($set->tags[array_search($tag, $set->tags)]); 
+                            unset($set->tags[array_search($tag, $set->tags)]);
                         }
                     }
                     $newset = new qtype_preg_fa_tag_set();
@@ -1658,7 +1656,7 @@ abstract class qtype_preg_finite_automaton {
                 $this->merge_states($del);
                 // Checking if start state was merged.
                 if ($this->has_endstate($del->to)) {
-                    $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                    $this->endstates[0][array_search($del->to, $this->endstates[0])] = $del->from;
                 }
                 $this->remove_state($del->to);
                 $waschanged = true;
@@ -1702,7 +1700,7 @@ abstract class qtype_preg_finite_automaton {
                 }
                 // Checking if start state was merged.
                 if ($this->has_endstate($del->to)) {
-                    $this->endstates[array_search($del->to, $this->endstates)] = $del->from;
+                    $this->endstates[0][array_search($del->to, $this->endstates[0])] = $del->from;
                 }
                 $this->remove_state($del->to);
                 $waschanged = true;
@@ -1728,7 +1726,7 @@ abstract class qtype_preg_finite_automaton {
             $trantype1 = $transitiontype;
             $trantype2 = $transitiontype;
         }
-        $oldfront = $this->startstates;
+        $oldfront = $this->start_states();
         while (count($oldfront) != 0) {
             $waschanged = false;
             // Analysis transitions of each state.
@@ -2025,7 +2023,7 @@ abstract class qtype_preg_finite_automaton {
         }
         $sourcenumbers = $source->get_state_numbers();
         // Add start states if fa has no one.
-        if (count($this->startstates) == 0) {
+        if (count($this->start_states()) == 0) {
             $sourcestart = $source->start_states();
             foreach ($sourcestart as $start) {
                 $realnumber = $sourcenumbers[$start];
@@ -2321,7 +2319,7 @@ abstract class qtype_preg_finite_automaton {
             $this->remove_state($tran->to);
         }
         $startstates = array_values($this->start_states());
-        if (count($this->endstates) == 0) {
+        if (count($this->end_states()) == 0) {
             $this->add_end_state($startstates[0]);
         }
     }
@@ -2331,7 +2329,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function avoid_wordbreaks() {
         $stateschecked = array();
-        $oldfront = $this->startstates;
+        $oldfront = $this->start_states();
 
         while (count($oldfront) != 0) {
             // Analysis transitions of each state.
@@ -2791,13 +2789,13 @@ abstract class qtype_preg_finite_automaton {
      */
     public function lead_to_one_end() {
         $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $i = count($this->endstates) - 1;
+        $i = count($this->end_states()) - 1;
         if ($i > 0) {
-            $to = $this->endstates[0];
+            $to = $this->endstates[0][0];
         }
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
-            $exendstate = $this->endstates[$i];
+            $exendstate = $this->endstates[0][$i];
             $transitions = $this->get_adjacent_transitions($exendstate, false);
             $epstran = new qtype_preg_fa_transition ($exendstate, $newleaf, $to, current($transitions)->origin, current($transitions)->consumeschars);
             $this->add_transition($epstran);
@@ -2853,7 +2851,7 @@ abstract class qtype_preg_finite_automaton {
         $firstnumbers = $fa->get_state_numbers();
         // Find uncompleted branches.
         if ($direction == 0) {
-            $states = $this->endstates;
+            $states = $this->end_states();
             foreach ($states as $state) {
                 if ($this->is_full_intersect_state($state)) {
                     $front[] = $state;
@@ -2916,7 +2914,7 @@ abstract class qtype_preg_finite_automaton {
                 }
             }
         } else {
-            $states = $this->startstates;
+            $states = $this->start_states();
             foreach ($states as $state) {
                 if ($this->is_full_intersect_state($state)) {
                     $front[] = $state;
