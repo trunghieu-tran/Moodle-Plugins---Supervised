@@ -235,8 +235,8 @@ class qtype_preg_cross_tests_future {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>4),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'length'=>array(0=>3),
+                        'left'=>array(1),
                         'next'=>'NEXT_CHAR_END_HERE');
 
         return array('regex'=>'(?m)a\nb\Z\n',
@@ -532,8 +532,8 @@ class qtype_preg_cross_tests_future {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
-                        'left'=>array(2),  
-                        'next'=>'\n');
+                        'left'=>array(1),  
+                        'next'=>'c');
 
         $test3 = array( 'str'=>'',
                         'is_match'=>false,
@@ -546,8 +546,8 @@ class qtype_preg_cross_tests_future {
         $test4 = array( 'str'=>"ab\nab\nab\nc",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
-                        'length'=>array(0=>10, 1=>9));
+                        'index_first'=>array(0=>0, 1=>6),
+                        'length'=>array(0=>10, 1=>3));
 
         return array( 'regex'=>'(?m)(ab$\n)*c',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -579,8 +579,8 @@ class qtype_preg_cross_tests_future {
         $test4 = array( 'str'=>"ab\nab\nab\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>9));
+                        'index_first'=>array(0=>0, 1=>6),
+                        'length'=>array(0=>9, 1=>3));
 
         return array('regex'=>'(?m)(^ab$\n)+',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -605,7 +605,7 @@ class qtype_preg_cross_tests_future {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),  
-                        'next'=>'\n');
+                        'next'=>'a');
 
         $test4 = array( 'str'=>"\na",
                         'is_match'=>true,
@@ -731,16 +731,16 @@ class qtype_preg_cross_tests_future {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(5),
-                        'next'=>'a');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),  
+                        'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
         $test3 = array( 'str'=>'abcab',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(0=>2),
-                        'next'=>'\n');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),  
+                        'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
         return array('regex'=>'(?D)\Aabc\n$a',
                      'tests'=>array($test1, $test2, $test3));
