@@ -20,7 +20,7 @@
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 M.block_supervised = M.block_supervised || {};
 
 // Code for updating the countdown timer that is used for finish out-of-date sessions automatically.
@@ -41,7 +41,7 @@ M.block_supervised.timer = {
      */
     init: function(Y, duration) {
         M.block_supervised.timer.Y = Y;
-        M.block_supervised.timer.endtime = M.pageloadstarttime.getTime() + duration*1000;
+        M.block_supervised.timer.endtime = M.pageloadstarttime.getTime() + duration * 1000;
         M.block_supervised.timer.update();
 
     },
@@ -59,7 +59,7 @@ M.block_supervised.timer = {
     // Function to update the clock with the current time left, and finish the session if necessary.
     update: function() {
         var Y = M.block_supervised.timer.Y;
-        var secondsleft = Math.floor((M.block_supervised.timer.endtime - new Date().getTime())/1000);
+        var secondsleft = Math.floor((M.block_supervised.timer.endtime - new Date().getTime()) / 1000);
         // If time has expired, finish session simulating mouse click by form button.
         if (secondsleft < 0) {
             M.block_supervised.timer.stop(null);

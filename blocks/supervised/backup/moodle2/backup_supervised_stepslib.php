@@ -76,7 +76,7 @@ class backup_supervised_block_structure_step extends backup_block_structure_step
                 ON {block_supervised_user}.sessionid = {block_supervised_session}.id
 
             WHERE {block_supervised_session}.courseid = :courseid";
-        $user->set_source_sql($select, array('courseid'=>backup::VAR_COURSEID));
+        $user->set_source_sql($select, array('courseid' => backup::VAR_COURSEID));
 
         // Annotations (none).
 

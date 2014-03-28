@@ -86,7 +86,7 @@ function build_sessions_array($limitfrom, $limitnum, $from, $to, $teacher=0, $co
 function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $course=0, $classroom=0, $lessontype=-1, $state=0) {
     global $OUTPUT, $USER, $PAGE, $DB;
 
-    $sessions = build_sessions_array($pagenum*$perpage, $perpage, $from, $to, $teacher, $course, $classroom, $lessontype, $state);
+    $sessions = build_sessions_array($pagenum * $perpage, $perpage, $from, $to, $teacher, $course, $classroom, $lessontype, $state);
     $totalcount = $sessions['totalcount'];
     // Check if any lesson type exists in course.
     if ($course) {
@@ -113,24 +113,24 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         $tablerow = array();
         $tablerow[] = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
         $tablerow[] = $session->classroomname;
-        $tablerow[] = $session->groupname == '' ? get_string('allgroups', 'block_supervised'): $session->groupname;
+        $tablerow[] = $session->groupname == '' ? get_string('allgroups', 'block_supervised') : $session->groupname;
         $tablerow[] = html_writer::link(
             new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
             fullname($session));
         if ($lessontypesexist) {
-            $tablerow[] = $session->lessontypename == ''
-                ? get_string('notspecified', 'block_supervised')
-                : $session->lessontypename;
+            $tablerow[] = $session->lessontypename == '' ?
+                get_string('notspecified', 'block_supervised') :
+                $session->lessontypename;
         }
         $tablerow[] = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
         $tablerow[] = $session->duration;
         $tablerow[] = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
         $tablerow[] = StateSession::get_state_name($session->state);
-        $tablerow[] = ($session->state !=  StateSession::PLANNED) ? $logslink : ('');
+        $tablerow[] = ($session->state != StateSession::PLANNED) ? $logslink : ('');
 
         // Build edit icon.
         $iconedit = '';
-        if ($session->state ==  StateSession::PLANNED) {
+        if ($session->state == StateSession::PLANNED) {
             if (  ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
                 || has_capability('block/supervised:manageallsessions', $PAGE->context) ) {
                 $editurl    = new moodle_url('/blocks/supervised/sessions/addedit.php',
@@ -141,11 +141,11 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         // Build delete icon.
         $icondelete = '';
         if (
-            ($session->state ==  StateSession::PLANNED && $session->teacherid == $USER->id
+            ($session->state == StateSession::PLANNED && $session->teacherid == $USER->id
                 && has_capability('block/supervised:manageownsessions', $PAGE->context))
-            || ($session->state ==  StateSession::PLANNED
+            || ($session->state == StateSession::PLANNED
                 && has_capability('block/supervised:manageallsessions', $PAGE->context))
-            || ($session->state ==  StateSession::FINISHED
+            || ($session->state == StateSession::FINISHED
                 && has_capability('block/supervised:managefinishedsessions', $PAGE->context))
         ) {
             $deleteurl      = new moodle_url('/blocks/supervised/sessions/delete.php',
@@ -245,7 +245,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($courseid) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.courseid = :courseid';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.courseid = :courseid';
         }
@@ -254,7 +254,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($teacherid) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.teacherid = :teacherid';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.teacherid = :teacherid';
         }
@@ -263,7 +263,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($classroomid) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.classroomid = :classroomid';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.classroomid = :classroomid';
         }
@@ -272,7 +272,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($lessontypeid != -1) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.lessontypeid = :lessontypeid';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.lessontypeid = :lessontypeid';
         }
@@ -281,7 +281,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($state) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.state = :state';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.state = :state';
         }
@@ -290,7 +290,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($timestart1) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.timestart >= :timestart1';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.timestart >= :timestart1';
         }
@@ -298,7 +298,8 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     }
     if ($timestart2) {
         if (!$whereflag) {
-            $select .= ' WHERE {block_supervised_session}.timestart <= :timestart2'; $whereflag=true;
+            $select .= ' WHERE {block_supervised_session}.timestart <= :timestart2';
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.timestart <= :timestart2';
         }
@@ -307,7 +308,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($timeend1) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.timeend >= :timeend1';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.timeend >= :timeend1';
         }
@@ -316,7 +317,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($timeend2) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.timeend <= :timeend2';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.timeend <= :timeend2';
         }
@@ -325,7 +326,7 @@ function get_sessions($courseid=0, $teacherid=0, $classroomid=0, $lessontypeid=-
     if ($id) {
         if (!$whereflag) {
             $select .= ' WHERE {block_supervised_session}.id = :id';
-            $whereflag=true;
+            $whereflag = true;
         } else {
             $select .= ' AND {block_supervised_session}.id = :id';
         }
@@ -377,12 +378,12 @@ function mail_newsession($session, $creator) {
     $sessioninfo = new stdClass();
     $sessioninfo->course           = $session->coursename;
     $sessioninfo->classroom        = $session->classroomname;
-    $sessioninfo->group            = $session->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $session->groupname;
-    $sessioninfo->lessontype       = $session->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $session->lessontypename;
+    $sessioninfo->group            = $session->groupname == '' ?
+        get_string('allgroups', 'block_supervised') :
+        $session->groupname;
+    $sessioninfo->lessontype       = $session->lessontypename == '' ?
+        get_string('notspecified', 'block_supervised') :
+        $session->lessontypename;
     $sessioninfo->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $sessioninfo->duration         = $session->duration;
     $sessioninfo->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
@@ -401,10 +402,10 @@ function mail_newsession($session, $creator) {
     $coursecontext = context_course::instance($session->courseid);
     if (has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
         has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
-        $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
-        $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
-        $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
-        $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
+        $editurl             = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$session->courseid&id=$session->id";
+        $deleteurl           = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$session->courseid&id=$session->id";
+        $data->editsession   = get_string('emaileditsessionurl', 'block_supervised', $editurl);
+        $data->deletesession = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
     }
 
     $subjectfields = new stdClass();
@@ -433,12 +434,12 @@ function mail_removedsession($session, $remover) {
     $sessioninfo = new stdClass();
     $sessioninfo->course           = $session->coursename;
     $sessioninfo->classroom        = $session->classroomname;
-    $sessioninfo->group            = $session->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $session->groupname;
-    $sessioninfo->lessontype       = $session->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $session->lessontypename;
+    $sessioninfo->group            = $session->groupname == '' ?
+        get_string('allgroups', 'block_supervised') :
+        $session->groupname;
+    $sessioninfo->lessontype       = $session->lessontypename == '' ?
+        get_string('notspecified', 'block_supervised') :
+        $session->lessontypename;
     $sessioninfo->timestart        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $sessioninfo->duration         = $session->duration;
     $sessioninfo->timeend          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);
@@ -493,12 +494,12 @@ function mail_editedsession($updsession, $editor) {
     $sessioninfo = new stdClass();
     $sessioninfo->course           = $updsession->coursename;
     $sessioninfo->classroom        = $updsession->classroomname;
-    $sessioninfo->group            = $updsession->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $updsession->groupname;
-    $sessioninfo->lessontype       = $updsession->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $updsession->lessontypename;
+    $sessioninfo->group            = $updsession->groupname == '' ?
+        get_string('allgroups', 'block_supervised') :
+        $updsession->groupname;
+    $sessioninfo->lessontype       = $updsession->lessontypename == '' ?
+        get_string('notspecified', 'block_supervised') :
+        $updsession->lessontypename;
     $sessioninfo->timestart        = userdate($updsession->timestart, '%a').' '.userdate($updsession->timestart, $strftimedatetime);
     $sessioninfo->duration         = $updsession->duration;
     $sessioninfo->timeend          = userdate($updsession->timeend, '%a').' '.userdate($updsession->timeend, $strftimedatetime);
@@ -517,8 +518,8 @@ function mail_editedsession($updsession, $editor) {
     $coursecontext = context_course::instance($updsession->courseid);
     if (has_capability('block/supervised:manageownsessions', $coursecontext, $user) ||
         has_capability('block/supervised:manageallsessions', $coursecontext, $user) ) {
-        $editurl                = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
-        $deleteurl              = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
+        $editurl    = $CFG->wwwroot ."/blocks/supervised/sessions/addedit.php?courseid=$updsession->courseid&id=$updsession->id";
+        $deleteurl  = $CFG->wwwroot ."/blocks/supervised/sessions/delete.php?courseid=$updsession->courseid&id=$updsession->id";
         $data->editsession      = get_string('emaileditsessionurl', 'block_supervised', $editurl);
         $data->deletesession    = get_string('emaildeletesessionurl', 'block_supervised', $deleteurl);
     }
@@ -590,7 +591,8 @@ function get_sessions_filter_user_preferences() {
             $date['mday'], $date['hours'], $date['minutes'], $date['seconds']);
     }
     if ( !isset($pref['block_supervised_from']) ) {
-        $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'], $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
+        $pref['block_supervised_from'] =
+            make_timestamp($date['year'], $date['mon'], $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
     }
     if ( !isset($pref['block_supervised_to']) ) {
         $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0);
@@ -642,11 +644,11 @@ function check_sessions_filter_user_preferences(&$pref) {
     $date = usergetdate(time());
     $curtimestamp = make_timestamp($date['year'], $date['mon'],
         $date['mday'], $date['hours'], $date['minutes'], $date['seconds']);
-    if($curtimestamp - $pref['block_supervised_timestamp'] > 86400) {
+    if ( $curtimestamp - $pref['block_supervised_timestamp'] > 86400 ) {
         // Last preferences saved earlier 24h => update preferences to defaults.
         $pref['block_supervised_from'] = make_timestamp($date['year'], $date['mon'],
             $date['mday'] - $CFG->block_supervised_sessions_days_past, 0, 0, 0);
-        $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'],$date['mday'], 23, 55, 0);
+        $pref['block_supervised_to'] = make_timestamp($date['year'], $date['mon'], $date['mday'], 23, 55, 0);
         $pref['block_supervised_page'] = 0;
         $pref['block_supervised_teacher'] = $USER->id;
         $pref['block_supervised_course'] = $COURSE->id;

@@ -21,7 +21,7 @@
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 /**
  * Returns logs array according to specified conditions
  *
@@ -79,7 +79,7 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
 function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $page=0, $perpage=50, $url='') {
     global $OUTPUT, $DB;
 
-    $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page*$perpage, $perpage);
+    $logs = supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $userid, $page * $perpage, $perpage);
     $totalcount = $logs['totalcount'];
 
     echo "<div class=\"info\">\n";
@@ -123,7 +123,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 
         // If $log->url has been trimmed short by the db size restriction
         // code in add_to_log, keep a note so we don't add a link to a broken url.
-        $brokenurl=(core_text::strlen($log->url)==100 && core_text::substr($log->url, 97)=='...');
+        $brokenurl = (core_text::strlen($log->url) == 100 && core_text::substr($log->url, 97) == '...');
 
         $row = array();
 
@@ -136,7 +136,7 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
         $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"),
             fullname($log));
 
-        $displayaction="$log->module $log->action";
+        $displayaction = "$log->module $log->action";
         if ($brokenurl) {
             $row[] = $displayaction;
         } else {
@@ -176,15 +176,13 @@ function print_session_info_form($sessionid) {
         new moodle_url("/course/view.php?id={$session->courseid}"),
         $session->coursename);
     $toform['classroomname']    = $session->classroomname;
-    $toform['groupname']        = $session->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $session->groupname;
-    $toform['teachername']      = html_writer::link(
-        new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
+    $toform['groupname']        =
+        $session->groupname == '' ? get_string('allgroups', 'block_supervised') : $session->groupname;
+    $toform['teachername']      =
+        html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
         fullname($session));
-    $toform['lessontypename']   = $session->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $session->lessontypename;
+    $toform['lessontypename']   =
+        $session->lessontypename == '' ? get_string('notspecified', 'block_supervised') : $session->lessontypename;
     $toform['timestart']        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);

@@ -25,9 +25,11 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     // Default session time.
-    $settings->add(new admin_setting_configtext('block_supervised_session_duration', get_string('settingsdurationtitle', 'block_supervised'),
-                       get_string('settingsdurationdesc', 'block_supervised'), 90, PARAM_INT));
+    $settings->add(new admin_setting_configtext('block_supervised_session_duration',
+        get_string('settingsdurationtitle', 'block_supervised'),
+        get_string('settingsdurationdesc', 'block_supervised'), 90, PARAM_INT));
     // How much days should settings table show by default.
-    $settings->add(new admin_setting_configtext('block_supervised_sessions_days_past', get_string('settingsdayspasttitle', 'block_supervised'),
-                       get_string('settingsdayspastdesc', 'block_supervised'), 7, PARAM_INT));
+    $settings->add(new admin_setting_configtext('block_supervised_sessions_days_past',
+        get_string('settingsdayspasttitle', 'block_supervised'),
+        get_string('settingsdayspastdesc', 'block_supervised'), 7, PARAM_INT));
 }
