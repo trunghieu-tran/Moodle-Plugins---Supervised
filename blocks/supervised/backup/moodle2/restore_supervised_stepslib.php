@@ -21,7 +21,7 @@
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 /**
  * Define all the restore steps that wll be used by the restore_supervised_block_task
  */

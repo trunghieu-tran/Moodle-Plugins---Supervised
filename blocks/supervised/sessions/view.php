@@ -63,7 +63,7 @@ $pref['block_supervised_from']      = optional_param('f',           $pref['block
 $pref['block_supervised_to']        = optional_param('t',           $pref['block_supervised_to'],        PARAM_INT);
 $pref['block_supervised_teacher']   = optional_param('teacher',     $pref['block_supervised_teacher'],   PARAM_INT);
 $pref['block_supervised_course']    = optional_param('course',      $pref['block_supervised_course'],    PARAM_INT);
-$pref['block_supervised_lessontype']= optional_param('lessontype',  $pref['block_supervised_lessontype'],PARAM_INT);
+$pref['block_supervised_lessontype'] = optional_param('lessontype',  $pref['block_supervised_lessontype'], PARAM_INT);
 $pref['block_supervised_classroom'] = optional_param('classroom',   $pref['block_supervised_classroom'], PARAM_INT);
 $pref['block_supervised_state']     = optional_param('state',       $pref['block_supervised_state'],     PARAM_INT);
 check_sessions_filter_user_preferences($pref);

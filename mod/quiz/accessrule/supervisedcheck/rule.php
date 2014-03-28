@@ -161,7 +161,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 $lessontypesinquiz[] = -1;
             }
 
-            for ($i=0; $i<count($lessontypesinquiz); $i++) {
+            for ($i = 0; $i < count($lessontypesinquiz); $i++) {
                 // Update an existing rule if possible.
                 $rule = array_shift($oldrules);
                 if (!$rule) {

@@ -129,8 +129,8 @@ class addedit_session_form extends moodleform {
         $errors = array();
 
         // Session must be active at least after 10 minutes from current time.
-        $sessiontimeend = $data['timestart'] + $data['duration']*60;
-        $minimumtimeend = time() + 10*60;
+        $sessiontimeend = $data['timestart'] + $data['duration'] * 60;
+        $minimumtimeend = time() + 10 * 60;
         if ($sessiontimeend <= $minimumtimeend) {
             $strftimedatetime = get_string('strftimerecent');
             $timeformatted = userdate($minimumtimeend, '%a').' '.userdate($minimumtimeend, $strftimedatetime);

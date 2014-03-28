@@ -107,15 +107,15 @@ if ($mform->is_cancelled()) {
     $toform['coursename']       = html_writer::link(new moodle_url("/course/view.php?id={$courseid}"),
         $session->coursename);
     $toform['classroomname']    = $session->classroomname;
-    $toform['groupname']        = $session->groupname == ''
-        ? get_string('allgroups', 'block_supervised')
-        : $session->groupname;
+    $toform['groupname']        = $session->groupname == '' ?
+        get_string('allgroups', 'block_supervised') :
+        $session->groupname;
     $toform['teachername']      = html_writer::link(
         new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
         fullname($session));
-    $toform['lessontypename']   = $session->lessontypename == ''
-        ? get_string('notspecified', 'block_supervised')
-        : $session->lessontypename;
+    $toform['lessontypename']   = $session->lessontypename == '' ?
+        get_string('notspecified', 'block_supervised') :
+        $session->lessontypename;
     $toform['timestart']        = userdate($session->timestart, '%a').' '.userdate($session->timestart, $strftimedatetime);
     $toform['duration']         = $session->duration;
     $toform['timeend']          = userdate($session->timeend, '%a').' '.userdate($session->timeend, $strftimedatetime);

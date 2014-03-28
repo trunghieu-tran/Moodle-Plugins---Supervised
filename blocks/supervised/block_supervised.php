@@ -103,8 +103,8 @@ class block_supervised extends block_base {
         require_once('sessions/lib.php');
         global $COURSE, $USER;
 
-        $time1          = time() - 20*60;
-        $time2          = time() + 20*60;
+        $time1          = time() - 20 * 60;
+        $time2          = time() + 20 * 60;
         $teacherid      = $USER->id;
         $courseid       = $COURSE->id;
         $stateplanned   = StateSession::PLANNED;
@@ -134,7 +134,7 @@ class block_supervised extends block_base {
                 print_error('noformdesc');
             }
             $mform = new plannedsession_block_form(null, array('lessontype' => $plannedsession->lessontypeid,
-                'needcomment' => $plannedsession->sessioncomment!='' ));
+                'needcomment' => $plannedsession->sessioncomment != '' ));
             if ($fromform = $mform->get_data()) {
                 // Start session and update fields that user could edit.
                 $curtime = time();
@@ -144,8 +144,8 @@ class block_supervised extends block_base {
                 $plannedsession->lessontypeid   = $fromform->lessontypeid;
                 $plannedsession->timestart      = $curtime;
                 $plannedsession->duration       = $fromform->duration;
-                $plannedsession->timeend        = $curtime + $fromform->duration*60;
-                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$plannedsession->classroomid));
+                $plannedsession->timeend        = $curtime + $fromform->duration * 60;
+                $classroom = $DB->get_record('block_supervised_classroom', array('id' => $plannedsession->classroomid));
                 $plannedsession->iplist  = $classroom->iplist;
                 if (!$DB->update_record('block_supervised_session', $plannedsession)) {
                     print_error('insertsessionerror', 'block_supervised');
@@ -206,8 +206,8 @@ class block_supervised extends block_base {
                 print_error('noformdesc');
             }
             $mform = new activesession_block_form(null, array('sessionid' => $activesession->id,
-                'courseid' => $activesession->courseid, 'needcomment' => $activesession->sessioncomment!='',
-                'needlessontype' => $activesession->lessontypeid!=0 ));
+                'courseid' => $activesession->courseid, 'needcomment' => $activesession->sessioncomment != '',
+                'needlessontype' => $activesession->lessontypeid != 0 ));
 
             if ($mform->is_cancelled()) {
                 // Finish session and update timeend and duration fields.
@@ -243,8 +243,8 @@ class block_supervised extends block_base {
                 $activesession->classroomid     = $fromform->classroomid;
                 $activesession->groupid         = $newgroupid;
                 $activesession->duration        = $fromform->duration;
-                $activesession->timeend         = $activesession->timestart  + $fromform->duration*60;
-                $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$activesession->classroomid));
+                $activesession->timeend         = $activesession->timestart + $fromform->duration * 60;
+                $classroom = $DB->get_record('block_supervised_classroom', array('id' => $activesession->classroomid));
                 $activesession->iplist  = $classroom->iplist;
 
                 if (!$DB->update_record('block_supervised_session', $activesession)) {
@@ -340,8 +340,8 @@ class block_supervised extends block_base {
             $fromform->courseid       = $COURSE->id;
             $fromform->teacherid      = $USER->id;
             $fromform->timestart      = $curtime;
-            $fromform->timeend        = $curtime + $fromform->duration*60;
-            $classroom = $DB->get_record('block_supervised_classroom', array('id'=>$fromform->classroomid));
+            $fromform->timeend        = $curtime + $fromform->duration * 60;
+            $classroom = $DB->get_record('block_supervised_classroom', array('id' => $fromform->classroomid));
             $fromform->iplist  = $classroom->iplist;
             if (!$newid = $DB->insert_record('block_supervised_session', $fromform)) {
                 print_error('insertsessionerror', 'block_supervised');
@@ -419,13 +419,13 @@ class block_supervised extends block_base {
                 $toform['teacher']          = html_writer::link(
                     new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
                     fullname($session));
-                $toform['lessontypename']   = $session->lessontypename == ''
-                    ? get_string('notspecified', 'block_supervised')
-                    : $session->lessontypename;
+                $toform['lessontypename']   = $session->lessontypename == '' ?
+                    get_string('notspecified', 'block_supervised') :
+                    $session->lessontypename;
                 $toform['classroomname']    = $session->classroomname;
-                $toform['groupname']        = $session->groupname == ''
-                    ? get_string('allgroups', 'block_supervised')
-                    : $session->groupname;
+                $toform['groupname']        = $session->groupname == '' ?
+                    get_string('allgroups', 'block_supervised') :
+                    $session->groupname;
                 $toform['timestart']        = userdate($session->timestart, $strftimedatetime);
                 $toform['duration']         = $session->duration;
                 $toform['timeend']          = userdate($session->timeend, $strftimedatetime);
@@ -553,8 +553,7 @@ class block_supervised extends block_base {
         cleanup($COURSE->id);
     }
 
-    public function has_config() 
-    {
+    public function has_config() {
         return true;
     }
 }

@@ -180,7 +180,7 @@ function user_active_sessions() {
     // Filter sessions by user's group and ip.
     foreach ($sessions as $id => $session) {
         // Check if current user is in current session's group.
-        $useringroup = $DB->record_exists('block_supervised_user', array('sessionid'=>$id, 'userid'=>$USER->id));
+        $useringroup = $DB->record_exists('block_supervised_user', array('sessionid' => $id, 'userid' => $USER->id));
         // Check if the ip of current user is in classroom's subnet.
         $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
 
