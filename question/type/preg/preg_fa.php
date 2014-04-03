@@ -744,7 +744,7 @@ class qtype_preg_fa {
                 //echo "inner: {$inner->from} -> {$inner->pregleaf->leaf_tohr()} -> {$inner->to}\n";
                 $innerranges = $inner->pregleaf->ranges();
                 foreach ($outertransitions as $outer) {
-                    if ($outer->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    if ($outer->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET || $outer->loopsback) {
                         continue;
                     }
                     //echo "outer: {$outer->from} -> {$outer->pregleaf->leaf_tohr()} -> {$outer->to}\n";
