@@ -121,7 +121,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     }
 
     public function root_subpatt_number() {
-        return $this->matcher->automaton->ast_root()->subpattern;
+        return $this->matcher->get_ast_root()->subpattern;
     }
 
     // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
@@ -227,7 +227,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         $index = array();
         $length = array();
         $subexprs = array(-2);
-        for ($subexpr = 0; $subexpr <= $this->matcher->automaton->max_subexpr(); $subexpr++) {
+        for ($subexpr = 0; $subexpr <= $this->matcher->get_max_subexpr(); $subexpr++) {
             $subexprs[] = $subexpr;
         }
         foreach ($subexprs as $subexpr) {
@@ -257,7 +257,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         $index[0] = $this->startpos;
         $length[0] = $this->length;
         $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
-        $result->set_source_info($this->str, $this->matcher->automaton->max_subexpr(), $this->matcher->get_subexpr_map());
+        $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_map());
         return $result;
     }
 
@@ -342,7 +342,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
         // PCRE/POSIX selection goes on below. Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
-        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->automaton->max_subpatt(); $i++) {
+        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
             $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
             $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
@@ -400,7 +400,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         }
 
         // Iterate over all subpatterns for the 2nd time to compare numbers of repetitions
-        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->automaton->max_subpatt(); $i++) {
+        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
             $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
             $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 

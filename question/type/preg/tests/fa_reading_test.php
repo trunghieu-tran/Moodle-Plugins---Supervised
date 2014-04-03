@@ -17,7 +17,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     2->3[label="[(/c-z/))]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
@@ -67,7 +67,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -85,7 +85,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     3->4[label="[a]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('4');
         $resultautomata->add_state('1');
@@ -154,7 +154,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -172,7 +172,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     4->0[label="[bc]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('4');
         $resultautomata->add_state('1');
@@ -241,7 +241,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -259,7 +259,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     5->6[label="[\\(\\)]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('6');
         $resultautomata->add_state('1');
@@ -332,7 +332,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -350,7 +350,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     4->0[label="[bc]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('1');
         $resultautomata->add_state('2');
@@ -421,7 +421,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -436,7 +436,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     2->3[label="[abc-hl-x]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
@@ -474,7 +474,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -491,7 +491,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     1->3 [label="[\\\\A]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('1');
@@ -551,7 +551,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -565,7 +565,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     "1   2"->3 [label="[\\\\A0-9]"];
                     }';
 
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('1   2');
@@ -592,7 +592,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -606,7 +606,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     "1,0"->"2,1"[label="[0-9]",color=red];
                     "2,1"->",2"[label="[a-z]",color=blue];
                     }';
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0,');
         $resultautomata->add_state(',2');
         $resultautomata->add_state('1,0');
@@ -645,7 +645,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->consumeschars = false;
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -660,7 +660,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     1->3[label="[]"];
                     2->3[label="[a-z]"];
                     }';
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('2');
@@ -700,7 +700,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');
@@ -715,7 +715,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     1->3[label="[.]"];
                     2->3[label="[a-z]"];
                     }';
-        $resultautomata = new qtype_preg_nfa(0, 0, 0, array());
+        $resultautomata = new qtype_preg_fa();
         $resultautomata->add_state('0');
         $resultautomata->add_state('3');
         $resultautomata->add_state('2');
@@ -754,7 +754,7 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
         $transition->set_transition_type();
         $resultautomata->add_transition($transition);
 
-        $automata = new qtype_preg_nfa(0, 0, 0, array());
+        $automata = new qtype_preg_fa();
         $automata->read_fa($dotdescription);
 
         $this->assertEquals($automata, $resultautomata, 'Result automata is not equal to expected');

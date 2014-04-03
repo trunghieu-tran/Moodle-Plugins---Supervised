@@ -31,66 +31,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
 
 /**
- * Represents a nondeterministic finite automaton.
- */
-class qtype_preg_nfa extends qtype_preg_finite_automaton {
-
-    protected function set_limits() {
-        global $CFG;
-        $this->statelimit = 250;
-        $this->transitionlimit = 250;
-        if (isset($CFG->qtype_preg_nfa_transition_limit)) {
-            $this->statelimit = $CFG->qtype_preg_nfa_transition_limit;
-        }
-        if (isset($CFG->qtype_preg_nfa_state_limit)) {
-            $this->transitionlimit = $CFG->qtype_preg_nfa_state_limit;
-        }
-    }
-
-    public function should_be_deterministic() {
-        return false;
-    }
-
-    public function substract_fa($anotherfa) {
-    }
-
-    public function invert_fa() {
-    }
-
-    public function match($str, $pos) {
-    }
-
-    public function next_character() {
-    }
-
-    public function complete_match() {
-    }
-
-    public function ast_root() {
-        return $this->astroot;
-    }
-
-    public function max_subpatt() {
-        return $this->maxsubpatt;
-    }
-
-    public function max_subexpr() {
-        return $this->maxsubexpr;
-    }
-
-    public function on_subexpr_added($pregnode, $body) {
-        // Copy the node to the starting transitions.
-        $start = $body['start'];
-        $outgoing = $this->get_adjacent_transitions($start, true);
-        foreach ($outgoing as $transition) {
-            if (in_array($pregnode->number, $this->subexpr_ref_numbers)) {
-                $transition->startsbackrefedsubexprs = true;
-            }
-        }
-    }
-}
-
-/**
  * Abstract class for both nodes (operators) and leafs (operands).
  */
 abstract class qtype_preg_nfa_node {

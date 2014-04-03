@@ -180,10 +180,6 @@ class qtype_preg_fa_transition {
         return min($g1, $g2);   // This actually works
     }
 
-    public function causes_backtrack() {
-        return $this->startsbackrefedsubexprs || $this->startsquantifier;
-    }
-
     public function clear_cache() {
         $this->flattentags = null;
     }
@@ -360,7 +356,7 @@ class qtype_preg_fa_transition {
  * Class for finite automaton group of states.
  */
  class qtype_preg_fa_group {
-    /** @var reference to qtype_preg_finite_automaton object this group of states belongs to. */
+    /** @var reference to qtype_preg_fa object this group of states belongs to. */
     protected $fa;
     /** @var array of int ids of states, which include in this group. */
     protected $states;
@@ -377,7 +373,7 @@ class qtype_preg_fa_transition {
     }
 
     /**
-     * Change reference to qtype_preg_finite_automaton object this group of states belongs to.
+     * Change reference to qtype_preg_fa object this group of states belongs to.
      *
      * @param fa - a reference to new automata.
      */
@@ -529,9 +525,9 @@ class qtype_preg_fa_transition {
  }
 
 /**
- * Represents an abstract finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
+ * Represents a finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
  */
-abstract class qtype_preg_finite_automaton {
+class qtype_preg_fa {
 
     /** @var two-dimensional array of qtype_preg_fa_transition objects: first index is "from", second index is "to"*/
     public $adjacencymatrix = array();
@@ -542,14 +538,8 @@ abstract class qtype_preg_finite_automaton {
     /** @var array of of int ids of states - end states. */
     public $endstates = array();
 
-    // The AST root node.
-    protected $astroot;
-
-    // Number of subpatterns in the regular expression.
-    protected $maxsubpatt;
-
-    // Number of subexpressions in the regular expression.
-    protected $maxsubexpr;
+    // Regex handler
+    protected $handler;
 
     // Subexpr references (numbers) existing in the regex.
     protected $subexpr_ref_numbers;
@@ -571,10 +561,8 @@ abstract class qtype_preg_finite_automaton {
     protected $statelimit;
     protected $transitionlimit;
 
-    public function __construct($astroot = null, $maxsubpatt = 0, $maxsubexpr = 0, $subexprrefs = array()) {
-        $this->astroot = $astroot;
-        $this->maxsubpatt = $maxsubpatt;
-        $this->maxsubexpr = $maxsubexpr;
+    public function __construct($handler = null, $subexprrefs = array()) {
+        $this->handler = $handler;
         $this->subexpr_ref_numbers = array();
         foreach ($subexprrefs as $ref) {
             $this->subexpr_ref_numbers[] = $ref->number;
@@ -582,12 +570,35 @@ abstract class qtype_preg_finite_automaton {
         $this->set_limits();
     }
 
+    public function handler() {
+        return $this->handler;
+    }
+
+    public function on_subexpr_added($pregnode, $body) {
+        // Copy the node to the starting transitions.
+        $start = $body['start'];
+        $outgoing = $this->get_adjacent_transitions($start, true);
+        foreach ($outgoing as $transition) {
+            if (in_array($pregnode->number, $this->subexpr_ref_numbers)) {
+                $transition->startsbackrefedsubexprs = true;
+            }
+        }
+    }
+
     /**
      * The function should set $this->statelimit and $this->transitionlimit properties using $CFG.
-     *
-     * DFA and NFA have different size limits in $CFG, so let them have separate implementation of this function.
      */
-    abstract protected function set_limits();
+    protected function set_limits() {
+        global $CFG;
+        $this->statelimit = 250;
+        $this->transitionlimit = 250;
+        if (isset($CFG->qtype_preg_nfa_transition_limit)) {
+            $this->statelimit = $CFG->qtype_preg_nfa_transition_limit;
+        }
+        if (isset($CFG->qtype_preg_nfa_state_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_nfa_state_limit;
+        }
+    }
 
     public function transitions_tohr() {
         $result = '';
@@ -620,7 +631,9 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Returns whether this implementation support DFA or NFA.
      */
-    abstract public function should_be_deterministic();
+    public function should_be_deterministic() {
+        return false;
+    }
 
     /**
      * Returns the start states for automaton.
@@ -648,45 +661,182 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Calculates where subexprs start and end.
+     * Calculates where subexpressions start and end.
      */
-    public function calculate_start_and_end_states() {
+    public function calculate_subexpr_start_and_end_states() {
+        $result = $this->calculate_start_and_end_states_inner(true);
+        $this->startstates = $result[0];
+        $this->endstates = $result[1];
+    }
+
+    /**
+     * Calculates where subpatterns start and end.
+     */
+    public function calculate_backtrack_states() {
+        $subpatterns = $this->calculate_start_and_end_states_inner(false);
+        $startstates = $subpatterns[0];
+        $endstates = $subpatterns[1];
+        $states = $this->get_states();
         $result = array();
-        $this->startstates = array();
-        $this->endstates = array();
+        // First kind of backtrack states: backreferenced subexpressions
+        foreach ($states as $state) {
+            $transitions = $this->get_adjacent_transitions($state, true);
+            foreach ($transitions as $transition) {
+                // Check if the transition starts a
+                if ($transition->startsbackrefedsubexprs) {
+                    $result[$transition->from] = true;
+                }
+            }
+        }
+
+        // Second kind of backtrack states: quantifiers have non-empty intersection with next transitions
+        $subpattmap = $this->handler->get_subpatt_map();
+        foreach ($endstates as $subpatt => $states) {
+            // Check if current subpattern is a quantifier
+            $node = $subpattmap[$subpatt];
+            if ($node->type != qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->type != qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+                continue;
+            }
+            // Get quantifier's end state's inner epsilon closure
+            $innerclosure = array();
+            foreach ($states as $state) {
+                $innerclosure = array_merge($innerclosure, $this->get_epsilon_closure($state, true));
+            }
+            $innertransitions = array();
+            foreach ($innerclosure as $state) {
+                $innertransitions = array_merge($innertransitions, $this->get_adjacent_transitions($state, false));
+            }
+            // Get quantifier's end state's outer epsilon closure
+            $outerclosure = array();
+            foreach ($states as $state) {
+                $outerclosure = array_merge($outerclosure, $this->get_epsilon_closure($state, false));
+            }
+            $outertransitions = array();
+            foreach ($outerclosure as $state) {
+                $outertransitions = array_merge($outertransitions, $this->get_adjacent_transitions($state, true));
+            }
+            // Check for intersections.
+            $add = false;
+            // First fast check: backreferences
+            foreach ($innertransitions as $transition) {
+                if ($add || $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+                    $add = true;
+                    break;
+                }
+            }
+            foreach ($outertransitions as $transition) {
+                if ($transition->loopsback) {
+                    continue;
+                }
+                if ($add || $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+                    $add = true;
+                    break;
+                }
+            }
+            // Now check for charset intersections.
+            foreach ($innertransitions as $inner) {
+                if ($inner->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    continue;
+                }
+                if ($add) {
+                    break;
+                }
+                //echo "inner: {$inner->from} -> {$inner->pregleaf->leaf_tohr()} -> {$inner->to}\n";
+                $innerranges = $inner->pregleaf->ranges();
+                foreach ($outertransitions as $outer) {
+                    if ($outer->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
+                        continue;
+                    }
+                    //echo "outer: {$outer->from} -> {$outer->pregleaf->leaf_tohr()} -> {$outer->to}\n";
+                    // Finally check for an intersection
+                    $outerranges = $outer->pregleaf->ranges();
+                    if (qtype_preg_unicode::intersects($innerranges, $outerranges)) {
+                        $add = true;
+                        break;
+                    }
+                }
+            }
+            if ($add && array_key_exists($subpatt, $startstates)) {
+                $result = array_merge($result, $startstates[$subpatt]);
+            }
+        }
+        //print_r($result);
+        return array_values($result);
+    }
+
+    private function calculate_start_and_end_states_inner($subexpronly = false) {
+        $startstates = array();
+        $endstates = array();
         $states = $this->get_states();
         foreach ($states as $state) {
             $outgoing = $this->get_adjacent_transitions($state, true);
             foreach ($outgoing as $transition) {
                 $tags = $transition->flatten_tags();
                 foreach ($tags as $tag) {
-                    if ($tag->pregnode->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->pregnode->subpattern != $this->astroot->subpattern) {
+                    // Skip all non-subpatterns
+                    if ($tag->pregnode->subpattern == -1) {
+                        continue;
+                    }
+                    if ($subexpronly && $tag->pregnode->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->pregnode->subpattern != $this->handler->get_ast_root()->subpattern) {
                         continue;
                     }
                     $keys = array();
-                    if ($tag->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
-                        $keys[] = $tag->pregnode->number;
+
+                    if ($subexpronly) {
+                        // Add subexpression number as a key
+                        if ($tag->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+                            $keys[] = $tag->pregnode->number;
+                        }
+                        if ($tag->pregnode->subpattern == $this->handler->get_ast_root()->subpattern) {
+                            $keys[] = 0;
+                        }
+                    } else {
+                        // Add subpattern number as a key
+                        $keys[] = $tag->pregnode->subpattern;
                     }
-                    if ($tag->pregnode->subpattern == $this->astroot->subpattern) {
-                        $keys[] = 0;
-                    }
+
+                    $keys = array_values($keys);
                     foreach ($keys as $key) {
-                        if (!array_key_exists($key, $this->startstates)) {
-                            $this->startstates[$key] = array();
+                        if (!array_key_exists($key, $startstates)) {
+                            $startstates[$key] = array();
                         }
-                        if (!array_key_exists($key, $this->endstates)) {
-                            $this->endstates[$key] = array();
+                        if (!array_key_exists($key, $endstates)) {
+                            $endstates[$key] = array();
                         }
-                        if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN && !in_array($transition->from, $this->startstates[$key])) {
-                            $this->startstates[$key][] = $transition->from;
+                        if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN && !in_array($transition->from, $startstates[$key])) {
+                            $startstates[$key][] = $transition->from;
                         }
-                        if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE && !in_array($transition->to, $this->endstates[$key])) {
-                            $this->endstates[$key][] = $transition->to;
+                        if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE && !in_array($transition->to, $endstates[$key])) {
+                            $endstates[$key][] = $transition->to;
                         }
                     }
                 }
             }
         }
+        return array($startstates, $endstates);
+    }
+
+    public function get_epsilon_closure($state, $backwards = false) {
+        $result = array($state);
+        $current = array($state);
+        while (!empty($current)) {
+            $cur = array_pop($current);
+            $transitions = $this->get_adjacent_transitions($cur, !$backwards);
+            foreach ($transitions as $transition) {
+                if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    continue;
+                }
+                $interesting = $backwards
+                             ? $transition->from
+                             : $transition->to;
+                if (in_array($interesting, $result)) {
+                    continue;
+                }
+                $result[] = $interesting;
+                $current[] = $interesting;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1044,111 +1194,6 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-     * Merges epsilon transitions to next non-epsilon transitions. Takes care of all the tags,
-     * their order, etc.
-     * It was so painful.
-     */
-    public function merge_epsilons() {
-        // Proprocessing: merge epsilon-loops into the next transitions
-        $states = $this->get_states();
-        foreach ($states as $state) {
-            $transitions = $this->get_adjacent_transitions($state, true);
-            foreach ($transitions as $transition) {
-                if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY || $transition->from !== $transition->to) {
-                    continue;
-                }
-                // Merge this transition to the next transitions.
-                // Hypothetically there can be a case with eps-looped ending state.
-                // Well, that doesn't make any sense and such loop can be removed (but no in the middle of the FA!)
-                $nexttransitions = $this->get_adjacent_transitions($transition->to, true);
-                foreach ($nexttransitions as $nexttransition) {
-                    // Skip another epsilon-loops at the current state.
-                    if ($nexttransition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY && $nexttransition->from === $nexttransition->to) {
-                        continue;
-                    }
-
-                    // Clone the transition, update its greedines and "from" state.
-                    $clone = clone $nexttransition;
-                    $clone->greediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $nexttransition->greediness);
-                    $clone->from = $transition->from;
-
-                    // Merge tag arrays.
-                    foreach ($transition->tagsets as $set) {
-                        $set->set_tags_position(qtype_preg_fa_tag::POS_BEFORE_TRANSITION);
-                        $clone->tagsets[] = $set;
-                    }
-
-                    // Add the cloned transition.
-                    $this->add_transition($clone);
-                }
-                $this->remove_transition($transition);
-            }
-        }
-
-        $curstates = $this->start_states();
-        while (!empty($curstates)) {
-            $reached = array();
-            while (!empty($curstates)) {
-                $curstate = array_pop($curstates);
-                $transitions = $this->get_adjacent_transitions($curstate, true);
-                $repeat = false;
-                foreach ($transitions as $transition) {
-                    if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        continue;
-                    }
-                    if (in_array($transition->to, $this->end_states())) {
-                        continue;
-                    }
-                    $nexttransitions = $this->get_adjacent_transitions($transition->to, true);
-                    //if (empty($nexttransitions)) {
-                    //    continue;
-                    //}
-                    //echo "merging {$transition->from} -> {$transition->pregleaf->leaf_tohr()} -> {$transition->to}\n";
-
-                    // Iterate over and clone all next transitions
-                    foreach ($nexttransitions as $nexttransition) {
-                        // Clone the transition, update its greedines and "from" state
-                        $clone = clone $nexttransition;
-                        $clone->greediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $nexttransition->greediness);
-                        $clone->from = $transition->from;
-
-                        // Merge tag arrays.
-                        foreach ($transition->tagsets as $set) {
-                            $set->set_tags_position(qtype_preg_fa_tag::POS_BEFORE_TRANSITION);
-                            $clone->tagsets[] = $set;
-                        }
-
-                        // TODO: update all fields?
-
-                        // Add the cloned transition.
-                        $this->add_transition($clone);
-                        $repeat = $repeat || $clone->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                        //echo "cloned {$nexttransition->from} -> {$nexttransition->pregleaf->leaf_tohr()} -> {$nexttransition->to}\n";
-                    }
-
-                    // Remove the original eps-transition
-                    $this->remove_transition($transition);
-                }
-
-                // Update the states queue
-                if ($repeat) {
-                    $reached[$curstate] = true;
-                } else {
-                    $transitions = $this->get_adjacent_transitions($curstate, true);
-                    foreach ($transitions as $transition) {
-                        if (!$transition->loopsback) {
-                            $reached[$transition->to] = true;
-                        }
-                    }
-                }
-            }
-            $curstates = array_keys($reached);
-        }
-
-        $this->remove_unreachable_states();
-    }
-
-    /**
      * Read and create a FA from dot-like language. Mainly used for unit-testing.   TODO: replace subpatt_start with tags
      */
     public function read_fa($dotstring, $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
@@ -1357,7 +1402,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Compares to FA and returns whether they are equal. Mainly used for unit-testing.
      *
-     * @param another qtype_preg_finite_automaton object - FA to compare.
+     * @param another qtype_preg_fa object - FA to compare.
      * @return boolean true if this FA equal to $another.
      */
     public function compare_fa($another, &$differences) {
@@ -1448,8 +1493,8 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Decide if the intersection was successful or not.
      *
-     * @param fa qtype_preg_finite_automaton object - first automata taking part in intersection.
-     * @param anotherfa qtype_preg_finite_automaton object - second automata taking part in intersection.
+     * @param fa qtype_preg_fa object - first automata taking part in intersection.
+     * @param anotherfa qtype_preg_fa object - second automata taking part in intersection.
      * @return boolean true if intersection was successful.
      */
     public function has_successful_intersection($fa, $anotherfa, $direction) {
@@ -3001,7 +3046,7 @@ abstract class qtype_preg_finite_automaton {
      * @return result automata without blind states with one end state and with merged asserts.
      */
     public function intersect_fa($anotherfa, $stateindex, $isstart) {
-        $result = new qtype_preg_nfa(0, 0, 0, array());
+        $result = new qtype_preg_fa();
         $stopcoping = $stateindex;
         // Get states for starting coping.
         if ($isstart == 0) {
@@ -3044,7 +3089,7 @@ abstract class qtype_preg_finite_automaton {
             $result->remove_all_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
         } else {
-            $result = new qtype_preg_nfa();
+            $result = new qtype_preg_fa();
         }
         return $result;
     }
@@ -3052,20 +3097,16 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Return set substraction: $this - $anotherfa. Used to get negation.
      */
-    abstract public function substract_fa($anotherfa);// TODO - functions that could be implemented only for DFA should be moved to DFA class.
+    public function substract_fa($anotherfa) {
+        // TODO
+    }
 
     /**
      * Return inversion of fa.
      */
-    abstract public function invert_fa();
-
-    abstract public function match($str, $pos);
-    abstract public function next_character();// TODO - define arguments.
-
-    /**
-     * Finds shortest possible string, completing partial given match.
-     */
-    abstract public function complete_match();// TODO - define arguments.
+    public function invert_fa() {
+        // TODO
+    }
 
     public function __clone() {
         // TODO - clone automaton.
