@@ -179,7 +179,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
                 if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                    // matching called explicitly via $subexpr > 0
+                    continue;
                 }
 
                 $curpos = $curstate->startpos + $curstate->length;
@@ -236,7 +238,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $transitions = $this->automaton->get_adjacent_transitions($laststate->state, true);
         foreach ($transitions as $transition) {
             if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                // matching called explicitly via $subexpr > 0
+                continue;
             }
             if ($transition->loopsback || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
@@ -280,7 +284,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
                 if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                    // matching called explicitly via $subexpr > 0
+                    continue;
                 }
                 // Skip loops.
                 if ($transition->loopsback) {
@@ -372,7 +378,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                        continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                        // matching called explicitly via $subexpr > 0
+                        continue;
                     }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
@@ -458,7 +466,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
             foreach ($transitions as $transition) {
                 if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                    // matching called explicitly via $subexpr > 0
+                    continue;
                 }
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
@@ -559,7 +569,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                        continue;   // Only subexpressions > 0 can be called to match, even if quantified with {0}
+                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                        // matching called explicitly via $subexpr > 0
+                        continue;
                     }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
