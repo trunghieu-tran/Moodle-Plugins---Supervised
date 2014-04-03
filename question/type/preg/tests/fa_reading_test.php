@@ -4,7 +4,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 
 class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
 

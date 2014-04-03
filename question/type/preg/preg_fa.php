@@ -16,7 +16,7 @@
 
 /**
  * Defines finite automata states and transitions classes for regular expression matching.
- * The class is used by FA-based matching engines (DFA and NFA), provides standartisation to them and enchances testability.
+ * The class is used by FA-based matching engines, provides standartisation to them and enchances testability.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -545,7 +545,7 @@ class qtype_preg_fa {
     protected $subexpr_ref_numbers;
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
-     * May be used for optimisation when an NFA object actually stores a DFA.
+     * May be used for optimisation when an FA object actually stores a DFA.
      */
     protected $deterministic = true;
 
@@ -592,11 +592,11 @@ class qtype_preg_fa {
         global $CFG;
         $this->statelimit = 250;
         $this->transitionlimit = 250;
-        if (isset($CFG->qtype_preg_nfa_transition_limit)) {
-            $this->statelimit = $CFG->qtype_preg_nfa_transition_limit;
+        if (isset($CFG->qtype_preg_fa_transition_limit)) {
+            $this->statelimit = $CFG->qtype_preg_fa_transition_limit;
         }
-        if (isset($CFG->qtype_preg_nfa_state_limit)) {
-            $this->transitionlimit = $CFG->qtype_preg_nfa_state_limit;
+        if (isset($CFG->qtype_preg_fa_state_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_fa_state_limit;
         }
     }
 

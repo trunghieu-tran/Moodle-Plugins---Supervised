@@ -34,7 +34,7 @@ class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
         $regular->penalty = 0.1;
         $regular->charhintpenalty = 0.2;
         $regular->hintgradeborder = 0.6;
-        $regular->engine = 'nfa_matcher';
+        $regular->engine = 'fa_matcher';
         $regular->notation = 'native';
         $regular->uselexemhint = true;
         $regular->lexemhintpenalty = 0.4;

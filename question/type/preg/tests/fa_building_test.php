@@ -3,7 +3,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 //$CFG->pathtodot = '/usr/bin/dot';
 
@@ -17,15 +17,15 @@ class qtype_preg_fa_building_test extends PHPUnit_Framework_TestCase {
         } else if ($CFG->pathtodot === '') {
             $CFG->pathtodot = QTYPE_PREG_TEST_CONFIG_PATHTODOT;
         }
-        $this->dir = qtype_preg_regex_handler::get_temp_dir('nfa');
+        $this->dir = qtype_preg_regex_handler::get_temp_dir('fa');
     }
 
     function draw($regex, $filename) {
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matcher = new qtype_preg_fa_matcher($regex);
         if (!$matcher->errors_exist()) {
             $matcher->automaton->fa_to_dot('svg', $this->dir . $filename);
         } else {
-            $this->assertTrue(false, "nfa building failed\n");
+            $this->assertTrue(false, "fa building failed\n");
         }
     }
 

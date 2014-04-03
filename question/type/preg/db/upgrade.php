@@ -269,8 +269,10 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
     /*if ($oldversion < TODO) {
 
         // Change matching engine.
-        $queries = array("UPDATE {qtype_preg} SET engine='nfa_matcher' WHERE engine='dfa_matcher'",
-                         "UPDATE {config} SET value='nfa_matcher' WHERE value='dfa_matcher'");
+        $queries = array("UPDATE {qtype_preg} SET engine='fa_matcher' WHERE engine='dfa_matcher'",
+                         "UPDATE {qtype_preg} SET engine='fa_matcher' WHERE engine='nfa_matcher'",
+                         "UPDATE {config} SET value='fa_matcher' WHERE value='dfa_matcher'",
+                         "UPDATE {config} SET value='fa_matcher' WHERE value='nfa_matcher'");
 
         foreach ($queries as $query) {
             $DB->execute($query);

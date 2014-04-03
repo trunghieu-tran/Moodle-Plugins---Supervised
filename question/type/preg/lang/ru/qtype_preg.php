@@ -32,6 +32,7 @@ $string['exactmatch'] = 'Точное совпадение';
 $string['exactmatch_help'] = '<p>По умолчанию поиск совпадений с регулярным выражением возвращает истину, если в ответе есть хотя бы одно совпадение. Точное совпадение означает, что совпадать должна строка целиком.</p><p>Установите значение Да, если вы пишете регулярное выражение для ответа целиком. Установка значения Нет дает дополнительную гибкость: вы можете указать ответ с низкой (или нулевой) оценкой, чтобы "отловить" частые ошибки студентов и дать на них отзыв. Вы также можете указывать режим точного совпадения, начиная регулярное выражение символом ^ и заканчивая его символом $.</p>';
 $string['explaining_graph_tool'] = 'Объясняющий граф';
 $string['explaining_graph_tool_help'] = 'Здесь вы можете увидеть объясняющий граф. При нажатии на узел дерева выделится соответствующий подграф темно-зеленым прямоугольником.';
+$string['fa_matcher'] = 'Недетерминированные конечные автоматы';
 $string['hintcolouredstring'] = ' совпавшую часть ответа';
 $string['hintgradeborder'] = 'Граница показа подсказок';
 $string['hintgradeborder_help'] = 'Ответы с оценкой ниже границы показа подсказок не будут использоваться для дачи подсказок.';
@@ -44,7 +45,6 @@ $string['lexemusername'] = 'Синоним слова "лексема", отоб
 $string['lexemusername_help'] = 'Возможно, студенты не знают, что атомарная часть языка называется <b>лексемой</b>. Они могут называть ее "словом", "цифрой" или чем-то другим. Вы можете задать слово, которое студенты будут видеть на кнопке подсказки лексемы.';
 $string['maxerrorsshowndescription'] = 'Максимальное число показываемых ошибок для каждого регулярного выражения в форме редактирования';
 $string['maxerrorsshownlabel'] = 'Максимальное число показываемых ошибок';
-$string['nfa_matcher'] = 'Недетерминированные конечные автоматы (НКА)';
 $string['nocorrectanswermatch'] = 'Не указано ни одного 100%-правильного ответа';
 $string['nohintgradeborderpass'] = 'Не указано ни одного с оценкой выше границы подсказок. Это отключает подсказки.';
 $string['notation'] = 'Нотация регулярных выражений';
@@ -74,6 +74,7 @@ $string['toomanyerrors'] = '.......и ещё {$a} ошибки(ошибок)';
 $string['lazyquant'] = 'Ленивые квантификаторы';
 $string['greedyquant'] = 'Жадные квантификаторы';
 $string['possessivequant'] = 'Ревнивые квантификаторы';
+$string['unallowedhint'] = 'Selected hint not allowed due to restrictions in question settings. Please set "Allow {$a} hinting" to "yes" to allow it. Selected matching engine could affect availability of hints.';
 $string['ungreedyquant'] = 'Нежадные квантификаторы';
 $string['unsupported'] = '{$a->nodename} в позиции с {$a->linefirst}:{$a->colfirst} по {$a->linelast}:{$a->collast} не поддерживается {$a->engine}.';
 $string['unsupportedmodifier'] = 'Ошибка: модификатор {$a->modifier} не поддерживается {$a->classname}.';
@@ -192,14 +193,14 @@ $string['leaf_charset_error'] = 'ошибка в символьном класс
 $string['error_PCREincorrectregex']              = 'Некорректное регулярное выражение - ошибка синтаксиса! Ознакомьтесь с <a href="http://pcre.org/pcre.txt">документацией PCRE</a> для получения информации.';
 $string['error_duringauthoringtool']             = 'Ошибки при попытке построения {$a}:';
 
-/******* NFA limitations *******/
+/******* FA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
 $string['fa_state_limit'] = 'Automata size limit: states';
 $string['fa_transition_limit'] = 'Automata size limit: transitions';
-$string['nfa_settings_heading'] = 'Nondeterministic finite state automata engine settings';
-$string['nfa_state_limit_description'] = 'Allows you to tune time and memory limits for the NFA engine when matching complex regexes';
-$string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
+$string['fa_settings_heading'] = 'Finite state automata engine settings';
+$string['fa_state_limit_description'] = 'Allows you to tune time and memory limits for the FA engine when matching complex regexes';
+$string['fa_transition_limit_description'] = 'Maximum number of transitions in FA';
 
 /********** Strings for authoring tools **********************/
 $string['authoring_form_page_header'] = 'Конструктор регулярных выражений';

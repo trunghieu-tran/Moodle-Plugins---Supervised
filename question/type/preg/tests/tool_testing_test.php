@@ -20,7 +20,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
 
     function test_loader_no_selection() {
         $_GET['regex'] = 'a';
-        $_GET['engine'] = 'nfa_matcher';
+        $_GET['engine'] = 'fa_matcher';
         $_GET['notation'] = 'native';
         $_GET['exactmatch'] = 0;
         $_GET['usecase'] = 0;
@@ -36,7 +36,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
 
     function test_loader_selection() {
         $_GET['regex'] = 'a';
-        $_GET['engine'] = 'nfa_matcher';
+        $_GET['engine'] = 'fa_matcher';
         $_GET['notation'] = 'native';
         $_GET['exactmatch'] = 0;
         $_GET['usecase'] = 0;
@@ -52,7 +52,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
 
     function test_loader_exact_selection() {
         $_GET['regex'] = 'a';
-        $_GET['engine'] = 'nfa_matcher';
+        $_GET['engine'] = 'fa_matcher';
         $_GET['notation'] = 'native';
         $_GET['exactmatch'] = 1;
         $_GET['usecase'] = 0;
@@ -71,7 +71,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = "a\nb";
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
@@ -85,7 +85,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = '';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
@@ -99,7 +99,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = ':/';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
@@ -113,7 +113,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = 'wat';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
@@ -127,7 +127,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = '';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
@@ -147,7 +147,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = 'a';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 0));
@@ -161,7 +161,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = 'abcd';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 6));
@@ -185,7 +185,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = 'ab';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 4));
@@ -209,7 +209,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $strings = 'abc';
         $usecase = false;
         $exactmatch = false;
-        $engine = 'nfa_matcher';
+        $engine = 'fa_matcher';
         $notation = 'native';
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
