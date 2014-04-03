@@ -35,6 +35,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
     protected $generateextensionforeachmatch = false;
+    protected $backtrackstates = array();
 
     public function name() {
         return 'nfa_matcher';
@@ -121,6 +122,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->last_transition = null;
         $result->last_match_len = 0;
         $result->backtrack_states = array();
+        if (in_array($state, $this->backtrackstates)) {
+            $result->backtrack_states[] = $result;
+        }
 
         return $result;
     }
@@ -154,7 +158,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $newstate->length += $length;
         $newstate->write_subpatt_info($transition, $curpos, $length);
 
-        if ($transition->causes_backtrack()) {
+        if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
         }
     }
@@ -809,21 +813,23 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
     }
 
+    protected function calculate_backtrackstates() {
+        $this->backtrackstates = $this->automaton->calculate_backtrack_states();
+    }
+
     /**
      * Constructs an NFA corresponding to the given node.
-     * @param $ast_node - object of qtype_preg_node child class.
-     * @param $dst_node - object of qtype_preg_nfa_node child class.
      * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
-    protected function build_nfa($ast_node, $dst_node) {
-        $result = new qtype_preg_nfa($ast_node, $this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_nodes_with_subexpr_refs());
+    protected function build_nfa() {
+        $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
             $stack = array();
-            $dst_node->create_automaton($result, $stack);
+            $this->dstroot->create_automaton($result, $stack);
             $body = array_pop($stack);
-            $result->calculate_start_and_end_states();
+            $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
             //$result->merge_epsilons();
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
@@ -840,12 +846,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $nfa = self::build_nfa($this->astroot, $this->dstroot);
+        $nfa = self::build_nfa();
         if ($nfa !== false) {
             $this->automaton = $nfa;
             $this->nestingmap = array();
             $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
             $this->calculate_generateextensionforeachmatch();
+            $this->calculate_backtrackstates();
             // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
             // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
             // $this->automaton->on_subexpr_added($this->astroot);
