@@ -37,7 +37,7 @@ class qtype_preg extends qtype_shortanswer {
      */
     public function available_engines() {
         return array(   'php_preg_matcher' => get_string('php_preg_matcher', 'qtype_preg'),
-                        'nfa_matcher' => get_string('nfa_matcher', 'qtype_preg')
+                        'fa_matcher' => get_string('fa_matcher', 'qtype_preg')
                     );
     }
 

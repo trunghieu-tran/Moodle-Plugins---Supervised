@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines NFA matcher class.
+ * Defines FA matcher class.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -27,18 +27,18 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_exec_state.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_exec_state.php');
 
-class qtype_preg_nfa_matcher extends qtype_preg_matcher {
+class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
-    public $automaton = null;          // An NFA corresponding to the given regex.
+    public $automaton = null;          // FA corresponding to the given regex.
 
     protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
     protected $generateextensionforeachmatch = false;
     protected $backtrackstates = array();
 
     public function name() {
-        return 'nfa_matcher';
+        return 'fa_matcher';
     }
 
     protected function get_engine_node_name($nodetype, $nodesubtype) {
@@ -49,13 +49,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_NODE_ALT:
             case qtype_preg_node::TYPE_NODE_SUBEXPR:
             case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
-                return 'qtype_preg_nfa_' . $nodetype;
+                return 'qtype_preg_fa_' . $nodetype;
             case qtype_preg_node::TYPE_LEAF_CHARSET:
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
             //case qtype_preg_node::TYPE_LEAF_RECURSION:
-                return 'qtype_preg_nfa_leaf';
+                return 'qtype_preg_fa_leaf';
         }
 
         return parent::get_engine_node_name($nodetype, $nodesubtype);
@@ -104,7 +104,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             return $result;
         }
 
-        $result = new qtype_preg_nfa_exec_state();
+        $result = new qtype_preg_fa_exec_state();
         $result->matcher = $this;
         $result->recursionlevel = 0;
         $result->state = $state;
@@ -146,10 +146,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $newstate->set_full(in_array($newstate->state, $endstates));
         if ($transition->is_start_anchor()) {
-            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_START_ANCHOR);
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_START_ANCHOR);
         }
         if ($transition->is_end_anchor()) {
-            $newstate->set_flag(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR);
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR);
         }
         $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $newstate->last_transition = $transition;
@@ -165,7 +165,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns an array of states which can be reached without consuming characters.
-     * @param qtype_preg_nfa_exec_state startstates states to go from.
+     * @param qtype_preg_fa_exec_state startstates states to go from.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
     protected function epsilon_closure($startstates, $subexpr = 0) {
@@ -259,8 +259,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Returns the minimal path to complete a partial match.
      * @param qtype_poasquestion_string str - original string that was matched.
-     * @param qtype_preg_nfa_exec_state laststate - the last state matched.
-     * @return object of qtype_preg_nfa_exec_state.
+     * @param qtype_preg_fa_exec_state laststate - the last state matched.
+     * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_brute_force($str, $laststate, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
@@ -293,7 +293,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     continue;
                 }
 
-                if ($length > 0 && $curstate->is_flag_set(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR)) {
+                if ($length > 0 && $curstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
                     continue;
                 }
 
@@ -327,8 +327,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Returns the minimal path to complete a partial match.
      * @param qtype_poasquestion_string str - original string that was matched.
-     * @param qtype_preg_nfa_exec_state laststate - the last state matched.
-     * @return object of qtype_preg_nfa_exec_state.
+     * @param qtype_preg_fa_exec_state laststate - the last state matched.
+     * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_fast($str, $laststate, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
@@ -340,7 +340,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $states = array();
         $curstates = array();
 
-        // Create an array of processing states for all nfa states (the only resumestate, other states are null yet).
+        // Create an array of processing states for all fa states (the only resumestate, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate] = $curstate === $resumestate->state
                                ? $resumestate
@@ -388,7 +388,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         continue;
                     }
 
-                    if ($length > 0 && $curstate->is_flag_set(qtype_preg_nfa_exec_state::FLAG_VISITED_END_ANCHOR)) {
+                    if ($length > 0 && $curstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
                         continue;
                     }
 
@@ -515,7 +515,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Returns array of all possible matches.
      */
     protected function match_fast($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
-        $states = array();           // Objects of qtype_preg_nfa_exec_state.
+        $states = array();           // Objects of qtype_preg_fa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
@@ -525,7 +525,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
         $endstatereached = false;
 
-        // Create an array of processing states for all nfa states (the only initial state, other states are null yet).
+        // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate] = in_array($curstate, $startstates)
                                ? $this->create_initial_state($curstate, $str, $startpos, $prevlevelstate)
@@ -818,10 +818,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Constructs an NFA corresponding to the given node.
-     * @return - object of qtype_preg_nfa in case of success, false otherwise.
+     * Constructs an FA corresponding to the given node.
+     * @return - object of qtype_preg_fa in case of success, false otherwise.
      */
-    protected function build_nfa() {
+    protected function build_fa() {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
@@ -846,9 +846,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $nfa = self::build_nfa();
-        if ($nfa !== false) {
-            $this->automaton = $nfa;
+        $fa = self::build_fa();
+        if ($fa !== false) {
+            $this->automaton = $fa;
             $this->nestingmap = array();
             $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
             $this->calculate_generateextensionforeachmatch();

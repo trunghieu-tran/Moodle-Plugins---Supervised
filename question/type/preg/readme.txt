@@ -3,11 +3,10 @@ Perl-compatible regular expression question
 
 Authors:
 1. Idea, design, question type and behaviours code, hinting, error reporting, regular expression testing (authoring tool) - Oleg Sychev.
-2. Regex parsing, NFA regex matching engine, matchers testing, backup&restore, unicode support, selection in regex text (in authoring tools) - Valeriy Streltsov.
-3. DFA regex matching engine (deprecated for now) - Dmitriy Kolesov.
-4. Explaining graph (authoring tool) - Vladimir Ivanov.
-5. Syntax tree (authoring tool) - Grigory Terekhov.
-6. Regex description (authoring tool) - Dmitriy Pahomov.
+2. Regex parsing, FA regex matching engine, matchers testing, backup&restore, unicode support, selection in regex text (in authoring tools) - Valeriy Streltsov.
+3. Explaining graph (authoring tool) - Vladimir Ivanov.
+4. Syntax tree (authoring tool) - Grigory Terekhov.
+5. Regex description (authoring tool) - Dmitriy Pahomov.
 
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;
@@ -27,7 +26,7 @@ behaviours if the student is stuck, which can be useful in training quizzes.
 
 To use hinting you don't need to know anything about regular expressions. Choosing Moodle Shortanswer notation allows
 you to just copy answers from shortanswer question and have hinting capabilities. '*' wildcard is supported.
-NFA engine is preferable for such questions for now.
+FA engine is preferable for such questions for now.
 
 ===============
 2. Installation
@@ -57,7 +56,7 @@ Be sure to use Graphviz 2.36 or newer (earlier versions had a bug in svg output 
 ==========
 3. Hinting
 ==========
-DFA and NFA matching engines support hinting for partial matching. If there is no full match in the response,
+FA matching engine support hinting for partial matching. If there is no full match in the response,
 question chooses the partial match that has less characters to complete matching. It could also show
 a next character (or lexem) that leads to the shortest path to complete matching as a hint (with adding hint penalty)
 when using adaptive behaviour. Only answers with grade greater or equal hint grade border are used in hinting.
@@ -71,7 +70,7 @@ choosing default engine, that could be set on the question type settings page.
 If you primary need is to use very complex regular expressions, than "PHP preg extension" is you most likely choice.
 By "very complex" we understand regular expression using complex assertions, conditional subexpressions, recursion etc.
 
-If you regular expressions are not that hardcore, but you want to make heavy use of hinting facility, choose NFA engine instead.
+If you regular expressions are not that hardcore, but you want to make heavy use of hinting facility, choose FA engine instead.
 
 Then just experiment. If some engine don't allow you to do something you need (you get messages that something is unsupported, or
 regular expression is too complex or hinting is inactive etc) or just have bug in you particular regular expression - try another one.

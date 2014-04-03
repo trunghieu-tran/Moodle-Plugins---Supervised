@@ -4,7 +4,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');

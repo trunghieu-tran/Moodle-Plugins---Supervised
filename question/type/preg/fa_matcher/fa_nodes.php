@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines NFA node classes.
+ * Defines FA node classes.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
 /**
  * Abstract class for both nodes (operators) and leafs (operands).
  */
-abstract class qtype_preg_nfa_node {
+abstract class qtype_preg_fa_node {
 
     public $pregnode;    // Reference to the corresponding qtype_preg_node.
 
@@ -86,9 +86,9 @@ abstract class qtype_preg_nfa_node {
 }
 
 /**
- * Class for leafs. They contruct trivial NFAs with two states and one transition between them.
+ * Class for leafs. They contruct trivial FAs with two states and one transition between them.
  */
-class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
+class qtype_preg_fa_leaf extends qtype_preg_fa_node {
 
     public function accept() {
         if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
@@ -110,9 +110,9 @@ class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 }
 
 /**
- * Abstract class for nodes, they construct NFAs by combining existing NFAs.
+ * Abstract class for nodes, they construct FAs by combining existing FAs.
  */
-abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
+abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
     public $operands = array();    // Array of operands.
 
@@ -137,7 +137,7 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
 /**
  * Class for concatenation.
  */
-class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
+class qtype_preg_fa_node_concat extends qtype_preg_fa_operator {
 
     protected function create_automaton_inner(&$automaton, &$stack) {
         $count = count($this->operands);
@@ -162,7 +162,7 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
 /**
  * Class for alternation.
  */
-class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
+class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
 
     protected function create_automaton_inner(&$automaton, &$stack) {
         $count = count($this->operands);
@@ -189,7 +189,7 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 /**
  * Class containing common methods for both finite and infinite quantifiers.
  */
-abstract class qtype_preg_nfa_node_quant extends qtype_preg_nfa_operator {
+abstract class qtype_preg_fa_node_quant extends qtype_preg_fa_operator {
 
     public function accept() {
         if ($this->pregnode->possessive) {
@@ -213,7 +213,7 @@ abstract class qtype_preg_nfa_node_quant extends qtype_preg_nfa_operator {
 /**
  * Class for infinite quantifiers (*, +, {m,}).
  */
-class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
+class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
 
     /**
      * Creates an automaton for * or {0,} quantifier.
@@ -298,7 +298,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_node_quant {
 /**
  * Class for finite quantifiers {m,n}.
  */
-class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
+class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
 
     /**
      * Creates an automaton for ? quantifier.
@@ -401,7 +401,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_node_quant {
 /**
  * Class for subexpressions.
  */
-class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
+class qtype_preg_fa_node_subexpr extends qtype_preg_fa_operator {
 
     public function accept() {
         if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
@@ -423,7 +423,7 @@ class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
 /**
  * Class for conditional subexpressions.
  */
-class qtype_preg_nfa_node_cond_subexpr extends qtype_preg_nfa_operator {
+class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
 
     public function __construct($node, $matcher) {
         $this->pregnode = $node;

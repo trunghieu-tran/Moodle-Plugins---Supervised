@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines NFA matcher class.
+ * Defines FA matcher execution state.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -26,12 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 
 /**
- * Represents an execution state of an nfa.
+ * Represents an execution state of an fa.
  */
-class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
+class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     // Indicates that this state is a full match state.
     const FLAG_FULL = 0x01;
@@ -40,13 +40,13 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Indicates that this state had \Z \z or $ transition.
     const FLAG_VISITED_END_ANCHOR   = 0x04;
 
-    // The nfa being executed.
+    // FA being executed.
     public $matcher;
 
     // Level of recursion
     public $recursionlevel;
 
-    // The corresponding nfa state.
+    // The corresponding fa state.
     public $state;
 
     // 2-dimensional array of matches; 1st is subpattern number; 2nd is repetitions of the subpattern.

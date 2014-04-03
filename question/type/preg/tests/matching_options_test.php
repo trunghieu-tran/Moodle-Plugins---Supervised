@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/question.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 
 class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
@@ -48,7 +48,7 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
         $this->options->modifiers = $this->question->get_modifiers(); // Usecase = true by default.
         $this->options->extensionneeded = false; // No character generation for PHP preg matcher.
         $this->options->capturesubexpressions = true;
-        $this->matchers = array('php_preg_matcher', 'nfa_matcher');
+        $this->matchers = array('php_preg_matcher', 'fa_matcher');
     }
 
     public function test_all_notations() {

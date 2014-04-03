@@ -34,7 +34,7 @@ if ($ADMIN->fulltree) {
     $qtypeobj = new qtype_preg;
     $engines = $qtypeobj->available_engines();
     $settings->add(new admin_setting_configselect('qtype_preg_defaultengine', get_string('defaultenginelabel', 'qtype_preg'),
-                    get_string('defaultenginedescription', 'qtype_preg'), 'nfa_matcher', $engines));
+                    get_string('defaultenginedescription', 'qtype_preg'), 'fa_matcher', $engines));
     $notations = $qtypeobj->available_notations();
     $settings->add(new admin_setting_configselect('qtype_preg_defaultnotation', get_string('defaultnotationlabel', 'qtype_preg'),
                     get_string('defaultnotationdescription', 'qtype_preg'), 'native', $notations));
@@ -45,11 +45,11 @@ if ($ADMIN->fulltree) {
                     get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
     $settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));
 
-    /******* NFA limitations *******/
-    $settings->add(new admin_setting_heading('nfa_settings_heading', get_string('nfa_settings_heading', 'qtype_preg'),
+    /******* FA limitations *******/
+    $settings->add(new admin_setting_heading('fa_settings_heading', get_string('fa_settings_heading', 'qtype_preg'),
                     get_string('engine_heading_descriptions', 'qtype_preg')));
-    $settings->add(new admin_setting_configtext('qtype_preg_nfa_state_limit', get_string('fa_state_limit', 'qtype_preg'),
-                    get_string('nfa_state_limit_description', 'qtype_preg'), 250, PARAM_INT));
-    $settings->add(new admin_setting_configtext('qtype_preg_nfa_transition_limit', get_string('fa_transition_limit', 'qtype_preg'),
-                    get_string('nfa_transition_limit_description', 'qtype_preg'), 250, PARAM_INT));
+    $settings->add(new admin_setting_configtext('qtype_preg_fa_state_limit', get_string('fa_state_limit', 'qtype_preg'),
+                    get_string('fa_state_limit_description', 'qtype_preg'), 250, PARAM_INT));
+    $settings->add(new admin_setting_configtext('qtype_preg_fa_transition_limit', get_string('fa_transition_limit', 'qtype_preg'),
+                    get_string('fa_transition_limit_description', 'qtype_preg'), 250, PARAM_INT));
 }

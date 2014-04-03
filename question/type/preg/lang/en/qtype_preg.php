@@ -15,7 +15,7 @@ $string['charhintpenalty_help'] = 'Penalty for getting the one-character hint. T
 $string['lexemhintpenalty'] = 'Penalty for the next lexem hint';
 $string['lexemhintpenalty_help'] = 'Penalty for getting the next lexem hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints) and next character one. These penalties are mutually exclusive.';
 $string['correctanswer'] = 'Correct answer';
-$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only NFA engine can generate correct answers.';
+$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only FA engine can generate correct answers.';
 $string['debugheading'] = 'Debug settings';
 $string['defaultenginedescription'] = 'Matching engine selected by default when creating a new question';
 $string['defaultenginelabel'] = 'Default matching engine';
@@ -27,11 +27,12 @@ $string['description_tool'] = 'Description';
 $string['description_tool_help'] = 'Here you can see description of regular expression. Pressing the node of the tree marks corresponding subgraph marks corresponding part of description with yellow color.';
 $string['doterror'] = 'Can\'t draw {$a->name} for this regex';
 $string['engine'] = 'Matching engine';
-$string['engine_help'] = '<p>There is no \'best\' matching engine, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP language. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p><b>NFA matching engine</b> uses custom matching code. It supports partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>NFA engine is probably the best choice if you don\'t use lookaround assertions.</p>';
+$string['engine_help'] = '<p>There is no \'best\' matching engine, so you can choose the engine that fits the particular question best.</p><p>Native <b>PHP preg matching engine</b> works using preg_match() function from PHP language. It\'s almost 100% bug-free and able to work with full PCRE syntax, but can\'t support advanced features (showing partial matches and hinting).</p><p><b>FA matching engine</b> uses custom matching code. It supports partial matching and hinting, but don\'t support lookaround assertions (you\'ll be notified when trying to save a question with unsupported expressions) and potentially can contain bugs.</p><p>If the difference between engines is too hard to you, just try them all to see how their capabilities suit your needs. If one engine fails in a question then try another engines to see if they can handle it better.</p><p>FA engine is probably the best choice if you don\'t use lookaround assertions.</p>';
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching returns true if there is at least one match in the given string (answer). Exact matching means that the match must be the entire string.</p><p>Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives you additional flexibility: you can specify an answer with low (or zero) grade to catch common errors and give comments on them. You still can specify exact matches for some of your regular expressions if you start them with ^ and end with $.</p>';
 $string['explaining_graph_tool'] = 'Explaining graph';
 $string['explaining_graph_tool_help'] = 'Here you can see explaining graph. Pressing the node of the tree marks corresponding subgraph with dark green rectangle.';
+$string['fa_matcher'] = 'Finite state automata';
 $string['hintcolouredstring'] = 'matched part of the response';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with the grade less than the hint grade border won\'t be used in hinting.';
@@ -44,7 +45,6 @@ $string['lexemusername'] = 'Student-visible name for lexem';
 $string['lexemusername_help'] = 'Your students probably won\'t know that an atomic part of the language they learn is called <b>lexem</b>. They may prefer to call it "word" or "number" or something. You may define a name for lexem that would be shown on the "Hint next lexem" button there.';
 $string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression in the question editing form';
 $string['maxerrorsshownlabel'] = 'Maximum number of errors shown';
-$string['nfa_matcher'] = 'Nondeterministic finite state automata';
 $string['nocorrectanswermatch'] = 'No maximum grade regular expression matches the correct answer';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal the hint grade border. This disables hinting.';
 $string['notation'] = 'Regular expression notation';
@@ -193,14 +193,14 @@ $string['leaf_charset_error'] = 'incorrect character set';
 $string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
 
-/******* NFA limitations *******/
+/******* FA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
 $string['fa_state_limit'] = 'Automata size limit: states';
 $string['fa_transition_limit'] = 'Automata size limit: transitions';
-$string['nfa_settings_heading'] = 'Nondeterministic finite state automata engine settings';
-$string['nfa_state_limit_description'] = 'Allows you to tune time and memory limits for the NFA engine when matching complex regexes';
-$string['nfa_transition_limit_description'] = 'Maximum number of transitions in NFA';
+$string['fa_settings_heading'] = 'Finite state automata engine settings';
+$string['fa_state_limit_description'] = 'Allows you to tune time and memory limits for the FA engine when matching complex regexes';
+$string['fa_transition_limit_description'] = 'Maximum number of transitions in FA';
 
 /********** Strings for authoring tools form**********************/
 $string['authoring_form_page_header'] = 'Regex constructor';
