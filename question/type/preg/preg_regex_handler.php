@@ -431,11 +431,31 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns subexpressions map.
+     * Returns max subpattern number.
+     */
+    public function get_max_subpatt() {
+        if ($this->parser !== null) {
+            return $this->parser->get_max_subpatt();
+        }
+        return 0;
+    }
+
+    /**
+     * Returns subexpressions name => number map.
      */
     public function get_subexpr_map() {
         if ($this->lexer !== null) {
             return $this->lexer->get_subexpr_map();
+        }
+        return array();
+    }
+
+    /**
+     * Returns subpatterns number => node map.
+     */
+    public function get_subpatt_map() {
+        if ($this->parser !== null) {
+            return $this->parser->get_subpatt_map();
         }
         return array();
     }
