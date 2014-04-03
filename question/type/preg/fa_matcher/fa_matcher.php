@@ -170,8 +170,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      */
     protected function epsilon_closure($startstates, $subexpr = 0) {
         $curstates = $startstates;
-        $result = array('lazy' => array(),
-                        'greedy' => $startstates
+        $result = array(qtype_preg_fa_transition::GREED_LAZY => array(),
+                        qtype_preg_fa_transition::GREED_GREEDY => $startstates
                         );
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
@@ -197,11 +197,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Resolve ambiguities if any.
                 $number = $newstate->state;
                 $key = $transition->greediness == qtype_preg_fa_transition::GREED_LAZY
-                     ? 'lazy'
-                     : 'greedy';
+                     ? qtype_preg_fa_transition::GREED_LAZY
+                     : qtype_preg_fa_transition::GREED_GREEDY;
                 if (!isset($result[$key][$number]) || $newstate->leftmost_longest($result[$key][$number])) {
                     $result[$key][$number] = $newstate;
-                    if ($key != 'lazy') {
+                    if ($key != qtype_preg_fa_transition::GREED_LAZY) {
                         $curstates[] = $newstate;
                     }
                 }
@@ -246,7 +246,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 continue;
             }
             $closure = $this->epsilon_closure(array($laststate->state => $laststate));
-            $closure = array_merge($closure['lazy'], $closure['greedy']);
+            $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
             foreach ($closure as $curclosure) {
                 if (in_array($curclosure->state, $endstates)) {
                     // The end state is reachable; return it immediately.
@@ -355,7 +355,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Get an epsilon-closure of the resume state.
         $closure = $this->epsilon_closure(array($resumestate->state => $resumestate));
-        $closure = array_merge($closure['lazy'], $closure['greedy']);
+        $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state] = $curclosure;
             $curstates[] = $curclosure->state;
@@ -427,7 +427,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             $reached = $this->epsilon_closure($reached);
-            $reached = array_merge($reached['lazy'], $reached['greedy']);
+            $reached = array_merge($reached[qtype_preg_fa_transition::GREED_LAZY], $reached[qtype_preg_fa_transition::GREED_GREEDY]);
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
@@ -550,8 +550,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         $closure = $this->epsilon_closure($curstates);
-        $lazystates = array_merge($lazystates, $closure['lazy']);
-        $closure = $closure['greedy'];
+        $lazystates = array_merge($lazystates, $closure[qtype_preg_fa_transition::GREED_LAZY]);
+        $closure = $closure[qtype_preg_fa_transition::GREED_GREEDY];
         $curstates = array();
         foreach ($closure as $curclosure) {
             $states[$curclosure->state] = $curclosure;
@@ -617,8 +617,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             $reached = $this->epsilon_closure($reached);
-            $lazystates = array_merge($lazystates, $reached['lazy']);
-            $reached = $reached['greedy'];
+            $lazystates = array_merge($lazystates, $reached[qtype_preg_fa_transition::GREED_LAZY]);
+            $reached = $reached[qtype_preg_fa_transition::GREED_GREEDY];
 
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
