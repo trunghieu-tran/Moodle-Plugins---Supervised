@@ -17,6 +17,8 @@
     private $id_counter;
     // Counter of subpatterns.
     private $subpatt_counter;
+    // Map subpattern number => subpattern node.
+    private $subpatt_map;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -27,6 +29,7 @@
         $this->handlingoptions = $handlingoptions;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
+        $this->subpatt_map = array();
     }
 
     public function get_root() {
@@ -51,6 +54,10 @@
 
     public function get_max_subpatt() {
         return $this->subpatt_counter;
+    }
+
+    public function get_subpatt_map() {
+        return $this->subpatt_map;
     }
 
     /**
@@ -148,6 +155,7 @@
     protected function assign_subpatts($node) {
         if ($node->is_subpattern() || $node === $this->root) {
             $node->subpattern = $this->subpatt_counter++;
+            $this->subpatt_map[$node->subpattern] = $node;
         }
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {

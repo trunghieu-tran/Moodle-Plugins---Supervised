@@ -4063,12 +4063,12 @@ class qtype_preg_cross_tests_from_preg {
         $test3 = array( 'str'=>'cdxyabab',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>4,1=>4),
-                        'length'=>array(0=>2,1=>2),
-                        'ext_index_first'=>array(0=>4,1=>4),
-                        'ext_length'=>array(0=>6,1=>2),
-                        'left'=>array(4),
-                        'next'=>'x');
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>6),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>6),
+                        'left'=>array(2),
+                        'next'=>'c');
 
         $test4 = array( 'str'=>'cdxycd',
                         'is_match'=>true,
@@ -4603,9 +4603,9 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>2,1=>2),
                         'ext_index_first'=>array(0=>0,2=>0),
-                        'ext_length'=>array(0=>4,1=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'ext_length'=>array(0=>4,2=>2),
+                        'left'=>array(4),
+                        'next'=>'c');
 
         return array('regex'=>'(?:(ab)|(cd))\2',
                      'tests'=>array($test1),
