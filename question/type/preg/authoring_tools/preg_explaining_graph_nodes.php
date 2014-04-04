@@ -141,7 +141,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
             $this->get_shape(),
             $this->get_color(),
             $graph,
-            $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast,
+            $this->pregnode->id . '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast,
             $this->get_style(),
             $this->get_fillcolor()
         );
