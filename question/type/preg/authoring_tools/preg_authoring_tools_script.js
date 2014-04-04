@@ -61,6 +61,12 @@ M.preg_authoring_tools_script = (function ($) {
         this.setup_parent_object();
     },
 
+    tree_err : function () { return $('#tree_err'); },
+    tree_img: function () { return $('#tree_img'); },
+    graph_err: function () { return $('#graph_err'); },
+    graph_img: function () { return $('#graph_img'); },
+    desc_hnd: function () { return $('#description_handler'); },
+
     /**
      * Sets up options of M.poasquestion_text_and_button object
      * This method defines onfirstpresscallback method, that calls on very first
@@ -414,35 +420,24 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     invalidate_content : function () {
-        var tree_err = $('#tree_err'),
-            tree_img = $('#tree_img'),
-            graph_err = $('#graph_err'),
-            graph_img = $('#graph_img'),
-            desc_hnd = $('#description_handler');
 
-        tree_err.html('');
-        tree_img.css('visibility', 'hidden');
+        self.tree_err().html('');
+        self.tree_img().css('visibility', 'hidden');
 
-        graph_err.html('');
-        graph_img.css('visibility', 'hidden');
+        self.graph_err().html('');
+        self.graph_img().css('visibility', 'hidden');
 
-        desc_hnd.html('');
+        self.desc_hnd().html('');
     },
 
     // Displays given images and description
     display_content : function (t, g, d, indfirst, indlast) {
-        var scroll = $(window).scrollTop(),
-            tree_err = $('#tree_err'),
-            tree_img = $('#tree_img'),
-            graph_err = $('#graph_err'),
-            graph_img = $('#graph_img'),
-            desc_hnd = $('#description_handler');
+        var scroll = $(window).scrollTop();
 
         self.invalidate_content();
 
-
         if (typeof t != 'undefined' && t.img) {
-            tree_img.css('visibility', 'visible').html(t.img);
+            self.tree_img().css('visibility', 'visible').html(t.img);
 
             /*$('#tree_img').mousedown(function(e) {
                 e.preventDefault();
@@ -462,14 +457,14 @@ M.preg_authoring_tools_script = (function ($) {
                 self.CALC_COORD = false;
             });*/
 
-            tree_img.click(self.tree_node_misclicked);
-            $("svg .node", tree_img).click(self.tree_node_clicked);
+            self.tree_img().click(self.tree_node_misclicked);
+            $("svg .node", self.tree_img()).click(self.tree_node_clicked);
         } else if (typeof t != 'undefined') {
-            tree_err.html(t);
+            self.tree_err().html(t);
         }
 
         if (typeof g != 'undefined' && g.img) {
-            graph_img.css('visibility', 'visible').html(g.img)
+            self.graph_img().css('visibility', 'visible').html(g.img)
 
             $('#graph_img').mousedown(function(e) {
                 e.preventDefault();
@@ -492,11 +487,11 @@ M.preg_authoring_tools_script = (function ($) {
             graph_img.click(self.graph_node_misclicked);
             $("svg .node", graph_img).click(self.graph_node_clicked);
         } else if (typeof g != 'undefined') {
-            graph_err.html(g);
+            self.graph_err().html(g);
         }
 
         if (typeof d != 'undefined') {
-            desc_hnd.html(d);
+            self.desc_hnd().html(d);
         }
 
         var length =  indlast - indfirst + 1;
@@ -507,7 +502,7 @@ M.preg_authoring_tools_script = (function ($) {
             length = 0;
         }
         $(self.regex_input).textrange('set', indfirst, length);
-        $(window).scrollTop(scroll);
+        $(window).scrollTop(scroll); // TODO - what is is? O_0
     },
 
 
@@ -773,10 +768,10 @@ M.preg_authoring_tools_script = (function ($) {
         }
 
         // Unbind tree handlers so nothing is clickable till the response is received.
-        $('#tree_img').unbind('click', self.tree_node_misclicked);
-        $("#tree_img svg .node").unbind('click', self.tree_node_clicked);
-        $('#graph_img').unbind('click', self.tree_node_misclicked);
-        $("#graph_img svg .node").unbind('click', self.tree_node_clicked); // TODO - idea says that this is bad :c
+        self.tree_img().unbind('click', self.tree_node_misclicked);
+        $("svg .node", self.tree_img()).unbind('click', self.tree_node_clicked);
+        self.graph_img().unbind('click', self.graph_node_misclicked);
+        $("svg .node", self.graph_img()).unbind('click', self.graph_node_clicked); // TODO - idea says that this is bad :c
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
@@ -868,35 +863,29 @@ M.preg_authoring_tools_script = (function ($) {
 
     panzooms : {
         reset_tree : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("reset");
+            self.tree_img().panzoom("reset");
         },
 
         reset_graph : function() {
-            var graph_img = $('#graph_img');
-            graph_img.panzoom("reset");
+            self.graph_img().panzoom("reset");
         },
 
         disable_tree : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("disable");
+            self.tree_img().panzoom("disable");
         },
 
         disable_graph : function() {
-            var graph_img = $('#graph_img');
-            graph_img.panzoom("instance")._unbind();
-            graph_img.off('mousewheel.focal', this._zoom);
+            self.graph_img().panzoom("instance")._unbind();
+            self.graph_img().off('mousewheel.focal', this._zoom);
         },
         
         enable_tree : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("enable");
+            self.tree_img().panzoom("enable");
         },
 
         enable_graph : function() {
-            var graph_img = $('#graph_img');
-            graph_img.panzoom("instance")._bind();
-            graph_img.on('mousewheel.focal', this._zoom);
+            self.graph_img().panzoom("instance")._bind();
+            self.graph_img().on('mousewheel.focal', this._zoom);
         },
 
         reset_all : function() {
@@ -907,26 +896,22 @@ M.preg_authoring_tools_script = (function ($) {
         },
 
         reset_tree_dimensions : function() {
-            var tree_img = $('#tree_img');
-            tree_img.panzoom("resetDimensions");
+            self.tree_img().panzoom("resetDimensions");
         },
 
         reset_graph_dimensions : function() {
-            var graph_img = $('#graph_img');
-            graph_img.panzoom("resetDimensions");
+            self.graph_img().panzoom("resetDimensions");
         },
 
         init_tree : function() {
-            var tree_img = $('#tree_img');
-            var tree_panzoom_obj = $(tree_img).panzoom();
-            $(tree_img).on('mousewheel.focal', this._zoom);
-            $(tree_img).panzoom("option", "pan", false);
+            var tree_panzoom_obj = self.tree_img().panzoom();
+            self.tree_img().on('mousewheel.focal', this._zoom);
+            self.tree_img().panzoom("option", "pan", false);
         },
 
         init_graph : function() {
-            var graph_img = $('#graph_img');
-            var graph_panzoom_obj = $(graph_img).panzoom();
-            $(graph_img).on('mousewheel.focal', this._zoom);
+            var graph_panzoom_obj = self.graph_img().panzoom();
+            self.graph_img().on('mousewheel.focal', this._zoom);
         },
 
         init : function() {
