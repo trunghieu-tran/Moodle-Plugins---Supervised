@@ -186,6 +186,9 @@ abstract class qtype_preg_syntax_tree_node {
         if ($context->handler->is_node_generated($this->pregnode)) {
             $style .= ', filled';
             $result .= ', fillcolor = lightgrey';
+        } else {
+            $style .= ', filled';
+            $result .= ', fillcolor = white';
         }
         $result .= ", style = \"$style\"";
         return '[' . $result . ']';

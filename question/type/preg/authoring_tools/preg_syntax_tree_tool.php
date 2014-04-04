@@ -78,8 +78,7 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
                                                     new qtype_preg_position($indfirst, $indlast), $this->options->foldcoords, $this->options->treeisfold);
         $dotscript = $this->get_dst_root()->dot_script($context);
         return array(
-            'img' => 'data:image/svg+xml;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'svg')),
-            'map' => qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx')
+            'img' => qtype_preg_regex_handler::execute_dot($dotscript, 'svg')
         );
     }
 }

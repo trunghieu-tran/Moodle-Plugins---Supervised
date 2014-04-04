@@ -112,10 +112,9 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->setDefault('authoring_tools_tree_orientation', 'vertical');
 
         // Add generated map.
-        $mform->addElement('html', '<div id="tree_map" ></div></br>');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
-                                            '<img src="" id="tree_img" usemap="#' . qtype_preg_syntax_tree_node::get_graph_name() . '" alt="' . get_string('authoring_form_tree_build', 'qtype_preg') . '" />' .
+                                            '<div id="tree_img" class="preg_img_panzoom" title="' . get_string('authoring_form_tree_build', 'qtype_preg') . '">&nbsp;</div>' .
                                             /*'<div id="resizeTree">' .
                                                 '<div id="resizeSE"></div>' .
                                                 '<div id="resizeE"></div>' .
@@ -138,10 +137,9 @@ class qtype_preg_authoring_form extends moodleform {
         $graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $mform->addGroup($graphselectionarray, 'graph_selection', '', array(' '), false);
 
-        $mform->addElement('html', '<div id="graph_map" ></div></br>');
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="graph_hnd">' .
                                        '<div id="graph_err"></div>' .
-                                       '<img src="" id="graph_img" usemap="#' . qtype_preg_explaining_graph_node_abstract::get_graph_name() . '" alt="' . get_string('authoring_form_graph_build', 'qtype_preg') . '" />' .
+                                       '<div id="graph_img" class="preg_img_panzoom" title="' . get_string('authoring_form_graph_build', 'qtype_preg') . '">&nbsp;</div>' .
                                        '<div id="resizeGraph">' .
                                             '<div id="resizeSE"></div>' .
                                             '<div id="resizeE"></div>' .
