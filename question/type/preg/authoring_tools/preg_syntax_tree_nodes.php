@@ -181,7 +181,7 @@ abstract class qtype_preg_syntax_tree_node {
         $color = $this->shape_color();
         $fontcolor = $this->font_color();
         $style = $this->style();
-        $id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+        $id = 'treeid_' . $this->pregnode->id . '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast;
         $result = "id = \"$id\", label = \"$label\", tooltip = \"$tooltip\", shape = \"$shape\", color = \"$color\", fontcolor = \"$fontcolor\"";
         if ($context->handler->is_node_generated($this->pregnode)) {
             $style .= ', filled';

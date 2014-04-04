@@ -449,7 +449,7 @@ class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_grap
             $right = $this->operands[$i]->create_graph();
             $graph->assume_subgraph($right);
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $graph);
-            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
+            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast;
             $graph->links[count($graph->links)-1]->tooltip = 'concatenation';
 
             if ($i != $n-1) {
@@ -516,7 +516,7 @@ class qtype_preg_explaining_graph_node_quant extends qtype_preg_explaining_graph
         $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $a);
 
         $quant = new qtype_preg_explaining_graph_tool_subgraph($label, $this->pregnode->id .
-                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast);
         $quant->tooltip = "quantifier";
         $quant->style = 'dotted';
         $quant->color = 'black';
@@ -575,7 +575,7 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
 
         $subexpr = new qtype_preg_explaining_graph_tool_subgraph(
                         $label,
-                        $this->pregnode->id. ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast
+                        $this->pregnode->id. '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast
                     );
         $subexpr->tooltip = "subexpression";
         $subexpr->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
@@ -613,7 +613,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
 
     protected function process_operator($graph) {
         $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id .
-                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast);
         $condsubexpr->tooltip = "conditional subexpression";
         $condsubexpr->style = 'solid';
         $condsubexpr->color = 'black';
@@ -752,7 +752,7 @@ class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_grap
                     'green' : 'red');
 
         $sub = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id .
-                    ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast);
+                    '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast);
         $sub->tooltip = "assert";
         $sub->style = 'solid';
         $sub->color = 'grey';
