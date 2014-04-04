@@ -277,7 +277,7 @@ abstract class qtype_preg_node {
     /** Back reference to a subexpression. */
     const TYPE_LEAF_BACKREF = 'leaf_backref';
     /** Recursive match. */
-    const TYPE_LEAF_RECURSION = 'leaf_recursion';
+    const TYPE_LEAF_SUBEXPR_CALL = 'leaf_subexpr_call';
     /** Backtracking control, newline conventions etc sequences. */
     const TYPE_LEAF_CONTROL = 'leaf_control';
     /** Option set. */
@@ -1882,14 +1882,18 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 }
 
-class qtype_preg_leaf_recursion extends qtype_preg_leaf {
+class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
 
+    /** Number of the subexpression to call. All names are converted to numbers by lexer. */
     public $number;
+    /** Is this actually a recursive call? Calculated by parser. */
+    public $isrecursive;
 
     public function __construct($number = null) {
-        $this->type = qtype_preg_node::TYPE_LEAF_RECURSION;
+        $this->type = qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL;
         $this->subtype = $this->type;
         $this->number = $number;
+        $this->isrecursive = false;
     }
 
     public function lang_key($usedescription = false) {
@@ -1917,7 +1921,7 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     }
 
     public function tohr() {
-        return 'recursion';
+        return 'subexpression call';
     }
 }
 

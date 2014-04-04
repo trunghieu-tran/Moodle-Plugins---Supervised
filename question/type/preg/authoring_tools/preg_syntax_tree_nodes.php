@@ -405,7 +405,7 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     }
 }
 
-class qtype_preg_syntax_tree_leaf_recursion extends qtype_preg_syntax_tree_leaf {
+class qtype_preg_syntax_tree_leaf_subexpr_call extends qtype_preg_syntax_tree_leaf {
 
     public function label() {
         return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);

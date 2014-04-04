@@ -1513,35 +1513,35 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();   // )
         $token = $lexer->nextToken();   // (?R)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 0);
         $token = $lexer->nextToken();   // (?14)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 14);
         $token = $lexer->nextToken();   // (?-1)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();   // (?+1)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();   // (?&name)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 'name');
         $token = $lexer->nextToken();   // (?P>name)
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 'name');
         $token = $lexer->nextToken();   // \g<name>
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 'name');
         $token = $lexer->nextToken();   // \g'name'
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($token->value->number === 'name');
     }
     function test_conditional_subexpressions() {
@@ -2508,7 +2508,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($token->value->userinscription) == 1 && $token->value->userinscription[0]->data === '(?i)');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_RECURSION);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue(count($token->value->userinscription) == 1 && $token->value->userinscription[0]->data === '(?R)');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);

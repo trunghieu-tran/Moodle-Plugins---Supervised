@@ -173,6 +173,28 @@
         }
     }
 
+    /**
+     * Calculates $isrecursive for all qtype_preg_leaf_subexpr_call instances.
+     */
+    protected function detect_recursive_subexpr_calls($node, $currentsubexprs = array(0)) {
+        if ($node->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+            $node->isrecursive = in_array($node->number, $currentsubexprs);
+        }
+
+        $newsubexprs = $currentsubexprs;
+        if ($node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+            if ($node->number != -1 && !in_array($node->number, $newsubexprs)) {
+                $newsubexprs[] = $node->number;
+            }
+        }
+
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->detect_recursive_subexpr_calls($operand, $newsubexprs);
+            }
+        }
+    }
+
     protected function expand_quantifiers($node) {
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $key => $operand) {
@@ -254,6 +276,9 @@ start ::= expr(B). {
 
     // Assign identifiers.
     $this->assign_ids($this->root);
+
+    // Calculate recursive subexpression calls.
+    $this->detect_recursive_subexpr_calls($this->root);
 }
 
 expr(A) ::= PARSELEAF(B). {

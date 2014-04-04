@@ -54,7 +54,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_RECURSION:
+            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
                 return 'qtype_preg_fa_leaf';
         }
 
@@ -85,7 +85,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_RECURSION:
+            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -473,7 +473,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
                 //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
-                $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_RECURSION
+                $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
                                  ? clone $curstate
                                  : $curstate;
                 if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
@@ -579,7 +579,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $curpos = $startpos + $curstate->length;
                     $length = 0;
                     //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
-                    $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_RECURSION
+                    $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
                                      ? clone $curstate
                                      : $curstate;
                     if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
@@ -695,7 +695,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $bruteforce = false;
         foreach ($this->get_nodes_with_subexpr_refs() as $node) {
             // Recursion leafs are kinda subexpr references but they don't cause bruteforce
-            if ($node->type != qtype_preg_node::TYPE_LEAF_RECURSION) {
+            if ($node->type != qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                 $bruteforce = true;
                 break;
             }

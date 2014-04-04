@@ -92,7 +92,7 @@ $string['leaf_charset_except']         = 'любой символ кроме';
 $string['leaf_meta']                   = 'мета-символ или escape-последовательность';
 $string['leaf_assert']                 = 'простое утверждение';
 $string['leaf_backref']                = 'обратная ссылка';
-$string['leaf_recursion']              = 'рекурсия';
+$string['leaf_subexpr_call']           = 'вызов подмаски';
 $string['leaf_control']                = 'управляющая последовательность';
 $string['leaf_options']                = 'модификатор';   // TODO: remove?
 $string['node_finite_quant']           = 'конечный квантификатор';
@@ -239,10 +239,10 @@ $string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
 // TYPE_LEAF_BACKREF
 $string['description_leaf_backref'] = 'текст, совпавший с подвыражением #{$a}';
 $string['description_leaf_backref_name'] = 'текст, совпавший с подвыражением "{$a}"';
-// TYPE_LEAF_RECURSION
-$string['description_leaf_recursion'] = 'рекурсивное совпадение с подмаской #{$a}';
-$string['description_leaf_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
-$string['description_leaf_recursion_name'] = 'рекурсивное совпадение с подмаской "{$a}"';
+// TYPE_LEAF_SUBEXPR_CALL
+$string['description_leaf_subexpr_call'] = 'рекурсивное совпадение с подмаской #{$a}';
+$string['description_leaf_subexpr_call_all'] = 'рекурсивное совпадение со всем регулярным выражением';
+$string['description_leaf_subexpr_call_name'] = 'рекурсивное совпадение с подмаской "{$a}"';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';

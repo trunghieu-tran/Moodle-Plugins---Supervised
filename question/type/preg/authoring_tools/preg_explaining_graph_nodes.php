@@ -323,9 +323,9 @@ class qtype_preg_explaining_graph_leaf_backref extends qtype_preg_explaining_gra
 }
 
 /**
- * Class for tree's recursion leaf.
+ * Class for tree's subexpr call leaf.
  */
-class qtype_preg_explaining_graph_leaf_recursion extends qtype_preg_explaining_graph_leaf {
+class qtype_preg_explaining_graph_leaf_subexpr_call extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
         return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));

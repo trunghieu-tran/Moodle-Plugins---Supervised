@@ -461,7 +461,7 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns all nodes with references to subexpressions (backreferences, conditional subexpressions, recursion).
+     * Returns all nodes with references to subexpressions (backreferences, conditional subexpressions, subexpression calls).
      */
     public function get_nodes_with_subexpr_refs() {
         if ($this->lexer !== null) {

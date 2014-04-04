@@ -836,4 +836,22 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->position->colfirst === 0);
         $this->assertTrue($root->position->collast === 2);
     }
+    function test_subexpr_calls() {
+        $handler = $this->run_handler("()(?R)(?1)(?<name>)(?&name)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->number === 1);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
+        $this->assertTrue($root->operands[1]->number === 0);
+        $this->assertTrue($root->operands[1]->isrecursive);
+        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
+        $this->assertTrue($root->operands[2]->number === 1);
+        $this->assertFalse($root->operands[2]->isrecursive);
+        $this->assertTrue($root->operands[3]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[3]->number === 2);
+        $this->assertTrue($root->operands[4]->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
+        $this->assertTrue($root->operands[4]->number === 2);
+        $this->assertFalse($root->operands[4]->isrecursive);
+    }
 }

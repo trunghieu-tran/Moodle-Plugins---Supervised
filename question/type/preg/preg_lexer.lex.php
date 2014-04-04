@@ -71,7 +71,7 @@ class qtype_preg_lexer extends JLexBase  {
     protected $subexpr_name_to_number_map = array();
     // Map of subexpression numbers => names.
     protected $subexpr_number_to_name_map = array();
-    // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, recursion.
+    // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, subexpression calls.
     protected $nodes_with_subexpr_refs = array();
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
@@ -588,21 +588,21 @@ class qtype_preg_lexer extends JLexBase  {
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
     /**
-     * Returns a named recursion token.
+     * Returns a named subexpression call token.
      */
-    protected function form_named_recursion($text, $name) {
+    protected function form_named_subexpr_call($text, $name) {
         // Error: empty name.
         if ($name === '') {
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
             return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        return $this->form_recursion($text, $name);
+        return $this->form_subexpr_call($text, $name);
     }
     /**
-     * Returns a recursion token.
+     * Returns a subexpression call token.
      */
-    protected function form_recursion($text, $number) {
-        $node = new qtype_preg_leaf_recursion();
+    protected function form_subexpr_call($text, $number) {
+        $node = new qtype_preg_leaf_subexpr_call();
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $node->number = $number;
         $this->set_node_modifiers($node);
@@ -6936,7 +6936,7 @@ array(
 							{         /* \g<name>        Call subexpression by name (Oniguruma) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $name);
+    return $this->form_named_subexpr_call($text, $name);
 }
 						case -65:
 							break;
@@ -6944,7 +6944,7 @@ array(
 							{         /* \g'name'        Call subexpression by name (Oniguruma) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $name);
+    return $this->form_named_subexpr_call($text, $name);
 // TODO:
 //         \g<n>           call subpattern by absolute number (Oniguruma)
 //         \g'n'           call subpattern by absolute number (Oniguruma)
@@ -7002,7 +7002,7 @@ array(
 							{            /* (?n)            Call subexpression by absolute number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
-    return $this->form_recursion($text, $number);
+    return $this->form_subexpr_call($text, $number);
 }
 						case -71:
 							break;
@@ -7116,7 +7116,7 @@ array(
 						case 80:
 							{                   /* (?R)            Recurse whole pattern */
     $text = $this->yytext();
-    return $this->form_recursion($text, 0);
+    return $this->form_subexpr_call($text, 0);
 }
 						case -81:
 							break;
@@ -7124,7 +7124,7 @@ array(
 							{         /* (?&name)        Call subexpression by name (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_named_recursion($text, $name);
+    return $this->form_named_subexpr_call($text, $name);
 }
 						case -82:
 							break;
@@ -7197,7 +7197,7 @@ array(
     } else {
         $number = $this->last_subexpr + $number;
     }
-    return $this->form_recursion($text, $number);
+    return $this->form_subexpr_call($text, $number);
 }
 						case -87:
 							break;
@@ -7238,7 +7238,7 @@ array(
 							{        /* (?P>name)       Call subexpression by name (Python) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_named_recursion($text, $name);
+    return $this->form_named_subexpr_call($text, $name);
 }
 						case -92:
 							break;

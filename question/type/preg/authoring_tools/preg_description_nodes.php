@@ -416,7 +416,7 @@ class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf {
 
 }
 
-class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf {
+class qtype_preg_description_leaf_subexpr_call extends qtype_preg_description_leaf {
 
     public function pattern($node_parent = null, $form = null) {
         //return parent::pattern($node_parent, $form);
