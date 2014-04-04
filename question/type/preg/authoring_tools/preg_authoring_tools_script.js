@@ -256,9 +256,9 @@ M.preg_authoring_tools_script = (function ($) {
     tree_node_clicked : function (e) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
-            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/[,;]/), // TODO -omg make beauty
-                indfirst = tmp[1],
-                indlast = tmp[2];
+            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/_/), // TODO -omg make beauty
+                indfirst = tmp[2],
+                indlast = tmp[3];
 
             if(self.is_tree_foldind_mode()) {
                 var points = $('input[name=\'tree_fold_node_points\']').val();

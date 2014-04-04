@@ -237,9 +237,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 // then we need to join this two nodes.
                 if ($neighbor !== null and $neighbor->type == qtype_preg_explaining_graph_tool_node::TYPE_SIMPLE && $neighbor->owner === $this) {
 
-                    $ids_this = explode(',', $tmpdnode->id);
-                    $ids_neighbor = explode(',', $neighbor->id);
-                    $ids_new = $ids_this[0] . ',' . $ids_this[1] . ',' . ($ids_neighbor[2]);
+                    $ids_this = explode('_', $tmpdnode->id);
+                    $ids_neighbor = explode('_', $neighbor->id);
+                    $ids_new = $ids_this[0] . '_' . $ids_this[1] . '_' . ($ids_neighbor[2]);
 
                     // Create the new joined node.
                     $tmp = new qtype_preg_explaining_graph_tool_node(
@@ -573,7 +573,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         foreach ($this->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd' . $iter->destination->id . '"';
             $instr .= "[";
-            if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
+            if ($iter->id !== -1) $instr .= "id=\"graphid_" . $iter->id . "\", ";
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
             $instr .= "color=\"" . $iter->color . "\", ";
@@ -649,10 +649,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' .$iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ',id="' . $iter->id .
+                $instr .= '"nd' .$iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ',id="graphid_' . $iter->id .
                     '", label=' . $this->compute_html($iter->label, $iter->invert) . ', fillcolor=' . $iter->fillcolor .',tooltip="character class"' ."];\n";
             } else {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' . 'id="' . $iter->id .
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' . 'id="graphid_' . $iter->id .
                     '",color=' . $iter->color . ', ' . 'style=' . $iter->style . ', ' .
                     'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' .
                     ', fillcolor=' . $iter->fillcolor . ',tooltip="'.str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])).'"' ."];\n";
@@ -666,7 +666,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         foreach ($gr->links as $iter) {
             $instr .= '"nd' . $iter->source->id . '" -> "nd' . $iter->destination->id . '"';
             $instr .= "[";
-            if ($iter->id !== -1) $instr .= "id=\"" . $iter->id . "\", ";
+            if ($iter->id !== -1) $instr .= "id=\"graphid_" . $iter->id . "\", ";
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
             $instr .= "color=\"" . $iter->color . "\", ";
