@@ -250,7 +250,7 @@ M.preg_authoring_tools_script = (function ($) {
     tree_node_clicked : function (e) {
         e.preventDefault();
         //if (!self.is_tree_selection_rectangle_visible()) {
-            var tmp = e.target.id.split(/[,;]/),
+            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/[,;]/), // TODO -omg make beauty
                 indfirst = tmp[1],
                 indlast = tmp[2];
 
@@ -296,7 +296,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     tree_node_misclicked : function (e) {
-        e.preventDefault();
+        e.preventDefault(); // TODO - joining many times when panning
         //if (!self.is_tree_selection_rectangle_visible()) {
         if(!self.is_tree_foldind_mode()) {
             $('input[name=\'tree_selected_node_points\']').val('');
@@ -308,7 +308,7 @@ M.preg_authoring_tools_script = (function ($) {
     graph_node_clicked : function (e) {
         e.preventDefault();
         if (!self.is_graph_selection_rectangle_visible()) {
-            var tmp = e.target.id.split(','),
+            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/[,;]/), // TODO -omg make beauty
                 indfirst = tmp[1],
                 indlast = tmp[2];
             self.load_content(indfirst, indlast);
@@ -416,17 +416,15 @@ M.preg_authoring_tools_script = (function ($) {
     invalidate_content : function () {
         var tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
-            tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
             graph_img = $('#graph_img'),
             desc_hnd = $('#description_handler');
 
         tree_err.html('');
-        tree_img.removeAttr('src').css('visibility', 'hidden');
-        tree_map.html('');
+        tree_img.css('visibility', 'hidden');
 
         graph_err.html('');
-        graph_img.removeAttr('src').css('visibility', 'hidden');
+        graph_img.css('visibility', 'hidden');
 
         desc_hnd.html('');
     },
@@ -436,18 +434,15 @@ M.preg_authoring_tools_script = (function ($) {
         var scroll = $(window).scrollTop(),
             tree_err = $('#tree_err'),
             tree_img = $('#tree_img'),
-            tree_map = $('#tree_map'),
             graph_err = $('#graph_err'),
             graph_img = $('#graph_img'),
-            graph_map = $('#graph_map'),
             desc_hnd = $('#description_handler');
 
         self.invalidate_content();
 
 
-        if (typeof t != 'undefined' && t.img && t.map) {
-            tree_img.attr('src', t.img).css('visibility', 'visible');
-            tree_map.html(t.map);
+        if (typeof t != 'undefined' && t.img) {
+            tree_img.css('visibility', 'visible').html(t.img);
 
             /*$('#tree_img').mousedown(function(e) {
                 e.preventDefault();
@@ -468,14 +463,13 @@ M.preg_authoring_tools_script = (function ($) {
             });*/
 
             tree_img.click(self.tree_node_misclicked);
-            $(self.TREE_MAP_ID + ' > area').click(self.tree_node_clicked);
+            $("svg .node", tree_img).click(self.tree_node_clicked);
         } else if (typeof t != 'undefined') {
             tree_err.html(t);
         }
 
-        if (typeof g != 'undefined' && g.img && g.map) {
-            graph_img.attr('src', g.img).css('visibility', 'visible');
-            graph_map.html(g.map);
+        if (typeof g != 'undefined' && g.img) {
+            graph_img.css('visibility', 'visible').html(g.img)
 
             $('#graph_img').mousedown(function(e) {
                 e.preventDefault();
@@ -495,8 +489,8 @@ M.preg_authoring_tools_script = (function ($) {
                 self.CALC_COORD = false;
             });
 
-            graph_map.click(self.graph_node_misclicked);
-            $(self.GRAPH_MAP_ID + ' > area').click(self.graph_node_clicked);
+            graph_img.click(self.graph_node_misclicked);
+            $("svg .node", graph_img).click(self.graph_node_clicked);
         } else if (typeof g != 'undefined') {
             graph_err.html(g);
         }
@@ -780,7 +774,9 @@ M.preg_authoring_tools_script = (function ($) {
 
         // Unbind tree handlers so nothing is clickable till the response is received.
         $('#tree_img').unbind('click', self.tree_node_misclicked);
-        $(self.TREE_MAP_ID + ' > area').unbind('click', self.tree_node_clicked);
+        $("#tree_img svg .node").unbind('click', self.tree_node_clicked);
+        $('#graph_img').unbind('click', self.tree_node_misclicked);
+        $("#graph_img svg .node").unbind('click', self.tree_node_clicked); // TODO - idea says that this is bad :c
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
@@ -942,7 +938,8 @@ M.preg_authoring_tools_script = (function ($) {
             e.preventDefault();
             var delta = e.delta || e.originalEvent.wheelDelta;
             var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-            $(e.target).panzoom().panzoom('zoom', zoomOut, { // TODO - panzoom() may reset options but jquery.mousewheel.js doesnt support passing data throught event O_O
+            var panzoomholder= $(e.target).parents(".preg_img_panzoom")[0];
+            $(panzoomholder).panzoom('zoom', zoomOut, {
               increment: 0.1,
               focal: e
             });

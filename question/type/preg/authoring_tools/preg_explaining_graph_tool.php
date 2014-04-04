@@ -106,8 +106,7 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
         $dotscript = $graph->create_dot();
         $rawdata = qtype_preg_regex_handler::execute_dot($dotscript, 'svg');
         return array(
-            'img' => 'data:image/svg+xml;base64,' . base64_encode($rawdata),
-            'map' => qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx')
+            'img' => $rawdata
         );
     }
 
