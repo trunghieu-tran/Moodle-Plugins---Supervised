@@ -314,9 +314,9 @@ M.preg_authoring_tools_script = (function ($) {
     graph_node_clicked : function (e) {
         e.preventDefault();
         if (!self.is_graph_selection_rectangle_visible()) {
-            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/[,;]/), // TODO -omg make beauty
-                indfirst = tmp[1],
-                indlast = tmp[2];
+            var tmp = $($(e.target).parents(".node")[0]).attr('id').split('_'), // TODO -omg make beauty
+                indfirst = tmp[2],
+                indlast = tmp[3];
             self.load_content(indfirst, indlast);
             self.load_strings(indfirst, indlast);
         }

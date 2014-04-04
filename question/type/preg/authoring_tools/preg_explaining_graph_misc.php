@@ -549,16 +549,17 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public function create_dot() {
         $this->regenerate_id();
         $instr = "digraph qtype_preg_graph {\n" .
+                  'id="explaining_graph";' .
                   "compound=true;\n" .
                   "rankdir = LR;\n" . ($this->isexact ? 'graph [bgcolor=lightgray];' : '') . "\n";
 
         foreach ($this->nodes as $iter) {
             if ($iter->shape == 'record') {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ',id="' . $iter->id .
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ',id="graphid_' . $iter->id .
                     '", label=' . $this->compute_html($iter->label, $iter->invert) . ', fillcolor=' . $iter->fillcolor .
                     ',tooltip="character class"' ."];\n";
             } else {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' . 'id="' . $iter->id .
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', ' . 'id="graphid_' . $iter->id .
                     '", color=' . $iter->color . ', ' . 'style=' . $iter->style . ', ' .
                     'label="' . str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])) . '"' .
                     ', fillcolor=' . $iter->fillcolor . ',tooltip="'.str_replace(chr(10), '', qtype_preg_authoring_tool::string_to_html($iter->label[0])).'"' ."];\n";
