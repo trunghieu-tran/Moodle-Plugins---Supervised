@@ -547,16 +547,16 @@ M.preg_authoring_tools_script = (function ($) {
 
     init_rectangle_selection : function(e, img, rectangle, hnd) {
         self.CALC_COORD = true;
-        var br = document.getElementById(img).getBoundingClientRect();
+        var br = $("#"+img+" > svg > g")[0].getBoundingClientRect(); // TODO - use pure jquery analog
         $('#' + rectangle).Resizable({
                 minWidth: 20,
                 minHeight: 20,
-                /*maxWidth: (br.right - br.left),
+                maxWidth: (br.right - br.left),
                 maxHeight: (br.bottom - br.top),
-                minTop: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
-                minLeft: (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
-                maxRight: br.right - br.left + (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left),
-                maxBottom: br.bottom - br.top,*/
+                minTop: 1,
+                minLeft: 1,
+                maxRight: br.right - br.left,
+                maxBottom: br.bottom - br.top,
                 dragHandle: true,
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
