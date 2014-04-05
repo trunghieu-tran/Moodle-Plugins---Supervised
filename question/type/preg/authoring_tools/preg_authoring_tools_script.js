@@ -629,51 +629,101 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    get_rect_selection : function (e, rectangle, img, area, deltaX, deltaY) {
+    /**
+     * Finds figures at image inside rectangle.
+     * @param rectangle selection area.
+     * @param img image to search.
+     * @param deltaX coordinate's shift by X axis.
+     * @param deltaY coordinate's shift by Y axis.
+     * @returns {Array} figures inside rectangle.
+     */
+    get_figures_in_rect : function (rectangle, img, deltaX, deltaY) {
+        rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + deltaY;
+        rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + deltaY;
+
+        var areas = $(".edge, .node", "#"+img+" > svg > g");
+        var figures = [];
+        for (var i = 0; i < areas.length; ++i) {
+            var nodeId = areas[i].id.split('_');
+            if (nodeId.length != 4) continue;
+            var figure = $("ellipse, polygon", areas[i])[0];
+
+            if (figure.tagName == "ellipse") {
+                var nodeCoords = [
+                    { x: figure.cx.baseVal.value, y : figure.cy.baseVal.value }
+                ];
+            } else if (figure.tagName == "polygon") {
+                var nodeCoords = [];
+                for (var j = 0; j < figure.points.numberOfItems; ++j) {
+                    nodeCoords.push({
+                        x : figure.points.getItem(j).x,
+                        y : figure.points.getItem(j).y
+                    });
+                }
+            } else {
+                continue;
+            }
+            // check selected coords
+            for (var j = 0; j < nodeCoords.length; ++j) {
+                if (rect_left_bot_x < nodeCoords[j].x
+                    && rect_right_top_x > nodeCoords[j].x
+                    && rect_left_bot_y > nodeCoords[j].y
+                    && rect_right_top_y < nodeCoords[j].y) {
+
+                    figures.push(figure);
+                }
+            }
+        }
+
+        return figures;
+    },
+
+    get_rect_selection : function (e, rectangle, img, deltaX, deltaY) {
         // Check ids selected nodes
         rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
         rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + deltaY;
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
         rect_right_top_y = $('#' + rectangle).prop('offsetTop') + deltaY;
-        var areas = $('#' + area).children();
+        var areas = $(".edge, .node", "#"+img+" > svg > g");
         var indfirst = 999;
         var indlast = -999;
         // check all areas and select indfirst and indlast
-        var i = 0;
-        while (areas[i]) {
-            var nodeId = areas[i].id.split(',');
-            var nodeCoords = areas[i].coords.split(/[, ]/);
-            if (areas[i].shape == "rect") {
-                nodeCoords = [
-                    nodeCoords[0], nodeCoords[1],
-                    nodeCoords[2], nodeCoords[1],
-                    nodeCoords[0], nodeCoords[3],
-                    nodeCoords[2], nodeCoords[3],
-                    String(Math.min(nodeCoords[0], nodeCoords[2]) + Math.abs(nodeCoords[0]-nodeCoords[2])/2),
-                    String(Math.min(nodeCoords[1], nodeCoords[3]) + Math.abs(nodeCoords[1]-nodeCoords[3])/2)
+        for (var i = 0; i < areas.length; ++i) {
+            var nodeId = areas[i].id.split('_');
+            if (nodeId.length != 4) continue;
+            var figure = $("ellipse, polygon", areas[i])[0];
+
+            if (figure.tagName == "ellipse") {
+                var nodeCoords = [
+                    { x: figure.cx.baseVal.value, y : figure.cy.baseVal.value }
                 ];
-            } else if (areas[i].shape == "poly") {
-                if (self.detect_rect(areas[i])) nodeCoords = areas[i].coords.split(/[, ]/);
-            }
-            var coords = [];
-            for (var j = 0; j < nodeCoords.length; j += 2) {
-                coords[coords.length] = [nodeCoords[j], nodeCoords[j + 1]];
+            } else if (figure.tagName == "polygon") {
+                var nodeCoords = [];
+                for (var j = 0; j < figure.points.numberOfItems; ++j) {
+                    nodeCoords.push({
+                        x : figure.points.getItem(j).x,
+                        y : figure.points.getItem(j).y
+                    });
+                }
+            } else {
+                continue;
             }
             // check selected coords
-            for (var j = 0; j < coords.length; ++j) {
-                if (rect_left_bot_x < coords[j][0]
-                    && rect_right_top_x > coords[j][0]
-                    && rect_left_bot_y > coords[j][1]
-                    && rect_right_top_y < coords[j][1]) {
-                        if(nodeId[1] < indfirst) {
-                            indfirst = nodeId[1];
+            for (var j = 0; j < nodeCoords.length; ++j) {
+                if (rect_left_bot_x < nodeCoords[j].x
+                    && rect_right_top_x > nodeCoords[j].x
+                    && rect_left_bot_y > nodeCoords[j].y
+                    && rect_right_top_y < nodeCoords[j].y) {
+                        if(nodeId[2] < indfirst) {
+                            indfirst = nodeId[2];
                         }
-                        if(nodeId[2] > indlast) {
-                            indlast = nodeId[2];
+                        if(nodeId[3] > indlast) {
+                            indlast = nodeId[3];
                         }
                 }
             }
-            ++i;
         }
 
         if (indfirst > indlast) {
@@ -692,7 +742,7 @@ M.preg_authoring_tools_script = (function ($) {
     /*btn_tree_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
-        var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img', 'qtype_preg_tree');
+        var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img');
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
@@ -707,7 +757,7 @@ M.preg_authoring_tools_script = (function ($) {
     btn_graph_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
-        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img', 'qtype_preg_graph', 
+        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
             (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left), 
             (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top));
         self.load_content(sel.indfirst, sel.indlast);
