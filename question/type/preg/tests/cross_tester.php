@@ -67,21 +67,24 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     // Different sources of test data.
-    const TAG_FROM_NFA           = 1;
-    const TAG_FROM_DFA           = 2;
-    const TAG_FROM_BACKTRACKING  = 4;
-    const TAG_FROM_PCRE          = 8;
-    const TAG_FROM_ATT           = 16;
+    const TAG_FROM_NFA           = 0x0001;
+    const TAG_FROM_DFA           = 0x0002;
+    const TAG_FROM_BACKTRACKING  = 0x0004;
+    const TAG_FROM_PCRE          = 0x0008;
+    const TAG_FROM_ATT           = 0x0010;
 
-    const TAG_CATEGORIZE         = 32;   // The test determines the matcher's associativity.
-    const TAG_ASSOC_LEFT         = 64;   // The test should be used for left-associative matchers.
-    const TAG_ASSOC_RIGHT        = 128;  // The test should be used for right-associative matchers.
+    const TAG_CATEGORIZE         = 0x0020; // The test determines the matcher's associativity.
+    const TAG_ASSOC_LEFT         = 0x0040; // The test should be used for left-associative matchers.
+    const TAG_ASSOC_RIGHT        = 0x0080; // The test should be used for right-associative matchers.
 
-    const TAG_MODE_PCRE          = 256;  // PCRE compatibility mode which is default.
-    const TAG_MODE_POSIX         = 512;  // POSIX compatibility mode.
+    const TAG_MODE_PCRE          = 0x0100; // PCRE compatibility mode which is default.
+    const TAG_MODE_POSIX         = 0x0200; // POSIX compatibility mode.
 
-    const TAG_DONT_CHECK_PARTIAL = 1024; // Indicates that if there's no full match, the cross-tester skips partial match checking.
-    const TAG_DEBUG_MODE         = 2048; // Informs matchers that it's debug mode.
+    const TAG_DONT_CHECK_PARTIAL = 0x0400; // Indicates that if there's no full match, the cross-tester skips partial match checking.
+    const TAG_DEBUG_MODE         = 0x0800; // Informs matchers that it's debug mode.
+
+    const MAX_BUILDING_TIME      = 2000;   // Max time for matchers to be compiled from regex, milliseconds.
+    const MAX_MATCHING_TIME      = 2000;   // Max time for matchers to match a string, milliseconds.
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
@@ -89,15 +92,9 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const NOTATION_PCRESTRICT         = 'pcrestrict';
 
     // TODO: tags for different capabilities for matchers.
-
-    protected $passcount;              // Number of passes.
-    protected $failcount;              // Number of fails.
-    protected $skipcount;              // Number of skipped tests.
-    protected $exceptionscount;        // Number of exceptions during testing.
     protected $testdataobjects;        // Objects with test data.
     protected $doextrachecks;          // Is it needed to do extra checks.
     protected $question;               // Question object for getting matchers.
-
     protected $blacklist;              // Blacklist of tags in different modes.
 
     /**
@@ -115,7 +112,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Determines the matcher's associativity.
      */
-    function categorize_assoc($enginename) {
+    protected function categorize_assoc() {
         $test1 = array('str'=>'abc',
                        'is_match'=>true,
                        'full'=>true,
@@ -134,7 +131,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Create a matcher in POSIX mode for categorization tests.
         $options = new qtype_preg_matching_options();
         $options->mode = qtype_preg_handling_options::MODE_POSIX;
-        $matcher = $this->question->get_matcher($enginename, $regex);
+        $matcher = $this->question->get_matcher($this->engine_name(), $regex);
         $matcher->set_options($options);
 
         // Match the first test.
@@ -156,13 +153,10 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     }
 
     public function __construct() {
-        $this->passcount = 0;
-        $this->failcount = 0;
-        $this->skipcount = 0;
-        $this->exceptionscount = 0;
         $this->testdataobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
         $this->question = new qtype_preg_question();
+        $this->blacklist = array();
 
         $testdir = dirname(__FILE__) . '/';
         $pregdir = dirname($testdir) . '/';
@@ -191,7 +185,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         closedir($dh);
 
         // Depending on associativity, blacklist some tests.
-        $assoc = $this->categorize_assoc($enginename);
+        $assoc = $this->categorize_assoc();
         if ($assoc === self::TAG_ASSOC_LEFT) {
             echo "\n$enginename has LEFT ASSOCIATIVITY\n\n";
             $this->blacklist = array(self::TAG_ASSOC_RIGHT);
@@ -208,17 +202,17 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * Checks matcher for parsing and accepting errors.
      */
     function check_for_errors($matcher) {
-        if ($matcher->errors_exist()) {
-            $errors = $matcher->get_errors();
-            foreach ($errors as $error) {
-                // Error messages are displayed for parsing errors only.
-                if (is_a($error, 'qtype_preg_parsing_error') && strpos($error->errormsg, 'not implemented') === false) {
-                    echo 'Regex incorrect: ' . $error->errormsg . "\n";
-                }
-            }
-            return true;
+        if (!$matcher->errors_exist()) {
+            return false;
         }
-        return false;
+        $errors = $matcher->get_errors();
+        foreach ($errors as $error) {
+            // Error messages are displayed for parsing errors only.
+            if (is_a($error, 'qtype_preg_parsing_error') && strpos($error->errormsg, 'not implemented') === false) {
+                echo 'Regex incorrect: ' . $error->errormsg . "\n";
+            }
+        }
+        return true;
     }
 
     function dump_boolean($label, $value) {
@@ -434,6 +428,14 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
+        $passcount = 0;
+        $failcount = 0;
+        $skipcount = 0;
+
+        $slowbuildtests = array();
+        $slowmatchtests = array();
+        $exceptiontests = array();
+
         $options = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $enginename = $this->engine_name();
         $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
@@ -475,17 +477,20 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     continue;
                 }
 
-                // Try to get matcher for the regex.
-
-                    $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
-                    $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
-                    $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
-                    $matcher->set_options($options);
-
+                // Get matcher for the regex.
+                $timestart = round(microtime(true) * 1000);
+                $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
+                $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
+                $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
+                $matcher->set_options($options);
+                $timeend = round(microtime(true) * 1000);
+                if ($timeend - $timestart > self::MAX_BUILDING_TIME) {
+                    $slowbuildtests[] = $classname . ' : ' . $methodname;
+                }
 
                 // Skip to the next regex if there's something wrong.
                 if ($this->check_for_errors($matcher)) {
-                    $this->skipcount += count($data['tests']);
+                    $skipcount += count($data['tests']);
                     continue;
                 }
 
@@ -505,33 +510,52 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     }
 
                     // There can be exceptions during matching.
+                    $timestart = round(microtime(true) * 1000);
                     try {
                         $matcher->match($str);
                         $obtained = $matcher->get_match_results();
                     } catch (Exception $e) {
                         echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $methodname .  "\n" . $e->getMessage() . "\n";
-                        $this->exceptionscount++;
+                        $exceptiontests[] = $classname . ' : ' . $methodname;
                         continue;
+                    }
+                    $timeend = round(microtime(true) * 1000);
+                    if ($timeend - $timestart > self::MAX_BUILDING_TIME) {
+                        $slowmatchtests[] = $classname . ' : ' . $methodname;
                     }
 
                     // Results obtained, check them.
                     $skippartialcheck = in_array(self::TAG_DONT_CHECK_PARTIAL, $tags);
                     if ($this->compare_results($regex, $notation, $str, $modifiers, $modifiersstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
-                        $this->passcount++;
+                        $passcount++;
                     } else {
-                        $this->failcount++;
+                        $failcount++;
                     }
                 }
             }
         }
-        if ($this->failcount == 0 && $this->exceptionscount == 0 && $this->passcount > 0) {
+        if ($failcount == 0 && empty($exceptiontests) && $passcount > 0) {
             echo "\n\nWow! All tests passed!\n\n";
         }
         echo "======================\n";
-        echo 'PASSED:     ' . $this->passcount . "\n";
-        echo 'FAILED:     ' . $this->failcount . "\n";
-        echo 'SKIPPED:    ' . $this->skipcount . "\n";
-        echo 'EXCEPTIONS: ' . $this->exceptionscount . "\n";
-        echo "======================";
+        echo 'PASSED:     ' . $passcount . "\n";
+        echo 'FAILED:     ' . $failcount . "\n";
+        echo 'SKIPPED:    ' . $skipcount . "\n";
+        echo "======================\n";
+        if (!empty($slowbuildtests)) {
+            echo "tests with slow matcher building:\n";
+            echo implode("\n", $slowbuildtests) . "\n";
+            echo "======================\n";
+        }
+        if (!empty($slowmatchtests)) {
+            echo "tests with slow matching:\n";
+            echo implode("\n", $slowmatchtests) . "\n";
+            echo "======================\n";
+        }
+        if (!empty($exceptiontests)) {
+            echo "tests with unhandled exceptions:\n";
+            echo implode("\n", $exceptiontests) . "\n";
+            echo "======================\n";
+        }
     }
 }
