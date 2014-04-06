@@ -434,7 +434,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
     public function process_voids($gmain) {
         foreach ($this->nodes as $iter) {
             // If this node is void...
-            if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_VOID) {
+            if ($iter->type == qtype_preg_explaining_graph_tool_node::TYPE_VOID
+            || $iter->type == qtype_preg_explaining_graph_tool_node::TYPE_OPTION) {
                 // Find neighbors of void.
                 $neighborl = $iter->find_neighbor_src($gmain);
                 $neighborr = $iter->find_neighbor_dst($gmain);
