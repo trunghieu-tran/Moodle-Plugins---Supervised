@@ -63,25 +63,27 @@ class qtype_preg_fa_tag_set {
     public $tags = array();
 
     /** @var object of qtype_preg_fa_tag - cached value for the min_open_tag() method. */
-    private $minopentag = false;
+    private $minopentag = array(qtype_preg_fa_tag::POS_BEFORE_TRANSITION => false,
+                                qtype_preg_fa_tag::POS_AT_TRANSITION => false,
+                                qtype_preg_fa_tag::POS_AFTER_TRANSITION => false);
 
     /**
      * Returns an opening tag of this set which has the minimal subpattern number.
      */
-    public function min_open_tag() {
-        if ($this->minopentag !== false) {
-            return $this->minopentag;
+    public function min_open_tag($pos) {
+        if ($this->minopentag[$pos] !== false) {
+            return $this->minopentag[$pos];
         }
-        $this->minopentag = null;
+        $this->minopentag[$pos] = null;
         foreach ($this->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pos != $pos) {
                 continue;
             }
-            if ($this->minopentag === null || $this->minopentag->pregnode->subpattern > $tag->pregnode->subpattern) {
-                $this->minopentag = $tag;
+            if ($this->minopentag[$pos] === null || $this->minopentag[$pos]->pregnode->subpattern > $tag->pregnode->subpattern) {
+                $this->minopentag[$pos] = $tag;
             }
         }
-        return $this->minopentag;
+        return $this->minopentag[$pos];
     }
 
     /**

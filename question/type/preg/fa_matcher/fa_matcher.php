@@ -136,6 +136,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
+    protected function before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_BEFORE_TRANSITION, $curpos, $length);
+    }
+
     /**
      * Updates all fields in the newstate after a transition match
      */
@@ -156,7 +160,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate->last_match_len = $length;
 
         $newstate->length += $length;
-        $newstate->write_subpatt_info($transition, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_AT_TRANSITION, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_AFTER_TRANSITION, $curpos, $length);
 
         if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
@@ -192,6 +197,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
+                $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
                 $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                 // Resolve ambiguities if any.
@@ -219,6 +225,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
 
             $resumestate = clone $laststate;
+            $this->before_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length, $subexpr);
             $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length, $subexpr);
             $resumestate->length -= $laststate->last_match_len; // Backreference was partially matched
 
@@ -251,6 +258,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 if (in_array($curclosure->state, $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
+                    $this->before_transition_matched($laststate, $result, $transition, $curpos, 0, $subexpr);
                     $this->after_transition_matched($laststate, $result, $transition, $curpos, 0, $subexpr);
                     return $result;
                 }
@@ -310,6 +318,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
+                $this->before_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
                 $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
 
                 // Generate a next character.
@@ -407,6 +416,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
+                    $this->before_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
                     $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
 
                     // Generate a next character.
@@ -473,12 +483,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
                 //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
+
+                $newstate = clone $curstate;
+                $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+
                 $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
-                                 ? clone $curstate
-                                 : $curstate;
+                                 ? clone $newstate
+                                 : $newstate;
+
                 if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
                     // Create a new state.
-                    $newstate = clone $matcherstateobj;
                     $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
                     //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
                     //echo "total length is {$newstate->length}\n\n";
@@ -493,11 +507,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 } else if (count($fullmatches) == 0 && $subexpr == 0) {
                     //echo "not matched, partial match length is $length :(\n";
                     // Transition not matched, save the partial match.
-                    $partialmatch = clone $curstate;
-                    $partialmatch->length += $length;
-                    $partialmatch->last_transition = $transition;
-                    $partialmatch->last_match_len = $length;
-                    $partialmatches[] = $partialmatch;
+                    $newstate->length += $length;
+                    $newstate->last_transition = $transition;
+                    $newstate->last_match_len = $length;
+                    $partialmatches[] = $newstate;
                 }
             }
 
@@ -579,12 +592,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $curpos = $startpos + $curstate->length;
                     $length = 0;
                     //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
+
+                    $newstate = clone $curstate;
+                    $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+
                     $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
-                                     ? clone $curstate
-                                     : $curstate;
+                                     ? clone $newstate
+                                     : $newstate;
+
                     if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
                         // Create a new state.
-                        $newstate = clone $matcherstateobj;
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
@@ -602,11 +619,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     } else if (!$endstatereached && $subexpr == 0) {
                         //echo "not matched, partial match length is $length :(\n";
                         // Transition not matched, save the partial match.
-                        $partialmatch = clone $curstate;
-                        $partialmatch->length += $length;
-                        $partialmatch->last_transition = $transition;
-                        $partialmatch->last_match_len = $length;
-                        $partialmatches[] = $partialmatch;
+                        $newstate->length += $length;
+                        $newstate->last_transition = $transition;
+                        $newstate->last_match_len = $length;
+                        $partialmatches[] = $newstate;
                     }
                 }
             }
@@ -843,8 +859,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
-            //$result->merge_epsilons();
-            //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_EPS);
+            //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH);
         } catch (Exception $e) {
             $result = false;
         }
