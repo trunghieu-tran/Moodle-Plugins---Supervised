@@ -62,7 +62,6 @@ class qtype_preg_fa_tag_set {
     /** @var array of qtype_preg_fa_tag objects - tags in this set. */
     public $tags = array();
 
-    /** @var object of qtype_preg_fa_tag - cached value for the min_open_tag() method. */
     private $minopentag = array(qtype_preg_fa_tag::POS_BEFORE_TRANSITION => false,
                                 qtype_preg_fa_tag::POS_AT_TRANSITION => false,
                                 qtype_preg_fa_tag::POS_AFTER_TRANSITION => false);
@@ -1776,22 +1775,18 @@ class qtype_preg_fa {
         $oldfront = $this->start_states();
         $endstates = $this->end_states();
         $endmerged = 1;
-        while ($endmerged != 0)
+
+        foreach ($endstates as $state)
         {
-            $endmerged = 0;
-            foreach ($endstates as $state)
-            {
-                $transitions = $this->get_adjacent_transitions($state, false);
-                foreach ($transitions as $tran) {
-                    $tran->set_transition_type();
-                    if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
-                        if ($this->go_round_transitions($tran)) {
-                            $endmerged++;
-                        }
-                    }
-                }
-            }   
-        }
+            $transitions = $this->get_adjacent_transitions($state, false);
+            foreach ($transitions as $tran) {
+                $tran->set_transition_type();
+                if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
+                    $this->go_round_transitions($tran);
+                }                      
+            }
+        }   
+
         $i = 0;
         while (count($oldfront) != 0) {
             $waschanged = false;
