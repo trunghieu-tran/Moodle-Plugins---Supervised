@@ -1774,6 +1774,25 @@ class qtype_preg_fa {
             $trantype2 = $transitiontype;
         }
         $oldfront = $this->start_states();
+        $endstates = $this->end_states();
+        $endmerged = 1;
+        while ($endmerged != 0)
+        {
+            $endmerged = 0;
+            foreach ($endstates as $state)
+            {
+                $transitions = $this->get_adjacent_transitions($state, false);
+                foreach ($transitions as $tran) {
+                    $tran->set_transition_type();
+                    if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
+                        if ($this->go_round_transitions($tran)) {
+                            $endmerged++;
+                        }
+                    }
+                }
+            }   
+        }
+        $i = 0;
         while (count($oldfront) != 0) {
             $waschanged = false;
             // Analysis transitions of each state.
@@ -1802,6 +1821,9 @@ class qtype_preg_fa {
                                             }
                                         }
                                     } else {
+                                        while (in_array($state, $stateschecked)) {
+                                            unset($stateschecked[array_search($state, $stateschecked)]);
+                                        }
                                         $newfront[] = $state;
                                     }
 
@@ -1852,16 +1874,8 @@ class qtype_preg_fa {
             }
             $oldfront = $newfront;
             $newfront = array();
-        }
-
-        foreach (array_keys($this->adjacencymatrix) as $state) {
-            $outtransitions = $this->get_adjacent_transitions($state, true);
-            foreach ($outtransitions as $t) {
-                $t->set_transition_type();
-                if ($t->to == $t->from && ($t->type == $trantype1 || $t->type == $trantype2)) {
-                    $this->go_round_transitions($t);
-                }
-            }
+            //printf ($this->fa_to_dot());
+            $i++;
         }
         //printf ($this->fa_to_dot());
         $this->remove_unreachable_states();
