@@ -315,7 +315,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider err_provider
      */
-    public function test_err($regex,$expected_en,$expected_ru)
+    /*public function test_err($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
@@ -329,12 +329,12 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
           array('a{9,0}','<span style="color:blue">a</span><span style="color:red"> is repeated from 9 to 0 times (incorrect quantifier borders)</span>','рус - TODO'),
           array('(a','<span style="color:red">Syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>','рус - TODO'),
         );
-    }
+    }*/
 
     /**
      * @dataProvider form_provider
      */
-    public function test_form($regex,$expected_en,$expected_ru)
+    /*public function test_form($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_description_tool($regex);
         $result = $handler->form_description('g');
@@ -349,7 +349,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
           array('$','end of the string(form g)','рус - TODO'),
           array('a|bc|','<span style="color:blue">a</span>(form g) or <span style="color:blue">b</span>(form g)<span style="color:blue">c</span>(form g) or nothing(form g)','рус - TODO'),
         );
-    }
+    }*/
 
     /*public function test_vardump()
     {

@@ -240,9 +240,12 @@ $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 $string['description_leaf_backref'] = 'text that matched by subpattern #{$a}';
 $string['description_leaf_backref_name'] = 'text that matched by subpattern "{$a}"';
 // TYPE_LEAF_SUBEXPR_CALL
-$string['description_leaf_subexpr_call'] = 'recursive match with subpattern #{$a}';
-$string['description_leaf_subexpr_call_all'] = 'recursive match with whole regular expression';
-$string['description_leaf_subexpr_call_name'] = 'recursive match with subpattern "{$a}"';
+$string['description_leaf_subexpr_call'] = 'call of the subpattern #{$a}';
+$string['description_leaf_subexpr_call_all'] = 'call of the whole regular expression';
+$string['description_leaf_subexpr_call_name'] = 'call of the subpattern "{$a}"';
+$string['description_leaf_subexpr_call_recursive'] = 'recursive call of the subpattern #{$a}';
+$string['description_leaf_subexpr_call_all_recursive'] = 'recursive call of the whole regular expression';
+$string['description_leaf_subexpr_call_name_recursive'] = 'recursive call of the subpattern "{$a}"';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
