@@ -240,9 +240,12 @@ $string['description_esc_b_leaf_assert_neg'] = 'не граница слова';
 $string['description_leaf_backref'] = 'текст, совпавший с подвыражением #{$a}';
 $string['description_leaf_backref_name'] = 'текст, совпавший с подвыражением "{$a}"';
 // TYPE_LEAF_SUBEXPR_CALL
-$string['description_leaf_subexpr_call'] = 'рекурсивное совпадение с подмаской #{$a}';
-$string['description_leaf_subexpr_call_all'] = 'рекурсивное совпадение со всем регулярным выражением';
-$string['description_leaf_subexpr_call_name'] = 'рекурсивное совпадение с подмаской "{$a}"';
+$string['description_leaf_subexpr_call'] = 'вызов подмаски #{$a}';
+$string['description_leaf_subexpr_call_all'] = 'вызов проверки совпадения со всем регулярным выражением';
+$string['description_leaf_subexpr_call_name'] = 'вызов подмаски "{$a}"';
+$string['description_leaf_subexpr_call_recursive'] = 'рекурсивный вызов подмаски #{$a}';
+$string['description_leaf_subexpr_call_all_recursive'] = 'рекурсивный вызов проверки совпадения со всем регулярным выражением';
+$string['description_leaf_subexpr_call_name_recursive'] = 'рекурсивный вызов подмаски "{$a}"';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';

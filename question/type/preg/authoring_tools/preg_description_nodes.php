@@ -420,7 +420,8 @@ class qtype_preg_description_leaf_subexpr_call extends qtype_preg_description_le
 
     public function pattern($node_parent = null, $form = null) {
         //return parent::pattern($node_parent, $form);
-        return self::get_form_string($this->pregnode->lang_key(true), $this->pregnode->number, $form);
+        $postfix = $this->pregnode->isrecursive ? '_recursive' : '';
+        return self::get_form_string($this->pregnode->lang_key(true).$postfix, $this->pregnode->number, $form);
     }
 }
 
