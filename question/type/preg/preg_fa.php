@@ -1593,7 +1593,7 @@ class qtype_preg_fa {
                     $opposite->pregleaf = $newleaf;
                     $del->pregleaf->assertionsafter = array();
 
-                    $tagsets = array_merge($sets, $opposite->tagsets);
+                    $tagsets = array_merge($opposite->tagsets, $sets);
                     $opposite->tagsets = $tagsets;
                 }
             }
@@ -1609,12 +1609,12 @@ class qtype_preg_fa {
                     foreach ($del->tagsets as $set) {
                         $set->set_tags_position(qtype_preg_fa_tag::POS_AFTER_TRANSITION);
                     }
-                    $tagsets = array_merge($del->tagsets, $transition->tagsets);
+                    $tagsets = array_merge($transition->tagsets, $del->tagsets);
                 } else {
                     foreach ($del->tagsets as $set) {
                         $set->set_tags_position(qtype_preg_fa_tag::POS_BEFORE_TRANSITION);
                     }
-                    $tagsets = array_merge($transition->tagsets, $del->tagsets);
+                    $tagsets = array_merge($del->tagsets, $transition->tagsets);
                 }
                 $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
                 $tran->pregleaf = $newleaf;

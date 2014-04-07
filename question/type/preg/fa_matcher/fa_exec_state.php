@@ -441,8 +441,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
      * Writes subpatterns start\end information to this state.
      */
     public function write_tag_values($transition, $tagspos, $strpos, $matchlen) {
-        $tagsets = array_reverse($transition->tagsets);
-        foreach ($tagsets as $tagset) {
+        foreach ($transition->tagsets as $tagset) {
             $this->write_tag_values_inner($tagset, $tagspos, $strpos, $matchlen);
         }
     }
