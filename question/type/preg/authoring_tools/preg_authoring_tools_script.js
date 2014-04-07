@@ -153,7 +153,6 @@ M.preg_authoring_tools_script = (function ($) {
                     // resize magic (alter for html-voodoo-bug-positioning-development)
                     $( window ).resize(self.resize_handler);
                     self.resize_handler();
-                    $(self.textbutton_widget.dialog).dialog( "option", "minWidth", "1000px" ); // TODO - should it be here?
 
                     self.panzooms.init();
                     options.oneachpresscallback();

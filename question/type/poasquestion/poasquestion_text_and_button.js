@@ -137,6 +137,7 @@ M.poasquestion_text_and_button = (function() {
             modal: true,
             closeOnEscape: true,
             width: self.dialogwidth,
+            minWidth: '1000px',
             title: self.dialogtitle,
             close: function() {
                 if (typeof(self.onclosecallback) === "function") {
