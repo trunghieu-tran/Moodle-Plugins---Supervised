@@ -125,7 +125,7 @@ abstract class qtype_preg_description_node {
         //return qtype_poasquestion_string::replace('%s', $s, qtype_poasquestion_string::replace('%n', $this->pregnode->id, $numbering_pattern));
         $result = $s;
         $classes = array();
-        $bgclor = '';
+        $bgclor = 'white';
 
         // Highlight generated and selected nodes.
         if ($this->handler->is_node_generated($this->pregnode)) {
