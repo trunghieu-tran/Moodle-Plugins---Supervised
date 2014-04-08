@@ -88,7 +88,7 @@ class qtype_preg_authoring_form extends moodleform {
 
         $mform->addElement('selectyesno', 'exactmatch_auth', get_string('exactmatch', 'qtype_preg'));
         $mform->addHelpButton('exactmatch_auth', 'exactmatch', 'qtype_preg');
-        $mform->setDefault('exactmatch_auth', 1);
+        $mform->setDefault('exactmatch_auth', 0);
 
         $mform->addElement('select', 'usecase_auth', get_string('casesensitive', 'qtype_shortanswer'), array(get_string('caseno', 'qtype_shortanswer'), get_string('caseyes', 'qtype_shortanswer')));
 
