@@ -40,6 +40,10 @@ M.preg_authoring_tools_script = (function ($) {
 
     matching_options : ['engine', 'notation', 'exactmatch', 'usecase'],
 
+    prevdata : null,
+
+    data : null,
+
     /** @var {Object} cache of content; dimensions are: 1) tool name, 2) concatenated options, selection borders, etc. */
     cache : {
         tree : {},
@@ -84,6 +88,7 @@ M.preg_authoring_tools_script = (function ($) {
                         self.www_root+'/question/type/poasquestion/interface.js',
                         self.www_root+'/question/type/poasquestion/jquery.mousewheel.js'
                         ];
+
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
                     // Remove the "skip to main content" link.
@@ -163,6 +168,8 @@ M.preg_authoring_tools_script = (function ($) {
                 self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
                 self.invalidate_content();
 
+				self.data = self.regex_input.val();
+
                 // Put the testing data into ui.
                 if (!self.textbutton_widget.is_stand_alone()) {
                     $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
@@ -193,6 +200,10 @@ M.preg_authoring_tools_script = (function ($) {
         self.textbutton_widget.setup(options);
     },
 
+    is_changed : function() {
+        return self.data !== self.prevdata;
+    },
+
     save_sections_state : function () {
         var sections = ['regex_input',
                         'regex_matching_options',
@@ -209,7 +220,13 @@ M.preg_authoring_tools_script = (function ($) {
 
     btn_show_clicked : function (e) {
         e.preventDefault();
-        $('input[name=\'tree_fold_node_points\']').val('');
+
+        self.data = self.regex_input.val();
+        // if regex is changed
+        if(self.is_changed()) {
+        	$('input[name=\'tree_fold_node_points\']').val('');
+        	self.prevdata = self.data;	
+    	}
         $('input[name=\'tree_selected_node_points\']').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
@@ -329,10 +346,6 @@ M.preg_authoring_tools_script = (function ($) {
         }
     },
 
-    /*is_tree_selection_rectangle_visible : function () {
-        return $("#id_tree_selection_mode").is(':checked');
-    },*/
-
     is_tree_foldind_mode : function () {
         return $("#id_tree_folding_mode").is(':checked');
     },
@@ -438,26 +451,14 @@ M.preg_authoring_tools_script = (function ($) {
         if (typeof t != 'undefined' && t.img) {
             self.tree_img().css('visibility', 'visible').html(t.img);
 
-            /*$('#tree_img').mousedown(function(e) {
-                e.preventDefault();
-                //check is checked check box
-                if (self.is_tree_selection_rectangle_visible()) {
-               		self.init_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
-                }
-            });
-
-            $('#tree_img').mousemove(function(e) {
-                e.preventDefault();
-                self.resize_rectangle_selection(e, 'tree_img','resizeTree', 'tree_hnd');
-            });
-
-            $(window).mouseup(function(e){
-                e.preventDefault();
-                self.CALC_COORD = false;
-            });*/
-
             self.tree_img().click(self.tree_node_misclicked);
             $("svg .node", self.tree_img()).click(self.tree_node_clicked);
+
+            var tmpH = $("#tree_img svg").attr('height');
+            var tmpW = $("#tree_img svg").attr('width');
+
+            $("#tree_img svg").attr('height', tmpH.replace('pt', 'px'));
+            $("#tree_img svg").attr('width', tmpW.replace('pt', 'px'));
         } else if (typeof t != 'undefined') {
             self.tree_err().html(t);
         }
@@ -485,6 +486,12 @@ M.preg_authoring_tools_script = (function ($) {
 
             graph_img.click(self.graph_node_misclicked);
             $("svg .node", graph_img).click(self.graph_node_clicked);
+
+            var tmpH = $("#graph_img svg").attr('height');
+            var tmpW = $("#graph_img svg").attr('width');
+
+            $("#graph_img svg").attr('height', tmpH.replace('pt', 'px'));
+            $("#graph_img svg").attr('width', tmpW.replace('pt', 'px'));
         } else if (typeof g != 'undefined') {
             self.graph_err().html(g);
         }
@@ -682,9 +689,9 @@ M.preg_authoring_tools_script = (function ($) {
     get_rect_selection : function (e, rectangle, img, deltaX, deltaY) {
         // Check ids selected nodes
         rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
-        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + deltaY;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - deltaY;
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
-        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + deltaY;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') - deltaY;
         var areas = $(".edge, .node", "#"+img+" > svg > g");
         var indfirst = 999;
         var indlast = -999;
@@ -738,27 +745,18 @@ M.preg_authoring_tools_script = (function ($) {
         $('#id_test_regex').html(s);
     },
 
-    /*btn_tree_select_rectangle_selection_click : function (e) {
-        e.preventDefault();
-
-        var sel = self.get_rect_selection(e, 'resizeTree', 'tree_img');
-        self.load_content(sel.indfirst, sel.indlast);
-        self.load_strings(sel.indfirst, sel.indlast);
-
-        $('#resizeTree').css({
-            width : 0,
-            height : 0,
-            left : -10,
-            top : -10,
-        });
-    },*/
-
     btn_graph_select_rectangle_selection_click : function (e) {
         e.preventDefault();
 
+        var transformattr = $('#explaining_graph').attr('transform');
+        var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+        var translate_x = ta[1];
+        var translate_y = ta[2];
         var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-            (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left), 
-            (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top));
+            (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+            	+ parseInt(translate_x)), 
+            (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+            	+ parseInt(translate_y)));
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
@@ -769,26 +767,6 @@ M.preg_authoring_tools_script = (function ($) {
             top : -10
         });
     },
-
-    /*btn_tree_selection_mode_rectangle_selection_click : function (e) {
-        e.preventDefault();
-        if (self.is_tree_selection_rectangle_visible()) {
-            $('#id_tree_send_select').attr('disabled',false);
-            $('#tree_img').attr("usemap", "");
-            self.panzooms.reset_tree();
-            self.panzooms.disable_tree();
-        } else {
-            $('#id_tree_send_select').attr('disabled',true);
-            $('#tree_img').attr("usemap", "#qtype_preg_tree");
-            self.panzooms.enable_tree();
-            $('#resizeTree').css({
-                width : 0,
-                height : 0,
-                left : -10,
-                top : -10,
-            });
-        }
-    },*/
 
     btn_graph_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
