@@ -275,10 +275,7 @@ class qtype_preg_syntax_tree_operator extends qtype_preg_syntax_tree_node {
                 $tooltip = substr($context->handler->get_regex(),
                                     $indfirst,
                                     $length);
-                $tmpcoord = $this->pregnode->id . ',' . $this->pregnode->position->indfirst . ',' . $this->pregnode->position->indlast;
-                //var_dump($nodename);
-                /*$dotscript .= $nodename . "->etc" . $this->pregnode->id . ";etc" . $this->pregnode->id .
-                              "[id=\"" . $tmpcoord . "\"" . "label=\"...\", tooltip=\"" . $tooltip . "\", style=\"dotted\"];\n";*/
+                $tmpcoord = "treeid_" . $this->pregnode->id . '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast;
                 $dotscript .= $nodename . "[id=\"" . $tmpcoord . "\"" . "label=\"...\", tooltip=\"" . $tooltip . "\", style=\"dotted\"];\n";
             }
 
