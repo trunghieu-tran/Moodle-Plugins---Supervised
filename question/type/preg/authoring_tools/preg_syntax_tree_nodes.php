@@ -398,14 +398,22 @@ class qtype_preg_syntax_tree_leaf_backref extends qtype_preg_syntax_tree_leaf {
     }
 
     public function tooltip() {
-        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
+        //return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
+        $postfix = $this->pregnode->isrecursive ? '_recursive' : '';
+        return get_string($this->pregnode->lang_key(true) . $postfix, 'qtype_preg', $this->pregnode->number);
     }
 }
 
 class qtype_preg_syntax_tree_leaf_subexpr_call extends qtype_preg_syntax_tree_leaf {
 
-    public function label() {
-        return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
+    /*public function label() {
+        //return get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number);
+        return $this->pregnode->userinscription;
+    }*/
+
+    public function tooltip() {
+        $postfix = $this->pregnode->isrecursive ? '_recursive' : '';
+        return get_string($this->pregnode->lang_key(true) . $postfix, 'qtype_preg', $this->pregnode->number);
     }
 }
 
