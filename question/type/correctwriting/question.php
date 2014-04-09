@@ -436,6 +436,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         $analyzername = $analyzers[$index];
         $createdanalyzername = 'qtype_correctwriting_' . $analyzername;
         $bypass  = $this->is_analyzer_enabled($analyzername) == false;
+        $string->analyzersequence[] = $createdanalyzername;
         /** @var qtype_correctwriting_abstract_analyzer $analyzer */
         $analyzer = new $createdanalyzername($this, $string, $this->get_used_language(), $bypass);
 
@@ -641,6 +642,11 @@ class qtype_correctwriting_question extends question_graded_automatically
             }
         }
         return $hints;
+    }
+
+    public function hints_available_for_student($response = null) {
+        // TODO - define behaviour when some hint used in interactive, but set to 'No' for adaptive.
+        return $this->available_specific_hints($response);
     }
 
     /**

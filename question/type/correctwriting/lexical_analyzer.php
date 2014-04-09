@@ -75,20 +75,24 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         $lexicalmistakes = $this->convert_lexer_errors_to_mistakes();
 
         // TODO: Biryukova's new code should be placed here!
-        // 1. Compute self code - Biryukova
+        // 1. Compute self code - Mamontov
         // 1.1. Replace result with fixed strings
-        $result = array( $this->basestringpair );
-        // 1.1. Compute own mistakes and place them in mistakes
-        // Also, you must create mistakes of skipped lexemes and additional lexemes
-        $mistakes = array( array( ) );
+        $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs(
+            $this->question->get_used_language(),
+            $this->basestringpair->correctstring(),
+            $this->basestringpair->comparedstring(),
+            $this->question->lexicalerrorthreshold,
+            $this->question->token_comparing_options(),
+            'qtype_correctwriting_string_pair'
+        );
 
-        // 2. Merge mistakes into one
-        $this->resultstringpairs = $result;
-        $this->resultmistakes = $mistakes;
         /** @var qtype_correctwriting_string_pair $pair */
-        foreach($this->resultstringpairs as $key => $pair) {
-            $currentmistakes = $pair->mistakes();
-            $pair->append_mistakes($currentmistakes) ;
+        foreach($this->resultstringpairs as $pair) {
+            $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
+            $pair->analyzersequence[] = get_class($this);
+            // TODO: Biryukova: create own lexical_errors here and append it to pair, via
+            // append_mistakes
+            $pair->append_mistakes($lexicalmistakes);
         }
     }
 
