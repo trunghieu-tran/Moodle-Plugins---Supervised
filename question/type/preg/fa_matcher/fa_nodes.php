@@ -123,7 +123,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         }
     }
 
-    public static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
+    protected static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
         $outgoing = $automaton->get_adjacent_transitions($stack_item['end'], true);
         if (!empty($outgoing)) {
             $end = $automaton->add_state();
@@ -131,6 +131,19 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $automaton->add_transition(new qtype_preg_fa_transition($stack_item['end'], $epsleaf, $end));
             $stack_item['end'] = $end;
         }
+    }
+
+    protected static function concatenate(&$automaton, &$stack, $count) {
+        if ($count < 2) {
+            return;
+        }
+        $result = array_pop($stack);
+        for ($i = 0; $i < $count - 1; $i++) {
+            $cur = array_pop($stack);
+            $automaton->redirect_transitions($cur['end'], $result['start']);
+            $result = array('start' => $cur['start'], 'end' => $result['end']);
+        }
+        $stack[] = $result;
     }
 }
 
@@ -141,21 +154,10 @@ class qtype_preg_fa_node_concat extends qtype_preg_fa_operator {
 
     protected function create_automaton_inner(&$automaton, &$stack) {
         $count = count($this->operands);
-        $result = null;
-
-        // Create automata for operands and concatenate them.
         for ($i = 0; $i < $count; $i++) {
             $this->operands[$i]->create_automaton($automaton, $stack);
-            $cur = array_pop($stack);
-            if ($result === null) {
-                $result = $cur;
-            } else {
-                $automaton->redirect_transitions($cur['start'], $result['end']);
-                $result = array('start' => $result['start'], 'end' => $cur['end']);
-            }
         }
-
-        $stack[] = $result;
+        self::concatenate($automaton, $stack, $count);
     }
 }
 
@@ -250,14 +252,11 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
     private function create_brace(&$automaton, &$stack) {
         // Operand creates its automaton m times.
         $leftborder = $this->pregnode->leftborder;
-        $result = null;
-
-        // Linking automatons to the resulting one.
         for ($i = 0; $i < $leftborder; $i++) {
             $this->operands[0]->create_automaton($automaton, $stack);
-            $cur = array_pop($stack);
             // The last block is repeated.
             if ($i == $leftborder - 1) {
+                $cur = array_pop($stack);
                 $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
                 $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
                 foreach ($outgoing as $transition) {
@@ -268,18 +267,11 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
                 }
-            }
-            if ($result === null) {
-                // On the first iteration we just remember current automaton as the result.
-                $result = $cur;
-            } else {
-                // On subsequent iterations we concatenate current automaton to the result.
-                $automaton->redirect_transitions($result['end'], $cur['start']);
-                $result['end'] = $cur['end'];
+                $stack[] = $cur;
             }
         }
-
-        $stack[] = $result;
+        // Concatenate operands.
+        self::concatenate($automaton, $stack, $leftborder);
     }
 
     protected function create_automaton_inner(&$automaton, &$stack) {
@@ -332,41 +324,38 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
-        $result = null;
-        $borderstates = array();    // States to which separating eps-transitions will be added.
 
-        // Linking automatons to the resulting one.
-        $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         for ($i = 0; $i < $rightborder; $i++) {
             $this->operands[0]->create_automaton($automaton, $stack);
-            $cur = array_pop($stack);
             if ($i >= $leftborder) {
+                $cur = array_pop($stack);
                 self::add_ending_eps_transition_if_needed($automaton, $cur);
-                $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
-                foreach ($outgoing as $transition) {
-                    $realgreediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $greediness);
-                    $transition->greediness = $realgreediness;
-                }
-                $borderstates[] = $cur['start'];
-            }
-            if ($result === null) {
-                // On the first iteration we just remember current automaton as the result.
-                $result = $cur;
-            } else {
-                // On subsequent iterations we concatenate current automaton to the result.
-                $automaton->redirect_transitions($result['end'], $cur['start']);
-                $result['end'] = $cur['end'];
+                $stack[] = $cur;
             }
         }
+        $endstate = end($stack);
+        $endstate = $endstate['end'];
 
-        // Adding eps-transitions after first m bodies.
-        foreach ($borderstates as $state) {
+        // Add eps-transitions to the end state. Set greediness.
+        $quantified = array();
+        $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
+        for ($i = 0; $i < $rightborder - $leftborder; $i++) {
+            $cur = array_pop($stack);
+            $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
+            foreach ($outgoing as $transition) {
+                $realgreediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $greediness);
+                $transition->greediness = $realgreediness;
+            }
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $transition = new qtype_preg_fa_transition($state, $epsleaf, $result['end']);
+            $transition = new qtype_preg_fa_transition($cur['start'], $epsleaf, $endstate);
             $automaton->add_transition($transition);
+            $quantified[] = $cur;
         }
-
-        $stack[] = $result;
+        for ($i = 0; $i < $rightborder - $leftborder; $i++) {
+            $cur = array_pop($quantified);
+            $stack[] = $cur;
+        }
+        self::concatenate($automaton, $stack, $rightborder);
     }
 
     protected function create_automaton_inner(&$automaton, &$stack) {

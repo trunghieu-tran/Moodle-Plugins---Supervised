@@ -717,6 +717,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
 
+        //$bruteforce = count($this->backtrackstates) > 0;
+
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce
                          ? $this->match_brute_force($str, $startpos, $subexpr, $prevlevelstate)
