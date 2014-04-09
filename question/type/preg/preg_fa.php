@@ -331,25 +331,43 @@ class qtype_preg_fa_transition {
     }
 
     public function open_tags_tohr() {
-        $numbers = array();
+        static $map = array(qtype_preg_fa_tag::POS_BEFORE_TRANSITION => array('(', ')'),
+                            qtype_preg_fa_tag::POS_AT_TRANSITION => array('[', ']'),
+                            qtype_preg_fa_tag::POS_AFTER_TRANSITION => array('{', '}'));
+        $result = '';
         $tags = $this->flatten_tags();
-        foreach ($tags as $tag) {
-            if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN) {
-                $numbers[] = $tag->pregnode->subpattern;
+        foreach ($this->tagsets as $set) {
+            $numbers = array();
+            foreach ($set->tags as $tag) {
+                if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN) {
+                    $numbers[] = $tag->pregnode->subpattern;
+                }
+            }
+            if (!empty($numbers)) {
+                $result .= $map[$set->tags[0]->pos][0] . implode(',', $numbers) . $map[$set->tags[0]->pos][1];
             }
         }
-        return implode(',', $numbers);
+        return $result;
     }
 
     public function close_tags_tohr() {
-        $numbers = array();
+        static $map = array(qtype_preg_fa_tag::POS_BEFORE_TRANSITION => array('(', ')'),
+                            qtype_preg_fa_tag::POS_AT_TRANSITION => array('[', ']'),
+                            qtype_preg_fa_tag::POS_AFTER_TRANSITION => array('{', '}'));
+        $result = '';
         $tags = $this->flatten_tags();
-        foreach ($tags as $tag) {
-            if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE) {
-                $numbers[] = $tag->pregnode->subpattern;
+        foreach ($this->tagsets as $set) {
+            $numbers = array();
+            foreach ($set->tags as $tag) {
+                if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE) {
+                    $numbers[] = $tag->pregnode->subpattern;
+                }
+            }
+            if (!empty($numbers)) {
+                $result .= $map[$set->tags[0]->pos][0] . implode(',', $numbers) . $map[$set->tags[0]->pos][1];
             }
         }
-        return implode(',', $numbers);
+        return $result;
     }
 }
 
@@ -1783,9 +1801,9 @@ class qtype_preg_fa {
                 $tran->set_transition_type();
                 if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
                     $this->go_round_transitions($tran);
-                }                      
+                }
             }
-        }   
+        }
 
         $i = 0;
         while (count($oldfront) != 0) {
