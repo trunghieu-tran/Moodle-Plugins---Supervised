@@ -508,7 +508,7 @@ M.preg_authoring_tools_script = (function ($) {
             length = 0;
         }
         $(self.regex_input).textrange('set', indfirst, length);
-        $(window).scrollTop(scroll); // TODO - what is is? O_0
+        $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },
 
 
@@ -548,16 +548,22 @@ M.preg_authoring_tools_script = (function ($) {
 
     init_rectangle_selection : function(e, img, rectangle, hnd) {
         self.CALC_COORD = true;
-        var br = $("#"+img+" > svg > g")[0].getBoundingClientRect(); // TODO - use pure jquery analog
+        //var br = $("#"+img+" > svg > g")[0].getBoundingClientRect(); // TODO - use pure jquery analog
         $('#' + rectangle).Resizable({
                 minWidth: 20,
                 minHeight: 20,
-                maxWidth: (br.right - br.left),
+                /*maxWidth: (br.right - br.left),
                 maxHeight: (br.bottom - br.top),
                 minTop: 1,
                 minLeft: 1,
                 maxRight: br.right - br.left,
-                maxBottom: br.bottom - br.top,
+                maxBottom: br.bottom - br.top,*/
+                maxWidth: 9999,
+                maxHeight: 9999,
+                minTop: 1,
+                minLeft: 1,
+                maxRight: 9999,
+                maxBottom: 9999,
                 dragHandle: true,
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
@@ -594,14 +600,16 @@ M.preg_authoring_tools_script = (function ($) {
         //var br = document.getElementById('tree_img').getBoundingClientRect();
         //var local_x = e.pageX - $(window).prop('scrollX') - br.left;
         return e.pageX - $(window).prop('scrollX') - document.getElementById(img).getBoundingClientRect().left
-                - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left);
+                - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left)
+                + $('#' + hnd).prop('scrollLeft');
     },
 
     get_current_y : function(e, img, hnd) {
         //var br = document.getElementById('tree_hnd').getBoundingClientRect();
         //var local_y = e.pageY - $(window).prop('scrollY') - br.top;
         return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top 
-                - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top);
+                - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
+                + $('#' + hnd).prop('scrollTop');
     },
 
     /**
@@ -754,9 +762,9 @@ M.preg_authoring_tools_script = (function ($) {
         var translate_y = ta[2];
         var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
             (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-            	+ parseInt(translate_x)), 
+            	+ parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
             (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
-            	+ parseInt(translate_y)));
+            	+ parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
 
