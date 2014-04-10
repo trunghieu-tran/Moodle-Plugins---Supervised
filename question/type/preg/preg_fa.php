@@ -91,9 +91,8 @@ class qtype_preg_fa_tag_set {
      * Sets position (before or after transition) for all tags of this set.
      */
     public function set_tags_position($pos) {
-        foreach ($this->tags as $tag) {
-            $tag->pos = $pos;
-        }
+        $this->pos = $pos;
+        
     }
 }
 
