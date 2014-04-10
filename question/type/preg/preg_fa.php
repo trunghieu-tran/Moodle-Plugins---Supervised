@@ -1568,6 +1568,28 @@ class qtype_preg_fa {
     }
 
     /**
+     * Define wether merging is necessary or not.
+     *
+     * @return - boolean flag wether merging is necessary or not.
+     */
+    public function merging_is_necessary() {
+        $states = $this->get_states();
+        foreach ($states as $state) {
+            $transitions = $this->get_adjacent_transitions($state, true);
+            foreach ($transitions as $tran) {
+                if ($tran->is_unmerged_assert()) {
+                    if ($tran->pregleaf->is_start_anchor() && !in_array($tran->from, $this->start_states())) {
+                        return true;
+                    } else if ($tran->pregleaf->is_end_anchor() && !in_array($tran->to, $this->end_states())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Merging transitions without merging states.
      *
      * @param del - uncapturing transition for deleting.
