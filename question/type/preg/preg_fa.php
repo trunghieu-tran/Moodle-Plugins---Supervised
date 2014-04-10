@@ -1625,12 +1625,14 @@ class qtype_preg_fa {
                 $tagsets = array();
                 // Work with tags.
                 if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
-                    foreach ($del->tagsets as $set) {
+                    foreach ($del->tagsets as &$set) {
+                        $del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
                     }
                     $tagsets = array_merge($transition->tagsets, $del->tagsets);
                 } else {
-                    foreach ($del->tagsets as $set) {
+                    foreach ($del->tagsets as &$set) {
+                        //$del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
                     }
                     $tagsets = array_merge($del->tagsets, $transition->tagsets);
