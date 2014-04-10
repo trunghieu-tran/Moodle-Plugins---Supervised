@@ -137,7 +137,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     protected function before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_BEFORE_TRANSITION, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION, $curpos, $length);
     }
 
     /**
@@ -160,8 +160,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate->last_match_len = $length;
 
         $newstate->length += $length;
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_AT_TRANSITION, $curpos, $length);
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag::POS_AFTER_TRANSITION, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_AT_TRANSITION, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_AFTER_TRANSITION, $curpos, $length);
 
         if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
@@ -716,6 +716,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 break;
             }
         }
+
+        //$bruteforce = count($this->backtrackstates) > 0;
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $bruteforce

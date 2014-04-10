@@ -317,25 +317,35 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
      * Returns true if this beats other, false if other beats this; for equal states returns false.
      */
     public function leftmost_longest($other, $matchinginprogress = true) {
+        //echo "\n";
+        //echo $this->subpatts_to_string();
+        //echo "vs\n";
+        //echo $other->subpatts_to_string();
         // Check for full match.
         if ($this->is_full() && !$other->is_full()) {
+            //echo "wins 1\n";
             return true;
         } else if (!$this->is_full() && $other->is_full()) {
+            //echo "wins 2\n";
             return false;
         }
 
         // Choose the longest match
         if ($this->length > $other->length) {
+            //echo "wins 1\n";
             return true;
         } else if ($other->length > $this->length) {
+            //echo "wins 2\n";
             return false;
         }
 
         // If both states have partial match, choose one with minimal left
         if (!$matchinginprogress && !$this->is_full() && !$other->is_full()) {
             if ($this->left < $other->left) {
+                //echo "wins 1\n";
                 return true;
             } else if ($other->left < $this->left) {
+                //echo "wins 2\n";
                 return false;
             }
         }
@@ -356,8 +366,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $this_last = $this->last_match($i);
                 $other_last = $other->last_match($i);
                 if ($repetitions_count_difference == 1 && $this_last[1] == 0 && $this_last[0] > $other_last[0]) {
+                    //echo "wins 1\n";
                     return true;
                 } else if ($repetitions_count_difference == -1 && $other_last[1] == 0 && $other_last[0] > $this_last[0]) {
+                    //echo "wins 2\n";
                     return false;
                 }
             }
@@ -385,15 +397,19 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
                 // Match existance.
                 if ($other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    //echo "wins 1\n";
                     return true;
                 } else if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    //echo "wins 2\n";
                     return false;
                 }
 
                 // Longest of all possible matches.
                 if ($this_length > $other_length) {
+                    //echo "wins 1\n";
                     return true;
                 } else if ($other_length > $this_length) {
+                    //echo "wins 2!!\n";
                     return false;
                 }
             }
@@ -440,16 +456,17 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     /**
      * Writes subpatterns start\end information to this state.
      */
-    public function write_tag_values($transition, $tagspos, $strpos, $matchlen) {
-        $tagsets = array_reverse($transition->tagsets);
-        foreach ($tagsets as $tagset) {
-            $this->write_tag_values_inner($tagset, $tagspos, $strpos, $matchlen);
+    public function write_tag_values($transition, $tagsetpos, $strpos, $matchlen) {
+        foreach ($transition->tagsets as $tagset) {
+            if ($tagset->pos == $tagsetpos) {
+                $this->write_tag_values_inner($tagset, $strpos, $matchlen);
+            }
         }
     }
 
-    public function write_tag_values_inner($tagset, $tagspos, $strpos, $matchlen) {
+    public function write_tag_values_inner($tagset, $strpos, $matchlen) {
         // Begin a new iteration of a subpattern. All "bigger" (inner) subpatterns will start a new iteration recursively.
-        $min = $tagset->min_open_tag($tagspos);
+        $min = $tagset->min_open_tag();
         if ($min !== null) {
             $this->begin_subpatt_iteration($min->pregnode);
         }
@@ -458,7 +475,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
         // Set matches to ($strpos, -1) for the new iteration.
         foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pos != $tagspos) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN) {
                 continue;
             }
             if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
@@ -466,16 +483,16 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
             // Starting indexes are always the same, equal $strpos
             $index = $strpos;
-            if ($tag->pos == qtype_preg_fa_tag::POS_AFTER_TRANSITION) {
+            if ($tagset->pos == qtype_preg_fa_tag_set::POS_AFTER_TRANSITION) {
                 $index += $matchlen;
             }
-            //echo "opening {$tag->pregnode->subpattern} at pos {$tag->pos}\n";
+            //echo "opening {$tag->pregnode->subpattern} at pos {$tagset->pos}\n";
             $this->set_current_match($tag->pregnode->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
 
         // Set matches to ($strpos, length) for the ending iterations.
         foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_CLOSE || $tag->pos != $tagspos) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_CLOSE) {
                 continue;
             }
             if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
@@ -484,10 +501,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             $current_match = $this->current_match($tag->pregnode->subpattern);
             $index = $current_match[0];
             $length = $strpos - $index;
-            if ($tag->pos != qtype_preg_fa_tag::POS_BEFORE_TRANSITION) {
+            if ($tagset->pos != qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION) {
                 $length += $matchlen;
             }
-            //echo "closing {$tag->pregnode->subpattern} at pos {$tag->pos}\n";
+            //echo "closing {$tag->pregnode->subpattern} at pos {$tagset->pos}\n";
             if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $this->set_current_match($tag->pregnode->subpattern, $index, $length);
             }
@@ -495,7 +512,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
         // Some stuff for subexpressions.
         foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pos != $tagspos || $tag->pregnode->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pregnode->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
                 continue;
             }
             if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
