@@ -158,6 +158,10 @@ class qtype_preg_fa_transition {
         }
     }
 
+    public function __toString() {
+        return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
+    }
+
     public function __construct($from, $pregleaf, $to, $origin = self::ORIGIN_TRANSITION_FIRST, $consumeschars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
@@ -336,7 +340,6 @@ class qtype_preg_fa_transition {
                             qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
                             qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
         $result = '';
-        $tags = $this->flatten_tags();
         foreach ($this->tagsets as $set) {
             $numbers = array();
             foreach ($set->tags as $tag) {
@@ -356,7 +359,6 @@ class qtype_preg_fa_transition {
                             qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
                             qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
         $result = '';
-        $tags = $this->flatten_tags();
         foreach ($this->tagsets as $set) {
             $numbers = array();
             foreach ($set->tags as $tag) {
