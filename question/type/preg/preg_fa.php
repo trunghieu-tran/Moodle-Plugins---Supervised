@@ -91,9 +91,8 @@ class qtype_preg_fa_tag_set {
      * Sets position (before or after transition) for all tags of this set.
      */
     public function set_tags_position($pos) {
-        foreach ($this->tags as $tag) {
-            $tag->pos = $pos;
-        }
+        $this->pos = $pos;
+        
     }
 }
 
@@ -157,6 +156,10 @@ class qtype_preg_fa_transition {
         foreach ($this->tagsets as $key => $set) {
             $this->tagsets[$key] = clone $set;
         }
+    }
+
+    public function __toString() {
+        return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
     }
 
     public function __construct($from, $pregleaf, $to, $origin = self::ORIGIN_TRANSITION_FIRST, $consumeschars = true) {
@@ -337,7 +340,6 @@ class qtype_preg_fa_transition {
                             qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
                             qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
         $result = '';
-        $tags = $this->flatten_tags();
         foreach ($this->tagsets as $set) {
             $numbers = array();
             foreach ($set->tags as $tag) {
@@ -357,7 +359,6 @@ class qtype_preg_fa_transition {
                             qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
                             qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
         $result = '';
-        $tags = $this->flatten_tags();
         foreach ($this->tagsets as $set) {
             $numbers = array();
             foreach ($set->tags as $tag) {
@@ -1569,6 +1570,28 @@ class qtype_preg_fa {
     }
 
     /**
+     * Define wether merging is necessary or not.
+     *
+     * @return - boolean flag wether merging is necessary or not.
+     */
+    public function merging_is_necessary() {
+        $states = $this->get_states();
+        foreach ($states as $state) {
+            $transitions = $this->get_adjacent_transitions($state, true);
+            foreach ($transitions as $tran) {
+                if ($tran->is_unmerged_assert()) {
+                    if ($tran->pregleaf->is_start_anchor() && !in_array($tran->from, $this->start_states())) {
+                        return true;
+                    } else if ($tran->pregleaf->is_end_anchor() && !in_array($tran->to, $this->end_states())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Merging transitions without merging states.
      *
      * @param del - uncapturing transition for deleting.
@@ -1626,12 +1649,14 @@ class qtype_preg_fa {
                 $tagsets = array();
                 // Work with tags.
                 if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
-                    foreach ($del->tagsets as $set) {
+                    foreach ($del->tagsets as &$set) {
+                        $del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
                     }
                     $tagsets = array_merge($transition->tagsets, $del->tagsets);
                 } else {
-                    foreach ($del->tagsets as $set) {
+                    foreach ($del->tagsets as &$set) {
+                        //$del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
                     }
                     $tagsets = array_merge($del->tagsets, $transition->tagsets);

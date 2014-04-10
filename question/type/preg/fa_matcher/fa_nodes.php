@@ -68,16 +68,15 @@ abstract class qtype_preg_fa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-            $transition->tagsets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_OPEN, $this->pregnode);
-            if ($this->pregnode->subpattern < 0) {
-                continue;
-            }
+            $tagset = $transition->tagsets[0];
+            $tagset->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_OPEN, $this->pregnode);
         }
 
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
             if ($transition->to === $body['end']) {
-                $transition->tagsets[0]->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_CLOSE, $this->pregnode);
+                $tagset = end($transition->tagsets);
+                $tagset->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_CLOSE, $this->pregnode);
             }
         }
 
@@ -133,6 +132,39 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         }
     }
 
+    protected static function merge_epsilons_after_concat(&$automaton, &$stack_item, $borderstate) {
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($incoming as $transition) {
+            if (/*$transition->loopsback ||*/ $transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                continue;
+            }
+            //echo "\nmerging $transition\n";
+            foreach ($transition->tagsets as $tagset) {
+                $tagset->pos = qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION;
+            }
+            foreach ($outgoing as $nexttransition) {
+                $clone = clone $nexttransition;
+                $clone->from = $transition->from;
+                $tagsets = array();
+                foreach ($transition->tagsets as $set) {
+                    $tagsets[] = clone $set;
+                }
+                foreach ($clone->tagsets as $set) {
+                    $tagsets[] = $set;  // already cloned
+                }
+                $clone->tagsets = $tagsets;
+                $clone->startsbackrefedsubexprs = $clone->startsbackrefedsubexprs || $transition->startsbackrefedsubexprs;
+                $clone->startsquantifier = $clone->startsquantifier || $transition->startsquantifier;
+                $clone->endsquantifier = $clone->endsquantifier || $transition->endsquantifier;
+                $clone->loopsback = $clone->loopsback || $transition->loopsback;
+                $automaton->add_transition($clone);
+                //echo "added $clone\n";
+            }
+            $automaton->remove_transition($transition);
+        }
+    }
+
     protected static function concatenate(&$automaton, &$stack, $count) {
         if ($count < 2) {
             return;
@@ -141,7 +173,9 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         for ($i = 0; $i < $count - 1; $i++) {
             $cur = array_pop($stack);
             $automaton->redirect_transitions($cur['end'], $result['start']);
+            $borderstate = $result['start'];
             $result = array('start' => $cur['start'], 'end' => $result['end']);
+            //self::merge_epsilons_after_concat($automaton, $result, $borderstate);
         }
         $stack[] = $result;
     }
