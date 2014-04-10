@@ -10,7 +10,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 // TODO: 1 class
-
 class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
     public function test_word_starts() {
         $description = 'digraph example {
@@ -96,6 +95,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             0;
                             4;
+                            "-0"->"/2"[label = "[\W]", color = violet, style = dotted];
                             0->"/2"[label = "[^]", color = violet];
                             2->3[label = "[a]", color = violet];
                             3->4[label = "[t]", color = violet];
@@ -129,6 +129,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label = "[a]", color = violet];
                             2->"/3"[label = "[t ∩ \w]", color = violet];
                             "/3"->4[label = "[$]", color = violet];
+                            "/3"->"-0"[label = "[\W]", color = violet, style = dotted];
                         }';
 
         $source = new qtype_preg_fa();
@@ -153,7 +154,13 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             4->5[label="[t]"];
                         }';
         $dotresult = 'digraph example {
-
+                            0;
+                            5;
+                            0->1[label="[\W]", color = violet, style = dotted];
+                            1->2[label="[\t ∩ \W]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            3->4[label="[a]", color = violet];
+                            4->5[label="[t]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -175,7 +182,13 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             4->5[label="[\b]"];
                         }';
         $dotresult = 'digraph example {
-
+                            0;
+                            5;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->3[label="[t]", color = violet];
+                            3->4[label="[\t ∩ \W]", color = violet];
+                            4->5[label="[\w]", color = violet, style = dotted];
                         }';
 
         $source = new qtype_preg_fa();
@@ -262,7 +275,12 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             3->4[label="[t]"];
                         }';
         $dotresult = 'digraph example {
-
+                            0;
+                            4;
+                            0->1[label="[\w]", color = violet, style = dotted];
+                            1->2[label="[c ∩ \w]", color = violet];
+                            2->3[label="[a]", color = violet];
+                            3->4[label="[t]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -283,7 +301,12 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             3->4[label="[\B]"];
                         }';
         $dotresult = 'digraph example {
-
+                            0;
+                            4;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->3[label="[t ∩ \w]", color = violet];
+                            3->4[label="[\w]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -307,6 +330,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             0;
                             5;
+                            "-0"->"/2"[label = "[\W]", color = violet, style = dotted];
                             0->"/2"[label = "[^]", color = violet];
                             2->3[label = "[c]", color = violet];
                             3->4[label = "[a]", color = violet];
@@ -343,6 +367,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             2->3[label = "[t]", color = violet];
                             3->"/3"[label = "[\t ∩ \W]", color = violet];
                             "/3"->5[label = "[$]", color = violet];
+                            "/3"->"-0"[label = "[\W]", color = violet, style = dotted];
                         }';
 
         $source = new qtype_preg_fa();
@@ -473,7 +498,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             8->9[label="[$]"];
                         }';
         $dotresult = 'digraph res {
-
+            
                         }';
 
         $source = new qtype_preg_fa();
@@ -482,6 +507,253 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $result = new qtype_preg_fa();
         $result->read_fa($dotresult);
         $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_lines() {
+        $description = 'digraph example {
+                            0;
+                            3;
+                            0->1[label="[a!?]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[с+]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[a!? ∩ \w]", color = violet];
+                            0->2[label = "[a!? ∩ \W]", color = violet];
+                            2->3[label = "[с+ ∩ \w]", color = violet];
+                            1->3[label = "[с+ ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+        public function test_two_lines() {
+        $description = 'digraph example {
+                            0;
+                            3;
+                            0->1[label="[a!?]"];
+                            0->1[label="[]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[с+]"];
+                            2->3[label="[]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[\W]", color = violet, style = dotted];
+                            0->2[label = "[^]", color = violet];
+                            0->3[label = "[\w]", color = violet, style = dotted];
+                            0->4[label = "[a!? ∩ \w]", color = violet];
+                            0->5[label = "[a!? ∩ \W]", color = violet];
+                            1->6[label = "[\w]", color = violet, style = dotted];
+                            1->6[label = "[c+ ∩ \w]", color = violet];
+                            2->6[label = "[c+ ∩ \w]", color = violet];
+                            3->6[label = "[c+ ∩ \W]", color = violet];
+                            3->6[label = "[\W]", color = violet, style = dotted];
+                            4->6[label = "[$]", color = violet];
+                            4->6[label = "[\W]", color = violet, style = dotted];
+                            5->6[label = "[\w]", color = violet, style = dotted];
+                            5->6[label = "[с+ ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_lines() {
+        $description = 'digraph example {
+                            0;
+                            8;
+                            0->1[label="[a!&]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[b?+]"];
+                            3->4[label="[\b]"];
+                            4->5[label="[c*/]"];
+                            5->6[label="[\b]"];
+                            6->7[label="[d]"];
+                            6->7[label="[&]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;1;
+                            6;
+                            0->2[label = "[a!& ∩ \w]", color = violet];
+                            0->1[label = "[a!& ∩ \W]", color = violet];
+                            2->4[label = "[b?+ ∩ \W]", color = violet];
+                            1->3[label = "[b?+ ∩ \w]", color = violet];
+                            4->6[label = "[c*/ ∩ \w]", color = violet];
+                            3->5[label = "[c*/ ∩ \W]", color = violet];
+                            5->7[label = "[d ∩ \w]", color = violet];
+                            6->7[label = "[& ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_lines() {
+        $description = 'digraph example {
+                            0;
+                            8;
+                            0->1[label="[a!&]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[b?+]"];
+                            3->4[label="[\b]"];
+                            4->5[label="[c*/]"];
+                            5->6[label="[\b]"];
+                            6->7[label="[d]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[a!& ∩ \W]", color = violet];
+                            1->3[label = "[b?+ ∩ \w]", color = violet];
+                            3->5[label = "[c*/ ∩ \W]", color = violet];
+                            5->7[label = "[d ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_lines() {
+        $description = 'digraph example {
+                            0;
+                            8;
+                            0->1[label="[a!&]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[b?+]"];
+                            3->4[label="[\b]"];
+                            4->5[label="[c*/]"];
+                            5->6[label="[\b]"];
+                            6->7[label="[&]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->2[label = "[a!& ∩ \w]", color = violet];
+                            2->4[label = "[b?+ ∩ \W]", color = violet];
+                            4->6[label = "[c*/ ∩ \w]", color = violet];
+                            6->7[label = "[& ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_lines_start_b() {
+        $description = 'digraph example {
+                            0;
+                            8;
+                            0->1[label="[\b]"];
+                            1->2[label="[a!&]"];
+                            2->3[label="[\b]"];
+                            3->4[label="[b?+]"];
+                            4->5[label="[\b]"];
+                            5->6[label="[c*/]"];
+                            6->7[label="[\b]"];
+                            7->8[label="[d]"];
+                            7->8[label="[&]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;1;
+                            6;
+                            0->1[label = "[\w]", color = violet, style = dotted];
+                            0->2[label = "[\W]", color = violet, style = dotted];
+                            0->2[label = "[^]", color = violet];
+                            2->4[label = "[a!& ∩ \w]", color = violet];
+                            4->6[label = "[b?+ ∩ \W]", color = violet];
+                            6->8[label = "[c*/ ∩ \w]", color = violet];
+                            8->9[label = "[& ∩ \W]", color = violet];
+                            1->3[label = "[a!& ∩ \W]", color = violet];
+                            3->5[label = "[b?+ ∩ \w]", color = violet];
+                            5->7[label = "[c*/ ∩ \W]", color = violet];
+                            7->9[label = "[d ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_divarication_character_classes() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c!]"];
+                            1->2[label="[a]"];
+                            1->3[label="[\b]"];
+                            2->4[label="[t]"];
+                            3->5[label="[a\t]"];
+                            4->6[label="[$]"];
+                            5->6[label="[$]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label="[c!]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            0->"/0"[label = "[c! ∩ \w]", color = violet];
+                            0->"/1"[label = "[c! ∩ \W]", color = violet];
+                            2->4[label = "[t]", color = violet];
+                            4->6[label = "[$]", color = violet];
+                            5->6[label = "[$]", color = violet];
+                            "/0"->5[label = "[a\t ∩ \W]", color = violet];
+                            "/1"->5[label = "[a\t ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_divarication() {
@@ -499,12 +771,372 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             0;
                             6;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
                             0->"/0"[label = "[c ∩ \w]", color = violet];
                             2->4[label = "[t]", color = violet];
                             4->6[label = "[$]", color = violet];
                             5->6[label = "[$]", color = violet];
-                            "/0"->2[label = "[a]", color = violet];
                             "/0"->5[label = "[\t ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_two_branches_into_one() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[\B]"];
+                            2->4[label="[t]"];
+                            3->5[label="[\t]"];
+                            4->6[label="[$]"];
+                            5->6[label="[$]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->4[label="[t]", color = violet];
+                            4->6[label="[$]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_before_divarication() {
+        $description = 'digraph example {
+                            0;
+                            9;
+                            0->1[label="[\t]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[c]"];
+                            3->5[label="[a]"];
+                            5->7[label="[t]"];
+                            2->4[label="[d]"];
+                            4->6[label="[o]"];
+                            6->8[label="[g]"];
+                            7->9[label="[$]"];
+                            8->9[label="[$]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->"/1"[label="[\t ∩ \W]", color = violet];
+                            "/1"->3[label="[c ∩ \w]", color = violet];
+                            "/1"->4[label="[d ∩ \w]", color = violet];
+                            3->5[label="[a]", color = violet];
+                            5->7[label="[t]", color = violet];
+                            4->6[label="[o]", color = violet];
+                            6->8[label="[g]", color = violet];
+                            7->9[label="[$]", color = violet];
+                            8->9[label="[$]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_before_divarication_classes() {
+        $description = 'digraph example {
+                            0;
+                            9;
+                            0->1[label="[a\t]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[c!]"];
+                            3->5[label="[a]"];
+                            5->7[label="[t]"];
+                            2->4[label="[d?]"];
+                            4->6[label="[o]"];
+                            6->8[label="[g]"];
+                            7->9[label="[$]"];
+                            8->9[label="[$]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->"/1"[label="[a\t ∩ \W]", color = violet];
+                            0->"/0"[label="[a\t ∩ \w]", color = violet];
+                            "/1"->3[label="[c! ∩ \w]", color = violet];
+                            "/1"->4[label="[d? ∩ \w]", color = violet];
+                            "/0"->3[label="[c! ∩ \W]", color = violet];
+                            "/0"->4[label="[d? ∩ \W]", color = violet];
+                            3->5[label="[a]", color = violet];
+                            5->7[label="[t]", color = violet];
+                            4->6[label="[o]", color = violet];
+                            6->8[label="[g]", color = violet];
+                            7->9[label="[$]", color = violet];
+                            8->9[label="[$]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_before_divarication_to_one() {
+        $description = 'digraph example {
+                            0;
+                            9;
+                            0->1[label="[\t]"];
+                            1->2[label="[\b]"];
+                            2->3[label="[c]"];
+                            3->5[label="[a]"];
+                            5->7[label="[t]"];
+                            2->4[label="[\t]"];
+                            4->6[label="[o]"];
+                            6->8[label="[g]"];
+                            7->9[label="[$]"];
+                            8->9[label="[$]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->"/1"[label="[\t ∩ \W]", color = violet];
+                            "/1"->3[label="[c ∩ \w]", color = violet];
+                            3->5[label="[a]", color = violet];
+                            5->7[label="[t]", color = violet];
+                            7->9[label="[$]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_end_of_divarication() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[o]"];
+                            2->4[label="[t]"];
+                            4->5[label="[\b]"];
+                            3->5[label="[w]"];
+                            5->6[label="[\t]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            1->3[label = "[o]", color = violet];
+                            2->4[label = "[t ∩ \w]", color = violet];
+                            4->6[label = "[\t ∩ \W]", color = violet];
+                            3->5[label = "[w]", color = violet];
+                            5->6[label = "[\t]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_end_of_divarication_classes() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[o]"];
+                            2->4[label="[!t]"];
+                            4->5[label="[\b]"];
+                            3->5[label="[w]"];
+                            5->6[label="[a\t]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            1->3[label = "[o]", color = violet];
+                            2->4[label = "[!t ∩ \w]", color = violet];
+                            4->6[label = "[a\t ∩ \W]", color = violet];
+                            2->7[label = "[!t ∩ \W]", color = violet];
+                            7->6[label = "[a\t ∩ \w]", color = violet];
+                            3->5[label = "[w]", color = violet];
+                            5->6[label = "[a\t]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_end_of_divarication_classes_end() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[o]"];
+                            2->4[label="[!t]"];
+                            4->5[label="[\b]"];
+                            3->5[label="[w]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            1->3[label = "[o]", color = violet];
+                            2->4[label = "[!t ∩ \w]", color = violet];
+                            4->6[label = "[\W]", color = violet, style = dotted];
+                            4->6[label = "[$]", color = violet];
+                            2->7[label = "[!t ∩ \W]", color = violet];
+                            7->6[label = "[\w]", color = violet, style = dotted];
+                            3->6[label = "[w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_after_divarication() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[o]"];
+                            2->4[label="[t]"];
+                            4->5[label="[\b]"];
+                            3->4[label="[w]"];
+                            5->6[label="[\t]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            1->3[label = "[o]", color = violet];
+                            2->4[label = "[t ∩ \w]", color = violet];
+                            4->5[label = "[\t ∩ \W]", color = violet];
+                            3->4[label = "[w ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_after_divarication_classes() {
+        $description = 'digraph example {
+                            0;
+                            6;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            1->3[label="[o]"];
+                            2->4[label="[t!]"];
+                            4->5[label="[\b]"];
+                            3->4[label="[w]"];
+                            5->6[label="[a\t]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            6;
+                            0->1[label = "[c]", color = violet];
+                            1->2[label = "[a]", color = violet];
+                            1->3[label = "[o]", color = violet];
+                            2->4[label = "[t! ∩ \w]", color = violet];
+                            4->5[label = "[a\t ∩ \W]", color = violet];
+                            2->6[label = "[t! ∩ \W]", color = violet];
+                            6->5[label = "[a\t ∩ \w]", color = violet];
+                            3->4[label = "[w ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_divarication_with_eps() {
+        $description = 'digraph example {
+                            0;
+                            3;
+                            0->1[label="[\b]"];
+                            1->2[label="[a]"];
+                            1->2[label="[]"];
+                            2->3[label="[b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            3;
+                            "-0"->1[label = "[\W]", color = violet, style = dotted];
+                            0->1[label = "[^]", color = violet];
+                            1->2[label = "[a ∩ \w]", color = violet];
+                            1->3[label = "[b ∩ \w]", color = violet];
+                            2->3[label = "[b]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -532,11 +1164,58 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             0;
                             4;
-                            0->"/0"[label = "[d]", color = violet];
-                            2->3[label = "[c]", color = violet];
-                            3->4[label = "[a]", color = violet];
-                            4->"/0"[label = "[t ∩ \w]", color = violet];
-                            "/0"->2[label = "[\t ∩ \W]", color = violet];
+                            0->1[label="[d]", color = violet];
+                            1->2[label="[\t]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            3->4[label="[a]", color = violet];
+                            4->"/1"[label = "[t ∩ \w]", color = violet];
+                            "/1"->"/2"[label = "[\t ∩ \W]", color = violet];
+                            "/2"->"/3"[label = "[c]", color = violet];
+                            "/3"->"/4"[label = "[a]", color = violet];
+                            "/4"->"/1"[label = "[t ∩ \w]", color = violet];
+                            "/4"->5[label = "[t]", color = violet];
+                            4->5[label = "[t]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[d]"];
+                            1->2[label="[b\t]"];
+                            2->3[label="[c]"];
+                            3->4[label="[a]"];
+                            4->5[label="[t!]"];
+                            5->1[label="[\b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            0;
+                            4;
+                            0->1[label="[d]", color = violet];
+                            1->2[label="[b\t]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            3->4[label="[a]", color = violet];
+                            4->"/1"[label = "[t! ∩ \w]", color = violet];
+                            "/1"->"/2"[label = "[b\t ∩ \W]", color = violet];
+                            4->"//1"[label = "[t! ∩ \W]", color = violet];
+                            "//1"->"/2"[label = "[b\t ∩ \w]", color = violet];
+                            "/2"->"/3"[label = "[c]", color = violet];
+                            "/3"->"/4"[label = "[a]", color = violet];
+                            "/4"->"/1"[label = "[t! ∩ \w]", color = violet];
+                            "/4"->"//1"[label = "[t! ∩ \W]", color = violet];
+                            "/4"->5[label = "[t!]", color = violet];
+                            4->5[label = "[t!]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -562,9 +1241,45 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             "/0";
                             3;
+                            0->1[label="[\t]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->3[label="[c]", color = violet];
                             1->"/0"[label = "[a ∩ \w]", color = violet];
+                            "/0"->"/1"[label = "[\t ∩ \W]", color = violet];
+                            "/1"->"/0"[label = "[a ∩ \w]", color = violet];
                             "/0"->3[label = "[c]", color = violet];
-                            "/0"->1[label = "[\t ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_to_start() {
+        $description = 'digraph example {
+                            0;
+                            3;
+                            0->1[label="[b\t]"];
+                            1->2[label="[a!]"];
+                            2->3[label="[c]"];
+                            2->0[label="[\b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            "/0";
+                            3;
+                            0->1[label="[b\t]", color = violet];
+                            1->2[label="[a!]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            1->"/0"[label = "[a! ∩ \w]", color = violet];
+                            "/0"->1[label = "[b\t ∩ \W]", color = violet];
+                            1->"/1"[label = "[a! ∩ \W]", color = violet];
+                            "/1"->1[label = "[b\t ∩ \w]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -589,8 +1304,45 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             "/0";
                             1;
+                            0->1[label="[\t]", color = violet];
+                            1->2[label="[a]", color = violet];
                             1->"/0"[label = "[a ∩ \w]", color = violet];
-                            "/0"->1[label = "[\t ∩ \W]", color = violet];
+                            "/0"->"/1"[label = "[\t ∩ \W]", color = violet];
+                            "/1"->"/0"[label = "[a ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $search = '
+                        ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $source->fa_to_dot();
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_to_start_from_end() {
+        $description = 'digraph example {
+                            0;
+                            2;
+                            0->1[label="[a!]"];
+                            1->0[label="[\b]"];
+                        }';
+        $dotresult = 'digraph res {
+                            "/0";
+                            1;
+                            0->1[label="[a! ∩ \w]", color = violet];
+                            1->3[label="[a! ∩ \W]", color = violet];
+                            0->2[label="[a! ∩ \W]", color = violet];
+                            2->4[label="[a! ∩ \w]", color = violet];
+                            3->1[label="[a! ∩ \w]", color = violet];
+                            4->2[label="[a! ∩ \W]", color = violet];
+                            0->5[label="[a!]", color = violet];
+                            1->5[label="[a!]", color = violet];
+                            2->5[label="[a!]", color = violet];
+                            3->5[label="[a!]", color = violet];
+                            4->5[label="[a!]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
@@ -614,6 +1366,8 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $dotresult = 'digraph res {
                             "/0";
                             "/0";
+                            0->1[label="[a]", color = violet];
+                            0->"/0"[label = "[a ∩ \w]", color = violet];
                             "/0"->"/0"[label = "[a ∩ \w]", color = violet];
                         }';
 
@@ -640,7 +1394,285 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             5->1[label="[\B]"];
                         }';
         $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[d]", color = violet];
+                            1->2[label="[\t]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            3->4[label="[a]", color = violet];
+                            4->5[label="[t]", color = violet];
+                        }';
 
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_no_success_end_state() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[d]"];
+                            1->2[label="[\t]"];
+                            2->3[label="[c]"];
+                            3->4[label="[a]"];
+                            4->5[label="[t]"];
+                            5->1[label="[\B]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[d]", color = violet];
+                            1->2[label="[\t]", color = violet];
+                            2->3[label="[c]", color = violet];
+                            3->4[label="[a]", color = violet];
+                            4->5[label="[t]", color = violet];
+                            5->6[label="[\w]", color = violet, style = dotted];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_empty_cycle() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[\b]"];
+                            1->2[label="[a]"];
+                            2->3[label="[b]"];
+                            3->1[label="[]"];
+                            3->4[label="[c]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[^]", color = violet];
+                            "-0"->1[label="[\W]", color = violet, style = dotted];
+                            1->2[label="[a ∩ \w]", color = violet];
+                            2->3[label="[b]", color = violet];
+                            3->5[label="[a]", color = violet];
+                            3->4[label="[c]", color = violet];
+                            5->3[label="[b]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_empty_cycle_character_class() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[\b]"];
+                            1->2[label="[a!]"];
+                            2->3[label="[b]"];
+                            3->1[label="[]"];
+                            3->4[label="[c]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[^]", color = violet];
+                            0->1[label="[\W]", color = violet, style = dotted];
+                            0->"/1"[label="[\w]", color = violet, style = dotted];
+                            "/1"->2[label="[a! ∩ \W]", color = violet];
+                            1->2[label="[a! ∩ \w]", color = violet];
+                            2->3[label="[b]", color = violet];
+                            3->5[label="[a!]", color = violet];
+                            3->4[label="[c]", color = violet];
+                            5->3[label="[b]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_divarication() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[a]"];
+                            1->2[label="[\b]"];
+                            1->3[label="[b]"];
+                            3->4[label="[d]"];
+                            4->5[label="[e]"];
+                            2->5[label="[\t]"];
+                            5->1[label="[g]"];
+                            5->6[label="[f]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->2[label="[a]", color = violet];
+                            0->1[label="[a ∩ \w]", color = violet];
+                            2->3[label="[b]", color = violet];
+                            3->4[label="[d]", color = violet];
+                            4->5[label="[e]", color = violet];
+                            5->7[label="[f]", color = violet];
+                            5->2[label="[g]", color = violet];
+                            5->1[label="[g ∩ \w]", color = violet];
+                            1->5[label="[\t ∩ \W]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_state() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[\b]"];
+                            1->1[label="[a]"];
+                            1->2[label="[t]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[^]", color = violet];
+                            "-0"->1[label="[\W]", color = violet, style = dotted];
+                            1->2[label="[a ∩ \w]", color = violet];
+                            2->2[label="[a]", color = violet];
+                            2->3[label="[t]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_state_start() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[\B]"];
+                            0->0[label="[a]"];
+                            1->2[label="[t]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[\w]", color = violet, style = dotted];
+                            "-0"->3[label="[a ∩ \w]", color = violet];
+                            "-0"->"-0"[label="[a]", color = violet];
+                            3->2[label="[t ∩ \w]", color = violet];
+                            1->2[label="[t ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_b() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[a]"];
+                            1->1[label="[\B]"];
+                            1->2[label="[t]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->2[label="[a]", color = violet];
+                            2->3[label="[t]", color = violet];
+                            0->1[label="[a ∩ \w]", color = violet];
+                            1->3[label="[t ∩ \w]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_b() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            2->3[label="[t!]"];
+                            3->4[label="[e]"];
+                            4->1[label="[o]"];
+                            3->5[label="[\b]"];
+                            5->6[label="[d?]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->3[label="[t!]", color = violet];
+                            2->5[label="[t! ∩ \w]", color = violet];
+                            2->6[label="[t! ∩ \W]", color = violet];
+                            5->7[label="[d? ∩ \W]", color = violet];
+                            6->7[label="[d? ∩ \w]", color = violet];
+                            3->4[label="[e]", color = violet];
+                            4->1[label="[o]", color = violet];
+                        }';
+
+        $source = new qtype_preg_fa();
+        $source->read_fa($description);
+        $source->avoid_wordbreaks();
+        $result = new qtype_preg_fa();
+        $result->read_fa($dotresult);
+        $this->assertEquals($source, $result, 'Result automata is not equal to expected');
+    }
+
+    public function test_cycle_b() {
+        $description = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[c]"];
+                            1->2[label="[a]"];
+                            2->3[label="[t!]"];
+                            3->4[label="[e]"];
+                            4->1[label="[o]"];
+                            3->5[label="[\b]"];
+                        }';
+        $dotresult = 'digraph example {
+                            0;
+                            5;
+                            0->1[label="[c]", color = violet];
+                            1->2[label="[a]", color = violet];
+                            2->3[label="[t!]", color = violet];
+                            2->5[label="[t! ∩ \w]", color = violet];
+                            2->6[label="[t! ∩ \W]", color = violet];
+                            5->7[label="[\W]", color = violet, style = dotted];
+                            5->7[label="[$]", color = violet];
+                            6->7[label="[\w]", color = violet, style = dotted];
+                            3->4[label="[e]", color = violet];
+                            4->1[label="[o]", color = violet];
                         }';
 
         $source = new qtype_preg_fa();
