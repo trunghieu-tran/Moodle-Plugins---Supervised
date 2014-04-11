@@ -454,10 +454,14 @@ class qtype_preg_regex_handler {
      * Returns subpatterns number => node map.
      */
     public function get_subpatt_map() {
+        $result = array();
         if ($this->parser !== null) {
-            return $this->parser->get_subpatt_map();
+            $result = $this->parser->get_subpatt_map();
         }
-        return array();
+        if ($this->selectednode !== null) {
+            $result[-2] = $this->selectednode;
+        }
+        return $result;
     }
 
     /**
