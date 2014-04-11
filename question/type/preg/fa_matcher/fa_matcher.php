@@ -31,11 +31,23 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_exec_state.php')
 
 class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
-    public $automaton = null;          // FA corresponding to the given regex.
+    // FA corresponding to the regex
+    protected $automaton = null;
 
-    protected $nestingmap = array();   // Array (subpatt number => nested qtype_preg_node objects)
+    // Map of nested subpatterns:  (subpatt number => nested qtype_preg_node objects)
+    protected $nestingmap = array();
+
+    // Should we generate extensions for each match before choosing the best one?
     protected $generateextensionforeachmatch = false;
+
+    // States to backtrack to when generating extensions
     protected $backtrackstates = array();
+
+    // Should we call bruteforce method to find a match?
+    protected $bruteforcematch = false;
+
+    // Should we call bruteforce method to generate a partial match extension?
+    protected $bruteforcegeneration = false;
 
     public function name() {
         return 'fa_matcher';
@@ -662,7 +674,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function generate_extensions($matches, $bruteforce, $str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+    protected function generate_extensions($matches, $str, $startpos, $subexpr = 0, $prevlevelstate = null) {
         foreach ($matches as $match) {
             $match->extendedmatch = null;
             // Try each backtrack state and choose the shortest one.
@@ -670,7 +682,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             foreach ($match->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
-                $tmp = $bruteforce
+                $tmp = $this->bruteforcegeneration
                      ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
                      : $this->generate_extension_fast($str, $backtrack, $subexpr);
 
@@ -708,19 +720,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
-        $bruteforce = false;
-        foreach ($this->get_nodes_with_subexpr_refs() as $node) {
-            // Recursion leafs are kinda subexpr references but they don't cause bruteforce
-            if ($node->type != qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
-                $bruteforce = true;
-                break;
-            }
-        }
-
-        //$bruteforce = count($this->backtrackstates) > 0;
-
         // Find all possible matches. Using the fast match method if there are no backreferences.
-        $possiblematches = $bruteforce
+        $possiblematches = $this->bruteforcematch
                          ? $this->match_brute_force($str, $startpos, $subexpr, $prevlevelstate)
                          : $this->match_fast($str, $startpos, $subexpr, $prevlevelstate);
 
@@ -739,7 +740,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // If there was no full match, generate extensions for each partial match.
         if (!$fullmatchexists && $this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
-            $this->generate_extensions($possiblematches, $bruteforce, $str, $startpos, $subexpr, $prevlevelstate);
+            $this->generate_extensions($possiblematches, $str, $startpos, $subexpr, $prevlevelstate);
         }
 
         // Choose the best one.
@@ -751,7 +752,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         if (!$fullmatchexists && !$this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
-            $this->generate_extensions(array($result), $bruteforce, $str, $startpos, $subexpr, $prevlevelstate);
+            $this->generate_extensions(array($result), $str, $startpos, $subexpr, $prevlevelstate);
         }
 
         return $result;
@@ -847,9 +848,22 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $this->backtrackstates = $this->automaton->calculate_backtrack_states();
     }
 
+    protected function calculate_bruteforce() {
+        foreach ($this->get_nodes_with_subexpr_refs() as $node) {
+            // Recursion leafs are kinda subexpr references but they don't cause bruteforce
+            if ($node->type != qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                $this->bruteforcematch = true;
+                $this->bruteforcegeneration = true;
+                break;
+            }
+        }
+
+        $this->bruteforcegeneration = $this->bruteforcegeneration && count($this->backtrackstates) > 0;
+    }
+
     /**
      * Constructs an FA corresponding to the given node.
-     * @return - object of qtype_preg_fa in case of success, false otherwise.
+     * @return - object of qtype_preg_fa in case of success, null otherwise.
      */
     protected function build_fa() {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
@@ -863,7 +877,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             //printf($result->fa_to_dot() . "\n");
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH);
         } catch (Exception $e) {
-            $result = false;
+            $result = null;
         }
         return $result;
     }
@@ -875,19 +889,19 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $fa = self::build_fa();
-        if ($fa !== false) {
-            $this->automaton = $fa;
-            $this->nestingmap = array();
-            $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
-            $this->calculate_generateextensionforeachmatch();
-            $this->calculate_backtrackstates();
-            // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
-            // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
-            // $this->automaton->on_subexpr_added($this->astroot);
-        } else {
-            $this->automaton = null;
+        $this->automaton = self::build_fa();
+        if ($this->automaton === null) {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
+            return;
         }
+
+        $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
+        $this->calculate_generateextensionforeachmatch();
+        $this->calculate_backtrackstates();
+        $this->calculate_bruteforce();
+
+        // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
+        // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
+        // $this->automaton->on_subexpr_added($this->astroot);
     }
 }

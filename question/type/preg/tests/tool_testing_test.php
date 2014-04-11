@@ -119,7 +119,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertTrue($str == '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by nondeterministic finite state automata.');
+        $this->assertTrue($str == '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by finite state automata.');
     }
 
     function test_empty_regex() {
