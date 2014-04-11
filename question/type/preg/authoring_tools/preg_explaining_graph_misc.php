@@ -549,8 +549,9 @@ class qtype_preg_explaining_graph_tool_subgraph {
      */
     public function create_dot() {
         $this->regenerate_id();
-        $instr = "digraph qtype_preg_graph {\n" .
-                  'id="explaining_graph";' .
+        $instr = "digraph \"explaining graph\" {\n" .
+                  "tooltip=\"" . $this->tooltip ."\";\n" .
+                  "id=\"explaining_graph\";\n" .
                   "compound=true;\n" .
                   "rankdir = LR;\n" . ($this->isexact ? 'graph [bgcolor=lightgray];' : '') . "\n";
 
