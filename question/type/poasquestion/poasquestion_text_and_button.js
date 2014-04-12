@@ -7,7 +7,7 @@
  * @package questions
  */
 
-M.poasquestion_text_and_button = (function() {
+M.poasquestion_text_and_button = (function ($) {
 
     var self = {
 
@@ -219,4 +219,4 @@ M.poasquestion_text_and_button = (function() {
 
 return self;
 
-})($);
+})(jQuery);
