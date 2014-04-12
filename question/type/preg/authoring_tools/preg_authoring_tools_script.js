@@ -168,7 +168,7 @@ M.preg_authoring_tools_script = (function ($) {
                 self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
                 self.invalidate_content();
 
-				self.data = self.regex_input.val();
+                self.data = self.regex_input.val();
 
                 // Put the testing data into ui.
                 if (!self.textbutton_widget.is_stand_alone()) {
@@ -224,14 +224,15 @@ M.preg_authoring_tools_script = (function ($) {
         self.data = self.regex_input.val();
         // if regex is changed
         if(self.is_changed()) {
-        	$('input[name=\'tree_fold_node_points\']').val('');
-        	self.prevdata = self.data;	
-    	}
+            $('input[name=\'tree_fold_node_points\']').val('');
+            self.prevdata = self.data;
+            self.panzooms.reset_all();
+        }
         $('input[name=\'tree_selected_node_points\']').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
-        self.panzooms.reset_all();
+        
     },
 
     btn_save_clicked : function (e) {
@@ -470,7 +471,7 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 //check is checked check box
                 if (self.is_graph_selection_rectangle_visible()) {
-               		self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+                    self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
                 }
             });
 
@@ -479,9 +480,28 @@ M.preg_authoring_tools_script = (function ($) {
                 self.resize_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
             });
 
-            $(window).mouseup(function(e){
+            $('#graph_img').mouseup(function(e){
                 e.preventDefault();
                 self.CALC_COORD = false;
+
+                var transformattr = $('#explaining_graph').attr('transform');
+                var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+                var translate_x = ta[1];
+                var translate_y = ta[2];
+                var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
+                    (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+                        + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
+                    (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                        + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
+                self.load_content(sel.indfirst, sel.indlast);
+                self.load_strings(sel.indfirst, sel.indlast);
+
+                $('#resizeGraph').css({
+                    width : 0,
+                    height : 0,
+                    left : -10,
+                    top : -10
+                });
             });
 
             graph_img.click(self.graph_node_misclicked);
@@ -513,7 +533,7 @@ M.preg_authoring_tools_script = (function ($) {
 
 
     resize_rectangle_selection : function(e, img, rectangle, hnd) {
-    	if (self.CALC_COORD) {
+        if (self.CALC_COORD) {
             var br = document.getElementById(img).getBoundingClientRect();
             var new_pageX = self.get_current_x(e, img, hnd);
             var new_pageY = self.get_current_y(e, img, hnd);
@@ -543,6 +563,29 @@ M.preg_authoring_tools_script = (function ($) {
                     left : new_pageX
                 });
             }
+        
+            // draw selected items in image
+            var transformattr = $('#explaining_graph').attr('transform');
+            var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+            var translate_x = ta[1];
+            var translate_y = ta[2];
+            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+                + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft'));
+            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop'));
+            var items = self.get_figures_in_rect('resizeGraph', 'graph_img', tdx, tdy);
+
+            var areas = $("ellipse, polygon", "#" + img + " > svg > g");
+            // check all sgv elements and set opasity 100%
+            for (var i = 0; i < areas.length; ++i) {
+                $(areas[i]).attr('stroke-opacity' , '1.0');
+            }
+
+            // check selected svg elements and set opasity 50%
+            for (var i = 0; i < items.length; ++i) {
+                $(items[i]).attr('stroke-opacity' , '0.1');
+            }
+
         }
     },
 
@@ -597,16 +640,12 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     get_current_x : function(e, img, hnd) {
-        //var br = document.getElementById('tree_img').getBoundingClientRect();
-        //var local_x = e.pageX - $(window).prop('scrollX') - br.left;
         return e.pageX - $(window).prop('scrollX') - document.getElementById(img).getBoundingClientRect().left
                 - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left)
                 + $('#' + hnd).prop('scrollLeft');
     },
 
     get_current_y : function(e, img, hnd) {
-        //var br = document.getElementById('tree_hnd').getBoundingClientRect();
-        //var local_y = e.pageY - $(window).prop('scrollY') - br.top;
         return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top 
                 - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
                 + $('#' + hnd).prop('scrollTop');
@@ -653,9 +692,9 @@ M.preg_authoring_tools_script = (function ($) {
      */
     get_figures_in_rect : function (rectangle, img, deltaX, deltaY) {
         rect_left_bot_x = $('#' + rectangle).prop('offsetLeft') + deltaX;
-        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') + deltaY;
+        rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - deltaY;
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
-        rect_right_top_y = $('#' + rectangle).prop('offsetTop') + deltaY;
+        rect_right_top_y = $('#' + rectangle).prop('offsetTop') - deltaY;
 
         var areas = $(".edge, .node", "#"+img+" > svg > g");
         var figures = [];
@@ -730,17 +769,17 @@ M.preg_authoring_tools_script = (function ($) {
                     && rect_right_top_x > nodeCoords[j].x
                     && rect_left_bot_y > nodeCoords[j].y
                     && rect_right_top_y < nodeCoords[j].y) {
-                        if(nodeId[2] < indfirst) {
+                        if(parseInt(nodeId[2]) < parseInt(indfirst)) {
                             indfirst = nodeId[2];
                         }
-                        if(nodeId[3] > indlast) {
+                        if(parseInt(nodeId[3]) > parseInt(indlast)) {
                             indlast = nodeId[3];
                         }
                 }
             }
         }
 
-        if (indfirst > indlast) {
+        if (parseInt(indfirst) > parseInt(indlast)) {
             indfirst = indlast = -2;
         }
         return {
@@ -751,29 +790,6 @@ M.preg_authoring_tools_script = (function ($) {
 
     display_strings : function (s) {
         $('#id_test_regex').html(s);
-    },
-
-    btn_graph_select_rectangle_selection_click : function (e) {
-        e.preventDefault();
-
-        var transformattr = $('#explaining_graph').attr('transform');
-        var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
-        var translate_x = ta[1];
-        var translate_y = ta[2];
-        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-            (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-            	+ parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
-            (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
-            	+ parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
-        self.load_content(sel.indfirst, sel.indlast);
-        self.load_strings(sel.indfirst, sel.indlast);
-
-        $('#resizeGraph').css({
-            width : 0,
-            height : 0,
-            left : -10,
-            top : -10
-        });
     },
 
     btn_graph_selection_mode_rectangle_selection_click : function (e) {
