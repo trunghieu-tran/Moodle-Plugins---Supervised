@@ -739,7 +739,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // If there was no full match, generate extensions for each partial match.
-        if (!$fullmatchexists && $this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+        if (!$fullmatchexists && $this->generateextensionforeachmatch && $this->options->extensionneeded) {
             $this->generate_extensions($possiblematches, $str, $startpos, $subexpr, $prevlevelstate);
         }
 
@@ -751,7 +751,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
 
-        if (!$fullmatchexists && !$this->generateextensionforeachmatch /*&& ($this->options === null || $this->options->extensionneeded)*/) {   // TODO
+        if (!$fullmatchexists && !$this->generateextensionforeachmatch && $this->options->extensionneeded) {
             $this->generate_extensions(array($result), $str, $startpos, $subexpr, $prevlevelstate);
         }
 
