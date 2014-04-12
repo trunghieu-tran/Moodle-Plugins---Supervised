@@ -168,7 +168,7 @@ M.preg_authoring_tools_script = (function ($) {
                 self.regex_input.val(self.textbutton_widget.data).trigger('keyup');
                 self.invalidate_content();
 
-				self.data = self.regex_input.val();
+                self.data = self.regex_input.val();
 
                 // Put the testing data into ui.
                 if (!self.textbutton_widget.is_stand_alone()) {
@@ -224,14 +224,15 @@ M.preg_authoring_tools_script = (function ($) {
         self.data = self.regex_input.val();
         // if regex is changed
         if(self.is_changed()) {
-        	$('input[name=\'tree_fold_node_points\']').val('');
-        	self.prevdata = self.data;	
-    	}
+            $('input[name=\'tree_fold_node_points\']').val('');
+            self.prevdata = self.data;
+            self.panzooms.reset_all();
+        }
         $('input[name=\'tree_selected_node_points\']').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
-        self.panzooms.reset_all();
+        
     },
 
     btn_save_clicked : function (e) {
@@ -470,7 +471,7 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 //check is checked check box
                 if (self.is_graph_selection_rectangle_visible()) {
-               		self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
+                    self.init_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
                 }
             });
 
@@ -483,24 +484,24 @@ M.preg_authoring_tools_script = (function ($) {
                 e.preventDefault();
                 self.CALC_COORD = false;
 
-				var transformattr = $('#explaining_graph').attr('transform');
-		        var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
-		        var translate_x = ta[1];
-		        var translate_y = ta[2];
-		        var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-		            (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-		            	+ parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
-		            (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
-		            	+ parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
+                var transformattr = $('#explaining_graph').attr('transform');
+                var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+                var translate_x = ta[1];
+                var translate_y = ta[2];
+                var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
+                    (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+                        + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
+                    (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                        + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
                 self.load_content(sel.indfirst, sel.indlast);
-		        self.load_strings(sel.indfirst, sel.indlast);
+                self.load_strings(sel.indfirst, sel.indlast);
 
-		        $('#resizeGraph').css({
-		            width : 0,
-		            height : 0,
-		            left : -10,
-		            top : -10
-		        });
+                $('#resizeGraph').css({
+                    width : 0,
+                    height : 0,
+                    left : -10,
+                    top : -10
+                });
             });
 
             graph_img.click(self.graph_node_misclicked);
@@ -532,7 +533,7 @@ M.preg_authoring_tools_script = (function ($) {
 
 
     resize_rectangle_selection : function(e, img, rectangle, hnd) {
-    	if (self.CALC_COORD) {
+        if (self.CALC_COORD) {
             var br = document.getElementById(img).getBoundingClientRect();
             var new_pageX = self.get_current_x(e, img, hnd);
             var new_pageY = self.get_current_y(e, img, hnd);
@@ -563,27 +564,27 @@ M.preg_authoring_tools_script = (function ($) {
                 });
             }
         
-        	// draw selected items in image
-        	var transformattr = $('#explaining_graph').attr('transform');
-	        var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
-	        var translate_x = ta[1];
-	        var translate_y = ta[2];
-	        var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-            	+ parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft'));
-	        var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
-            	+ parseInt(translate_y) + $('#graph_hnd').prop('scrollTop'));
-        	var items = self.get_figures_in_rect('resizeGraph', 'graph_img', tdx, tdy);
+            // draw selected items in image
+            var transformattr = $('#explaining_graph').attr('transform');
+            var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+            var translate_x = ta[1];
+            var translate_y = ta[2];
+            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+                + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft'));
+            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop'));
+            var items = self.get_figures_in_rect('resizeGraph', 'graph_img', tdx, tdy);
 
-			var areas = $("ellipse, polygon", "#" + img + " > svg > g");
-			// check all sgv elements and set opasity 100%
-        	for (var i = 0; i < areas.length; ++i) {
-        		$(areas[i]).attr('stroke-opacity' , '1.0');
-        	}
+            var areas = $("ellipse, polygon", "#" + img + " > svg > g");
+            // check all sgv elements and set opasity 100%
+            for (var i = 0; i < areas.length; ++i) {
+                $(areas[i]).attr('stroke-opacity' , '1.0');
+            }
 
-        	// check selected svg elements and set opasity 50%
-        	for (var i = 0; i < items.length; ++i) {
-        		$(items[i]).attr('stroke-opacity' , '0.1');
-        	}
+            // check selected svg elements and set opasity 50%
+            for (var i = 0; i < items.length; ++i) {
+                $(items[i]).attr('stroke-opacity' , '0.1');
+            }
 
         }
     },
