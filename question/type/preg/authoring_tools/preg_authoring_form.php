@@ -115,16 +115,6 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;max-width:100%" id="tree_hnd">' .
                                         '<div id="tree_err"></div>' .
                                             '<div id="tree_img" class="preg_img_panzoom" title="' . get_string('authoring_form_tree_build', 'qtype_preg') . '">&nbsp;</div>' .
-                                            /*'<div id="resizeTree">' .
-                                                '<div id="resizeSE"></div>' .
-                                                '<div id="resizeE"></div>' .
-                                                '<div id="resizeNE"></div>' .
-                                                '<div id="resizeN"></div>' .
-                                                '<div id="resizeNW"></div>' .
-                                                '<div id="resizeW"></div>' .
-                                                '<div id="resizeSW"></div>' .
-                                                '<div id="resizeS"></div>' .
-                                            '</div>' .*/
                                         '</div></br>');
 
         // Add explaining graph tool.
@@ -134,22 +124,14 @@ class qtype_preg_authoring_form extends moodleform {
 
         $graphselectionarray = array();
         $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        $graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
+        //$graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $mform->addGroup($graphselectionarray, 'graph_selection', '', array(' '), false);
 
         $mform->addElement('html', '<div style="max-height:400px;position:relative;overflow:auto !important;width:1000px;max-width:100%" id="graph_hnd">' .
                                        '<div id="graph_err"></div>' .
                                        '<div id="graph_img" class="preg_img_panzoom" title="' . get_string('authoring_form_graph_build', 'qtype_preg') . '">&nbsp;</div>' .
                                        '<div id="resizeGraph">' .
-                                            '<div id="resizeSE"></div>' .
-                                            '<div id="resizeE"></div>' .
-                                            '<div id="resizeNE"></div>' .
-                                            '<div id="resizeN"></div>' .
-                                            '<div id="resizeNW"></div>' .
-                                            '<div id="resizeW"></div>' .
-                                            '<div id="resizeSW"></div>' .
-                                            '<div id="resizeS"></div>' .
-                                        '</div>' .
+                                       '</div>' .
                                    '</div></br>');
         //$mform->addElement('html', $abc);
 
