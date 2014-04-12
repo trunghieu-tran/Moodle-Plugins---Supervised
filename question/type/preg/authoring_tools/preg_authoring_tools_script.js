@@ -557,12 +557,12 @@ M.preg_authoring_tools_script = (function ($) {
             var areas = $("ellipse, polygon", "#" + img + " > svg > g");
             // check all sgv elements and set opasity 100%
             for (var i = 0; i < areas.length; ++i) {
-                $(areas[i]).attr('stroke-opacity' , '1.0');
+                $(areas[i]).attr('opacity' , '1.0');
             }
 
             // check selected svg elements and set opasity 50%
             for (var i = 0; i < items.length; ++i) {
-                $(items[i]).attr('stroke-opacity' , '0.1');
+                $(items[i]).attr('opacity' , '0.5');
             }
 
         }

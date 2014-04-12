@@ -123,9 +123,7 @@
                 }
             },
             highlight: function (start, end, color) {
-                console.log('highlight '+start+' '+end);
                 if ( (end-start+1)<=0 ) {
-                    //console.log('end-start+1<=0 @ jQuery.'+PLUGINNAME+'.highlight');
                     methods._hidehelper.apply(this);
                     return;
                 }
@@ -139,10 +137,8 @@
                 data._textareael.scroll();
                 $this.blur();
             },
-            highlight2areas: function (starto, endo, coloro, starti, endi, colori) {
-                console.log('333');
+            highlight2areas: function (starto, endo, coloro, starti, endi, colori) { // TODO - remove copypasted code -_-
                 if ( (endo-starto+1)<=0 || (endi-starti+1)<=0 ) {
-                    //console.log('end-start+1<=0 @ jQuery.'+PLUGINNAME+'.highlight');
                     methods._hidehelper.apply(this);
                     return;
                 }
