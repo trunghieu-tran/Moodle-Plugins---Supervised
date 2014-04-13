@@ -4547,7 +4547,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_zero_length_loop() {
+    function data_for_test_zero_length_loop_1() {
         $test1 = array( 'str'=>' a',
                         'is_match'=>true,
                         'full'=>true,
@@ -4563,6 +4563,19 @@ class qtype_preg_cross_tests_from_preg {
         return array('regex'=>'^*[a-z 0-9](?:\b)+a${1,}',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_zero_length_loop_2() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>0),
+                        'length'=>array(0=>1,1=>1,2=>1),
+                        );
+
+        return array('regex'=>'((b)?$)+',
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_zero_length_loop_with_backref() {
