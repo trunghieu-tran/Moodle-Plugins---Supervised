@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_exec_state.php')
 class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     // FA corresponding to the regex
-    protected $automaton = null;
+    public $automaton = null;   // for testing purposes
 
     // Map of nested subpatterns:  (subpatt number => nested qtype_preg_node objects)
     protected $nestingmap = array();
@@ -494,7 +494,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 $curpos = $startpos + $curstate->length;
                 $length = 0;
-                //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
+                //echo "trying $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
 
                 $newstate = clone $curstate;
                 $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
@@ -506,7 +506,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
                     // Create a new state.
                     $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
-                    //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
+                    //echo "MATCHED $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
                     //echo "total length is {$newstate->length}\n\n";
                     // Save the current match.
                     if (!($transition->loopsback && $newstate->has_null_iterations())) {
@@ -517,7 +517,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         }
                     }
                 } else if (count($fullmatches) == 0 && $subexpr == 0) {
-                    //echo "not matched, partial match length is $length :(\n";
+                    //echo "not matched, partial match length is $length\n";
                     // Transition not matched, save the partial match.
                     $newstate->length += $length;
                     $newstate->last_transition = $transition;
@@ -603,7 +603,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     }
                     $curpos = $startpos + $curstate->length;
                     $length = 0;
-                    //echo "trying {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel and pos $curpos\n";
+                    //echo "trying $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
 
                     $newstate = clone $curstate;
                     $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
@@ -617,19 +617,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
-                        //echo "MATCHED {$transition->pregleaf->leaf_tohr()} at level $curstate->recursionlevel, length is $length\n";
+                        //echo "MATCHED $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
                         //echo "total length is {$newstate->length}\n\n";
                         // Save the current result.
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             $lazystates[] = $newstate;
                         } else {
                             $number = $newstate->state;
-                            if (!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) {
+                            if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
+                                ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {   // $states does not contain a better state
                                 $reached[$number] = $newstate;
                             }
                         }
                     } else if (!$endstatereached && $subexpr == 0) {
-                        //echo "not matched, partial match length is $length :(\n";
+                        //echo "not matched, partial match length is $length\n";
                         // Transition not matched, save the partial match.
                         $newstate->length += $length;
                         $newstate->last_transition = $transition;
