@@ -51,6 +51,7 @@ M.preg_authoring_tools_script = (function ($) {
         description : {},
         regex_test : {}
     },
+
     usertextselectioncoords: null,
 
     /**
@@ -84,7 +85,7 @@ M.preg_authoring_tools_script = (function ($) {
             onfirstpresscallback : function () {
                 var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
                 var scripts = [
-                        self.www_root+'/question/type/poasquestion/jquerypanzoommin.js',
+                        self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
                         self.www_root+'/question/type/poasquestion/jquery-textrange.js',
                         self.www_root+'/question/type/poasquestion/interface.js',
                         self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
@@ -328,7 +329,7 @@ M.preg_authoring_tools_script = (function ($) {
     is_graph_selection_rectangle_visible : function () {
         return $("#id_graph_selection_mode").is(':checked');
     },
-    
+
     cache_key_for_explaining_tools : function (indfirst, indlast) {
         return '' /*+
                self.regex_input.val() +
@@ -463,9 +464,9 @@ M.preg_authoring_tools_script = (function ($) {
                 var translate_x = ta[1];
                 var translate_y = ta[2];
                 var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-                    (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-                        + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
-                    (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                    (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left
+                        + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')),
+                    (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                         + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
                 self.load_content(sel.indfirst, sel.indlast);
                 self.load_strings(sel.indfirst, sel.indlast);
@@ -542,15 +543,15 @@ M.preg_authoring_tools_script = (function ($) {
                     left : new_pageX
                 });
             }
-        
+
             // draw selected items in image
             var transformattr = $('#explaining_graph').attr('transform');
             var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
             var translate_x = ta[1];
             var translate_y = ta[2];
-            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left
                 + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft'));
-            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                 + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop'));
             var items = self.get_figures_in_rect('resizeGraph', 'graph_img', tdx, tdy);
 
@@ -625,7 +626,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     get_current_y : function(e, img, hnd) {
-        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top 
+        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top
                 - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
                 + $('#' + hnd).prop('scrollTop');
     },
@@ -908,7 +909,7 @@ M.preg_authoring_tools_script = (function ($) {
             self.graph_img().panzoom("instance")._unbind();
             self.graph_img().off('mousewheel.focal', this._zoom);
         },
-        
+
         enable_tree : function() {
             self.tree_img().panzoom("enable");
         },
