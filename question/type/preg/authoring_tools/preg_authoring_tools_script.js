@@ -118,7 +118,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text').textareaHighlighter();
+                    self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
 
                     // Add handlers for the regex testing textarea.
