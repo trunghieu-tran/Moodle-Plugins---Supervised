@@ -63,6 +63,9 @@ function qtype_preg_get_json_array() {
     foreach($tools as $tool) {
         $json = array_merge($json, $tool->generate_json());
     }
+
+    $json['indfirstorig'] = $indfirst;
+    $json['indlastorig'] = $indlast;
     return $json;
 }
 
