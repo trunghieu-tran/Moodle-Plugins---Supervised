@@ -152,6 +152,13 @@
             methods._showhelper.apply(this);
             data._textareael.scroll();
             $this.blur();
+        },
+        setHtml: function (html) {
+            var srctext = $this.val($('<span>'+html+'</span>').text());
+            data._helperel.html(html);
+            methods._showhelper.apply(this);
+            data._textareael.scroll();
+            $this.blur();
         }
     };
 
