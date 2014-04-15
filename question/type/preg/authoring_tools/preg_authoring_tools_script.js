@@ -52,8 +52,6 @@ M.preg_authoring_tools_script = (function ($) {
         regex_test : {}
     },
 
-    usertextselectioncoords: null,
-
     /**
      * setups module
      * @param {Object} Y NOT USED! It's needed because moodle passes this object anyway
@@ -118,7 +116,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text').textareaHighlighter();
+                    self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
 
                     // Add handlers for the regex testing textarea.
@@ -207,7 +205,6 @@ M.preg_authoring_tools_script = (function ($) {
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
-        self.usertextselectioncoords = {indfirst: sel.indfirst, indlast: sel.indlast};
     },
 
     btn_save_clicked : function (e) {
@@ -365,8 +362,10 @@ M.preg_authoring_tools_script = (function ($) {
             usecase = json['usecase'],
             treeorientation = json['treeorientation'],
             displayas = json['displayas'],
-            indfirst = json['indfirst'],
-            indlast = json['indlast'],
+            indfirst = parseInt(json['indfirst']),
+            indlast = parseInt(json['indlast']),
+            indfirstorig = parseInt(json['indfirstorig']),
+            indlastorig = parseInt(json['indlastorig']),
             t = json[self.TREE_KEY],
             g = json[self.GRAPH_KEY],
             d = json[self.DESCRIPTION_KEY],
@@ -378,7 +377,7 @@ M.preg_authoring_tools_script = (function ($) {
         self.cache[self.DESCRIPTION_KEY][k] = d;
 
         // Display the content.
-        self.display_content(t, g, d, indfirst, indlast);
+        self.display_content(t, g, d, indfirst, indlast, indfirstorig, indlastorig);
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
@@ -419,7 +418,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Displays given images and description
-    display_content : function (t, g, d, indfirst, indlast) {
+    display_content : function (t, g, d, indfirst, indlast, indfirstorig, indlastorig) {
         var scroll = $(window).scrollTop();
 
         self.invalidate_content();
@@ -502,11 +501,10 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if (self.usertextselectioncoords !== null) {
-            self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', self.usertextselectioncoords.indfirst, self.usertextselectioncoords.indlast, 'orange');
-            self.usertextselectioncoords = null;
+        if (indfirstorig!==indfirst || indlastorig!==indlast) {
+            self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
         } else {
-            self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'yellow');
+            self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'orange');
         }
         $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },
