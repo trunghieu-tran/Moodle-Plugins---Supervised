@@ -558,7 +558,7 @@ class qtype_preg_fa {
     /** @var array of int ids of states - start states. */
     public $startstates = array();
     /** @var array of of int ids of states - end states. */
-    public $endstates = array();
+    public $endstates = array(array());
 
     // Regex handler
     protected $handler;
@@ -1643,14 +1643,14 @@ class qtype_preg_fa {
         }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
-            if ($transition->from != $transition->to || $transition->is_merged() == false) {
+            //if ($transition->from != $transition->to || $transition->is_merged() == false) {
                 $tran = clone($transition);
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $del->greediness);
                 $tagsets = array();
                 // Work with tags.
                 if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
                     foreach ($del->tagsets as &$set) {
-                        $del->get_label_for_dot($del->from, $del->to);
+                        //$del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
                     }
                     $tagsets = array_merge($transition->tagsets, $del->tagsets);
@@ -1666,11 +1666,11 @@ class qtype_preg_fa {
                 $tran->tagsets = $tagsets;
 
                 $clonetransitions[] = $tran;
-            }
+            //}
         }
         // Has deleting or changing transitions.
         if (count($transitions) != 0) {
-            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to,$this->end_states()))) {
+            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to, $this->end_states()))) {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
                     $tran->make_merged();
