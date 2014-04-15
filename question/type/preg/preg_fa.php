@@ -1600,8 +1600,11 @@ class qtype_preg_fa {
         $clonetransitions = array();
         $tagsets = array();
         $oppositetransitions = array();
-
-
+        $outtransitions = $this->get_adjacent_transitions($del->to, true);
+        if ($del->from == $del->to && in_array($del->to, $this->end_states()))
+        {
+            return false;
+        }
         if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
             $transitions = $this->get_adjacent_transitions($del->from, false);
         } else {
