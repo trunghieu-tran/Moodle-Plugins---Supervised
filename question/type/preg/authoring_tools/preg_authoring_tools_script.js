@@ -92,6 +92,9 @@ M.preg_authoring_tools_script = (function ($) {
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
+                    // init moodle form js
+                    M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
+
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
 
