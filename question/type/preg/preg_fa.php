@@ -965,11 +965,11 @@ class qtype_preg_fa {
                             ? $id
                             : $this->statenumbers[$id];
                 $tmp = '"' . $realnumber . '"';
-                if (in_array($id, $this->start_states())) {
-                    $start .= "{$tmp}[shape=rarrow];\n";
-                } else if (in_array($id, $this->end_states())) {
-                    $end .= "   {$tmp}[shape=doublecircle];\n";
-                }
+                //if (in_array($id, $this->start_states())) {
+                  //  $start .= "{$tmp}[shape=rarrow];\n";
+                //} else if (in_array($id, $this->end_states())) {
+                  //  $end .= "   {$tmp}[shape=doublecircle];\n";
+                //}
 
                 $outgoing = $this->get_adjacent_transitions($id, true);
                 foreach ($outgoing as $transition) {
