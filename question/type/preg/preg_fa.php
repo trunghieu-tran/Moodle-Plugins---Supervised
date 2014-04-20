@@ -558,7 +558,7 @@ class qtype_preg_fa {
     /** @var array of int ids of states - start states. */
     public $startstates = array();
     /** @var array of of int ids of states - end states. */
-    public $endstates = array(array());
+    public $endstates = array();
 
     // Regex handler
     protected $handler;
@@ -1599,7 +1599,7 @@ class qtype_preg_fa {
      *
      * @param del - uncapturing transition for deleting.
      */
-    public function go_round_transitions($del) {
+    /*public function go_round_transitions($del) {
         $clonetransitions = array();
         $tagsets = array();
         $oppositetransitions = array();
@@ -1694,7 +1694,7 @@ class qtype_preg_fa {
             return true;
         }
         return false;
-    }
+    }*/
 
     /**
      * Merging states connected by uncapturing transition.
