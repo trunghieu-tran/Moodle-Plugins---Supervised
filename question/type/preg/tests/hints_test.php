@@ -99,6 +99,7 @@ class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($hint->to_be_continued($matchresults));
 
         // Test a case where generated string starts before end of match.
+        $testquestion = clone $this->testquestion;
         $testquestion->answers[100]->answer = '[a-zA-Z_][\w_]*\s*=\s*127';
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'a127'));
         $matchresults = $bestfit['match'];
