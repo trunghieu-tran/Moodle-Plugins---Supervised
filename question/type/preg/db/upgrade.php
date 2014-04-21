@@ -266,11 +266,11 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
 
     // There ends code for Preg 2.5 release upgrade.
 
-    /*if ($oldversion < TODO) {
+    if ($oldversion < 2014042200) {
 
         // Change matching engine.
-        $queries = array("UPDATE {qtype_preg} SET engine='fa_matcher' WHERE engine='dfa_matcher'",
-                         "UPDATE {qtype_preg} SET engine='fa_matcher' WHERE engine='nfa_matcher'",
+        $queries = array("UPDATE {qtype_preg_options} SET engine='fa_matcher' WHERE engine='dfa_matcher'",
+                         "UPDATE {qtype_preg_options} SET engine='fa_matcher' WHERE engine='nfa_matcher'",
                          "UPDATE {config} SET value='fa_matcher' WHERE value='dfa_matcher'",
                          "UPDATE {config} SET value='fa_matcher' WHERE value='nfa_matcher'");
 
@@ -279,8 +279,8 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         }
 
         // Preg savepoint reached.
-        upgrade_plugin_savepoint(true, TODO, 'qtype', 'preg');
-    }*/
+        upgrade_plugin_savepoint(true, 2014042200, 'qtype', 'preg');
+    }
 
     return true;
 }
