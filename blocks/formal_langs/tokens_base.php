@@ -212,6 +212,8 @@ class block_formal_langs_ast_node_base {
      * @var string
      */
     protected $description;
+	
+	public $rule;
 
     public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
