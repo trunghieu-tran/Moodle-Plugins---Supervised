@@ -453,7 +453,7 @@ M.preg_authoring_tools_script = (function ($) {
                 self.resize_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
             });
 
-            $('#graph_img').mouseup(function(e){
+            $(window).mouseup(function(e){
                 e.preventDefault();
                 if(self.CALC_COORD == true) {
                     self.CALC_COORD = false;
@@ -582,7 +582,7 @@ M.preg_authoring_tools_script = (function ($) {
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
                 },
-                handlers: {
+                /*handlers: {
                     se: '#resizeSE',
                     e: '#resizeE',
                     ne: '#resizeNE',
@@ -591,7 +591,7 @@ M.preg_authoring_tools_script = (function ($) {
                     w: '#resizeW',
                     sw: '#resizeSW',
                     s: '#resizeS'
-                },
+                },*/
                 onResize : function(size, position) {
                     this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
                 }
