@@ -51,7 +51,6 @@ M.preg_authoring_tools_script = (function ($) {
         description : {},
         regex_test : {}
     },
-    usertextselectioncoords: null,
 
     /**
      * setups module
@@ -84,7 +83,7 @@ M.preg_authoring_tools_script = (function ($) {
             onfirstpresscallback : function () {
                 var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
                 var scripts = [
-                        self.www_root+'/question/type/poasquestion/jquerypanzoommin.js',
+                        self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
                         self.www_root+'/question/type/poasquestion/jquery-textrange.js',
                         self.www_root+'/question/type/poasquestion/interface.js',
                         self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
@@ -92,6 +91,9 @@ M.preg_authoring_tools_script = (function ($) {
                         ];
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
+
+                    // init moodle form js
+                    M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
 
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
@@ -113,7 +115,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text').textareaHighlighter();
+                    self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
                     self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
 
                     // Add handlers for the regex testing textarea.
@@ -199,7 +201,6 @@ M.preg_authoring_tools_script = (function ($) {
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
         self.load_strings(sel.indfirst, sel.indlast);
-        self.usertextselectioncoords = {indfirst: sel.indfirst, indlast: sel.indlast};
     },
 
     btn_save_clicked : function (e) {
@@ -318,7 +319,7 @@ M.preg_authoring_tools_script = (function ($) {
     is_graph_selection_rectangle_visible : function () {
         return $("#id_graph_selection_mode").is(':checked');
     },
-    
+
     cache_key_for_explaining_tools : function (indfirst, indlast) {
         return '' /*+
                self.regex_input.val() +
@@ -354,8 +355,10 @@ M.preg_authoring_tools_script = (function ($) {
             usecase = json['usecase'],
             treeorientation = json['treeorientation'],
             displayas = json['displayas'],
-            indfirst = json['indfirst'],
-            indlast = json['indlast'],
+            indfirst = parseInt(json['indfirst']),
+            indlast = parseInt(json['indlast']),
+            indfirstorig = parseInt(json['indfirstorig']),
+            indlastorig = parseInt(json['indlastorig']),
             t = json[self.TREE_KEY],
             g = json[self.GRAPH_KEY],
             d = json[self.DESCRIPTION_KEY],
@@ -367,7 +370,7 @@ M.preg_authoring_tools_script = (function ($) {
         self.cache[self.DESCRIPTION_KEY][k] = d;
 
         // Display the content.
-        self.display_content(t, g, d, indfirst, indlast);
+        self.display_content(t, g, d, indfirst, indlast, indfirstorig, indlastorig);
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
@@ -408,7 +411,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     // Displays given images and description
-    display_content : function (t, g, d, indfirst, indlast) {
+    display_content : function (t, g, d, indfirst, indlast, indfirstorig, indlastorig) {
         var scroll = $(window).scrollTop();
 
         self.invalidate_content();
@@ -493,11 +496,10 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if (self.usertextselectioncoords !== null) {
-            self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', self.usertextselectioncoords.indfirst, self.usertextselectioncoords.indlast, 'orange');
-            self.usertextselectioncoords = null;
+        if (indfirstorig!==indfirst || indlastorig!==indlast) {
+            self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
         } else {
-            self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'yellow');
+            self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'orange');
         }
         $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },
@@ -534,15 +536,15 @@ M.preg_authoring_tools_script = (function ($) {
                     left : new_pageX
                 });
             }
-        
+
             // draw selected items in image
             var transformattr = $('#explaining_graph').attr('transform');
             var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
             var translate_x = ta[1];
             var translate_y = ta[2];
-            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+            var tdx = (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left
                 + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft'));
-            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+            var tdy = (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                 + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop'));
             var items = self.get_figures_in_rect('resizeGraph', 'graph_img', tdx, tdy);
 
@@ -617,7 +619,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     get_current_y : function(e, img, hnd) {
-        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top 
+        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top
                 - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
                 + $('#' + hnd).prop('scrollTop');
     },
@@ -895,7 +897,7 @@ M.preg_authoring_tools_script = (function ($) {
             self.graph_img().panzoom("instance")._unbind();
             self.graph_img().off('mousewheel.focal', this._zoom);
         },
-        
+
         enable_tree : function() {
             self.tree_img().panzoom("enable");
         },

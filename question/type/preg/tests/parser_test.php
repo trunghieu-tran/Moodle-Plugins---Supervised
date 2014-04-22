@@ -455,11 +455,9 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === chr(0));
+        $this->assertTrue($root->operands[0]->flags[0][0]->data->string() === '8');
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === '8');
-        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[2]->flags[0][0]->data->string() === '9');
+        $this->assertTrue($root->operands[1]->flags[0][0]->data->string() === '9');
     }
     function test_parser_nested_subexprs() {
         $handler = $this->run_handler('((?|(a)|(b(c)))(d))');
