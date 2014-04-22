@@ -236,7 +236,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'hats?');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
         // Matching breaks inside the word.
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Oh! Do cats eat bets?'));
         $matchresults = $bestfit['match'];
@@ -245,7 +245,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue(strstr('a', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'ets?');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
         // No wrong head.
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do cats eat hats?'));
         $matchresults = $bestfit['match'];
@@ -254,7 +254,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'hats?');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
         // No wrong tail.
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Oh! Do cats eat '));
         $matchresults = $bestfit['match'];
@@ -263,7 +263,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == '');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
         // No wrong tail and hinted character.
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Oh! Do cats eat rats?'));
         $matchresults = $bestfit['match'];
@@ -272,7 +272,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue($hintstr === '');
         $this->assertTrue($matchresults->match_tail() == '');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
         // No correct part - so no guess except hinting.
         $bestfit = $testquestion->get_best_fit_answer(array('answer' => '!@#$^%&'));
         $matchresults = $bestfit['match'];
@@ -280,7 +280,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($matchresults->matched_part() == '');
         $hintstr = $matchresults->string_extension();
         $this->assertTrue(strstr('D', $hintstr[0]) !== false);
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
 
         //  Engine without partial matching support should show colored parts only when there is a match.
         $testquestion1 = clone $this->testquestion;
@@ -296,12 +296,12 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $hintstr = $matchresults->string_extension();
         $this->assertTrue($hintstr === '');
         $this->assertTrue($matchresults->match_tail() == ' Really?');
-        $this->assertTrue($hintobj->could_show_hint($matchresults));
+        $this->assertTrue($hintobj->could_show_hint($matchresults, false));
 
         // Partial match but no colored string since engine don't supports partial matching.
         $bestfit = $testquestion1->get_best_fit_answer(array('answer' => 'Oh! Do cats eat hats? Really?'));
         $matchresults = $bestfit['match'];
-        $this->assertFalse($hintobj->could_show_hint($matchresults));
+        $this->assertFalse($hintobj->could_show_hint($matchresults, false));
     }
 
     public function test_get_matcher() {
