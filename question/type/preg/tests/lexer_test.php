@@ -277,7 +277,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->errors[0]->position->collast === 7);
     }
     function test_backreferences() {
-        $lexer = $this->create_lexer('\1\9\12\g15\g-2\g{15}\g{-15}');
+        $lexer = $this->create_lexer('\1\7\9\12\g15\g-2\g{15}\g{-15}');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);
@@ -285,7 +285,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number === 9);
+        $this->assertTrue($token->value->number === 7);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === '9');
         $token = $lexer->nextToken();   // not a backreference, but a character with octal code 12
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -394,22 +398,16 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(is_array($token));
         $this->assertTrue($token[0]->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token[0]->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token[0]->value->flags[0][0]->data->string() === chr(0x00));
-        $this->assertTrue($token[0]->value->userinscription[0]->data === '\\');
-        $this->assertTrue($token[0]->value->position->indfirst === 35);
-        $this->assertTrue($token[0]->value->position->indlast === 35);
+        $this->assertTrue($token[0]->value->flags[0][0]->data->string() === '8');
+        $this->assertTrue($token[0]->value->userinscription[0]->data === '8');
+        $this->assertTrue($token[0]->value->position->indfirst === 36);
+        $this->assertTrue($token[0]->value->position->indlast === 36);
         $this->assertTrue($token[1]->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token[1]->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token[1]->value->flags[0][0]->data->string() === '8');
-        $this->assertTrue($token[1]->value->userinscription[0]->data === '8');
-        $this->assertTrue($token[1]->value->position->indfirst === 36);
-        $this->assertTrue($token[1]->value->position->indlast === 36);
-        $this->assertTrue($token[2]->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token[2]->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token[2]->value->flags[0][0]->data->string() === '1');
-        $this->assertTrue($token[2]->value->userinscription[0]->data === '1');
-        $this->assertTrue($token[2]->value->position->indfirst === 37);
-        $this->assertTrue($token[2]->value->position->indlast === 37);
+        $this->assertTrue($token[1]->value->flags[0][0]->data->string() === '1');
+        $this->assertTrue($token[1]->value->userinscription[0]->data === '1');
+        $this->assertTrue($token[1]->value->position->indfirst === 37);
+        $this->assertTrue($token[1]->value->position->indlast === 37);
         $token = $lexer->nextToken();// \377 - chr(octal(37))
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -1137,7 +1135,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
         $this->assertTrue($token->type === qtype_preg_parser::ALT);
-        $token = $lexer->nextToken();    // (?<asd>
+        $token = $lexer->nextToken();    // (?<asd1>
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES);
         $lexer = $this->create_lexer('(?|(?<asd>)(?<fgh>)|(?<asd>)(?<zxc>)');
@@ -1621,7 +1619,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[0]->value->number === 'R');
     }
     function test_backslash() {
-        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\223\o{223}\x\x23\x{7ff}\d\s\t\b\B\>\<\%\a\e\f\n\r\cz\c{\c;\u3f1\U\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}\p{L&}[\023][\223][\x]');
+        $lexer = $this->create_lexer('\\\\\\*\\[\23\7\8\023\223\o{223}\x\x23\x{7ff}\d\s\t\b\B\>\<\%\a\e\f\n\r\cz\c{\c;\u3f1\U\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}\p{L&}[\023][\223][\x]');
         $token = $lexer->nextToken();// \\
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -1638,10 +1636,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// \23
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);    // No subexpressions before this token.
-        $token = $lexer->nextToken();// \9
+        $token = $lexer->nextToken();// \7
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);    // Backref to the 9th subexpression.
-        $this->assertTrue($token->value->number === 9);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);    // Backref to the 7th subexpression.
+        $this->assertTrue($token->value->number === 7);
+        $token = $lexer->nextToken();// \8
+        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data->string() === '8');
         $token = $lexer->nextToken();// \023
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -2189,11 +2191,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_PQH);
-        $lexer = $this->create_lexer('\9[bc');
+        $lexer = $this->create_lexer('\7[bc');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number === 9);
+        $this->assertTrue($token->value->number === 7);
         $token = $lexer->nextToken();
         $this->assertTrue($token === null);
         $errors = $lexer->get_error_nodes();
@@ -2205,7 +2207,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR);
         $this->assertTrue($errors[1]->position->colfirst === 0);
         $this->assertTrue($errors[1]->position->collast === 1);
-        $this->assertTrue($errors[1]->addinfo === '9');
+        $this->assertTrue($errors[1]->addinfo === '7');
         $lexer = $this->create_lexer('a\\');
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
