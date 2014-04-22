@@ -250,7 +250,9 @@ class qtype_preg_matching_results {
             }
 
             // Check that each subexpression lies inside overall match.
-            foreach ($this->indexfirst as $i => $start) {
+            // TODO - decide, what to do with this check.
+            // The problem is subexpression inside assertion - it can have match outside of main match.
+            /*foreach ($this->indexfirst as $i => $start) {
                 if ($start === self::NO_MATCH_FOUND) {
                     // No need to check subexpression that wasn't matched.
                     break;
@@ -264,7 +266,7 @@ class qtype_preg_matching_results {
                     throw new qtype_preg_exception('Error: '.$i.' subexpression end '.$end.' doesn\'t lie between match start '.
                         $this->indexfirst[0].' and end '.($this->indexfirst[0] + $this->length[0]));
                 }
-            }
+            }*/
         }
         // Calculate extension start comparing existing and extended strings.
         // We could find it looking for the first different character in two strings.
