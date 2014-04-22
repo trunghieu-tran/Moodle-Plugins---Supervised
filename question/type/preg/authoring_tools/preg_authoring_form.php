@@ -34,8 +34,8 @@ class qtype_preg_authoring_form extends moodleform {
         global $CFG;
         global $PAGE;
 
+        $PAGE->requires->js('/question/type/poasquestion/jquery.panzoom.js');
         $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
-        $PAGE->requires->js('/question/type/poasquestion/jquerypanzoommin.js');
         $PAGE->requires->js('/question/type/poasquestion/interface.js');
         /*$PAGE->requires->css('/question/type/poasquestion/shadow.css');
         $PAGE->requires->css('/question/type/poasquestion/rect.css');*/

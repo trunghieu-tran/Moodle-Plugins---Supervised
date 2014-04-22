@@ -92,7 +92,7 @@ class qtype_preg_fa_tag_set {
      */
     public function set_tags_position($pos) {
         $this->pos = $pos;
-        
+
     }
 }
 
@@ -692,7 +692,7 @@ class qtype_preg_fa {
     }
 
     /**
-     * Calculates where subpatterns start and end.
+     * Calculates states that cause backtrack when generating strings
      */
     public function calculate_backtrack_states() {
         $subpatterns = $this->calculate_start_and_end_states_inner(false);
@@ -786,6 +786,9 @@ class qtype_preg_fa {
         return array_values($result);
     }
 
+    /**
+     * Calculates start and end states for subpatterns.
+     */
     private function calculate_start_and_end_states_inner($subexpronly = false) {
         $startstates = array();
         $endstates = array();
