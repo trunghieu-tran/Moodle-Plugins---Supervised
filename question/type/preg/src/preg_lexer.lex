@@ -1031,7 +1031,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {      /* \n              Backreference by number (can be ambiguous) */
     $text = $this->yytext();
     $str = qtype_preg_unicode::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
+    if ((int)$str < 8 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
         return $this->form_backref($text, (int)$str);
     }
@@ -1046,31 +1046,31 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
             $failed = true;
         }
     }
-    if (qtype_preg_unicode::strlen($octal) === 0) {
-        // If no octal digits found, it should be 0.
-        $octal = '0';
-        $tail = $str;
-    } else {
-        // Octal digits found.
-        $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
+    $tail = qtype_preg_unicode::substr($str, qtype_preg_unicode::strlen($octal));
+    $result = array();
+    if ($octal != '') {
+        // Character by octal code.
+        $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
+        $charset->value->position->indlast -= core_text::strlen($tail);
+        $charset->value->position->collast -= core_text::strlen($tail);
+        $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
+        $result[] = $charset;
     }
-    // Return a single lexem if all digits are octal, an array of lexems otherwise.
-    $charset = $this->form_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec($octal)));
-    $charset->value->position->indlast -= core_text::strlen($tail);
-    $charset->value->position->collast -= core_text::strlen($tail);
-    $charset->value->userinscription = array(new qtype_preg_userinscription($tail == $str ? '\\' : '\\' . $octal));
-    if (qtype_preg_unicode::strlen($tail) === 0) {
-        return $charset;
+    if (qtype_preg_unicode::strlen($tail) > 0) {
+        // Plain digits
+        $tokens = $this->string_to_tokens($tail);
+        $offset = core_text::strlen($text) - core_text::strlen($tail);
+        foreach ($tokens as $token) {
+            $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
+                                            $this->yyline, $this->yyline,
+                                            $this->yycol + $offset, $this->yycol + $offset);
+            $offset++;
+        }
+        $result = array_merge($result, $tokens);
     }
-    $tokens = $this->string_to_tokens($tail);
-    $offset = core_text::strlen($text) - core_text::strlen($tail);
-    foreach ($tokens as $token) {
-        $token->value->position = new qtype_preg_position($this->yychar + $offset, $this->yychar + $offset,
-                                        $this->yyline, $this->yyline,
-                                        $this->yycol + $offset, $this->yycol + $offset);
-        $offset++;
-    }
-    return array_merge(array($charset), $tokens);
+    return count($result) > 1
+           ? $result
+           : $result[0];
 }
 <YYINITIAL> "\g"-?[0-9][0-9]? {        /* \gn \g-n        Backreference by number */
     $text = $this->yytext();
@@ -1852,7 +1852,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         }
     }
 }
-<YYCHARSET> \\[0-9][0-9]?[0-9]? {
+<YYCHARSET> \\[0-7][0-7]?[0-7]? {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::TYPE_SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($text, 1))));
 }
