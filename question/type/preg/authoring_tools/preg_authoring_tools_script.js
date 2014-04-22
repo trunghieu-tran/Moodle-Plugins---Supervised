@@ -496,7 +496,7 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if (indfirstorig!==indfirst || indlastorig!==indlast) {
+        if ( (indfirstorig!==indfirst || indlastorig!==indlast) && indfirst<=indfirstorig && indlast>=indlastorig) {
             self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
         } else {
             self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'orange');
