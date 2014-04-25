@@ -515,10 +515,13 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // (?<qwe>
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->name === 'qwe');
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -527,6 +530,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->name === 'qwe');
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -535,6 +540,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->name === 'rty');
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();
@@ -632,6 +639,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->name === 'qwe');
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();   // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();   // |
@@ -640,15 +649,21 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->name === 'qwe');
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();   // (?'rty'
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
-        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->name === 'rty');
+        $this->assertTrue($token->value->isduplicate === false);
+        $token = $lexer->nextToken();   // (?'abc'
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
-        $token = $lexer->nextToken();   // (?'abc'
+        $this->assertTrue($token->value->name === 'abc');
+        $this->assertTrue($token->value->isduplicate === false);
+        $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
@@ -671,6 +686,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -679,12 +695,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -693,6 +711,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
@@ -705,6 +724,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -715,6 +735,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -723,6 +744,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
@@ -732,6 +754,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
@@ -741,6 +764,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -749,6 +773,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
@@ -758,6 +783,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -766,10 +792,12 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -782,6 +810,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
@@ -789,6 +818,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -797,12 +827,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -815,6 +847,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 5);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
@@ -827,6 +860,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -835,24 +869,28 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?<qwe>
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?<rty>
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
     }
     function test_duplicate_subexpression_numbers_with_names_tricky() {
@@ -864,12 +902,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // |
@@ -878,12 +918,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?<second>
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -892,6 +934,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
@@ -901,6 +944,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // a
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -918,6 +962,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // y
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -934,6 +979,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // p
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -942,6 +988,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // q
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -960,6 +1007,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // y
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -974,6 +1022,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // v
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -986,6 +1035,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // z
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -999,6 +1049,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
@@ -1008,18 +1059,21 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // |
         $this->assertTrue($token->type === qtype_preg_parser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -1030,6 +1084,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->isduplicate === true);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // )
@@ -1038,18 +1093,21 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 5);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 6);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 7);
+        $this->assertTrue($token->value->isduplicate === false);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
