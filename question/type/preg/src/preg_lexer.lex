@@ -134,7 +134,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     protected $errors = array();
 
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
-    protected $last_subexpr = 0;
+    protected $lastsubexpr = 0;
 
     // Max subexpression number.
     protected $maxsubexpr = 0;
@@ -361,7 +361,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         // Check if we got out of a (?|...) block. If so, reset subpattern numeration to the max occurred number.
         $topitem = end($this->opt_stack);
         if ($topitem->dup_subexpr_number == -1) {
-            $this->last_subexpr = $this->maxsubexpr;
+            $this->lastsubexpr = $this->maxsubexpr;
         }
     }
 
@@ -555,6 +555,10 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
 
+        // Is it a duplicate (by name) of already existing subexpression?
+        $maxsubexprbefore = $this->maxsubexpr;
+        $nameexists = array_key_exists($name, $this->subexpr_name_to_number_map);
+
         // Are we inside a (?| group?
         $topitem = end($this->opt_stack);
         $insidedup = ($topitem->dup_subexpr_number !== -1);
@@ -576,7 +580,12 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         // If all is fine, fill the another, inverse, map.
         $this->subexpr_number_to_name_map[$number] = $name;
 
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name);
+        $isduplicate = $nameexists || $number <= $maxsubexprbefore;
+        return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name, $isduplicate);
+    }
+
+    protected function form_subexpr($text, $subtype, $number = -1, $name = null, $isduplicate = false) {
+        $node = new qtype_preg_node_subexpr($subtype, $number, $name, $isduplicate);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
     }
@@ -822,7 +831,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
         $exists = isset($this->subexpr_name_to_number_map[$name]);
         if (!$exists) {
             // This subexpression does not exists, all is OK. Almost.
-            $number = $this->last_subexpr + 1;
+            $number = $this->lastsubexpr + 1;
 
             if (isset($this->subexpr_number_to_name_map[$number])) {
                 // There can be situations like (?|(?<name1>)|(?<name2>)). By this moment name2 doesn't exist, but this is an error.
@@ -835,8 +844,8 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
             }
 
             $this->subexpr_name_to_number_map[$name] = $number;
-            $this->last_subexpr++;
-            $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
+            $this->lastsubexpr++;
+            $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
             return $number;
         }
 
@@ -847,18 +856,18 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 
         $assumed_name = $this->subexpr_number_to_name_map[$number];
 
-        if ($number == $this->last_subexpr && !$modJ) {
+        if ($number == $this->lastsubexpr && !$modJ) {
             // Two subexpressions with same number in a row is error.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
             return $error;
         }
 
-        if ($modJ && $number == $this->last_subexpr) {
+        if ($modJ && $number == $this->lastsubexpr) {
             $number++;
         }
 
-        $this->last_subexpr++;
-        $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
+        $this->lastsubexpr++;
+        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
         return $number;
     }
 
@@ -1079,7 +1088,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $number = (int)qtype_preg_unicode::substr($text, 2);
     // Convert relative backreferences to absolute.
     if ($number < 0) {
-        $number = $this->last_subexpr + $number + 1;
+        $number = $this->lastsubexpr + $number + 1;
     }
     return $this->form_backref($text, $number);
 }
@@ -1088,7 +1097,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     // Convert relative backreferences to absolute.
     if ($number < 0) {
-        $number = $this->last_subexpr + $number + 1;
+        $number = $this->lastsubexpr + $number + 1;
     }
     return $this->form_backref($text, $number);
 }
@@ -1113,11 +1122,10 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 
 <YYINITIAL> "(" {                      /* (...)           Subexpression */
     $this->push_options_stack_item();
-    $this->last_subexpr++;
-    $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->last_subexpr);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    $this->lastsubexpr++;
+    $isduplicate = $this->lastsubexpr <= $this->maxsubexpr;
+    $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
+    return $this->form_subexpr('(', qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->lastsubexpr, null, $isduplicate);
 }
 <YYINITIAL> "(?<"{ALNUM}*">"? {         /* (?<name>...)     Named subexpression (Perl) */
     $text = $this->yytext();
@@ -1151,22 +1159,16 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 }
 <YYINITIAL> "(?:" {                    /* (?:...)         Non-capturing group */
     $this->push_options_stack_item();
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?:')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    return $this->form_subexpr('(?:', qtype_preg_node_subexpr::SUBTYPE_GROUPING);
 }
 <YYINITIAL> "(?|" {                    /* (?|...)         Non-capturing group, duplicate subexpression numbers */
     // Save the top-level subexpression number.
-    $this->push_options_stack_item($this->last_subexpr);
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?|')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    $this->push_options_stack_item($this->lastsubexpr);
+    return $this->form_subexpr('(?|', qtype_preg_node_subexpr::SUBTYPE_GROUPING);
 }
 <YYINITIAL> "(?>" {                    /* (?>...)         Atomic, non-capturing group */
     $this->push_options_stack_item();
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?>')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    return $this->form_subexpr('(?>', qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
 }
 <YYINITIAL> ")" {
     $this->pop_options_stack_item();
@@ -1247,18 +1249,14 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
         $res = array();
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        $res[] = new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+        $res[] = $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $res[] = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         return $res;
     } else {
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+        return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
     }
 }
 
@@ -1306,9 +1304,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($text[2] == '-') {
-        $number = $this->last_subexpr - $number + 1;
+        $number = $this->lastsubexpr - $number + 1;
     } else {
-        $number = $this->last_subexpr + $number;
+        $number = $this->lastsubexpr + $number;
     }
     return $this->form_subexpr_call($text, $number);
 }
@@ -1381,9 +1379,9 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     if ($text[3] == '-') {
-        $number = $this->last_subexpr - $number + 1;
+        $number = $this->lastsubexpr - $number + 1;
     } else {
-        $number = $this->last_subexpr + $number;
+        $number = $this->lastsubexpr + $number;
     }
     return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
 }
@@ -1509,7 +1507,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
     // Reset subexpressions numeration inside a (?|...) group.
     $topitem = end($this->opt_stack);
     if ($topitem->dup_subexpr_number != -1) {
-        $this->last_subexpr = $topitem->dup_subexpr_number;
+        $this->lastsubexpr = $topitem->dup_subexpr_number;
     }
     $alt = new qtype_preg_lexem();
     $alt->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('|')));
