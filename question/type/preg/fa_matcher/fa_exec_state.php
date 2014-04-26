@@ -60,6 +60,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public $length;
 
     // Array used mostly for disambiguation when there are duplicate subpexpressions numbers.
+    // Keys are subexpr numbers, values are qtype_preg_node objects.
     public $subexpr_to_subpatt;
 
     // Bitwise union of the above constants.
@@ -144,7 +145,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     // Returns the last match for the given subpattern number. This function has different behaviour in PCRE and POSIX mode.
     // If there was no attemt to match, returns null.
-    public function last_match($subpatt) {
+    protected function last_match($subpatt) {
         if ($this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_POSIX) {
             return $this->current_match($subpatt);
         }
@@ -183,17 +184,33 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return true;
     }*/
 
-    public function find_dup_subexpr_match($subexpr) {
+    protected function find_dup_subexpr_match($subexpr) {
+        if ($subexpr == 0) {
+            return array($this->startpos, $this->length);
+        }
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
             // Can get here when {0} occurs in the regex.
             return self::empty_subpatt_match();
         }
-        $subpatt = $this->subexpr_to_subpatt[$subexpr];
+        $subpatt = $this->subexpr_to_subpatt[$subexpr]->subpattern;
         $last = $this->last_match($subpatt);
         if (!self::is_being_captured($last[0], $last[1])) {
             return $last;
         }
         return self::empty_subpatt_match();
+    }
+
+    public function is_subexpr_opened($subexpr) {
+        return array_key_exists($subexpr, $this->subexpr_to_subpatt);
+    }
+
+    public function has_duplicate_subexpression() {
+        foreach ($this->subexpr_to_subpatt as $node) {
+            if ($node->type == qtype_preg_node::TYPE_NODE_SUBEXPR && $node->isduplicate) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function index_first($subexpr = 0) {
@@ -236,7 +253,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
                 $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
             } else {
-                $subpatt = $this->subexpr_to_subpatt[$subexpr];
+                $subpatt = $this->subexpr_to_subpatt[$subexpr]->subpattern;
                 $match = $this->last_match($subpatt);
                 if ($match[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                     $index[$subexpr] = $match[0];
@@ -518,7 +535,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
                 continue;
             }
-            $this->subexpr_to_subpatt[$tag->pregnode->number] = $tag->pregnode->subpattern;
+            $this->subexpr_to_subpatt[$tag->pregnode->number] = $tag->pregnode;
         }
     }
 
@@ -538,8 +555,8 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function subexprs_to_string() {
         $res = '';
-        foreach ($this->subexpr_to_subpatt as $subexpr => $subpatt) {
-            $lastmatch = $this->last_match($subpatt);
+        foreach ($this->subexpr_to_subpatt as $subexpr => $node) {
+            $lastmatch = $this->last_match($node->subpattern);
             $ind = $lastmatch[0];
             $len = $lastmatch[1];
             $res .= $subexpr . ": ($ind, $len) ";
