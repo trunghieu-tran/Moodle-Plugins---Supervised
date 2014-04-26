@@ -1909,8 +1909,9 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         $result = $matcherstateobj->match_from_pos_internal($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
+        // is_full() should be set if the needed subexpression is captured.
         if ($result->is_full()) {
-            $length = $result->length($this->number);
+            $length = $result->length() - $pos;
             return true;
         }
         return false;
