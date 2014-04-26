@@ -72,6 +72,7 @@ MODIFIER   = [imsxuADSUXJ]                              // Recognizable modifier
 ALNUM      = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
 ANY        = (.|[\r\n])                                 // Any character.
 SIGN       = ("+"|"-")                                  // Sign of an integer.
+WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 %init{
     $this->options = new qtype_preg_handling_options();
@@ -946,7 +947,7 @@ SIGN       = ("+"|"-")                                  // Sign of an integer.
 <YYINITIAL> \n {
     // Newlines are totally ignored independent on the 'x' option.
 }
-<YYINITIAL> [\ \r\t\f] {                         /* More than one whitespace */
+<YYINITIAL> {WHITESPACE} {                       /* Whitespace */
     $topitem = end($this->opt_stack);
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
