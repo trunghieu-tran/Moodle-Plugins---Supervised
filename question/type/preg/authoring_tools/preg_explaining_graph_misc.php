@@ -622,7 +622,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 if ($elements[$i][0] == chr(10)) {
                     $result .= '<TD>' . substr($elements[$i], 1) . '</TD>';
                 } else {
-                    $elements[$i] = qtype_preg_authoring_tool::string_to_html($elements[$i]);
+                    $elements[$i] = $elements[$i];
                     $result .= '<TD>' . $elements[$i] . '</TD>';
                 }
             }

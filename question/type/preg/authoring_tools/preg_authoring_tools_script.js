@@ -92,6 +92,9 @@ M.preg_authoring_tools_script = (function ($) {
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
+                    // init moodle form js
+                    M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
+
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
 
@@ -105,11 +108,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#id_regex_cancel').click(self.btn_cancel_clicked);
                     $('#id_regex_check_strings').click(self.btn_check_strings_clicked);
 
-                    $("#id_tree_selection_mode").change(self.btn_tree_selection_mode_rectangle_selection_click);
-                    $('#id_tree_send_select').click(self.btn_tree_select_rectangle_selection_click);
-
                     $("#id_graph_selection_mode").change(self.btn_graph_selection_mode_rectangle_selection_click);
-                    $('#id_graph_send_select').click(self.btn_graph_select_rectangle_selection_click);
 
                     // Add handlers for the radiobuttons.
                     $('#fgroup_id_tree_orientation_radioset input').change(self.rbtn_changed);
@@ -124,9 +123,6 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
-
-                    $('#id_tree_send_select').attr('disabled',true);
-                    $('#id_graph_send_select').attr('disabled',true);
 
                     // resize magic (alter for html-voodoo-bug-positioning-development)
                     $( window ).resize(self.resize_handler);
@@ -195,7 +191,7 @@ M.preg_authoring_tools_script = (function ($) {
         e.preventDefault();
 
         self.data = self.regex_input.val();
-        // if regex is changed
+        // If regex is changed
         if(self.is_changed()) {
             $('input[name=\'tree_fold_node_points\']').val('');
             self.prevdata = self.data;
@@ -244,55 +240,52 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_clicked : function (e) {
         e.preventDefault();
-        //if (!self.is_tree_selection_rectangle_visible()) {
-            var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/_/), // TODO -omg make beauty
-                indfirst = tmp[2],
-                indlast = tmp[3];
 
-            if(self.is_tree_foldind_mode()) {
-                var points = $('input[name=\'tree_fold_node_points\']').val();
-                // if new point not contained
-                //if(points.split(',').indexOf(indfirst) == -1 || points.split(',').indexOf(indlast) == -1) {
-                if(points.indexOf(indfirst + ',' + indlast) == -1) {
-                    // add new point
-                    if(points != '') {
-                        points += ';';
-                    }
-                    points += indfirst + ',' + indlast;
-                } else { // if new point already contained
-                    // remove this point
-                    if(points.indexOf(';' + indfirst + ',' + indlast) != -1) {
-                        points = points.replace(';' + indfirst + ',' + indlast, '');
-                    } else if(points.indexOf(indfirst + ',' + indlast + ';') != -1) {
-                        points = points.replace(indfirst + ',' + indlast + ';', '');
-                    } else {
-                        points = points.replace(indfirst + ',' + indlast, '');
-                    }
+        var tmp = $($(e.target).parents(".node")[0]).attr('id').split(/_/), // TODO -omg make beauty
+            indfirst = tmp[2],
+            indlast = tmp[3];
+
+        if(self.is_tree_foldind_mode()) {
+            var points = $('input[name=\'tree_fold_node_points\']').val();
+            // if new point not contained
+            if(points.indexOf(indfirst + ',' + indlast) == -1) {
+                // add new point
+                if(points != '') {
+                    points += ';';
                 }
-                $('input[name=\'tree_fold_node_points\']').val(points);
-
-                if(typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
-                    var tmpcoords = $('input[name=\'tree_selected_node_points\']').val().split(',');
-                    indfirst = tmpcoords[0];
-                    indlast = tmpcoords[1];
-
-                    self.load_content(indfirst, indlast);
-                    self.load_strings(indfirst, indlast);
+                points += indfirst + ',' + indlast;
+            } else { // if new point already contained
+                // remove this point
+                if(points.indexOf(';' + indfirst + ',' + indlast) != -1) {
+                    points = points.replace(';' + indfirst + ',' + indlast, '');
+                } else if(points.indexOf(indfirst + ',' + indlast + ';') != -1) {
+                    points = points.replace(indfirst + ',' + indlast + ';', '');
                 } else {
-                    self.load_content();
-                    self.load_strings();
+                    points = points.replace(indfirst + ',' + indlast, '');
                 }
-            } else {
-                $('input[name=\'tree_selected_node_points\']').val(indfirst + ',' + indlast);
+            }
+            $('input[name=\'tree_fold_node_points\']').val(points);
+
+            if(typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
+                var tmpcoords = $('input[name=\'tree_selected_node_points\']').val().split(',');
+                indfirst = tmpcoords[0];
+                indlast = tmpcoords[1];
+
                 self.load_content(indfirst, indlast);
                 self.load_strings(indfirst, indlast);
+            } else {
+                self.load_content();
+                self.load_strings();
             }
-        //}
+        } else {
+            $('input[name=\'tree_selected_node_points\']').val(indfirst + ',' + indlast);
+            self.load_content(indfirst, indlast);
+            self.load_strings(indfirst, indlast);
+        }
     },
 
     tree_node_misclicked : function (e) {
         e.preventDefault(); // TODO - joining many times when panning
-        //if (!self.is_tree_selection_rectangle_visible()) {
         if(!self.is_tree_foldind_mode()) {
             $('input[name=\'tree_selected_node_points\']').val('');
             self.load_content();
@@ -441,6 +434,15 @@ M.preg_authoring_tools_script = (function ($) {
         if (typeof g != 'undefined' && g.img) {
             self.graph_img().css('visibility', 'visible').html(g.img)
 
+            self.graph_img().click(self.graph_node_misclicked);
+            $("svg .node", self.graph_img()).click(self.graph_node_clicked);
+
+            var tmpH = $("#graph_img svg").attr('height');
+            var tmpW = $("#graph_img svg").attr('width');
+
+            $("#graph_img svg").attr('height', tmpH.replace('pt', 'px'));
+            $("#graph_img svg").attr('width', tmpW.replace('pt', 'px'));
+
             $('#graph_img').mousedown(function(e) {
                 e.preventDefault();
                 //check is checked check box
@@ -454,38 +456,31 @@ M.preg_authoring_tools_script = (function ($) {
                 self.resize_rectangle_selection(e, 'graph_img','resizeGraph', 'graph_hnd');
             });
 
-            $('#graph_img').mouseup(function(e){
+            $(window).mouseup(function(e){
                 e.preventDefault();
-                self.CALC_COORD = false;
+                if(self.CALC_COORD == true) {
+                    self.CALC_COORD = false;
 
-                var transformattr = $('#explaining_graph').attr('transform');
-                var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
-                var translate_x = ta[1];
-                var translate_y = ta[2];
-                var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-                    (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left
-                        + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')),
-                    (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
-                        + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
-                self.load_content(sel.indfirst, sel.indlast);
-                self.load_strings(sel.indfirst, sel.indlast);
+                    var transformattr = $('#explaining_graph').attr('transform');
+                    var ta = /.*translate\(\s*(\d+)\s+(\d+).*/g.exec(transformattr);
+                    var translate_x = ta[1];
+                    var translate_y = ta[2];
+                    var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
+                        (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
+                            + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
+                        (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                            + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
+                    self.load_content(sel.indfirst, sel.indlast);
+                    self.load_strings(sel.indfirst, sel.indlast);
 
-                $('#resizeGraph').css({
-                    width : 0,
-                    height : 0,
-                    left : -10,
-                    top : -10
-                });
+                    $('#resizeGraph').css({
+                        width : 0,
+                        height : 0,
+                        left : -10,
+                        top : -10
+                    });
+                }
             });
-
-            graph_img.click(self.graph_node_misclicked);
-            $("svg .node", graph_img).click(self.graph_node_clicked);
-
-            var tmpH = $("#graph_img svg").attr('height');
-            var tmpW = $("#graph_img svg").attr('width');
-
-            $("#graph_img svg").attr('height', tmpH.replace('pt', 'px'));
-            $("#graph_img svg").attr('width', tmpW.replace('pt', 'px'));
         } else if (typeof g != 'undefined') {
             self.graph_err().html(g);
         }
@@ -501,7 +496,7 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if (indfirstorig!==indfirst || indlastorig!==indlast) {
+        if ( (indfirstorig!==indfirst || indlastorig!==indlast) && indfirst<=indfirstorig && indlast>=indlastorig) {
             self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
         } else {
             self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'orange');
@@ -589,7 +584,7 @@ M.preg_authoring_tools_script = (function ($) {
                 onDrag: function(x, y) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
                 },
-                handlers: {
+                /*handlers: {
                     se: '#resizeSE',
                     e: '#resizeE',
                     ne: '#resizeNE',
@@ -598,7 +593,7 @@ M.preg_authoring_tools_script = (function ($) {
                     w: '#resizeW',
                     sw: '#resizeSW',
                     s: '#resizeS'
-                },
+                },*/
                 onResize : function(size, position) {
                     this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
                 }
@@ -773,13 +768,8 @@ M.preg_authoring_tools_script = (function ($) {
     btn_graph_selection_mode_rectangle_selection_click : function (e) {
         e.preventDefault();
         if (self.is_graph_selection_rectangle_visible()) {
-            $('#id_graph_send_select').attr('disabled',false);
-            $('#graph_img').attr("usemap", "");
-            //self.panzooms.reset_graph();
             self.panzooms.disable_graph();
         } else {
-            $('#id_graph_send_select').attr('disabled',true);
-            $('#graph_img').attr("usemap", "#qtype_preg_graph");
             self.panzooms.enable_graph();
             $('#resizeGraph').css({
                 width : 0,

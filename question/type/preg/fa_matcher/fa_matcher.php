@@ -122,7 +122,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $result->state = $state;
 
         $result->matches = array();
-        $result->subexpr_to_subpatt = array(0 => $this->astroot->subpattern);
+        $result->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
         $result->startpos = $startpos;
         $result->length = 0;
 
@@ -178,6 +178,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
         }
+    }
+
+    /**
+     * Check if a fa_exec_state instance has
+     */
+    protected function is_state_ok_for_subexpr_call($state, $subexpr = 0) {
+        if ($subexpr == 0) {
+            return true;
+        }
+        return $state->is_subexpr_opened($subexpr) && !$state->has_duplicate_subexpression();
     }
 
     /**
@@ -479,57 +489,68 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Do search.
+        $firststep = true;
         while (!empty($curstates)) {
-            // Get the current state and iterate over all transitions.
-            $curstate = array_pop($curstates);
-            if ($curstate->is_full()) {
-                $fullmatches[] = $curstate;
-            }
-            $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
-            foreach ($transitions as $transition) {
-                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                    // matching called explicitly via $subexpr > 0
-                    continue;
+            $reached = array();
+            while (!empty($curstates)) {
+                // Get the current state and iterate over all transitions.
+                $curstate = array_pop($curstates);
+                if ($curstate->is_full()) {
+                    $fullmatches[] = $curstate;
                 }
-                $curpos = $startpos + $curstate->length;
-                $length = 0;
-                //echo "trying $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
-
-                $newstate = clone $curstate;
-                $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
-
-                $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
-                                 ? clone $newstate
-                                 : $newstate;
-
-                if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
-                    // Create a new state.
-                    $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
-                    //echo "MATCHED $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
-                    //echo "total length is {$newstate->length}\n\n";
-                    // Save the current match.
-                    if (!($transition->loopsback && $newstate->has_null_iterations())) {
-                        if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
-                            $lazystates[] = $newstate;
-                        } else {
-                            $curstates[] = $newstate;
-                        }
+                $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+                foreach ($transitions as $transition) {
+                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
+                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
+                        // matching called explicitly via $subexpr > 0
+                        continue;
                     }
-                } else if (empty($fullmatches) && $subexpr == 0) {
-                    //echo "not matched, partial match length is $length\n";
-                    // Transition not matched, save the partial match.
-                    $newstate->length += $length;
-                    $newstate->last_transition = $transition;
-                    $newstate->last_match_len = $length;
-                    $partialmatches[] = $newstate;
+                    $curpos = $startpos + $curstate->length;
+                    $length = 0;
+                    //echo "trying $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
+
+                    $newstate = clone $curstate;
+                    $this->before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+
+                    $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
+                                     ? clone $newstate
+                                     : $newstate;
+
+                    if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
+                        // Create a new state.
+                        $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+                        //$tmp = core_text::substr($str, $curpos, $length);
+                        //echo "MATCHED $transition with '$tmp' at pos $curpos (recursion level: $curstate->recursionlevel)\n";
+                        //echo "total length is {$curstate->length} : {$newstate->length}\n\n";
+
+                        // Additional filtering for subexpression calls
+                        $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
+
+                        // Save the current match.
+                        if (!$skip && !($transition->loopsback && $newstate->has_null_iterations())) {
+                            if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
+                                $lazystates[] = $newstate;
+                            } else {
+                                $reached[] = $newstate;
+                            }
+                        }
+                    } else if (empty($fullmatches) && $subexpr == 0) {
+                        //echo "not matched, partial match length is $length\n";
+                        // Transition not matched, save the partial match.
+                        $newstate->length += $length;
+                        $newstate->last_transition = $transition;
+                        $newstate->last_match_len = $length;
+                        $partialmatches[] = $newstate;
+                    }
+                }
+
+                // If there's no full match yet and no states reached, try the lazy ones.
+                if (empty($fullmatches) && empty($reached) && !empty($lazystates)) {
+                    $reached[] = array_pop($lazystates);
                 }
             }
-
-            // If there's no full match yet and no curstates remain, try the lazy ones.
-            if (empty($fullmatches) && empty($curstates) && !empty($lazystates)) {
-                $curstates[] = array_pop($lazystates);
-            }
+            $curstates = $reached;
+            $firststep = false;
         }
 
         // Return array of all possible matches.
@@ -585,6 +606,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Do search.
+        $firststep = true;
         while (!empty($curstates)) {
             $reached = array();
             // We'll replace curstates with reached by the end of this loop.
@@ -617,11 +639,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                         $endstatereached = $endstatereached || $newstate->is_full();
-                        //echo "MATCHED $transition at pos $curpos (recursion level: $curstate->recursionlevel)\n";
-                        //echo "total length is {$newstate->length}\n\n";
+                        //$tmp = core_text::substr($str, $curpos, $length);
+                        //echo "MATCHED $transition with '$tmp' at pos $curpos (recursion level: $curstate->recursionlevel)\n";
+                        //echo "total length is {$curstate->length} : {$newstate->length}\n\n";
                         // Save the current result.
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
-                            $lazystates[] = $newstate;
+                            // Additional filtering for subexpression calls
+                            $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
+                            if (!$skip) {
+                                $lazystates[] = $newstate;
+                            }
                         } else {
                             $number = $newstate->state;
                             if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
@@ -640,7 +667,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
 
-            // If there's no full match yet and no states were reached, try the lazy ones.
+            // If there's no full match yet and no states reached, try the lazy ones.
             if (!$endstatereached && empty($reached) && !empty($lazystates)) {
                 $reached[] = array_pop($lazystates);
             }
@@ -650,14 +677,17 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $reached = $reached[qtype_preg_fa_transition::GREED_GREEDY];
 
             // Replace curstates with reached.
-            foreach ($reached as $curstate) {
+            foreach ($reached as $newstate) {
+                // Additional filtering for subexpression calls
+                $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
-                if ($states[$curstate->state] === null || $curstate->leftmost_longest($states[$curstate->state])) {
-                    $states[$curstate->state] = $curstate;
-                    $curstates[] = $curstate->state;
-                    $endstatereached = $endstatereached || $curstate->is_full();
+                if (!$skip && ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {
+                    $states[$newstate->state] = $newstate;
+                    $curstates[] = $newstate->state;
+                    $endstatereached = $endstatereached || $newstate->is_full();
                 }
             }
+            $firststep = false;
         }
 
         // Return array of all possible matches.

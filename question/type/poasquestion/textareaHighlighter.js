@@ -142,12 +142,15 @@
                 return;
             }
             var srctext = $this.val();
+            //console.log($this.val());
+            //console.log(starto+' '+endo+' '+starti+' '+endi);
             var p = [];
             p[0] = srctext.substring(0, starto);
             p[1] = srctext.substring(starto, starti);
             p[2] = srctext.substring(starti, endi+1);
             p[3] = srctext.substring(endi+1, endo+1);
             p[4] = srctext.substring(endo+1, srctext.length);
+            //console.log(p[0]+' '+p[1]+' '+p[2]+' '+p[3]+' '+p[4]);
             data._helperel.html(p[0]+'<span style="background: '+coloro+'">'+p[1]+'<span style="background: '+colori+'">'+p[2]+'</span>'+p[3]+'</span>'+p[4]);
             methods._showhelper.apply(this);
             data._textareael.scroll();
