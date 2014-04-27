@@ -6314,21 +6314,6 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test4, $test5));
     }
 
-    function data_for_test_598() {
-        $test1 = array( 'str'=>'ab',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
-                        'left'=>array(2),
-                        'next'=>'',
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-
-        return array('regex'=>'ab',
-                     'modifiers'=>'x',
-                     'tests'=>array($test1));
-    }
-
     function data_for_test_600() {
         $test1 = array( 'str'=>"a\nxb\n",
                         'is_match'=>true,

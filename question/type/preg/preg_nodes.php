@@ -1909,8 +1909,9 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         $result = $matcherstateobj->match_from_pos_internal($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
+        // is_full() should be set if the needed subexpression is captured.
         if ($result->is_full()) {
-            $length = $result->length($this->number);
+            $length = $result->length() - $pos;
             return true;
         }
         return false;
@@ -2211,12 +2212,15 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     public $number = -1;
     /** Subexpression name. */
     public $name = null;
+    /** Is this a duplicate subexpression number or name? */
+    public $isduplicate = false;
 
-    public function __construct($subtype, $number = -1, $name = null) {
+    public function __construct($subtype, $number = -1, $name = null, $isduplicate = false) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
         $this->name = $name;
+        $this->isduplicate = $isduplicate;
     }
 
     public function is_subpattern() {

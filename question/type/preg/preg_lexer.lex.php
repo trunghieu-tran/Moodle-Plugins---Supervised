@@ -29,15 +29,19 @@ require_once($CFG->dirroot . '/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
+/**
+ * Class providing information for current subexpression. Stack of such objects
+ * grows when hitting '(' and similar parens; decreases when hitting ')'
+ */
 class qtype_preg_opt_stack_item {
     public $options;
-    public $last_dup_subexpr_number;
-    public $last_dup_subexpr_name;
+    public $dup_subexpr_number;
+    public $dup_subexpr_name;
     public $parennum;
-    public function __construct($options, $last_dup_subexpr_number, $last_dup_subexpr_name, $parennum) {
+    public function __construct($options, $dup_subexpr_number, $dup_subexpr_name, $parennum) {
         $this->options = $options;
-        $this->last_dup_subexpr_number = $last_dup_subexpr_number;
-        $this->last_dup_subexpr_name = $last_dup_subexpr_name;
+        $this->dup_subexpr_number = $dup_subexpr_number;
+        $this->dup_subexpr_name = $dup_subexpr_name;
         $this->parennum = $parennum;
     }
     public function __clone() {
@@ -64,7 +68,7 @@ class qtype_preg_lexer extends JLexBase  {
     // Array of lexical errors found.
     protected $errors = array();
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
-    protected $last_subexpr = 0;
+    protected $lastsubexpr = 0;
     // Max subexpression number.
     protected $maxsubexpr = 0;
     // Map of subexpression names => numbers.
@@ -75,8 +79,6 @@ class qtype_preg_lexer extends JLexBase  {
     protected $nodes_with_subexpr_refs = array();
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
-    // Number of items in the above stack.
-    protected $opt_count = 1;
     // Comment string.
     protected $comment = '';
     // Comment length.
@@ -227,41 +229,42 @@ class qtype_preg_lexer extends JLexBase  {
             return $errors;
         }
         // Unset and set local modifiers.
-        $stackitem = $this->opt_stack[$this->opt_count - 1];
+        $stackitem = end($this->opt_stack);
         $stackitem->options->unset_modifier($unset);
         $stackitem->options->set_modifier($set);
         return null;
     }
-    protected function push_options_stack_item($last_dup_subexpr_number = -1) {
-        $newitem = clone $this->opt_stack[$this->opt_count - 1];
-        $newitem->last_dup_subexpr_name = null;   // Reset it anyway.
-        $newitem->parennum = $this->opt_count;
-        $newitem->last_dup_subexpr_number = $last_dup_subexpr_number;
-        $this->opt_stack[$this->opt_count] = $newitem;
-        $this->opt_count++;
+    /**
+     * Should be called when any kind of opening paren occurs
+     */
+    protected function push_options_stack_item($dup_subexpr_number = -1) {
+        $newitem = clone end($this->opt_stack);
+        $newitem->dup_subexpr_name = null;   // Reset it anyway.
+        $newitem->parennum = count($this->opt_stack);
+        $newitem->dup_subexpr_number = $dup_subexpr_number;
+        $this->opt_stack[] = $newitem;
     }
+    /**
+     * Should be called when a closing paren occurs
+     */
     protected function pop_options_stack_item() {
-        if ($this->opt_count < 2) {
+        if (count($this->opt_stack) < 2) {
             // Stack should always contain at least 1 item.
+            // This is a syntax error, will be reported by parser.
             return;
         }
-        $item = array_pop($this->opt_stack);
-        $this->opt_count--;
-        // Is it a pair for some opening paren?
-        if ($item->parennum === $this->opt_count) {
-            // Are we eventually outside of a (?|...) block?
-            $previtem = $this->opt_stack[$this->opt_count - 1];
-            if ($previtem->last_dup_subexpr_number == -1) {
-                // Yes we are outside; set subpattern numeration to max occurred number.
-                $this->last_subexpr = $this->maxsubexpr;
-            }
+        array_pop($this->opt_stack);
+        // Check if we got out of a (?|...) block. If so, reset subpattern numeration to the max occurred number.
+        $topitem = end($this->opt_stack);
+        if ($topitem->dup_subexpr_number == -1) {
+            $this->lastsubexpr = $this->maxsubexpr;
         }
     }
     /**
      * Sets modifiers for the given node using the top stack item.
      */
     protected function set_node_modifiers(&$node) {
-        $topitem = $this->opt_stack[$this->opt_count - 1];
+        $topitem = end($this->opt_stack);
         if (is_a($node, 'qtype_preg_leaf')) {
             $node->caseless = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         }
@@ -431,22 +434,30 @@ class qtype_preg_lexer extends JLexBase  {
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
-        $number = $this->map_subexpression($name);
+        // Is it a duplicate (by name) of already existing subexpression?
+        $maxsubexprbefore = $this->maxsubexpr;
+        $nameexists = array_key_exists($name, $this->subexpr_name_to_number_map);
+        // Are we inside a (?| group?
+        $topitem = end($this->opt_stack);
+        $insidedup = ($topitem->dup_subexpr_number !== -1);
         $this->push_options_stack_item();
-        // Error: subexpressions with same names should have same numbers.
+        // Map name to number.
+        $number = $this->map_subexpression($name);
         if (is_object($number)) {
+            // Error: subexpressions with same names should have same numbers.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $number);  // $number contains the error object.
         }
-        // Are we inside a (?| group?
-        $penult = $this->opt_stack[$this->opt_count - 2];
-        $insidedup = ($penult->last_dup_subexpr_number !== -1);
-        if ($insidedup && $penult->last_dup_subexpr_name === null) {
+        if ($insidedup && $topitem->dup_subexpr_name === null) {
             // First occurence of a named subexpression inside a (?| group.
-            $penult->last_dup_subexpr_name = $name;
+            $topitem->dup_subexpr_name = $name;
         }
         // If all is fine, fill the another, inverse, map.
         $this->subexpr_number_to_name_map[$number] = $name;
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name);
+        $isduplicate = $nameexists || $number <= $maxsubexprbefore;
+        return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name, $isduplicate);
+    }
+    protected function form_subexpr($text, $subtype, $number = -1, $name = null, $isduplicate = false) {
+        $node = new qtype_preg_node_subexpr($subtype, $number, $name, $isduplicate);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
     }
@@ -656,7 +667,7 @@ class qtype_preg_lexer extends JLexBase  {
         $exists = isset($this->subexpr_name_to_number_map[$name]);
         if (!$exists) {
             // This subexpression does not exists, all is OK. Almost.
-            $number = $this->last_subexpr + 1;
+            $number = $this->lastsubexpr + 1;
             if (isset($this->subexpr_number_to_name_map[$number])) {
                 // There can be situations like (?|(?<name1>)|(?<name2>)). By this moment name2 doesn't exist, but this is an error.
                 $assumed_name = $this->subexpr_number_to_name_map[$number];
@@ -667,25 +678,25 @@ class qtype_preg_lexer extends JLexBase  {
                 }
             }
             $this->subexpr_name_to_number_map[$name] = $number;
-            $this->last_subexpr++;
-            $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
+            $this->lastsubexpr++;
+            $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
             return $number;
         }
         // This subexpression does exist.
         $number = $this->subexpr_name_to_number_map[$name];
-        $topitem = $this->opt_stack[$this->opt_count - 1];
+        $topitem = end($this->opt_stack);
         $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
         $assumed_name = $this->subexpr_number_to_name_map[$number];
-        if ($number == $this->last_subexpr && !$modJ) {
+        if ($number == $this->lastsubexpr && !$modJ) {
             // Two subexpressions with same number in a row is error.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
             return $error;
         }
-        if ($modJ && $number == $this->last_subexpr) {
+        if ($modJ && $number == $this->lastsubexpr) {
             $number++;
         }
-        $this->last_subexpr++;
-        $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
+        $this->lastsubexpr++;
+        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
         return $number;
     }
     /**
@@ -1240,15 +1251,15 @@ class qtype_preg_lexer extends JLexBase  {
 		/* 413 */ self::YY_NOT_ACCEPT
 	);
 		static $yy_cmap = array(
- 18, 18, 18, 18, 18, 18, 18, 18, 18, 2, 1, 18, 19, 19, 18, 18, 18, 18, 18, 18,
+ 18, 18, 18, 18, 18, 18, 18, 18, 18, 2, 1, 19, 19, 19, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 2, 29, 4, 3, 69, 4, 31, 21,
  22, 25, 7, 6, 10, 15, 42, 4, 9, 74, 74, 74, 74, 74, 74, 74, 13, 13, 26, 4,
  17, 24, 20, 5, 18, 53, 54, 37, 32, 33, 34, 68, 57, 35, 28, 63, 73, 18, 36, 18,
  23, 38, 30, 59, 18, 71, 60, 62, 64, 18, 67, 39, 12, 41, 40, 18, 4, 43, 65, 49,
  55, 44, 45, 14, 56, 76, 18, 16, 72, 75, 46, 51, 50, 18, 47, 58, 48, 70, 60, 61,
- 52, 18, 66, 8, 27, 11, 4, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+ 52, 18, 66, 8, 27, 11, 4, 18, 18, 18, 18, 18, 18, 19, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
- 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+ 19, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
  18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
@@ -6301,8 +6312,8 @@ array(
 						case -3:
 							break;
 						case 3:
-							{                         /* More than one whitespace */
-    $topitem = $this->opt_stack[$this->opt_count - 1];
+							{                         /* Whitespace */
+    $topitem = end($this->opt_stack);
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
         $text = $this->yytext();
@@ -6313,7 +6324,7 @@ array(
 							break;
 						case 4:
 							{                                /* Comment beginning when modifier x is set */
-    $topitem = $this->opt_stack[$this->opt_count - 1];
+    $topitem = end($this->opt_stack);
     if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         $this->state_begin_position = $this->current_position_for_node();
         $this->yybegin(self::YYCOMMENTEXT);
@@ -6370,11 +6381,10 @@ array(
 						case 10:
 							{                      /* (...)           Subexpression */
     $this->push_options_stack_item();
-    $this->last_subexpr++;
-    $this->maxsubexpr = max($this->maxsubexpr, $this->last_subexpr);
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->last_subexpr);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    $this->lastsubexpr++;
+    $isduplicate = $this->lastsubexpr <= $this->maxsubexpr;
+    $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
+    return $this->form_subexpr('(', qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $this->lastsubexpr, null, $isduplicate);
 }
 						case -11:
 							break;
@@ -6390,9 +6400,9 @@ array(
 						case 12:
 							{
     // Reset subexpressions numeration inside a (?|...) group.
-    $topitem = $this->opt_stack[$this->opt_count - 1];
-    if ($topitem->last_dup_subexpr_number != -1) {
-        $this->last_subexpr = $topitem->last_dup_subexpr_number;
+    $topitem = end($this->opt_stack);
+    if ($topitem->dup_subexpr_number != -1) {
+        $this->lastsubexpr = $topitem->dup_subexpr_number;
     }
     $alt = new qtype_preg_lexem();
     $alt->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('|')));
@@ -6418,7 +6428,7 @@ array(
 							break;
 						case 14:
 							{
-    $topitem = $this->opt_stack[$this->opt_count - 1];
+    $topitem = end($this->opt_stack);
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
         return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
@@ -6431,7 +6441,7 @@ array(
 							break;
 						case 15:
 							{
-    $topitem = $this->opt_stack[$this->opt_count - 1];
+    $topitem = end($this->opt_stack);
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOTALL)) {
         // The true dot matches everything.
         return $this->form_charset($this->yytext(), qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::META_DOT);
@@ -6444,7 +6454,7 @@ array(
 							break;
 						case 16:
 							{
-    $topitem = $this->opt_stack[$this->opt_count - 1];
+    $topitem = end($this->opt_stack);
     if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
         // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
         return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
@@ -6726,7 +6736,7 @@ array(
     $number = (int)qtype_preg_unicode::substr($text, 2);
     // Convert relative backreferences to absolute.
     if ($number < 0) {
-        $number = $this->last_subexpr + $number + 1;
+        $number = $this->lastsubexpr + $number + 1;
     }
     return $this->form_backref($text, $number);
 }
@@ -6785,9 +6795,7 @@ array(
 						case 51:
 							{                    /* (?>...)         Atomic, non-capturing group */
     $this->push_options_stack_item();
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?>')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    return $this->form_subexpr('(?>', qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
 }
 						case -52:
 							break;
@@ -6856,19 +6864,15 @@ array(
 						case 57:
 							{                    /* (?:...)         Non-capturing group */
     $this->push_options_stack_item();
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?:')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    return $this->form_subexpr('(?:', qtype_preg_node_subexpr::SUBTYPE_GROUPING);
 }
 						case -58:
 							break;
 						case 58:
 							{                    /* (?|...)         Non-capturing group, duplicate subexpression numbers */
     // Save the top-level subexpression number.
-    $this->push_options_stack_item($this->last_subexpr);
-    $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-    $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription('(?|')));
-    return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+    $this->push_options_stack_item($this->lastsubexpr);
+    return $this->form_subexpr('(?|', qtype_preg_node_subexpr::SUBTYPE_GROUPING);
 }
 						case -59:
 							break;
@@ -7023,18 +7027,14 @@ array(
     $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
         $res = array();
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        $res[] = new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+        $res[] = $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $res[] = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         return $res;
     } else {
-        $node = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
+        return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
     }
 }
 						case -72:
@@ -7150,7 +7150,7 @@ array(
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     // Convert relative backreferences to absolute.
     if ($number < 0) {
-        $number = $this->last_subexpr + $number + 1;
+        $number = $this->lastsubexpr + $number + 1;
     }
     return $this->form_backref($text, $number);
 }
@@ -7193,9 +7193,9 @@ array(
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
     if ($text[2] == '-') {
-        $number = $this->last_subexpr - $number + 1;
+        $number = $this->lastsubexpr - $number + 1;
     } else {
-        $number = $this->last_subexpr + $number;
+        $number = $this->lastsubexpr + $number;
     }
     return $this->form_subexpr_call($text, $number);
 }
@@ -7218,9 +7218,9 @@ array(
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     if ($text[3] == '-') {
-        $number = $this->last_subexpr - $number + 1;
+        $number = $this->lastsubexpr - $number + 1;
     } else {
-        $number = $this->last_subexpr + $number;
+        $number = $this->lastsubexpr + $number;
     }
     return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
 }
@@ -7858,7 +7858,7 @@ array(
     $number = (int)qtype_preg_unicode::substr($text, 2);
     // Convert relative backreferences to absolute.
     if ($number < 0) {
-        $number = $this->last_subexpr + $number + 1;
+        $number = $this->lastsubexpr + $number + 1;
     }
     return $this->form_backref($text, $number);
 }
@@ -8028,9 +8028,9 @@ array(
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
     if ($text[3] == '-') {
-        $number = $this->last_subexpr - $number + 1;
+        $number = $this->lastsubexpr - $number + 1;
     } else {
-        $number = $this->last_subexpr + $number;
+        $number = $this->lastsubexpr + $number;
     }
     return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
 }
