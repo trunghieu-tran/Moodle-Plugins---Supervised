@@ -394,12 +394,18 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
             }
+            if ($transition->is_wordbreak()) {
+                qtype_preg_fa_node::merge_wordbreaks($transition, $automaton);
+            }
         }
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
         foreach ($outgoing as $transition) {
             $transition->set_transition_type();
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
+            }
+            if ($transition->is_wordbreak()) {
+                qtype_preg_fa_node::merge_wordbreaks($transition, $automaton);
             }
         }
     }
