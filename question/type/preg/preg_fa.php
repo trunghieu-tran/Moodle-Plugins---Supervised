@@ -325,6 +325,10 @@ class qtype_preg_fa_transition {
         return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor();
     }
 
+    public function is_wordbreak() {
+        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B;
+    }
+
     public function is_end_anchor() {
         return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor();
     }
