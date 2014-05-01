@@ -187,6 +187,146 @@ abstract class qtype_preg_fa_node {
         }
         return false;
     }
+
+
+    public static function get_wordbreaks_transitions($negative, $isinto) {
+        $result = array();
+        // Create transitions which can replace \b and \B.
+        // Create \w.
+        $flagw = new qtype_preg_charset_flag();
+        $flagw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
+        $charsetw = new qtype_preg_leaf_charset();
+        $charsetw->flags = array(array($flagw));
+        $charsetw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W));
+        $tranw = new qtype_preg_fa_transition(0, $charsetw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        // Create \W.
+        $flagbigw = clone $flagw;
+        $flagbigw->negative = true;
+        $charsetbigw = new qtype_preg_leaf_charset();
+        $charsetbigw->flags = array(array($flagbigw));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
+        $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        // Create ^.
+        $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
+        $transitioncircumflex = new qtype_preg_fa_transition(0, $assertcircumflex, 1);
+        // Create $.
+        $assertdollar = new qtype_preg_leaf_assert_dollar();
+        $transitiondollar = new qtype_preg_fa_transition(0, $assertdollar, 1);
+
+        // Incoming transitions.
+        if ($isinto) {
+            $result[] = $tranw;
+            $result[] = $tranbigw;
+            $result[] = $transitioncircumflex;
+            // Case \b.
+            if (!$negative) {
+                $result[] = $tranw;
+            } else {
+                // Case \B.
+                $result[] = $tranbigw;
+            }
+        } else {
+            // Outcoming transitions.
+            // Case \b.
+            if (!$negative) {
+                $result[] = $tranbigw;
+                $result[] = $tranw;
+                $result[] = $tranw;
+            } else {
+                // Case \B.
+                $result[] = $tranw;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
+            }
+            $result[] = $transitiondollar;
+        }
+        return $result;
+    }
+
+    public static function merge_wordbreaks($tran, $automaton) {
+        printf($tran->get_label_for_dot($tran->from, $tran->to));
+        printf($automaton->fa_to_dot());
+        $fromdel = true;
+        $todel = true;
+        $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
+        $intotransitions = $automaton->get_adjacent_transitions($tran->from, false);
+        //$startstates = $this->start_states();
+
+        // Add empty transitions if ot's nessesaary.
+        if (count($outtransitions) == 0) {
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_fa_transition($tran->to, $pregleaf, 1, $tran->origin, $tran->consumeschars);
+            $outtransitions[] = $transition;
+            $todel = false;
+        }
+        if (count($intotransitions) == 0) {
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_fa_transition(0, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
+            $intotransitions[] = $transition;
+            $fromdel = false;
+        }
+
+        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
+        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
+
+        // Intersect transitions.
+        for ($i = 0; $i < count($wordbreakinto); $i++) {
+            foreach ($intotransitions as $intotran) {
+                var_dump($intotran->get_label_for_dot($intotran->from, $intotran->to));
+                var_dump($wordbreakinto[$i]->get_label_for_dot($wordbreakinto[$i]->from, $wordbreakinto[$i]->to));
+                $resultinto = $intotran->intersect($wordbreakinto[$i]);
+                if ($resultinto !== null) {
+                    var_dump(true);
+                    var_dump($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
+                    foreach ($outtransitions as $outtran) {
+                        $resultout = $outtran->intersect($wordbreakout[$i]);
+                        if ($resultout !== null) {
+                            var_dump('aaaaaaaaaa');
+                            // Add state and transition
+                            $state = $automaton->add_state();
+                            $resultinto->from = $intotran->from;
+                            $resultinto->to = $intotran->to;
+                            $resultout->from = $tran->from;
+                            $resultout->to = $outtran->to;
+                            $automaton->add_transition($resultinto);
+                            $automaton->add_transition($resultout);
+                            /*if ($fromdel) {
+                                // Copy transitions from deleting states.
+                                $copiedout = $automaton->get_adjacent_transitions($tran->from, true);
+                                foreach ($copiedout as $copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->from = $state;
+                                        $automaron->add_transition($copytran);
+                                    }
+                                }
+                            }
+                            if ($todel) {
+                                // Copy transitions from deleting states.
+                                $copiedinto = $automaton->get_adjacent_transitions($tran->to, false);
+                                foreach ($copiedinto as $copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->to = $state;
+                                        $automaton->add_transition($copytran);
+                                    }
+                                }
+                            }*/
+                            // If result should be one cycled state.
+                            /*if ($intotran->from == $tran->to) {
+                                $resulttran = new qtype_preg_fa_transition($state, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                            } else {
+                                $resulttran = new qtype_preg_fa_transition($intotran->from, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                                $resulttran = new qtype_preg_fa_transition($state, $resultout->pregleaf, $outtran->to, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                            }*/
+                        }
+                    }
+                }
+            }
+        }
+        $automaton->remove_transition($tran);
+    }
 }
 
 /**
