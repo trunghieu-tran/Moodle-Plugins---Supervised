@@ -785,7 +785,7 @@ class qtype_preg_cross_tests_future {
                         'left'=>array(2),  
                         'next'=>'b');
 
-        return array('regex'=>'a\b\c',
+        return array('regex'=>'a\bc',
                      'tests'=>array($test1, $test2));
     }
     
