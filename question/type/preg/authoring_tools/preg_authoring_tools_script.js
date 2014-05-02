@@ -93,7 +93,13 @@ M.preg_authoring_tools_script = (function ($) {
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
                     // init moodle form js
-                    M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
+                    if (M.form && M.form.shortforms) {
+                        M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
+                    } /*else {
+                        $.getScript(self.www_root+'/lib/form/yui/shortforms/shortforms.js',function() {
+                            M.form.shortforms({"formid":"mformauthoring"});
+                        });
+                    }*/
 
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
