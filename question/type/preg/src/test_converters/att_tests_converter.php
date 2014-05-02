@@ -47,25 +47,35 @@ function replace_bre_characters($regex) {
     return $result;
 }
 
+function php_escape($str) {
+    $str = str_replace("\\", "\\\\", $str);
+    $str = str_replace("$", "\\$", $str);
+    $str = str_replace("\"", "\\\"", $str);
+    return $str;
+}
+
 // There are some incompatibilites in the files with cross-tester checking algorithm.
 function do_correction($regex, $string, &$index2write, &$length2write) {
-    if ($regex == '(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\\\* */?)0*[6-7]))([^0-9]|$)' && $string == 'feb 6,') {
-        $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>5)';
-        $length2write = 'array(0=>6,1=>0,2=>5,3=>5,4=>4,5=>1)';
+    if ($regex == "(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\\\* */?)0*[6-7]))([^0-9]|\\\$)") {
+        if ($string == 'feb 6,') {
+            $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>5)';
+            $length2write = 'array(0=>6,1=>0,2=>5,3=>5,4=>4,5=>1)';
+        }
+        if ($string == '2/7') {
+            $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>3)';
+            $length2write = 'array(0=>3,1=>0,2=>3,3=>3,4=>2,5=>0)';
+        }
+        if ($string == 'feb 1,Feb 6') {
+            $index2write = 'array(0=>5,1=>5,2=>6,3=>6,4=>6,5=>11)';
+            $length2write = 'array(0=>6,1=>1,2=>5,3=>5,4=>4,5=>0)';
+        }
     }
-    if ($regex == '(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\\\* */?)0*[6-7]))([^0-9]|$)' && $string == '2/7') {
-        $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>3)';
-        $length2write = 'array(0=>3,1=>0,2=>3,3=>3,4=>2,5=>0)';
-    }
-    if ($regex == '(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\\\* */?)0*[6-7]))([^0-9]|$)' && $string == 'feb 1,Feb 6') {
-        $index2write = 'array(0=>5,1=>5,2=>6,3=>6,4=>6,5=>11)';
-        $length2write = 'array(0=>6,1=>1,2=>5,3=>5,4=>4,5=>0)';
-    }
-    if ($regex == '((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))' && $string == 'x') {
+
+    if ($regex == "((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))" && $string == 'x') {
         $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0,13=>0,14=>0,15=>0,16=>0,17=>0,18=>0,19=>0,20=>0,21=>0,22=>0,23=>0,24=>0,25=>0,26=>0,27=>0,28=>0,29=>0,30=>0)';
         $length2write = 'array(0=>1,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1)';
     }
-    if ($regex == '((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))*' && $string == 'xx') {
+    if ($regex == "((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))*" && $string == 'xx') {
         $index2write = 'array(0=>0,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1)';
         $length2write = 'array(0=>2,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1)';
     }
@@ -126,7 +136,7 @@ function process_file($filename) {
             // Convert BRE to ERE syntax.
             $regex = replace_bre_characters($regex);
         }
-        $regex = str_replace("\\", "\\\\", $regex); // Make slash escaped in the resulting file.
+        $regex = php_escape($regex);
         $lastregex = $regex;
 
         // Get string.
@@ -135,7 +145,7 @@ function process_file($filename) {
             $string = '';
         }
         $string = replace_esc_sequences($string);
-        $string = str_replace("\\", "\\\\", $string); // Make slash escaped in the resulting file.
+        $string = php_escape($string);
 
         // Get matches.
         $indexes = $parts[3];

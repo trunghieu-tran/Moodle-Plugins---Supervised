@@ -9,7 +9,7 @@ class qtype_preg_cross_tests_from_att_basic {
                        'index_first'=>array(0=>7),
                        'length'=>array(0=>11));
 
-        return array('regex'=>"abracadabra$",
+        return array('regex'=>"abracadabra\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -189,19 +189,19 @@ class qtype_preg_cross_tests_from_att_basic {
                        'index_first'=>array(0=>1),
                        'length'=>array(0=>1));
 
-        return array('regex'=>"a$",
+        return array('regex'=>"a\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_basic_16() {
-        $test1 = array('str'=>"a$",
+        $test1 = array('str'=>"a\$",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>2));
 
-        return array('regex'=>"a\\$",
+        return array('regex'=>"a\\\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -213,7 +213,7 @@ class qtype_preg_cross_tests_from_att_basic {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"^$",
+        return array('regex'=>"^\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -225,7 +225,7 @@ class qtype_preg_cross_tests_from_att_basic {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"$^",
+        return array('regex'=>"\$^",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -237,7 +237,7 @@ class qtype_preg_cross_tests_from_att_basic {
                        'index_first'=>array(0=>1,1=>2),
                        'length'=>array(0=>1,1=>0));
 
-        return array('regex'=>"a($)",
+        return array('regex'=>"a(\$)",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -770,7 +770,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>5),
                        'length'=>array(0=>6,1=>0,2=>5,3=>5,4=>4,5=>1));
 
-        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
+        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|\$)",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -782,7 +782,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>3),
                        'length'=>array(0=>3,1=>0,2=>3,3=>3,4=>2,5=>0));
 
-        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
+        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|\$)",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -794,7 +794,7 @@ a",
                        'index_first'=>array(0=>5,1=>5,2=>6,3=>6,4=>6,5=>11),
                        'length'=>array(0=>6,1=>1,2=>5,3=>5,4=>4,5=>0));
 
-        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
+        return array('regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|\$)",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -938,7 +938,7 @@ a",
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"$",
+        return array('regex'=>"\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -950,7 +950,7 @@ a",
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"^$",
+        return array('regex'=>"^\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -962,7 +962,7 @@ a",
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>1));
 
-        return array('regex'=>"^a$",
+        return array('regex'=>"^a\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1118,7 +1118,7 @@ a",
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3));
 
-        return array('regex'=>"^abc$",
+        return array('regex'=>"^abc\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1142,7 +1142,7 @@ a",
                        'index_first'=>array(0=>1),
                        'length'=>array(0=>3));
 
-        return array('regex'=>"abc$",
+        return array('regex'=>"abc\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1166,7 +1166,7 @@ a",
                        'index_first'=>array(0=>3),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"$",
+        return array('regex'=>"\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1790,7 +1790,7 @@ a",
                        'index_first'=>array(0=>1),
                        'length'=>array(0=>2));
 
-        return array('regex'=>"^a(bc+|b[eh])g|.h$",
+        return array('regex'=>"^a(bc+|b[eh])g|.h\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1802,7 +1802,7 @@ a",
                        'index_first'=>array(0=>0,1=>0),
                        'length'=>array(0=>5,1=>5));
 
-        return array('regex'=>"(bc+d$|ef*g.|h?i(j|k))",
+        return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1814,7 +1814,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>1),
                        'length'=>array(0=>2,1=>2,2=>1));
 
-        return array('regex'=>"(bc+d$|ef*g.|h?i(j|k))",
+        return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1826,7 +1826,7 @@ a",
                        'index_first'=>array(0=>1,1=>1),
                        'length'=>array(0=>5,1=>5));
 
-        return array('regex'=>"(bc+d$|ef*g.|h?i(j|k))",
+        return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2126,7 +2126,7 @@ a",
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>4));
 
-        return array('regex'=>"^.+$",
+        return array('regex'=>"^.+\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2138,7 +2138,7 @@ a",
                        'index_first'=>array(0=>0,1=>0),
                        'length'=>array(0=>4,1=>4));
 
-        return array('regex'=>"^(.+)$",
+        return array('regex'=>"^(.+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2150,7 +2150,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>16),
                        'length'=>array(0=>19,1=>7,2=>3));
 
-        return array('regex'=>"^([^!.]+).att.com!(.+)$",
+        return array('regex'=>"^([^!.]+).att.com!(.+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2162,7 +2162,7 @@ a",
                        'index_first'=>array(0=>0,2=>0),
                        'length'=>array(0=>3,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2174,7 +2174,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>4),
                        'length'=>array(0=>7,1=>4,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2186,7 +2186,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>4),
                        'length'=>array(0=>7,1=>4,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2198,7 +2198,7 @@ a",
                        'index_first'=>array(0=>0,1=>4,2=>8),
                        'length'=>array(0=>11,1=>4,2=>3));
 
-        return array('regex'=>"^.+!([^!]+!)([^!]+)$",
+        return array('regex'=>"^.+!([^!]+!)([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2354,7 +2354,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,4=>4,5=>8),
                        'length'=>array(0=>11,1=>11,4=>4,5=>3));
 
-        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$",
+        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2366,7 +2366,7 @@ a",
                        'index_first'=>array(0=>0,2=>0),
                        'length'=>array(0=>3,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$|^.+!([^!]+!)([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$|^.+!([^!]+!)([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2378,7 +2378,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>4),
                        'length'=>array(0=>7,1=>4,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$|^.+!([^!]+!)([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$|^.+!([^!]+!)([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2390,7 +2390,7 @@ a",
                        'index_first'=>array(0=>0,3=>4,4=>8),
                        'length'=>array(0=>11,3=>4,4=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$|^.+!([^!]+!)([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$|^.+!([^!]+!)([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2402,7 +2402,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>4),
                        'length'=>array(0=>7,1=>4,2=>3));
 
-        return array('regex'=>"^([^!]+!)?([^!]+)$|^.+!([^!]+!)([^!]+)$",
+        return array('regex'=>"^([^!]+!)?([^!]+)\$|^.+!([^!]+!)([^!]+)\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2414,7 +2414,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,3=>0),
                        'length'=>array(0=>3,1=>3,3=>3));
 
-        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$",
+        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2426,7 +2426,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>0,3=>4),
                        'length'=>array(0=>7,1=>7,2=>4,3=>3));
 
-        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$",
+        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2438,7 +2438,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,4=>4,5=>8),
                        'length'=>array(0=>11,1=>11,4=>4,5=>3));
 
-        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$",
+        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -2450,7 +2450,7 @@ a",
                        'index_first'=>array(0=>0,1=>0,2=>0,3=>4),
                        'length'=>array(0=>7,1=>7,2=>4,3=>3));
 
-        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$",
+        return array('regex'=>"^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))\$",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
