@@ -474,6 +474,13 @@ class qtype_preg_regex_handler {
         return array();
     }
 
+    public function get_subexpr_refs_map() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_subexpr_refs_map();
+        }
+        return array();
+    }
+
     public function is_node_generated($pregnode) {
         if (!$this->options->exactmatch) {
             return false;
