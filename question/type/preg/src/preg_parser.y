@@ -53,7 +53,7 @@
     }
 
     public function get_max_subpatt() {
-        return $this->subpatt_counter;
+        return $this->subpatt_counter - 1;
     }
 
     public function get_subpatt_map() {
