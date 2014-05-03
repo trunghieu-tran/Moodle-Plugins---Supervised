@@ -430,10 +430,17 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                     return false;
                 }
             }
+
+            // TODO: is this correct?
+            if ($this_repetitions_count < $other_repetitions_count) {
+                return true;
+            } else if ($other_repetitions_count < $this_repetitions_count) {
+                return false;
+            }
         }
 
         // Iterate over all subpatterns for the 2nd time to compare numbers of repetitions
-        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
+        /*for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
             $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
             $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
 
@@ -445,7 +452,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             } else if ($other_repetitions_count < $this_repetitions_count) {
                 return false;
             }
-        }
+        }*/
 
         return false;
     }

@@ -83,17 +83,19 @@ function do_correction($regex, $string, &$index2write, &$length2write) {
 
 function process_file($filename) {
     $INPUT_SET = explode('.', $filename)[0];
+    $INPUT_SET = str_replace('-', '_', $INPUT_SET);
+    $INPUT_SET = str_replace('+', 'plus', $INPUT_SET);
     $OUTPUT_FILENAME = "cross_tests_from_att_$INPUT_SET.php";
     $FUNCTION_PREFIX = "function data_for_test_att_{$INPUT_SET}_";
 
     echo $filename . '... ';
 
     $in = @fopen($filename, 'r');
-    $out = @fopen($OUTPUT_FILENAME, 'w');
     if (!$in) {
         echo "not found\n";
         return;
     }
+    $out = @fopen($OUTPUT_FILENAME, 'w');
     if (!$out) {
         echo "can't create output file\n";
         return;
@@ -170,7 +172,7 @@ function process_file($filename) {
         $length2write = '';
         foreach ($subexpressions as $key => $subexpression) {
             $pair = explode(',', $subexpression);
-            if ($pair[0] != '?') {
+            if ($pair[0] != '?' && $pair[0] != '-1') {
                 $index2write .= $key . '=>' . (int)($pair[0]) . ',';
                 $length2write .= $key . '=>' . ((int)($pair[1]) - (int)($pair[0])) . ',';
             } else {
@@ -224,14 +226,48 @@ function process_file($filename) {
 
 }
 
-$filenames = array('basic.dat',
+$filenames = array('austin.dat',
+                   'basic.dat',
+                   'callout.dat',
                    //'categorize.dat',
+                   'cut.dat',
+                   'escape.dat',
                    'forcedassoc.dat',
+                   'group.dat',
+                   'haskell.dat',
                    'interpretation.dat',
+                   'iso8859-1.dat',
                    'leftassoc.dat',
+                   'libtre.dat',
+                   'locale.dat',
+                   'minimal.dat',
+                   'nested.dat',
+                   'noop.dat',
+                   //'nullsubexpr-A.dat',
                    'nullsubexpr.dat',
+                   'pcre-1.dat',
+                   'pcre-2.dat',
+                   'pcre-3.dat',
+                   'pcre-4.dat',
+                   'pcre-5.dat',
+                   'perl.dat',
+                   'reg.dat',
+                   'regex++.dat',
                    'repetition.dat',
-                   'rightassoc.dat'
+                   'rightassoc.dat',
+                   'rxposix.dat',
+                   'subexpr.dat',
+                   'testdecomp.dat',
+                   'testfmt.dat',
+                   'testfnmatch.dat',
+                   'testglob.dat',
+                   'testmatch.dat',
+                   'testregex.dat',
+                   'testsub.dat',
+                   'type.dat',
+                   'unknownassoc.dat',
+                   'xopen.dat',
+                   'zero.dat'
                    );
 foreach ($filenames as $filename) {
     process_file($filename);
