@@ -123,6 +123,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $node->number = $number;
         }
     }
+
+    // Form the subexpr reference map.
+    foreach ($this->nodes_with_subexpr_refs as $node) {
+        if (!array_key_exists($node->number, $this->subexpr_refs_map)) {
+            $this->subexpr_refs_map[$node->number] = array();
+        }
+        $this->subexpr_refs_map[$node->number][] = $node;
+    }
+
 %eof}
 %{
     // Regex handling options set from the outside.
@@ -148,6 +157,9 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, subexpression calls.
     protected $nodes_with_subexpr_refs = array();
+
+    // Array of subexpr references: subexpr number => array of reference nodes.
+    protected $subexpr_refs_map = array();
 
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
@@ -294,6 +306,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     public function get_nodes_with_subexpr_refs() {
         return $this->nodes_with_subexpr_refs;
+    }
+
+    public function get_subexpr_refs_map() {
+        return $this->subexpr_refs_map;
     }
 
     public function set_options($options) {

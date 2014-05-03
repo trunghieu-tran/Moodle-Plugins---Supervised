@@ -367,6 +367,9 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
         }
 
+        $subpattmap = $this->matcher->get_subpatt_map();
+        $refsmap = $this->matcher->get_subexpr_refs_map();
+
         // PCRE/POSIX selection goes on below. Iterate over all subpatterns skipping the first which is the whole expression.
         $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
         for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
@@ -431,28 +434,32 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 }
             }
 
-            // TODO: is this correct?
+            // Now let's see if this is a backreferenced subexpression. Not sure, but looks like the following code implies that
+            // the referenced subexpression has zero-length match. It does the trick for the situations like:
+            // :RE#49:B    \(a*\)*b\1*     ab  (0,2)(1,1)
+            // Yes, the match is NOT (0,2)(0,1) because \1 should me zero-length-matched, not skipped.
+            if ($subpattmap[$i]->type == qtype_preg_node::TYPE_NODE_SUBEXPR && array_key_exists($subpattmap[$i]->number, $refsmap)) {
+                $refs = $refsmap[$subpattmap[$i]->number];
+                foreach ($refs as $ref) {
+                    $this_ref_last = $this->last_match($ref->subpattern);
+                    $other_ref_last = $other->last_match($ref->subpattern);
+                    $this_ref_captured = $this_ref_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
+                    $other_ref_captured = $other_ref_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
+                    if ($this_ref_captured && !$other_ref_captured) {
+                        return true;
+                    } else if ($other_ref_captured && !$this_ref_captured) {
+                        return false;
+                    }
+                }
+            }
+
+            // Finally, select the one with minimal repetitions count.
             if ($this_repetitions_count < $other_repetitions_count) {
                 return true;
             } else if ($other_repetitions_count < $this_repetitions_count) {
                 return false;
             }
         }
-
-        // Iterate over all subpatterns for the 2nd time to compare numbers of repetitions
-        /*for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
-            $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
-            $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
-
-            $this_repetitions_count = count($this_match);
-            $other_repetitions_count = count($other_match);
-
-            if ($this_repetitions_count < $other_repetitions_count) {
-                return true;
-            } else if ($other_repetitions_count < $this_repetitions_count) {
-                return false;
-            }
-        }*/
 
         return false;
     }

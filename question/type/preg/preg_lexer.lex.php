@@ -77,6 +77,8 @@ class qtype_preg_lexer extends JLexBase  {
     protected $subexpr_number_to_name_map = array();
     // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, subexpression calls.
     protected $nodes_with_subexpr_refs = array();
+    // Array of subexpr references: subexpr number => array of reference nodes.
+    protected $subexpr_refs_map = array();
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
     // Comment string.
@@ -197,6 +199,9 @@ class qtype_preg_lexer extends JLexBase  {
     }
     public function get_nodes_with_subexpr_refs() {
         return $this->nodes_with_subexpr_refs;
+    }
+    public function get_subexpr_refs_map() {
+        return $this->subexpr_refs_map;
     }
     public function set_options($options) {
         $this->options = $options;
@@ -816,6 +821,13 @@ class qtype_preg_lexer extends JLexBase  {
         if (!$this->options->preserveallnodes) {
             $node->number = $number;
         }
+    }
+    // Form the subexpr reference map.
+    foreach ($this->nodes_with_subexpr_refs as $node) {
+        if (!array_key_exists($node->number, $this->subexpr_refs_map)) {
+            $this->subexpr_refs_map[$node->number] = array();
+        }
+        $this->subexpr_refs_map[$node->number][] = $node;
     }
 		}
 		$this->yy_eof_done = true;
@@ -6312,7 +6324,7 @@ array(
 						case -3:
 							break;
 						case 3:
-							{                         /* Whitespace */
+							{                       /* Whitespace */
     $topitem = end($this->opt_stack);
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
         // If the "x" modifier is not set, return all the whitespaces.
