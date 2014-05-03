@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines class which is builder of graphical syntax tree.
+ * Defines class for regex testing tool.
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory <grvlter@gmail.com>
