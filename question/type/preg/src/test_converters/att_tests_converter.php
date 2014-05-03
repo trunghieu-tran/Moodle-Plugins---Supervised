@@ -28,15 +28,41 @@ function code2utf8($num) {
 
 // Replaces escape sequences with real characters.
 function replace_esc_sequences($string) {
-    $result = str_replace('\\n', "\n", $string);
+    $dummy = array('\\a' => chr(0x07),
+                   '\\b' => chr(0x08),
+                   //'\\c'
+                   '\\e' => chr(033),
+                   '\\E' => chr(033),
+                   '\\f' => chr(0x0C),
+                   '\\n' => chr(0x0A),
+                   '\\r' => chr(0x0D),
+                   '\\s' => chr(0x20),
+                   '\\t' => chr(0x09),
+                   '\\v' => chr(0x0B),
+                   );
+
+    foreach ($dummy as $key => $ch) {
+        $string = str_replace($key, $ch, $string);
+    }
+
     $match = array();
-    while (preg_match('/[\\\\][x]..?/', $result, $match) > 0) {
+
+    // \cx
+    /*while (preg_match('/\\Q\\c\E./', $string, $match) > 0) {
+        $x = ord(substr($match[0], 1));
+        $x &= 037;
+        $ch = code2utf8($x);
+        $string = str_replace($match[0], $ch, $string);
+    }*/
+
+    // \xhh
+    while (preg_match('/\\x..?/', $string, $match) > 0) {
         $hex = substr($match[0], 2);
         $code = hexdec($hex);
         $ch = code2utf8($code);
-        $result = str_replace($match[0], $ch, $result);
+        $string = str_replace($match[0], $ch, $string);
     }
-    return $result;
+    return $string;
 }
 
 function replace_bre_characters($regex) {
@@ -120,26 +146,79 @@ function process_file($filename) {
             continue;
         }
 
-        // Split the line by tabs; skip if it's empty or if it starts with "NOTE".
+        // Split the line by tabs; skip if it's empty or if it starts with "#" or ":" or "NOTE".
         $parts = explode("\t", $line);
-        if (count($parts) < 4 || $parts[0] == 'NOTE') {
+        if (count($parts) < 4 || $parts[0][0] == '#' || $parts[0][0] == ':' || $parts[0][0] == 'N') {
             continue;
         }
 
-        // Get modifiers.
-        $modifiers = $parts[0];
+        // Get the flags.
+        $flags = $parts[0];
 
-        // Get regex.
+        // Check if this test is supported.
+        static $unsupported = array(
+                //'B',//    basic           BRE (grep, ed, sed)
+                //'E',//    REG_EXTENDED        ERE (egrep)
+                'A',//    REG_AUGMENTED       ARE (egrep with negation)
+                'S',//    REG_SHELL       SRE (sh glob)
+                'K',//    REG_SHELL|REG_AUGMENTED KRE (ksh glob)
+                'L',//    REG_LITERAL     LRE (fgrep)
+
+                'a',//    REG_LEFT|REG_RIGHT  implicit ^...$
+                'b',//    REG_NOTBOL      lhs does not match ^
+                'c',//    REG_COMMENT     ignore space and #...\\n
+                'd',//    REG_SHELL_DOT       explicit leading . match
+                'e',//    REG_NOTEOL      rhs does not match $
+                'f',//    REG_MULTIPLE        multiple \\n separated patterns
+                'g',//    FNM_LEADING_DIR     testfnmatch only -- match until /
+                'h',//    REG_MULTIREF        multiple digit backref
+                'i',//    REG_ICASE       ignore case
+                'j',//    REG_SPAN        . matches \\n
+                'k',//    REG_ESCAPE      \\ to ecape [...] delimiter
+                'l',//    REG_LEFT        implicit ^...
+                'm',//    REG_MINIMAL     minimal match
+                'n',//    REG_NEWLINE     explicit \\n match
+                'o',//    REG_ENCLOSED        (|&) magic inside [@|&](...)
+                'p',//    REG_SHELL_PATH      explicit / match
+                'q',//    REG_DELIMITED       delimited pattern
+                'r',//    REG_RIGHT       implicit ...$
+                's',//    REG_SHELL_ESCAPED   \\ not special
+                't',//    REG_MUSTDELIM       all delimiters must be specified
+                'u',//    standard unspecified behavior -- errors not counted
+                'v',//    REG_CLASS_ESCAPE    \\ special inside [...]
+                'w',//    REG_NOSUB       no subexpression match array
+                'x',//    REG_LENIENT     let some errors slide
+                'y',//    REG_LEFT        regexec() implicit ^...
+                'z',//    REG_NULL        NULL subexpressions ok
+                '$',//                            expand C \\c escapes in fields 2 and 3
+                '/',//                            field 2 is a regsubcomp() expression
+                '=',//                            field 3 is a regdecomp() expression
+            );
+        $skip = false;
+        foreach ($unsupported as $flag) {
+            if (strpos($flags, $flag) !== false) {
+                $skip = true;
+                break;
+            }
+        }
+
+        // Get regex despite possibly unsupported flags, cuz there can be 'SAME' reference in the next lines.
         $regex = $parts[1];
         if ($regex == 'SAME') {
             $regex = $lastregex;
         }
-        if (strstr($modifiers, 'B')) {
+        if (strstr($flags, 'B')) {
             // Convert BRE to ERE syntax.
             $regex = replace_bre_characters($regex);
         }
         $regex = php_escape($regex);
         $lastregex = $regex;
+
+        // Now can skip the unsupported test.
+        if ($skip) {
+            echo "skipping unsupported test: $line\n";
+            continue;
+        }
 
         // Get string.
         $string = $parts[2];
@@ -212,7 +291,7 @@ function process_file($filename) {
         fwrite($out,      "                       'index_first'=>" . $index2write . ",\n");
         fwrite($out,      "                       'length'=>" . $length2write . ");\n\n");
         fwrite($out,      "        return array('regex'=>\"" . $regex . "\",\n");
-        if ($modifiers != '' && strpos($modifiers, 'i') != false) {
+        if ($flags != '' && strpos($flags, 'i') != false) {
             fwrite($out, "                     'modifiers'=>'i',\n");
         }
         fwrite($out, "                     'tests'=>array(" . '$test1' . "),\n");
@@ -222,7 +301,12 @@ function process_file($filename) {
     fwrite($out, "}\n");
     fclose($in);
     fclose($out);
-    echo "converted\n";
+    if ($counter > 0) {
+        echo "converted\n";
+    } else {
+        echo "no tests were converted, deleting file $OUTPUT_FILENAME\n";
+        unlink($OUTPUT_FILENAME);
+    }
 
 }
 
