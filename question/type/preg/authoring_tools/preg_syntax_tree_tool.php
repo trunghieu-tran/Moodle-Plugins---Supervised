@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines class which is builder of graphical syntax tree.
+ * Defines syntax tree tool.
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory <grvlter@gmail.com>, Valeriy Streltsov <vostreltsov@gmail.com>
