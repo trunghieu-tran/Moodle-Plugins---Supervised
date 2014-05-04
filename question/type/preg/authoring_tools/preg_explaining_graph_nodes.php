@@ -451,7 +451,8 @@ class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_grap
             $right = $this->operands[$i]->create_graph();
             $graph->assume_subgraph($right);
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $graph);
-            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast;
+            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . '_' .
+                $this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
             $graph->links[count($graph->links)-1]->tooltip = 'concatenation';
 
             if ($i != $n-1) {
