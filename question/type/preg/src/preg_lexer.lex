@@ -1036,17 +1036,6 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, true, $leftborder, null, $lazy, $greedy, $possessive);
 }
-<YYINITIAL> "{,"[0-9]+"}"{QUANTTYPE} {           // {,m}  Quantifier no more than m
-    $text = $this->yytext();
-    $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greedy= ($lastchar === '}');
-    $lazy = !$greedy&& $lastchar === '?';
-    $possessive = !$greedy&& !$lazy;
-    $greedy|| $textlen--;
-    $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    return $this->form_quant($text, false, 0, $rightborder, $lazy, $greedy, $possessive);
-}
 <YYINITIAL> "{"[0-9]+"}" {                       // {n}    Quantifier exactly n
     $text = $this->yytext();
     $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);

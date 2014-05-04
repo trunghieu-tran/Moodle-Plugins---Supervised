@@ -106,7 +106,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->negative);
     }
     function test_quantifiers() {
-        $lexer = $this->create_lexer('?*++{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}+');
+        $lexer = $this->create_lexer('?*++{1,5}{1,}{5}*???+?{1,5}?{1,}?{5}+');
         $token = $lexer->nextToken();// ?
         $this->assertTrue($token->type === qtype_preg_parser::QUANT);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
@@ -131,14 +131,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::QUANT);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder === 1);
-        $this->assertTrue($token->value->rightborder === 5);
-        $this->assertTrue(!$token->value->lazy);
-        $this->assertTrue($token->value->greedy);
-        $this->assertTrue(!$token->value->possessive);
-        $token = $lexer->nextToken();// {,5}
-        $this->assertTrue($token->type === qtype_preg_parser::QUANT);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
-        $this->assertTrue($token->value->leftborder === 0);
         $this->assertTrue($token->value->rightborder === 5);
         $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greedy);
@@ -186,14 +178,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greedy);
         $this->assertTrue(!$token->value->possessive);
-        $token = $lexer->nextToken();// {,5}?
-        $this->assertTrue($token->type === qtype_preg_parser::QUANT);
-        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
-        $this->assertTrue($token->value->leftborder === 0);
-        $this->assertTrue($token->value->rightborder === 5);
-        $this->assertTrue($token->value->lazy);
-        $this->assertTrue(!$token->value->greedy);
-        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {1,}?
         $this->assertTrue($token->type === qtype_preg_parser::QUANT);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
@@ -216,7 +200,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greedy);
         $this->assertTrue(!$token->value->possessive);
-        $lexer = $this->create_lexer('{135,12755139}{135,}{,12755139}{135}');
+        $lexer = $this->create_lexer('{135,12755139}{135,}{0,12755139}{135}');
         $token = $lexer->nextToken();// {135,12755139}
         $this->assertTrue($token->type === qtype_preg_parser::QUANT);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
@@ -228,7 +212,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder === 135);
         $this->assertTrue($token->value->greedy);
-        $token = $lexer->nextToken();// {,12755139}
+        $token = $lexer->nextToken();// {0,12755139}
         $this->assertTrue($token->type === qtype_preg_parser::QUANT);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder === 0);
