@@ -131,6 +131,7 @@ class qtype_preg_explaining_graph_tool_link {
     public $owner = null;       // Subgraph which has this link.
     public $tooltip = '';       // Tooltip for link.
     public $color = 'black';    // Color of arrow.
+	ublic $id = -1;            // Id of link.
 
     public function __construct($lbl, $src, $dst, $ownr = null, $stl = 'normal') {
         $this->label = $lbl;
