@@ -762,7 +762,7 @@ expr_prec_10(R) ::= expr_prec_9(A) LEFTSHIFT_ASSIGN(B) expr_prec_10(C) . {
 
 expr_prec_10(R) ::= expr_prec_9(A) MODULO_ASSIGN(B) expr_prec_10(C) . {
 	R = $this->create_node('expr_prec_10', array( A, B, C ));
- }
+}
 
 expr_prec_10(R) ::= expr_prec_9(A) DIVISION_ASSIGN(B) expr_prec_10(C) . {
 	R = $this->create_node('expr_prec_10', array( A, B, C ));
