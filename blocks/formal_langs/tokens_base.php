@@ -24,6 +24,7 @@
  */
 require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstream.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.php');
 
 class block_formal_langs_ast {
 
@@ -214,6 +215,12 @@ class block_formal_langs_ast_node_base {
      */
     protected $description;
 
+    /**
+     * A rule for generating node description
+     * @var block_formal_langs_description_rule
+     */
+    public $rule;
+
     public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
         $this->type = $type;
@@ -222,6 +229,7 @@ class block_formal_langs_ast_node_base {
 
         $this->childs = array();
         $this->description = '';
+        $this->rule = null;
     }
 
     /**
@@ -1724,7 +1732,7 @@ class block_formal_langs_processed_string {
     protected function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse()) {
             // TODO: Fix this inconsistency
-            $this->language->parse(this);
+            $this->language->parse($this, true);
         }
         return $this->syntaxtree;
     }
@@ -1829,7 +1837,7 @@ class block_formal_langs_string_pair {
         /** @var block_formal_langs_token_stream $correctstream */
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
-        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
@@ -1845,7 +1853,7 @@ class block_formal_langs_string_pair {
         $bestgroups = array();
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
-        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
