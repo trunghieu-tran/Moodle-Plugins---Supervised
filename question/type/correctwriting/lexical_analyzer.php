@@ -87,12 +87,24 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         );
 
         /** @var qtype_correctwriting_string_pair $pair */
+        /** @var qtype_correctwriting_string_pair $pair */
         foreach($this->resultstringpairs as $pair) {
             $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
             $pair->analyzersequence[] = get_class($this);
-            // TODO: Biryukova: create own lexical_errors here and append it to pair, via
-            // append_mistakes
-            $pair->append_mistakes($lexicalmistakes);
+
+            $setmatches = $pair->matches;
+            $lexmistakes=array();
+            foreach ($setmatches as $onematch) {
+                if ($onematch->mistakeweight > 0) {
+                    $lexmistake = new qtype_correctwriting_lexical_mistake($onematch);
+                    $lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
+                    $lexmistake->weight = $onematch->mistakeweight;
+                    $lexmistake->answermistaken = $onematch->correcttokens;
+                    $lexmistake->responsemistaken = $onematch->comparedtokens;
+                    $lexmistakes[] = $lexmistake;
+                }
+            }
+            $pair->append_mistakes($lexmistakes);
         }
     }
 
