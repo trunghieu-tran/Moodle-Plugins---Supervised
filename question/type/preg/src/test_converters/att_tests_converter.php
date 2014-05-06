@@ -134,14 +134,24 @@ function process_file($filename) {
     $counter = 0;
     $lastregex = '';
     while (!feof($in)) {
-        $line = fgets($in);
+        $tmp = fgets($in);
         if (feof($in)) {
             break;
         }
 
         // Chop the \n at the end; minimize consequent tabs to one.
-        $line = substr($line, 0, strlen($line) - 1);
-        $line = preg_replace("/\t+/", "\t", $line);
+        $line = '';
+        // There can be multiple lines 'concatenated' with slash
+        do {
+            $tmp = substr($tmp, 0, strlen($tmp) - 1);
+            $tmp = preg_replace("/\t+/", "\t", $tmp);
+            $lastchar = '';
+            if ($tmp != '') {
+                $line .= $tmp;
+                $lastchar = substr($tmp, -1);
+            }
+        } while ($lastchar == '\\');
+
         if ($line == '') {
             continue;
         }
@@ -172,8 +182,8 @@ function process_file($filename) {
                 'f',//    REG_MULTIPLE        multiple \\n separated patterns
                 'g',//    FNM_LEADING_DIR     testfnmatch only -- match until /
                 'h',//    REG_MULTIREF        multiple digit backref
-                'i',//    REG_ICASE       ignore case
-                'j',//    REG_SPAN        . matches \\n
+                //'i',//    REG_ICASE       ignore case
+                //'j',//    REG_SPAN        . matches \\n
                 'k',//    REG_ESCAPE      \\ to ecape [...] delimiter
                 'l',//    REG_LEFT        implicit ^...
                 'm',//    REG_MINIMAL     minimal match
@@ -194,6 +204,11 @@ function process_file($filename) {
                 '/',//                            field 2 is a regsubcomp() expression
                 '=',//                            field 3 is a regdecomp() expression
             );
+        static $modmap = array('B' => 'B',
+                               'E' => 'E',
+                               'i' => 'i',
+                               'j' => 's'
+            );
         $skip = false;
         foreach ($unsupported as $flag) {
             if (strpos($flags, $flag) !== false) {
@@ -206,18 +221,29 @@ function process_file($filename) {
         $regex = $parts[1];
         if ($regex == 'SAME') {
             $regex = $lastregex;
+        } else {
+            if (strstr($flags, 'B')) {
+                // Convert BRE to ERE syntax.
+                $regex = replace_bre_characters($regex);
+            }
+            $regex = php_escape($regex);
+            $lastregex = $regex;
         }
-        if (strstr($flags, 'B')) {
-            // Convert BRE to ERE syntax.
-            $regex = replace_bre_characters($regex);
-        }
-        $regex = php_escape($regex);
-        $lastregex = $regex;
+
 
         // Now can skip the unsupported test.
         if ($skip) {
             echo "skipping unsupported test: $line\n";
             continue;
+        }
+
+        // Convert to PCRE modifiers.
+        $modifiers = '';
+        for ($i = 0; $i < strlen($flags); $i++) {
+            $key = $flags[$i];
+            if (array_key_exists($key, $modmap)) {
+                $modifiers .= $modmap[$key];
+            }
         }
 
         // Get string.
@@ -292,7 +318,7 @@ function process_file($filename) {
         fwrite($out,      "                       'length'=>" . $length2write . ");\n\n");
         fwrite($out,      "        return array('regex'=>\"" . $regex . "\",\n");
         if ($flags != '' && strpos($flags, 'i') != false) {
-            fwrite($out, "                     'modifiers'=>'i',\n");
+            fwrite($out, "                     'modifiers'=>'$modifiers',\n");
         }
         fwrite($out, "                     'tests'=>array(" . '$test1' . "),\n");
         fwrite($out, "                     'tags'=>" . $tags . ");\n");
