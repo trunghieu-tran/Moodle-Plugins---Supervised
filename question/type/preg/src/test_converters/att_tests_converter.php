@@ -56,7 +56,7 @@ function replace_esc_sequences($string) {
     }*/
 
     // \xhh
-    while (preg_match('/\\x..?/', $string, $match) > 0) {
+    while (preg_match('/[\\\\]x..?/', $string, $match) > 0) {
         $hex = substr($match[0], 2);
         $code = hexdec($hex);
         $ch = code2utf8($code);
@@ -156,10 +156,21 @@ function process_file($filename) {
             continue;
         }
 
+        // Convert the line to UTF-8
+        $line = mb_convert_encoding($line, 'UTF-8');
+
         // Split the line by tabs; skip if it's empty or if it starts with "#" or ":" or "NOTE".
         $parts = explode("\t", $line);
-        if (count($parts) < 4 || $parts[0][0] == '#' || $parts[0][0] == ':' || $parts[0][0] == 'N') {
+        if (count($parts) < 4 || $parts[0][0] == '#' || $parts[0][0] == 'N') {
             continue;
+        }
+        if ($parts[0][0] == ':') {
+            $i = 1;
+            while ($i < strlen($parts[0]) && $parts[0][$i] != ':') {
+                $i++;
+            }
+            $i++;
+            $parts[0] = substr($parts[0], $i);
         }
 
         // Get the flags.
@@ -172,7 +183,7 @@ function process_file($filename) {
                 'A',//    REG_AUGMENTED       ARE (egrep with negation)
                 'S',//    REG_SHELL       SRE (sh glob)
                 'K',//    REG_SHELL|REG_AUGMENTED KRE (ksh glob)
-                'L',//    REG_LITERAL     LRE (fgrep)
+                //'L',//    REG_LITERAL     LRE (fgrep)
 
                 'a',//    REG_LEFT|REG_RIGHT  implicit ^...$
                 'b',//    REG_NOTBOL      lhs does not match ^
@@ -187,26 +198,24 @@ function process_file($filename) {
                 'k',//    REG_ESCAPE      \\ to ecape [...] delimiter
                 'l',//    REG_LEFT        implicit ^...
                 'm',//    REG_MINIMAL     minimal match
-                'n',//    REG_NEWLINE     explicit \\n match
+                //'n',//    REG_NEWLINE     explicit \\n match
                 'o',//    REG_ENCLOSED        (|&) magic inside [@|&](...)
                 'p',//    REG_SHELL_PATH      explicit / match
                 'q',//    REG_DELIMITED       delimited pattern
                 'r',//    REG_RIGHT       implicit ...$
                 's',//    REG_SHELL_ESCAPED   \\ not special
                 't',//    REG_MUSTDELIM       all delimiters must be specified
-                'u',//    standard unspecified behavior -- errors not counted
+                //'u',//    standard unspecified behavior -- errors not counted
                 'v',//    REG_CLASS_ESCAPE    \\ special inside [...]
                 'w',//    REG_NOSUB       no subexpression match array
                 'x',//    REG_LENIENT     let some errors slide
                 'y',//    REG_LEFT        regexec() implicit ^...
-                'z',//    REG_NULL        NULL subexpressions ok
-                '$',//                            expand C \\c escapes in fields 2 and 3
+                //'z',//    REG_NULL        NULL subexpressions ok
+                //'$',//                            expand C \\c escapes in fields 2 and 3    TODO: really escape
                 '/',//                            field 2 is a regsubcomp() expression
                 '=',//                            field 3 is a regdecomp() expression
             );
-        static $modmap = array('B' => 'B',
-                               'E' => 'E',
-                               'i' => 'i',
+        static $modmap = array('i' => 'i',
                                'j' => 's'
             );
         $skip = false;
@@ -222,6 +231,10 @@ function process_file($filename) {
         if ($regex == 'SAME') {
             $regex = $lastregex;
         } else {
+            if ($regex == 'NULL') {
+                $regex = '';
+                $skip = true;
+            }
             if (strstr($flags, 'B')) {
                 // Convert BRE to ERE syntax.
                 $regex = replace_bre_characters($regex);
@@ -229,7 +242,6 @@ function process_file($filename) {
             $regex = php_escape($regex);
             $lastregex = $regex;
         }
-
 
         // Now can skip the unsupported test.
         if ($skip) {
