@@ -1015,11 +1015,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "{"[0-9]+","[0-9]+"}"{QUANTTYPE} {   // {n,m} Quantifier at least n, no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $lastchar = qtype_preg_unicode::substr($text, -1);
     $greedy = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greedy && !$lazy;
-    $greedy|| $textlen--;
+    $greedy || $textlen--;
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
@@ -1028,18 +1028,24 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "{"[0-9]+",}"{QUANTTYPE} {           // {n,}  Quantifier n or more
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greedy= $lastchar === '}';
+    $lastchar = qtype_preg_unicode::substr($text, -1);
+    $greedy = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greedy&& !$lazy;
-    $greedy|| $textlen--;
+    $greedy || $textlen--;
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, true, $leftborder, null, $lazy, $greedy, $possessive);
 }
-<YYINITIAL> "{"[0-9]+"}" {                       // {n}    Quantifier exactly n
+<YYINITIAL> "{"[0-9]+"}"{QUANTTYPE} {            // {n}    Quantifier exactly n
     $text = $this->yytext();
-    $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
-    return $this->form_quant($text, false, $count, $count, false, true, false);
+    $textlen = $this->yylength();
+    $lastchar = qtype_preg_unicode::substr($text, -1);
+    $greedy = $lastchar === '}';
+    $lazy = $lastchar === '?';
+    $possessive = !$greedy&& !$lazy;
+    $greedy || $textlen--;
+    $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
+    return $this->form_quant($text, false, $count, $count, $lazy, $greedy, $possessive);
 }
 
 
