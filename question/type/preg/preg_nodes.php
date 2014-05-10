@@ -651,7 +651,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     $result->assertionsbefore = $this->assertionsbefore;
                     $result->assertionsafter = $this->assertionsafter;
                     $result = $result->intersect_asserts($other);
-                    $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
+                    //$result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
                     // If there are asserts then intersection is only when there is also \n.
                     if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
                         if (!$result->match($str, 0, $length)) {
@@ -1147,6 +1147,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
+        $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
         return $result;
     }
 
