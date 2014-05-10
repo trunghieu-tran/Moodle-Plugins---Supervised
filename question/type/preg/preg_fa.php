@@ -371,6 +371,27 @@ class qtype_preg_fa_transition {
         }
     }
 
+    public function get_tags($open) {
+        $tagsets = array();
+        
+        foreach ($this->tagsets as $set) {
+            $tagset = new qtype_preg_fa_tag_set();
+            foreach ($set->tags as $tag) {
+                if ($open) {
+                    if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN) {
+                        $tagset->tags[] = $tag;
+                    }
+                } else {
+                    if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE) {
+                        $tagset->tags[] = $tag;
+                    }
+                }
+            }
+            $tagsets[] = $tagset;
+        }
+        return $tagsets;
+    }
+
     public function open_tags_tohr() {
         static $map = array(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION => array('(', ')'),
                             qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
