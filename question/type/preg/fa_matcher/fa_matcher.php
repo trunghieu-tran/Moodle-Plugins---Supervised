@@ -857,16 +857,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
-        try {
+        //try {
             $stack = array();
             $this->dstroot->create_automaton($result, $stack);
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
-            //printf($result->fa_to_dot() . "\n");
+            printf($result->fa_to_dot() . "\n");
+            $result->remove_unreachable_states();
+           printf($result->fa_to_dot() . "\n");
+           var_dump($result->start_states());
+           var_dump($result->end_states());
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH);
-        } catch (Exception $e) {
-            $result = null;
-        }
+        //} catch (Exception $e) {
+          //  $result = null;
+        //}
         return $result;
     }
 
