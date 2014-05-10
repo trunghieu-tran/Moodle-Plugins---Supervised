@@ -264,7 +264,18 @@ class qtype_preg_fa_transition {
         // TODO
         // По идее нужно объединять set'ы параллельным образом: нулевой с нулевым, первый с первым и т.д.
         // И просто дописывать когда сеты в одном кончились, а в другом еще есть
-        $this->tagsets = array_values(array_merge($this->tagsets, $other->tagsets));
+        $cloneother = clone $other;
+        $clonethis = clone $this;
+        //var_dump($this->get_label_for_dot(0,1));
+        if ($other->consumeschars && $this->consumeschars) {
+            return array_values(array_merge($clonethis->tagsets, $cloneother->tagsets));
+        } else {
+            foreach ($cloneother->tagsets as &$set) {
+                        //$del->get_label_for_dot($del->from, $del->to);
+                $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
+            }
+            return array_merge($clonethis->tagsets, $cloneother->tagsets);
+        }
     }
 
     /**
@@ -278,10 +289,24 @@ class qtype_preg_fa_transition {
         $resulttran = null;
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
-            return new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
+
+            $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
+            if ($resulttran !== null) {
+                $resulttran->tagsets = $this->unite_tags($other);
+            }
+            return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
-            return new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
+            $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
+            if ($resulttran !== null) {
+                $resulttran->tagsets = $this->unite_tags($other);
+            }
+            return $resulttran;
+        }
+        var_dump($other->is_unmerged_assert() && !$other->consumeschars);
+        if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
+            || $other->is_unmerged_assert() && $other->consumeschars == false && (!$this->is_eps() && !$this->is_unmerged_assert())) {
+            return null;
         }
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
@@ -294,7 +319,7 @@ class qtype_preg_fa_transition {
             }
         }
         if ($resulttran !== null) {
-            $resulttran->unite_tags($other);
+            $resulttran->tagsets = $this->unite_tags($other);
         }
         return $resulttran;
     }
@@ -976,11 +1001,11 @@ class qtype_preg_fa {
                             ? $id
                             : $this->statenumbers[$id];
                 $tmp = '"' . $realnumber . '"';
-                if (in_array($id, $this->start_states())) {
+               /* if (in_array($id, $this->start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
                 } else if (in_array($id, $this->end_states())) {
                     $end .= "   {$tmp}[shape=doublecircle];\n";
-                }
+                }*/
 
                 $outgoing = $this->get_adjacent_transitions($id, true);
                 foreach ($outgoing as $transition) {
