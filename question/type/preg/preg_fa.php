@@ -267,12 +267,20 @@ class qtype_preg_fa_transition {
         $cloneother = clone $other;
         $clonethis = clone $this;
         //var_dump($this->get_label_for_dot(0,1));
+        // Normal intersection.
         if ($other->consumeschars && $this->consumeschars) {
             return array_values(array_merge($clonethis->tagsets, $cloneother->tagsets));
         } else {
-            foreach ($cloneother->tagsets as &$set) {
+            if ($this->consumeschars) {
+                foreach ($cloneother->tagsets as &$set) {
                         //$del->get_label_for_dot($del->from, $del->to);
-                $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
+                    $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
+                }
+            } else {
+                foreach ($clonethis->tagsets as &$set) {
+                        //$del->get_label_for_dot($del->from, $del->to);
+                    $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
+                }
             }
             return array_merge($clonethis->tagsets, $cloneother->tagsets);
         }
