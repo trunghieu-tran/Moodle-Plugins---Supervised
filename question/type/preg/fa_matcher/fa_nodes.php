@@ -447,23 +447,20 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
         }
 
+        self::intersect($borderstate, $automaton);
         
-        
+    }
+
+    protected static function intersect($borderstate, $automaton) {
         $charset = null;
         $charsetuncapturering = null;
         $uncapturing = array();
 
         $hasintersect = false;
+        // Uncapturing transitions are outgoing. 
         // If one transition doesn't consume chars intersect it with other.
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
-        /*foreach ($incoming as $tran) {
-            if (!$tran->consumeschars) {
-                $uncapturing[] = $tran;
-                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                    $charsetuncapturering = $tran;
-                }
-            }
-        }*/
+
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
         foreach ($outgoing as $tran) {
             printf($tran->get_label_for_dot($tran->from, $tran->to));
@@ -512,6 +509,55 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             }
         }
 
+        // Uncapturing transitions are incoming. 
+        // If one transition doesn't consume chars intersect it with other.
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($incoming as $tran) {
+            printf($tran->get_label_for_dot($tran->from, $tran->to));
+            if (!$tran->consumeschars) {
+                $uncapturing[] = $tran;
+                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    $charsetuncapturering = $tran;
+                }
+            }
+        }
+        //printf($automaton->fa_to_dot());
+        var_dump(count($uncapturing));
+        if (count($uncapturing) != 0) {
+
+            foreach ($uncapturing as $tran) {
+                
+                foreach ($outgoing as $outtran) {
+                    if ($outtran->consumeschars) {
+                        if ($outtran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                            $charset = $outtran;
+                        }
+                        $resulttran = $tran->intersect($outtran);
+                        if ($resulttran != NULL) {
+                            $hasintersect = true;
+                            $resulttran->from = $tran->from;
+                            $resulttran->to = $outtran->to;
+                            //$resulttran->consumeschars = true;
+                            $automaton->remove_transition($tran);
+                            $automaton->add_transition($resulttran);
+                            printf($automaton->fa_to_dot());
+                        } 
+                    }
+                    if (count($incoming) == count($uncapturing)) {
+                        $automaton->remove_transition($outtran);
+                    }
+                }
+            }
+            if (!$hasintersect && $charset != null && $charsetuncapturering != null) {                  
+                $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
+                $automaton->add_transition($unreachable);
+                foreach ($uncapturing as $tran) {
+                    $automaton->remove_transition($tran);
+                }
+            }
+        }
     }
 
     protected static function concatenate(&$automaton, &$stack, $count) {
