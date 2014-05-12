@@ -1056,7 +1056,7 @@ class qtype_preg_cross_tests_future {
                      'tests'=>array($test1, $test2));
     }
     
-    function data_for_test_assertions_wordboundary_19() {
+    /*function data_for_test_assertions_wordboundary_19() {
         $test1 = array( 'str'=>'a+',   
                         'is_match'=>true,
                         'full'=>true,
@@ -1087,7 +1087,7 @@ class qtype_preg_cross_tests_future {
 
         return array('regex'=>'[a!?]\b[c+]',
                      'tests'=>array($test1, $test2, $test3, $test4));
-    }
+    }*/
     
     function data_for_test_assertions_wordboundary_20() {
         $test1 = array( 'str'=>' a',   
@@ -1144,7 +1144,7 @@ class qtype_preg_cross_tests_future {
                         'index_first'=>array(0=>0, 1=>0, 2=>1),
                         'length'=>array(0=>1, 1=>1, 2=>1));
                         
-        $test9 = array( 'str'=>'a+',   
+        $test10 = array( 'str'=>'a+',   
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>0, 2=>1),
@@ -1293,7 +1293,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(at$|\Bat$)',
                      'tests'=>array($test1));
     }
-    
+
     function data_for_test_assertions_wordboundary_28() {
         $test1 = array( 'str'=>"\tcat",   
                         'is_match'=>true,
@@ -1311,7 +1311,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'\t\b(cat|dog)$',
                      'tests'=>array($test1, $test2));
     }
-    
+
     function data_for_test_assertions_wordboundary_29() {
         $test1 = array( 'str'=>"\tcat",   
                         'is_match'=>true,
@@ -1340,7 +1340,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'[a\t]\b([c!]at|[d?]og)$',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-    
+
     function data_for_test_assertions_wordboundary_30() {
         $test1 = array( 'str'=>"\tcat",   
                         'is_match'=>true,
@@ -1360,7 +1360,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'\t\b(cat|\tog)$',
                      'tests'=>array($test1, $test2));
     }
-    
+
     function data_for_test_assertions_wordboundary_31() {
         $test1 = array( 'str'=>"cat\t",   
                         'is_match'=>true,
@@ -1377,7 +1377,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(at\b|ow)\t',
                      'tests'=>array($test1, $test2));
     }
-    
+
     function data_for_test_assertions_wordboundary_32() {
         $test1 = array( 'str'=>"cat\t",   
                         'is_match'=>true,
@@ -1406,7 +1406,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(a[!t]\b|ow)[a\t]',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-    
+
     function data_for_test_assertions_wordboundary_33() {
         $test1 = array( 'str'=>"cat\t",   
                         'is_match'=>true,
@@ -1430,7 +1430,7 @@ class qtype_preg_cross_tests_future {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>2));
+                        'length'=>array(0=>3, 1=>2));
                         
         $test5 = array( 'str'=>'ca!',   
                         'is_match'=>true,
@@ -1441,7 +1441,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(a[!t]\b|ow)',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
-    
+
     function data_for_test_assertions_wordboundary_34() {
         $test1 = array( 'str'=>"cat\t",   
                         'is_match'=>true,
@@ -1458,7 +1458,7 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(at|ow)\b\t',
                      'tests'=>array($test1, $test2));
     }
-    
+
     function data_for_test_assertions_wordboundary_35() {
         $test1 = array( 'str'=>"cat\t",   
                         'is_match'=>true,
@@ -1480,20 +1480,22 @@ class qtype_preg_cross_tests_future {
                                                
         $test4 = array( 'str'=>'cowa',   
                         'is_match'=>true,
-                        'full'=>true,
+                        'full'=>false,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>4, 1=>2));
+                        'length'=>array(0=>3, 1=>2),
+                        'left'=>array(0=>1),
+                        'next'=>'\t');
    
         return array('regex'=>'c(a[!t]|ow)\b[a\t]',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
-    
+
     function data_for_test_assertions_wordboundary_36() {
         $test1 = array( 'str'=>'ab',   
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>1, 1=>1));
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>2, 1=>1));
                                                
         $test2 = array( 'str'=>'b',   
                         'is_match'=>true,
