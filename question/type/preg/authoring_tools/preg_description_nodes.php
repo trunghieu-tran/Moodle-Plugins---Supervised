@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http:// www.gnu.org/licenses/>.
 
 /**
- * Defines handler for generating description of reg exp
- * Also defines specific tree, containing methods for generating descriptions of current node
+ * Defines tree nodes specific for generating regex descriptions
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Pahomov Dmitry

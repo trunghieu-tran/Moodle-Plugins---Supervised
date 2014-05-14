@@ -1,6 +1,6 @@
 <?php
 /**
- * Create interactive tree, explain graph and description.
+ * Creates interactive tree, explaining graph and description.
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Terechov Grigory, Volgograd State Technical University

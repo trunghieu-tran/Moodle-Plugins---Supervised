@@ -779,11 +779,13 @@ class qtype_preg_fa {
                 }
             }
             if ($add && array_key_exists($subpatt, $startstates)) {
-                $result = array_merge($result, $startstates[$subpatt]);
+                foreach ($startstates[$subpatt] as $state) {
+                    $result[$state] = true;
+                }
             }
         }
         //print_r($result);
-        return array_values($result);
+        return array_keys($result);
     }
 
     /**

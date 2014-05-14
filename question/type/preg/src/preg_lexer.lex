@@ -123,6 +123,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $node->number = $number;
         }
     }
+
+    // Form the subexpr reference map.
+    foreach ($this->nodes_with_subexpr_refs as $node) {
+        if (!array_key_exists($node->number, $this->subexpr_refs_map)) {
+            $this->subexpr_refs_map[$node->number] = array();
+        }
+        $this->subexpr_refs_map[$node->number][] = $node;
+    }
+
 %eof}
 %{
     // Regex handling options set from the outside.
@@ -148,6 +157,9 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     // Array of nodes which have references to subexpressions: backreferences, conditional subexpressions, subexpression calls.
     protected $nodes_with_subexpr_refs = array();
+
+    // Array of subexpr references: subexpr number => array of reference nodes.
+    protected $subexpr_refs_map = array();
 
     // Stack containing additional information about subexpressions (options, current subexpression name, etc).
     protected $opt_stack = array();
@@ -294,6 +306,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     public function get_nodes_with_subexpr_refs() {
         return $this->nodes_with_subexpr_refs;
+    }
+
+    public function get_subexpr_refs_map() {
+        return $this->subexpr_refs_map;
     }
 
     public function set_options($options) {
@@ -999,11 +1015,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "{"[0-9]+","[0-9]+"}"{QUANTTYPE} {   // {n,m} Quantifier at least n, no more than m
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $lastchar = qtype_preg_unicode::substr($text, -1);
     $greedy = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greedy && !$lazy;
-    $greedy|| $textlen--;
+    $greedy || $textlen--;
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
@@ -1012,29 +1028,24 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "{"[0-9]+",}"{QUANTTYPE} {           // {n,}  Quantifier n or more
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greedy= $lastchar === '}';
+    $lastchar = qtype_preg_unicode::substr($text, -1);
+    $greedy = $lastchar === '}';
     $lazy = $lastchar === '?';
     $possessive = !$greedy&& !$lazy;
-    $greedy|| $textlen--;
+    $greedy || $textlen--;
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, true, $leftborder, null, $lazy, $greedy, $possessive);
 }
-<YYINITIAL> "{,"[0-9]+"}"{QUANTTYPE} {           // {,m}  Quantifier no more than m
+<YYINITIAL> "{"[0-9]+"}"{QUANTTYPE} {            // {n}    Quantifier exactly n
     $text = $this->yytext();
     $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greedy= ($lastchar === '}');
-    $lazy = !$greedy&& $lastchar === '?';
+    $lastchar = qtype_preg_unicode::substr($text, -1);
+    $greedy = $lastchar === '}';
+    $lazy = $lastchar === '?';
     $possessive = !$greedy&& !$lazy;
-    $greedy|| $textlen--;
-    $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    return $this->form_quant($text, false, 0, $rightborder, $lazy, $greedy, $possessive);
-}
-<YYINITIAL> "{"[0-9]+"}" {                       // {n}    Quantifier exactly n
-    $text = $this->yytext();
-    $count = (int)qtype_preg_unicode::substr($text, 1, $this->yylength() - 2);
-    return $this->form_quant($text, false, $count, $count, false, true, false);
+    $greedy || $textlen--;
+    $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
+    return $this->form_quant($text, false, $count, $count, $lazy, $greedy, $possessive);
 }
 
 

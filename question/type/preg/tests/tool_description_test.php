@@ -192,7 +192,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function quant_provider()
     {
         return array(
-          array('g{,1}','<span style="color:blue">g</span> may be missing','рус - TODO'),
+          array('g{0,1}','<span style="color:blue">g</span> may be missing','рус - TODO'),
           array('g+','<span style="color:blue">g</span> repeated any number of times','рус - TODO'),
           array('g*','<span style="color:blue">g</span> repeated any number of times or missing','рус - TODO'),
           array('g?','<span style="color:blue">g</span> may be missing','рус - TODO'),
