@@ -3542,7 +3542,7 @@ class qtype_preg_cross_tests_from_preg {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>7));
 
-        return array('regex'=>'abcd(?:[a-z]|[A-Z]){,10}Az',
+        return array('regex'=>'abcd(?:[a-z]|[A-Z]){0,10}Az',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
     }

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines classes relates with graph.
+ * Defines classes relating to explaining graph.
  *
  * @copyright &copy; 2012 Oleg Sychev, Volgograd State Technical University
  * @author Vladimir Ivanov, Volgograd State Technical University
@@ -131,6 +131,7 @@ class qtype_preg_explaining_graph_tool_link {
     public $owner = null;       // Subgraph which has this link.
     public $tooltip = '';       // Tooltip for link.
     public $color = 'black';    // Color of arrow.
+    public $id = -1;            // Id of link.
 
     public function __construct($lbl, $src, $dst, $ownr = null, $stl = 'normal') {
         $this->label = $lbl;
