@@ -394,7 +394,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                             $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
                             $this->links[] = new qtype_preg_explaining_graph_tool_link('', $leftneighbor, end($this->nodes), $this);
-                            $leftborder = end($leftneighbor->owner->nodes);    // Now left neighbor of assert is point.
+                            $leftborder = end($this->nodes);    // Now left neighbor of assert is point.
                         } else {
                             $leftborder = $leftneighbor;
                         }
