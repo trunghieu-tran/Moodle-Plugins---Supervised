@@ -675,12 +675,30 @@ M.preg_authoring_tools_script = (function ($) {
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
         rect_right_top_y = $('#' + rectangle).prop('offsetTop') - deltaY;
 
-        var areas = $(".edge, .node", "#"+img+" > svg > g");
+        var areas = $(".edge, .node, .cluster", "#"+img+" > svg > g");
         var figures = [];
         for (var i = 0; i < areas.length; ++i) {
             var nodeId = areas[i].id.split('_');
             if (nodeId.length != 4) continue;
-            var figure = $("ellipse, polygon", areas[i])[0];
+
+            var figure = null;
+            switch (areas[i].getAttribute('class')) {
+                case 'node':
+                    figure = $("ellipse, polygon", areas[i])[0];
+                    if (figure.length == 0) {
+                        figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    }
+                    break;
+                case 'edge':
+                    figure = $("path", areas[i])[0];
+                    var additionalFigure = $("polygon", areas[i])[0];
+                    break;
+                case 'cluster':
+                    figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    break;
+                default:
+                    continue;
+            }
 
             if (figure.tagName == "ellipse") {
                 var nodeCoords = [
@@ -694,6 +712,26 @@ M.preg_authoring_tools_script = (function ($) {
                         y : figure.points.getItem(j).y
                     });
                 }
+            } else if (figure.tagName == "path") {
+                var nodeCoords = [];
+                var pathInfo = figure.getAttribute('d');
+                var delimIndex = pathInfo.indexOf('C');
+                var biginCoordsStr = pathInfo.substring(1, delimIndex).split(',');
+                var biginCoords = {x: parseFloat(biginCoordsStr[0]), y: parseFloat(biginCoordsStr[1])};
+                var pathCoordsStr = pathInfo.substring(delimIndex+1).split(' ');
+                for (var j = 0; j < pathCoordsStr.length; ++j) {
+                    var pairStr = pathCoordsStr[j].split(',');
+                    nodeCoords.push({
+                        x : parseFloat(pairStr[0]),
+                        y : parseFloat(pairStr[1])
+                    });
+                }
+
+                nodeCoords = nodeCoords.filter(function (item) {
+                    var maxX = additionalFigure.points.getItem(1).x;
+                    var pathLength = maxX - biginCoords.x;
+                    return item.x < (maxX - pathLength*0.15) && item.x > (biginCoords.x + pathLength*0.15);
+                });
             } else {
                 continue;
             }
@@ -718,14 +756,32 @@ M.preg_authoring_tools_script = (function ($) {
         rect_left_bot_y = $('#' + rectangle).prop('offsetTop') + $('#' + rectangle).prop('offsetHeight') - deltaY;
         rect_right_top_x = $('#' + rectangle).prop('offsetLeft') + $('#'  + rectangle).prop('offsetWidth') + deltaX;
         rect_right_top_y = $('#' + rectangle).prop('offsetTop') - deltaY;
-        var areas = $(".edge, .node", "#"+img+" > svg > g");
+        var areas = $(".edge, .node, .cluster", "#"+img+" > svg > g");
         var indfirst = 999;
         var indlast = -999;
         // check all areas and select indfirst and indlast
         for (var i = 0; i < areas.length; ++i) {
             var nodeId = areas[i].id.split('_');
             if (nodeId.length != 4) continue;
-            var figure = $("ellipse, polygon", areas[i])[0];
+
+            var figure = null;
+            switch (areas[i].getAttribute('class')) {
+                case 'node':
+                    figure = $("ellipse, polygon", areas[i])[0];
+                    if (figure.length == 0) {
+                        figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    }
+                    break;
+                case 'edge':
+                    figure = $("path", areas[i])[0];
+                    var additionalFigure = $("polygon", areas[i])[0];
+                    break;
+                case 'cluster':
+                    figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    break;
+                default:
+                    continue;
+            }
 
             if (figure.tagName == "ellipse") {
                 var nodeCoords = [
@@ -739,6 +795,26 @@ M.preg_authoring_tools_script = (function ($) {
                         y : figure.points.getItem(j).y
                     });
                 }
+            } else if (figure.tagName == "path") {
+                var nodeCoords = [];
+                var pathInfo = figure.getAttribute('d');
+                var delimIndex = pathInfo.indexOf('C');
+                var biginCoordsStr = pathInfo.substring(1, delimIndex).split(',');
+                var biginCoords = {x: parseFloat(biginCoordsStr[0]), y: parseFloat(biginCoordsStr[1])};
+                var pathCoordsStr = pathInfo.substring(delimIndex+1).split(' ');
+                for (var j = 0; j < pathCoordsStr.length; ++j) {
+                    var pairStr = pathCoordsStr[j].split(',');
+                    nodeCoords.push({
+                        x : parseFloat(pairStr[0]),
+                        y : parseFloat(pairStr[1])
+                    });
+                }
+
+                nodeCoords = nodeCoords.filter(function (item) {
+                    var maxX = additionalFigure.points.getItem(1).x;
+                    var pathLength = maxX - biginCoords.x;
+                    return item.x < (maxX - pathLength*0.15) && item.x > (biginCoords.x + pathLength*0.15);
+                });
             } else {
                 continue;
             }
@@ -758,7 +834,7 @@ M.preg_authoring_tools_script = (function ($) {
             }
         }
 
-        if (parseInt(indfirst) > parseInt(indlast)) {
+        if (parseInt(indfirst) == 999 || parseInt(indlast) == -999) {
             indfirst = indlast = -2;
         }
         return {
