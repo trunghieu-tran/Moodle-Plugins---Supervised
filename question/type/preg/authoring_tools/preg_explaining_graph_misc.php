@@ -645,7 +645,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $instr .= 'color=' . $gr->color . ';';
         $instr .= 'bgcolor=' . $gr->bgcolor . ';';
         $instr .= 'label="' . $gr->label . '";';
-        $instr .= 'id="' . $gr->id . '";';
+        $instr .= 'id="graphid_' . $gr->id . '";';
         $instr .= 'tooltip="' . $gr->tooltip . '";';
         $instr .= $gr->edge;
         $instr .= $gr->node;

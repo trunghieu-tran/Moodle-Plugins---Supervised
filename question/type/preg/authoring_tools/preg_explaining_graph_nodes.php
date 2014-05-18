@@ -152,6 +152,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
 
         if ($this->is_selected()) {
             $graph->color = 'darkgreen';
+            $graph->tooltip = "selection";
             $graph->isselection = true;
 
             $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
@@ -424,6 +425,7 @@ abstract class qtype_preg_explaining_graph_operator extends qtype_preg_explainin
             $marking->isselection = true;
             $marking->style = 'solid';
             $marking->color = 'darkgreen';
+            $marking->tooltip = "selection";
             $marking->assume_subgraph($graph);
             $graph->nodes = array();
             $graph->links = array();
@@ -450,8 +452,8 @@ class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_grap
             $right = $this->operands[$i]->create_graph();
             $graph->assume_subgraph($right);
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $graph);
-            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . '_' .
-                $this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
+            $graph->links[count($graph->links)-1]->id = $this->pregnode->id;// . '_' .
+                //$this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
             $graph->links[count($graph->links)-1]->tooltip = 'concatenation';
 
             if ($i != $n-1) {
@@ -481,7 +483,9 @@ class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_o
             $graph->assume_subgraph($newoperand);
 
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left, $newoperand->entries[count($newoperand->entries)-1], $graph);
+            $graph->links[count($graph->links)-1]->tooltip = 'alternative';
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $newoperand->exits[count($newoperand->exits)-1], $right, $graph);
+            $graph->links[count($graph->links)-1]->tooltip = 'alternative';
         }
 
         $graph->nodes[] = $left;
