@@ -700,11 +700,11 @@ M.preg_authoring_tools_script = (function ($) {
                     continue;
             }
 
-            if (figure.tagName == "ellipse") {
+            if ($(figure).is("ellipse")) {
                 var nodeCoords = [
                     { x: figure.cx.baseVal.value, y : figure.cy.baseVal.value }
                 ];
-            } else if (figure.tagName == "polygon") {
+            } else if ($(figure).is("polygon")) {
                 var nodeCoords = [];
                 for (var j = 0; j < figure.points.numberOfItems; ++j) {
                     nodeCoords.push({
@@ -712,7 +712,7 @@ M.preg_authoring_tools_script = (function ($) {
                         y : figure.points.getItem(j).y
                     });
                 }
-            } else if (figure.tagName == "path") {
+            } else if ($(figure).is("path")) {
                 var nodeCoords = [];
                 var pathInfo = figure.getAttribute('d');
                 var delimIndex = pathInfo.indexOf('C');
@@ -783,11 +783,11 @@ M.preg_authoring_tools_script = (function ($) {
                     continue;
             }
 
-            if (figure.tagName == "ellipse") {
+            if ($(figure).is("ellipse")) {
                 var nodeCoords = [
                     { x: figure.cx.baseVal.value, y : figure.cy.baseVal.value }
                 ];
-            } else if (figure.tagName == "polygon") {
+            } else if ($(figure).is("polygon")) {
                 var nodeCoords = [];
                 for (var j = 0; j < figure.points.numberOfItems; ++j) {
                     nodeCoords.push({
@@ -795,7 +795,7 @@ M.preg_authoring_tools_script = (function ($) {
                         y : figure.points.getItem(j).y
                     });
                 }
-            } else if (figure.tagName == "path") {
+            } else if ($(figure).is("path")) {
                 var nodeCoords = [];
                 var pathInfo = figure.getAttribute('d');
                 var delimIndex = pathInfo.indexOf('C');
