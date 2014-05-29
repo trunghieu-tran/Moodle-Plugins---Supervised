@@ -243,4 +243,54 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
             return $json;
         }
     }
+
+    public function check_dot_version() {
+        global $CFG;
+
+        if (empty($CFG->pathtodot)) {
+            throw new qtype_preg_pathtodot_empty('');
+        }
+
+        $cmd = escapeshellarg($CFG->pathtodot) . ' -V';
+
+        $descriptorspec = array(0 => array('pipe', 'r'),  // Stdin is a pipe that the child will read from.
+            1 => array('pipe', 'w'),  // Stdout is a pipe that the child will write to.
+            2 => array('pipe', 'w')); // Stderr is a pipe that the child will write to.
+
+        $process = proc_open($cmd, $descriptorspec, $pipes);
+        $output = '';
+        if (is_resource($process)) {
+            $output = stream_get_contents($pipes[1]);
+            $err = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            proc_close($process);
+
+            if (!empty($err)) {
+                if (!qtype_poasquestion::is_dot_available()) {
+                    throw new qtype_preg_pathtodot_incorrect('', $CFG->pathtodot);
+                } else {
+                    throw new qtype_preg_dot_error('');
+                }
+            }
+        }
+
+        $matches = array();
+        $status = preg_match(
+            'dot\s-\sgraphviz\sversion\s(\d+)\.(\d+)\.(\d+)\s\(.+\)',
+            $output,
+            $matches
+        );
+
+        if ($status === 1) {
+            if ((int)$matches[0] < 2 && (int)$matches[1] < 36 && (int)$matches[2] < 0) {
+                return FALSE;
+            } else {
+                return TRUE;
+            }
+        } else {
+            throw new qtype_preg_dot_error('Invalid graphviz version.');
+        }
+    }
 }
