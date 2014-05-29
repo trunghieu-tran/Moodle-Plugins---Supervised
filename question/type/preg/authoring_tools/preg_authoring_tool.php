@@ -244,7 +244,7 @@ abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_t
         }
     }
 
-    public function check_dot_version() {
+    public static function check_dot_version() {
         global $CFG;
 
         if (empty($CFG->pathtodot)) {
