@@ -695,6 +695,9 @@ M.preg_authoring_tools_script = (function ($) {
                     break;
                 case 'cluster':
                     figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    if (figure === undefined) {
+                        figure = $("polygon", "#"+areas[i].id+" > a")[0];
+                    }
                     break;
                 default:
                     continue;
@@ -778,6 +781,9 @@ M.preg_authoring_tools_script = (function ($) {
                     break;
                 case 'cluster':
                     figure = $("polygon", "#"+areas[i].id+" > g > a")[0];
+                    if (figure === undefined) {
+                        figure = $("polygon", "#"+areas[i].id+" > a")[0];
+                    }
                     break;
                 default:
                     continue;

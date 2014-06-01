@@ -56,7 +56,6 @@ $string['nosubexprcapturing'] = '{$a} engine doesn\'t support subpattern capturi
 $string['objectname'] = 'question';
 $string['pathtodotempty'] = 'Can\'t draw {$a->name}: path to dot of graphviz is empty. Please ask your administrator to install <a href="http://www.graphviz.com">graphviz</a> and specify path to it using the \'pathtodot\' option at Administration > Server > System Paths';
 $string['pathtodotincorrect'] = 'Can\'t draw {$a->name}: path to dot of graphviz is incorrect or dot can not be executed. Please ask your administrator to check if <a href="http://www.graphviz.com">graphviz</a> is installed and \'pathtodot\' option is correct at Administration > Server > System Paths';
-$string['dotversionisincorrect'] = 'Invalid graphviz version. Please install 2.36 version of graphviz or greater.';
 $string['pluginname'] = 'Regular expression';
 $string['pluginname_help'] = '<p>Regular expressions are a form of writing patterns to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match a part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p><p>This question uses the PHP perl-compatible regular expression syntax as the default notation. There are many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression here: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p><p>You can also use this question as the advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions! Just select <b>Moodle shortanswer</b> as notation for your questions.</p>';
 $string['php_preg_matcher'] = 'PHP preg extension';
@@ -703,3 +702,6 @@ $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
 $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';
+$string['explain_true'] = 'true';
+$string['explain_false'] = 'false';
+
