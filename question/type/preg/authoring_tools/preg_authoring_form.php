@@ -18,7 +18,6 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
-require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_authoring_tool.php');
 
 class qtype_preg_authoring_form extends moodleform {
 
@@ -122,19 +121,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addHelpButton('regex_graph_header', 'explaining_graph_tool', 'qtype_preg');
 
         $graphselectionarray = array();
-        try {
-            if(qtype_preg_dotbased_authoring_tool::check_dot_version() === TRUE) {
-                $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-            } else {
-                $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode_error', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg') . '<br />' . get_string('dotversionisincorrect', 'qtype_preg'), '', null);
-            }
-        } catch(qtype_preg_pathtodot_incorrect $e) { // maybe this redundant?..
-            $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode_error', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        } catch(qtype_preg_pathtodot_empty $e) { // ...and this?
-            $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode_error', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
-        } catch(qtype_preg_dot_error $e) {
-            $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode_error', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg') . '<br />' . get_string('dotversionisincorrect', 'qtype_preg'), '', null);
-        }
+        $graphselectionarray[] =& $mform->createElement('checkbox', 'graph_selection_mode', '', get_string('authoring_form_rect_selection_mode', 'qtype_preg'), '', null);
         //$graphselectionarray[] =& $mform->createElement('button', 'graph_send_select', get_string('authoring_form_rect_selection_select', 'qtype_preg'));
         $mform->addGroup($graphselectionarray, 'graph_selection', '', array(' '), false);
 
