@@ -238,7 +238,32 @@ class block_formal_langs_ast_node_base {
         return $this->number;
     }
 
+    /**
+     * Returns position for tokem or a position for most left position
+     * @return block_formal_langs_node_position
+     */
     public function position() {
+        if ($this->position == null) {
+            if (count($this->childs())) {
+                $children = $this->childs();
+                /** @var block_formal_langs_ast_node_base $firstchild */
+                $firstchild = $children[0];
+                /** @var block_formal_langs_ast_node_base $lastchild */
+                $lastchild  = $children[count($children) - 1];
+                $firstchildpos = $firstchild->position();
+                $lastchildpos = $lastchild->position();
+                $this->position = new block_formal_langs_node_position(
+                    $firstchildpos->linestart(),
+                    $lastchildpos->lineend(),
+                    $firstchildpos->colstart(),
+                    $lastchildpos->colend(),
+                    $firstchildpos->stringstart(),
+                    $lastchildpos->stringend()
+                );
+            } else {
+                $this->position = new block_formal_langs_node_position( 0, 0, 0, 0, 0, 0);
+            }
+        }
         return $this->position;
     }
 
@@ -276,6 +301,27 @@ class block_formal_langs_ast_node_base {
             return true;
         }
         return false;
+    }
+	
+	/**
+     * Returns value for node
+     * @return string value for text of node
+     */
+    public function value() {
+        $values = array();
+        foreach($this->childs() as $child) {
+            /** @var block_formal_langs_ast_node_base $child */
+            $data = $child->value();
+            if ($data != null) {
+                if (is_object($data)) {
+                    /** @var qtype_poasquestion_string $data */
+                    $data = $data->string();
+                }
+                $values[] = $data;
+            }
+        }
+
+        return implode(' ', $values);
     }
 }
 
@@ -1039,21 +1085,70 @@ class block_formal_langs_processed_string {
             return $this->tokenstream->tokens;
         }
     }
+	
+	/**
+     * Returns node by number
+     * @param $nodenumber
+     * @param array|block_formal_langs_ast_node_base $root a root node
+     * @return null|block_formal_langs_ast_node_base
+     */
+    public function find_node($nodenumber, $root = array()) {
+        if (is_array($root) && count($root) == 0) {
+            $result = null;
+            $tree = $this->get_syntax_tree();
+            foreach($tree as $v) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $v);
+                }
+            }
+            return $result;
+        }
+
+        if ($root->number() == $nodenumber) {
+            return $root;
+        }
+        $children = $root->childs();
+        $result = null;
+        foreach($children as $child) {
+            if ($result == null) {
+                $result = $this->find_node($nodenumber, $child);
+            }
+        }
+        return $result;
+    }
 
     /**
      * Returns description string for passed node.
      *
-     * @param $nodenumber number of node
-     * @param $quotevalue should the value be quoted if description is absent; no position on this one
-     * @param $at whether include position if token description is absent
+     * @param int $nodenumber number of node
+     * @param boolean $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param boolean $at whether include position if token description is absent
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         $result = '';
         if ($this->has_description($nodenumber)) {
             return $this->descriptions[$nodenumber];
         } else {
-            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            $tokens = $this->tokenstream->tokens;
+            /** @var block_formal_langs_node_position $pos */
+            $pos = null;
+            /** @var null|qtype_poasquestion_string $value */
+            $value = null;
+            if (array_key_exists($nodenumber, $tokens)) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $tokens[$nodenumber];
+                $value = $token->value();
+                $pos = $token->position();
+            } else {
+                $node = $this->find_node($nodenumber, array());
+                if ($node == null) {
+                    return '';
+                }
+                $value = $node->value();
+                $pos = $node->position();
+            }
             if (!is_string($value)) {
                 $value = $value->string();
             }
@@ -1062,7 +1157,6 @@ class block_formal_langs_processed_string {
             } else if ($at) {// Should return position information.
                 $a = new stdClass();
                 $a->value = $value;
-                $pos = $this->tokenstream->tokens[$nodenumber]->position();
                 $a->column = $pos->colstart();
                 if ($this->single_line_string()) {
                     return get_string('quoteatsingleline', 'block_formal_langs', $a);
@@ -1070,7 +1164,7 @@ class block_formal_langs_processed_string {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {// Just quote.
+            } else {//Just quote 
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
