@@ -360,6 +360,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
+	public function number() {
+        if ($this->number === null) {
+            $this->number = $this->tokenindex;
+        }
+        return $this->number;
+    }
+	
     public function value() {
         return $this->value;
     }
@@ -1133,7 +1140,7 @@ class block_formal_langs_processed_string {
         if (count($arraytobescanned)) {
             foreach($arraytobescanned as $node) {
                 $tmp = $this->tree_to_list($node);
-                if (count($result)) {
+                if (count($result) == 0) {
                     $result = $tmp;
                 } else {
                     $result = array_merge($result, $tmp);
