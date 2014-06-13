@@ -1116,6 +1116,48 @@ class block_formal_langs_processed_string {
         }
         return $result;
     }
+	
+	/**
+     * Returns tree, converted to list and sorted by number
+     * @param null|block_formal_langs_ast_node_base $root a root node
+     * @return array array of nodes, sorted by number
+     */
+    public function tree_to_list($root = null) {
+        $result = array();
+        if ($root == null) {
+            $arraytobescanned = $this->get_syntax_tree();
+        } else {
+            $result = array( $root );
+            $arraytobescanned = $root->childs();
+        }
+        if (count($arraytobescanned)) {
+            foreach($arraytobescanned as $node) {
+                $tmp = $this->tree_to_list($node);
+                if (count($result)) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+
+        if (count($result)) {
+            /**
+             * Comparator for sorting all of nodes
+             * @param  block_formal_langs_ast_node_base $a
+             * @param  block_formal_langs_ast_node_base $b
+             * @return int
+             */
+            $cmp = function($a, $b) {
+                if ($a->number() == $b->number()) {
+                    return 0;
+                }
+                return ($a->number() < $b->number()) ? -1 : 1;
+            };
+            usort($result, $cmp);
+        }
+        return $result;
+    }
 
     /**
      * Returns description string for passed node.
