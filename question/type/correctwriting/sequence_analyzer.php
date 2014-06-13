@@ -346,6 +346,9 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
     public function matches_to_mistakes($pair,$weights) {
         $answer = &$this->basestringpair->correctstring()->stream->tokens;
         $response = &$this->basestringpair->correctedstring()->stream->tokens;
+        $pair->addedlexemesindexes = array();
+        $pair->skippedlexemesindexes = array();
+        $pair->movedlexemesindexes = array();
         $lcs = $pair->lcs();
         // Determines, whether answer tokens are used in mistake computation
         $answerused = array();
@@ -401,12 +404,14 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
                     $mistake = $this->create_moved_mistake($pair, $i, $movedpos);
+                    $pair->movedlexemesindexes[$j] = $i;
                     $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->movedweight;
                     $result[] = $mistake;
                     $counts->moved  = $counts->moved + 1;
                 } else {
                     $mistake = $this->create_absent_mistake($pair, $i);
+                    $pair->skippedlexemesindexes[] = $i;
                     $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->absentweight;
                     $result[] = $mistake;
@@ -418,6 +423,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
         //Determine added lexemes from reponse
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
+                $pair->addedlexemesindexes[] = $i;
                 $mistake = $this->create_added_mistake($pair, $i);
                 $result[] = $mistake;
                 $mistake->set_lcs($lcs);
