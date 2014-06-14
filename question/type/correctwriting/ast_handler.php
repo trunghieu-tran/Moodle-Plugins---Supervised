@@ -151,6 +151,9 @@ class qtype_correctwriting_marked_tree_remarker extends qtype_correctwriting_ast
      * @return mixed
      */
     public function visit($node) {
+        if ($node->marker !== null) {
+            return;
+        }
         $children = $this->children($node);
         if (count($children)) {
             $marker = null;
@@ -159,12 +162,13 @@ class qtype_correctwriting_marked_tree_remarker extends qtype_correctwriting_ast
             foreach($children as $child) {
                 if ($first) {
                     $marker = $child->marker;
+                    $first = false;
                 } else {
-                    $allmarkersequal = $allmarkersequal && ($children->marker == $marker && $marker !== null);
+                    $allmarkersequal = $allmarkersequal && ($child->marker == $marker && $marker !== null);
                 }
             }
 
-            if ($allmarkersequal) {
+            if ($allmarkersequal && $marker != NULL) {
                 $node->marker = $marker;
                 $this->changed = true;
             } else {

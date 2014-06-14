@@ -35,7 +35,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
-
+require_once($CFG->dirroot.'/question/type/correctwriting/ast_handler.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/syntax_mistakes.php');
 
 class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract_analyzer {
 
@@ -142,8 +143,39 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
             }
         }
 
+        // Find nodes for correct string
+        $tree = $result->correctstring()->syntaxtree;
+        $builder = new qtype_correctwriting_marked_tree_builder($tree);
+        $builder->markers = array(
+            'skipped' => $skippedlexemegroups,
+            'moved' => $movedlexemegroups
+        );
+        $builder->visit_array($tree);
+        $markedtree = $builder->tree;
 
+        $marker = new qtype_correctwriting_marked_tree_remarker();
+        $marker->mark_tree($markedtree);
 
+        $findnodes = new qtype_correctwriting_find_top_marked_nodes();
+        $findnodes->visit_array($markedtree);
+
+        $correctmistakenodes = $findnodes->result;
+
+        // Find nodes for added string
+        $tree = $result->correctedstring()->syntaxtree;
+        $builder = new qtype_correctwriting_marked_tree_builder($tree);
+        $builder->markers = array(
+            'added' => $addedlexemegroups,
+        );
+        $builder->visit_array($tree);
+        $markedtree = $builder->tree;
+
+        $marker = new qtype_correctwriting_marked_tree_remarker();
+        $marker->mark_tree($markedtree);
+
+        $findnodes = new qtype_correctwriting_find_top_marked_nodes();
+        $findnodes->visit_array($markedtree);
+        $correctedmistakenodes = $findnodes->result;
 
         // Erase sequence errors
         $mistakes = $result->mistakes();
@@ -153,14 +185,50 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
                     unset($mistakes[$key]);
                 }
             }
-            $result->set_mistakes($mistakes);
+            $mistakes = array_values($mistakes);
         }
 
-        // Convert found mistake to a found data
+        // Convert found mistakes to a data
+        $weights = new stdClass;
+        $weights->movedweight = $this->question->movedmistakeweight;
+        $weights->absentweight = $this->question->absentmistakeweight;
+        $weights->addedweight = $this->question->addedmistakeweight;
+        for($i = 0; $i < count($correctmistakenodes); $i++) {
+            /**
+             * @var stdClass $node
+             * @var block_formal_langs_ast_node_base $item
+             */
+            $node = $correctmistakenodes[$i];
+            $item = $node->item;
+            $mistake = null;
+            if ($node->marker[0] == 'skipped') {
+                $mistake = new qtype_correctwriting_node_absent_mistake($result->correctstring()->language, $result, $item->number());
+                $mistake->weight = $weights->absentweight;
+            }
+            if ($node->marker[0] == 'moved') {
+                $mistake = new qtype_correctwriting_node_moved_mistake($result->correctstring()->language, $result, $item->number());
+                $mistake->weight = $weights->movedweight;
+            }
+            $mistake->source = get_class($this);
+            $mistakes[] = $mistake;
+        }
 
+        for($i = 0; $i < count($correctedmistakenodes); $i++) {
+            /**
+             * @var stdClass $node
+             * @var block_formal_langs_ast_node_base $item
+             */
+            $node = $correctedmistakenodes[$i];
+            $item = $node->item;
+            $mistake = new qtype_correctwriting_node_added_mistake($result->correctstring()->language, $result, $item->number());
+            $mistake->source = get_class($this);
+            $mistakes[] = $mistake;
+        }
+
+
+        $result->set_mistakes($mistakes);
         // Return value
         $this->resultstringpairs[] = $result;
-
     }
 
 
@@ -174,6 +242,13 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
         $this->resultstringpairs[] = clone $this->basestringpair; //Clone string pair for future use.
     }
 
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_syntax_mistake';
+    }
 
     /**
      * Lexical analyzer does not have any hints, currently
