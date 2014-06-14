@@ -202,11 +202,11 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
             $item = $node->item;
             $mistake = null;
             if ($node->marker[0] == 'skipped') {
-                $mistake = new qtype_correctwriting_node_absent_mistake($result->correctstring()->language, $result, $item->number());
+                $mistake = new qtype_correctwriting_node_absent_mistake($result->correctstring()->language, $result, $node->item);
                 $mistake->weight = $weights->absentweight;
             }
             if ($node->marker[0] == 'moved') {
-                $mistake = new qtype_correctwriting_node_moved_mistake($result->correctstring()->language, $result, $item->number());
+                $mistake = new qtype_correctwriting_node_moved_mistake($result->correctstring()->language, $result, $node->item);
                 $mistake->weight = $weights->movedweight;
             }
             $mistake->source = get_class($this);
@@ -220,7 +220,7 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
              */
             $node = $correctedmistakenodes[$i];
             $item = $node->item;
-            $mistake = new qtype_correctwriting_node_added_mistake($result->correctstring()->language, $result, $item->number());
+            $mistake = new qtype_correctwriting_node_added_mistake($result->correctstring()->language, $result, $node->item);
             $mistake->source = get_class($this);
             $mistakes[] = $mistake;
         }
