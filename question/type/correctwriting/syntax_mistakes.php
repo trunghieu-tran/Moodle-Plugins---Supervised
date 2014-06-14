@@ -29,7 +29,29 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 
 // A marker class to indicate errors from syntax_analyzer.
 abstract class qtype_correctwriting_syntax_mistake extends qtype_correctwriting_response_mistake {
+    /**
+     * A error node for mistake
+     * @var block_formal_langs_ast_node_base
+     */
+    protected $node;
 
+    /**
+     * Converts tokens to indexes, sorting them descending
+     * @param array $tokens
+     * @return indexes
+     */
+    protected  function tokens_to_indexes($tokens) {
+        $result = array();
+        for($i = 0; $i < count($tokens); $i++) {
+            /** @var block_formal_langs_token_base $token */
+            $token = $tokens[$i];
+            $result[] = $token->number();
+        }
+        if (count($result)) {
+            sort($result);
+        }
+        return $result;
+    }
 }
 
 
@@ -39,20 +61,26 @@ class qtype_correctwriting_node_moved_mistake extends qtype_correctwriting_synta
     /**
      * Constructs a new error, filling it with constant message.
      * @param object $language      a language object
-     * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
-     * @param int    $answerindex   index of answer token
+     * @param qtype_correctwriting_string_pair  $stringpair  a string pair with information about strings
+     * @param block_formal_langs_ast_node_base   $node   node to be used
      */
-    public function __construct($language, $stringpair, $answerindex) {
+    public function __construct($language, $stringpair, $node) {
         $this->languagename = $language->name();
 
+        $this->node = $node;
         $this->stringpair = $stringpair;
-        $this->position = $this->stringpair->correctstring()->find_node($answerindex)->position();
+        $this->position = $node->position();
         $this->mistakemsg = null;
+        $lexemes = array_flip($stringpair->movedlexemesindexes);
+
         // Fill answer data.
-        $this->answermistaken = array();
-        $this->answermistaken[] = $answerindex;
+        $this->answermistaken = $this->tokens_to_indexes($node->tokens_list());
         // Fill response data.
         $this->responsemistaken = array();
+        foreach($this->answermistaken as $index) {
+            $this->responsemistaken[] = $lexemes[$index];
+        }
+        sort($this->responsemistaken);
     }
 
     /**
@@ -61,7 +89,7 @@ class qtype_correctwriting_node_moved_mistake extends qtype_correctwriting_synta
     public function get_mistake_message() {
         if ($this->mistakemsg === null) {
             // Create a mistake message.
-            $a = $this->token_description($this->answermistaken[0], true, true);
+            $a = $this->token_description($this->node->number(), true, true);
             $this->mistakemsg = get_string('movedmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
@@ -71,7 +99,7 @@ class qtype_correctwriting_node_moved_mistake extends qtype_correctwriting_synta
      * Returns a key, uniquely identifying mistake.
      */
     public function mistake_key() {
-        return 'moved_node_'.$this->answermistaken[0];// 'movedtoken_' is better, but too long for question_attempt_step_data name column (32).
+        return 'moved_node_'.implode(' ', $this->answermistaken);// 'movedtoken_' is better, but too long for question_attempt_step_data name column (32).
     }
 
 }
@@ -83,23 +111,20 @@ class qtype_correctwriting_node_added_mistake extends qtype_correctwriting_synta
      * Constructs a new error, filling it with constant message.
      * @param object $language      a language object
      * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
-     * @param int    $responseindex index of response token
+     * @param block_formal_langs_ast_node_base $node
      */
-    public function __construct($language, $stringpair, $responseindex) {
+    public function __construct($language, $stringpair, $node) {
         $this->languagename = $language->name();
         $this->stringpair = $stringpair;
-        $this->position = $this->stringpair->correctedstring()->find_node($responseindex)->position();
+        $this->node = $node;
+        $this->position = $node->position();
         // Fill answer data.
         $this->answermistaken = array();
         // Fill response data.
-        $this->responsemistaken = array($responseindex);
-
-        // Find, if such token exists in answer (to call it extraneous) or not (to write that it should not be there).
-        $responsemistaken =  $stringpair->correctedstring()->find_node($responseindex);
-
+        $this->responsemistaken = $this->tokens_to_indexes($node->tokens_list());
 
         // Create a mistake message.
-        $data = $responsemistaken->value();
+        $data = $node->value();
         if (!is_string($data)) {
             $data = $data->string();
         }
@@ -108,7 +133,7 @@ class qtype_correctwriting_node_added_mistake extends qtype_correctwriting_synta
     }
 
     public function mistake_key() {
-        return 'added_node_'.$this->responsemistaken[0];// 'addedtoken_' is better, but too long for question_attempt_step_data name column (32).
+        return 'added_node_'.implode(' ', $this->responsemistaken[0]);// 'addedtoken_' is better, but too long for question_attempt_step_data name column (32).
     }
 }
 
@@ -120,17 +145,17 @@ class qtype_correctwriting_node_absent_mistake extends qtype_correctwriting_synt
      * Constructs a new error, filling it with constant message.
      * @param object $language      a language object
      * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
-     * @param int    $answerindex   index of answer token
+     * @param block_formal_langs_ast_node_base $node node data
      */
-    public function __construct($language, $stringpair, $answerindex) {
+    public function __construct($language, $stringpair, $node) {
+        $this->node = $node;
         $this->languagename = $language->name();
 
         $this->stringpair = $stringpair;
 
-        $this->position = $this->stringpair->correctstring()->find_node($answerindex)->position();
+        $this->position = $node->position();
         // Fill answer data.
-        $this->answermistaken=array();
-        $this->answermistaken[] = $answerindex;
+        $this->answermistaken = $this->tokens_to_indexes($node->tokens_list());
         // Fill response data.
         $this->responsemistaken = array();
 
@@ -143,14 +168,14 @@ class qtype_correctwriting_node_absent_mistake extends qtype_correctwriting_synt
     public function get_mistake_message() {
         if ($this->mistakemsg == null) {
             // Create a mistake message.
-            $a = $this->token_description($this->answermistaken[0]);
+            $a = $this->token_description($this->node->number());
             $this->mistakemsg = get_string('absentmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
     }
 
     public function mistake_key() {
-        return 'absent_node_'.$this->answermistaken[0];// 'absenttoken_' is better, but too long for question_attempt_step_data name column (32).
+        return 'absent_node_'.implode(' ', $this->answermistaken[0]);// 'absenttoken_' is better, but too long for question_attempt_step_data name column (32).
     }
 
 }
