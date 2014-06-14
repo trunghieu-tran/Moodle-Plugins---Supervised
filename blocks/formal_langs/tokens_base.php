@@ -1116,11 +1116,13 @@ class block_formal_langs_processed_string {
         }
         $children = $root->childs();
         $result = null;
-        foreach($children as $child) {
-            if ($result == null) {
-                $result = $this->find_node($nodenumber, $child);
+		if (count($children)) {
+            foreach($children as $child) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $child);
+                }
             }
-        }
+		}
         return $result;
     }
 	
