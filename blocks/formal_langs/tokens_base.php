@@ -323,6 +323,29 @@ class block_formal_langs_ast_node_base {
 
         return implode(' ', $values);
     }
+	
+	/**
+     * Returns list of tokens, covered by AST node. Tokens determined as not having any children
+     * @return array list of tokens
+     */
+    public function tokens_list() {
+        $childcount = count($this->childs());
+        $result = array();
+        if (count($childcount) == 0) {
+            $result[] = $this;
+        } else {
+            /** @var block_formal_langs_ast_node_base $child */
+            foreach($this->childs() as $child) {
+                $tmp = $child->tokens_list();
+                if (count($result) == 0) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+        return $result;
+    }
 }
 
 /**
