@@ -404,7 +404,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
                     $mistake = $this->create_moved_mistake($pair, $i, $movedpos);
-                    $pair->movedlexemesindexes[$j] = $i;
+                    $pair->movedlexemesindexes[$movedpos] = $i;
                     $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->movedweight;
                     $result[] = $mistake;
