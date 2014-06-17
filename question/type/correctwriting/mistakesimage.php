@@ -786,7 +786,11 @@ class qtype_correctwriting_arrow_builder {
                            $rects[] = $rect;
                        }
                        $rect = $this->merge_rects($rects);
-                       $this->draw_big_strikethrough($im, $palette['red'], $rect);
+                       $miny = $rect->y + $rect->height / 2;
+                       $maxy = $miny + 2 * BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
+                       $miny -= 2 * BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
+                       imageline($im, $rect->x, $miny, $rect->x + $rect->width, $maxy, $palette['red']);
+                       imageline($im, $rect->x, $maxy, $rect->x + $rect->width, $miny, $palette['red']);
                    }
                }
            } else {
