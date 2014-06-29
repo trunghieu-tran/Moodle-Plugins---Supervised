@@ -28,6 +28,8 @@ class grade_page extends abstract_page{
     }
     
     public function pre_view() {
+        global $DB;
+
         $poasmodel = poasassignment_model::get_instance();
         $cmid = $poasmodel->get_cm()->id;
         $poasassignmentid = $poasmodel->get_poasassignment()->id;
@@ -115,8 +117,8 @@ class grade_form extends moodleform {
             $attempts = array_reverse($DB->get_records('poasassignment_attempts', array('assigneeid' => $assignee->id), 'attemptnumber'));
             foreach ($attempts as $curattempt) {
                 if ($curattempt != $latestattempt) {
-                    $mform->addElement('html', '<h1>' . get_string('attempt', 'poasassignment') . ' ' . $curattempt->attemptnumber
-                                       . ($curattempt->draft ? ' (' . get_string('draft', 'poasassignment') . ')' : '') . '</h1>');
+                    $mform->addElement('html', '<h3>' . get_string('attempt', 'poasassignment') . ' ' . $curattempt->attemptnumber
+                                       . ($curattempt->draft ? ' (' . get_string('draft', 'poasassignment') . ')' : '') . '</h3>');
                     $mform->addElement('static', null, get_string('submitted', 'assignment'), userdate($curattempt->attemptdate));
                     $mform->addElement('static', null, get_string('gradedate', 'poasassignment'), userdate($curattempt->ratingdate));
                     $mform->addElement('static', null, get_string('totalratingis', 'poasassignment'), $curattempt->rating);
