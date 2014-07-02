@@ -1877,4 +1877,197 @@ class qtype_preg_cross_tests_future {
         return array('regex'=>'c(a[t!])+\b',
                      'tests'=>array($test1, $test2, $test3));
     }
+	
+	// Asserts with tags.
+	function data_for_test_assertions_tags_1() {
+		$test1 = array( 'str'=>"a\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>2));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>2),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)a$(c|\nb)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_2() {
+		$test1 = array( 'str'=>"a\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>2),
+                        'length'=>array(0=>3, 1=>1, 2=>1));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1),
+                        'left'=>array(0=>1),
+                        'next'=>'NEXT_CHAR_CANNOT_GENERATE');
+						
+		return array('regex'=>'(?m)a(\n|c)(^b)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_3() {
+		$test1 = array( 'str'=>"a\n",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1),
+                        'length'=>array(0=>2, 1=>1, 2=>1));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>1),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)(a$)(\n|c)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_4() {
+		$test1 = array( 'str'=>"a\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1),
+                        'length'=>array(0=>3, 1=>1, 2=>1));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>2),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)(a$)(\n|c)^b',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_5() {
+		$test1 = array( 'str'=>"a\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>2),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>2),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)(a$)(\n|c)(^b)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_6() {
+		$test1 = array( 'str'=>"a\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>2),
+                        'length'=>array(0=>3, 1=>1, 2=>1));
+						
+		$test2 = array( 'str'=>"ac",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>2),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)a$(\n|c)(^b)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_7() {
+		$test1 = array( 'str'=>"a\n\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>2, 3=>2),
+                        'length'=>array(0=>4, 1=>2, 2=>2, 3=>1));
+						
+		$test2 = array( 'str'=>"a\nc",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0=>2),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)(a\n$)(^(\n|c)b)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_8() {
+		$test1 = array( 'str'=>"ab",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>2, 1=>2));
+						
+		$test2 = array( 'str'=>"\nab",  
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(0=>2),
+                        'next'=>'a');
+						
+		return array('regex'=>'(?m)\A(^ab)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_9() {
+		$test1 = array( 'str'=>"ab\n",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>2),
+                        'length'=>array(0=>3, 1=>2, 2=>1));
+						
+		$test2 = array( 'str'=>"abc",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0=>1),
+                        'next'=>'\n');
+						
+		return array('regex'=>'(?m)(ab$)\Z(\n|c)',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	function data_for_test_assertions_tags_10() {
+		$test1 = array( 'str'=>"\nb",   
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>3, 1=>2));
+						
+		$test2 = array( 'str'=>"ab",  
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>1, 1=>1),
+                        'left'=>array(0=>1),
+                        'next'=>'NEXT_CHAR_CANNOT_GENERATE');
+						
+		return array('regex'=>'(?m)(\n|a)^b',
+                     'tests'=>array($test1, $test2));
+	}
+	
+	
 }
