@@ -108,7 +108,8 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
     }
 
     if ($oldversion < 2014060500) {
-        $lang = new stdClass();
+        /*
+		$lang = new stdClass();
         $lang->uiname = 'C++ parseable programming language';
         $lang->description = 'C++ parseable language';
         $lang->name = 'cpp_parseable_language';
@@ -121,6 +122,7 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $lang->visible = 1;
 
         $DB->insert_record('block_formal_langs',$lang);
+		*/
     }
 
     return true;
