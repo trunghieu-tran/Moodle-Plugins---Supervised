@@ -393,7 +393,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         if ($leftneighbor->type != qtype_preg_explaining_graph_tool_node::TYPE_POINT) {
                             $this->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
 
-                            $this->links[] = new qtype_preg_explaining_graph_tool_link('', $leftneighbor, end($this->nodes), $this);
+                            $gmain->links[] = new qtype_preg_explaining_graph_tool_link('', $leftneighbor, end($this->nodes), $this);
                             $leftborder = end($this->nodes);    // Now left neighbor of assert is point.
                         } else {
                             $leftborder = $leftneighbor;
