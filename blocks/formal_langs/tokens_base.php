@@ -214,7 +214,7 @@ class block_formal_langs_ast_node_base {
      * @var string
      */
     protected $description;
-
+	
     /**
      * A rule for generating node description
      * @var block_formal_langs_description_rule
@@ -245,7 +245,32 @@ class block_formal_langs_ast_node_base {
         return $this->number;
     }
 
+    /**
+     * Returns position for tokem or a position for most left position
+     * @return block_formal_langs_node_position
+     */
     public function position() {
+        if ($this->position == null) {
+            if (count($this->childs())) {
+                $children = $this->childs();
+                /** @var block_formal_langs_ast_node_base $firstchild */
+                $firstchild = $children[0];
+                /** @var block_formal_langs_ast_node_base $lastchild */
+                $lastchild  = $children[count($children) - 1];
+                $firstchildpos = $firstchild->position();
+                $lastchildpos = $lastchild->position();
+                $this->position = new block_formal_langs_node_position(
+                    $firstchildpos->linestart(),
+                    $lastchildpos->lineend(),
+                    $firstchildpos->colstart(),
+                    $lastchildpos->colend(),
+                    $firstchildpos->stringstart(),
+                    $lastchildpos->stringend()
+                );
+            } else {
+                $this->position = new block_formal_langs_node_position( 0, 0, 0, 0, 0, 0);
+            }
+        }
         return $this->position;
     }
 
@@ -284,6 +309,50 @@ class block_formal_langs_ast_node_base {
         }
         return false;
     }
+	
+	/**
+     * Returns value for node
+     * @return string value for text of node
+     */
+    public function value() {
+        $values = array();
+        foreach($this->childs() as $child) {
+            /** @var block_formal_langs_ast_node_base $child */
+            $data = $child->value();
+            if ($data != null) {
+                if (is_object($data)) {
+                    /** @var qtype_poasquestion_string $data */
+                    $data = $data->string();
+                }
+                $values[] = $data;
+            }
+        }
+
+        return implode(' ', $values);
+    }
+	
+	/**
+     * Returns list of tokens, covered by AST node. Tokens determined as not having any children
+     * @return array list of tokens
+     */
+    public function tokens_list() {
+        $childcount = count($this->childs());
+        $result = array();
+        if (count($childcount) == 0) {
+            $result[] = $this;
+        } else {
+            /** @var block_formal_langs_ast_node_base $child */
+            foreach($this->childs() as $child) {
+                $tmp = $child->tokens_list();
+                if (count($result) == 0) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+        return $result;
+    }
 }
 
 /**
@@ -321,6 +390,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
+	public function number() {
+        if ($this->number === null) {
+            $this->number = $this->tokenindex;
+        }
+        return $this->number;
+    }
+	
     public function value() {
         return $this->value;
     }
@@ -1631,13 +1707,88 @@ class block_formal_langs_processed_string {
             return $this->tokenstream->tokens;
         }
     }
+	
+	/**
+     * Returns node by number
+     * @param $nodenumber
+     * @param array|block_formal_langs_ast_node_base $root a root node
+     * @return null|block_formal_langs_ast_node_base
+     */
+    public function find_node($nodenumber, $root = array()) {
+        if (is_array($root) && count($root) == 0) {
+            $result = null;
+            $tree = $this->get_syntax_tree();
+            foreach($tree as $v) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $v);
+                }
+            }
+            return $result;
+        }
+
+        if ($root->number() == $nodenumber) {
+            return $root;
+        }
+        $children = $root->childs();
+        $result = null;
+		if (count($children)) {
+            foreach($children as $child) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $child);
+                }
+            }
+		}
+        return $result;
+    }
+	
+	/**
+     * Returns tree, converted to list and sorted by number
+     * @param null|block_formal_langs_ast_node_base $root a root node
+     * @return array array of nodes, sorted by number
+     */
+    public function tree_to_list($root = null) {
+        $result = array();
+        if ($root == null) {
+            $arraytobescanned = $this->get_syntax_tree();
+        } else {
+            $result = array( $root );
+            $arraytobescanned = $root->childs();
+        }
+        if (count($arraytobescanned)) {
+            foreach($arraytobescanned as $node) {
+                $tmp = $this->tree_to_list($node);
+                if (count($result) == 0) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+
+        if (count($result)) {
+            /**
+             * Comparator for sorting all of nodes
+             * @param  block_formal_langs_ast_node_base $a
+             * @param  block_formal_langs_ast_node_base $b
+             * @return int
+             */
+            $cmp = function($a, $b) {
+                if ($a->number() == $b->number()) {
+                    return 0;
+                }
+                return ($a->number() < $b->number()) ? -1 : 1;
+            };
+            usort($result, $cmp);
+        }
+        return $result;
+    }
 
     /**
      * Returns description string for passed node.
      *
-     * @param $nodenumber number of node
-     * @param $quotevalue should the value be quoted if description is absent; no position on this one
-     * @param $at whether include position if token description is absent
+     * @param int $nodenumber number of node
+     * @param boolean $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param boolean $at whether include position if token description is absent
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
@@ -1646,7 +1797,24 @@ class block_formal_langs_processed_string {
         if ($this->has_description($nodenumber)) {
             return $this->descriptions[$nodenumber];
         } else {
-            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            $tokens = $this->tokenstream->tokens;
+            /** @var block_formal_langs_node_position $pos */
+            $pos = null;
+            /** @var null|qtype_poasquestion_string $value */
+            $value = null;
+            if (array_key_exists($nodenumber, $tokens)) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $tokens[$nodenumber];
+                $value = $token->value();
+                $pos = $token->position();
+            } else {
+                $node = $this->find_node($nodenumber, array());
+                if ($node == null) {
+                    return '';
+                }
+                $value = $node->value();
+                $pos = $node->position();
+            }
             if (!is_string($value)) {
                 $value = $value->string();
             }
@@ -1655,7 +1823,6 @@ class block_formal_langs_processed_string {
             } else if ($at) {// Should return position information.
                 $a = new stdClass();
                 $a->value = $value;
-                $pos = $this->tokenstream->tokens[$nodenumber]->position();
                 $a->column = $pos->colstart();
                 if ($this->single_line_string()) {
                     return get_string('quoteatsingleline', 'block_formal_langs', $a);

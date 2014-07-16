@@ -21,7 +21,7 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
 
     if ($oldversion < 2013030700) {
         $lang = new stdClass();
-        $lang->ui_name = 'C++ programming language';
+        $lang->uiname = 'C++ programming language';
         $lang->description = 'C++ language, with only lexer';
         $lang->name = 'cpp_language';
         $lang->scanrules = null;
@@ -34,7 +34,7 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
 
     if ($oldversion < 2013041400) {
         $lang = new stdClass();
-        $lang->ui_name = 'C formatting string rules';
+        $lang->uiname = 'C formatting string rules';
         $lang->description = 'C formatting string rules, as used in printf';
         $lang->name = 'printf_language';
         $lang->scanrules = null;
@@ -105,6 +105,24 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
         $field = new xmldb_field('author');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'lexemname');
         $dbman->add_field($bfl, $field);
+    }
+
+    if ($oldversion < 2014060500) {
+        /*
+		$lang = new stdClass();
+        $lang->uiname = 'C++ parseable programming language';
+        $lang->description = 'C++ parseable language';
+        $lang->name = 'cpp_parseable_language';
+        $lang->scanrules = null;
+        $lang->parserules = null;
+        $lang->version='1.0';
+        $lang->visible = 1;
+        $lang->lexemname = '';
+        $lang->version='1.0';
+        $lang->visible = 1;
+
+        $DB->insert_record('block_formal_langs',$lang);
+		*/
     }
 
     return true;
