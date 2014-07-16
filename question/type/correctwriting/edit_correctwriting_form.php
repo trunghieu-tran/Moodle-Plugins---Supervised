@@ -287,16 +287,29 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
                     if (count($tokens) > 0 && ($fraction >= $data['hintgradeborder'])) {//Answer needs token descriptions.
                         $textdata = array();
-                        foreach($tokens as $token) {
-                            /** @var block_formal_langs_token_base $token */
-                            $textdata[] = htmlspecialchars($token->value());
+                        if ($lang->could_parse() && $data['issyntaxanalyzerenabled']) {
+                            $tree = $processedstring->syntaxtree;
+                            $treelist = $processedstring->tree_to_list();
+                            foreach($treelist as $node) {
+                                /** @var block_formal_langs_ast_node_base $node */
+                                $string = $node->value();
+                                if (is_object($string)) {
+                                    $string = $string->string();
+                                }
+                                $textdata[] = htmlspecialchars($string);
+                            }
+                        } else {
+                            foreach($tokens as $token) {
+                                /** @var block_formal_langs_token_base $token */
+                                $textdata[] = htmlspecialchars($token->value());
+                            }
                         }
                         $newtext = $this->get_label($textdata);
                         $element=$mform->getElement('lexemedescriptions[' . $key . ']');
                         $element->setLabel($newtext);
                         $element->setRows(count($textdata));
                         if (array_key_exists($key, $data['lexemedescriptions'])) {
-                            $element->setCols($this->computeColumnsForText($data['lexemedescriptions'][$key]));
+                            $element->setCols($this->compute_columns_for_text($data['lexemedescriptions'][$key]));
                         }
 
                     } else {
@@ -374,7 +387,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
       * @param string $text a text
       * @return int a count of columns
       */
-     protected function computeColumnsForText($text)  {
+     protected function compute_columns_for_text($text)  {
         $lines = explode("\n", $text);
         $max = 0;
         if (count($lines) != 0) {
@@ -596,8 +609,25 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             foreach($data['answer'] as $key => $value) {
                 $processedstring = $lang->create_from_string($value);
                 $stream = $processedstring->stream;
-                $tokens = $stream->tokens;
-
+                if ($lang->could_parse() && $data['issyntaxanalyzerenabled']) {
+                    $tree = $processedstring->syntaxtree;
+                    $treelist = $processedstring->tree_to_list();
+                    $tokens = $treelist;
+                    if (count($tree) > 1) {
+                        $fieldkey =  "answer[$key]";
+                        if (array_key_exists($fieldkey, $errors) == false) {
+                            $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
+                        } else {
+                            if (textlib::strlen($errors[$fieldkey]) == 0) {
+                                $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
+                            } else {
+                                $errors[$fieldkey] .= $br . get_string('parseerror', 'qtype_correctwriting');
+                            }
+                        }
+                    }
+                } else {
+                    $tokens = $stream->tokens;
+                }
                 if (count($tokens) > 0 && $fractions[$key] >= $data['hintgradeborder']) {//Token descriptions needed for this answer.
                     $descriptionstring = $data['lexemedescriptions'][$key];
                     if (trim($value) != '' /*&& trim($descriptionstring) != ''*/) {//Uncomment if empty descriptions will be good as "no descriptions" variant.

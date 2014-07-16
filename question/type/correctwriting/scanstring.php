@@ -40,21 +40,39 @@ require_login();
 
 $langid  =  required_param('lang', PARAM_INT);
 $text = required_param('scannedtext', PARAM_RAW);
+$shouldperformparse = optional_param('parse', 0, PARAM_INT);
 
 $language = block_formal_langs::lang_object($langid);
 
 if ($language == null) {
     echo '{"tokens": [], "errors": ""}';
 } else {
-    $stream = $language->create_from_string($text)->stream;
+    $string = $language->create_from_string($text);
+    $stream = $string->stream;
     $tokens = $stream->tokens;
     if(count($tokens)) {
         $tokenvalues = array();
-        foreach($tokens as $token) {
-            $tokenvalues[] = (string)($token->value());
-        }
         $form = 'qtype_correctwriting_edit_form';
         $errormessages = $form::convert_tokenstream_errors_to_formatted_messages($text, $stream);
+        if (!$shouldperformparse || $language->could_parse() == false) {
+            foreach($tokens as $token) {
+                $tokenvalues[] = (string)($token->value());
+            }
+        } else {
+            $tree = $string->syntaxtree;
+            if (count($tree) > 1) {
+                $errormessages[] = get_string('parseerror', 'qtype_correctwiriting');
+            }
+            $treelist = $string->tree_to_list();
+            foreach($treelist as $node) {
+                /** @var block_formal_langs_ast_node_base $node */
+                $string = $node->value();
+                if (is_object($string)) {
+                    $string = $string->string();
+                }
+                $tokenvalues[] = $string;
+            }
+        }
         $result = (object)array('tokens' => $tokenvalues, "errors" => $errormessages);
         echo json_encode($result);
     } else {

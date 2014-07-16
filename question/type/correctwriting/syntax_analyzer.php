@@ -35,7 +35,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
-
+require_once($CFG->dirroot.'/question/type/correctwriting/ast_handler.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/syntax_mistakes.php');
 
 class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract_analyzer {
 
@@ -57,7 +58,6 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
      */
     public function __construct($question = null, $basepair = null, $language = null, $bypass = true) {
         parent::__construct($question, $basepair, $language, $bypass);
-
     }
 
     /**
@@ -79,9 +79,176 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
         //  - special function
         //NOTE: if response is null just check for errors - Pashaev
         //NOTE: if some stage create errors, stop processing right there
-        parent::bypass();
+        $result =  clone $this->basestringpair;
+
+        // Group indexes into sequences
+        $skippedlexemeindexes = $result->skippedlexemesindexes;
+        $addedlexemeindexes = $result->addedlexemesindexes;
+        $movedlexemeindexes = $result->movedlexemesindexes;
+
+        $skippedlexemegroups = array();
+        if (count($skippedlexemeindexes)) {
+            sort($skippedlexemeindexes);
+            foreach($skippedlexemeindexes as  $index) {
+                if (count($skippedlexemegroups) == 0) {
+                    $skippedlexemegroups[] = array( $index );
+                } else {
+                    $lastgroup = $skippedlexemegroups[count($skippedlexemegroups) - 1];
+                    $lastitem = $lastgroup[count($lastgroup) - 1];
+                    if ($index == $lastitem + 1) {
+                        $skippedlexemegroups[count($skippedlexemegroups) - 1][] = $index;
+                    } else {
+                        $skippedlexemegroups[] = array( $index );
+                    }
+                }
+            }
+        }
+
+        $addedlexemegroups = array();
+        if (count($addedlexemeindexes)) {
+            sort($addedlexemeindexes);
+            foreach($addedlexemeindexes as  $index) {
+                if (count($addedlexemegroups) == 0) {
+                    $addedlexemegroups[] = array( $index );
+                } else {
+                    $lastgroup = $addedlexemegroups[count($addedlexemegroups) - 1];
+                    $lastitem = $lastgroup[count($lastgroup) - 1];
+                    if ($index == $lastitem + 1) {
+                        $addedlexemegroups[count($addedlexemegroups) - 1][] = $index;
+                    } else {
+                        $addedlexemegroups[] = array( $index );
+                    }
+                }
+            }
+        }
+
+
+        $movedlexemegroups = array();
+        if (count($movedlexemeindexes)) {
+            ksort($movedlexemeindexes);
+            foreach($movedlexemeindexes as $key => $value) {
+                if (count($movedlexemegroups) == 0) {
+                    $movedlexemegroups[] = array( $key => $value );
+                } else {
+                    $lastgroup = $movedlexemegroups[count($movedlexemegroups) - 1];
+                    $keys = array_keys($lastgroup);
+                    $lastkey = $keys[count($keys) - 1];
+                    $lastvalue = $lastgroup[$lastkey];
+                    if ($key == $lastkey + 1 && $value == $lastvalue + 1) {
+                        $movedlexemegroups[count($movedlexemegroups) - 1][$key] = $value;
+                    } else {
+                        $movedlexemegroups[] = array( $key => $value );
+                    }
+                }
+            }
+        }
+
+        // Find nodes for correct string
+        $tree = $result->correctstring()->syntaxtree;
+        $builder = new qtype_correctwriting_marked_tree_builder($tree);
+        $builder->markers = array(
+            'skipped' => $skippedlexemegroups,
+            'moved' => $movedlexemegroups
+        );
+        $builder->visit_array($tree);
+        $markedtree = $builder->tree;
+
+        $marker = new qtype_correctwriting_marked_tree_remarker();
+        $marker->mark_tree($markedtree);
+
+        $findnodes = new qtype_correctwriting_find_top_marked_nodes();
+        $findnodes->visit_array($markedtree);
+
+        $correctmistakenodes = $findnodes->result;
+
+        // Find nodes for added string
+        $tree = $result->correctedstring()->syntaxtree;
+        $builder = new qtype_correctwriting_marked_tree_builder($tree);
+        $builder->markers = array(
+            'added' => $addedlexemegroups,
+        );
+        $builder->visit_array($tree);
+        $markedtree = $builder->tree;
+
+        $marker = new qtype_correctwriting_marked_tree_remarker();
+        $marker->mark_tree($markedtree);
+
+        $findnodes = new qtype_correctwriting_find_top_marked_nodes();
+        $findnodes->visit_array($markedtree);
+        $correctedmistakenodes = $findnodes->result;
+
+        // Erase sequence errors
+        $mistakes = $result->mistakes();
+        if (count($mistakes)) {
+            foreach($mistakes as $key => $value) {
+                if (is_a($value, 'qtype_correctwriting_sequence_mistake')) {
+                    unset($mistakes[$key]);
+                }
+            }
+            $mistakes = array_values($mistakes);
+        }
+
+        // Convert found mistakes to a data
+        $weights = new stdClass;
+        $weights->movedweight = $this->question->movedmistakeweight;
+        $weights->absentweight = $this->question->absentmistakeweight;
+        $weights->addedweight = $this->question->addedmistakeweight;
+        for($i = 0; $i < count($correctmistakenodes); $i++) {
+            /**
+             * @var stdClass $node
+             * @var block_formal_langs_ast_node_base $item
+             */
+            $node = $correctmistakenodes[$i];
+            $item = $node->item;
+            $mistake = null;
+            if ($node->marker[0] == 'skipped') {
+                $mistake = new qtype_correctwriting_node_absent_mistake($result->correctstring()->language, $result, $node->item);
+                $mistake->weight = $weights->absentweight;
+            }
+            if ($node->marker[0] == 'moved') {
+                $mistake = new qtype_correctwriting_node_moved_mistake($result->correctstring()->language, $result, $node->item);
+                $mistake->weight = $weights->movedweight;
+            }
+            $mistake->source = get_class($this);
+            $mistakes[] = $mistake;
+        }
+
+        for($i = 0; $i < count($correctedmistakenodes); $i++) {
+            /**
+             * @var stdClass $node
+             * @var block_formal_langs_ast_node_base $item
+             */
+            $node = $correctedmistakenodes[$i];
+            $item = $node->item;
+            $mistake = new qtype_correctwriting_node_added_mistake($result->correctstring()->language, $result, $node->item);
+            $mistake->source = get_class($this);
+            $mistakes[] = $mistake;
+        }
+
+
+        $result->set_mistakes($mistakes);
+        // Return value
+        $this->resultstringpairs[] = $result;
     }
 
+
+    /**
+     * Fill resultstringpairs with a string pair, that simulates work of this analyzer allowing subsequent analyzers to work.
+     *
+     * You are normally would overload this, starting overload with parent function call, then add you work.
+     * Don't actually analyze something, no mistakes generated: just fill necessary fields in string pair.
+     */
+    protected function bypass() {
+        $this->resultstringpairs[] = clone $this->basestringpair; //Clone string pair for future use.
+    }
+
+    /**
+     * Returns a mistake type for a error, used by this analyzer
+     * @return string
+     */
+    protected function own_mistake_type() {
+        return 'qtype_correctwriting_syntax_mistake';
+    }
 
     /**
      * Lexical analyzer does not have any hints, currently

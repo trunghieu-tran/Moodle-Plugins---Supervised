@@ -61,6 +61,7 @@ $string['movedmistakemessagenodescription'] = 'the "{$a->value}" at {$a->line}:{
 $string['movedmistakeweight'] = 'Penalty for misplaced token';
 $string['movedmistakeweight_help'] = 'Penalty for each misplaced token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
 $string['objectname'] = 'question';
+$string['parseerror'] = 'Ошибка при синтаксическом разборе! Пожалуйста, проверьте свой ответ еще раз и исправьте её';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['pluginname'] = 'Correct writing';
 $string['pluginname_help'] = 'Enter the question and correct answer(s). When you try to save question, answer will be breaked down to the smallest meaningful parts of selectet languges - the <b>tokens</b>. You need to write grammatical role of these tokens to be shown in the mistake message. If you leave description string empty, token text will be used in mistake message instead.';

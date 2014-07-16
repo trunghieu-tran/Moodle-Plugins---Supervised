@@ -151,7 +151,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
        if ($results!=null) {
            if (count($results->mistakes()) != 0) {
                $mistakecodeddata = $question->create_image_information($results);
-               $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
+               $grouping = intval($question->issyntaxanalyzerenabled);
+               $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata) . '&group=' . $grouping ;
                $imagesrc = html_writer::empty_tag('image', array('src' => $url));
                $resulttext = $imagesrc . $resulttext;
            }
