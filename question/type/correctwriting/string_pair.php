@@ -73,6 +73,23 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     public $analyzersequence = array();
 
     /**
+     * Indexes of skipped lexemes from teacher's answer
+     * @var array
+     */
+    public $skippedlexemesindexes = array();
+    /**
+     * Indexes of added lexemes from student's answer
+     * @var array
+     */
+    public $addedlexemesindexes = array();
+    /**
+     * Indexes of moved lexemes from teacher's answer, using student answer's as a key
+     * @var array
+     */
+    public $movedlexemesindexes = array();
+
+
+    /**
      * Maps index from source token index of one analyzer to
      * source token index, entered by user
      * @param int $source индекс исходной лексемы
