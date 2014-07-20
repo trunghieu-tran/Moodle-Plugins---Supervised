@@ -118,7 +118,9 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add handlers for the regex textarea.
                     self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
-                    self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
+
+                    //remove left margin
+                    $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
