@@ -85,12 +85,21 @@ M.preg_authoring_tools_script = (function ($) {
                 var scripts = [
                         self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
                         self.www_root+'/question/type/poasquestion/jquery-textrange.js',
-                        //self.www_root+'/question/type/poasquestion/interface.js',
+                        self.www_root+'/question/type/poasquestion/interface.js',
                         self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
                         self.www_root+'/question/type/poasquestion/textareaHighlighter.js'
                         ];
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
+
+                    // init moodle form js
+                    if (M.form && M.form.shortforms) {
+                        M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
+                    } /*else {
+                        $.getScript(self.www_root+'/lib/form/yui/shortforms/shortforms.js',function() {
+                            M.form.shortforms({"formid":"mformauthoring"});
+                        });
+                    }*/
 
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
