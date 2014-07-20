@@ -742,8 +742,8 @@ M.preg_authoring_tools_script = (function ($) {
             for (var j = 0; j < nodeCoords.length; ++j) {
                 if (rect_left_bot_x < nodeCoords[j].x
                     && rect_right_top_x > nodeCoords[j].x
-                    && rect_left_bot_y > nodeCoords[j].y
-                    && rect_right_top_y < nodeCoords[j].y) {
+                    && rect_left_bot_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) > nodeCoords[j].y
+                    && rect_right_top_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) < nodeCoords[j].y) {
 
                     figures.push(figure);
                 }
@@ -828,8 +828,8 @@ M.preg_authoring_tools_script = (function ($) {
             for (var j = 0; j < nodeCoords.length; ++j) {
                 if (rect_left_bot_x < nodeCoords[j].x
                     && rect_right_top_x > nodeCoords[j].x
-                    && rect_left_bot_y > nodeCoords[j].y
-                    && rect_right_top_y < nodeCoords[j].y) {
+                    && rect_left_bot_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) > nodeCoords[j].y
+                    && rect_right_top_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) < nodeCoords[j].y) {
                         if(parseInt(nodeId[2]) < parseInt(indfirst)) {
                             indfirst = nodeId[2];
                         }
