@@ -148,55 +148,22 @@ M.poasquestion_text_and_button = (function ($) {
         });
     },
 
-    execScripts: function(scripts) {
-        if (window.execScript) {
-            window.execScript(scripts);
-        } else {
-            var head = document.getElementsByTagName('head')[0] || document.documentElement;
-            var scriptElement = document.createElement('script');
-            scriptElement.type = "text/javascript";
-            try {
-                // doesn't work on ie...
-                scriptElement.appendChild(document.createTextNode(scripts));
-            } catch(e) {
-                // IE has funky script nodes
-                scriptElement.text = scripts;
-            }
-            head.appendChild(scriptElement);
-            head.removeChild(scriptElement);
-        }
-    },
-
     loadDialogContent : function(url, scripts, callback) {
         var received = 0;
-        var c = scripts.length+1;
-        var scripttext = '';
-        var tmpM = M;
         var fakeCallback = function() {
             received++;
-            if (received === c) {
-                self.execScripts(scripttext);
-                M = $.extend(M, tmpM);
+            if (received === scripts.length+1)
                 callback();
-            }
         };
         $.ajax({
             url: url,
             type: "GET",
             dataType: "text"
         }).done(function (responseText, textStatus, jqXHR) {
-            var tpage_html = $.parseHTML(responseText, document, true);
-            var scripts = $(tpage_html).filter('script');
-            $(scripts).each(function(){
-                var html = $(this).html();
-                if (html && html.trim()) {
-                    scripttext = scripttext + $(this).html();
-                } else {
-                    $.getScript(this.src, fakeCallback);
-                    c++;
-                }
-            });
-            $(self.dialog).html($(tpage_html).not('script'));
+            var tmpM = M;
+            var tpage_html = $.parseHTML(responseText, document, false);
+            $(self.dialog).html(tpage_html);
+            M = $.extend(M, tmpM);
             fakeCallback();
         });
         for (var i = 0; i < scripts.length; i++) {
