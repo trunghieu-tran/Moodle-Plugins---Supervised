@@ -83,23 +83,19 @@ M.preg_authoring_tools_script = (function ($) {
             onfirstpresscallback : function () {
                 var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
                 var scripts = [
-                        self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
-                        self.www_root+'/question/type/poasquestion/jquery-textrange.js',
-                        self.www_root+'/question/type/poasquestion/interface.js',
-                        self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
-                        self.www_root+'/question/type/poasquestion/textareaHighlighter.js'
-                        ];
+                    self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
+                    self.www_root+'/question/type/poasquestion/jquery-textrange.js',
+                    self.www_root+'/question/type/poasquestion/interface.js',
+                    self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
+                    self.www_root+'/question/type/poasquestion/textareaHighlighter.js'
+                ];
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
 
                     // init moodle form js
                     if (M.form && M.form.shortforms) {
                         M.form.shortforms({"formid":"mformauthoring"}); // TODO - find native way to init headers collapce functionatily
-                    } /*else {
-                        $.getScript(self.www_root+'/lib/form/yui/shortforms/shortforms.js',function() {
-                            M.form.shortforms({"formid":"mformauthoring"});
-                        });
-                    }*/
+                    }
 
                     // Remove the "skip to main content" link.
                     $(self.textbutton_widget.dialog).find('.skiplinks').remove();
@@ -122,7 +118,9 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Add handlers for the regex textarea.
                     self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
-                    self.regex_input.keyup(self.textbutton_widget.fix_textarea_rows);
+
+                    //remove left margin
+                    $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
@@ -148,7 +146,7 @@ M.preg_authoring_tools_script = (function ($) {
                 // Put the testing data into ui.
                 if (!self.textbutton_widget.is_stand_alone()) {
                     $('#id_regex_match_text').val($('input[name=\'regextests[' + $(self.textbutton_widget.current_input).attr('id').split("id_answer_")[1] + ']\']').val())
-                                         .trigger('keyup');
+                        .trigger('keyup');
 
                     $.each(self.matching_options, function (i, option) {
                         var preg_id = '#id_' + option,
@@ -181,12 +179,12 @@ M.preg_authoring_tools_script = (function ($) {
 
     save_sections_state : function () {
         var sections = ['regex_input',
-                        'regex_matching_options',
-                        'regex_tree',
-                        'regex_graph',
-                        'regex_description',
-                        'regex_testing'
-                        ];
+            'regex_matching_options',
+            'regex_tree',
+            'regex_graph',
+            'regex_description',
+            'regex_testing'
+        ];
         $.each(sections, function (i, section) {
             var val = $("[name='mform_isexpanded_id_" + section + "_header']").val();
             M.util.set_user_preference('qtype_preg_' + section + '_expanded', val);
@@ -328,24 +326,24 @@ M.preg_authoring_tools_script = (function ($) {
 
     cache_key_for_explaining_tools : function (indfirst, indlast) {
         return '' /*+
-               self.regex_input.val() +
-               $('#id_notation_auth').val() +
-               $('#id_exactmatch_auth').val() +
-               $('#id_usecase_auth').val() +
-               self.get_orientation() +
-               self.get_displayas() +
-               indfirst + ',' + indlast*/;
+         self.regex_input.val() +
+         $('#id_notation_auth').val() +
+         $('#id_exactmatch_auth').val() +
+         $('#id_usecase_auth').val() +
+         self.get_orientation() +
+         self.get_displayas() +
+         indfirst + ',' + indlast*/;
     },
 
     cache_key_for_testing_tool : function (indfirst, indlast) {
         return '' +
-               self.regex_input.val() +
-               $('#id_engine_auth').val() +
-               $('#id_notation_auth').val() +
-               $('#id_exactmatch_auth').val() +
-               $('#id_usecase_auth').val() +
-               $('#id_regex_match_text').val() +
-               indfirst + ',' + indlast;
+            self.regex_input.val() +
+            $('#id_engine_auth').val() +
+            $('#id_notation_auth').val() +
+            $('#id_exactmatch_auth').val() +
+            $('#id_usecase_auth').val() +
+            $('#id_regex_match_text').val() +
+            indfirst + ',' + indlast;
     },
 
     upd_content_success : function (data, textStatus, jqXHR) {
@@ -472,9 +470,9 @@ M.preg_authoring_tools_script = (function ($) {
                     var translate_x = ta[1];
                     var translate_y = ta[2];
                     var sel = self.get_rect_selection(e, 'resizeGraph', 'graph_img',
-                        (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left 
-                            + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')), 
-                        (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top 
+                        (document.getElementById('graph_hnd').getBoundingClientRect().left - document.getElementById('graph_img').getBoundingClientRect().left
+                            + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')),
+                        (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                             + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
                     self.load_content(sel.indfirst, sel.indlast);
                     self.load_strings(sel.indfirst, sel.indlast);
@@ -575,11 +573,11 @@ M.preg_authoring_tools_script = (function ($) {
                 minWidth: 20,
                 minHeight: 20,
                 /*maxWidth: (br.right - br.left),
-                maxHeight: (br.bottom - br.top),
-                minTop: 1,
-                minLeft: 1,
-                maxRight: br.right - br.left,
-                maxBottom: br.bottom - br.top,*/
+                 maxHeight: (br.bottom - br.top),
+                 minTop: 1,
+                 minLeft: 1,
+                 maxRight: br.right - br.left,
+                 maxBottom: br.bottom - br.top,*/
                 maxWidth: 9999,
                 maxHeight: 9999,
                 minTop: 1,
@@ -591,15 +589,15 @@ M.preg_authoring_tools_script = (function ($) {
                     this.style.backgroundPosition = '-' + (x - 50) + 'px -' + (y - 50) + 'px';
                 },
                 /*handlers: {
-                    se: '#resizeSE',
-                    e: '#resizeE',
-                    ne: '#resizeNE',
-                    n: '#resizeN',
-                    nw: '#resizeNW',
-                    w: '#resizeW',
-                    sw: '#resizeSW',
-                    s: '#resizeS'
-                },*/
+                 se: '#resizeSE',
+                 e: '#resizeE',
+                 ne: '#resizeNE',
+                 n: '#resizeN',
+                 nw: '#resizeNW',
+                 w: '#resizeW',
+                 sw: '#resizeSW',
+                 s: '#resizeS'
+                 },*/
                 onResize : function(size, position) {
                     this.style.backgroundPosition = '-' + (position.left - 50) + 'px -' + (position.top - 50) + 'px';
                 }
@@ -620,14 +618,14 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_current_x : function(e, img, hnd) {
         return e.pageX - $(window).prop('scrollX') - document.getElementById(img).getBoundingClientRect().left
-                - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left)
-                + $('#' + hnd).prop('scrollLeft');
+            - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left)
+            + $('#' + hnd).prop('scrollLeft');
     },
 
     get_current_y : function(e, img, hnd) {
         return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top
-                - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
-                + $('#' + hnd).prop('scrollTop');
+            - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
+            + $('#' + hnd).prop('scrollTop');
     },
 
     /**
@@ -830,12 +828,12 @@ M.preg_authoring_tools_script = (function ($) {
                     && rect_right_top_x > nodeCoords[j].x
                     && rect_left_bot_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) > nodeCoords[j].y
                     && rect_right_top_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) < nodeCoords[j].y) {
-                        if(parseInt(nodeId[2]) < parseInt(indfirst)) {
-                            indfirst = nodeId[2];
-                        }
-                        if(parseInt(nodeId[3]) > parseInt(indlast)) {
-                            indlast = nodeId[3];
-                        }
+                    if(parseInt(nodeId[2]) < parseInt(indfirst)) {
+                        indfirst = nodeId[2];
+                    }
+                    if(parseInt(nodeId[3]) > parseInt(indlast)) {
+                        indlast = nodeId[3];
+                    }
                 }
             }
         }
@@ -1032,8 +1030,8 @@ M.preg_authoring_tools_script = (function ($) {
             var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
             var panzoomholder= $(e.target).parents(".preg_img_panzoom")[0];
             $(panzoomholder).panzoom('zoom', zoomOut, {
-              increment: 0.1,
-              focal: e
+                increment: 0.1,
+                focal: e
             });
         }
     },
