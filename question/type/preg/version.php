@@ -25,16 +25,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version = 2014042200;
-$plugin->requires = 2013051400;
+$plugin->version = 2014071000;
+$plugin->requires = 2013110500;
 $plugin->release = 'Preg 2.6 Release';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2013050100,
-    'qbehaviour_adaptivehints' => 2013052500,
-    'qbehaviour_adaptivehintsnopenalties' => 2013052500,
-    'qbehaviour_interactivehints' => 2013060200,
-    'qtype_poasquestion' => 2013102900,
-    'block_formal_langs' => 2013071900
+    'qbehaviour_adaptivehints' => 2014071000,
+    'qbehaviour_adaptivehintsnopenalties' => 2014071000,
+    'qbehaviour_interactivehints' => 2014071000,
+    'qtype_poasquestion' => 2014071000,
+    'block_formal_langs' => 2014071000
 );
