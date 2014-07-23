@@ -13,22 +13,52 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Version information for the formal languages block.
+ * A main class of block
  *
  * @package    formal_langs
  * @copyright  2012 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/** A rule for generating a description for a node of AST
+ *
+ */
+class block_formal_langs_description_rule {
+    /**
+     * Left part of rules
+     * @var string
+     */
+    public $left;
+    /**
+     * Right part of rules as string
+     * @var array
+     */
+    public $right;
 
-$plugin->component = 'block_formal_langs';
-$plugin->version  = 2014071000;
-$plugin->requires = 2013110500;
-$plugin->release = 'Formal languages 2.6';
-$plugin->maturity = MATURITY_BETA;
+    /**
+     * Constructs new description rule
+     * @param string $left left part of rule
+     * @param string $right right right part of rule
+     */
+    public function __construct($left, $right) {
+        $this->left = $left;
+        $this->right = $right;
+    }
 
-$plugin->dependencies = array(
-    'qtype_poasquestion' => 2014071000
-);
+    /**
+     * Returns left part of description rule
+     */
+    public function left_part() {
+        return $this->left;
+    }
+
+    /**
+     * Returns right part of description rule
+     * @return array
+     */
+    public function right_part() {
+        return $this->right;
+    }
+}
