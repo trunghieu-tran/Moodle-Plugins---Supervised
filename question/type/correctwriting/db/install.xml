@@ -20,7 +20,11 @@
         <FIELD NAME="whatishintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for &quot;what is&quot; hint. Setting above 1 will disable this hint for the question" PREVIOUS="maxmistakepercentage" NEXT="wheretxthintpenalty"/>
         <FIELD NAME="wheretxthintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for text &quot;where&quot; hint" PREVIOUS="whatishintpenalty" NEXT="absenthintpenaltyfactor"/>
         <FIELD NAME="absenthintpenaltyfactor" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" DECIMALS="1" COMMENT="Penalty factor for absent token hints." PREVIOUS="wheretxthintpenalty" NEXT="wherepichintpenalty" />
-        <FIELD NAME="wherepichintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for picture &quot;where&quot; hint" PREVIOUS="absenthintpenaltyfactor" />
+        <FIELD NAME="wherepichintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for picture &quot;where&quot; hint" PREVIOUS="absenthintpenaltyfactor" NEXT="islexicalanalyzerenabled" />
+        <FIELD NAME="islexicalanalyzerenabled" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether lexical analyzer is enabled" PREVIOUS="wherepichintpenalty" NEXT="isenumanalyzerenabled"/>
+        <FIELD NAME="isenumanalyzerenabled" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether enum analyzer is enabled" PREVIOUS="islexicalanalyzerenabled" NEXT="issequenceanalyzerenabled"/>
+        <FIELD NAME="issequenceanalyzerenabled" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether sequence analyzer is enabled" PREVIOUS="isenumanalyzerenabled" NEXT="issyntaxanalyzerenabled"/>
+        <FIELD NAME="issyntaxanalyzerenabled" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether syntax analyzer is enabled" PREVIOUS="issequenceanalyzerenabled"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>

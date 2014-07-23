@@ -34,7 +34,6 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      * @var array
      */
     protected $lcs;
-
     /**
      * Sets an lcs for mistake
      * @param $lcs
@@ -43,6 +42,8 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
         $this->lcs = $lcs;
     }
 
+
+
     /**
      * Returns an lcs, which mistake is based on
      * @return array
@@ -50,6 +51,7 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
     public function lcs() {
         return $this->lcs;
     }
+
 }
 
 
