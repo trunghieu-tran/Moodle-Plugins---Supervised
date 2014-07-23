@@ -15,18 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block
- * @subpackage supervised
+ * @package     block
+ * @subpackage  supervised
  * @author      Andrey Ushakov <andrey200964@yandex.ru>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$PAGE->set_heading($course->fullname);
+$PAGE->navbar->add(get_string('pluginname', 'block_supervised'));
 
-defined('MOODLE_INTERNAL') || die();
+$sessionsurl = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
+$PAGE->navbar->add(get_string('sessionsbreadcrumb', 'block_supervised'), $sessionsurl);
 
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
-$plugin->maturity   = MATURITY_STABLE;
+$logsurl = new moodle_url('/blocks/supervised/logs/view.php', array('courseid' => $courseid, 'sessionid' => $sessionid));
+$PAGE->navbar->add(get_string('logsbreadcrumb', 'block_supervised'), $logsurl);

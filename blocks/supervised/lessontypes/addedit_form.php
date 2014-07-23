@@ -14,19 +14,39 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+require_once("{$CFG->libdir}/formslib.php");
+
 /**
- * @package    block
- * @subpackage supervised
+ * Class addedit_lessontype_form
+ *
+ * The form for adding of editing lesson types
+ *
+ * @package     block
+ * @subpackage  supervised
  * @author      Andrey Ushakov <andrey200964@yandex.ru>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class addedit_lessontype_form extends moodleform {
 
-defined('MOODLE_INTERNAL') || die();
+    protected function definition() {
 
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
-$plugin->maturity   = MATURITY_STABLE;
+        $mform =& $this->_form;
+
+        // Add group.
+        $mform->addElement('header', 'general', get_string('general', 'form'));
+        // ...name element.
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '48'));
+        $mform->setType('name', PARAM_RAW);
+        $mform->addRule('name', null, 'required', null, 'client');
+
+        // ...hidden elements.
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
+
+        $this->add_action_buttons();
+    }
+}

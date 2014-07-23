@@ -14,19 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * @package    block
- * @subpackage supervised
+ * Class StateSession
+ *
+ * Describes possible session states
+ *
+ * @package     block
+ * @subpackage  supervised
  * @author      Andrey Ushakov <andrey200964@yandex.ru>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class StateSession
+{
+    const PLANNED   = 1;
+    const ACTIVE    = 2;
+    const FINISHED  = 3;
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
-$plugin->maturity   = MATURITY_STABLE;
+    /**
+     * Converts session state to string
+     *
+     * @param $val  integer session state
+     * @return string string representation of the session state
+     */
+    public static function get_state_name($val) {
+        switch($val) {
+            case 1:
+                return get_string('plannedstate', 'block_supervised');
+                break;
+            case 2:
+                return get_string('active');
+                break;
+            case 3:
+                return get_string('finishedstate', 'block_supervised');
+                break;
+            default:
+                return get_string('unknown', 'question');
+        }
+    }
+}
