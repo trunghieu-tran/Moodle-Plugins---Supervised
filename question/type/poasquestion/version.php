@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_poasquestion';
-$plugin->version = 2013102900;
-$plugin->requires = 2013051400;
-$plugin->release = 'Abstract Poasquestion 2.5.2';
+$plugin->version = 2014071000;
+$plugin->requires = 2013110500;
+$plugin->release = 'Abstract Poasquestion 2.6';
 $plugin->maturity = MATURITY_STABLE;
