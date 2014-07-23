@@ -15,18 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block
- * @subpackage supervised
+ * @package     quizaccess_supervisedcheck
  * @author      Andrey Ushakov <andrey200964@yandex.ru>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Removes all supervised access rules for nonexistent quizzes
+ */
+function supervisedcheck_cleanup($course) {
+    global $DB;
+    $quizzes = $DB->get_records('quiz', array('course' => $course->objectid));
+    $DB->delete_records_list('quizaccess_supervisedcheck', 'quizid', array_keys($quizzes));
+}
 
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
-$plugin->maturity   = MATURITY_STABLE;
+/**
+ * Course deleted (event). Remove all out-of-date quiz access rules.
+ *
+ * @param $course int course id
+ */
+function supervisedcheck_course_deleted($course) {
+    supervisedcheck_cleanup($course);
+}
+
+/**
+ * Course deleted (event). Remove all out-of-date quiz access rules.
+ *
+ * @param $course int course id
+ */
+function supervisedcheck_course_content_deleted($course) {
+    supervisedcheck_cleanup($course);
+}
+
+function supervisedcheck_course_module_deleted($cm) {
+    global $DB;
+    if ($cm->other['modulename'] == 'quiz') {
+        $DB->delete_records('quizaccess_supervisedcheck', array('quizid' => $cm->other['instanceid']));
+    }
+}

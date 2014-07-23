@@ -15,18 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block
- * @subpackage supervised
+ * Version information for the quizaccess_supervisedcheck plugin.
+ *
+ * @package     quizaccess_supervisedcheck
  * @author      Andrey Ushakov <andrey200964@yandex.ru>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
+
+$plugin->version   = 2014022202;                    // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2013110500;                    // Requires this Moodle version
+$plugin->component = 'quizaccess_supervisedcheck';  // Full name of the plugin (used for diagnostics).
+$plugin->dependencies = array('block_supervised' => 2014022201);
+$plugin->release    = 'Supervised check quiz access rule 2.6';
 $plugin->maturity   = MATURITY_STABLE;

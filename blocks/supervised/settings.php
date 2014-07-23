@@ -15,18 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block
- * @subpackage supervised
- * @author      Andrey Ushakov <andrey200964@yandex.ru>
+ * @package     block
+ * @subpackage  supervised
+ * @author      Oleg Sychev <oasychev@gmail.com>
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die;
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
-$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
-$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
-$plugin->maturity   = MATURITY_STABLE;
+if ($ADMIN->fulltree) {
+    // Default session time.
+    $settings->add(new admin_setting_configtext('block_supervised_session_duration',
+        get_string('settingsdurationtitle', 'block_supervised'),
+        get_string('settingsdurationdesc', 'block_supervised'), 90, PARAM_INT));
+    // How much days should settings table show by default.
+    $settings->add(new admin_setting_configtext('block_supervised_sessions_days_past',
+        get_string('settingsdayspasttitle', 'block_supervised'),
+        get_string('settingsdayspastdesc', 'block_supervised'), 7, PARAM_INT));
+}
