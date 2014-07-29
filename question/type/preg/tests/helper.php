@@ -64,6 +64,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->options->exactmatch = true;
         $qdata->options->notation = 'native';
         $qdata->options->engine = 'fa_matcher';
+        $qdata->options->usecharhint = true;
+        $qdata->options->uselexemhint = true;
 
         $qdata->options->answers = array(
             13 => (object) array(
@@ -153,6 +155,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->exactmatch = 1;
         $qdata->notation = 'native';
         $qdata->engine = 'fa_matcher';
+        $qdata->usecharhint = true;
+        $qdata->uselexemhint = true;
 
         $qdata->fraction = array( 0 => '0.5', 1 => '0.9', 2 => '0.8', 3 => '0.5', 4 => '1.0', 5 => '0.0');
         $qdata->answer = array(
@@ -245,6 +249,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->options->exactmatch = true;
         $qdata->options->notation = 'native';
         $qdata->options->engine = 'fa_matcher';
+        $qdata->options->usecharhint = true;
+        $qdata->options->uselexemhint = true;
 
         $qdata->options->answers = array(
             13 => (object) array(
@@ -343,6 +349,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->exactmatch = 1;
         $qdata->notation = 'native';
         $qdata->engine = 'fa_matcher';
+        $qdata->usecharhint = true;
+        $qdata->uselexemhint = true;
 
         $qdata->fraction = array( 0 => '0.5', 1 => '0.9', 2 => '0.8', 3 => '0.5', 4 => '1.0', 5 => '0.5');
         $qdata->answer = array(
@@ -435,6 +443,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->options->exactmatch = true;
         $qdata->options->notation = 'native';
         $qdata->options->engine = 'fa_matcher';
+        $qdata->options->usecharhint = true;
+        $qdata->options->uselexemhint = true;
 
         $qdata->options->answers = array(
             13 => (object) array(
@@ -514,6 +524,8 @@ class qtype_preg_test_helper extends question_test_helper {
         $qdata->exactmatch = 1;
         $qdata->notation = 'native';
         $qdata->engine = 'fa_matcher';
+        $qdata->usecharhint = true;
+        $qdata->uselexemhint = true;
 
         $qdata->fraction = array( 0 => '0.5', 1 => '0.0', 2 => '0.8', 3 => '0.5', 4 => '1.0', 5 => '0.0');
         $qdata->answer = array(

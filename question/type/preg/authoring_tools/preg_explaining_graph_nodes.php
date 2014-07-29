@@ -152,6 +152,7 @@ abstract class qtype_preg_explaining_graph_leaf extends qtype_preg_explaining_gr
 
         if ($this->is_selected()) {
             $graph->color = 'darkgreen';
+            $graph->tooltip = "selection";
             $graph->isselection = true;
 
             $marking = new qtype_preg_explaining_graph_tool_subgraph('', 0.5 + $this->pregnode->id);
@@ -341,8 +342,7 @@ class qtype_preg_explaining_graph_leaf_subexpr_call extends qtype_preg_explainin
      * Returns type of node which will use in postprocessing.
      * @return string Type of node.
      */
-    public function get_type()
-    {
+    public function get_type() {
         return qtype_preg_explaining_graph_tool_node::TYPE_OTHER;
     }
 }
@@ -425,6 +425,7 @@ abstract class qtype_preg_explaining_graph_operator extends qtype_preg_explainin
             $marking->isselection = true;
             $marking->style = 'solid';
             $marking->color = 'darkgreen';
+            $marking->tooltip = "selection";
             $marking->assume_subgraph($graph);
             $graph->nodes = array();
             $graph->links = array();
@@ -451,8 +452,8 @@ class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_grap
             $right = $this->operands[$i]->create_graph();
             $graph->assume_subgraph($right);
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $graph);
-            $graph->links[count($graph->links)-1]->id = $this->pregnode->id . '_' .
-                $this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
+            $graph->links[count($graph->links)-1]->id = $this->pregnode->id;// . '_' .
+                //$this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
             $graph->links[count($graph->links)-1]->tooltip = 'concatenation';
 
             if ($i != $n-1) {
@@ -482,7 +483,9 @@ class qtype_preg_explaining_graph_node_alt extends qtype_preg_explaining_graph_o
             $graph->assume_subgraph($newoperand);
 
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $left, $newoperand->entries[count($newoperand->entries)-1], $graph);
+            $graph->links[count($graph->links)-1]->tooltip = 'alternative';
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $newoperand->exits[count($newoperand->exits)-1], $right, $graph);
+            $graph->links[count($graph->links)-1]->tooltip = 'alternative';
         }
 
         $graph->nodes[] = $left;
@@ -615,6 +618,8 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
     }*/
 
     protected function process_operator($graph) {
+
+        /***** CONSTRUCTING INITIAL STUFF *****/
         $condsubexpr = new qtype_preg_explaining_graph_tool_subgraph('', $this->pregnode->id .
                     '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast);
         $condsubexpr->tooltip = "conditional subexpression";
@@ -625,6 +630,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         $condsubexpr->subgraphs[0]->color = 'purple';
         $isassert = $this->pregnode->is_condition_assertion();
         $tmp = null;
+        /***************************************/
 
         if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
             // TODO: refactor this and below
@@ -632,7 +638,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             if (is_string($this->pregnode->number)) {
                 $key .= '_name';
             }
-            $label = array(get_string($key, 'qtype_preg', $this->pregnode));
+            $label = array(get_string($key, 'qtype_preg', $this->pregnode) . '?');
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
             $key = 'description_recursion_node_cond_subexpr';
@@ -641,10 +647,10 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             } else if (is_string($this->pregnode->number)) {
                 $key .= '_name';
             }
-            $label = array(get_string($key, 'qtype_preg', $this->pregnode));
+            $label = array(get_string($key, 'qtype_preg', $this->pregnode) . '?');
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else if ($this->pregnode->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
-            $label = array(get_string('explain_define', 'qtype_preg'));
+            $label = array(get_string('explain_define', 'qtype_preg') . '?');
             $condsubexpr->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node($label, 'ellipse', 'blue', $condsubexpr->subgraphs[0], -1);
         } else {
             $tmp = $this->operands[0]->create_graph();
@@ -715,7 +721,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
                 $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
                 $condsubexpr);
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
-                'true',
+                get_string('explain_true', 'qtype_preg'),
                 $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
                 $condsubexpr->subgraphs[1]->entries[0],
                 $condsubexpr
@@ -723,7 +729,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link('', $condsubexpr->subgraphs[1]->exits[0], $graph->exits[0], $condsubexpr);
 
             $condsubexpr->links[] = new qtype_preg_explaining_graph_tool_link(
-                'false',
+                get_string('explain_false', 'qtype_preg'),
                 $graph->subgraphs[0]->nodes[count($graph->subgraphs[0]->nodes)-1],
                 $condsubexpr->subgraphs[2]->entries[0],
                 $condsubexpr

@@ -139,24 +139,30 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @return object $question the modified data.
      */
     protected function data_preprocessing_extra_answer_fields($question, $extrafields, $withanswerfiles = false) {
-        $key = 0;
-        // Setting $question->$field[$key] won't work, so we need set an array to $question->$field.
+        // Setting $question->$field[$key] won't work in PHP, so we need set an array of answer values to $question->$field.
+        // As we may have several extra fields with data for several answers in each, we use an array of arrays.
+        // Index in $extrafieldsdata is an extra answer field name, value - array of it's data for each answer.
         $extrafieldsdata = array();
-        foreach ($extrafields as $field) {
+        // First, prepare an array if empty arrays for each extra answer fields data.
+        foreach ($extraanswerfields as $field) {
             $extrafieldsdata[$field] = array();
         }
 
+        // Fill arrays with data from $question->options->answers.
+        $key = 0;
         foreach ($question->options->answers as $answer) {
-            foreach ($extrafields as $field) {
-                $this->data_preprocessing_extra_answer_field($extrafieldsdata, $answer, $field, $key);
+            foreach ($extraanswerfields as $field) {
+                // See hack comment in {@link data_preprocessing_answers()}.
+                unset($this->_form->_defaultValues["{$field}[{$key}]"]);
+                $extrafieldsdata[$field][$key] = $this->data_preprocessing_extra_answer_field($answer, $field);
             }
             $key++;
         }
 
-        foreach ($extrafields as $field) {
+        // Set this data in the $question object.
+        foreach ($extraanswerfields as $field) {
             $question->$field = $extrafieldsdata[$field];
         }
-
         return $question;
     }
 
@@ -166,10 +172,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * Questions with non-trivial DB - form element relationship will
      * want to override this.
      */
-    protected function data_preprocessing_extra_answer_field(&$extrafieldsdata, $answer, $field, $key) {
-        // See hack comment in data_preprocessing_answers.
-        unset($this->_form->_defaultValues["$field[$key]"]);
-        $extrafieldsdata[$field][$key] = $answer->$field;
+    protected function data_preprocessing_extra_answer_field($answer, $field) {
+        return $answer->$field;
     }
 
     protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
