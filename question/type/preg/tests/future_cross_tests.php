@@ -653,8 +653,8 @@ class qtype_preg_cross_tests_future {
         $test1 = array( 'str'=>"\na\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>2));
+                        'index_first'=>array(0=>0, 1=>-1),
+                        'length'=>array(0=>0, 1=>-1));
 
         $test2 = array( 'str'=>"a\na\n",
                         'is_match'=>true,
@@ -665,14 +665,14 @@ class qtype_preg_cross_tests_future {
         $test3 = array( 'str'=>'',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(),
-                        'length'=>array());
+                        'index_first'=>array(0=>0, 1=>-1),
+                        'length'=>array(0=>0, 1=>-1));
 
-        $test4 = array( 'str'=>"\na\na",
+        $test4 = array( 'str'=>"\na\na\n",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>2));
+                        'index_first'=>array(0=>0, 1=>-1),
+                        'length'=>array(0=>0, 1=>-1));
 
         return array('regex'=>'(?m)(^a$\n)*',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -704,8 +704,8 @@ class qtype_preg_cross_tests_future {
         $test4 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1));
+                        'index_first'=>array(0=>0, 1=>0, 2=>-1),
+                        'length'=>array(0=>1, 1=>0, 2=>-1));
                         
         $test5 = array( 'str'=>"ab\n\n\n",
                         'is_match'=>true,
