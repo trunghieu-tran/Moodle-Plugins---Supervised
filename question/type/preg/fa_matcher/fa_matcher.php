@@ -149,7 +149,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     protected function before_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION, $curpos, $length);
+        //$newstate->write_tag_values($transition, $curpos, $length);
     }
 
     /**
@@ -172,8 +172,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate->last_match_len = $length;
 
         $newstate->length += $length;
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_AT_TRANSITION, $curpos, $length);
-        $newstate->write_tag_values($transition, qtype_preg_fa_tag_set::POS_AFTER_TRANSITION, $curpos, $length);
+        $newstate->write_tag_values($transition, qtype_preg_fa_transition::TAG_POS_AT, $curpos, $length);
+        //$newstate->write_tag_values($transition, qtype_preg_fa_transition::TAG_POS_AFTER, $curpos, $length);
 
         if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
@@ -863,10 +863,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
-            $result->remove_unreachable_states();
-           //printf($result->fa_to_dot() . "\n");
-           //var_dump($result->start_states());
-           //var_dump($result->end_states());
+            //$result->remove_unreachable_states();     TODO27
+            //printf($result->fa_to_dot() . "\n");
+            //var_dump($result->start_states());
+            //var_dump($result->end_states());
             //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH);
         //} catch (Exception $e) {
           //  $result = null;
