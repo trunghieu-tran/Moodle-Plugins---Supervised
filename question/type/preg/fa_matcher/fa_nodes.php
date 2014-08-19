@@ -94,20 +94,28 @@ abstract class qtype_preg_fa_node {
         $tagsets = array();
         $oppositetransitions = array();
         $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
+        // Cycled last states.
         if ($del->from == $del->to && in_array($del->to, $endstates) || !$del->consumeschars)
         {
             return false;
         }
-        if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
+        // Get transitions for merging back.
+        if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
             $transitions = $automaton->get_adjacent_transitions($del->from, false);
         } else {
+            // Get transitions for merging forward.
             $transitions = $automaton->get_adjacent_transitions($del->to, true);
+            // Case of changeing assrts' places while merging.//TO THINK AND TODO!!!
             if ($del->is_unmerged_assert() && $del->pregleaf->is_both_anchor()) {
                 $oppositetransitions = $automaton->get_adjacent_transitions($del->from, false);
                 if (empty($oppositetransitions)) {
                     return false;
                 }
                 // Copy after-tags.
+                // Copy open tags.
+                foreach ($del->opentags as $open) {
+                    
+                }
                 $sets = array();
                 foreach ($del->tagsets as &$set) {
                     $copytags = array();
@@ -145,7 +153,7 @@ abstract class qtype_preg_fa_node {
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
                 $tagsets = array();
                 // Work with tags.
-                if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
+                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
                     foreach ($delclone->tagsets as &$set) {
                         //$del->get_label_for_dot($del->from, $del->to);
                         $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
