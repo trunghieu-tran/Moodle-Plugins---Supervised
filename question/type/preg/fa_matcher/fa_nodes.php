@@ -151,7 +151,7 @@ abstract class qtype_preg_fa_node {
                 $tran = clone($transition);
                 $delclone = clone $del;
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                $merged = array_merge($delclone->mergedbefore, $delclone);
+                $merged = array_merge($delclone->mergedbefore, array($delclone));
                 $merged = array_merge($merged, $delclone->mergedafter);
                 // Work with tags.
                 if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {  
