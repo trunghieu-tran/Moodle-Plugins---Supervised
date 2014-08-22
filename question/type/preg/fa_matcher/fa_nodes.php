@@ -151,24 +151,14 @@ abstract class qtype_preg_fa_node {
                 $tran = clone($transition);
                 $delclone = clone $del;
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                $tagsets = array();
+                $merged = array_merge($delclone->mergedbefore, $delclone);
+                $merged = array_merge($merged, $delclone->mergedafter);
                 // Work with tags.
-                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
-                    foreach ($delclone->tagsets as &$set) {
-                        //$del->get_label_for_dot($del->from, $del->to);
-                        $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
-                    }
-                    $tagsets = array_merge($tran->tagsets, $delclone->tagsets);
+                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {  
+                    $tran->mergedafter = array_merge($tran->mergedafter, $merged);
                 } else {
-                    foreach ($delclone->tagsets as &$set) {
-                        //$del->get_label_for_dot($del->from, $del->to);
-                        $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
-                    }
-                    $tagsets = array_merge($delclone->tagsets, $tran->tagsets);
+                    $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
                 }
-                $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
-                $tran->pregleaf = $newleaf;
-                $tran->tagsets = $tagsets;
 
                 $clonetransitions[] = $tran;
             //}
