@@ -568,7 +568,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $borderstate = $result['start'];
 
             $result = array('start' => $cur['start'], 'end' => $result['end']);
-            //self::merge_after_concat($automaton, $result, $borderstate);
+            self::merge_after_concat($automaton, $result, $borderstate);
         }
         $stack[] = $result;
     }
