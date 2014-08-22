@@ -521,7 +521,10 @@ class qtype_preg_fa_transition {
     public function tags_before_transition() {
         $result = '';
         foreach ($this->mergedbefore as $transition) {
-            $result .= $transition->this_tags_tohr(true, true);
+            if (!$transition->is_eps()) {
+                $result .= $transition->pregleaf->leaf_tohr();
+            }
+            //$result .= $transition->this_tags_tohr(true, true);
         }
         $result .= $this->this_tags_tohr(true, false);
         return $result;
@@ -531,7 +534,10 @@ class qtype_preg_fa_transition {
         $result = '';
         $result .= $this->this_tags_tohr(false, true);
         foreach ($this->mergedafter as $transition) {
-            $result .= $transition->this_tags_tohr(true, true);
+            if (!$transition->is_eps()) {
+                $result .= $transition->pregleaf->leaf_tohr();
+            }
+            //$result .= $transition->this_tags_tohr(true, true);
         }
         return $result;
     }
