@@ -463,7 +463,9 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        return !empty($this->all_open_tags) || !empty($this->all_close_tags());
+        $open = $this->all_open_tags();
+        $close = $this->all_close_tags();
+        return (!empty($open) || !empty($close));
     }
 
     /**
