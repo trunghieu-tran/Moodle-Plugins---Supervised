@@ -912,7 +912,7 @@ expr_prec_10(R) ::= expr_prec_9(A) LEFTSHIFT_ASSIGN(B) expr_prec_10(C) . {
 expr_prec_10(R) ::= expr_prec_9(A) MODULO_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с получением остатка от деления\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с получением остатка от модуля", "%ur(именительный)"));
 	R = $this->create_node('expr_prec_10', array( A, B, C ));
- }
+}
 
 expr_prec_10(R) ::= expr_prec_9(A) DIVISION_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с делением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с делением", "%ur(именительный)"));
@@ -966,7 +966,8 @@ expr_prec_9(R) ::= expr_prec_9(A) BINARYXOR(B) expr_prec_8(C) . {
 	R = $this->create_node('expr_prec_9', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) BINARYAND(B) expr_prec_8(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) AMPERSAND(B) expr_prec_8(C) . {
+	// Well, that's what you get when you mix binary and and adress taking
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И", "%ur(именительный)"));
 	R = $this->create_node('expr_prec_9', array( A, B, C ));
 }
