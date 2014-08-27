@@ -110,6 +110,22 @@ class block_formal_langs_c_token_typename extends block_formal_langs_c_token_bas
 							$str='';
 						}
 					}
+					//int - signed int +
+					if ($this->value='int') {
+						$signedint = new block_formal_langs_token_base(null, 'type', 'signed int', null, 0);
+						// if student write 'signed int'
+						if ($k+1 != count($other)) {
+							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+							$dist = $signedint->possible_pair($lexem, 0, $options);
+							if ($dist != -1) {
+								$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), 0, false, '');
+								$possiblepairs[] = $pair;
+							}
+							$str='';
+						}
+					}					
+					
 				} else {
                     // possible pair (missing separator)
                     if ($k+1 != count($other)) {
@@ -123,13 +139,27 @@ class block_formal_langs_c_token_typename extends block_formal_langs_c_token_bas
                         }
                         $str = '';
                     }
-					//signed char - char
+					//signed char - char +
 					if ($this->value='char') {
 						if ($k+1 != count($other)) {
 							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
 							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
 							$signedchar = new block_formal_langs_token_base(null, 'type', 'signed char', null, 0);
 							$dist = $signedchar->possible_pair($lexem, 0, $options);
+							if ($dist != -1) {
+								$pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), 0, false, '');
+								$possiblepairs[] = $pair;
+							}
+							$str = '';
+						}
+					}
+					//signed int - int +
+					if ($this->value='int') {
+						if ($k+1 != count($other)) {
+							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+							$signedint = new block_formal_langs_token_base(null, 'type', 'signed int', null, 0);
+							$dist = $signedint->possible_pair($lexem, 0, $options);
 							if ($dist != -1) {
 								$pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), 0, false, '');
 								$possiblepairs[] = $pair;
