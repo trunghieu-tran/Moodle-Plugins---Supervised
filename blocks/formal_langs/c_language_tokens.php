@@ -58,7 +58,91 @@ class block_formal_langs_c_token_keyword extends block_formal_langs_c_token_base
  */ 
 class block_formal_langs_c_token_typename extends block_formal_langs_c_token_base
 {
-
+	public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
+		if ($bypass == true) {
+            $possiblepairs = array();
+            if($options->usecase == true){
+                for ($k=0; $k < count($other); $k++) {
+                    if($other[$k] == $this->value) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                }
+            }
+        } else {
+            $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
+            $str = '';
+            $possiblepairs = array();
+            for ($k=0; $k < count($other); $k++) {
+                // incorrect lexem
+                if ($iscorrect == true) {
+                    $max = round($result);
+                    // possible pair (typo)
+                    $dist = $this->possible_pair($other[$k], $max, $options);
+                    if ($dist != -1) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                    // possible pair (extra separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str='';
+                    }	
+					//char - signed char +
+					if ($this->value='char') {
+						$signedchar = new block_formal_langs_token_base(null, 'type', 'signed char', null, 0);
+						// if student write 'signed char'
+						if ($k+1 != count($other)) {
+							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+							$dist = $signedchar->possible_pair($lexem, 0, $options);
+							if ($dist != -1) {
+								$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), 0, false, '');
+								$possiblepairs[] = $pair;
+							}
+							$str='';
+						}
+					}
+				} else {
+                    // possible pair (missing separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str = '';
+                    }
+					//signed char - char
+					if ($this->value='char') {
+						if ($k+1 != count($other)) {
+							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+							$signedchar = new block_formal_langs_token_base(null, 'type', 'signed char', null, 0);
+							$dist = $signedchar->possible_pair($lexem, 0, $options);
+							if ($dist != -1) {
+								$pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), 0, false, '');
+								$possiblepairs[] = $pair;
+							}
+							$str = '';
+						}
+					}
+                }
+            }
+        }
+        return $possiblepairs;
+		}
+	}
 }
 
 /** Describes an identifier
