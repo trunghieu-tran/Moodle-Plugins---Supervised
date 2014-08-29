@@ -97,6 +97,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             }
         }
 
+        $hintmessage = html_writer::tag('span', $hintmessage, array('id' => 'qtype-preg-colored-string'));
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
     }
