@@ -786,62 +786,62 @@ stmt(R) ::= expr_prec_11(A) SEMICOLON(B) . {
 
 expr_prec_11(R) ::= NEWKWD(A) expr_prec_10(B)  . {
 	$this->currentrule = new block_formal_langs_description_rule("выделение памяти", array("ключевое слово выделения памяти", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B ));
+	R = $this->create_node('new_kwd', array( A, B ));
 } 
 
 expr_prec_11(R) ::= DELETE(A) LEFTSQUAREBRACKET(B)  RIGHTSQUAREBRACKET(C)  expr_prec_10(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "левая квадратная скобка", "правая квадратная скобка", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B, C, D ));
+	R = $this->create_node('delete_array', array( A, B, C, D ));
 } 
 
 expr_prec_11(R) ::= DELETE(A) expr_prec_10(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B ));
+	R = $this->create_node('delete_pointer', array( A, B ));
 } 
 
 expr_prec_11(R) ::= type(A) expr_atom(B) ASSIGN(C) expr_prec_9(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B, C, D ));
+	R = $this->create_node('variable_declaration_with_assignment', array( A, B, C, D ));
 }
 
 expr_prec_11(R) ::= type(A) primitive_or_complex_type(B) ASSIGN(C) expr_prec_9(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B, C, D ));
+	R = $this->create_node('variable_declaration_with_assignment', array( A, B, C, D ));
 }
 
 expr_prec_11(R) ::= type(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('expr_prec_11', array( A, B ));
+	R = $this->create_node('variable_declaration', array( A, B ));
 }
 
 expr_prec_11(R) ::= type(A) primitive_or_complex_type(B)  . {
     $this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('expr_prec_11', array( A, B ));
+	R = $this->create_node('variable_declaration', array( A, B ));
 }
 
 expr_prec_11(R) ::= type_with_qualifier(A) IDENTIFIER(C) ASSIGN(D) expr_prec_9(E) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A,  C, D, E ));
+	R = $this->create_node('variable_declaration_with_assignment', array( A,  C, D, E ));
 }
 
 expr_prec_11(R) ::= type_with_qualifier(A)  primitive_or_complex_type(C) ASSIGN(D) expr_prec_9(E) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, C, D, E ));
+	R = $this->create_node('variable_declaration_with_assignment', array( A, C, D, E ));
 }
 
 expr_prec_11(R) ::= type_with_qualifier(A)  IDENTIFIER(C)  . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('expr_prec_11', array( A, C ));
+	R = $this->create_node('variable_declaration', array( A, C ));
 }
 
 expr_prec_11(R) ::= type_with_qualifier(A) primitive_or_complex_type(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('expr_prec_11', array( A, C ));
+	R = $this->create_node('variable_declaration', array( A, C ));
 }
 
 expr_prec_11(R) ::= expr_prec_11(A) COMMA(B)  expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("список выражений %l(expr_prec_10)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A, B, C ));
+	R = $this->create_node('expr_comma', array( A, B, C ));
 }
 
 expr_prec_11(R) ::= expr_prec_10(A) . {
@@ -886,57 +886,57 @@ varqualifier(R) ::= FRIENDKWD(A) .  {
 
 expr_prec_10(R) ::= expr_prec_9(A) BINARYXOR_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым исключающим ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового исключающего ИЛИ с присваиванием", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_binaryxor_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) BINARYOR_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового ИЛИ  с присваиванием", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_binaryor_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) BINARYAND_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И  с присваиванием", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_binaryand_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) RIGHTSHIFT_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом вправо\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом вправо", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_rightshift_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) LEFTSHIFT_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом влево\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом влево", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_leftshift_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) MODULO_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с получением остатка от деления\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с получением остатка от модуля", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_modulo_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) DIVISION_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с делением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с делением", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_division_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) MULTIPLY_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с умножением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с умножением", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_multiply_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) PLUS_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с суммированием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с суммированием", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_plus_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) MINUS_ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с вычитанием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с вычитанием", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_minus_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) ASSIGN(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A, B, C ));
+	R = $this->create_node('expr_assign', array( A, B, C ));
 }
 
 expr_prec_10(R) ::= expr_prec_9(A) . {
@@ -948,38 +948,38 @@ expr_prec_10(R) ::= expr_prec_9(A) . {
 
 expr_prec_9(R) ::= expr_prec_9(A) BINARYOR(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_binary_or', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_logical_or', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) LOGICALAND(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_logical_and', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) BINARYXOR(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_binary_xor', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) AMPERSAND(B) expr_prec_8(C) . {
 	// Well, that's what you get when you mix binary and and adress taking
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_binary_and', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) NOT_EQUAL(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"не равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция не равно", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_notequal', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) EQUAL(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция равно", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A, B, C ));
+	R = $this->create_node('expr_equal', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_8(A) . {
@@ -991,22 +991,22 @@ expr_prec_9(R) ::= expr_prec_8(A) . {
 
 expr_prec_8(R) ::= expr_prec_8(A) LESSER_OR_EQUAL(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"меньше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция меньше или равно", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_8', array( A, B, C ));
+	R = $this->create_node('expr_lesser_or_equal', array( A, B, C ));
 }
 
 expr_prec_8(R) ::= expr_prec_8(A) GREATER_OR_EQUAL(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"больше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция больше или равно", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_8', array( A, B, C ));
+	R = $this->create_node('expr_greater_or_equal', array( A, B, C ));
 }
 
 expr_prec_8(R) ::= expr_prec_8(A) GREATER(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"больше\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция больше", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_8', array( A, B, C ));
+	R = $this->create_node('expr_greater', array( A, B, C ));
 }
 
 expr_prec_8(R) ::= expr_prec_8(A) LESSER(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"меньше\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция меньше", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_8', array( A, B, C ));
+	R = $this->create_node('expr_lesser', array( A, B, C ));
 }
 
 expr_prec_8(R) ::= expr_prec_7(A) . {
@@ -1018,12 +1018,12 @@ expr_prec_8(R) ::= expr_prec_7(A) . {
 
 expr_prec_7(R) ::= expr_prec_7(A) LEFTSHIFT(B) expr_prec_6(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг влево выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига влево", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_7', array( A, B, C ));
+	R = $this->create_node('expr_leftshift', array( A, B, C ));
 }
 
 expr_prec_7(R) ::= expr_prec_7(A) RIGHTSHIFT(B) expr_prec_6(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг вправо выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига вправо", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_7', array( A, B, C ));
+	R = $this->create_node('expr_rightshift', array( A, B, C ));
 }
 
 expr_prec_7(R) ::= expr_prec_6(A) . {
@@ -1035,12 +1035,12 @@ expr_prec_7(R) ::= expr_prec_6(A) . {
 
 expr_prec_6(R) ::= expr_prec_6(A) MINUS(B) expr_prec_5(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("разность выражений \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция вычитания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_6', array( A, B, C ));
+	R = $this->create_node('expr_minus', array( A, B, C ));
 }
 
 expr_prec_6(R) ::= expr_prec_6(A) PLUS(B) expr_prec_5(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сумма %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция суммирования", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_6', array( A, B, C ));
+	R = $this->create_node('expr_plus', array( A, B, C ));
 }
 
 expr_prec_6(R) ::= expr_prec_5(A) . {
@@ -1052,17 +1052,17 @@ expr_prec_6(R) ::= expr_prec_5(A) . {
 
 expr_prec_5(R) ::= expr_prec_5(A)  MODULOSIGN(B) expr_prec_4(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("получение остатка от деления выражений %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция получения остатка от деления", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_5', array( A, B, C ));
+	R = $this->create_node('expr_modulosign', array( A, B, C ));
 }
 
 expr_prec_5(R) ::= expr_prec_5(A)  DIVISION(B) expr_prec_4(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("деление %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция деления", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_5', array( A, B, C ));
+	R = $this->create_node('expr_division', array( A, B, C ));
 }
 
 expr_prec_5(R) ::= expr_prec_5(A)  MULTIPLY(B) expr_prec_4(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("умножение %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция умножения", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_5', array( A, B, C ));
+	R = $this->create_node('expr_multiply', array( A, B, C ));
 }
 
 expr_prec_5(R) ::= expr_prec_4(A) . {
@@ -1074,12 +1074,12 @@ expr_prec_5(R) ::= expr_prec_4(A) . {
 
 expr_prec_4(R) ::= try_value_access(A) MULTIPLY(B) IDENTIFIER(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("взятие поля по указателю", array("%ur(именительный)", "%s", "%s"));
-	R = $this->create_node('expr_prec_4', array( A, B, C ));
+	R = $this->create_node('expr_get_property', array( A, B, C ));
 }
 
 expr_prec_4(R) ::= try_pointer_access(A) MULTIPLY(B) IDENTIFIER(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("взятие поля по указателю", array("%ur(именительный)", "%s", "%s"));
-	R = $this->create_node('expr_prec_4', array( A, B, C ));
+	R = $this->create_node('expr_get_property', array( A, B, C ));
 }
 
 expr_prec_4(R) ::= expr_prec_3(A) . {
@@ -1091,47 +1091,47 @@ expr_prec_4(R) ::= expr_prec_3(A) . {
 
 expr_prec_3(R) ::= AMPERSAND(A) expr_prec_3(B) . [UADRESS]  {
 	$this->currentrule = new block_formal_langs_description_rule("операция взятия указателя", array("операция взятия указателя", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B ));
+	R = $this->create_node('expr_take_adress', array( A, B ));
 }
 
 expr_prec_3(R) ::= MULTIPLY(A) expr_prec_3(B) . [UINDIRECTION]  {
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя", array("операция разыменования", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B ));
+	R = $this->create_node('expr_dereference', array( A, B ));
 }
 
 expr_prec_3(R) ::= typecast(A) expr_prec_3(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция приведения к типу", array("%ur(именительный)", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_typecast', array( A, B));
 }
 
 expr_prec_3(R) ::= LOGICALNOT(A) expr_prec_3(B) .  {
 	$this->currentrule = new block_formal_langs_description_rule("логическое отрицание на выражении %2(именительный)", array("операция логического отрицания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_logical_not', array( A, B));
 }
 
 expr_prec_3(R) ::= BINARYNOT(A) expr_prec_3(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("побитовое отрицание на выражении %2(именительный)", array("операция побитового отрицания", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_binary_not', array( A, B));
 }
 
 expr_prec_3(R) ::= MINUS(A) expr_prec_2(B)   . [UMINUS] {
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного минуса на выражении %2(именительный)", array("операция унарного минуса", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_unary_minus', array( A, B));
 }
 
 expr_prec_3(R) ::= PLUS(A) expr_prec_2(B)   . [UPLUS] {
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного плюса на выражении %2(именительный)", array("операция унарного плюса", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_unary_plus', array( A, B));
 }
 
 expr_prec_3(R) ::= DECREMENT(A) expr_prec_3(B)   . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция декремента", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_prefix_decrement', array( A, B));
 }
 
 expr_prec_3(R) ::= INCREMENT(A) expr_prec_3(B)   . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция инкремента", "%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A, B));
+	R = $this->create_node('expr_prefix_decrement', array( A, B));
 }
 
 expr_prec_3(R) ::= expr_prec_2(A) . {
@@ -1143,42 +1143,42 @@ expr_prec_3(R) ::= expr_prec_2(A) . {
 
 expr_prec_2(R) ::= try_value_access(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("обращение к полю по указателю на метод", array("%ur(именительный)", "имя свойства"));
-	R = $this->create_node('expr_prec_2', array( A , B) );
+	R = $this->create_node('expr_property_access', array( A , B) );
 }
 
 expr_prec_2(R) ::= try_pointer_access(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("обращение к полю по указателю на метод", array("%ur(именительный)", "имя свойства"));
-	R = $this->create_node('expr_prec_2', array( A , B) );
+	R = $this->create_node('expr_property_access', array( A , B) );
 }
 
 expr_prec_2(R) ::= cpp_style_cast(A)  LEFTROUNDBRACKET(B) expr_prec_11(C)  RIGHTROUNDBRACKET(D) . [UBRACKET] {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный) выражения \"%3(именительный)\"", array("%ur(именительный)", "левая круглая скобка", "%ur(именительный)", "правая квадратная скобка"));
-	R = $this->create_node('expr_prec_2', array( A, B, C, D));
+	R = $this->create_node('expr_array_access', array( A, B, C, D));
 }
 
 expr_prec_2(R) ::= expr_prec_2(A)  LEFTSQUAREBRACKET(B) expr_prec_10(C)  RIGHTSQUAREBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая квадратная скобка", "%ur(именительный)", "правая квадратная скобка"));
-	R = $this->create_node('expr_prec_2', array( A, B, C, D));
+	R = $this->create_node('expr_array_access', array( A, B, C, D));
 }
 
 expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) expr_prec_11(C)  RIGHTROUNDBRACKET(D) . [UBRACKET] {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
-	R = $this->create_node('expr_prec_2', array( A, B, C, D));
+	R = $this->create_node('expr_function_call', array( A, B, C, D));
 }
 
 expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) RIGHTROUNDBRACKET(D) . [UBRACKET] {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая круглая скобка", "правая круглая скобка"));
-	R = $this->create_node('expr_prec_2', array( A, B, D));
+	R = $this->create_node('expr_function_call', array( A, B, D));
 }
 
 expr_prec_2(R) ::= expr_prec_2(A)  INCREMENT(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция инкремента"));
-	R = $this->create_node('expr_prec_2', array( A, B));
+	R = $this->create_node('expr_postfix_increment', array( A, B));
 }
 
 expr_prec_2(R) ::= expr_prec_2(A)  DECREMENT(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция декремента"));
-	R = $this->create_node('expr_prec_2', array( A, B));
+	R = $this->create_node('expr_postfix_decrement', array( A, B));
 }
 
 expr_prec_2(R) ::= expr_atom(A) . {
@@ -1202,22 +1202,22 @@ try_pointer_access(R) ::= expr_prec_2(A) RIGHTARROW(B) . {
 
 cpp_style_cast(R) ::= CONST_CAST(A)  LESSER(B) type(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("приведение со снятием константности к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
-	R = $this->create_node('cpp_style_cast', array(A, B, C, D));
+	R = $this->create_node('expr_const_cast', array(A, B, C, D));
 }
 
 cpp_style_cast(R) ::= STATIC_CAST(A)  LESSER(B) type(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("статическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
-	R = $this->create_node('cpp_style_cast', array(A, B, C, D));
+	R = $this->create_node('expr_static_cast', array(A, B, C, D));
 }
 
 cpp_style_cast(R) ::= DYNAMIC_CAST(A)  LESSER(B) type(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("динамическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
-	R = $this->create_node('cpp_style_cast', array(A, B, C, D));
+	R = $this->create_node('expr_dynamic_cast', array(A, B, C, D));
 }
 
 cpp_style_cast(R) ::= REINTERPRET_CAST(A)  LESSER(B) type(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("побайтовое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
-	R = $this->create_node('cpp_style_cast', array(A, B, C, D));
+	R = $this->create_node('expr_reinterpret_cast', array(A, B, C, D));
 }
 
 /* EXPRESSIONS OF FIRST PRECEDENCE */
@@ -1244,27 +1244,27 @@ expr_atom(R) ::= STRING(A) . {
 
 expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_prec_11(B) RIGHTROUNDBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая круглая скобка", "%s", "провая круглая скобка"));
-	R =  $this->create_node('expr_atom', array( A, B, C));
+	R =  $this->create_node('expr_brackets', array( A, B, C));
 }
 
 expr_atom(R) ::= PREPROCESSOR_STRINGIFY(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
-	R =  $this->create_node('expr_atom', array( A, B));
+	R =  $this->create_node('expr_preprocessor_stringify', array( A, B));
 }
 
 expr_atom(R) ::= expr_atom(A) PREPROCESSOR_CONCAT(B) IDENTIFIER(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
-	R =  $this->create_node('expr_atom', array( A, B, C));
+	R =  $this->create_node('expr_preprocessor_concat', array( A, B, C));
 }
 
 expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  type(C) RIGHTROUNDBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
-	R =  $this->create_node('expr_atom', array( A, B, C, D));
+	R =  $this->create_node('expr_sizeof', array( A, B, C, D));
 }
 
 expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  IDENTIFIER(C) RIGHTROUNDBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%s", "правая круглая скобка"));
-	R =  $this->create_node('expr_atom', array( A, B, C, D));
+	R =  $this->create_node('expr_sizeof', array( A, B, C, D));
 }
 
 /* TYPECAST */
