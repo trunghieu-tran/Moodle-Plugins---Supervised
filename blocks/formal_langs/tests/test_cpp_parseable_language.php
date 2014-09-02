@@ -31,7 +31,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 /**
  * Tests C++ parseable language
  */
-class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
+class block_formal_langs_cpp_parseable_language_test extends PHPUnit_Framework_TestCase {
     /**
      * Optimizes tree replacing nodes with one child with their child
      * @param array|block_formal_langs_processed_string $nodes nodes
