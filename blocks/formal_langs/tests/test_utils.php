@@ -24,7 +24,6 @@
  * @package questions
  */
 global $CFG;
-require_once($CFG->dirroot.'/lib/textlib.class.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar_parser.php');
 

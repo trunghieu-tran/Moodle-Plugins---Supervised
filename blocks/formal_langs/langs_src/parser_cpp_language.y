@@ -846,7 +846,7 @@ expr_prec_11(R) ::= expr_prec_11(A) COMMA(B)  expr_prec_10(C) . {
 
 expr_prec_11(R) ::= expr_prec_10(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_11', array( A ));
+	R = A;
 }
 
 /* VARIABLE QUALIFIERS */
@@ -941,7 +941,7 @@ expr_prec_10(R) ::= expr_prec_9(A) ASSIGN(B) expr_prec_10(C) . {
 
 expr_prec_10(R) ::= expr_prec_9(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_10', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF NINTH PRECEDENCE */
@@ -984,7 +984,7 @@ expr_prec_9(R) ::= expr_prec_9(A) EQUAL(B) expr_prec_8(C) . {
 
 expr_prec_9(R) ::= expr_prec_8(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_9', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF EIGHTH PRECEDENCE */
@@ -1011,7 +1011,7 @@ expr_prec_8(R) ::= expr_prec_8(A) LESSER(B) expr_prec_7(C) . {
 
 expr_prec_8(R) ::= expr_prec_7(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_8', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF SEVENTH PRECEDENCE */
@@ -1028,7 +1028,7 @@ expr_prec_7(R) ::= expr_prec_7(A) RIGHTSHIFT(B) expr_prec_6(C) . {
 
 expr_prec_7(R) ::= expr_prec_6(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_7', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF SIXTH PRECEDENCE */
@@ -1045,7 +1045,7 @@ expr_prec_6(R) ::= expr_prec_6(A) PLUS(B) expr_prec_5(C) . {
 
 expr_prec_6(R) ::= expr_prec_5(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_6', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF FIFTH PRECEDENCE */
@@ -1067,7 +1067,7 @@ expr_prec_5(R) ::= expr_prec_5(A)  MULTIPLY(B) expr_prec_4(C) . {
 
 expr_prec_5(R) ::= expr_prec_4(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_5', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF FOURTH PRECEDENCE */
@@ -1084,7 +1084,7 @@ expr_prec_4(R) ::= try_pointer_access(A) MULTIPLY(B) IDENTIFIER(C) . {
 
 expr_prec_4(R) ::= expr_prec_3(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_4', array( A ));
+	R = A;
 }
 
 /* EXPRESSIONS OF THIRD PRECEDENCE */
@@ -1136,7 +1136,7 @@ expr_prec_3(R) ::= INCREMENT(A) expr_prec_3(B)   . {
 
 expr_prec_3(R) ::= expr_prec_2(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('expr_prec_3', array( A ) );
+	R = A;
 }
 
 /* EXPRESSIONS OF SECOND PRECEDENCE */
@@ -1183,7 +1183,7 @@ expr_prec_2(R) ::= expr_prec_2(A)  DECREMENT(B) . {
 
 expr_prec_2(R) ::= expr_atom(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R =  $this->create_node('expr_prec_2', array( A ));
+	R =  A;
 }
 
 /* SPECIAL PRODUCTIONS, NEEDED TO SUPPORT ACCESS BY POINTERS TO MEMBERS */
@@ -1224,22 +1224,22 @@ cpp_style_cast(R) ::= REINTERPRET_CAST(A)  LESSER(B) type(C) GREATER(D) . {
 
 expr_atom(R) ::= NUMERIC(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R =  $this->create_node('expr_atom', array( A ));
+	R =  A;
 }
 
 expr_atom(R) ::= IDENTIFIER(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R =  $this->create_node('expr_atom', array( A ));
+	R =  A;
 }
 
 expr_atom(R) ::= CHARACTER(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R =  $this->create_node('expr_atom', array( A ));
+	R =  A;
 }
 
 expr_atom(R) ::= STRING(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R =  $this->create_node('expr_atom', array( A ));
+	R =  A;
 }
 
 expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_prec_11(B) RIGHTROUNDBRACKET(C) . {
