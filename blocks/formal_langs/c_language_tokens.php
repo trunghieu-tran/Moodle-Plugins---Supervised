@@ -129,7 +129,7 @@ class block_formal_langs_c_token_typename extends block_formal_langs_c_token_bas
 						if ($k+1 != count($other)) {
 							$str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
 							$lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
-							$dist = $signedint->possible_pair($lexem, 0, $options);
+							$dist = $shortint->possible_pair($lexem, 0, $options);
 							if ($dist != -1) {
 								$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), 0, false, '');
 								$possiblepairs[] = $pair;
@@ -276,7 +276,175 @@ class block_formal_langs_c_token_string extends block_formal_langs_c_token_base
  */ 
 class block_formal_langs_c_token_operators extends block_formal_langs_c_token_base
 {
-
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
+        if ($bypass == true) {
+            $possiblepairs = array();
+            if($options->usecase == true){
+                for ($k=0; $k < count($other); $k++) {
+                    if($other[$k] == $this->value) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                }
+            }
+        } else {
+            // TODO: generic mistakes handling
+            $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
+            $str = '';
+            $possiblepairs = array();
+            for ($k=0; $k < count($other); $k++) {
+                // incorrect lexem
+                if ($iscorrect == true) {
+                    $max = round($result);
+                    // possible pair (typo)
+                    $dist = $this->possible_pair($other[$k], $max, $options);
+                    if ($dist != -1) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                    // possible pair (extra separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str='';
+                    }
+					if ($this->value=='||') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'or', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='or') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', '||', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='&&') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'and', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='and') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'or', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='not') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'or', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='!') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'or', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='^') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'xor', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='xor') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', '^', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='and_eq') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', '&=', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='&=') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'and_eq', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='or_eq') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', '|=', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='|=') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'or_eq', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='not_eq') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', '!=', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					if ($this->value=='!=') {
+						$lexemor = new block_formal_langs_token_base(null, 'type', 'not_eq', null, 0);
+						$dist = $lexemor->possible_pair($other[$k], 0, $options);
+						if ($dist !=-1) {
+							$pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+							$possiblepairs[] = $pair;
+						}
+					}
+					
+                } else {
+                    // possible pair (missing separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str = '';
+                    }
+                }
+            }
+        }
+        return $possiblepairs;
+    }
 }
 
 /** Describes an ellipsis
