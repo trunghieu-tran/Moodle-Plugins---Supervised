@@ -24,11 +24,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_formal_langs';
-$plugin->version  = 2013120900;
-$plugin->requires = 2013051400;
-$plugin->release = 'Formal languages 2.5';
-$plugin->maturity = MATURITY_STABLE;
+$plugin->version  = 2014071000;
+$plugin->requires = 2013110500;
+$plugin->release = 'Formal languages 2.6';
+$plugin->maturity = MATURITY_BETA;
 
 $plugin->dependencies = array(
-    'qtype_poasquestion' => 2013062900
+    'qtype_poasquestion' => 2014071000
 );
