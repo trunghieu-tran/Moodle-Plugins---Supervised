@@ -47,13 +47,13 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
 
 /* Feedback colors.*/
 #qtype-preg-colored-string .correct {
-    background-color: #dff0d8;
+    background-color: #beffa5;
 }
 
 #qtype-preg-colored-string .incorrect {
-    background-color: #f2dede;
+    background-color: #fca19e;
 }
 
 #qtype-preg-colored-string .partiallycorrect {
-    background-color: #fcf8e3;
+    background-color: #ffffa5;
 }
