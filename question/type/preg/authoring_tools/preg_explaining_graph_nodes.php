@@ -586,7 +586,7 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
         $subexpr->tooltip = "subexpression";
         $subexpr->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
         $subexpr->color = ($this->pregnode->userinscription[0]->data != '(?i:...)')
-                            ? ($generated ? 'invis' : 'black')
+                            ? ($generated || $this->pregnode->position->indfirst < 0 ? 'invis' : 'black')
                             : 'lightgrey';
         if ($this->pregnode->userinscription[0]->data != '(?i:...)' && $generated) {
             $subexpr->bgcolor = 'white';
