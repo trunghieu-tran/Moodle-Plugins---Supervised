@@ -517,6 +517,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                      : $newstate;
 
                     if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
+                        if (!$transition->consumeschars) {
+                            $length = 0;
+                        }
+
                         // Create a new state.
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
                         //$tmp = core_text::substr($str, $curpos, $length);
@@ -635,6 +639,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                      : $newstate;
 
                     if ($transition->pregleaf->match($str, $curpos, $length, $matcherstateobj)) {
+                        if (!$transition->consumeschars) {
+                            $length = 0;
+                        }
+
                         // Create a new state.
                         $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
