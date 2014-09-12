@@ -737,7 +737,9 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
 /***************************************** Tests for charset *****************************************/
 
-    function test_charflag_set_match() {
+    // TODO; раскомментить и поправить на новый интерфейс. match теперь только в charset'е
+
+    /*function test_charflag_set_match() {
         $flag = new qtype_preg_charset_flag;
         $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('asdf0123'));
         $this->assertTrue($flag->match(new qtype_poasquestion_string('abc015'), 0, true));
@@ -1094,4 +1096,29 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 3, $l, true), 'Incorrect matching');
         $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 4, $l, true), 'Incorrect matching');
     }*/
+
+    function test_charset_dnf_match() {
+        $str = new qtype_poasquestion_string('a');
+        $length = 0;
+
+        $flag1 = new qtype_preg_charset_flag();
+        $flag1->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('a!&'));
+        $flag2 = new qtype_preg_charset_flag();
+        $flag2->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
+        $flag2->negative = true;
+        $flag3 = new qtype_preg_charset_flag();
+        $flag3->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('a'));
+
+        $charset = new qtype_preg_leaf_charset();
+        $charset->flags = array(array($flag1, $flag2));
+        $res = $charset->match($str, 0, $length);
+        $this->assertTrue($res === false);
+        $this->assertTrue($length === 0);
+
+        $charset = new qtype_preg_leaf_charset();
+        $charset->flags = array(array($flag1, $flag2), array($flag3));
+        $res = $charset->match($str, 0, $length);
+        $this->assertTrue($res === true);
+        $this->assertTrue($length === 1);
+    }
 }

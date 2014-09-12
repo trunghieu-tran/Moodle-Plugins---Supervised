@@ -956,16 +956,28 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function ranges() {
-        if ($this->cachedranges === null) {
-            $this->cachedranges = $this->flags[0][0]->ranges($this->caseless);
-            for ($i = 1; $i < count($this->flags); $i++) {
-                $tmp = $this->flags[$i][0]->ranges($this->caseless);
-                $this->cachedranges = qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
-            }
-            if ($this->negative) {
-                $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
-            }
+        if ($this->cachedranges !== null) {
+            return $this->cachedranges;
         }
+
+        for ($i = 0; $i < count($this->flags); ++$i) {
+            // Get the intersection for current disjunct
+            $tmp = $this->flags[$i][0]->ranges($this->caseless);
+            for ($j = 1; $j < count($this->flags[$i]); ++$j) {
+                $ranges = $this->flags[$i][$j]->ranges($this->caseless);
+                $tmp = qtype_preg_unicode::kinda_operator($tmp, $ranges, true, false, false, false);
+            }
+
+            // Add it to the result
+            $this->cachedranges = $i == 0
+                                ? $tmp
+                                : qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
+        }
+
+        if ($this->negative) {
+            $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+        }
+
         return $this->cachedranges;
     }
 
@@ -1007,7 +1019,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
 
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
-            $ranges = qtype_preg_unicode::dot_ranges();
+            $ranges = qtype_preg_unicode::minmax_ranges();
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
