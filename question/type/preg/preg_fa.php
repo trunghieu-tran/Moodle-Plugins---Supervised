@@ -128,6 +128,155 @@ class qtype_preg_fa_transition {
         $this->ismerged = false;
     }
 
+    public function is_start_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor() &&  empty($this->assertionsbefore));
+    }
+
+    public function is_end_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor() &&  empty($this->assertionsafter));
+    }
+
+    public function is_both_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_end_anchor() && !empty($this->assertionsafter) ||
+                $this->pregleaf->is_start_anchor() && !empty($this->assertionsbefore)));
+    }
+
+    /**
+     * Find intersection of asserts.
+     *
+     * @param other - the second assert for intersection.
+     * @return assert, which is intersection of ginen.
+     */
+    public function intersect_asserts($other) {
+
+        // Adding assert to array.
+        $thisclone = clone($this);
+        if ($this->is_start_anchor()) {
+            $this->assertionsafter[] = $thisclone;
+        } else if ($this->is_end_anchor()) {
+            $this->assertionsbefore[] = $thisclone;
+        }
+        
+        
+        $otherclone = clone($other);
+        if ($other->is_start_anchor()) {
+            $other->assertionsafter[] = $otherclone;
+        } else if ($other->is_end_anchor()){
+            $other->assertionsbefore[] = $otherclone;
+        }
+        
+        $resultbefore = array_merge($this->assertionsbefore, $other->assertionsbefore);
+        $resultafter = array_merge($this->assertionsafter, $other->assertionsafter);
+        // Removing same asserts.
+        for ($i = 0; $i < count($resultbefore); $i++) {
+            for ($j = ($i+1); $j < count($resultbefore); $j++) {
+                if ($resultbefore[$i]->pregleaf->subtype == $resultbefore[$j]->pregleaf->subtype) {
+                    unset($resultbefore[$j]);
+                    $resultbefore = array_values($resultbefore);
+                    $j--;
+                }
+            }
+        }
+
+        for ($i = 0; $i < count($resultafter); $i++) {
+            for ($j = ($i+1); $j < count($resultafter); $j++) {
+                if ($resultafter[$i]->pregleaf->subtype == $resultafter[$j]->pregleaf->subtype) {
+                    unset($resultafter[$j]);
+                    $resultafter = array_values($resultafter);
+                    $j--;
+                }
+            }
+        }
+
+        $resultbefore = array_values($resultbefore);
+        $resultafter = array_values($resultafter);
+
+        foreach ($resultafter as $assert) {
+            $key = array_search($assert, $resultafter);
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                // Searching compatible asserts.
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $resultafter)) {
+                    unset($resultafter[$key]);
+                    $resultafter = array_values($resultafter);
+                }
+            }
+        }
+
+        foreach ($resultbefore as $assert) {
+            $key = array_search($assert, $resultbefore);
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                // Searching compatible asserts.
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
+                }
+
+            }
+            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                // Searching compatible asserts.
+                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore)) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
+                }
+
+            }
+        }
+
+        // Getting result leaf.
+        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+            $assert = clone $this;
+        } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+            $assert = clone $other;
+        } else {
+            if (count($resultbefore) != 0) {
+                switch($resultbefore[0]->subtype) {
+                    case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
+                        $assert = new qtype_preg_leaf_assert_capital_esc_z;
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
+                        $assert = new qtype_preg_leaf_assert_small_esc_z;
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
+                        $assert = new qtype_preg_leaf_assert_dollar;
+                        break;
+                }
+                unset($resultbefore[0]);
+            } else if (count($resultafter) != 0) {
+                switch($resultafter[0]->subtype) {
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
+                        $assert = new qtype_preg_leaf_assert_esc_a;
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
+                        $assert = new qtype_preg_leaf_assert_esc_g;
+                        break;
+                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                        $assert = new qtype_preg_leaf_assert_circumflex;
+                        break;
+                }
+                unset($resultafter[0]);
+            } else {
+                $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            }
+        }
+        $assert->assertionsbefore = $resultbefore;
+        $assert->assertionsafter = $resultafter;
+        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            if ($this->is_start_anchor()) {
+                unset($this->assertionsafter[0]);
+            } else {
+                unset($this->assertionsbefore[0]);
+            }
+        }
+        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            if ($other->is_start_anchor()) {
+                unset($other->assertionsafter[0]);
+            } else {
+                unset($other->assertionsbefore[0]);
+            }
+        }
+        return $assert;
+    }
+
     /**
      * Return the laziest greedines of two
      */
@@ -314,7 +463,9 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        return !empty($this->all_open_tags) || !empty($this->all_close_tags());
+        $open = $this->all_open_tags();
+        $close = $this->all_close_tags();
+        return (!empty($open) || !empty($close));
     }
 
     /**
@@ -331,16 +482,8 @@ class qtype_preg_fa_transition {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_B  && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_G);
     }
 
-    public function is_start_anchor() {
-        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor();
-    }
-
     public function is_wordbreak() {
         return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B;
-    }
-
-    public function is_end_anchor() {
-        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor();
     }
 
     /**
@@ -378,7 +521,10 @@ class qtype_preg_fa_transition {
     public function tags_before_transition() {
         $result = '';
         foreach ($this->mergedbefore as $transition) {
-            $result .= $transition->this_tags_tohr(true, true);
+            if (!$transition->is_eps()) {
+                $result .= $transition->pregleaf->leaf_tohr();
+            }
+            //$result .= $transition->this_tags_tohr(true, true);
         }
         $result .= $this->this_tags_tohr(true, false);
         return $result;
@@ -388,7 +534,10 @@ class qtype_preg_fa_transition {
         $result = '';
         $result .= $this->this_tags_tohr(false, true);
         foreach ($this->mergedafter as $transition) {
-            $result .= $transition->this_tags_tohr(true, true);
+            if (!$transition->is_eps()) {
+                $result .= $transition->pregleaf->leaf_tohr();
+            }
+            //$result .= $transition->this_tags_tohr(true, true);
         }
         return $result;
     }
