@@ -395,13 +395,13 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $automaton->add_transition(new qtype_preg_fa_transition($stack_item['end'], $epsleaf, $end));
             $stack_item['end'] = $end;
         }
-        /*$incoming = $automaton->get_adjacent_transitions($stack_item['end'], false);
+        $incoming = $automaton->get_adjacent_transitions($stack_item['end'], false);
         foreach ($incoming as $transition) {
             $transition->set_transition_type();
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
             }
-        }*/
+        }
     }
 
     protected static function merge_after_concat(&$automaton, &$stack_item, $borderstate) {
@@ -662,20 +662,20 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $newtransition = clone $transition;
             $newtransition->from = $body['end'];
             $newtransition->loopsback = true;
-            //$newtransition->set_transition_type();
+            $newtransition->set_transition_type();
             $automaton->add_transition($newtransition);
-            /*if ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
+            if ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($body['end']));
-            }*/
+            }
         }
 
-        /*$prevtrans = $automaton->get_adjacent_transitions($body['end'], false);
+        $prevtrans = $automaton->get_adjacent_transitions($body['end'], false);
         foreach ($prevtrans as $transition) {
             $transition->set_transition_type();
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition,  array($body['end']));
             }
-        }*/
+        }
 
         // The body automaton can be skipped by an eps-transition.
         self::add_ending_eps_transition_if_needed($automaton, $body);
@@ -705,19 +705,19 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->from = $cur['end'];
                     $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
-                    /*$newtransition->set_transition_type();
+                    $newtransition->set_transition_type();
                     if ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                         qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($cur['end']));
-                    }*/
+                    }
                 }
 
-                /*$prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
+                $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
                 foreach ($prevtrans as $transition) {
                     $transition->set_transition_type();
                     if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                         qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
                     }
-                }*/
+                }
 
                 $stack[] = $cur;
             }
@@ -800,10 +800,10 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_fa_transition($cur['start'], $epsleaf, $endstate);
             $automaton->add_transition($transition);
-            /*$transition->set_transition_type();
+            $transition->set_transition_type();
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
-            }*/
+            }
             $quantified[] = $cur;
         }
         for ($i = 0; $i < $rightborder - $leftborder; $i++) {
