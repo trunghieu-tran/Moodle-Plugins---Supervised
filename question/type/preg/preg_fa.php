@@ -356,11 +356,25 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
+        $lab = '"';
+        foreach ($clone->mergedbefore as $before) {
+            $open = $before->tags_before_transition();
+            $close = $before->tags_after_transition();
+            $lab = $before->pregleaf->leaf_tohr();
+            $lab = $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close;
+        }
         $open = $clone->tags_before_transition();
         $close = $clone->tags_after_transition();
-        $lab = $this->pregleaf->leaf_tohr();
-        $lab = '"' . $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close . '"';
+        $label = $this->pregleaf->leaf_tohr();
+        $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
 
+        foreach ($clone->mergedafter as $after) {
+            $open = $after->tags_before_transition();
+            $close = $after->tags_after_transition();
+            $label = $after->pregleaf->leaf_tohr();
+            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close ;
+        }
+        $lab .= '"';
         $thickness = 2;
         if ($this->greediness == self::GREED_LAZY) {
             $thickness = 1;
@@ -500,7 +514,7 @@ class qtype_preg_fa_transition {
     }
 
     private function this_tags_tohr($open, $close) {
-        return '';  // uncomment when needed
+        //return '';  // uncomment when needed
 
         $result = '';
         if ($open) {
@@ -519,27 +533,11 @@ class qtype_preg_fa_transition {
     }
 
     public function tags_before_transition() {
-        $result = '';
-        foreach ($this->mergedbefore as $transition) {
-            if (!$transition->is_eps()) {
-                $result .= $transition->pregleaf->leaf_tohr();
-            }
-            //$result .= $transition->this_tags_tohr(true, true);
-        }
-        $result .= $this->this_tags_tohr(true, false);
-        return $result;
+        return $this->this_tags_tohr(true, false);
     }
 
     public function tags_after_transition() {
-        $result = '';
-        $result .= $this->this_tags_tohr(false, true);
-        foreach ($this->mergedafter as $transition) {
-            if (!$transition->is_eps()) {
-                $result .= $transition->pregleaf->leaf_tohr();
-            }
-            //$result .= $transition->this_tags_tohr(true, true);
-        }
-        return $result;
+        return $this->this_tags_tohr(false, true);
     }
 }
 
