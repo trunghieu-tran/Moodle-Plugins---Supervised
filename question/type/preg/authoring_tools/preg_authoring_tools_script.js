@@ -201,10 +201,21 @@ M.preg_authoring_tools_script = (function ($) {
             self.prevdata = self.data;
             self.panzooms.reset_all();
         }
-        $('input[name=\'tree_selected_node_points\']').val('');
+
+        selection = $(self.regex_input).textrange('get'),
+            indfirst = selection.start,
+            indlast = selection.end - 1;
+        if (indfirst > indlast) {
+            indfirst = indlast = -2;
+        }
+        $('input[name=\'tree_selected_node_points\']').val(indfirst + ',' + indlast);
+        self.load_content(indfirst, indlast);
+        self.load_strings(indfirst, indlast);
+
+        /*$('input[name=\'tree_selected_node_points\']').val('');
         var sel = self.get_selection();
         self.load_content(sel.indfirst, sel.indlast);
-        self.load_strings(sel.indfirst, sel.indlast);
+        self.load_strings(sel.indfirst, sel.indlast);*/
     },
 
     btn_save_clicked : function (e) {
@@ -303,6 +314,9 @@ M.preg_authoring_tools_script = (function ($) {
             var tmp = $($(e.target).parents(".node")[0]).attr('id').split('_'), // TODO -omg make beauty
                 indfirst = tmp[2],
                 indlast = tmp[3];
+
+            $('input[name=\'tree_selected_node_points\']').val(indfirst + ',' + indlast);
+
             self.load_content(indfirst, indlast);
             self.load_strings(indfirst, indlast);
         }
@@ -311,6 +325,9 @@ M.preg_authoring_tools_script = (function ($) {
     graph_node_misclicked : function (e) {
         e.preventDefault();
         if (!self.is_graph_selection_rectangle_visible()) {
+        
+            $('input[name=\'tree_selected_node_points\']').val('');
+            
             self.load_content();
             self.load_strings();
         }
@@ -474,6 +491,9 @@ M.preg_authoring_tools_script = (function ($) {
                             + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')),
                         (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                             + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
+                            
+                    $('input[name=\'tree_selected_node_points\']').val(sel.indfirst + ',' + sel.indlast);
+                            
                     self.load_content(sel.indfirst, sel.indlast);
                     self.load_strings(sel.indfirst, sel.indlast);
 
@@ -940,9 +960,15 @@ M.preg_authoring_tools_script = (function ($) {
 
     get_selection : function () {
         var scroll = $(window).scrollTop(),
-            selection = $(self.regex_input).textrange('get'),
+            /*selection = $(self.regex_input).textrange('get'),
             indfirst = selection.start,
-            indlast = selection.end - 1;
+            indlast = selection.end - 1;*/
+            indfirst = indlast = -2;
+        if(typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
+            var tmpcoords = $('input[name=\'tree_selected_node_points\']').val().split(',');
+            indfirst = tmpcoords[0];
+            indlast = tmpcoords[1];
+        }
         if (indfirst > indlast) {
             indfirst = indlast = -2;
         }
