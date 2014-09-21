@@ -247,7 +247,7 @@ abstract class qtype_preg_fa_node {
 
     public static function merge_wordbreaks($tran, $automaton, &$stack_item) {
 
-        printf($automaton->fa_to_dot());
+        //printf($automaton->fa_to_dot());
         $fromdel = true;
         $todel = true;
         $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
@@ -345,7 +345,7 @@ abstract class qtype_preg_fa_node {
         }
         //Remove repeated uncapturing transitions.
         $automaton->remove_transition($tran);
-        printf($automaton->fa_to_dot());
+        //printf($automaton->fa_to_dot());
     }
 }
 
@@ -405,7 +405,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
     }
 
     protected static function merge_after_concat(&$automaton, &$stack_item, $borderstate) {
-        printf($automaton->fa_to_dot());
+        //printf($automaton->fa_to_dot());
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
 
@@ -424,7 +424,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 qtype_preg_fa_node::merge_wordbreaks($transition, $automaton, $stack_item);
             }
         }
-        printf($automaton->fa_to_dot());
+        //printf($automaton->fa_to_dot());
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
 
@@ -460,7 +460,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
         foreach ($outgoing as $tran) {
-            printf($tran->get_label_for_dot($tran->from, $tran->to));
+            //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
                 $uncapturing[] = $tran;
                 if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
@@ -469,7 +469,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             }
         }
         //printf($automaton->fa_to_dot());
-        var_dump(count($uncapturing));
+        //var_dump(count($uncapturing));
         if (count($uncapturing) != 0) {
 
             foreach ($incoming as $intran) {
@@ -479,8 +479,8 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                     foreach ($uncapturing as $tran) {
 
-                        printf($intran->get_label_for_dot($intran->from, $intran->to));
-                        printf($tran->get_label_for_dot($tran->from, $tran->to));
+                        //printf($intran->get_label_for_dot($intran->from, $intran->to));
+                        //printf($tran->get_label_for_dot($tran->from, $tran->to));
                         $resulttran = $intran->intersect($tran);
                         if ($resulttran != NULL) {
                             $hasintersect = true;
@@ -489,7 +489,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             //$resulttran->consumeschars = true;
                             $automaton->remove_transition($tran);
                             $automaton->add_transition($resulttran);
-                            printf($automaton->fa_to_dot());
+                            //printf($automaton->fa_to_dot());
                         }
                     }
                     if (count($outgoing) == count($uncapturing)) {
@@ -512,7 +512,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
         foreach ($incoming as $tran) {
-            printf($tran->get_label_for_dot($tran->from, $tran->to));
+            //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
                 $uncapturing[] = $tran;
                 if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
@@ -521,7 +521,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             }
         }
         //printf($automaton->fa_to_dot());
-        var_dump(count($uncapturing));
+        //var_dump(count($uncapturing));
         if (count($uncapturing) != 0) {
 
             foreach ($uncapturing as $tran) {
@@ -539,7 +539,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             //$resulttran->consumeschars = true;
                             $automaton->remove_transition($tran);
                             $automaton->add_transition($resulttran);
-                            printf($automaton->fa_to_dot());
+                            //printf($automaton->fa_to_dot());
                         }
                     }
                     if (count($incoming) == count($uncapturing)) {
