@@ -68,7 +68,14 @@ abstract class qtype_preg_fa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-            $transition->opentags[] = $this->pregnode;
+            if (!empty($transition->mergedbefore)) {
+                array_unshift($transition->mergedbefore[0]->opentags, $this->pregnode);
+            }
+            else
+            {
+                $transition->opentags[] = $this->pregnode;
+            }
+            
             if ($transition->minopentag === null || $this->pregnode->subpattern < $transition->minopentag->subpattern) {
                 $transition->minopentag = $this->pregnode;
             }
@@ -77,7 +84,13 @@ abstract class qtype_preg_fa_node {
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
             if ($transition->to === $body['end']) {
-                $transition->closetags[] = $this->pregnode;
+                if (!empty($transition->mergedafter)) {
+                    $transition->mergedafter[count($transition->mergedafter)-1]->closetags[] = $this->pregnode;
+                }
+                else
+                {
+                    $transition->closetags[] = $this->pregnode;
+                }
             }
         }
 
