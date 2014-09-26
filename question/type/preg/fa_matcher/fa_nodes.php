@@ -106,7 +106,7 @@ abstract class qtype_preg_fa_node {
             // Get transitions for merging forward.
             $transitions = $automaton->get_adjacent_transitions($del->to, true);
             // Case of changeing assrts' places while merging.//TO THINK AND TODO!!!
-            if ($del->is_unmerged_assert() && $del->pregleaf->is_both_anchor()) {
+            if ($del->is_unmerged_assert() && $del->is_both_anchor()) {
                 $oppositetransitions = $automaton->get_adjacent_transitions($del->from, false);
                 if (empty($oppositetransitions)) {
                     return false;
@@ -169,12 +169,29 @@ abstract class qtype_preg_fa_node {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
                     $tran->make_merged();
+
+                    foreach ($tran->mergedbefore as &$merged) {
+                        $merged->from = $tran->from;
+                        $merged->to = $tran->to;
+                    }
+                    foreach ($tran->mergedafter as &$merged) {
+                        $merged->from = $tran->from;
+                        $merged->to = $tran->to;
+                    }
                     $automaton->add_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as $tran) {
                     $tran->to = $del->to;
                     $tran->make_merged();
+                    foreach ($tran->mergedbefore as &$merged) {
+                        $merged->from = $tran->from;
+                        $merged->to = $tran->to;
+                    }
+                    foreach ($tran->mergedafter as &$merged) {
+                        $merged->from = $tran->from;
+                        $merged->to = $tran->to;
+                    }
                     $automaton->add_transition($tran);
 
                 }
