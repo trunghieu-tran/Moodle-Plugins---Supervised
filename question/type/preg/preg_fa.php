@@ -1320,6 +1320,15 @@ class qtype_preg_fa {
             if ($transition->to == $oldstateid) {
                 $transition->to = $newstateid;
             }
+            // Redirect merged transitions too.
+            foreach ($transition->mergedbefore as $merged) {
+                $merged->from = $transition->from;
+                $merged->to = $transition->to; 
+            }
+            foreach ($transition->mergedafter as $merged) {
+                $merged->from = $transition->from;
+                $merged->to = $transition->to; 
+            }
             $this->add_transition($transition);
         }
 
