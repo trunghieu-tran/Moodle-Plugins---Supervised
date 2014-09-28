@@ -68,13 +68,7 @@ abstract class qtype_preg_fa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-            if (!empty($transition->mergedbefore)) {
-                array_unshift($transition->mergedbefore[0]->opentags, $this->pregnode);
-            }
-            else
-            {
                 $transition->opentags[] = $this->pregnode;
-            }
             
             if ($transition->minopentag === null || $this->pregnode->subpattern < $transition->minopentag->subpattern) {
                 $transition->minopentag = $this->pregnode;
@@ -84,13 +78,7 @@ abstract class qtype_preg_fa_node {
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
             if ($transition->to === $body['end']) {
-                if (!empty($transition->mergedafter)) {
-                    $transition->mergedafter[count($transition->mergedafter)-1]->closetags[] = $this->pregnode;
-                }
-                else
-                {
-                    $transition->closetags[] = $this->pregnode;
-                }
+                $transition->closetags[] = $this->pregnode;
             }
         }
 
@@ -182,29 +170,12 @@ abstract class qtype_preg_fa_node {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
                     $tran->make_merged();
-
-                    foreach ($tran->mergedbefore as &$merged) {
-                        $merged->from = $tran->from;
-                        $merged->to = $tran->to;
-                    }
-                    foreach ($tran->mergedafter as &$merged) {
-                        $merged->from = $tran->from;
-                        $merged->to = $tran->to;
-                    }
                     $automaton->add_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as $tran) {
                     $tran->to = $del->to;
                     $tran->make_merged();
-                    foreach ($tran->mergedbefore as &$merged) {
-                        $merged->from = $tran->from;
-                        $merged->to = $tran->to;
-                    }
-                    foreach ($tran->mergedafter as &$merged) {
-                        $merged->from = $tran->from;
-                        $merged->to = $tran->to;
-                    }
                     $automaton->add_transition($tran);
 
                 }
@@ -461,6 +432,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($incoming as $transition) {
             $transition->set_transition_type();
             if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
+                
                 qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
             }
 

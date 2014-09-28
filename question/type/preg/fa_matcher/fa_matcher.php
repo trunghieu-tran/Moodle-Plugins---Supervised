@@ -170,16 +170,19 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if (!$tr->consumeschars) {
                 $tmplength = 0;
             }
-            $length += $tmplength;
+            
+            
             if ($res) {
                 $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
             } else {
                 $result = false;
                 break;
             }
+            $curpos += $tmplength;
+            $length += $tmplength;
         }
 
-        $newstate->state = $transition->to; // TODO: remove this line after Elena fixes ->from and ->to after merging
+        //$newstate->state = $transition->to; // TODO: remove this line after Elena fixes ->from and ->to after merging
 
         return $result ? $newstate : null;
     }
