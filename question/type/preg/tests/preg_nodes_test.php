@@ -757,7 +757,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_charflag_flag_d_match() {
-        $lexer = $this->create_lexer("\\d");
+        $lexer = $this->create_lexer("[[:digit:]]");
         $flag = $lexer->nextToken()->value;
         $length = 0;
         $this->assertTrue($flag->match(new qtype_poasquestion_string('12Afg'), 0, $length));
