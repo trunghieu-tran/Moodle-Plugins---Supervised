@@ -170,19 +170,15 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if (!$tr->consumeschars) {
                 $tmplength = 0;
             }
-            
-            
             if ($res) {
                 $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
+                $curpos += $tmplength;
+                $length += $tmplength;
             } else {
                 $result = false;
                 break;
             }
-            $curpos += $tmplength;
-            $length += $tmplength;
         }
-
-        //$newstate->state = $transition->to; // TODO: remove this line after Elena fixes ->from and ->to after merging
 
         return $result ? $newstate : null;
     }
@@ -878,11 +874,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // The create_automaton() can throw an exception in case of too large finite automaton.
         //try {
             $stack = array();
-            $this->dstroot->create_automaton($result, $stack);
+            $this->dstroot->create_automaton($result, $stack, false);   // TODO: real value?
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
-            //$result->remove_unreachable_states();     TODO27
+            //$result->remove_unreachable_states();     TODO 27
             //printf($result->fa_to_dot() . "\n");
             //var_dump($result->start_states());
             //var_dump($result->end_states());
