@@ -241,16 +241,12 @@ abstract class qtype_preg_fa_node {
             }
             $result[] = $transitiondollar;
         }
-        foreach ($result as &$restran) {
-            //$restran->tagsets = $wordbreak->get_tags($isinto);
-        }
         return $result;
     }
 
     public static function merge_wordbreaks($tran, $automaton, &$stack_item) {
-
         //printf($automaton->fa_to_dot());
-        /*$fromdel = true;
+        $fromdel = true;
         $todel = true;
         $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
         $intotransitions = $automaton->get_adjacent_transitions($tran->from, false);
@@ -287,7 +283,7 @@ abstract class qtype_preg_fa_node {
                  var_dump("\n");
                 printf($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
                  var_dump("\n");*/
-                /*if ($resultinto !== null) {
+                if ($resultinto !== null) {
 
                     foreach ($outtransitions as $outtran) {
                         $clone = clone $resultinto;
@@ -303,7 +299,7 @@ abstract class qtype_preg_fa_node {
                             // Add state and transition
                  //printf($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
                  //var_dump("\n");
-                            /*$state = $automaton->add_state();
+                            $state = $automaton->add_state();
                             $clone->from = $intotran->from;
                             $clone->to = $state;
                             $resultout->from = $state;
@@ -340,7 +336,7 @@ abstract class qtype_preg_fa_node {
                                 $resulttran = new qtype_preg_fa_transition($state, $resultout->pregleaf, $outtran->to, $tran->origin, $tran->consumeschars);
                                 $automaton->add_transition($resulttran);
                             }*/
-                       /* }
+                        }
                     }
                 }
             }

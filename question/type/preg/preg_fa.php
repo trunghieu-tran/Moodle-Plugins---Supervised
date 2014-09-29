@@ -152,21 +152,21 @@ class qtype_preg_fa_transition {
         // Adding assert to array.
         $thisclone = clone($this);
         if ($this->is_start_anchor()) {
-            $this->assertionsafter[] = $thisclone;
+            $this->mergedafter[] = $thisclone;
         } else if ($this->is_end_anchor()) {
-            $this->assertionsbefore[] = $thisclone;
+            $this->mergedbefore[] = $thisclone;
         }
         
         
         $otherclone = clone($other);
         if ($other->is_start_anchor()) {
-            $other->assertionsafter[] = $otherclone;
+            $other->mergedafter[] = $otherclone;
         } else if ($other->is_end_anchor()){
-            $other->assertionsbefore[] = $otherclone;
+            $other->mergedbefore[] = $otherclone;
         }
         
-        $resultbefore = array_merge($this->assertionsbefore, $other->assertionsbefore);
-        $resultafter = array_merge($this->assertionsafter, $other->assertionsafter);
+        $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
+        $resultafter = array_merge($this->mergedafter, $other->mergedafter);
         // Removing same asserts.
         for ($i = 0; $i < count($resultbefore); $i++) {
             for ($j = ($i+1); $j < count($resultbefore); $j++) {
@@ -204,7 +204,7 @@ class qtype_preg_fa_transition {
 
         foreach ($resultbefore as $assert) {
             $key = array_search($assert, $resultbefore);
-            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
                 if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
                     unset($resultbefore[$key]);
@@ -212,7 +212,7 @@ class qtype_preg_fa_transition {
                 }
 
             }
-            if ($assert->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
                 // Searching compatible asserts.
                 if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore)) {
                     unset($resultbefore[$key]);
@@ -223,55 +223,36 @@ class qtype_preg_fa_transition {
         }
 
         // Getting result leaf.
-        if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+        if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = clone $this;
-        } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+        } else if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = clone $other;
         } else {
             if (count($resultbefore) != 0) {
-                switch($resultbefore[0]->subtype) {
-                    case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
-                        $assert = new qtype_preg_leaf_assert_capital_esc_z;
-                        break;
-                    case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
-                        $assert = new qtype_preg_leaf_assert_small_esc_z;
-                        break;
-                    case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                        $assert = new qtype_preg_leaf_assert_dollar;
-                        break;
-                }
+                $assert = clone $resultbefore[0];
                 unset($resultbefore[0]);
             } else if (count($resultafter) != 0) {
-                switch($resultafter[0]->subtype) {
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-                        $assert = new qtype_preg_leaf_assert_esc_a;
-                        break;
-                    case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-                        $assert = new qtype_preg_leaf_assert_esc_g;
-                        break;
-                    case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                        $assert = new qtype_preg_leaf_assert_circumflex;
-                        break;
-                }
+                $assert = $resultafter[0];
                 unset($resultafter[0]);
             } else {
-                $assert = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                $assert = new qtype_preg_fa_transition(0, $pregleaf, 1);
             }
         }
-        $assert->assertionsbefore = $resultbefore;
-        $assert->assertionsafter = $resultafter;
-        if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+        $assert->mergedbefore = $resultbefore;
+        $assert->mergedafter = $resultafter;
+        if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             if ($this->is_start_anchor()) {
-                unset($this->assertionsafter[0]);
+                unset($this->mergedafter[0]);
             } else {
-                unset($this->assertionsbefore[0]);
+                unset($this->mergedbefore[0]);
             }
         }
-        if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+        if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             if ($other->is_start_anchor()) {
-                unset($other->assertionsafter[0]);
+                unset($other->mergedafter[0]);
             } else {
-                unset($other->assertionsbefore[0]);
+                unset($other->mergedbefore[0]);
             }
         }
         return $assert;
@@ -400,30 +381,13 @@ class qtype_preg_fa_transition {
     /**
      * Copies tags from other transition in this transition.
      */
-    public function unite_tags($other) {
-        // TODO27
-        // По идее нужно объединять set'ы параллельным образом: нулевой с нулевым, первый с первым и т.д.
-        // И просто дописывать когда сеты в одном кончились, а в другом еще есть
+    public function unite_tags($other, $result) {
         $cloneother = clone $other;
         $clonethis = clone $this;
         //var_dump($this->get_label_for_dot(0,1));
         // Normal intersection.
-        if ($other->consumeschars && $this->consumeschars) {
-            return array_values(array_merge($clonethis->tagsets, $cloneother->tagsets));
-        } else {
-            if ($this->consumeschars) {
-                foreach ($cloneother->tagsets as &$set) {
-                        //$del->get_label_for_dot($del->from, $del->to);
-                    $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
-                }
-            } else {
-                foreach ($clonethis->tagsets as &$set) {
-                        //$del->get_label_for_dot($del->from, $del->to);
-                    $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
-                }
-            }
-            return array_merge($clonethis->tagsets, $cloneother->tagsets);
-        }
+        $result->opentags = array_merge($clonethis->opentags, $cloneother->opentags);
+        $result->closetags = array_merge($clonethis->closetags, $cloneother->closetags);
     }
 
     /**
@@ -432,27 +396,24 @@ class qtype_preg_fa_transition {
      * @param other another transition for intersection.
      */
     public function intersect($other) {
-        // TODO27
         $thishastags = $this->has_tags();
         $otherhastags = $other->has_tags();
         $resulttran = null;
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
-
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
             if ($resulttran !== null) {
-                $resulttran->tagsets = $this->unite_tags($other);
+                $this->unite_tags($other, $resulttran);
             }
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
             if ($resulttran !== null) {
-                $resulttran->tagsets = $this->unite_tags($other);
+                $this->unite_tags($other, $resulttran);
             }
             return $resulttran;
         }
-        var_dump($other->is_unmerged_assert() && !$other->consumeschars);
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
             || $other->is_unmerged_assert() && $other->consumeschars == false && (!$this->is_eps() && !$this->is_unmerged_assert())) {
             return null;
@@ -468,7 +429,10 @@ class qtype_preg_fa_transition {
             }
         }
         if ($resulttran !== null) {
-            $resulttran->tagsets = $this->unite_tags($other);
+            $this->unite_tags($other, $resulttran);
+            $assert = $this->intersect_asserts($other);
+            $resulttran->mergedafter = $assert->mergedafter;
+            $resulttran->mergedbefore = $assert->mergedbefore;
         }
         return $resulttran;
     }
