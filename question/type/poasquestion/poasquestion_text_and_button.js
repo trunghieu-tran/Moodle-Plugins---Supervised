@@ -87,7 +87,9 @@ M.poasquestion_text_and_button = (function ($) {
             targetinput: testregexlineedit
         };
         $(testregexbtn).click(eventdata, self.btn_pressed);
-        $(testregexlineedit).elastic();
+        if (input_id != '#') {
+            $(testregexlineedit).elastic();
+        }
     },
 
     /**
