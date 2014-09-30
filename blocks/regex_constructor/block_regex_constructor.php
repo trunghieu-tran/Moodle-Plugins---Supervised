@@ -55,8 +55,11 @@ class block_regex_constructor extends block_base {
         $this->page->requires->string_for_js('cancel', 'moodle');
         $this->page->requires->string_for_js('close', 'editor');
 
+        $this->page->requires->js('/question/type/poasquestion/jquery.elastic.1.6.11.js');
+
         $jsmodule = array('name' => 'poasquestion_text_and_button',
                                     'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
+
         $jsargs = array(
                     '90%',
                     get_string('regex_constructor', 'block_regex_constructor')
