@@ -49,15 +49,16 @@ abstract class qtype_preg_fa_node {
      * @param automaton - a reference to the automaton being built.
      * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2),
      *                start and end states of parts of the resulting automaton.
+     * @param transform - if true, perform transformations such as assertion merging
      */
-    abstract protected function create_automaton_inner(&$automaton, &$stack);
+    abstract protected function create_automaton_inner(&$automaton, &$stack, $transform);
 
     public function __construct($node, $matcher) {
         $this->pregnode = $node;
     }
 
-    public function create_automaton(&$automaton, &$stack) {
-        $this->create_automaton_inner($automaton, $stack);
+    public function create_automaton(&$automaton, &$stack, $transform) {
+        $this->create_automaton_inner($automaton, $stack, $transform);
 
         // Don't augment transition if the node is not a subpattern.
         if ($this->pregnode->subpattern == -1) {
@@ -68,19 +69,281 @@ abstract class qtype_preg_fa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-            $tagset = $transition->tagsets[0];
-            $tagset->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_OPEN, $this->pregnode);
+                $transition->opentags[] = $this->pregnode;
+
+            if ($transition->minopentag === null || $this->pregnode->subpattern < $transition->minopentag->subpattern) {
+                $transition->minopentag = $this->pregnode;
+            }
         }
 
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
             if ($transition->to === $body['end']) {
-                $tagset = end($transition->tagsets);
-                $tagset->tags[] = new qtype_preg_fa_tag(qtype_preg_fa_tag::TYPE_CLOSE, $this->pregnode);
+                $transition->closetags[] = $this->pregnode;
             }
         }
 
         $stack[] = $body;
+    }
+
+    /**
+     * Merging transitions without merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    static public function go_round_transitions($automaton, $del, $endstates) {
+        $clonetransitions = array();
+        $tagsets = array();
+        $oppositetransitions = array();
+        $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
+        // Cycled last states.
+        if ($del->from == $del->to && in_array($del->to, $endstates) || !$del->consumeschars)
+        {
+            return false;
+        }
+        // Get transitions for merging back.
+        if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
+            $transitions = $automaton->get_adjacent_transitions($del->from, false);
+        } else {
+            // Get transitions for merging forward.
+            $transitions = $automaton->get_adjacent_transitions($del->to, true);
+            // Case of changeing assrts' places while merging.//TO THINK AND TODO!!!
+            if ($del->is_unmerged_assert() && $del->is_both_anchor()) {
+                $oppositetransitions = $automaton->get_adjacent_transitions($del->from, false);
+                if (empty($oppositetransitions)) {
+                    return false;
+                }
+                // Copy after-tags.
+                // Copy open tags.
+                foreach ($del->opentags as $open) {
+
+                }
+                $sets = array();
+                foreach ($del->tagsets as &$set) {
+                    $copytags = array();
+                    foreach ($set->tags as $tag) {
+                        if ($tag->pos == qtype_preg_fa_tag_set::POS_AFTER_TRANSITION) {
+                            $copytags[] = $tag;
+                            unset($set->tags[array_search($tag, $set->tags)]);
+                        }
+                    }
+                    $newset = new qtype_preg_fa_tag_set(qtype_preg_fa_tag_set::POS_AT_TRANSITION);  // TODO!!!
+                    $newset->tags = $copytags;
+                    $sets[] = $newset;
+                    if (empty($set->tags)) {
+                        unset($del->tagsets[array_search($set, $del->tagsets)]);
+                    }
+                }
+                foreach ($oppositetransitions as $opposite) {
+                    // Copy after assertions.
+                    $leaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                    $leaf->assertionsafter = $del->pregleaf->assertionsafter;
+                    $newleaf = $opposite->pregleaf->intersect_asserts($leaf);
+                    $opposite->pregleaf = $newleaf;
+                    $del->pregleaf->assertionsafter = array();
+
+                    $tagsets = array_merge($opposite->tagsets, $sets);
+                    $opposite->tagsets = $tagsets;
+                }
+            }
+        }
+        // Changing leafs in case of merging.
+        foreach ($transitions as $transition) {
+            //if ($transition->from != $transition->to || $transition->is_merged() == false) {
+                $tran = clone($transition);
+                $delclone = clone $del;
+                $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
+                $merged = array_merge($delclone->mergedbefore, array($delclone));
+                $merged = array_merge($merged, $delclone->mergedafter);
+                // Work with tags.
+                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
+                    $tran->mergedafter = array_merge($tran->mergedafter, $merged);
+                } else {
+                    $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
+                }
+
+                $clonetransitions[] = $tran;
+            //}
+        }
+        // Has deleting or changing transitions.
+        if (count($transitions) != 0) {
+            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to, $endstates))) {
+                foreach ($clonetransitions as $tran) {
+                    $tran->from = $del->from;
+                    $tran->make_merged();
+                    $automaton->add_transition($tran);
+                }
+            } else {
+                foreach ($clonetransitions as $tran) {
+                    $tran->to = $del->to;
+                    $tran->make_merged();
+                    $automaton->add_transition($tran);
+
+                }
+            }
+            if (!($del->is_end_anchor() && in_array($del->to, $endstates))) {
+                $automaton->remove_transition($del);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    public static function get_wordbreaks_transitions($negative, $isinto, $wordbreak) {
+        $result = array();
+        // Create transitions which can replace \b and \B.
+        // Create \w.
+        $flagw = new qtype_preg_charset_flag();
+        $flagw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
+        $charsetw = new qtype_preg_leaf_charset();
+        $charsetw->flags = array(array($flagw));
+        $charsetw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W));
+        $tranw = new qtype_preg_fa_transition(0, $charsetw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        // Create \W.
+        $flagbigw = clone $flagw;
+        $flagbigw->negative = true;
+        $charsetbigw = new qtype_preg_leaf_charset();
+        $charsetbigw->flags = array(array($flagbigw));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
+        $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        // Create ^.
+        $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
+        $transitioncircumflex = new qtype_preg_fa_transition(0, $assertcircumflex, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        // Create $.
+        $assertdollar = new qtype_preg_leaf_assert_dollar();
+        $transitiondollar = new qtype_preg_fa_transition(0, $assertdollar, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+
+        // Incoming transitions.
+        if ($isinto) {
+            $result[] = $tranw;
+            $result[] = $tranbigw;
+            $result[] = $transitioncircumflex;
+            // Case \b.
+            if (!$negative) {
+                $result[] = $tranw;
+            } else {
+                // Case \B.
+                $result[] = $tranbigw;
+            }
+        } else {
+            // Outcoming transitions.
+            // Case \b.
+            if (!$negative) {
+                $result[] = $tranbigw;
+                $result[] = $tranw;
+                $result[] = $tranw;
+            } else {
+                // Case \B.
+                $result[] = $tranw;
+                $result[] = $tranbigw;
+                $result[] = $tranbigw;
+            }
+            $result[] = $transitiondollar;
+        }
+        return $result;
+    }
+
+    public static function merge_wordbreaks($tran, $automaton, &$stack_item) {
+        //printf($automaton->fa_to_dot());
+        $fromdel = true;
+        $todel = true;
+        $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
+        $intotransitions = $automaton->get_adjacent_transitions($tran->from, false);
+        //$startstates = $this->start_states();
+
+        // Add empty transitions if ot's nessesaary.
+        if (count($outtransitions) == 0) {
+            $state = $automaton->add_state();
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_fa_transition($tran->to, $pregleaf, $state, $tran->origin, $tran->consumeschars);
+            $outtransitions[] = $transition;
+            $todel = false;
+            $stack_item['end'] = $state;
+        }
+        if (count($intotransitions) == 0) {
+            $state = $automaton->add_state();
+            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_fa_transition($state, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
+            $intotransitions[] = $transition;
+            $fromdel = false;
+            $stack_item['start'] = $state;
+        }
+
+        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true, $tran);
+        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false, $tran);
+
+        // Intersect transitions.
+        for ($i = 0; $i < count($wordbreakinto); $i++) {
+            foreach ($intotransitions as $intotran) {
+                $resultinto = $intotran->intersect($wordbreakinto[$i]);
+                /*printf($wordbreakinto[$i]->get_label_for_dot($wordbreakinto[$i]->from, $wordbreakinto[$i]->to));
+                var_dump("\n");
+                printf($intotran->get_label_for_dot($intotran->from, $intotran->to));
+                 var_dump("\n");
+                printf($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
+                 var_dump("\n");*/
+                if ($resultinto !== null) {
+
+                    foreach ($outtransitions as $outtran) {
+                        $clone = clone $resultinto;
+                        $resultout = $wordbreakout[$i]->intersect($outtran);
+
+                        if ($resultout !== null) {
+                            /*printf($wordbreakout[$i]->get_label_for_dot($wordbreakout[$i]->from, $wordbreakout[$i]->to));
+                var_dump("\n");
+                printf($outtran->get_label_for_dot($outtran->from, $outtran->to));
+                 var_dump("\n");
+                printf($resultout->get_label_for_dot($resultout->from, $resultout->to));
+                 var_dump("\n");*/
+                            // Add state and transition
+                 //printf($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
+                 //var_dump("\n");
+                            $state = $automaton->add_state();
+                            $clone->from = $intotran->from;
+                            $clone->to = $state;
+                            $resultout->from = $state;
+                            $resultout->to = $outtran->to;
+                            $automaton->add_transition($clone);
+                            $automaton->add_transition($resultout);
+                            /*if ($fromdel) {
+                                // Copy transitions from deleting states.
+                                $copiedout = $automaton->get_adjacent_transitions($tran->from, true);
+                                foreach ($copiedout as $copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->from = $state;
+                                        $automaron->add_transition($copytran);
+                                    }
+                                }
+                            }
+                            if ($todel) {
+                                // Copy transitions from deleting states.
+                                $copiedinto = $automaton->get_adjacent_transitions($tran->to, false);
+                                foreach ($copiedinto as $copytran) {
+                                    if ($copytran !== $tran) {
+                                        $copytran->to = $state;
+                                        $automaton->add_transition($copytran);
+                                    }
+                                }
+                            }*/
+                            // If result should be one cycled state.
+                            /*if ($intotran->from == $tran->to) {
+                                $resulttran = new qtype_preg_fa_transition($state, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                            } else {
+                                $resulttran = new qtype_preg_fa_transition($intotran->from, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                                $resulttran = new qtype_preg_fa_transition($state, $resultout->pregleaf, $outtran->to, $tran->origin, $tran->consumeschars);
+                                $automaton->add_transition($resulttran);
+                            }*/
+                        }
+                    }
+                }
+            }
+        }
+        //Remove repeated uncapturing transitions.
+        $automaton->remove_transition($tran);
+        //printf($automaton->fa_to_dot());*/
     }
 }
 
@@ -96,7 +359,7 @@ class qtype_preg_fa_leaf extends qtype_preg_fa_node {
         return true;
     }
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         // Create start and end states of the resulting automaton.
         $start = $automaton->add_state();
         $end = $automaton->add_state();
@@ -122,7 +385,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         }
     }
 
-    protected static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
+    protected static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item, $transform) {
         $outgoing = $automaton->get_adjacent_transitions($stack_item['end'], true);
         if (!empty($outgoing)) {
             $end = $automaton->add_state();
@@ -130,42 +393,172 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $automaton->add_transition(new qtype_preg_fa_transition($stack_item['end'], $epsleaf, $end));
             $stack_item['end'] = $end;
         }
-    }
-
-    protected static function merge_epsilons_after_concat(&$automaton, &$stack_item, $borderstate) {
-        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
-        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
-        foreach ($incoming as $transition) {
-            if (/*$transition->loopsback ||*/ $transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                continue;
-            }
-            //echo "\nmerging $transition\n";
-            foreach ($transition->tagsets as $tagset) {
-                $tagset->pos = qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION;
-            }
-            foreach ($outgoing as $nexttransition) {
-                $clone = clone $nexttransition;
-                $clone->from = $transition->from;
-                $tagsets = array();
-                foreach ($transition->tagsets as $set) {
-                    $tagsets[] = clone $set;
+        if ($transform) {
+            $incoming = $automaton->get_adjacent_transitions($stack_item['end'], false);
+            foreach ($incoming as $transition) {
+                $transition->set_transition_type();
+                if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS) {
+                    qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
                 }
-                foreach ($clone->tagsets as $set) {
-                    $tagsets[] = $set;  // already cloned
-                }
-                $clone->tagsets = $tagsets;
-                $clone->startsbackrefedsubexprs = $clone->startsbackrefedsubexprs || $transition->startsbackrefedsubexprs;
-                $clone->startsquantifier = $clone->startsquantifier || $transition->startsquantifier;
-                $clone->endsquantifier = $clone->endsquantifier || $transition->endsquantifier;
-                $clone->loopsback = $clone->loopsback || $transition->loopsback;
-                $automaton->add_transition($clone);
-                //echo "added $clone\n";
             }
-            $automaton->remove_transition($transition);
         }
     }
 
-    protected static function concatenate(&$automaton, &$stack, $count) {
+    protected static function merge_after_concat(&$automaton, &$stack_item, $borderstate) {
+        //printf($automaton->fa_to_dot());
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+
+        foreach ($incoming as $transition) {
+            $transition->set_transition_type();
+
+            if ($transition->is_wordbreak()) {
+                qtype_preg_fa_node::merge_wordbreaks($transition, $automaton, $stack_item);
+            }
+        }
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($outgoing as $transition) {
+            $transition->set_transition_type();
+
+            if ($transition->is_wordbreak()) {
+                qtype_preg_fa_node::merge_wordbreaks($transition, $automaton, $stack_item);
+            }
+        }
+        //printf($automaton->fa_to_dot());
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+
+        foreach ($incoming as $transition) {
+            $transition->set_transition_type();
+            if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
+
+                qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
+            }
+
+        }
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($outgoing as $transition) {
+            $transition->set_transition_type();
+            if ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT) {
+                qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($stack_item['end']));
+            }
+
+        }
+
+        self::intersect($borderstate, $automaton);
+
+    }
+
+    protected static function intersect($borderstate, $automaton) {
+        $charset = null;
+        $charsetuncapturering = null;
+        $uncapturing = array();
+
+        $hasintersect = false;
+        // Uncapturing transitions are outgoing.
+        // If one transition doesn't consume chars intersect it with other.
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($outgoing as $tran) {
+            //printf($tran->get_label_for_dot($tran->from, $tran->to));
+            if (!$tran->consumeschars) {
+                $uncapturing[] = $tran;
+                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    $charsetuncapturering = $tran;
+                }
+            }
+        }
+        //printf($automaton->fa_to_dot());
+        //var_dump(count($uncapturing));
+        if (count($uncapturing) != 0) {
+
+            foreach ($incoming as $intran) {
+                if ($intran->consumeschars) {
+                    if ($intran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                        $charset = $intran;
+                    }
+                    foreach ($uncapturing as $tran) {
+
+                        //printf($intran->get_label_for_dot($intran->from, $intran->to));
+                        //printf($tran->get_label_for_dot($tran->from, $tran->to));
+                        $resulttran = $intran->intersect($tran);
+                        if ($resulttran != NULL) {
+                            $hasintersect = true;
+                            $resulttran->from = $intran->from;
+                            $resulttran->to = $tran->to;
+                            //$resulttran->consumeschars = true;
+                            $automaton->remove_transition($tran);
+                            $automaton->add_transition($resulttran);
+                            //printf($automaton->fa_to_dot());
+                        }
+                    }
+                    if (count($outgoing) == count($uncapturing)) {
+                        $automaton->remove_transition($intran);
+                    }
+                }
+            }
+            if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
+                $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
+                $automaton->add_transition($unreachable);
+                foreach ($uncapturing as $tran) {
+                    $automaton->remove_transition($tran);
+                }
+            }
+        }
+
+        // Uncapturing transitions are incoming.
+        // If one transition doesn't consume chars intersect it with other.
+        $incoming = $automaton->get_adjacent_transitions($borderstate, false);
+
+        $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        foreach ($incoming as $tran) {
+            //printf($tran->get_label_for_dot($tran->from, $tran->to));
+            if (!$tran->consumeschars) {
+                $uncapturing[] = $tran;
+                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                    $charsetuncapturering = $tran;
+                }
+            }
+        }
+        //printf($automaton->fa_to_dot());
+        //var_dump(count($uncapturing));
+        if (count($uncapturing) != 0) {
+
+            foreach ($uncapturing as $tran) {
+
+                foreach ($outgoing as $outtran) {
+                    if ($outtran->consumeschars) {
+                        if ($outtran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+                            $charset = $outtran;
+                        }
+                        $resulttran = $tran->intersect($outtran);
+                        if ($resulttran != NULL) {
+                            $hasintersect = true;
+                            $resulttran->from = $tran->from;
+                            $resulttran->to = $outtran->to;
+                            //$resulttran->consumeschars = true;
+                            $automaton->remove_transition($tran);
+                            $automaton->add_transition($resulttran);
+                            //printf($automaton->fa_to_dot());
+                        }
+                    }
+                    if (count($incoming) == count($uncapturing)) {
+                        $automaton->remove_transition($outtran);
+                    }
+                }
+            }
+            if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
+                $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
+                $automaton->add_transition($unreachable);
+                foreach ($uncapturing as $tran) {
+                    $automaton->remove_transition($tran);
+                }
+            }
+        }
+    }
+
+    protected static function concatenate(&$automaton, &$stack, $count, $transform) {
         if ($count < 2) {
             return;
         }
@@ -174,8 +567,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $cur = array_pop($stack);
             $automaton->redirect_transitions($cur['end'], $result['start']);
             $borderstate = $result['start'];
+
             $result = array('start' => $cur['start'], 'end' => $result['end']);
-            //self::merge_epsilons_after_concat($automaton, $result, $borderstate);
+            if ($transform) {
+                self::merge_after_concat($automaton, $result, $borderstate);
+            }
         }
         $stack[] = $result;
     }
@@ -186,12 +582,12 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
  */
 class qtype_preg_fa_node_concat extends qtype_preg_fa_operator {
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         $count = count($this->operands);
         for ($i = 0; $i < $count; $i++) {
-            $this->operands[$i]->create_automaton($automaton, $stack);
+            $this->operands[$i]->create_automaton($automaton, $stack, $transform);
         }
-        self::concatenate($automaton, $stack, $count);
+        self::concatenate($automaton, $stack, $count, $transform);
     }
 }
 
@@ -200,15 +596,15 @@ class qtype_preg_fa_node_concat extends qtype_preg_fa_operator {
  */
 class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         $count = count($this->operands);
         $result = null;
 
         // Create automata for operands and alternate them.
         for ($i = 0; $i < $count; $i++) {
-            $this->operands[$i]->create_automaton($automaton, $stack);
+            $this->operands[$i]->create_automaton($automaton, $stack, $transform);
             $cur = array_pop($stack);
-            self::add_ending_eps_transition_if_needed($automaton, $cur);  // Necessary if there's a quantifier in the end.
+            self::add_ending_eps_transition_if_needed($automaton, $cur, $transform);  // Necessary if there's a quantifier in the end.
             if ($result === null) {
                 $result = $cur;
             } else {
@@ -220,6 +616,7 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
 
         $stack[] = $result;
     }
+
 }
 
 /**
@@ -254,9 +651,9 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
     /**
      * Creates an automaton for * or {0,} quantifier.
      */
-    private function create_aster(&$automaton, &$stack) {
+    private function create_aster(&$automaton, &$stack, $transform) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack, $transform);
         $body = array_pop($stack);
 
         // Now, clone all transitions from the start state to the end state.
@@ -268,26 +665,37 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $newtransition = clone $transition;
             $newtransition->from = $body['end'];
             $newtransition->loopsback = true;
+            $newtransition->set_transition_type();
             $automaton->add_transition($newtransition);
+            if ($transform && ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
+                qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($body['end']));
+            }
+        }
+
+        $prevtrans = $automaton->get_adjacent_transitions($body['end'], false);
+        foreach ($prevtrans as $transition) {
+            $transition->set_transition_type();
+            if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
+                qtype_preg_fa_node::go_round_transitions($automaton, $transition,  array($body['end']));
+            }
         }
 
         // The body automaton can be skipped by an eps-transition.
-        self::add_ending_eps_transition_if_needed($automaton, $body);
+        self::add_ending_eps_transition_if_needed($automaton, $body, $transform);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_fa_transition($body['start'], $epsleaf, $body['end']);
         $automaton->add_transition($transition);
-
         $stack[] = $body;
     }
 
     /**
      * Creates an automaton for {m,} quantifier
      */
-    private function create_brace(&$automaton, &$stack) {
+    private function create_brace(&$automaton, &$stack, $transform) {
         // Operand creates its automaton m times.
         $leftborder = $this->pregnode->leftborder;
         for ($i = 0; $i < $leftborder; $i++) {
-            $this->operands[0]->create_automaton($automaton, $stack);
+            $this->operands[0]->create_automaton($automaton, $stack, $transform);
             // The last block is repeated.
             if ($i == $leftborder - 1) {
                 $cur = array_pop($stack);
@@ -300,19 +708,32 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->from = $cur['end'];
                     $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
+                    $newtransition->set_transition_type();
+                    if ($transform && ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
+                        qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($cur['end']));
+                    }
                 }
+
+                $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
+                foreach ($prevtrans as $transition) {
+                    $transition->set_transition_type();
+                    if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
+                        qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
+                    }
+                }
+
                 $stack[] = $cur;
             }
         }
         // Concatenate operands.
-        self::concatenate($automaton, $stack, $leftborder);
+        self::concatenate($automaton, $stack, $leftborder, $transform);
     }
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         if ($this->pregnode->leftborder == 0) {
-            $this->create_aster($automaton, $stack);
+            $this->create_aster($automaton, $stack, $transform);
         } else {
-            $this->create_brace($automaton, $stack);
+            $this->create_brace($automaton, $stack, $transform);
         }
         $body = array_pop($stack);
         $this->mark_transitions($automaton, $body['start'], $body['end']);
@@ -329,9 +750,9 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
     /**
      * Creates an automaton for ? quantifier.
      */
-    private function create_qu(&$automaton, &$stack) {
+    private function create_qu(&$automaton, &$stack, $transform) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack, $transform);
         $body = array_pop($stack);
 
         // Set the greediness.
@@ -341,9 +762,8 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             $realgreediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $greediness);
             $transition->greediness = $realgreediness;
         }
-
         // The body automaton can be skipped by an eps-transition.
-        self::add_ending_eps_transition_if_needed($automaton, $body);
+        self::add_ending_eps_transition_if_needed($automaton, $body, $transform);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_fa_transition($body['start'], $epsleaf, $body['end']);
         $automaton->add_transition($transition);
@@ -354,16 +774,16 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
     /**
      * Creates an automaton for {m, n} quantifier.
      */
-    private function create_brace(&$automaton, &$stack) {
+    private function create_brace(&$automaton, &$stack, $transform) {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
 
         for ($i = 0; $i < $rightborder; $i++) {
-            $this->operands[0]->create_automaton($automaton, $stack);
+            $this->operands[0]->create_automaton($automaton, $stack, $transform);
             if ($i >= $leftborder) {
                 $cur = array_pop($stack);
-                self::add_ending_eps_transition_if_needed($automaton, $cur);
+                self::add_ending_eps_transition_if_needed($automaton, $cur, $transform);
                 $stack[] = $cur;
             }
         }
@@ -383,18 +803,22 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_fa_transition($cur['start'], $epsleaf, $endstate);
             $automaton->add_transition($transition);
+            $transition->set_transition_type();
+            if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
+                qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
+            }
             $quantified[] = $cur;
         }
         for ($i = 0; $i < $rightborder - $leftborder; $i++) {
             $cur = array_pop($quantified);
             $stack[] = $cur;
         }
-        self::concatenate($automaton, $stack, $rightborder);
+        self::concatenate($automaton, $stack, $rightborder, $transform);
     }
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         if ($this->pregnode->rightborder == 0) {
-            $this->operands[0]->create_automaton($automaton, $stack);
+            $this->operands[0]->create_automaton($automaton, $stack, $transform);
             $body = array_pop($stack);
 
             $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
@@ -403,16 +827,16 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             }
 
             // The body automaton can be skipped by a greedy eps-transition.
-            self::add_ending_eps_transition_if_needed($automaton, $body);
+            self::add_ending_eps_transition_if_needed($automaton, $body, $transform);
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_fa_transition($body['start'], $epsleaf, $body['end']);
             $automaton->add_transition($transition);
 
             $stack[] = $body;
         } else if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
-            $this->create_qu($automaton, $stack);
+            $this->create_qu($automaton, $stack, $transform);
         } else {
-            $this->create_brace($automaton, $stack);
+            $this->create_brace($automaton, $stack, $transform);
         }
         $body = array_pop($stack);
         $this->mark_transitions($automaton, $body['start'], $body['end']);
@@ -433,9 +857,9 @@ class qtype_preg_fa_node_subexpr extends qtype_preg_fa_operator {
         return true;
     }
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         // Operand creates its automaton.
-        $this->operands[0]->create_automaton($automaton, $stack);
+        $this->operands[0]->create_automaton($automaton, $stack, $transform);
 
         if ($this->pregnode->subpattern != -1) {
             $automaton->on_subexpr_added($this->pregnode, end($stack));
@@ -484,7 +908,7 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
         return true;
     }
 
-    protected function create_automaton_inner(&$automaton, &$stack) {
-        $this->operands[0]->create_automaton($automaton, $stack);
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
+        $this->operands[0]->create_automaton($automaton, $stack, $transform);
     }
 }

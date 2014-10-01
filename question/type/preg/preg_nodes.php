@@ -647,44 +647,14 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
-                if ($result != null) {
-                    $result->assertionsbefore = $this->assertionsbefore;
-                    $result->assertionsafter = $this->assertionsafter;
-                    $result = $result->intersect_asserts($other);
-                    $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
-                    // If there are asserts then intersection is only when there is also \n.
-                    if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
-                        if (!$result->match($str, 0, $length)) {
-                            $result = null;
-                        }
-                    }
-                }
-            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-                $result = $this->intersect_asserts($other);
-                // If there are asserts then intersection is only when there is also \n.
-                if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
-                    if (!$result->match($str, 0, $length)) {
-                        $result = null;
-                    }
-                }
             } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $otherhastags) {
                 $result = $this;
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_META && $this->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                 $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-                $result = $this->intersect_asserts($other);
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET && $thishastags) {
                 $result = $other;
-            }
-        } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
-            $result = $this->intersect_asserts($other);
-            // If there are asserts then intersection is only when there is also \n.
-            if (count($result->assertionsbefore) != 0 || count($result->assertionsafter) != 0) {
-                if (!$result->match($str, 0, $length)) {
-                    $result = null;
-                }
             }
         }
         return $result;
@@ -956,16 +926,28 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function ranges() {
-        if ($this->cachedranges === null) {
-            $this->cachedranges = $this->flags[0][0]->ranges($this->caseless);
-            for ($i = 1; $i < count($this->flags); $i++) {
-                $tmp = $this->flags[$i][0]->ranges($this->caseless);
-                $this->cachedranges = qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
-            }
-            if ($this->negative) {
-                $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
-            }
+        if ($this->cachedranges !== null) {
+            return $this->cachedranges;
         }
+
+        for ($i = 0; $i < count($this->flags); ++$i) {
+            // Get the intersection for current disjunct
+            $tmp = $this->flags[$i][0]->ranges($this->caseless);
+            for ($j = 1; $j < count($this->flags[$i]); ++$j) {
+                $ranges = $this->flags[$i][$j]->ranges($this->caseless);
+                $tmp = qtype_preg_unicode::kinda_operator($tmp, $ranges, true, false, false, false);
+            }
+
+            // Add it to the result
+            $this->cachedranges = $i == 0
+                                ? $tmp
+                                : qtype_preg_unicode::kinda_operator($this->cachedranges, $tmp, true, true, true, false);
+        }
+
+        if ($this->negative) {
+            $this->cachedranges = qtype_preg_unicode::negate_ranges($this->cachedranges);
+        }
+
         return $this->cachedranges;
     }
 
@@ -1007,7 +989,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
 
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
-            $ranges = qtype_preg_unicode::dot_ranges();
+            $ranges = qtype_preg_unicode::minmax_ranges();
             foreach ($flags as $flag) {
                 if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
@@ -1147,6 +1129,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
+        $result->userinscription[] = array(0 => $this->userinscription, 1 => $other->userinscription);
         return $result;
     }
 
@@ -1539,20 +1522,13 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     }
 
     public function is_start_anchor() {
-        return (($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
-                $this->subtype == self::SUBTYPE_ESC_G) &&  empty($this->assertionsbefore));
+        return ($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
+                $this->subtype == self::SUBTYPE_ESC_G);
     }
 
     public function is_end_anchor() {
-        return (($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
-                $this->subtype == self::SUBTYPE_SMALL_ESC_Z) &&  empty($this->assertionsafter));
-    }
-
-    public function is_both_anchor() {
-        return ((($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
-                $this->subtype == self::SUBTYPE_SMALL_ESC_Z) &&  !empty($this->assertionsafter)) ||
-                (($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
-                $this->subtype == self::SUBTYPE_ESC_G) &&  !empty($this->assertionsbefore)));
+        return ($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
+                $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
     }
 
     public function consumes($matcherstateobj = null) {
