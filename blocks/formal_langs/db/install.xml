@@ -6,31 +6,43 @@
   <TABLES>
     <TABLE NAME="block_formal_langs" COMMENT="An language descriptions" NEXT="block_formal_langs_node_dscr">
         <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="ui_name"/>
-            <FIELD NAME="ui_name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="UI name for language" PREVIOUS="id" NEXT="description" />
-            <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Description of language" PREVIOUS="ui_name" NEXT="name" />
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="uiname"/>
+            <FIELD NAME="uiname" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="UI name for language" PREVIOUS="id" NEXT="description" />
+            <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Description of language" PREVIOUS="uiname" NEXT="name" />
             <FIELD NAME="name" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Name for predefined language" PREVIOUS="description" NEXT="scanrules" />
             <FIELD NAME="scanrules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Scan rules for user-defined language" PREVIOUS="name" NEXT="parserules" />
             <FIELD NAME="parserules" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Parse rules for user-defined language" PREVIOUS="scanrules" NEXT="version" />
             <FIELD NAME="version" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Version of language" PREVIOUS="parserules" NEXT="visible" />
             <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="version" NEXT="lexemname" />
-            <FIELD NAME="lexemname" TYPE="text"  SEQUENCE="false" COMMENT="A name for lexeme in language" PREVIOUS="visible" />
+            <FIELD NAME="lexemname" TYPE="text"  SEQUENCE="false" COMMENT="A name for lexeme in language" PREVIOUS="visible" NEXT="author" />
+            <FIELD NAME="author" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="lexemname"/>
         </FIELDS>
         <KEYS>
             <KEY NAME="primary" TYPE="primary" FIELDS="id" />
         </KEYS>
     </TABLE>
-    <TABLE NAME="block_formal_langs_node_dscr" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="block_formal_langs">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="tablename"/>
-        <FIELD NAME="tablename" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
-        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="tablename" NEXT="number"/>
-        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
-      </KEYS>
-    </TABLE>
+      <TABLE NAME="block_formal_langs_node_dscr" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="block_formal_langs" NEXT="block_formal_langs_perms">
+          <FIELDS>
+              <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="tablename"/>
+              <FIELD NAME="tablename" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
+              <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="tablename" NEXT="number"/>
+              <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
+              <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
+          </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+          </KEYS>
+      </TABLE>
+      <TABLE NAME="block_formal_langs_perms" COMMENT="A permisiions for courses and categories to see languages in list" PREVIOUS="block_formal_langs_node_dscr">
+          <FIELDS>
+              <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="languageid"/>
+              <FIELD NAME="languageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" NEXT="contextid" PREVIOUS="id"/>
+              <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="languageid" NEXT="visible"/>
+              <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="contextid"/>
+          </FIELDS>
+          <KEYS>
+              <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+          </KEYS>
+      </TABLE>
   </TABLES>
 </XMLDB>

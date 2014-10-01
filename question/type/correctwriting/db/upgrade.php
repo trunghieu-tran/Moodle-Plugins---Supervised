@@ -86,5 +86,37 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2013012900, 'qtype', 'correctwriting');
     }
 
+    if ($oldversion < 2013092400) {
+        $table = new xmldb_table('qtype_correctwriting');
+        $fieldnames = array(
+            'islexicalanalyzerenabled' => 'wherepichintpenalty',
+            'isenumanalyzerenabled' => 'islexicalanalyzerenabled',
+            'issequenceanalyzerenabled' => 'isenumanalyzerenabled',
+            'issyntaxanalyzerenabled' =>  'issequenceanalyzerenabled'
+        );
+
+        foreach($fieldnames as $name => $previous) {
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '4', null ,XMLDB_NOTNULL, null, '1', $previous);
+            $dbman->add_field($table, $field);
+
+        }
+
+        $record = new stdClass();
+        $record->islexicalanalyzerenabled = 0;
+        $record->isenumanalyzerenabled = 0;
+        $record->issequenceanalyzerenabled = 1;
+        $record->issyntaxanalyzerenabled = 0;
+        $result = $DB->get_records('qtype_correctwriting', null, 'id', 'id');
+        if (count($result)) {
+            foreach($result as $id => $object) {
+                $record->id = $id;
+                $DB->update_record('qtype_correctwriting', $record, true);
+            }
+        }
+
+        // correctwriting savepoint reached
+        upgrade_plugin_savepoint(true, 2013092400, 'qtype', 'correctwriting');
+    }
+
     return true;
 }

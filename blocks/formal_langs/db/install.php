@@ -17,8 +17,14 @@
 function xmldb_block_formal_langs_install() {
     global $DB;
 
+    $systemcontext = context_system::instance()->id;
+    $templatepermission = new stdClass();
+    $templatepermission->languageid = 0;
+    $templatepermission->contextid = $systemcontext;
+    $templatepermission->visible = 1;
+
     $lang = new stdClass();
-    $lang->ui_name = 'Simple english';
+    $lang->uiname = 'Simple english';
     $lang->description = 'Simple english language definition';
     $lang->name = 'simple_english';
     $lang->scanrules = null;
@@ -26,11 +32,14 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
+    $lang->author = 0;
     
-    $DB->insert_record('block_formal_langs',$lang);
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
     $lang = new stdClass();
-    $lang->ui_name = 'C programming language';
+    $lang->uiname = 'C programming language';
     $lang->description = 'C language, with only lexer. One-line comments not supported';
     $lang->name = 'c_language';
     $lang->scanrules = null;
@@ -38,23 +47,29 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
-    
-    $DB->insert_record('block_formal_langs',$lang);
+    $lang->author = 0;
+
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
 
     $lang = new stdClass();
-    $lang->ui_name = 'C++ programming language';
+    $lang->uiname = 'C++ programming language';
     $lang->description = 'C++ language, with only lexer. One-line comments not supported';
     $lang->name = 'cpp_language';
     $lang->scanrules = null;
     $lang->parserules = null;
     $lang->version='1.0';
     $lang->visible = 1;
+    $lang->author = 0;
 
-    $DB->insert_record('block_formal_langs',$lang);
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
 
     $lang = new stdClass();
-    $lang->ui_name = 'C formatting string rules';
+    $lang->uiname = 'C formatting string rules';
     $lang->description = 'C formatting string rules, as used in printf';
     $lang->name = 'printf_language';
     $lang->scanrules = null;
@@ -62,8 +77,26 @@ function xmldb_block_formal_langs_install() {
     $lang->version='1.0';
     $lang->visible = 1;
     $lang->lexemname = '';
+    $lang->author = 0;
 
+    $id = $DB->insert_record('block_formal_langs',$lang);
+    $templatepermission->languageid = $id;
+    $DB->insert_record('block_formal_langs_perms', $templatepermission);
+
+	/*
+    $lang = new stdClass();
+    $lang->ui_name = 'C++ parseable programming language';
+    $lang->description = 'C++ parseable language';
+    $lang->name = 'cpp_parseable_language';
+    $lang->scanrules = null;
+    $lang->parserules = null;
+    $lang->version='1.0';
+    $lang->visible = 1;
+    $lang->lexemname = '';
+    $lang->version='1.0';
+    $lang->visible = 1;
+	
     $DB->insert_record('block_formal_langs',$lang);
-
+	*/
 }
 

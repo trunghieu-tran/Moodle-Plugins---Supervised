@@ -92,6 +92,14 @@ class block_formal_langs_node_position {
     protected $lineend;
     protected $colstart;
     protected $colend;
+    /** A starting position in string, as sequence of characters
+     *	@var int
+     */	
+    protected $stringstart;
+    /** An end position in string, as sequence of characters
+     *	@var int
+     */	    
+    protected $stringend;
 
     public function linestart(){
         return $this->linestart;
@@ -109,11 +117,21 @@ class block_formal_langs_node_position {
         return $this->colend;
     }
     
-    public function __construct($linestart, $lineend, $colstart, $colend) {
+    public function stringstart() {
+        return $this->stringstart;
+    }
+
+    public function stringend() {
+        return $this->stringend;
+    }
+    
+    public function __construct($linestart, $lineend, $colstart, $colend, $stringstart = 0, $stringend = 0) {
         $this->linestart = $linestart;
         $this->lineend = $lineend;
         $this->colstart = $colstart;
         $this->colend = $colend;
+        $this->stringstart = $stringstart;
+        $this->stringend = $stringend;        
     }
 
     /**
@@ -122,25 +140,39 @@ class block_formal_langs_node_position {
      * Resulting position is defined from minimum to maximum postion of nodes
      *
      * @param array $nodepositions positions of adjanced nodes
+     * @return block_formal_langs_token_position
      */
     public function summ($nodepositions) {
         $minlinestart = $nodepositions[0]->linestart;
         $maxlineend = $nodepositions[0]->lineend;
         $mincolstart = $nodepositions[0]->colstart;
         $maxcolend = $nodepositions[0]->colend;
+        $minstringstart = $nodepositions[0]->stringstart;
+        $maxstringend = $nodepositions[0]->stringend;
 
         foreach ($nodepositions as $node) {
-            if ($node->linestart < $minlinestart)
+            if ($node->linestart < $minlinestart) {
                 $minlinestart = $node->linestart;
-            if ($node->colstart < $mincolstart)
                 $mincolstart = $node->colstart;
-            if ($node->lineend > $maxlineend)
+            }
+            
+            if ($node->linestart == $minlinestart) {
+                $mincolstart = min($mincolstart, $node->colstart);
+            }
+            if ($node->lineend > $maxlineend) {
                 $maxlineend = $node->lineend;
-            if ($node->colend > $maxcolend)
                 $maxcolend = $node->colend;
+            }
+            
+            if ($node->lineend == $maxlineend) {
+                $maxcolend = max($maxcolend, $node->colend);
+            }
+
+            $minstringstart = min($minstringstart, $node->stringstart);
+            $maxstringend = max($maxstringend, $node->stringend);
         }
 
-        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend);
+        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend, $minstringstart, $maxstringend);
     }
 }
 
@@ -180,6 +212,8 @@ class block_formal_langs_ast_node_base {
      * @var string
      */
     protected $description;
+	
+	public $rule;
 
     public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
@@ -204,7 +238,32 @@ class block_formal_langs_ast_node_base {
         return $this->number;
     }
 
+    /**
+     * Returns position for tokem or a position for most left position
+     * @return block_formal_langs_node_position
+     */
     public function position() {
+        if ($this->position == null) {
+            if (count($this->childs())) {
+                $children = $this->childs();
+                /** @var block_formal_langs_ast_node_base $firstchild */
+                $firstchild = $children[0];
+                /** @var block_formal_langs_ast_node_base $lastchild */
+                $lastchild  = $children[count($children) - 1];
+                $firstchildpos = $firstchild->position();
+                $lastchildpos = $lastchild->position();
+                $this->position = new block_formal_langs_node_position(
+                    $firstchildpos->linestart(),
+                    $lastchildpos->lineend(),
+                    $firstchildpos->colstart(),
+                    $lastchildpos->colend(),
+                    $firstchildpos->stringstart(),
+                    $lastchildpos->stringend()
+                );
+            } else {
+                $this->position = new block_formal_langs_node_position( 0, 0, 0, 0, 0, 0);
+            }
+        }
         return $this->position;
     }
 
@@ -243,6 +302,50 @@ class block_formal_langs_ast_node_base {
         }
         return false;
     }
+	
+	/**
+     * Returns value for node
+     * @return string value for text of node
+     */
+    public function value() {
+        $values = array();
+        foreach($this->childs() as $child) {
+            /** @var block_formal_langs_ast_node_base $child */
+            $data = $child->value();
+            if ($data != null) {
+                if (is_object($data)) {
+                    /** @var qtype_poasquestion_string $data */
+                    $data = $data->string();
+                }
+                $values[] = $data;
+            }
+        }
+
+        return implode(' ', $values);
+    }
+	
+	/**
+     * Returns list of tokens, covered by AST node. Tokens determined as not having any children
+     * @return array list of tokens
+     */
+    public function tokens_list() {
+        $childcount = count($this->childs());
+        $result = array();
+        if (count($childcount) == 0) {
+            $result[] = $this;
+        } else {
+            /** @var block_formal_langs_ast_node_base $child */
+            foreach($this->childs() as $child) {
+                $tmp = $child->tokens_list();
+                if (count($result) == 0) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+        return $result;
+    }
 }
 
 /**
@@ -280,6 +383,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
+	public function number() {
+        if ($this->number === null) {
+            $this->number = $this->tokenindex;
+        }
+        return $this->number;
+    }
+	
     public function value() {
         return $this->value;
     }
@@ -556,8 +666,20 @@ class block_formal_langs_token_stream {
     public $errors;
 
     public function __clone() {
-        $this->tokens = clone $this->tokens;
-        $this->errors = clone $this->errors;
+        // PHP 5.3.3, which is required by Moodle 2.5, supports anonymous functions
+        // so we go for that
+        $clonearray = function($array) {
+            $clone = function($o) {
+                return clone $o;
+            };
+            $result = array();
+            if (is_array($array)) {
+                $result = array_map($clone, $array);
+            }
+            return $result;
+        };
+        $this->tokens = $clonearray($this->tokens);
+        $this->errors = $clonearray($this->errors);
     }
 
     /**
@@ -632,10 +754,12 @@ class block_formal_langs_token_stream {
 class  block_formal_langs_matches_group {
     /**
      * Array of matched pairs
+     * This is main data for the group, other three fields contains agregate information from it.
+     * @var array of block_formal_langs_matched_tokens_pair and it's child classes objects
      */
     public $matchedpairs;
 
-    //Sum of mistake weights
+    //Sum of mistake weights for the group
     public $mistakeweight;
 
     //Sorted array of all correct token indexes for tokens, covered by pairs from this group
@@ -858,7 +982,7 @@ class block_formal_langs_processed_string {
      *  Sets a syntax tree.
      *  @param object $tree syntax tree 
      */
-    protected function set_syntax_tree($tree) {
+    public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
     
@@ -991,21 +1115,114 @@ class block_formal_langs_processed_string {
             return $this->tokenstream->tokens;
         }
     }
+	
+	/**
+     * Returns node by number
+     * @param $nodenumber
+     * @param array|block_formal_langs_ast_node_base $root a root node
+     * @return null|block_formal_langs_ast_node_base
+     */
+    public function find_node($nodenumber, $root = array()) {
+        if (is_array($root) && count($root) == 0) {
+            $result = null;
+            $tree = $this->get_syntax_tree();
+            foreach($tree as $v) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $v);
+                }
+            }
+            return $result;
+        }
+
+        if ($root->number() == $nodenumber) {
+            return $root;
+        }
+        $children = $root->childs();
+        $result = null;
+		if (count($children)) {
+            foreach($children as $child) {
+                if ($result == null) {
+                    $result = $this->find_node($nodenumber, $child);
+                }
+            }
+		}
+        return $result;
+    }
+	
+	/**
+     * Returns tree, converted to list and sorted by number
+     * @param null|block_formal_langs_ast_node_base $root a root node
+     * @return array array of nodes, sorted by number
+     */
+    public function tree_to_list($root = null) {
+        $result = array();
+        if ($root == null) {
+            $arraytobescanned = $this->get_syntax_tree();
+        } else {
+            $result = array( $root );
+            $arraytobescanned = $root->childs();
+        }
+        if (count($arraytobescanned)) {
+            foreach($arraytobescanned as $node) {
+                $tmp = $this->tree_to_list($node);
+                if (count($result) == 0) {
+                    $result = $tmp;
+                } else {
+                    $result = array_merge($result, $tmp);
+                }
+            }
+        }
+
+        if (count($result)) {
+            /**
+             * Comparator for sorting all of nodes
+             * @param  block_formal_langs_ast_node_base $a
+             * @param  block_formal_langs_ast_node_base $b
+             * @return int
+             */
+            $cmp = function($a, $b) {
+                if ($a->number() == $b->number()) {
+                    return 0;
+                }
+                return ($a->number() < $b->number()) ? -1 : 1;
+            };
+            usort($result, $cmp);
+        }
+        return $result;
+    }
 
     /**
      * Returns description string for passed node.
      *
-     * @param $nodenumber number of node
-     * @param $quotevalue should the value be quoted if description is absent; no position on this one
-     * @param $at whether include position if token description is absent
+     * @param int $nodenumber number of node
+     * @param boolean $quotevalue should the value be quoted if description is absent; no position on this one
+     * @param boolean $at whether include position if token description is absent
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
+        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         $result = '';
         if ($this->has_description($nodenumber)) {
             return $this->descriptions[$nodenumber];
         } else {
-            $value = $this->tokenstream->tokens[$nodenumber]->value();
+            $tokens = $this->tokenstream->tokens;
+            /** @var block_formal_langs_node_position $pos */
+            $pos = null;
+            /** @var null|qtype_poasquestion_string $value */
+            $value = null;
+            if (array_key_exists($nodenumber, $tokens)) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $tokens[$nodenumber];
+                $value = $token->value();
+                $pos = $token->position();
+            } else {
+                $node = $this->find_node($nodenumber, array());
+                if ($node == null) {
+                    return '';
+                }
+                $value = $node->value();
+                $pos = $node->position();
+            }
             if (!is_string($value)) {
                 $value = $value->string();
             }
@@ -1014,7 +1231,6 @@ class block_formal_langs_processed_string {
             } else if ($at) {// Should return position information.
                 $a = new stdClass();
                 $a->value = $value;
-                $pos = $this->tokenstream->tokens[$nodenumber]->position();
                 $a->column = $pos->colstart();
                 if ($this->single_line_string()) {
                     return get_string('quoteatsingleline', 'block_formal_langs', $a);
@@ -1022,7 +1238,7 @@ class block_formal_langs_processed_string {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {// Just quote.
+            } else {//Just quote 
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
@@ -1089,8 +1305,10 @@ class block_formal_langs_processed_string {
      *  @return syntax tree
      */
     protected function get_syntax_tree() {
-        if ($this->syntaxtree == null && $this->language->could_parse())
-            $this->language->parse($this);
+        if ($this->syntaxtree == null && $this->language->could_parse()) {
+            // TODO: Fix this inconsistency
+            $this->language->parse($this, false);
+        }
         return $this->syntaxtree;
     }
     /**
@@ -1140,6 +1358,19 @@ class block_formal_langs_string_pair {
      */
     protected $correctedstring;
 
+
+    public function __clone() {
+        $this->correctstring = clone $this->correctstring;
+        if (is_object($this->correctedstring)) {
+             $this->correctedstring = clone $this->correctedstring;
+        }
+        if (is_object($this->comparedstring)) {
+            $this->comparedstring = clone $this->comparedstring;
+        }
+        if (is_object($this->matches)) {
+            $this->matches = clone $this->matches;
+        }
+    }
 
     //TODO - anyone -  access functions
     //TODO - functions for the lexical and sequence analyzers, and mistake classes.
