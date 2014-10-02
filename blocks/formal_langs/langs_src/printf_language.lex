@@ -87,7 +87,9 @@ class block_formal_langs_language_printf_language extends block_formal_langs_pre
     private function return_pos() {
         $begin_line = $this->yyline;
         $begin_col = $this->yycol;
-
+		$begin_str  = $this->yychar;
+		$end_str = $begin_str + strlen($this->yytext()) - 1;
+		
         if(strpos($this->yytext(), '\n')) {
             $lines = explode("\n", $this->yytext());
             $num_lines = count($lines);
@@ -99,7 +101,7 @@ class block_formal_langs_language_printf_language extends block_formal_langs_pre
             $end_col = $begin_col + strlen($this->yytext()) - 1;
         }
         
-        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
+        $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col, $begin_str, $end_str);
         
         return $res;
     }
@@ -115,5 +117,8 @@ class block_formal_langs_language_printf_language extends block_formal_langs_pre
 <STRING> "\""       {  $this->yybegin(self::YYINITIAL); return $this->create_token('quote',$this->yytext()); }
 <STRING> "%%"     { return $this->create_token('text',$this->yytext()); }
 <STRING> "%"("-"|"+"|#|0)?([0-9]+|"*")?("."([0-9]+|"*"))?(hh|h|l|ll|j|z|t|l|L)?[diuoxXfFeEgGaAcspn]    { return $this->create_token('specifier',$this->yytext()); }
-<STRING> ([^"\"""%"\\]|\\.)+     { return $this->create_token('text',($this->yytext())); }
-<STRING> .               { return $this->create_token('text',$this->yytext()); }
+<STRING> \\x[0-9A-F]+               { return $this->create_token('text',($this->yytext())); }
+<STRING> \\[0-7]+               { return $this->create_token('text',($this->yytext())); }
+<STRING> \\[ab\\fnrtv"'""\""?\-]  { return $this->create_token('text',($this->yytext())); }
+<STRING> ([^"\"""%"\\])+        { return $this->create_token('text',($this->yytext())); }
+<STRING> .                      { return $this->create_token('text',$this->yytext()); }
