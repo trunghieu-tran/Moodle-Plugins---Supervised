@@ -39,10 +39,6 @@ class qtype_preg_fa_transition {
     const GREED_GREEDY = 4;
     const GREED_POSSESSIVE = 8;
 
-    const TAG_POS_BEFORE = 1;
-    const TAG_POS_AT = 2;
-    const TAG_POS_AFTER = 4;
-
     /** Empty transition. */
     const TYPE_TRANSITION_EPS = 'eps_transition';
     /** Transition with unmerged simple assert. */
@@ -156,15 +152,15 @@ class qtype_preg_fa_transition {
         } else if ($this->is_end_anchor()) {
             $this->mergedbefore[] = $thisclone;
         }
-        
-        
+
+
         $otherclone = clone($other);
         if ($other->is_start_anchor()) {
             $other->mergedafter[] = $otherclone;
         } else if ($other->is_end_anchor()){
             $other->mergedbefore[] = $otherclone;
         }
-        
+
         $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
         $resultafter = array_merge($this->mergedafter, $other->mergedafter);
         // Removing same asserts.
@@ -1287,11 +1283,11 @@ class qtype_preg_fa {
             // Redirect merged transitions too.
             foreach ($transition->mergedbefore as $merged) {
                 $merged->from = $transition->from;
-                $merged->to = $transition->to; 
+                $merged->to = $transition->to;
             }
             foreach ($transition->mergedafter as $merged) {
                 $merged->from = $transition->from;
-                $merged->to = $transition->to; 
+                $merged->to = $transition->to;
             }
             $this->add_transition($transition);
         }

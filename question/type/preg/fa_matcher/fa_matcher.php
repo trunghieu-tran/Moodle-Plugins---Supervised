@@ -171,7 +171,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $tmplength = 0;
             }
 
-            $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
+            if ($result) {
+            	$this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
+            }
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
             $curpos += $tmplength;
@@ -206,8 +208,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate->last_match_len = $length;
 
         $newstate->length += $length;
-        $newstate->write_tag_values($transition, qtype_preg_fa_transition::TAG_POS_AT, $curpos, $length);
-        //$newstate->write_tag_values($transition, qtype_preg_fa_transition::TAG_POS_AFTER, $curpos, $length);
+        $newstate->write_tag_values($transition, $curpos, $length);
 
         if (in_array($transition->to, $this->backtrackstates)) {
             $newstate->backtrack_states[] = $curstate;
@@ -658,6 +659,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $endstatereached = $endstatereached || $newstate->is_full();
 
                         //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel. length changed {$curstate->length} : {$newstate->length}\n\n";
+                        //echo $newstate->subpatts_to_string();
 
                         // Save the current result.
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {

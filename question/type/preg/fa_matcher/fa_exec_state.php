@@ -484,7 +484,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return false;
     }
 
-    public function write_tag_values($transition, $tagpos, $strpos, $matchlen) {
+    public function write_tag_values($transition, $strpos, $matchlen) {
         // Begin a new iteration of a subpattern. All "bigger" (inner) subpatterns will start a new iteration recursively.
         if ($transition->minopentag !== null) {
             $this->begin_subpatt_iteration($transition->minopentag);
@@ -499,9 +499,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
             // Starting indexes are always the same, equal $strpos
             $index = $strpos;
-            if ($tagpos == qtype_preg_fa_transition::TAG_POS_AFTER) {
-                $index += $matchlen;
-            }
             $this->set_current_match($tag->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
 
@@ -512,10 +509,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
             $current_match = $this->current_match($tag->subpattern);
             $index = $current_match[0];
-            $length = $strpos - $index;
-            if ($tagpos != qtype_preg_fa_transition::TAG_POS_BEFORE) {
-                $length += $matchlen;
-            }
+            $length = $strpos - $index + $matchlen;
             if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $this->set_current_match($tag->subpattern, $index, $length);
             }
