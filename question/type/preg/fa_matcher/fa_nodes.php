@@ -57,6 +57,56 @@ abstract class qtype_preg_fa_node {
         $this->pregnode = $node;
     }
 
+    protected function add_open_tag($transition, $transform) {
+        //echo "\nthis node: {$this->pregnode->subpattern}\n";
+        //echo "main transition: {$transition->pregleaf->subpattern}\n";
+        $thetransition = $transition;
+        $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
+
+        if ($transform) {
+            // Look through all merged transitions and fine one with minimal subpattern number
+            foreach ($transition->mergedbefore as $merged) {
+                if (/*$merged->pregleaf->subpattern < $this->pregnode->subpattern/*/$merged->pregleaf->subpattern == -1) {
+                   // continue;
+                }
+                $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
+                if ($newdelta < $thedelta) {
+                    //echo "merged transition: {$merged->pregleaf->subpattern} $thedelta : $newdelta\n";
+                    //var_dump($merged->pregleaf->subtype);
+                    $thetransition = $merged;
+                    $thedelta = $newdelta;
+                }
+            }
+        }
+
+        $thetransition->opentags[] = $this->pregnode;
+
+        if ($thetransition->minopentag === null || $this->pregnode->subpattern < $thetransition->minopentag->subpattern) {
+            $thetransition->minopentag = $this->pregnode;
+        }
+    }
+
+    protected function add_close_tag($transition, $transform) {
+        $thetransition = $transition;
+        $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
+
+        if ($transform) {
+            // Look through all merged transitions and fine one with maximal subpattern number
+            foreach ($transition->mergedafter as $merged) {
+                if (/*$merged->pregleaf->subpattern > */$merged->pregleaf->subpattern == -1) {
+                  //  continue;
+                }
+                $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
+                if ($newdelta > $thedelta) {
+                    $thetransition = $merged;
+                    $thedelta = $newdelta;
+                }
+            }
+        }
+
+        $thetransition->closetags[] = $this->pregnode;
+    }
+
     public function create_automaton(&$automaton, &$stack, $transform) {
         $this->create_automaton_inner($automaton, $stack, $transform);
 
@@ -69,18 +119,12 @@ abstract class qtype_preg_fa_node {
 
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
-                $transition->opentags[] = $this->pregnode;
-
-            if ($transition->minopentag === null || $this->pregnode->subpattern < $transition->minopentag->subpattern) {
-                $transition->minopentag = $this->pregnode;
-            }
+            $this->add_open_tag($transition, $transform);
         }
 
         // Copy this node to the ending transitions.
         foreach ($automaton->get_adjacent_transitions($body['end'], false) as $transition) {
-            if ($transition->to === $body['end']) {
-                $transition->closetags[] = $this->pregnode;
-            }
+            $this->add_close_tag($transition, $transform);
         }
 
         $stack[] = $body;

@@ -879,7 +879,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // The create_automaton() can throw an exception in case of too large finite automaton.
         //try {
             $stack = array();
-            $this->dstroot->create_automaton($result, $stack, false);   // TODO: real value?
+            $this->dstroot->create_automaton($result, $stack, true);   // TODO: real value?
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
