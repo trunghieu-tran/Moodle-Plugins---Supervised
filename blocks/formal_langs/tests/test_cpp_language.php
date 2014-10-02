@@ -455,5 +455,27 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) == 1, 'There must be one lexeme');
         $this->assertTrue($result[0]->value() == '/*  a comment */');    
     }
+
+    public function test_multiline() {
+        $lang = new block_formal_langs_language_cpp_language();
+        $test = 'mad
+                 man
+                ';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 2);
+        $this->assertTrue($result[0]->value() == 'mad');
+        $this->assertTrue($result[1]->value() == 'man');
+    }
+
+    public function test_stringpos() {
+        $lang = new block_formal_langs_language_cpp_language();
+        $test = 'mad';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 1);
+        $this->assertTrue($result[0]->position()->stringstart() == 0);
+        $this->assertTrue($result[0]->position()->stringend() == 2);
+    }
 }
  ?>

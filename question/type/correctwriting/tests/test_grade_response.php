@@ -25,7 +25,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
-global $CFG;  
+global $CFG;
+require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
  
@@ -52,6 +53,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
        $this->question->addedmistakeweight = 0.12;
        $this->question->hintgradeborder = 0.75;
        $this->question->maxmistakepercentage = 0.95;
+       $this->question->qtype = new qtype_correctwriting();
     }
     // Tests perfect match
     public function test_perfect_match() {

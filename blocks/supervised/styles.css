@@ -1,3 +1,28 @@
-/** General display rules **/
-#page-blocks-supervised-listclassroom .inputip{text-align: center; padding:5px;}
-#page-blocks-supervised-listclassroom .addbutton{text-align: center; padding:5px;}
+/* Styles for block's body */
+.block_supervised .content {
+    font-size: 11px;
+}
+.block_supervised .content .footer {
+    font-size: 13px;
+}
+
+.block_supervised .content .mform .fdescription.required {
+    display: none;
+}
+
+.block_supervised .content .mform .fitem .fitemtitle {
+    width: auto;
+}
+
+.block_supervised .content .mform .fitem .fstatic,
+.block_supervised .content .mform .fitem .fselect,
+.block_supervised .content .mform .fitem .ftext {
+    margin-left: 0;
+    width: auto;
+}
+
+/* Styles for view sessions page */
+#supervisedblock_selectcourseform {
+    text-align: center;
+    width: 100%;
+}
