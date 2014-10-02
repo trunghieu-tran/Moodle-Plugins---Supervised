@@ -341,8 +341,8 @@ class qtype_preg_fa_transition {
         foreach ($clone->mergedbefore as $before) {
             $open = $before->tags_before_transition();
             $close = $before->tags_after_transition();
-            $lab = $before->pregleaf->leaf_tohr();
-            $lab = $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close;
+            $label = $before->pregleaf->leaf_tohr();
+            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
         }
         $open = $clone->tags_before_transition();
         $close = $clone->tags_after_transition();
