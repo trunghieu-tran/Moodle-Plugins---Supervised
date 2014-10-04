@@ -193,7 +193,7 @@ abstract class qtype_preg_fa_node {
         }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
-            //if ($transition->from != $transition->to || $transition->is_merged() == false) {
+            if ($transition->from != $transition->to) {
                 $tran = clone($transition);
                 $delclone = clone $del;
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
@@ -207,7 +207,7 @@ abstract class qtype_preg_fa_node {
                 }
 
                 $clonetransitions[] = $tran;
-            //}
+            }
         }
         // Has deleting or changing transitions.
         if (count($transitions) != 0) {
