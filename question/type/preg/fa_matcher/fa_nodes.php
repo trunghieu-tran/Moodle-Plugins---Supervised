@@ -193,7 +193,7 @@ abstract class qtype_preg_fa_node {
         }
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
-            if ($transition->from != $transition->to) {
+            if (!($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
                 $tran = clone($transition);
                 $delclone = clone $del;
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
@@ -225,7 +225,7 @@ abstract class qtype_preg_fa_node {
 
                 }
             }
-            if (!($del->is_end_anchor() && in_array($del->to, $endstates))) {
+            if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
                 $automaton->remove_transition($del);
             }
             return true;
