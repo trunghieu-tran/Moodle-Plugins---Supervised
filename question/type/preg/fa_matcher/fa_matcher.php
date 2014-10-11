@@ -66,7 +66,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
                 return 'qtype_preg_fa_leaf';
         }
 
@@ -97,7 +97,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -172,7 +172,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             if ($result) {
-            	$this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
+                $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
             }
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
@@ -218,11 +218,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     /**
      * Check if a fa_exec_state instance has
      */
-    protected function is_state_ok_for_subexpr_call($state, $subexpr = 0) {
+    protected function is_state_subexpr_match_started($state, $subexpr = 0) {
         if ($subexpr == 0) {
             return true;
         }
-        return $state->is_subexpr_opened($subexpr) && !$state->has_duplicate_subexpression();
+        return $state->is_subexpr_match_started($subexpr) && !$state->has_duplicate_subexpression();
+    }
+
+    protected function is_state_subexpr_match_finished($state, $subexpr = 0) {
+        if ($subexpr == 0) {
+            return false;
+        }
+        return $state->is_subexpr_match_finished($subexpr);
     }
 
     /**
@@ -525,9 +532,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
                 $curstate = array_pop($curstates);
-                if ($curstate->is_full()) {
-                    $fullmatches[] = $curstate;
-                }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
@@ -547,15 +551,22 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel. length changed {$curstate->length} : {$newstate->length}\n\n";
 
                         // Additional filtering for subexpression calls
-                        $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
+                        $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
+                        $skip = $skip || $this->is_state_subexpr_match_finished($newstate, $subexpr);
+
+                        $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
 
                         // Save the current match.
-                        if (!$skip && !($transition->loopsback && $newstate->has_null_iterations())) {
+                        if (!$skip) {
                             if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                                 $lazystates[] = $newstate;
                             } else {
                                 $reached[] = $newstate;
                             }
+                        }
+
+                        if ($newstate->is_full()) {
+                            $fullmatches[] = $newstate;
                         }
                     } else if (empty($fullmatches) && $subexpr == 0) {
                         //echo "not matched, partial match length is $length\n";
@@ -664,7 +675,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         // Save the current result.
                         if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                             // Additional filtering for subexpression calls
-                            $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
+                            $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
                             if (!$skip) {
                                 $lazystates[] = $newstate;
                             }
@@ -699,11 +710,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             // Replace curstates with reached.
             foreach ($reached as $newstate) {
                 // Additional filtering for subexpression calls
-                $skip = $firststep && !$this->is_state_ok_for_subexpr_call($newstate, $subexpr);
+                $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
                 if (!$skip && ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {
                     $states[$newstate->state] = $newstate;
-                    $curstates[] = $newstate->state;
+
+                    // Important: if a subexpression was called and it's already matched, DON'T add this to curstates
+                    if (!$this->is_state_subexpr_match_finished($newstate, $subexpr)) {
+                        $curstates[] = $newstate->state;
+                    }
+
                     $endstatereached = $endstatereached || $newstate->is_full();
                 }
             }
@@ -767,7 +783,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
         //echo "======================== $recursionlevel\n";
 
-        if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 3) {
+        if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 30) {
             return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
         }
 
@@ -879,7 +895,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // The create_automaton() can throw an exception in case of too large finite automaton.
         //try {
             $stack = array();
-            $this->dstroot->create_automaton($result, $stack, true);   // TODO: real value?
+            $this->dstroot->create_automaton($result, $stack, false);   // TODO: real value?
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");

@@ -125,12 +125,11 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return $this->matcher->get_ast_root()->subpattern;
     }
 
-    // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
+    /**
+     * Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
+     */
     public function current_match($subpatt) {
-        if (!isset($this->matches[$subpatt])) {
-            return null;
-        }
-        return end($this->matches[$subpatt]);
+        return isset($this->matches[$subpatt]) ? end($this->matches[$subpatt]) : null;
     }
 
     // Sets the current match for the given subpattern number.
@@ -200,10 +199,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return self::empty_subpatt_match();
     }
 
-    public function is_subexpr_opened($subexpr) {
-        return array_key_exists($subexpr, $this->subexpr_to_subpatt);
-    }
-
     public function has_duplicate_subexpression() {
         foreach ($this->subexpr_to_subpatt as $node) {
             if ($node->type == qtype_preg_node::TYPE_NODE_SUBEXPR && $node->isduplicate) {
@@ -211,6 +206,22 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
         }
         return false;
+    }
+
+    public function is_subexpr_match_started($subexpr) {
+        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
+            return false;
+        }
+        $current = $this->current_match($this->subexpr_to_subpatt[$subexpr]->subpattern);
+        return ($current !== null && $current[0] != qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    public function is_subexpr_match_finished($subexpr) {
+        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
+            return false;
+        }
+        $current = $this->current_match($this->subexpr_to_subpatt[$subexpr]->subpattern);
+        return ($current !== null && $current[0] != qtype_preg_matching_results::NO_MATCH_FOUND && $current[1] != qtype_preg_matching_results::NO_MATCH_FOUND);
     }
 
     public function index_first($subexpr = 0) {
