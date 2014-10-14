@@ -355,6 +355,7 @@ class qtype_preg_fa_transition {
             $close = $before->tags_after_transition();
             $label = $before->pregleaf->leaf_tohr();
             $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
+            $lab .= '(' . $before->from . ',' . $before->to . ')';
         }
         $open = $clone->tags_before_transition();
         $close = $clone->tags_after_transition();
@@ -366,6 +367,7 @@ class qtype_preg_fa_transition {
             $close = $after->tags_after_transition();
             $label = $after->pregleaf->leaf_tohr();
             $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close ;
+            $lab .= '(' . $after->from . ',' . $after->to . ')';
         }
         $lab .= '"';
         $thickness = 2;
