@@ -124,6 +124,22 @@ class qtype_preg_fa_transition {
         $this->ismerged = false;
     }
 
+    public function __clone() {
+        $this->pregleaf = clone $this->pregleaf;
+        $mergedbefore = $this->mergedbefore;
+        $this->mergedbefore = array();
+        foreach ($mergedbefore as $before) {
+            $newbefore = clone $before;
+            $this->mergedbefore[] = $newbefore;
+        }
+        $mergedafter = $this->mergedafter;
+        $this->mergedafter = array();
+        foreach ($mergedafter as $after) {
+            $newafter = clone $after;
+            $this->mergedafter[] = $newafter;
+        }
+    }
+
     public function is_start_anchor() {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor() &&  empty($this->assertionsbefore));
     }
