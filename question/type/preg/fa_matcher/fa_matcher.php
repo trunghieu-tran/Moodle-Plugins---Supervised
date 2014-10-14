@@ -672,18 +672,19 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel. length changed {$curstate->length} : {$newstate->length}\n\n";
                         //echo $newstate->subpatts_to_string();
 
+                        // Additional filtering for subexpression calls
+                        $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
+
                         // Save the current result.
-                        if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
-                            // Additional filtering for subexpression calls
-                            $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
-                            if (!$skip) {
+                        if (!$skip) {
+                            if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                                 $lazystates[] = $newstate;
-                            }
-                        } else {
-                            $number = $newstate->state;
-                            if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
-                                ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {   // $states does not contain a better state
-                                $reached[$number] = $newstate;
+                            } else {
+                                $number = $newstate->state;
+                                if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
+                                    ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {   // $states does not contain a better state
+                                    $reached[$number] = $newstate;
+                                }
                             }
                         }
                     } else if (!$endstatereached && $subexpr == 0) {
