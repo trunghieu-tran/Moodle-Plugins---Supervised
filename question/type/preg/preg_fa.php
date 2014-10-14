@@ -1286,12 +1286,8 @@ class qtype_preg_fa {
         // Remember transitions to be added and remove them.
         $toadd = array();
         foreach ($transitions as $transition) {
-            $toadd[] = $transition;
             $this->remove_transition($transition);
-        }
-
-        // Change "from" and "to" and add the transitions again.
-        foreach ($toadd as $transition) {
+            // Change "from" and "to" and add the transitions again.
             if ($transition->from == $oldstateid) {
                 $transition->from = $newstateid;
             }
@@ -1299,11 +1295,11 @@ class qtype_preg_fa {
                 $transition->to = $newstateid;
             }
             // Redirect merged transitions too.
-            foreach ($transition->mergedbefore as $merged) {
+            foreach ($transition->mergedbefore as &$merged) {
                 $merged->from = $transition->from;
                 $merged->to = $transition->to;
             }
-            foreach ($transition->mergedafter as $merged) {
+            foreach ($transition->mergedafter as &$merged) {
                 $merged->from = $transition->from;
                 $merged->to = $transition->to;
             }
