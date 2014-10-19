@@ -292,7 +292,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $resumestate->length -= $laststate->last_match_len; // Backreference was partially matched
 
             // Re-write the string with correct characters.
-            list($flag, $newchr) = $laststate->last_transition->pregleaf->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
+            list($flag, $newchr) = $laststate->last_transition->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
             if ($newchr != null) {
                 $resumestate->str->concatenate($newchr);
             }
@@ -384,7 +384,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Generate a next character.
                 //if ($length > 0) {
                     $prevpos = $newstate->startpos + $newstate->length - $length;
-                    list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $prevpos, 0, $curstate);
+                    list($flag, $newchr) = $transition->next_character($str, $newstate->str, $prevpos, 0, $curstate);
                     if ($newchr != null) {
                         $newstate->str->concatenate($newchr);
                     }
@@ -481,7 +481,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     // Generate a next character.
                     //if ($length > 0) {
                         $prevpos = $newstate->startpos + $newstate->length - $length;
-                        list($flag, $newchr) = $transition->pregleaf->next_character($str, $newstate->str, $prevpos, 0, $curstate);
+                        list($flag, $newchr) = $transition->next_character($str, $newstate->str, $prevpos, 0, $curstate);
                         if ($newchr != null) {
                             $newstate->str->concatenate($newchr);
                         }
