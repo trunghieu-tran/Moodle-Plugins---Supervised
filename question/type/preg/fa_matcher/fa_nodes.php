@@ -215,12 +215,28 @@ abstract class qtype_preg_fa_node {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
                     $tran->make_merged();
+                    foreach ($tran->mergedbefore as $before) {
+                        $before->from = $tran->from;
+                        $before->to = $tran->to;
+                    }
+                    foreach ($tran->mergedafter as $after) {
+                        $after->from = $tran->from;
+                        $after->to = $tran->to;
+                    }
                     $automaton->add_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as $tran) {
                     $tran->to = $del->to;
                     $tran->make_merged();
+                    foreach ($tran->mergedbefore as $before) {
+                        $before->from = $tran->from;
+                        $before->to = $tran->to;
+                    }
+                    foreach ($tran->mergedafter as $after) {
+                        $after->from = $tran->from;
+                        $after->to = $tran->to;
+                    }
                     $automaton->add_transition($tran);
 
                 }
