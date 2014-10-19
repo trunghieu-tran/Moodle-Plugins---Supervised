@@ -147,6 +147,7 @@ class qtype_preg_fa_transition {
             $capz = array('before' => false, 'after' => false);
             $condassert = array('before' => false, 'after' => false);
             $key = 'before';
+            $epscount = 0;
 
             foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
                 foreach ($assertions as $assertion) {
@@ -163,6 +164,9 @@ class qtype_preg_fa_transition {
                         $condassert[$key] = true;
                         $condassertindex = array_search($assertion, $assertions);
                     }
+                    if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                        $epscount++;
+                    }
                 }
 
                 $key = 'after';
@@ -170,9 +174,10 @@ class qtype_preg_fa_transition {
 
             // Check all the returned ranges.
             $chars = $this->pregleaf->next_character_base($originalstr, $newstr, $pos, $length, $matcherstateobj,$dollar['before'], $circumflex['after']);
+
             if (count($chars) != 0) {
                 // There is no merge assertions.
-                if (count($this->mergedbefore) == 0 && count($this->mergedafter) == 0) {
+                if (count($this->mergedbefore) == 0 && count($this->mergedafter) == 0 || count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
                     return array(qtype_preg_leaf::NEXT_CHAR_OK, $chars[0]);
                 }
 
