@@ -141,6 +141,7 @@ abstract class qtype_preg_fa_node {
         $oppositetransitions = array();
         $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
         // Cycled last states.
+        $backref = false;
         if ($del->from == $del->to && in_array($del->to, $endstates) || !$del->consumeschars)
         {
             return false;
@@ -194,23 +195,28 @@ abstract class qtype_preg_fa_node {
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
             if (!($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
-                $tran = clone($transition);
-                $delclone = clone $del;
-                $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                $merged = array_merge($delclone->mergedbefore, array($delclone));
-                $merged = array_merge($merged, $delclone->mergedafter);
-                // Work with tags.
-                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
-                    $tran->mergedafter = array_merge($tran->mergedafter, $merged);
+                if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+                    $backref = true;
                 } else {
-                    $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
-                }
+                    $tran = clone($transition);
+                    $delclone = clone $del;
+                    $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
+                    $merged = array_merge($delclone->mergedbefore, array($delclone));
+                    $merged = array_merge($merged, $delclone->mergedafter);
+                    // Work with tags.
+                    if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
+                        $tran->mergedafter = array_merge($tran->mergedafter, $merged);
+                    } else {
+                        $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
+                    }
 
-                $clonetransitions[] = $tran;
+                    $clonetransitions[] = $tran;
+                }
             }
+        
         }
         // Has deleting or changing transitions.
-        if (count($transitions) != 0) {
+        if (count($transitions) != 0 && !$backref) {
             if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to, $endstates))) {
                 foreach ($clonetransitions as $tran) {
                     $tran->from = $del->from;
@@ -242,7 +248,9 @@ abstract class qtype_preg_fa_node {
                 }
             }
             if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
-                $automaton->remove_transition($del);
+                if (!$backref) {
+                    $automaton->remove_transition($del);
+                }
             }
             return true;
         }
