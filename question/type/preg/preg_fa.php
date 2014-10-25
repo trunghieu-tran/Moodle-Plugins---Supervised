@@ -151,20 +151,23 @@ class qtype_preg_fa_transition {
 
             foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
                 foreach ($assertions as $assertion) {
+                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
+                        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                    }
                     if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                         $circumflex[$key] = true;
                     }
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                         $dollar[$key] = true;
                     }
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
                         $capz[$key] = true;
                     }
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
+                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
                         $condassert[$key] = true;
                         $condassertindex = array_search($assertion, $assertions);
                     }
-                    if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         $epscount++;
                     }
                 }
@@ -177,7 +180,7 @@ class qtype_preg_fa_transition {
 
             if (count($chars) != 0) {
                 // There is no merge assertions.
-                if (count($this->mergedbefore) == 0 && count($this->mergedafter) == 0 || count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
+                if (count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
                     return array(qtype_preg_leaf::NEXT_CHAR_OK, $chars[0]);
                 }
 
