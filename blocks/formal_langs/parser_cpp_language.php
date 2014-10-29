@@ -1,5 +1,5 @@
 <?php
-/* Driver template for the PHP_lock_formal_langs_parser_cpp_languagerGenerator parser generator. (PHP port of LEMON)
+/* Driver template for the PHP_block_formal_langs_parser_cpp_languagerGenerator parser generator. (PHP port of LEMON)
 */
 
 /**
@@ -8,19 +8,19 @@
  *
  * meta-data should be stored as an array
  */
-class lock_formal_langs_parser_cpp_languageyyToken implements ArrayAccess
+class block_formal_langs_parser_cpp_languageyyToken implements ArrayAccess
 {
     public $string = '';
     public $metadata = array();
 
     function __construct($s, $m = array())
     {
-        if ($s instanceof lock_formal_langs_parser_cpp_languageyyToken) {
+        if ($s instanceof block_formal_langs_parser_cpp_languageyyToken) {
             $this->string = $s->string;
             $this->metadata = $s->metadata;
         } else {
             $this->string = (string) $s;
-            if ($m instanceof lock_formal_langs_parser_cpp_languageyyToken) {
+            if ($m instanceof block_formal_langs_parser_cpp_languageyyToken) {
                 $this->metadata = $m->metadata;
             } elseif (is_array($m)) {
                 $this->metadata = $m;
@@ -47,7 +47,7 @@ class lock_formal_langs_parser_cpp_languageyyToken implements ArrayAccess
     {
         if ($offset === null) {
             if (isset($value[0])) {
-                $x = ($value instanceof lock_formal_langs_parser_cpp_languageyyToken) ?
+                $x = ($value instanceof block_formal_langs_parser_cpp_languageyyToken) ?
                     $value->metadata : $value;
                 $this->metadata = array_merge($this->metadata, $x);
                 return;
@@ -57,7 +57,7 @@ class lock_formal_langs_parser_cpp_languageyyToken implements ArrayAccess
         if ($value === null) {
             return;
         }
-        if ($value instanceof lock_formal_langs_parser_cpp_languageyyToken) {
+        if ($value instanceof block_formal_langs_parser_cpp_languageyyToken) {
             if ($value->metadata) {
                 $this->metadata[$offset] = $value->metadata;
             }
@@ -84,7 +84,7 @@ class lock_formal_langs_parser_cpp_languageyyToken implements ArrayAccess
  *      the information used by the action routines in the grammar.
  *      It is sometimes called the "minor" token.
  */
-class lock_formal_langs_parser_cpp_languageyyStackEntry
+class block_formal_langs_parser_cpp_languageyyStackEntry
 {
     public $stateno;       /* The state-number */
     public $major;         /* The major token value.  This is the code
@@ -94,14 +94,18 @@ class lock_formal_langs_parser_cpp_languageyyStackEntry
 };
 
 // code external to the class is included here
+#line 3 "langs_src/parser_cpp_language.y"
+
+require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.php');
+#line 102 "langs_src/parser_cpp_language.php"
 
 // declare_class is output here
 #line 2 "langs_src/parser_cpp_language.y"
-class block_formal_langs_parser_cpp_language#line 102 "langs_src/parser_cpp_language.php"
+class block_formal_langs_parser_cpp_language#line 107 "langs_src/parser_cpp_language.php"
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 3 "langs_src/parser_cpp_language.y"
+#line 6 "langs_src/parser_cpp_language.y"
 
     // Root of the Abstract Syntax Tree (AST).
     public $root;
@@ -134,7 +138,7 @@ class block_formal_langs_parser_cpp_language#line 102 "langs_src/parser_cpp_lang
 		return $oldmajor;
 	}
 	
-#line 140 "langs_src/parser_cpp_language.php"
+#line 145 "langs_src/parser_cpp_language.php"
 
 /* Next is all token values, as class constants
 */
@@ -1767,7 +1771,7 @@ static public $yy_action = array(
 */
     const YYNOCODE = 182;
     const YYSTACKDEPTH = 100;
-    const lock_formal_langs_parser_cpp_languageARG_DECL = '0';
+    const block_formal_langs_parser_cpp_languageARG_DECL = '0';
     const YYNSTATE = 480;
     const YYNRULE = 237;
     const YYERRORSYMBOL = 116;
@@ -2192,7 +2196,7 @@ static public $yy_action = array(
      * is popped from the stack, then call it.
      *
      * Return the major token number for the symbol popped.
-     * @param lock_formal_langs_parser_cpp_languageyyParser
+     * @param block_formal_langs_parser_cpp_languageyyParser
      * @return int
      */
     function yy_pop_parser_stack()
@@ -2271,7 +2275,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new lock_formal_langs_parser_cpp_languageyyStackEntry;
+                        $x = new block_formal_langs_parser_cpp_languageyyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -2345,7 +2349,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new lock_formal_langs_parser_cpp_languageyyStackEntry;
+                        $x = new block_formal_langs_parser_cpp_languageyyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -2475,7 +2479,7 @@ static public $yy_action = array(
             ** stack ever overflows */
             return;
         }
-        $yytos = new lock_formal_langs_parser_cpp_languageyyStackEntry;
+        $yytos = new block_formal_langs_parser_cpp_languageyyStackEntry;
         $yytos->stateno = $yyNewState;
         $yytos->major = $yyMajor;
         $yytos->minor = $yypMinor;
@@ -2996,7 +3000,7 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 83 "langs_src/parser_cpp_language.y"
+#line 86 "langs_src/parser_cpp_language.y"
     function yy_r0(){
 	$stack = array( $this->create_node('program', array( $this->yystack[$this->yyidx + 0]->minor ) ) );
 	if (is_array($this->root)) {
@@ -3011,1286 +3015,1286 @@ static public $yy_action = array(
     }
 	$this->_retvalue = $stack;
     }
-#line 3019 "langs_src/parser_cpp_language.php"
-#line 99 "langs_src/parser_cpp_language.y"
+#line 3024 "langs_src/parser_cpp_language.php"
+#line 102 "langs_src/parser_cpp_language.y"
     function yy_r1(){
 	$this->currentrule = new block_formal_langs_description_rule("список выражения %l(stmt_or_defined_macro)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3025 "langs_src/parser_cpp_language.php"
-#line 104 "langs_src/parser_cpp_language.y"
+#line 3030 "langs_src/parser_cpp_language.php"
+#line 107 "langs_src/parser_cpp_language.y"
     function yy_r2(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3031 "langs_src/parser_cpp_language.php"
-#line 109 "langs_src/parser_cpp_language.y"
+#line 3036 "langs_src/parser_cpp_language.php"
+#line 112 "langs_src/parser_cpp_language.y"
     function yy_r3(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления пространства имен", "идентификатор", "%ur(именительный)"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3038 "langs_src/parser_cpp_language.php"
-#line 115 "langs_src/parser_cpp_language.y"
+#line 3043 "langs_src/parser_cpp_language.php"
+#line 118 "langs_src/parser_cpp_language.y"
     function yy_r4(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('namespace_body', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3044 "langs_src/parser_cpp_language.php"
-#line 120 "langs_src/parser_cpp_language.y"
+#line 3049 "langs_src/parser_cpp_language.php"
+#line 123 "langs_src/parser_cpp_language.y"
     function yy_r5(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('namespace_body', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3050 "langs_src/parser_cpp_language.php"
-#line 127 "langs_src/parser_cpp_language.y"
+#line 3055 "langs_src/parser_cpp_language.php"
+#line 130 "langs_src/parser_cpp_language.y"
     function yy_r6(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3056 "langs_src/parser_cpp_language.php"
-#line 132 "langs_src/parser_cpp_language.y"
+#line 3061 "langs_src/parser_cpp_language.php"
+#line 135 "langs_src/parser_cpp_language.y"
     function yy_r7(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "%s", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -3]->minor->value());
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3063 "langs_src/parser_cpp_language.php"
-#line 138 "langs_src/parser_cpp_language.y"
+#line 3068 "langs_src/parser_cpp_language.php"
+#line 141 "langs_src/parser_cpp_language.y"
     function yy_r8(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -2]->minor->value());
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3070 "langs_src/parser_cpp_language.php"
-#line 144 "langs_src/parser_cpp_language.y"
+#line 3075 "langs_src/parser_cpp_language.php"
+#line 147 "langs_src/parser_cpp_language.y"
     function yy_r9(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3077 "langs_src/parser_cpp_language.php"
-#line 150 "langs_src/parser_cpp_language.y"
+#line 3082 "langs_src/parser_cpp_language.php"
+#line 153 "langs_src/parser_cpp_language.y"
     function yy_r10(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%s", "точка с запятой"));
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3083 "langs_src/parser_cpp_language.php"
-#line 155 "langs_src/parser_cpp_language.y"
+#line 3088 "langs_src/parser_cpp_language.php"
+#line 158 "langs_src/parser_cpp_language.y"
     function yy_r11(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "точка с запятой"));
 	$this->_retvalue = $this->create_node('class_or_union_or_struct', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3089 "langs_src/parser_cpp_language.php"
-#line 160 "langs_src/parser_cpp_language.y"
+#line 3094 "langs_src/parser_cpp_language.php"
+#line 163 "langs_src/parser_cpp_language.y"
     function yy_r12(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный) и %2(именительный)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('type_meta_specifier_with_template_def', array(A, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3095 "langs_src/parser_cpp_language.php"
-#line 165 "langs_src/parser_cpp_language.y"
+#line 3100 "langs_src/parser_cpp_language.php"
+#line 168 "langs_src/parser_cpp_language.y"
     function yy_r13(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('type_meta_specifier_with_template_def', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3101 "langs_src/parser_cpp_language.php"
-#line 170 "langs_src/parser_cpp_language.y"
+#line 3106 "langs_src/parser_cpp_language.php"
+#line 173 "langs_src/parser_cpp_language.y"
     function yy_r14(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления класса"));
 	$this->_retvalue = $this->create_node('type_meta_specifier', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3107 "langs_src/parser_cpp_language.php"
-#line 175 "langs_src/parser_cpp_language.y"
+#line 3112 "langs_src/parser_cpp_language.php"
+#line 178 "langs_src/parser_cpp_language.y"
     function yy_r15(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления структуры"));
 	$this->_retvalue = $this->create_node('type_meta_specifier', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3113 "langs_src/parser_cpp_language.php"
-#line 180 "langs_src/parser_cpp_language.y"
+#line 3118 "langs_src/parser_cpp_language.php"
+#line 183 "langs_src/parser_cpp_language.y"
     function yy_r16(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления объединения"));
 	$this->_retvalue = $this->create_node('type_meta_specifier', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3119 "langs_src/parser_cpp_language.php"
-#line 185 "langs_src/parser_cpp_language.y"
+#line 3124 "langs_src/parser_cpp_language.php"
+#line 188 "langs_src/parser_cpp_language.y"
     function yy_r17(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('structure_body', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3125 "langs_src/parser_cpp_language.php"
-#line 190 "langs_src/parser_cpp_language.y"
+#line 3130 "langs_src/parser_cpp_language.php"
+#line 193 "langs_src/parser_cpp_language.y"
     function yy_r18(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('structure_body', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3131 "langs_src/parser_cpp_language.php"
-#line 195 "langs_src/parser_cpp_language.y"
+#line 3136 "langs_src/parser_cpp_language.php"
+#line 198 "langs_src/parser_cpp_language.y"
     function yy_r19(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_visibility_spec_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3137 "langs_src/parser_cpp_language.php"
-#line 200 "langs_src/parser_cpp_language.y"
+#line 3142 "langs_src/parser_cpp_language.php"
+#line 203 "langs_src/parser_cpp_language.y"
     function yy_r20(){
 	$this->currentrule = new block_formal_langs_description_rule("%l(stmt_or_visibility_spec)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_visibility_spec_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3143 "langs_src/parser_cpp_language.php"
-#line 207 "langs_src/parser_cpp_language.y"
+#line 3148 "langs_src/parser_cpp_language.php"
+#line 210 "langs_src/parser_cpp_language.y"
     function yy_r21(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_visibility_spec', array($this->yystack[$this->yyidx + 0]->minor));
 	$this->_retvalue  = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3150 "langs_src/parser_cpp_language.php"
-#line 213 "langs_src/parser_cpp_language.y"
+#line 3155 "langs_src/parser_cpp_language.php"
+#line 216 "langs_src/parser_cpp_language.y"
     function yy_r22(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_visibility_spec', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3156 "langs_src/parser_cpp_language.php"
-#line 218 "langs_src/parser_cpp_language.y"
+#line 3161 "langs_src/parser_cpp_language.php"
+#line 221 "langs_src/parser_cpp_language.y"
     function yy_r23(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "двоеточие"));
 	$this->_retvalue = $this->create_node('visibility_spec_full', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3162 "langs_src/parser_cpp_language.php"
-#line 223 "langs_src/parser_cpp_language.y"
+#line 3167 "langs_src/parser_cpp_language.php"
+#line 226 "langs_src/parser_cpp_language.y"
     function yy_r24(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "двоеточие"));
 	$this->_retvalue = $this->create_node('visibility_spec_full', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3168 "langs_src/parser_cpp_language.php"
-#line 228 "langs_src/parser_cpp_language.y"
+#line 3173 "langs_src/parser_cpp_language.php"
+#line 231 "langs_src/parser_cpp_language.y"
     function yy_r25(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово открытой видимости"));
 	$this->_retvalue = $this->create_node('visibility_spec', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3174 "langs_src/parser_cpp_language.php"
-#line 233 "langs_src/parser_cpp_language.y"
+#line 3179 "langs_src/parser_cpp_language.php"
+#line 236 "langs_src/parser_cpp_language.y"
     function yy_r26(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово защищенной видимости"));
 	$this->_retvalue = $this->create_node('visibility_spec', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3180 "langs_src/parser_cpp_language.php"
-#line 238 "langs_src/parser_cpp_language.y"
+#line 3185 "langs_src/parser_cpp_language.php"
+#line 241 "langs_src/parser_cpp_language.y"
     function yy_r27(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово скрытой видимости"));
 	$this->_retvalue = $this->create_node('visibility_spec', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3186 "langs_src/parser_cpp_language.php"
-#line 243 "langs_src/parser_cpp_language.y"
+#line 3191 "langs_src/parser_cpp_language.php"
+#line 246 "langs_src/parser_cpp_language.y"
     function yy_r28(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления сигнала"));
 	$this->_retvalue = $this->create_node('signal_slots', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3192 "langs_src/parser_cpp_language.php"
-#line 248 "langs_src/parser_cpp_language.y"
+#line 3197 "langs_src/parser_cpp_language.php"
+#line 251 "langs_src/parser_cpp_language.y"
     function yy_r29(){
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления слота"));
 	$this->_retvalue = $this->create_node('signal_slots', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3198 "langs_src/parser_cpp_language.php"
-#line 255 "langs_src/parser_cpp_language.y"
+#line 3203 "langs_src/parser_cpp_language.php"
+#line 258 "langs_src/parser_cpp_language.y"
     function yy_r30(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово перечисления", "%s", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3205 "langs_src/parser_cpp_language.php"
-#line 261 "langs_src/parser_cpp_language.y"
+#line 3210 "langs_src/parser_cpp_language.php"
+#line 264 "langs_src/parser_cpp_language.y"
     function yy_r31(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово перечисления", "%s", "%ur(именительный)", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -2]->minor->value());
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3212 "langs_src/parser_cpp_language.php"
-#line 267 "langs_src/parser_cpp_language.y"
+#line 3217 "langs_src/parser_cpp_language.php"
+#line 270 "langs_src/parser_cpp_language.y"
     function yy_r32(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово перечисления", "%ur(именительный)", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3218 "langs_src/parser_cpp_language.php"
-#line 272 "langs_src/parser_cpp_language.y"
+#line 3223 "langs_src/parser_cpp_language.php"
+#line 275 "langs_src/parser_cpp_language.y"
     function yy_r33(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово перечисления", "%s", "%ur(именительный)", "%s", "точка с запятой"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -3]->minor->value());
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3225 "langs_src/parser_cpp_language.php"
-#line 278 "langs_src/parser_cpp_language.y"
+#line 3230 "langs_src/parser_cpp_language.php"
+#line 281 "langs_src/parser_cpp_language.y"
     function yy_r34(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово перечисления", "%ur(именительный)", "%s", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3231 "langs_src/parser_cpp_language.php"
-#line 283 "langs_src/parser_cpp_language.y"
+#line 3236 "langs_src/parser_cpp_language.php"
+#line 286 "langs_src/parser_cpp_language.y"
     function yy_r35(){
 	$this->currentrule = new block_formal_langs_description_rule("тело перечисления", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('enum_body', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3237 "langs_src/parser_cpp_language.php"
-#line 288 "langs_src/parser_cpp_language.y"
+#line 3242 "langs_src/parser_cpp_language.php"
+#line 291 "langs_src/parser_cpp_language.y"
     function yy_r36(){
 	$this->currentrule = new block_formal_langs_description_rule("тело перечисления", array("левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('enum_body', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3243 "langs_src/parser_cpp_language.php"
-#line 293 "langs_src/parser_cpp_language.y"
+#line 3248 "langs_src/parser_cpp_language.php"
+#line 296 "langs_src/parser_cpp_language.y"
     function yy_r37(){
 	$this->currentrule = new block_formal_langs_description_rule("список значений перечисления %l(enum_value)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('enum_value_list', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3249 "langs_src/parser_cpp_language.php"
-#line 298 "langs_src/parser_cpp_language.y"
+#line 3254 "langs_src/parser_cpp_language.php"
+#line 301 "langs_src/parser_cpp_language.y"
     function yy_r38(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('enum_value_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3255 "langs_src/parser_cpp_language.php"
-#line 303 "langs_src/parser_cpp_language.y"
+#line 3260 "langs_src/parser_cpp_language.php"
+#line 306 "langs_src/parser_cpp_language.y"
     function yy_r39(){
 	$this->currentrule = new block_formal_langs_description_rule("%ur(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('enum_value', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3261 "langs_src/parser_cpp_language.php"
-#line 308 "langs_src/parser_cpp_language.y"
+#line 3266 "langs_src/parser_cpp_language.php"
+#line 311 "langs_src/parser_cpp_language.y"
     function yy_r40(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "операция присвоения", "%s"));
 	$this->_retvalue = $this->create_node('enum_value', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3267 "langs_src/parser_cpp_language.php"
-#line 315 "langs_src/parser_cpp_language.y"
+#line 3272 "langs_src/parser_cpp_language.php"
+#line 318 "langs_src/parser_cpp_language.y"
     function yy_r41(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3273 "langs_src/parser_cpp_language.php"
-#line 325 "langs_src/parser_cpp_language.y"
+#line 3278 "langs_src/parser_cpp_language.php"
+#line 328 "langs_src/parser_cpp_language.y"
     function yy_r43(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3279 "langs_src/parser_cpp_language.php"
-#line 336 "langs_src/parser_cpp_language.y"
+#line 3284 "langs_src/parser_cpp_language.php"
+#line 339 "langs_src/parser_cpp_language.y"
     function yy_r45(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor));
     }
-#line 3285 "langs_src/parser_cpp_language.php"
-#line 342 "langs_src/parser_cpp_language.y"
+#line 3290 "langs_src/parser_cpp_language.php"
+#line 345 "langs_src/parser_cpp_language.y"
     function yy_r46(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("тип", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3291 "langs_src/parser_cpp_language.php"
-#line 347 "langs_src/parser_cpp_language.y"
+#line 3296 "langs_src/parser_cpp_language.php"
+#line 350 "langs_src/parser_cpp_language.y"
     function yy_r47(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3297 "langs_src/parser_cpp_language.php"
-#line 352 "langs_src/parser_cpp_language.y"
+#line 3302 "langs_src/parser_cpp_language.php"
+#line 355 "langs_src/parser_cpp_language.y"
     function yy_r48(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "оператор разрешения пространства имен", "тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -7]->minor, $this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor));
     }
-#line 3303 "langs_src/parser_cpp_language.php"
-#line 357 "langs_src/parser_cpp_language.y"
+#line 3308 "langs_src/parser_cpp_language.php"
+#line 360 "langs_src/parser_cpp_language.y"
     function yy_r49(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3309 "langs_src/parser_cpp_language.php"
-#line 362 "langs_src/parser_cpp_language.y"
+#line 3314 "langs_src/parser_cpp_language.php"
+#line 365 "langs_src/parser_cpp_language.y"
     function yy_r50(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "оператор разрешения пространства имен", "тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor));
     }
-#line 3315 "langs_src/parser_cpp_language.php"
-#line 373 "langs_src/parser_cpp_language.y"
+#line 3320 "langs_src/parser_cpp_language.php"
+#line 376 "langs_src/parser_cpp_language.y"
     function yy_r51(){
 	$this->currentrule = new block_formal_langs_description_rule("определение шаблона", array("ключевое слово определения шаблона", "начало аргументов шаблона", "конец аргументов шаблона"));
 	$this->_retvalue = $this->create_node('template_def', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3321 "langs_src/parser_cpp_language.php"
-#line 378 "langs_src/parser_cpp_language.y"
+#line 3326 "langs_src/parser_cpp_language.php"
+#line 381 "langs_src/parser_cpp_language.y"
     function yy_r52(){
 	$this->currentrule = new block_formal_langs_description_rule("определение шаблона", array("ключевое слово определения шаблона", "начало аргументов шаблона", "%ur(именительный)", "конец аргументов шаблона"));
 	$this->_retvalue = $this->create_node('template_def', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3327 "langs_src/parser_cpp_language.php"
-#line 383 "langs_src/parser_cpp_language.y"
+#line 3332 "langs_src/parser_cpp_language.php"
+#line 386 "langs_src/parser_cpp_language.y"
     function yy_r53(){
 	$this->currentrule = new block_formal_langs_description_rule("список параметров шаблона %l(template_spec)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('template_spec_list', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3333 "langs_src/parser_cpp_language.php"
-#line 388 "langs_src/parser_cpp_language.y"
+#line 3338 "langs_src/parser_cpp_language.php"
+#line 391 "langs_src/parser_cpp_language.y"
     function yy_r54(){
 	$this->currentrule = new block_formal_langs_description_rule("список параметров шаблона", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('template_spec_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3339 "langs_src/parser_cpp_language.php"
-#line 393 "langs_src/parser_cpp_language.y"
+#line 3344 "langs_src/parser_cpp_language.php"
+#line 396 "langs_src/parser_cpp_language.y"
     function yy_r55(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + 0]->minor->value());
 	$this->_retvalue = $this->create_node('template_spec', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3346 "langs_src/parser_cpp_language.php"
-#line 400 "langs_src/parser_cpp_language.y"
+#line 3351 "langs_src/parser_cpp_language.php"
+#line 403 "langs_src/parser_cpp_language.y"
     function yy_r56(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово имени типа"));
 	$this->_retvalue = $this->create_node('template_typename', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3352 "langs_src/parser_cpp_language.php"
-#line 405 "langs_src/parser_cpp_language.y"
+#line 3357 "langs_src/parser_cpp_language.php"
+#line 408 "langs_src/parser_cpp_language.y"
     function yy_r57(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления класса"));
 	$this->_retvalue = $this->create_node('template_typename', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3358 "langs_src/parser_cpp_language.php"
-#line 410 "langs_src/parser_cpp_language.y"
+#line 3363 "langs_src/parser_cpp_language.php"
+#line 413 "langs_src/parser_cpp_language.y"
     function yy_r58(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления структуры"));
 	$this->_retvalue = $this->create_node('template_typename', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3364 "langs_src/parser_cpp_language.php"
-#line 415 "langs_src/parser_cpp_language.y"
+#line 3369 "langs_src/parser_cpp_language.php"
+#line 418 "langs_src/parser_cpp_language.y"
     function yy_r59(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово перечисления"));
 	$this->_retvalue = $this->create_node('template_typename', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3370 "langs_src/parser_cpp_language.php"
-#line 421 "langs_src/parser_cpp_language.y"
+#line 3375 "langs_src/parser_cpp_language.php"
+#line 424 "langs_src/parser_cpp_language.y"
     function yy_r60(){
 	$this->currentrule = new block_formal_langs_description_rule("тело функции", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('function_body', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3376 "langs_src/parser_cpp_language.php"
-#line 426 "langs_src/parser_cpp_language.y"
+#line 3381 "langs_src/parser_cpp_language.php"
+#line 429 "langs_src/parser_cpp_language.y"
     function yy_r61(){
 	$this->currentrule = new block_formal_langs_description_rule("тело функции", array("левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('function_body', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3382 "langs_src/parser_cpp_language.php"
-#line 431 "langs_src/parser_cpp_language.y"
+#line 3387 "langs_src/parser_cpp_language.php"
+#line 434 "langs_src/parser_cpp_language.y"
     function yy_r62(){
     $this->currentrule = new block_formal_langs_description_rule("тело функции", array("точка с запятой"));
 	$this->_retvalue = $this->create_node('function_body', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3388 "langs_src/parser_cpp_language.php"
-#line 437 "langs_src/parser_cpp_language.y"
+#line 3393 "langs_src/parser_cpp_language.php"
+#line 440 "langs_src/parser_cpp_language.y"
     function yy_r63(){
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('possible_function_name', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3394 "langs_src/parser_cpp_language.php"
-#line 442 "langs_src/parser_cpp_language.y"
+#line 3399 "langs_src/parser_cpp_language.php"
+#line 445 "langs_src/parser_cpp_language.y"
     function yy_r64(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('possible_function_name', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3400 "langs_src/parser_cpp_language.php"
-#line 455 "langs_src/parser_cpp_language.y"
+#line 3405 "langs_src/parser_cpp_language.php"
+#line 458 "langs_src/parser_cpp_language.y"
     function yy_r66(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('formal_args_list_with_or_without_const', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3406 "langs_src/parser_cpp_language.php"
-#line 460 "langs_src/parser_cpp_language.y"
+#line 3411 "langs_src/parser_cpp_language.php"
+#line 463 "langs_src/parser_cpp_language.y"
     function yy_r67(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)", "ключевое слово константности"));
 	$this->_retvalue = $this->create_node('formal_args_list_with_or_without_const', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3412 "langs_src/parser_cpp_language.php"
-#line 465 "langs_src/parser_cpp_language.y"
+#line 3417 "langs_src/parser_cpp_language.php"
+#line 468 "langs_src/parser_cpp_language.y"
     function yy_r68(){
 	$this->currentrule = new block_formal_langs_description_rule("список формальных аргументов", array("левая круглая скобка", "правая круглая скобка"));
 	$this->_retvalue = $this->create_node('args_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3418 "langs_src/parser_cpp_language.php"
-#line 470 "langs_src/parser_cpp_language.y"
+#line 3423 "langs_src/parser_cpp_language.php"
+#line 473 "langs_src/parser_cpp_language.y"
     function yy_r69(){
 	$this->currentrule = new block_formal_langs_description_rule("список формальных аргументов", array("левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
 	$this->_retvalue = $this->create_node('formal_args_list', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3424 "langs_src/parser_cpp_language.php"
-#line 475 "langs_src/parser_cpp_language.y"
+#line 3429 "langs_src/parser_cpp_language.php"
+#line 478 "langs_src/parser_cpp_language.y"
     function yy_r70(){
 	$this->currentrule = new block_formal_langs_description_rule("список аргументов", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('arg_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3430 "langs_src/parser_cpp_language.php"
-#line 480 "langs_src/parser_cpp_language.y"
+#line 3435 "langs_src/parser_cpp_language.php"
+#line 483 "langs_src/parser_cpp_language.y"
     function yy_r71(){
 	$this->currentrule = new block_formal_langs_description_rule("список аргументов %l(arg)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('arg_list', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3436 "langs_src/parser_cpp_language.php"
-#line 485 "langs_src/parser_cpp_language.y"
+#line 3441 "langs_src/parser_cpp_language.php"
+#line 488 "langs_src/parser_cpp_language.y"
     function yy_r72(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	$this->_retvalue = $this->create_node('arg', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3442 "langs_src/parser_cpp_language.php"
-#line 492 "langs_src/parser_cpp_language.y"
+#line 3447 "langs_src/parser_cpp_language.php"
+#line 495 "langs_src/parser_cpp_language.y"
     function yy_r73(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "ключевое слово конца условного блока препроцессора"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3448 "langs_src/parser_cpp_language.php"
-#line 497 "langs_src/parser_cpp_language.y"
+#line 3453 "langs_src/parser_cpp_language.php"
+#line 500 "langs_src/parser_cpp_language.y"
     function yy_r74(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "ключевое слово конца условного блока препроцессора"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3454 "langs_src/parser_cpp_language.php"
-#line 502 "langs_src/parser_cpp_language.y"
+#line 3459 "langs_src/parser_cpp_language.php"
+#line 505 "langs_src/parser_cpp_language.y"
     function yy_r75(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_else_clauses', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3460 "langs_src/parser_cpp_language.php"
-#line 507 "langs_src/parser_cpp_language.y"
+#line 3465 "langs_src/parser_cpp_language.php"
+#line 510 "langs_src/parser_cpp_language.y"
     function yy_r76(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_else_clauses', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3466 "langs_src/parser_cpp_language.php"
-#line 512 "langs_src/parser_cpp_language.y"
+#line 3471 "langs_src/parser_cpp_language.php"
+#line 515 "langs_src/parser_cpp_language.y"
     function yy_r77(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_else_clauses', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3472 "langs_src/parser_cpp_language.php"
-#line 517 "langs_src/parser_cpp_language.y"
+#line 3477 "langs_src/parser_cpp_language.php"
+#line 520 "langs_src/parser_cpp_language.y"
     function yy_r78(){
 	$this->currentrule = new block_formal_langs_description_rule("список условий  препроцессора %l(preprocessor_elif)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_elif_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3478 "langs_src/parser_cpp_language.php"
-#line 522 "langs_src/parser_cpp_language.y"
+#line 3483 "langs_src/parser_cpp_language.php"
+#line 525 "langs_src/parser_cpp_language.y"
     function yy_r79(){
 	$this->currentrule = new block_formal_langs_description_rule("список условий препроцессора", array("%1(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_elif_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3484 "langs_src/parser_cpp_language.php"
-#line 527 "langs_src/parser_cpp_language.y"
+#line 3489 "langs_src/parser_cpp_language.php"
+#line 530 "langs_src/parser_cpp_language.y"
     function yy_r80(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое-слово \"если-то\" препроцессора", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_elif', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3490 "langs_src/parser_cpp_language.php"
-#line 532 "langs_src/parser_cpp_language.y"
+#line 3495 "langs_src/parser_cpp_language.php"
+#line 535 "langs_src/parser_cpp_language.y"
     function yy_r81(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое-слово \"если\" препроцессора", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('preprocessor_else', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3496 "langs_src/parser_cpp_language.php"
-#line 537 "langs_src/parser_cpp_language.y"
+#line 3501 "langs_src/parser_cpp_language.php"
+#line 540 "langs_src/parser_cpp_language.y"
     function yy_r82(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("условная директива препроцессора с условием что макроопределение определено", "%s"));
 	$this->_retvalue = $this->create_node('preprocessor_cond', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor, C));
     }
-#line 3502 "langs_src/parser_cpp_language.php"
-#line 547 "langs_src/parser_cpp_language.y"
+#line 3507 "langs_src/parser_cpp_language.php"
+#line 550 "langs_src/parser_cpp_language.y"
     function yy_r84(){
     $this->currentrule = new block_formal_langs_description_rule("%s", array("условная директива препроцессора вида \"если\""));
 	$this->_retvalue = $this->create_node('preprocessor_cond', array($this->yystack[$this->yyidx + 0]->minor, B));
     }
-#line 3508 "langs_src/parser_cpp_language.php"
-#line 552 "langs_src/parser_cpp_language.y"
+#line 3513 "langs_src/parser_cpp_language.php"
+#line 555 "langs_src/parser_cpp_language.y"
     function yy_r85(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + 0]->minor, B));
     }
-#line 3514 "langs_src/parser_cpp_language.php"
-#line 557 "langs_src/parser_cpp_language.y"
+#line 3519 "langs_src/parser_cpp_language.php"
+#line 560 "langs_src/parser_cpp_language.y"
     function yy_r86(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt_or_defined_macro', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3520 "langs_src/parser_cpp_language.php"
-#line 562 "langs_src/parser_cpp_language.y"
+#line 3525 "langs_src/parser_cpp_language.php"
+#line 565 "langs_src/parser_cpp_language.y"
     function yy_r87(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3526 "langs_src/parser_cpp_language.php"
-#line 574 "langs_src/parser_cpp_language.y"
+#line 3531 "langs_src/parser_cpp_language.php"
+#line 577 "langs_src/parser_cpp_language.y"
     function yy_r88(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления цикла с предусловием", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('while', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3532 "langs_src/parser_cpp_language.php"
-#line 586 "langs_src/parser_cpp_language.y"
+#line 3537 "langs_src/parser_cpp_language.php"
+#line 589 "langs_src/parser_cpp_language.y"
     function yy_r89(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово  объявления цикла с постусловием", "%ur(именительный)", "ключевое слово начала условия в цикле с постусловием", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "точка с запятой"));
 	$this->_retvalue = $this->create_node('do_while', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3538 "langs_src/parser_cpp_language.php"
-#line 599 "langs_src/parser_cpp_language.y"
+#line 3543 "langs_src/parser_cpp_language.php"
+#line 602 "langs_src/parser_cpp_language.y"
     function yy_r90(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления цикла со счетчиком", "левая круглая скобка", "%ur(именительный)", "точка с запятой", "%ur(именительный)", "точка с запятой", "%ur(именительный)", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('for', array($this->yystack[$this->yyidx + -8]->minor, $this->yystack[$this->yyidx + -7]->minor, $this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3544 "langs_src/parser_cpp_language.php"
-#line 607 "langs_src/parser_cpp_language.y"
+#line 3549 "langs_src/parser_cpp_language.php"
+#line 610 "langs_src/parser_cpp_language.y"
     function yy_r91(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "%ur(именительный)", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3550 "langs_src/parser_cpp_language.php"
-#line 612 "langs_src/parser_cpp_language.y"
+#line 3555 "langs_src/parser_cpp_language.php"
+#line 615 "langs_src/parser_cpp_language.y"
     function yy_r92(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3556 "langs_src/parser_cpp_language.php"
-#line 620 "langs_src/parser_cpp_language.y"
+#line 3561 "langs_src/parser_cpp_language.php"
+#line 623 "langs_src/parser_cpp_language.y"
     function yy_r93(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово пропуска итерации цикла", "точка с запятой"));
 	$this->_retvalue = $this->create_node('continue', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3562 "langs_src/parser_cpp_language.php"
-#line 627 "langs_src/parser_cpp_language.y"
+#line 3567 "langs_src/parser_cpp_language.php"
+#line 630 "langs_src/parser_cpp_language.y"
     function yy_r94(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово безусловного перехода", "имя метки перехода для  операции %ul(именительный)", "точка с запятой"));
 	$this->_retvalue = $this->create_node('goto', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3568 "langs_src/parser_cpp_language.php"
-#line 637 "langs_src/parser_cpp_language.y"
+#line 3573 "langs_src/parser_cpp_language.php"
+#line 640 "langs_src/parser_cpp_language.y"
     function yy_r96(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("имя метки", "двоеточие"));
 	$this->_retvalue = $this->create_node('goto_label', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3574 "langs_src/parser_cpp_language.php"
-#line 644 "langs_src/parser_cpp_language.y"
+#line 3579 "langs_src/parser_cpp_language.php"
+#line 647 "langs_src/parser_cpp_language.y"
     function yy_r97(){
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
     $this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3580 "langs_src/parser_cpp_language.php"
-#line 649 "langs_src/parser_cpp_language.y"
+#line 3585 "langs_src/parser_cpp_language.php"
+#line 652 "langs_src/parser_cpp_language.y"
     function yy_r98(){
     $this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('try_catch', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3586 "langs_src/parser_cpp_language.php"
-#line 654 "langs_src/parser_cpp_language.y"
+#line 3591 "langs_src/parser_cpp_language.php"
+#line 657 "langs_src/parser_cpp_language.y"
     function yy_r99(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово начала небезопасного блока", "левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('try', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3592 "langs_src/parser_cpp_language.php"
-#line 659 "langs_src/parser_cpp_language.y"
+#line 3597 "langs_src/parser_cpp_language.php"
+#line 662 "langs_src/parser_cpp_language.y"
     function yy_r100(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово начала небезопасного блока", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('try', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3598 "langs_src/parser_cpp_language.php"
-#line 664 "langs_src/parser_cpp_language.y"
+#line 3603 "langs_src/parser_cpp_language.php"
+#line 667 "langs_src/parser_cpp_language.y"
     function yy_r101(){
 	$this->currentrule = new block_formal_langs_description_rule("список веток обработки исключения %l(catch)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('catch_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3604 "langs_src/parser_cpp_language.php"
-#line 669 "langs_src/parser_cpp_language.y"
+#line 3609 "langs_src/parser_cpp_language.php"
+#line 672 "langs_src/parser_cpp_language.y"
     function yy_r102(){
 	$this->currentrule = new block_formal_langs_description_rule("список веток обработки исключения", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('catch_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3610 "langs_src/parser_cpp_language.php"
-#line 674 "langs_src/parser_cpp_language.y"
+#line 3615 "langs_src/parser_cpp_language.php"
+#line 677 "langs_src/parser_cpp_language.y"
     function yy_r103(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветки исключения", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('catch', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3616 "langs_src/parser_cpp_language.php"
-#line 679 "langs_src/parser_cpp_language.y"
+#line 3621 "langs_src/parser_cpp_language.php"
+#line 682 "langs_src/parser_cpp_language.y"
     function yy_r104(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветки исключения", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('catch', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3622 "langs_src/parser_cpp_language.php"
-#line 684 "langs_src/parser_cpp_language.y"
+#line 3627 "langs_src/parser_cpp_language.php"
+#line 687 "langs_src/parser_cpp_language.y"
     function yy_r105(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_prec_11_or_ellipsis', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3628 "langs_src/parser_cpp_language.php"
-#line 689 "langs_src/parser_cpp_language.y"
+#line 3633 "langs_src/parser_cpp_language.php"
+#line 692 "langs_src/parser_cpp_language.y"
     function yy_r106(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("эллипсис"));
 	$this->_retvalue = $this->create_node('expr_prec_11_or_ellipsis', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3634 "langs_src/parser_cpp_language.php"
-#line 696 "langs_src/parser_cpp_language.y"
+#line 3639 "langs_src/parser_cpp_language.php"
+#line 699 "langs_src/parser_cpp_language.y"
     function yy_r107(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3640 "langs_src/parser_cpp_language.php"
-#line 703 "langs_src/parser_cpp_language.y"
+#line 3645 "langs_src/parser_cpp_language.php"
+#line 706 "langs_src/parser_cpp_language.y"
     function yy_r108(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('stmt', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3646 "langs_src/parser_cpp_language.php"
-#line 708 "langs_src/parser_cpp_language.y"
+#line 3651 "langs_src/parser_cpp_language.php"
+#line 711 "langs_src/parser_cpp_language.y"
     function yy_r109(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветвления", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('switch_stmt', array($this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3652 "langs_src/parser_cpp_language.php"
-#line 713 "langs_src/parser_cpp_language.y"
+#line 3657 "langs_src/parser_cpp_language.php"
+#line 716 "langs_src/parser_cpp_language.y"
     function yy_r110(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветвления", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('switch_stmt', array($this->yystack[$this->yyidx + -6]->minor, $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3658 "langs_src/parser_cpp_language.php"
-#line 718 "langs_src/parser_cpp_language.y"
+#line 3663 "langs_src/parser_cpp_language.php"
+#line 721 "langs_src/parser_cpp_language.y"
     function yy_r111(){
 	$this->currentrule = new block_formal_langs_description_rule("список ветвлений", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('switch_case_list', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3664 "langs_src/parser_cpp_language.php"
-#line 723 "langs_src/parser_cpp_language.y"
+#line 3669 "langs_src/parser_cpp_language.php"
+#line 726 "langs_src/parser_cpp_language.y"
     function yy_r112(){
 	$this->currentrule = new block_formal_langs_description_rule("список ветвлений %l(case)", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('switch_case_list', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3670 "langs_src/parser_cpp_language.php"
-#line 728 "langs_src/parser_cpp_language.y"
+#line 3675 "langs_src/parser_cpp_language.php"
+#line 731 "langs_src/parser_cpp_language.y"
     function yy_r113(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово, обозначающее ветку ветвления", "%ur(именительный)", "двоеточие", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('case', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3676 "langs_src/parser_cpp_language.php"
-#line 733 "langs_src/parser_cpp_language.y"
+#line 3681 "langs_src/parser_cpp_language.php"
+#line 736 "langs_src/parser_cpp_language.y"
     function yy_r114(){
 	$this->currentrule = new block_formal_langs_description_rule("ветка по умолчанию", array("ключевое слово, обозначающее ветку ветвления по умолчанию", "двоеточие", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('case', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3682 "langs_src/parser_cpp_language.php"
-#line 745 "langs_src/parser_cpp_language.y"
+#line 3687 "langs_src/parser_cpp_language.php"
+#line 748 "langs_src/parser_cpp_language.y"
     function yy_r116(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('if_then_else', array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3688 "langs_src/parser_cpp_language.php"
-#line 750 "langs_src/parser_cpp_language.y"
+#line 3693 "langs_src/parser_cpp_language.php"
+#line 753 "langs_src/parser_cpp_language.y"
     function yy_r117(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "ключевое слово \"иначе\"", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('if_then_else', array($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3694 "langs_src/parser_cpp_language.php"
-#line 755 "langs_src/parser_cpp_language.y"
+#line 3699 "langs_src/parser_cpp_language.php"
+#line 758 "langs_src/parser_cpp_language.y"
     function yy_r118(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово \"если\"", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('if_then', array($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3700 "langs_src/parser_cpp_language.php"
-#line 762 "langs_src/parser_cpp_language.y"
+#line 3705 "langs_src/parser_cpp_language.php"
+#line 765 "langs_src/parser_cpp_language.y"
     function yy_r119(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%s", "правая фигурная скобка"));
 	$this->_retvalue = $this->create_node('stmt', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3706 "langs_src/parser_cpp_language.php"
-#line 767 "langs_src/parser_cpp_language.y"
+#line 3711 "langs_src/parser_cpp_language.php"
+#line 770 "langs_src/parser_cpp_language.y"
     function yy_r120(){ 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
     }
-#line 3713 "langs_src/parser_cpp_language.php"
-#line 774 "langs_src/parser_cpp_language.y"
+#line 3718 "langs_src/parser_cpp_language.php"
+#line 777 "langs_src/parser_cpp_language.y"
     function yy_r121(){
 	$this->currentrule = new block_formal_langs_description_rule("прерывание работы", array("ключевое слово прерывания работы", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3719 "langs_src/parser_cpp_language.php"
-#line 779 "langs_src/parser_cpp_language.y"
+#line 3724 "langs_src/parser_cpp_language.php"
+#line 782 "langs_src/parser_cpp_language.y"
     function yy_r122(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)", "точка с запятой"));
 	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 3725 "langs_src/parser_cpp_language.php"
-#line 786 "langs_src/parser_cpp_language.y"
+#line 3730 "langs_src/parser_cpp_language.php"
+#line 789 "langs_src/parser_cpp_language.y"
     function yy_r123(){
 	$this->currentrule = new block_formal_langs_description_rule("выделение памяти", array("ключевое слово выделения памяти", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('new_kwd', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3731 "langs_src/parser_cpp_language.php"
-#line 791 "langs_src/parser_cpp_language.y"
+#line 3736 "langs_src/parser_cpp_language.php"
+#line 794 "langs_src/parser_cpp_language.y"
     function yy_r124(){
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "левая квадратная скобка", "правая квадратная скобка", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('delete_array', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3737 "langs_src/parser_cpp_language.php"
-#line 796 "langs_src/parser_cpp_language.y"
+#line 3742 "langs_src/parser_cpp_language.php"
+#line 799 "langs_src/parser_cpp_language.y"
     function yy_r125(){
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('delete_pointer', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3743 "langs_src/parser_cpp_language.php"
-#line 801 "langs_src/parser_cpp_language.y"
+#line 3748 "langs_src/parser_cpp_language.php"
+#line 804 "langs_src/parser_cpp_language.y"
     function yy_r126(){
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('variable_declaration_with_assignment', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3749 "langs_src/parser_cpp_language.php"
-#line 811 "langs_src/parser_cpp_language.y"
+#line 3754 "langs_src/parser_cpp_language.php"
+#line 814 "langs_src/parser_cpp_language.y"
     function yy_r128(){
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
 	$this->_retvalue = $this->create_node('variable_declaration', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3755 "langs_src/parser_cpp_language.php"
-#line 816 "langs_src/parser_cpp_language.y"
+#line 3760 "langs_src/parser_cpp_language.php"
+#line 819 "langs_src/parser_cpp_language.y"
     function yy_r129(){
     $this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
 	$this->_retvalue = $this->create_node('variable_declaration', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3761 "langs_src/parser_cpp_language.php"
-#line 821 "langs_src/parser_cpp_language.y"
+#line 3766 "langs_src/parser_cpp_language.php"
+#line 824 "langs_src/parser_cpp_language.y"
     function yy_r130(){
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('variable_declaration_with_assignment', array( $this->yystack[$this->yyidx + -3]->minor,  $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3767 "langs_src/parser_cpp_language.php"
-#line 841 "langs_src/parser_cpp_language.y"
+#line 3772 "langs_src/parser_cpp_language.php"
+#line 844 "langs_src/parser_cpp_language.y"
     function yy_r134(){
 	$this->currentrule = new block_formal_langs_description_rule("список выражений %l(expr_prec_10)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_comma', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3773 "langs_src/parser_cpp_language.php"
-#line 846 "langs_src/parser_cpp_language.y"
+#line 3778 "langs_src/parser_cpp_language.php"
+#line 849 "langs_src/parser_cpp_language.y"
     function yy_r135(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3779 "langs_src/parser_cpp_language.php"
-#line 853 "langs_src/parser_cpp_language.y"
+#line 3784 "langs_src/parser_cpp_language.php"
+#line 856 "langs_src/parser_cpp_language.y"
     function yy_r136(){
 	$this->currentrule = new block_formal_langs_description_rule("тип с квалифицирующим словом", array("%ur(именительный)", "%ur(именительный)"));
 	$result = $this->create_node('type_with_qualifier', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 3786 "langs_src/parser_cpp_language.php"
-#line 859 "langs_src/parser_cpp_language.y"
+#line 3791 "langs_src/parser_cpp_language.php"
+#line 862 "langs_src/parser_cpp_language.y"
     function yy_r137(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово для статичности значения"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3792 "langs_src/parser_cpp_language.php"
-#line 864 "langs_src/parser_cpp_language.y"
+#line 3797 "langs_src/parser_cpp_language.php"
+#line 867 "langs_src/parser_cpp_language.y"
     function yy_r138(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово импорта из внешней части"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3798 "langs_src/parser_cpp_language.php"
-#line 869 "langs_src/parser_cpp_language.y"
+#line 3803 "langs_src/parser_cpp_language.php"
+#line 872 "langs_src/parser_cpp_language.y"
     function yy_r139(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово, указания, что переменная должна содержаться в регистре процессора"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3804 "langs_src/parser_cpp_language.php"
-#line 874 "langs_src/parser_cpp_language.y"
+#line 3809 "langs_src/parser_cpp_language.php"
+#line 877 "langs_src/parser_cpp_language.y"
     function yy_r140(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово изменяемости"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3810 "langs_src/parser_cpp_language.php"
-#line 879 "langs_src/parser_cpp_language.y"
+#line 3815 "langs_src/parser_cpp_language.php"
+#line 882 "langs_src/parser_cpp_language.y"
     function yy_r141(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово дружественности"));
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 3816 "langs_src/parser_cpp_language.php"
-#line 886 "langs_src/parser_cpp_language.y"
+#line 3821 "langs_src/parser_cpp_language.php"
+#line 889 "langs_src/parser_cpp_language.y"
     function yy_r142(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым исключающим ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового исключающего ИЛИ с присваиванием", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binaryxor_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3822 "langs_src/parser_cpp_language.php"
-#line 891 "langs_src/parser_cpp_language.y"
+#line 3827 "langs_src/parser_cpp_language.php"
+#line 894 "langs_src/parser_cpp_language.y"
     function yy_r143(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового ИЛИ  с присваиванием", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binaryor_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3828 "langs_src/parser_cpp_language.php"
-#line 896 "langs_src/parser_cpp_language.y"
+#line 3833 "langs_src/parser_cpp_language.php"
+#line 899 "langs_src/parser_cpp_language.y"
     function yy_r144(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И  с присваиванием", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binaryand_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3834 "langs_src/parser_cpp_language.php"
-#line 901 "langs_src/parser_cpp_language.y"
+#line 3839 "langs_src/parser_cpp_language.php"
+#line 904 "langs_src/parser_cpp_language.y"
     function yy_r145(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом вправо\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом вправо", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_rightshift_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3840 "langs_src/parser_cpp_language.php"
-#line 906 "langs_src/parser_cpp_language.y"
+#line 3845 "langs_src/parser_cpp_language.php"
+#line 909 "langs_src/parser_cpp_language.y"
     function yy_r146(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом влево\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом влево", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_leftshift_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3846 "langs_src/parser_cpp_language.php"
-#line 911 "langs_src/parser_cpp_language.y"
+#line 3851 "langs_src/parser_cpp_language.php"
+#line 914 "langs_src/parser_cpp_language.y"
     function yy_r147(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с получением остатка от деления\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с получением остатка от модуля", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_modulo_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3852 "langs_src/parser_cpp_language.php"
-#line 916 "langs_src/parser_cpp_language.y"
+#line 3857 "langs_src/parser_cpp_language.php"
+#line 919 "langs_src/parser_cpp_language.y"
     function yy_r148(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с делением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с делением", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_division_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3858 "langs_src/parser_cpp_language.php"
-#line 921 "langs_src/parser_cpp_language.y"
+#line 3863 "langs_src/parser_cpp_language.php"
+#line 924 "langs_src/parser_cpp_language.y"
     function yy_r149(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с умножением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с умножением", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_multiply_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3864 "langs_src/parser_cpp_language.php"
-#line 926 "langs_src/parser_cpp_language.y"
+#line 3869 "langs_src/parser_cpp_language.php"
+#line 929 "langs_src/parser_cpp_language.y"
     function yy_r150(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с суммированием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с суммированием", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_plus_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3870 "langs_src/parser_cpp_language.php"
-#line 931 "langs_src/parser_cpp_language.y"
+#line 3875 "langs_src/parser_cpp_language.php"
+#line 934 "langs_src/parser_cpp_language.y"
     function yy_r151(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с вычитанием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с вычитанием", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_minus_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3876 "langs_src/parser_cpp_language.php"
-#line 936 "langs_src/parser_cpp_language.y"
+#line 3881 "langs_src/parser_cpp_language.php"
+#line 939 "langs_src/parser_cpp_language.y"
     function yy_r152(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_assign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3882 "langs_src/parser_cpp_language.php"
-#line 948 "langs_src/parser_cpp_language.y"
+#line 3887 "langs_src/parser_cpp_language.php"
+#line 951 "langs_src/parser_cpp_language.y"
     function yy_r154(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binary_or', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3888 "langs_src/parser_cpp_language.php"
-#line 953 "langs_src/parser_cpp_language.y"
+#line 3893 "langs_src/parser_cpp_language.php"
+#line 956 "langs_src/parser_cpp_language.y"
     function yy_r155(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_logical_or', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3894 "langs_src/parser_cpp_language.php"
-#line 958 "langs_src/parser_cpp_language.y"
+#line 3899 "langs_src/parser_cpp_language.php"
+#line 961 "langs_src/parser_cpp_language.y"
     function yy_r156(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_logical_and', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3900 "langs_src/parser_cpp_language.php"
-#line 963 "langs_src/parser_cpp_language.y"
+#line 3905 "langs_src/parser_cpp_language.php"
+#line 966 "langs_src/parser_cpp_language.y"
     function yy_r157(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binary_xor', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3906 "langs_src/parser_cpp_language.php"
-#line 968 "langs_src/parser_cpp_language.y"
+#line 3911 "langs_src/parser_cpp_language.php"
+#line 971 "langs_src/parser_cpp_language.y"
     function yy_r158(){
 	// Well, that's what you get when you mix binary and and adress taking
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binary_and', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3913 "langs_src/parser_cpp_language.php"
-#line 974 "langs_src/parser_cpp_language.y"
+#line 3918 "langs_src/parser_cpp_language.php"
+#line 977 "langs_src/parser_cpp_language.y"
     function yy_r159(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"не равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция не равно", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_notequal', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3919 "langs_src/parser_cpp_language.php"
-#line 979 "langs_src/parser_cpp_language.y"
+#line 3924 "langs_src/parser_cpp_language.php"
+#line 982 "langs_src/parser_cpp_language.y"
     function yy_r160(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция равно", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_equal', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3925 "langs_src/parser_cpp_language.php"
-#line 991 "langs_src/parser_cpp_language.y"
+#line 3930 "langs_src/parser_cpp_language.php"
+#line 994 "langs_src/parser_cpp_language.y"
     function yy_r162(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"меньше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция меньше или равно", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_lesser_or_equal', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3931 "langs_src/parser_cpp_language.php"
-#line 996 "langs_src/parser_cpp_language.y"
+#line 3936 "langs_src/parser_cpp_language.php"
+#line 999 "langs_src/parser_cpp_language.y"
     function yy_r163(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"больше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция больше или равно", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_greater_or_equal', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3937 "langs_src/parser_cpp_language.php"
-#line 1001 "langs_src/parser_cpp_language.y"
+#line 3942 "langs_src/parser_cpp_language.php"
+#line 1004 "langs_src/parser_cpp_language.y"
     function yy_r164(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"больше\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция больше", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_greater', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3943 "langs_src/parser_cpp_language.php"
-#line 1006 "langs_src/parser_cpp_language.y"
+#line 3948 "langs_src/parser_cpp_language.php"
+#line 1009 "langs_src/parser_cpp_language.y"
     function yy_r165(){
 	$this->currentrule = new block_formal_langs_description_rule("операция \"меньше\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция меньше", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_lesser', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3949 "langs_src/parser_cpp_language.php"
-#line 1018 "langs_src/parser_cpp_language.y"
+#line 3954 "langs_src/parser_cpp_language.php"
+#line 1021 "langs_src/parser_cpp_language.y"
     function yy_r167(){
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг влево выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига влево", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_leftshift', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3955 "langs_src/parser_cpp_language.php"
-#line 1023 "langs_src/parser_cpp_language.y"
+#line 3960 "langs_src/parser_cpp_language.php"
+#line 1026 "langs_src/parser_cpp_language.y"
     function yy_r168(){
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг вправо выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига вправо", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_rightshift', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3961 "langs_src/parser_cpp_language.php"
-#line 1035 "langs_src/parser_cpp_language.y"
+#line 3966 "langs_src/parser_cpp_language.php"
+#line 1038 "langs_src/parser_cpp_language.y"
     function yy_r170(){
 	$this->currentrule = new block_formal_langs_description_rule("разность выражений \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция вычитания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_minus', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3967 "langs_src/parser_cpp_language.php"
-#line 1040 "langs_src/parser_cpp_language.y"
+#line 3972 "langs_src/parser_cpp_language.php"
+#line 1043 "langs_src/parser_cpp_language.y"
     function yy_r171(){
 	$this->currentrule = new block_formal_langs_description_rule("сумма %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция суммирования", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_plus', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3973 "langs_src/parser_cpp_language.php"
-#line 1052 "langs_src/parser_cpp_language.y"
+#line 3978 "langs_src/parser_cpp_language.php"
+#line 1055 "langs_src/parser_cpp_language.y"
     function yy_r173(){
 	$this->currentrule = new block_formal_langs_description_rule("получение остатка от деления выражений %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция получения остатка от деления", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_modulosign', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3979 "langs_src/parser_cpp_language.php"
-#line 1057 "langs_src/parser_cpp_language.y"
+#line 3984 "langs_src/parser_cpp_language.php"
+#line 1060 "langs_src/parser_cpp_language.y"
     function yy_r174(){
 	$this->currentrule = new block_formal_langs_description_rule("деление %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция деления", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_division', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3985 "langs_src/parser_cpp_language.php"
-#line 1062 "langs_src/parser_cpp_language.y"
+#line 3990 "langs_src/parser_cpp_language.php"
+#line 1065 "langs_src/parser_cpp_language.y"
     function yy_r175(){
 	$this->currentrule = new block_formal_langs_description_rule("умножение %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция умножения", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_multiply', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3991 "langs_src/parser_cpp_language.php"
-#line 1074 "langs_src/parser_cpp_language.y"
+#line 3996 "langs_src/parser_cpp_language.php"
+#line 1077 "langs_src/parser_cpp_language.y"
     function yy_r177(){
 	$this->currentrule = new block_formal_langs_description_rule("взятие поля по указателю", array("%ur(именительный)", "%s", "%s"));
 	$this->_retvalue = $this->create_node('expr_get_property', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 3997 "langs_src/parser_cpp_language.php"
-#line 1091 "langs_src/parser_cpp_language.y"
+#line 4002 "langs_src/parser_cpp_language.php"
+#line 1094 "langs_src/parser_cpp_language.y"
     function yy_r180(){
 	$this->currentrule = new block_formal_langs_description_rule("операция взятия указателя", array("операция взятия указателя", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_take_adress', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4003 "langs_src/parser_cpp_language.php"
-#line 1096 "langs_src/parser_cpp_language.y"
+#line 4008 "langs_src/parser_cpp_language.php"
+#line 1099 "langs_src/parser_cpp_language.y"
     function yy_r181(){
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя", array("операция разыменования", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_dereference', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4009 "langs_src/parser_cpp_language.php"
-#line 1101 "langs_src/parser_cpp_language.y"
+#line 4014 "langs_src/parser_cpp_language.php"
+#line 1104 "langs_src/parser_cpp_language.y"
     function yy_r182(){
 	$this->currentrule = new block_formal_langs_description_rule("операция приведения к типу", array("%ur(именительный)", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_typecast', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4015 "langs_src/parser_cpp_language.php"
-#line 1106 "langs_src/parser_cpp_language.y"
+#line 4020 "langs_src/parser_cpp_language.php"
+#line 1109 "langs_src/parser_cpp_language.y"
     function yy_r183(){
 	$this->currentrule = new block_formal_langs_description_rule("логическое отрицание на выражении %2(именительный)", array("операция логического отрицания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_logical_not', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4021 "langs_src/parser_cpp_language.php"
-#line 1111 "langs_src/parser_cpp_language.y"
+#line 4026 "langs_src/parser_cpp_language.php"
+#line 1114 "langs_src/parser_cpp_language.y"
     function yy_r184(){
 	$this->currentrule = new block_formal_langs_description_rule("побитовое отрицание на выражении %2(именительный)", array("операция побитового отрицания", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_binary_not', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4027 "langs_src/parser_cpp_language.php"
-#line 1116 "langs_src/parser_cpp_language.y"
+#line 4032 "langs_src/parser_cpp_language.php"
+#line 1119 "langs_src/parser_cpp_language.y"
     function yy_r185(){
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного минуса на выражении %2(именительный)", array("операция унарного минуса", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_unary_minus', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4033 "langs_src/parser_cpp_language.php"
-#line 1121 "langs_src/parser_cpp_language.y"
+#line 4038 "langs_src/parser_cpp_language.php"
+#line 1124 "langs_src/parser_cpp_language.y"
     function yy_r186(){
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного плюса на выражении %2(именительный)", array("операция унарного плюса", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_unary_plus', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4039 "langs_src/parser_cpp_language.php"
-#line 1126 "langs_src/parser_cpp_language.y"
+#line 4044 "langs_src/parser_cpp_language.php"
+#line 1129 "langs_src/parser_cpp_language.y"
     function yy_r187(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция декремента", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_prefix_decrement', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4045 "langs_src/parser_cpp_language.php"
-#line 1131 "langs_src/parser_cpp_language.y"
+#line 4050 "langs_src/parser_cpp_language.php"
+#line 1134 "langs_src/parser_cpp_language.y"
     function yy_r188(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция инкремента", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('expr_prefix_decrement', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4051 "langs_src/parser_cpp_language.php"
-#line 1143 "langs_src/parser_cpp_language.y"
+#line 4056 "langs_src/parser_cpp_language.php"
+#line 1146 "langs_src/parser_cpp_language.y"
     function yy_r190(){
 	$this->currentrule = new block_formal_langs_description_rule("обращение к полю по указателю на метод", array("%ur(именительный)", "имя свойства"));
 	$this->_retvalue = $this->create_node('expr_property_access', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
     }
-#line 4057 "langs_src/parser_cpp_language.php"
-#line 1153 "langs_src/parser_cpp_language.y"
+#line 4062 "langs_src/parser_cpp_language.php"
+#line 1156 "langs_src/parser_cpp_language.y"
     function yy_r192(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный) выражения \"%3(именительный)\"", array("%ur(именительный)", "левая круглая скобка", "%ur(именительный)", "правая квадратная скобка"));
 	$this->_retvalue = $this->create_node('expr_array_access', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4063 "langs_src/parser_cpp_language.php"
-#line 1158 "langs_src/parser_cpp_language.y"
+#line 4068 "langs_src/parser_cpp_language.php"
+#line 1161 "langs_src/parser_cpp_language.y"
     function yy_r193(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая квадратная скобка", "%ur(именительный)", "правая квадратная скобка"));
 	$this->_retvalue = $this->create_node('expr_array_access', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4069 "langs_src/parser_cpp_language.php"
-#line 1163 "langs_src/parser_cpp_language.y"
+#line 4074 "langs_src/parser_cpp_language.php"
+#line 1166 "langs_src/parser_cpp_language.y"
     function yy_r194(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
 	$this->_retvalue = $this->create_node('expr_function_call', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4075 "langs_src/parser_cpp_language.php"
-#line 1168 "langs_src/parser_cpp_language.y"
+#line 4080 "langs_src/parser_cpp_language.php"
+#line 1171 "langs_src/parser_cpp_language.y"
     function yy_r195(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая круглая скобка", "правая круглая скобка"));
 	$this->_retvalue = $this->create_node('expr_function_call', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4081 "langs_src/parser_cpp_language.php"
-#line 1173 "langs_src/parser_cpp_language.y"
+#line 4086 "langs_src/parser_cpp_language.php"
+#line 1176 "langs_src/parser_cpp_language.y"
     function yy_r196(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция инкремента"));
 	$this->_retvalue = $this->create_node('expr_postfix_increment', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4087 "langs_src/parser_cpp_language.php"
-#line 1178 "langs_src/parser_cpp_language.y"
+#line 4092 "langs_src/parser_cpp_language.php"
+#line 1181 "langs_src/parser_cpp_language.y"
     function yy_r197(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция декремента"));
 	$this->_retvalue = $this->create_node('expr_postfix_decrement', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4093 "langs_src/parser_cpp_language.php"
-#line 1183 "langs_src/parser_cpp_language.y"
+#line 4098 "langs_src/parser_cpp_language.php"
+#line 1186 "langs_src/parser_cpp_language.y"
     function yy_r198(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue =  $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4099 "langs_src/parser_cpp_language.php"
-#line 1190 "langs_src/parser_cpp_language.y"
+#line 4104 "langs_src/parser_cpp_language.php"
+#line 1193 "langs_src/parser_cpp_language.y"
     function yy_r199(){
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя на метод или переменной", array("%ur (именительный)", "операция взятия указателя на метод или поля переменной"));
 	$this->_retvalue = $this->create_node('try_value_access', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
     }
-#line 4105 "langs_src/parser_cpp_language.php"
-#line 1195 "langs_src/parser_cpp_language.y"
+#line 4110 "langs_src/parser_cpp_language.php"
+#line 1198 "langs_src/parser_cpp_language.y"
     function yy_r200(){
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя на метод или переменной", array("%ur (именительный)", "операция взятия указателя на метод или переменной"));
 	$this->_retvalue = $this->create_node('try_pointer_access', array( $this->yystack[$this->yyidx + -1]->minor , $this->yystack[$this->yyidx + 0]->minor) );
     }
-#line 4111 "langs_src/parser_cpp_language.php"
-#line 1202 "langs_src/parser_cpp_language.y"
+#line 4116 "langs_src/parser_cpp_language.php"
+#line 1205 "langs_src/parser_cpp_language.y"
     function yy_r201(){
 	$this->currentrule = new block_formal_langs_description_rule("приведение со снятием константности к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	$this->_retvalue = $this->create_node('expr_const_cast', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4117 "langs_src/parser_cpp_language.php"
-#line 1207 "langs_src/parser_cpp_language.y"
+#line 4122 "langs_src/parser_cpp_language.php"
+#line 1210 "langs_src/parser_cpp_language.y"
     function yy_r202(){
 	$this->currentrule = new block_formal_langs_description_rule("статическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	$this->_retvalue = $this->create_node('expr_static_cast', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4123 "langs_src/parser_cpp_language.php"
-#line 1212 "langs_src/parser_cpp_language.y"
+#line 4128 "langs_src/parser_cpp_language.php"
+#line 1215 "langs_src/parser_cpp_language.y"
     function yy_r203(){
 	$this->currentrule = new block_formal_langs_description_rule("динамическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	$this->_retvalue = $this->create_node('expr_dynamic_cast', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4129 "langs_src/parser_cpp_language.php"
-#line 1217 "langs_src/parser_cpp_language.y"
+#line 4134 "langs_src/parser_cpp_language.php"
+#line 1220 "langs_src/parser_cpp_language.y"
     function yy_r204(){
 	$this->currentrule = new block_formal_langs_description_rule("побайтовое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	$this->_retvalue = $this->create_node('expr_reinterpret_cast', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4135 "langs_src/parser_cpp_language.php"
-#line 1224 "langs_src/parser_cpp_language.y"
+#line 4140 "langs_src/parser_cpp_language.php"
+#line 1227 "langs_src/parser_cpp_language.y"
     function yy_r205(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue =  $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4141 "langs_src/parser_cpp_language.php"
-#line 1244 "langs_src/parser_cpp_language.y"
+#line 4146 "langs_src/parser_cpp_language.php"
+#line 1247 "langs_src/parser_cpp_language.y"
     function yy_r209(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая круглая скобка", "%s", "провая круглая скобка"));
 	$this->_retvalue =  $this->create_node('expr_brackets', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4147 "langs_src/parser_cpp_language.php"
-#line 1249 "langs_src/parser_cpp_language.y"
+#line 4152 "langs_src/parser_cpp_language.php"
+#line 1252 "langs_src/parser_cpp_language.y"
     function yy_r210(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
 	$this->_retvalue =  $this->create_node('expr_preprocessor_stringify', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4153 "langs_src/parser_cpp_language.php"
-#line 1254 "langs_src/parser_cpp_language.y"
+#line 4158 "langs_src/parser_cpp_language.php"
+#line 1257 "langs_src/parser_cpp_language.y"
     function yy_r211(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
 	$this->_retvalue =  $this->create_node('expr_preprocessor_concat', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4159 "langs_src/parser_cpp_language.php"
-#line 1259 "langs_src/parser_cpp_language.y"
+#line 4164 "langs_src/parser_cpp_language.php"
+#line 1262 "langs_src/parser_cpp_language.y"
     function yy_r212(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
 	$this->_retvalue =  $this->create_node('expr_sizeof', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4165 "langs_src/parser_cpp_language.php"
-#line 1264 "langs_src/parser_cpp_language.y"
+#line 4170 "langs_src/parser_cpp_language.php"
+#line 1267 "langs_src/parser_cpp_language.y"
     function yy_r213(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%s", "правая круглая скобка"));
 	$this->_retvalue =  $this->create_node('expr_sizeof', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4171 "langs_src/parser_cpp_language.php"
-#line 1271 "langs_src/parser_cpp_language.y"
+#line 4176 "langs_src/parser_cpp_language.php"
+#line 1274 "langs_src/parser_cpp_language.y"
     function yy_r214(){
 	$this->currentrule = new block_formal_langs_description_rule("операция приведения к типу %2(именительный) ", array("левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
 	$result = $this->create_node('typecast', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
 	$this->_retvalue = $result;
     }
-#line 4178 "langs_src/parser_cpp_language.php"
-#line 1279 "langs_src/parser_cpp_language.y"
+#line 4183 "langs_src/parser_cpp_language.php"
+#line 1282 "langs_src/parser_cpp_language.y"
     function yy_r215(){
 	$this->currentrule = new block_formal_langs_description_rule("список типов", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('type_list', array( $this->yystack[$this->yyidx + 0]->minor ) );
     }
-#line 4184 "langs_src/parser_cpp_language.php"
-#line 1284 "langs_src/parser_cpp_language.y"
+#line 4189 "langs_src/parser_cpp_language.php"
+#line 1287 "langs_src/parser_cpp_language.y"
     function yy_r216(){
 	$this->currentrule = new block_formal_langs_description_rule("%l(type)", array("список типов", "запятая", "%n-ый тип"));
 	$this->_retvalue = $this->create_node('type_list', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ) );
     }
-#line 4190 "langs_src/parser_cpp_language.php"
-#line 1291 "langs_src/parser_cpp_language.y"
+#line 4195 "langs_src/parser_cpp_language.php"
+#line 1294 "langs_src/parser_cpp_language.y"
     function yy_r217(){
 	$this->currentrule = new block_formal_langs_description_rule("константный тип %1(именительный) ", array("признак константности", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('type', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4196 "langs_src/parser_cpp_language.php"
-#line 1296 "langs_src/parser_cpp_language.y"
+#line 4201 "langs_src/parser_cpp_language.php"
+#line 1299 "langs_src/parser_cpp_language.y"
     function yy_r218(){
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
     $this->_retvalue = $this->create_node('type', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4202 "langs_src/parser_cpp_language.php"
-#line 1301 "langs_src/parser_cpp_language.y"
+#line 4207 "langs_src/parser_cpp_language.php"
+#line 1304 "langs_src/parser_cpp_language.y"
     function yy_r219(){
 	$this->currentrule = new block_formal_langs_description_rule("указатель на переменную %1(родительный) типа", array("%ur(именительный)", "признак указателя"));
 	$this->_retvalue = $this->create_node('type', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4208 "langs_src/parser_cpp_language.php"
-#line 1306 "langs_src/parser_cpp_language.y"
+#line 4213 "langs_src/parser_cpp_language.php"
+#line 1309 "langs_src/parser_cpp_language.y"
     function yy_r220(){
 	$this->currentrule = new block_formal_langs_description_rule("указатель на константную переменную %1(родительный) типа", array("%ur(именительный)", "ключевое слово константности", "признак указателя"));
 	$this->_retvalue = $this->create_node('type', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4214 "langs_src/parser_cpp_language.php"
-#line 1311 "langs_src/parser_cpp_language.y"
+#line 4219 "langs_src/parser_cpp_language.php"
+#line 1314 "langs_src/parser_cpp_language.y"
     function yy_r221(){
 	$this->currentrule = new block_formal_langs_description_rule("ссылка на  переменную %1(родительный) типа", array("%ur(именительный)", "амперсанд"));
 	$this->_retvalue = $this->create_node('type', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4220 "langs_src/parser_cpp_language.php"
-#line 1316 "langs_src/parser_cpp_language.y"
+#line 4225 "langs_src/parser_cpp_language.php"
+#line 1319 "langs_src/parser_cpp_language.y"
     function yy_r222(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	$this->_retvalue = $this->create_node('non_const_type', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4226 "langs_src/parser_cpp_language.php"
-#line 1326 "langs_src/parser_cpp_language.y"
+#line 4231 "langs_src/parser_cpp_language.php"
+#line 1329 "langs_src/parser_cpp_language.y"
     function yy_r224(){
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4232 "langs_src/parser_cpp_language.php"
-#line 1331 "langs_src/parser_cpp_language.y"
+#line 4237 "langs_src/parser_cpp_language.php"
+#line 1334 "langs_src/parser_cpp_language.y"
     function yy_r225(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4238 "langs_src/parser_cpp_language.php"
-#line 1336 "langs_src/parser_cpp_language.y"
+#line 4243 "langs_src/parser_cpp_language.php"
+#line 1339 "langs_src/parser_cpp_language.y"
     function yy_r226(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%ur(именительный)", "%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4244 "langs_src/parser_cpp_language.php"
-#line 1341 "langs_src/parser_cpp_language.y"
+#line 4249 "langs_src/parser_cpp_language.php"
+#line 1344 "langs_src/parser_cpp_language.y"
     function yy_r227(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4250 "langs_src/parser_cpp_language.php"
-#line 1350 "langs_src/parser_cpp_language.y"
+#line 4255 "langs_src/parser_cpp_language.php"
+#line 1353 "langs_src/parser_cpp_language.y"
     function yy_r229(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%s", "%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4256 "langs_src/parser_cpp_language.php"
-#line 1355 "langs_src/parser_cpp_language.y"
+#line 4261 "langs_src/parser_cpp_language.php"
+#line 1358 "langs_src/parser_cpp_language.y"
     function yy_r230(){
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%s", "%ur", "%s"));
 	$this->_retvalue = $this->create_node('primitive_or_complex_type', array( $this->yystack[$this->yyidx + -5]->minor, $this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4262 "langs_src/parser_cpp_language.php"
-#line 1360 "langs_src/parser_cpp_language.y"
+#line 4267 "langs_src/parser_cpp_language.php"
+#line 1363 "langs_src/parser_cpp_language.y"
     function yy_r231(){
     $this->currentrule = new block_formal_langs_description_rule("знаковое %2(именительный)", array("признак присутствия знака", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4268 "langs_src/parser_cpp_language.php"
-#line 1365 "langs_src/parser_cpp_language.y"
+#line 4273 "langs_src/parser_cpp_language.php"
+#line 1368 "langs_src/parser_cpp_language.y"
     function yy_r232(){
     $this->currentrule = new block_formal_langs_description_rule("беззнаковое %2(именительный)", array("признак беззнаковости", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4274 "langs_src/parser_cpp_language.php"
-#line 1370 "langs_src/parser_cpp_language.y"
+#line 4279 "langs_src/parser_cpp_language.php"
+#line 1373 "langs_src/parser_cpp_language.y"
     function yy_r233(){
     $this->currentrule = new block_formal_langs_description_rule("длинное %2(именительный)", array("признак длинного целого", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4280 "langs_src/parser_cpp_language.php"
-#line 1375 "langs_src/parser_cpp_language.y"
+#line 4285 "langs_src/parser_cpp_language.php"
+#line 1378 "langs_src/parser_cpp_language.y"
     function yy_r234(){
     $this->currentrule = new block_formal_langs_description_rule("длинное %3(именительный)", array("признак длинного целого", "признак длинного целого", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4286 "langs_src/parser_cpp_language.php"
-#line 1380 "langs_src/parser_cpp_language.y"
+#line 4291 "langs_src/parser_cpp_language.php"
+#line 1383 "langs_src/parser_cpp_language.y"
     function yy_r235(){
     $this->currentrule = new block_formal_langs_description_rule("беззнаковое длинное %4(именительный)", array("признак беззнаковости", "признак длинного целого", "признак длинного целого", "%ur(именительный)"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4292 "langs_src/parser_cpp_language.php"
-#line 1385 "langs_src/parser_cpp_language.y"
+#line 4297 "langs_src/parser_cpp_language.php"
+#line 1388 "langs_src/parser_cpp_language.y"
     function yy_r236(){
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	$this->_retvalue = $this->create_node('builtintype', array( $this->yystack[$this->yyidx + 0]->minor ));
     }
-#line 4298 "langs_src/parser_cpp_language.php"
+#line 4303 "langs_src/parser_cpp_language.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -4331,7 +4335,7 @@ static public $yy_action = array(
         //int $yygoto;                     /* The next state */
         //int $yyact;                      /* The next action */
         //mixed $yygotominor;        /* The LHS of the rule reduced */
-        //lock_formal_langs_parser_cpp_languageyyStackEntry $yymsp;            /* The top of the parser's stack */
+        //block_formal_langs_parser_cpp_languageyyStackEntry $yymsp;            /* The top of the parser's stack */
         //int $yysize;                     /* Amount to pop the stack */
         $yymsp = $this->yystack[$this->yyidx];
         if (self::$yyTraceFILE && $yyruleno >= 0 
@@ -4363,7 +4367,7 @@ static public $yy_action = array(
             ** That gives a significant speed improvement. */
             if (!self::$yyTraceFILE && $yysize) {
                 $this->yyidx++;
-                $x = new lock_formal_langs_parser_cpp_languageyyStackEntry;
+                $x = new block_formal_langs_parser_cpp_languageyyStackEntry;
                 $x->stateno = $yyact;
                 $x->major = $yygoto;
                 $x->minor = $yy_lefthand_side;
@@ -4402,7 +4406,7 @@ static public $yy_action = array(
      */
     function yy_syntax_error($yymajor, $TOKEN)
     {
-#line 37 "langs_src/parser_cpp_language.y"
+#line 40 "langs_src/parser_cpp_language.y"
 
     $this->error = true;
     $stack = array();
@@ -4434,7 +4438,7 @@ static public $yy_action = array(
     }
 	throw new Exception(implode(',', $expect));
 	*/
-#line 4443 "langs_src/parser_cpp_language.php"
+#line 4448 "langs_src/parser_cpp_language.php"
     }
 
     /**
@@ -4479,7 +4483,7 @@ static public $yy_action = array(
             /* if ($yymajor == 0) return; // not sure why this was here... */
             $this->yyidx = 0;
             $this->yyerrcnt = -1;
-            $x = new lock_formal_langs_parser_cpp_languageyyStackEntry;
+            $x = new block_formal_langs_parser_cpp_languageyyStackEntry;
             $x->stateno = 0;
             $x->major = 0;
             $this->yystack = array();
