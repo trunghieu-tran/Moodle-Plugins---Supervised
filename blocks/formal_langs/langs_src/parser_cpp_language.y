@@ -1,5 +1,8 @@
-%name lock_formal_langs_parser_cpp_language
+%name block_formal_langs_parser_cpp_language
 %declare_class {class block_formal_langs_parser_cpp_language}
+%include {
+require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.php');
+}
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     public $root;
