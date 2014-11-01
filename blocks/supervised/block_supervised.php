@@ -123,6 +123,7 @@ class block_supervised extends block_base {
      */
     private function render_plannedsession_form(&$title, &$formbody) {
         global $CFG, $COURSE, $DB;
+		$context = context_course::instance($COURSE->id);
         $plannedsession = $this->get_teacher_planned_session();
 
         if ( !empty($plannedsession) ) {
@@ -194,6 +195,7 @@ class block_supervised extends block_base {
      */
     private function render_activesession_form(&$title, &$formbody) {
         global $CFG, $COURSE, $DB;
+		$context = context_course::instance($COURSE->id);
         $activesession  = $this->get_teacher_active_session();
 
         if ( !empty($activesession) ) {
@@ -315,7 +317,7 @@ class block_supervised extends block_base {
      */
     private function render_startsession_form(&$title, &$formbody) {
         global $CFG, $COURSE, $DB, $USER;
-
+		$context = context_course::instance($COURSE->id);
         $title = get_string('nosessionstitle', 'block_supervised');
         // Prepare form.
         $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
