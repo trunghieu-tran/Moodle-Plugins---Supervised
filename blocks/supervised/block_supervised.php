@@ -221,10 +221,9 @@ class block_supervised extends block_base {
                 if (!$DB->update_record('block_supervised_session', $activesession)) {
                     print_error('insertsessionerror', 'block_supervised');
                 }
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'finish session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-
+                $event = \block_supervised\event\finish_session::create(array('context' => $context,
+					'userid' => $USER->id,'other' => array('courseid' => $COURSE->id)));
+				$event->trigger();
                 // Trigger event (session finished).
                 $sessioninfo = new stdClass();
                 $sessioninfo->courseid      = $activesession->courseid;
