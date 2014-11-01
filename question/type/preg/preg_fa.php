@@ -142,6 +142,7 @@ class qtype_preg_fa_transition {
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
+
             $circumflex = array('before' => false, 'after' => false);
             $dollar = array('before' => false, 'after' => false);
             $capz = array('before' => false, 'after' => false);
@@ -170,6 +171,7 @@ class qtype_preg_fa_transition {
                     else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         $epscount++;
                     }
+
                 }
 
                 $key = 'after';
@@ -191,12 +193,14 @@ class qtype_preg_fa_transition {
                             if ($capz['before']) {
                                 return array(qtype_preg_leaf::NEXT_CHAR_END_HERE, $c);
                             }
+
                             return array(qtype_preg_leaf::NEXT_CHAR_OK, $c);
                         }
                     }
                 } else if ($circumflex['after']) {
                     // There are start string assertions.
                     foreach ($chars as $c) {
+
                         if ($c == "\n") {
                             return array(qtype_preg_leaf::NEXT_CHAR_OK, $c);
                         }
@@ -212,7 +216,6 @@ class qtype_preg_fa_transition {
                     }
                 }
             }
-
             return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
         }
         else {
@@ -282,12 +285,17 @@ class qtype_preg_fa_transition {
 
         $resultbefore = array_values($resultbefore);
         $resultafter = array_values($resultafter);
-
+        foreach ($resultbefore as $tran) {
+            $before[] = $tran->pregleaf;
+        }
+        foreach ($resultafter as $tran) {
+            $after[] = $tran->pregleaf;
+        }
         foreach ($resultafter as $assert) {
             $key = array_search($assert, $resultafter);
             if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                 // Searching compatible asserts.
-                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $resultafter)) {
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $after)) {
                     unset($resultafter[$key]);
                     $resultafter = array_values($resultafter);
                 }
@@ -298,7 +306,7 @@ class qtype_preg_fa_transition {
             $key = array_search($assert, $resultbefore);
             if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
                 // Searching compatible asserts.
-                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore) || self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $resultbefore)) {
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $before) || qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $before)) {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
@@ -306,7 +314,7 @@ class qtype_preg_fa_transition {
             }
             if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
                 // Searching compatible asserts.
-                if (self::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $resultbefore)) {
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $before)) {
                     unset($resultbefore[$key]);
                     $resultbefore = array_values($resultbefore);
                 }
@@ -522,7 +530,7 @@ class qtype_preg_fa_transition {
                 $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
             }
         }
-        if ($resulttran !== null) {
+        if ($resulttran !== null ) {
             $this->unite_tags($other, $resulttran);
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedafter = $assert->mergedafter;
