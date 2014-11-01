@@ -89,10 +89,10 @@ if ($mform->is_cancelled()) {
         if (!$DB->update_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'edit lesson type',
-            "blocks/supervised/lessontypes/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
-    }
+        $event = \block_supervised\event\update_lessontype::create(array('context' => $context,
+			'userid' => $USER->id,'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'fromform_id' => $fromform->id)));
+		$event->trigger();
+        }
     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);
 } else {
