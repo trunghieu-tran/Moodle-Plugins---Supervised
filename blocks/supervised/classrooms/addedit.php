@@ -76,6 +76,7 @@ if (file_exists($mform)) {
 $mform = new addedit_classroom_form();
 $toform['courseid'] = $courseid;
 $mform->set_data($toform);
+$context = context_course::instance($courseid);
 
 if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
