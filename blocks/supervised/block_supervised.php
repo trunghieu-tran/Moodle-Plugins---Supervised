@@ -348,10 +348,10 @@ class block_supervised extends block_base {
                 print_error('insertsessionerror', 'block_supervised');
             }
             update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
-            // TODO Logging.
-            add_to_log($COURSE->id, 'role', 'start session',
-                'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-            // Refresh block: render active session form.
+            $event = \block_supervised\event\start_session::create(array('context' => $context,
+				'userid' => $USER->id,'other' => array('courseid' => $COURSE->id)));
+			$event->trigger();
+			// Refresh block: render active session form.
             $title = '';
             $formbody = '';
             $this->render_activesession_form($title, $formbody);
