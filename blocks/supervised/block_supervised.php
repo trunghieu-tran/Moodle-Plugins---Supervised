@@ -152,10 +152,10 @@ class block_supervised extends block_base {
                     print_error('insertsessionerror', 'block_supervised');
                 }
                 update_users_in_session($plannedsession->groupid, $plannedsession->courseid, $plannedsession->id);
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'start planned session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-                // Trigger event (session started).
+                $event = \block_supervised\event\start_planned_session::create(array('context' => $context,
+					'userid' => $USER->id,'other' => array('courseid' => $COURSE->id)));
+				$event->trigger();
+				// Trigger event (session started).
                 $sessioninfo = new stdClass();
                 $sessioninfo->courseid      = $plannedsession->courseid;
                 $sessioninfo->groupid       = $plannedsession->groupid;
