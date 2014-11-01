@@ -96,10 +96,9 @@ if ($mform->is_cancelled()) {
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'edit classroom',
-            "blocks/supervised/classrooms/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
-
+        $event = \block_supervised\event\update_classroom::create(array('context' => $context,
+			'userid' => $USER->id,'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'fromform_id' => $fromform->id)));
+		$event->trigger();
         // Find all Active and Planned sessions and update their ip lists.
         $select = "SELECT * FROM {block_supervised_session}
                     WHERE classroomid = :classroomid
