@@ -27,6 +27,7 @@ require_once('../lib.php');
 $id         = required_param('id', PARAM_INT);              // Lessontype id.
 $courseid   = required_param('courseid', PARAM_INT);
 $delete     = optional_param('delete', '', PARAM_ALPHANUM); // Delete confirmation hash.
+$context    = context_course::instance($COURSE->id);
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
