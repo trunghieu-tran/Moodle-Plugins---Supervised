@@ -234,9 +234,9 @@ class block_supervised extends block_base {
                 unset($activesession);
             } else if ($fromform = $mform->get_data()) {
                 // Update session
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'update active session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
+				$event = \block_supervised\event\update_active_session::create(array('context' => $context,
+					'userid' => $USER->id,'other' => array('courseid' => $COURSE->id)));
+				$event->trigger();
                 $title = get_string('activesessiontitle', 'block_supervised');
                 $oldgroupid = $activesession->groupid;
                 $newgroupid = $fromform->groupid;
