@@ -52,7 +52,7 @@ if (!$DB->update_record('block_supervised_classroom', $classroom)) {
     print_error('insertclassroomerror', 'block_supervised');
 }
 
-// TODO Logging.
+$context = context_course::instance($courseid);
 if ($classroom->active) {
     add_to_log($COURSE->id, 'role', 'show classroom',
         "blocks/supervised/classrooms/addedit.php?id={$classroom->id}&courseid={$COURSE->id}", $classroom->name);
