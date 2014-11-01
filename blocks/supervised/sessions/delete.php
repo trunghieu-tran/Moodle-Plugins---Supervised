@@ -74,7 +74,7 @@ if (file_exists($mform)) {
 $mform = new delete_session_form();
 
 
-
+$context = context_course::instance($courseid);
 if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
