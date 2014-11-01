@@ -162,10 +162,10 @@ if ($mform->is_cancelled()) {
             print_error('insertsessionerror', 'block_supervised');
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'plane session',
-            'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-        // Send e-mail to teacher.
+        $event = \block_supervised\event\add_session::create(array('context' => $context,
+			'userid' => $USER->id,'other' => array('courseid' => $courseid)));
+		$event->trigger();
+		// Send e-mail to teacher.
         if ($fromform->sendemail) {
             mail_newsession(get_session($newid), $USER);
         }
@@ -177,10 +177,10 @@ if ($mform->is_cancelled()) {
             print_error('insertsessionerror', 'block_supervised');
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $fromform->id);
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'edit session',
-            'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-        // Send e-mail to teacher(s).
+         $event = \block_supervised\event\update_session::create(array('context' => $context,
+			'userid' => $USER->id,'other' => array('courseid' => $courseid)));
+		$event->trigger();
+		// Send e-mail to teacher(s).
         if ($fromform->sendemail) {
             $oldteacherid = $session->teacherid;
             $newteacherid = $fromform->teacherid;
