@@ -40,7 +40,7 @@ require_capability('block/supervised:editlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 require('breadcrumbs.php');
-
+$context = context_course::instance($courseid);
 
 // Initializing variables depending of mode.
 if (!$id) {   // Add mode.
