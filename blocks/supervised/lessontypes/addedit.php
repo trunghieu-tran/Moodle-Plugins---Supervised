@@ -82,10 +82,10 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'add lesson type',
-            "blocks/supervised/lessontypes/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
-    } else {     // Edit mode.
+		$event = \block_supervised\event\add_lessontype::create(array('context' => $context,
+			'userid' => $USER->id,'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'newlessontypeid' => $newid)));
+		$event->trigger();
+        } else {     // Edit mode.
         if (!$DB->update_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
