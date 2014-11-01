@@ -144,7 +144,7 @@ if (file_exists($mform)) {
 $mform = new addedit_session_form(null, array('courseid' => $courseid, 'addnotspecified' => $addnotspecified));
 
 
-
+$context = context_course::instance($courseid);
 if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
