@@ -155,6 +155,9 @@ class qtype_preg_fa_transition {
                     if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
                         return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
                     }
+                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
+                        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                    }
                     if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
                         $circumflex[$key] = true;
                     }
