@@ -30,34 +30,21 @@ defined('MOODLE_INTERNAL') || die();
 define('QUESTION_PAGE_LENGTH', 25);
 
 require_once($CFG->libdir . '/listlib.php');
+require_once($CFG->dirroot . '/question/category_class.php');
 require_once($CFG->dirroot . '/question/category_form.php');
 require_once($CFG->dirroot . '/question/move_form.php');
 
 
 /**
- * Class representing a list of question categories
+ * Class representing a list of ajax question categories
  *
- * @copyright  1999 onwards Martin Dougiamas {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_category_list extends moodle_list {
-    public $table = "question_categories";
-    public $listitemclassname = 'question_category_list_item';
-    /**
-     * @var reference to list displayed below this one.
-     */
-    public $nextlist = null;
-    /**
-     * @var reference to list displayed above this one.
-     */
-    public $lastlist = null;
+class ajax_question_category_list extends question_category_list {
 
-    public $context = null;
-    public $sortby = 'parent, sortorder, name';
 
     public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0, $pageparamname = 'page', $itemsperpage = 20, $context = null){
-        parent::__construct('ul', '', $editable, $pageurl, $page, 'cpage', $itemsperpage);
-        $this->context = $context;
+        parent::__construct($type, $attributes, $editable, $pageurl, $page, $pageparamname, $itemsperpage, $context);
+        $this->$listitemclassname = 'ajax_question_category_list_item';
     }
 
     public function get_records() {
@@ -72,7 +59,7 @@ class question_category_list extends moodle_list {
  * @copyright  1999 onwards Martin Dougiamas {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_category_list_item extends list_item {
+class ajax_question_category_list_item extends list_item {
     public function set_icon_html($first, $last, $lastitem){
         global $CFG;
         $category = $this->item;
@@ -132,7 +119,7 @@ class question_category_list_item extends list_item {
  * @copyright  1999 onwards Martin Dougiamas {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_category_object {
+class ajax_question_category_object {
 
     /**
      * @var array common language strings.
@@ -162,7 +149,7 @@ class question_category_object {
      *
      * Gets necessary strings and sets relevant path information
      */
-    public function question_category_object($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
+    public function ajax_question_category_object($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         global $CFG, $COURSE, $OUTPUT;
 
         $this->tab = str_repeat('&nbsp;', $this->tabsize);
