@@ -92,48 +92,47 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     $strftimedatetime = get_string('strftimerecent');
     foreach ($logs['logs'] as $log) {
 
-        if (isset($ldcache[$log->module][$log->action])) {
-            $ld = $ldcache[$log->module][$log->action];
-        } else {
-            $ld = $DB->get_record('log_display', array('module' => $log->module, 'action' => $log->action));
-            $ldcache[$log->module][$log->action] = $ld;
-        }
-        if ($ld && is_numeric($log->info)) {
-            // Ugly hack to make sure fullname is shown correctly.
-            if ($ld->mtable == 'user' && $ld->field == $DB->sql_concat('firstname', "' '" , 'lastname')) {
-                $log->info = fullname($DB->get_record($ld->mtable, array('id' => $log->info)), true);
-            } else {
-                $log->info = $DB->get_field($ld->mtable, $ld->field, array('id' => $log->info));
-            }
-        }
-
-        // Filter log->info.
-        $log->info = format_string($log->info);
-
-        // If $log->url has been trimmed short by the db size restriction
-        // code in add_to_log, keep a note so we don't add a link to a broken url.
-        $brokenurl = (core_text::strlen($log->url) == 100 && core_text::substr($log->url, 97) == '...');
-
-        $row = array();
-
-        $row[] = userdate($log->time, '%a').' '.userdate($log->time, $strftimedatetime);
-
-        $link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
-        $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',
-            array('height' => 440, 'width' => 700)));
-
-        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"),
-            fullname($log));
-
-        $displayaction = "$log->module $log->action";
-        if ($brokenurl) {
-            $row[] = $displayaction;
-        } else {
-            $link = make_log_url($log->module, $log->url);
-            $row[] = $OUTPUT->action_link($link, $displayaction, new popup_action('click', $link, 'fromloglive'),
-                array('height' => 440, 'width' => 700));
-        }
-        $row[] = $log->info;
+        //Creating a new table row
+		$row = array();
+		//Getting the time of triggered event
+		$row[] = userdate($log->timecreated, '%a').' '.userdate($log->timecreated, $strftimedatetime);
+		//Connecting the ip of user with iplookup
+		$link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
+		$row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',array('height' => 440, 'width' => 700)));
+		//Getting the full username and connecting it with user's info page
+		$user = $DB->get_record_sql('SELECT * FROM {user} WHERE id=?', array($log->userid),IGNORE_MISSING);
+		$fullname = fullname($user);
+		$row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->courseid}"),$fullname);
+		//Getting the type of event (read, update, create or delete)
+		switch ($log->crud ){
+			case ('r'):
+				$row[] = 'Read';
+			break;
+			case ('u'):
+				$row[] = 'Update';
+			break;
+			case ('d'):
+				$row[] = 'Delete';
+			break;
+			case ('c'):
+				$row[] = 'Create';
+			break;
+		}
+		//Getting the event description
+		$select = "id=:logid"; //Log id is the same with event id
+		$params = array();
+		$params['logid']=$log->id;
+		$manager = get_log_manager();
+		$logreaders = $manager->get_readers();
+		//Choosing the reader, which works with events
+		foreach ($logreaders as $reader){
+			if($reader instanceof \core\log\sql_select_reader){
+				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
+				foreach ($events as $event) {
+					$row[] = $event->get_description();
+				}
+			}
+		}
         $table->data[] = $row;
     }
 
