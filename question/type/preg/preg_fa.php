@@ -181,7 +181,7 @@ class qtype_preg_fa_transition {
             }
 
             // Check all the returned ranges.
-            $chars = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj,$dollar['before'], $circumflex['after']);
+            $chars = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar['before'], $circumflex['after']);
 
             if (count($chars) != 0) {
                 // There is no merge assertions.

@@ -978,55 +978,43 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
-        $chars = array();
-        $desired_ranges = array();
         $originalchar = $originalstr[$pos];
         $originalcode = core_text::utf8ord($originalchar);
+
+        $desired_ranges = array();	// Contains ranges of desired characters, decreasing priority.
+
         if (!$dollar/*&& !$capz['before']*/ && !$circumflex) {
             if ($pos < $originalstr->length()) {
-                $desired_ranges[] = array(array($originalcode, $originalcode)); // original character
+                $desired_ranges[] = array(array($originalcode, $originalcode)); // original character - highest priority
             }
-            $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters
-            $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces
+            $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters - middle priority
+            $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces - lowest priority
         } else if ($originalchar == "\n") {
-            $desired_ranges[] = array($originalcode, $originalcode);
+            $desired_ranges[] = array(array($originalcode, $originalcode));
         }
 
-        foreach ($this->flags as $flags) {
-            // Get intersection of all current flags.
-            $ranges = qtype_preg_unicode::minmax_ranges();
-            foreach ($flags as $flag) {
-                if ($flag->type === qtype_preg_charset_flag::TYPE_SET) {
-                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
-                } else {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
-                }
-                if ($flag->negative) {
-                    $currange = qtype_preg_unicode::negate_ranges($currange);
-                }
-                $ranges = qtype_preg_unicode::intersect_ranges($ranges, $currange);
-            }
-            if ($this->negative) {
-                $ranges = qtype_preg_unicode::negate_ranges($ranges);
-            }
+        $ranges = $this->ranges();
 
-            foreach ($desired_ranges as $desired) {
-                $tmp = qtype_preg_unicode::intersect_ranges($ranges, $desired);
-                if (!empty($tmp)) {
-                    $ranges = $tmp;
-                    break;
-                }
-            }
-
-            // Check all the returned ranges.
-            foreach ($ranges as $range) {
-                for ($i = $range[0]; $i <= $range[1]; $i++) {
-                    $c = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($i));
-                    $chars[] = $c;
-                }
+        // Try to form the result ranges by intersecting this leaf's ranges and desired ranges
+        $result_ranges = null;
+        foreach ($desired_ranges as $desired) {
+            $tmp = qtype_preg_unicode::kinda_operator($ranges, $desired, true, false, false, false);	// intersect_ranges?
+            if (!empty($tmp)) {
+                $result_ranges = $tmp;
+                break;
             }
         }
-        return $chars;
+
+        // If the were no intersections, just use this leaf's ranges
+        if ($result_ranges === null) {
+        	$result_ranges = $ranges;
+        }
+
+        if (empty($result_ranges)) {
+        	return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+        }
+
+        return array(self::NEXT_CHAR_OK, qtype_preg_unicode::code2utf8($result_ranges[0][0]));
     }
 
     /*public function tohr() {
