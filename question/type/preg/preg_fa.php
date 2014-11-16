@@ -1498,6 +1498,17 @@ class qtype_preg_fa {
     }
 
     /**
+     * Compares to FA and returns whether they are equal. Mainly used for unit-testing.
+     *
+     * @param another qtype_preg_fa object - FA to compare.
+     * @return boolean true if this FA equal to $another.
+     */
+    public function compare_fa($another, &$differences) {
+        // TODO
+        return false;
+    }
+
+    /**
      * Decide if the intersection was successful or not.
      *
      * @param fa qtype_preg_fa object - first automata taking part in intersection.
@@ -1554,7 +1565,7 @@ class qtype_preg_fa {
         return $issuccessful;
     }
 
-    
+
     /**
      * Get connected with given states in given direction.
      *
@@ -1904,7 +1915,7 @@ class qtype_preg_fa {
         return $transitions;
     }
 
-    
+
     /**
      * Generate real number of state from intersection part.
      *
@@ -2370,15 +2381,7 @@ class qtype_preg_fa {
         }
         // Prepare automata for intersection.
         $this->remove_unreachable_states();
-        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number);
-        if ($isstart == 0) {
-            $number2 = $anotherfa->start_states();
-        } else {
-            $number2 = $anotherfa->end_states();
-        }
-        $secnumber = $number2[0];
         $anotherfa->remove_unreachable_states();
-        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $secnumber);
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();

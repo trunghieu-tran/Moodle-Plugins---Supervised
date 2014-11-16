@@ -904,7 +904,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             //printf($result->fa_to_dot() . "\n");
             //var_dump($result->start_states());
             //var_dump($result->end_states());
-            //$result->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH);
         //} catch (Exception $e) {
           //  $result = null;
         //}
