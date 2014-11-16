@@ -518,10 +518,10 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
     }
 
     protected static function intersect($borderstate, $automaton) {
+        $change = false;
         $charset = null;
         $charsetuncapturering = null;
         $uncapturing = array();
-
         $hasintersect = false;
         // Uncapturing transitions are outgoing.
         // If one transition doesn't consume chars intersect it with other.
@@ -559,10 +559,12 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->remove_transition($tran);
                             $automaton->add_transition($resulttran);
                             //printf($automaton->fa_to_dot());
+                            $change = true;
                         }
                     }
                     if (count($outgoing) == count($uncapturing)) {
                         $automaton->remove_transition($intran);
+                        $change = true;
                     }
                 }
             }
@@ -571,6 +573,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 $automaton->add_transition($unreachable);
                 foreach ($uncapturing as $tran) {
                     $automaton->remove_transition($tran);
+                    $change = true;
                 }
             }
         }
@@ -590,7 +593,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             }
         }
         //printf($automaton->fa_to_dot());
-        //var_dump(count($uncapturing));
         if (count($uncapturing) != 0) {
 
             foreach ($uncapturing as $tran) {
@@ -608,11 +610,13 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             //$resulttran->consumeschars = true;
                             $automaton->remove_transition($tran);
                             $automaton->add_transition($resulttran);
+                            $change = true;
                             //printf($automaton->fa_to_dot());
                         }
                     }
                     if (count($incoming) == count($uncapturing)) {
                         $automaton->remove_transition($outtran);
+                        $change = true;
                     }
                 }
             }
@@ -621,9 +625,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 $automaton->add_transition($unreachable);
                 foreach ($uncapturing as $tran) {
                     $automaton->remove_transition($tran);
+                    $change = true;
                 }
             }
         }
+        return $change;
     }
 
     protected static function concatenate(&$automaton, &$stack, $count, $transform) {
@@ -777,19 +783,32 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
                     $newtransition->set_transition_type();
+                    if ($newtransition->is_wordbreak()) {
+                        qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur);
+                    }
                     if ($transform && ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
                         qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($cur['end']));
                     }
-                }
 
+                }
+                
+                $change = parent::intersect($cur['end'], $automaton);
+                var_dump($change);
                 $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
                 foreach ($prevtrans as $transition) {
                     $transition->set_transition_type();
+                    if ($newtransition->is_wordbreak()) {
+                        qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur);
+                    }
                     if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
                         qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
                     }
                 }
-
+                // Change end states if automaton was rebuilt with intersection.
+                if ($change) {
+                    $prevtrans = $automaton->get_adjacent_transitions($prevtrans[0]->from, false);
+                    $cur['end'] = $prevtrans[0]->from;
+                }
                 $stack[] = $cur;
             }
         }
