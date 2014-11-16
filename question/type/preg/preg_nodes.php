@@ -457,10 +457,6 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     /** Is this leaf negative? */
     public $negative = false;
 
-    public function __clone() {
-        parent::__clone();
-    }
-
     public function is_subpattern() {
         return true;    // Any leaf is a subpattern.
     }
@@ -530,26 +526,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
     /**
      * Returns true if character(s) starting from $str[$pos] match(es) this leaf, false otherwise
-     * Contains universal code to deal with merged assertions. Overload match_inner to define your leaf type matching
      * @param str the string being matched.
      * @param pos position of character in the string, if leaf is non-consuming than position before this character is analyzed.
      * @param length an integer variable to store the length of the match.
      * @param matcherstateobj an object which implements the qtype_preg_matcher_state interface.
      */
-    public function match($str, $pos, &$length, $matcherstateobj = null) {
-        $result = $this->match_inner($str, $pos, $length, $matcherstateobj);
-        return $result;
-    }
-
-    /**
-     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
-     * Implements details of a particular leaf matching.
-     * @param str the string being matched.
-     * @param pos position of character in the string, if leaf is non-consuming than position before this character is analyzed.
-     * @param length an integer variable to store the length of the match.
-     * @param matcherstateobj an object which implements the qtype_preg_matcher_state interface.
-     */
-    abstract protected function match_inner($str, $pos, &$length, $matcherstateobj = null);
+    abstract public function match($str, $pos, &$length, $matcherstateobj = null);
 
     /**
      * Returns an array (flag, character) suitable for both this leaf and merged assertions and the previous character.
@@ -766,7 +748,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $this->cachedranges;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;
         }
@@ -1215,13 +1197,13 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         return 0;
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
-    }
-
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         return true;
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
     }
 
     public function tohr() {
@@ -1282,7 +1264,7 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
         $this->subtype = self::SUBTYPE_ESC_B;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $alnumrange = qtype_preg_unicode::alnum_ranges();
         $ch0 = $str[0];
         $ch1 = $str[$pos - 1];
@@ -1325,7 +1307,7 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
         $this->subtype = self::SUBTYPE_ESC_A;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         return ($pos == 0);
     }
@@ -1352,7 +1334,7 @@ class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
         $this->subtype = self::SUBTYPE_SMALL_ESC_Z;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         return ($pos == $str->length());
     }
@@ -1376,8 +1358,8 @@ class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_
         $this->subtype = self::SUBTYPE_CAPITAL_ESC_Z;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return ($pos == $str->length() - 1 && $str[$pos] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        return ($pos == $str->length() - 1 && $str[$pos] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
@@ -1396,7 +1378,7 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
         $this->subtype = self::SUBTYPE_ESC_G;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         return false; // TODO
     }
@@ -1421,8 +1403,8 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
         $this->subtype = self::SUBTYPE_CIRCUMFLEX;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return ($str[$pos - 1] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        return ($str[$pos - 1] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
@@ -1448,8 +1430,8 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
         $this->subtype = self::SUBTYPE_DOLLAR;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        return ($str[$pos] == "\n") || parent::match_inner($str, $pos, $length, $matcherstateobj);
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        return ($str[$pos] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
@@ -1472,7 +1454,7 @@ class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
         $this->number = $number;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         return ($matcherstateobj->is_subexpr_captured($this->number) xor $this->negative);
     }
@@ -1518,7 +1500,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         return $matcherstateobj->length($this->number);
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
 
         if (!$matcherstateobj->is_subexpr_captured($this->number)) {
@@ -1565,14 +1547,13 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
-
         if (!$matcherstateobj->is_subexpr_captured($this->number)) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $matcherstateobj->length($this->number);
         if ($end > $newstr->length()) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
 
         return array(self::NEXT_CHAR_OK, $newstr->substring($start + $length, $end - $start - $length));
@@ -1607,7 +1588,7 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
         return $result;
     }
 
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
         $result = $matcherstateobj->match_from_pos_internal($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
         // is_full() should be set if the needed subexpression is captured.
@@ -1682,7 +1663,7 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
         $this->subtype = $subtype;
         $this->name = $name;
     }
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
     }
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
@@ -1703,7 +1684,7 @@ class qtype_preg_leaf_options extends qtype_preg_leaf {
         $this->posopt = $posopt;
         $this->negopt = $negopt;
     }
-    protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
     }
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
