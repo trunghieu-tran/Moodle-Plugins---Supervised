@@ -66,7 +66,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
                 return 'qtype_preg_fa_leaf';
         }
 
@@ -97,7 +97,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:

@@ -1072,48 +1072,5 @@ TODO: это надо перенести в тесты переходов
         $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 2, $l, true), 'Incorrect matching');
         $this->assertTrue($result->match(new qtype_poasquestion_string('(b@%)'), 3, $l, true), 'Incorrect matching');
         $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 4, $l, true), 'Incorrect matching');
-    }
-
-    function test_charset_substract() {
-        //create elemenntary charclasses
-        $a = new qtype_preg_charset_flag;
-        $b = new qtype_preg_charset_flag;
-        $c = new qtype_preg_charset_flag;
-        $d = new qtype_preg_charset_flag;
-        $e = new qtype_preg_charset_flag;
-        $f = new qtype_preg_charset_flag;
-        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%('));
-        $b->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('s@'));
-        $c->negative = true;
-        $d->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $d->negative = true;
-        $e->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('a%'));
-        $e->negative = true;
-        $f->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%)'));
-        //form charsets
-        $charset1 = new qtype_preg_leaf_charset;
-        $charset1->flags[0][0] = $a;
-        $charset1->flags[1][0] = $b;
-        $charset1->flags[1][1] = $c;
-        $charset1->negative = true;
-        $charset2 = new qtype_preg_leaf_charset;
-        $charset2->flags[0][0] = $d;
-        $charset2->flags[0][1] = $e;
-        $charset2->flags[1][0] = $f;
-        $charset2->negative = false;
-        //intersect them
-        $result = $charset1->substract($charset2);
-        //verify result
-        $this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->type===qtype_preg_charset_flag::TYPE_SET, 'Not set instead first set in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in substraction of ^[b%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->set=='s', '\"s\" not exist in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 0, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 1, $l, true), 'Incorrect matching');
-        $this->assertTrue($result->match(new qtype_poasquestion_string('(bs%)'), 2, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 3, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 4, $l, true), 'Incorrect matching');
     }*/
 }

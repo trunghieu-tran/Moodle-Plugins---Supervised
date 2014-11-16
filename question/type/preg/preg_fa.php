@@ -141,89 +141,86 @@ class qtype_preg_fa_transition {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
 
-            $circumflex = array('before' => false, 'after' => false);
-            $dollar = array('before' => false, 'after' => false);
-            $capz = array('before' => false, 'after' => false);
-            $condassert = array('before' => false, 'after' => false);
-            $key = 'before';
-            $epscount = 0;
-
-            foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
-                foreach ($assertions as $assertion) {
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
-                        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-                    }
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
-                        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-                    }
-                    if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-                        $circumflex[$key] = true;
-                    }
-                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
-                        $dollar[$key] = true;
-                    }
-                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
-                        $capz[$key] = true;
-                    }
-                    else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
-                        $condassert[$key] = true;
-                        $condassertindex = array_search($assertion, $assertions);
-                    }
-                    else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        $epscount++;
-                    }
-
-                }
-
-                $key = 'after';
-            }
-
-            // Check all the returned ranges.
-            $chars = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar['before'], $circumflex['after']);
-
-            if (count($chars) != 0) {
-                // There is no merge assertions.
-                if (count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
-                    return array(qtype_preg_leaf::NEXT_CHAR_OK, $chars[0]);
-                }
-
-                if ($dollar['before'] || $capz['before']) {
-                    // There are end string assertions.
-                    foreach ($chars as $c) {
-                        if ($c == "\n") {
-                            if ($capz['before']) {
-                                return array(qtype_preg_leaf::NEXT_CHAR_END_HERE, $c);
-                            }
-
-                            return array(qtype_preg_leaf::NEXT_CHAR_OK, $c);
-                        }
-                    }
-                } else if ($circumflex['after']) {
-                    // There are start string assertions.
-                    foreach ($chars as $c) {
-
-                        if ($c == "\n") {
-                            return array(qtype_preg_leaf::NEXT_CHAR_OK, $c);
-                        }
-                    }
-                }
-                if ($condassert['before']) {
-                    $list = $this->mergedbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
-                    if ($list[0] === qtype_preg_leaf::NEXT_CHAR_OK) {
-                        $result = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
-                        if (count($result) != 0) {
-                            return array(qtype_preg_leaf::NEXT_CHAR_OK, $result[0]);
-                        }
-                    }
-                }
-            }
-            return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-        }
-        else {
+        if ($this->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
             return $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
         }
+
+        $circumflex = array('before' => false, 'after' => false);
+        $dollar = array('before' => false, 'after' => false);
+        $capz = array('before' => false, 'after' => false);
+        $condassert = array('before' => false, 'after' => false);
+        $key = 'before';
+        $epscount = 0;
+
+        foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
+            foreach ($assertions as $assertion) {
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                }
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                }
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                    $circumflex[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                    $dollar[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                    $capz[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
+                    $condassert[$key] = true;
+                    $condassertindex = array_search($assertion, $assertions);
+                }
+                else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    $epscount++;
+                }
+
+            }
+
+            $key = 'after';
+        }
+
+        // Check all the returned ranges.
+        $ranges = $this->pregleaf->next_character_ranges($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar['before'], $circumflex['after']);
+
+        if (empty($ranges)) {
+            return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+        }
+
+        if (count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
+            // There are no merged assertions.
+            return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($ranges[0][0])));
+        }
+
+
+        if ($dollar['before'] || $capz['before']) {
+            // There are end string assertions.
+            if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
+                if ($capz['before']) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion_string("\n"));
+                }
+                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+            }
+        } else if ($circumflex['after']) {
+            // There are start string assertions.
+            if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
+                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+            }
+        }
+        if ($condassert['before']) {
+            $list = $this->mergedbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+            if ($list[0] === qtype_preg_leaf::NEXT_CHAR_OK) {
+                $result = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+                if (count($result) != 0) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_OK, $result[0]);    // TODO: возвращать нужно все-таки символ этого листа, а не то что было в ассерте
+                }
+            }
+        }
+
+        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function is_start_anchor() {

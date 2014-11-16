@@ -769,13 +769,13 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $result;
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character_ranges($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
         $originalchar = $originalstr[$pos];
         $originalcode = core_text::utf8ord($originalchar);
 
-        $desired_ranges = array();	// Contains ranges of desired characters, decreasing priority.
+        /*$desired_ranges = array();	// Contains ranges of desired characters, decreasing priority.
 
-        if (!$dollar/*&& !$capz['before']*/ && !$circumflex) {
+        if (!$dollar && !$circumflex) {					// && !$capz['before']
             if ($pos < $originalstr->length()) {
                 $desired_ranges[] = array(array($originalcode, $originalcode)); // original character - highest priority
             }
@@ -783,30 +783,36 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces - lowest priority
         } else if ($originalchar == "\n") {
             $desired_ranges[] = array(array($originalcode, $originalcode));
-        }
+        }*/
 
         $ranges = $this->ranges();
 
         // Try to form the result ranges by intersecting this leaf's ranges and desired ranges
         $result_ranges = null;
-        foreach ($desired_ranges as $desired) {
+        /*foreach ($desired_ranges as $desired) {
             $tmp = qtype_preg_unicode::kinda_operator($ranges, $desired, true, false, false, false);	// intersect_ranges?
             if (!empty($tmp)) {
                 $result_ranges = $tmp;
                 break;
             }
-        }
+        }*/
 
         // If the were no intersections, just use this leaf's ranges
         if ($result_ranges === null) {
         	$result_ranges = $ranges;
         }
 
+        return $result_ranges;
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+        $result_ranges = $this->next_character_ranges($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar, $circumflex);
+
         if (empty($result_ranges)) {
         	return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
 
-        return array(self::NEXT_CHAR_OK, qtype_preg_unicode::code2utf8($result_ranges[0][0]));
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($result_ranges[0][0])));
     }
 
     /*public function tohr() {
@@ -888,40 +894,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $charset = null;
         }
         return $charset;
-    }
-
-    /**
-     * Unite this charset with another one.
-     * @param other charset to intersect with.
-     * @return an object of qtype_preg_leaf_charset which is the union of this and other.
-     */
-    public function unite(qtype_preg_leaf_charset $other) {
-        $result = new qtype_preg_leaf_charset;
-        if (count($this->flags) == 1 && count($this->flags[0]) == 1 && count($other->flags) == 1 && count($this->flags[0]) == 1) {
-            $resultstring = $this->flags[0][0]->data->string() . $other->flags[0][0]->data->string();
-            preg_replace('#(.)\\1{2,}#ius', '\\1', $resultstring);
-            $resflag = new qtype_preg_charset_flag;
-            $resflag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($resultstring));
-            $resflags = array(array($resflag));
-            $result = new qtype_preg_leaf_charset;
-        } else {
-            $resflags = array_merge($this->flags, $other->flags);
-        }
-        $result->flags = $resflags;
-        $result->userinscription = array_merge($this->userinscription, $other->userinscription);
-        return $result;
-    }
-
-    /**
-     * Substracts other charset from this.
-     * @param other charset to substract.
-     * @return an object of qtype_preg_leaf_charset which is the substraction of this and other.
-     */
-    public function substract(qtype_preg_leaf_charset $other) {
-        $other->negative = !$other->negative;
-        $result = $this->intersect($other);
-        $other->negative = !$other->negative;
-        return $result;
     }
 }
 
