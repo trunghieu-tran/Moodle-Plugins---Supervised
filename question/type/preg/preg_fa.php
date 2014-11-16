@@ -181,7 +181,7 @@ class qtype_preg_fa_transition {
             }
 
             // Check all the returned ranges.
-            $chars = $this->pregleaf->next_character_base($originalstr, $newstr, $pos, $length, $matcherstateobj,$dollar['before'], $circumflex['after']);
+            $chars = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj,$dollar['before'], $circumflex['after']);
 
             if (count($chars) != 0) {
                 // There is no merge assertions.
@@ -212,7 +212,7 @@ class qtype_preg_fa_transition {
                 if ($condassert['before']) {
                     $list = $this->mergedbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
                     if ($list[0] === qtype_preg_leaf::NEXT_CHAR_OK) {
-                        $result = $this->pregleaf->next_character_base($originalstr, $newstr, $pos, $length, $matcherstateobj);
+                        $result = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
                         if (count($result) != 0) {
                             return array(qtype_preg_leaf::NEXT_CHAR_OK, $result[0]);
                         }
