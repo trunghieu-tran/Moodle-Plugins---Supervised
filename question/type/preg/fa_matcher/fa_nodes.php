@@ -213,7 +213,7 @@ abstract class qtype_preg_fa_node {
                     $clonetransitions[] = $tran;
                 }
             }
-        
+
         }
         // Has deleting or changing transitions.
         if (count($transitions) != 0 && !$backref) {
@@ -362,7 +362,7 @@ abstract class qtype_preg_fa_node {
                 var_dump("\n");
                 printf($outtran->get_label_for_dot($outtran->from, $outtran->to));
                  var_dump("\n");*/
-                
+
                         if ($resultout !== null) {
                             /*printf($resultout->get_label_for_dot($resultout->from, $resultout->to));
                  var_dump("\n");*/
@@ -747,7 +747,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         }
 
         $change = parent::intersect($body['end'], $automaton);
-        
+
         foreach ($prevtrans as $transition) {
             $transition->set_transition_type();
             if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
@@ -798,7 +798,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     }
 
                 }
-                
+
                 $change = parent::intersect($cur['end'], $automaton);
                 $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
                 foreach ($prevtrans as $transition) {
