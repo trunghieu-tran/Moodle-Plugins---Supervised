@@ -258,7 +258,7 @@ abstract class qtype_preg_fa_node {
     }
 
 
-    public static function get_wordbreaks_transitions($negative, $isinto, $wordbreak) {
+    public static function get_wordbreaks_transitions($negative, $isinto) {
         $result = array();
         // Create transitions which can replace \b and \B.
         // Create \w.
@@ -338,8 +338,8 @@ abstract class qtype_preg_fa_node {
             $stack_item['start'] = $state;
         }
 
-        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true, $tran);
-        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false, $tran);
+        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
+        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
 
         // Intersect transitions.
         for ($i = 0; $i < count($wordbreakinto); $i++) {
