@@ -60,7 +60,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         if ($response !== null) {
             $bestfit = $this->question->get_best_fit_answer($response);
             $matchresults = $bestfit['match'];
-            return $this->could_show_hint($matchresults, false);
+            return $this->could_show_hint($matchresults, false) && $bestfit['answer']->fraction >= $this->question->hintgradeborder;
         }
         return false;
     }
