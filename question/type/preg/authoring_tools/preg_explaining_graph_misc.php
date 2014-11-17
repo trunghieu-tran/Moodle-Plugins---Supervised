@@ -620,7 +620,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $result = '';
         if (count($lbl)) {
             if (count($lbl) == 1) {
-                if ($invert || textlib::strlen($lbl[0]) != 1) {
+                if ($invert || core_text::strlen($lbl[0]) != 1) {
                     $elements[] = $lbl[0];
                 } else {
                     return '"' . $lbl[0] . '"';

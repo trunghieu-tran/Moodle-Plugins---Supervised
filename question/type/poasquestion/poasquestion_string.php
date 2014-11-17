@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class qtype_poasquestion_string extends textlib implements ArrayAccess {
+class qtype_poasquestion_string extends core_text implements ArrayAccess {
     /** @var string the utf-8 string itself. */
     private $fstring;
     /**@var int length of the string, calculated when the string is modified. */

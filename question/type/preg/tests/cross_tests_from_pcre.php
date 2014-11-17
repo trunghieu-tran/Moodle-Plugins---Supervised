@@ -673,8 +673,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>9),
                         'ext_index_first'=>array(0=>0,1=>1,2=>3,3=>5),
                         'ext_length'=>array(0=>6,1=>1,2=>1,3=>1),
-                        'left'=>array(5),
-                        'next'=>'\d',
+                        'left'=>array(0),
+                        'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'1.2.3',
@@ -2543,8 +2543,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>15),
                         'ext_index_first'=>array(0=>0),
                         'ext_length'=>array(0=>11),
-                        'left'=>array(1),
-                        'next'=>'[^k]',
+                        'left'=>array(0),
+                        'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'1234567@a.b.c.d',

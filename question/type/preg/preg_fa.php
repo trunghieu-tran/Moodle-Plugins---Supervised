@@ -30,73 +30,6 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 
 /**
- * Represents a tag for FA transitions. Basically it corresponds to original AST node
- * which contains subpattern number and some other flags.
- */
-class qtype_preg_fa_tag {
-    // Type of the tag: opening or closing subpattern
-    const TYPE_OPEN = 0x0001;
-    const TYPE_CLOSE = 0x0002;
-
-    public $type;
-    public $pregnode;
-
-    public function __construct($type, $pregnode) {
-        $this->type = $type;
-        $this->pregnode = $pregnode;
-    }
-}
-
-/**
- * Helper class for tag sets. Each transition initially has one set (array) of tags.
- */
-class qtype_preg_fa_tag_set {
-
-    // When should this tag set be written: before or after a transition match
-    const POS_BEFORE_TRANSITION = 0x0004;
-    const POS_AT_TRANSITION = 0x0008;
-    const POS_AFTER_TRANSITION = 0x0010;
-
-    public $pos;
-
-    /** @var array of qtype_preg_fa_tag objects - tags in this set. */
-    public $tags = array();
-
-    private $minopentag = false;
-
-    public function __construct($pos = self::POS_AT_TRANSITION) {
-        $this->pos = $pos;
-    }
-
-    /**
-     * Returns an opening tag of this set which has the minimal subpattern number.
-     */
-    public function min_open_tag() {
-        if ($this->minopentag !== false) {
-            return $this->minopentag;
-        }
-        $this->minopentag = null;
-        foreach ($this->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN) {
-                continue;
-            }
-            if ($this->minopentag === null || $this->minopentag->pregnode->subpattern > $tag->pregnode->subpattern) {
-                $this->minopentag = $tag;
-            }
-        }
-        return $this->minopentag;
-    }
-
-    /**
-     * Sets position (before or after transition) for all tags of this set.
-     */
-    public function set_tags_position($pos) {
-        $this->pos = $pos;
-
-    }
-}
-
-/**
  * Represents a finite automaton transition.
  */
 class qtype_preg_fa_transition {
@@ -130,14 +63,17 @@ class qtype_preg_fa_transition {
     public $to;
     /** @var greediness of this transition. */
     public $greediness;
+    /** @var array of qtype_preg_node objects - subpatterns opened by this transition */
+    public $opentags;
+    /** @var array of qtype_preg_node objects - subpatterns closed by this transition */
+    public $closetags;
+    public $minopentag;
     /** @var type of the transition - should be equal to a constant defined in this class. */
     public $type;
     /** @var origin of the transition - should be equal to a constant defined in this class. */
     public $origin;
     /** @var bool - TODO. */
     public $consumeschars;
-    /** @var array of qtype_preg_fa_tag_set - initially each transition has 1 set of tags at index 0. */
-    public $tagsets;
     /** @var bool - does this transition start a backreferenced subexpression(s)? */
     public $startsbackrefedsubexprs;
     /** @var bool - does this transition start a quantifier? */
@@ -146,17 +82,21 @@ class qtype_preg_fa_transition {
     public $endsquantifier;
     /** @var bool - does this transition make a infinite quantifier loop? */
     public $loopsback;
-    /** @var array of qtype_preg_fa_tag - cached value for flatten_tags() method. */
-    private $flattentags;
+
+    /** Array of qtype_preg_fa_transition objects merged to this transition and matched before it. Note that:
+      a) Merged transitions are expected to be zero-length (simple assertions, epsilons)
+      b) Max 'nestedness' level is 2, i.e. you are not expected to merge transitions into merged transitions
+      c) You should guarantee that merged transitins are placed in the same order as they occurred originally */
+    public $mergedbefore;
+
+    /** Array of qtype_preg_fa_transition objects merged to this transition and matched after it. */
+    public $mergedafter;
+
+    private $allopentags;
+    private $allclosetags;
+
     /** @var bool - is the transition result of merging? */
     private $ismerged;
-
-    public function __clone() {
-        $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
-        foreach ($this->tagsets as $key => $set) {
-            $this->tagsets[$key] = clone $set;
-        }
-    }
 
     public function __toString() {
         return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
@@ -167,16 +107,255 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
         $this->greediness = self::GREED_GREEDY;
+        $this->opentags = array();
+        $this->closetags = array();
+        $this->minopentag = null;
         $this->type = null; // TODO
         $this->origin = $origin;
         $this->consumeschars = $consumeschars;
-        $this->tagsets = array(0 => new qtype_preg_fa_tag_set(qtype_preg_fa_tag_set::POS_AT_TRANSITION));
         $this->startsbackrefedsubexprs = false;
         $this->startsquantifier = false;
         $this->endsquantifier = false;
         $this->loopsback = false;
-        $this->flattentags = null;
+        $this->mergedbefore = array();
+        $this->mergedafter = array();
+        $this->allopentags = null;
+        $this->allclosetags = null;
         $this->ismerged = false;
+    }
+
+    public function __clone() {
+        $this->pregleaf = clone $this->pregleaf;
+        $mergedbefore = $this->mergedbefore;
+        $this->mergedbefore = array();
+        foreach ($mergedbefore as $before) {
+            $newbefore = clone $before;
+            $this->mergedbefore[] = $newbefore;
+        }
+        $mergedafter = $this->mergedafter;
+        $this->mergedafter = array();
+        foreach ($mergedafter as $after) {
+            $newafter = clone $after;
+            $this->mergedafter[] = $newafter;
+        }
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
+
+        if ($this->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
+            return $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+        }
+
+        $circumflex = array('before' => false, 'after' => false);
+        $dollar = array('before' => false, 'after' => false);
+        $capz = array('before' => false, 'after' => false);
+        $condassert = array('before' => false, 'after' => false);
+        $key = 'before';
+        $epscount = 0;
+
+        foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
+            foreach ($assertions as $assertion) {
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                }
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+                }
+                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                    $circumflex[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                    $dollar[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                    $capz[$key] = true;
+                }
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
+                    $condassert[$key] = true;
+                    $condassertindex = array_search($assertion, $assertions);
+                }
+                else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    $epscount++;
+                }
+
+            }
+
+            $key = 'after';
+        }
+
+        // Check all the returned ranges.
+        $ranges = $this->pregleaf->next_character_ranges($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar['before'], $circumflex['after']);
+
+        if (empty($ranges)) {
+            return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+        }
+
+        if (count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
+            // There are no merged assertions.
+            return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($ranges[0][0])));
+        }
+
+
+        if ($dollar['before'] || $capz['before']) {
+            // There are end string assertions.
+            if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
+                if ($capz['before']) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion_string("\n"));
+                }
+                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+            }
+        } else if ($circumflex['after']) {
+            // There are start string assertions.
+            if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
+                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+            }
+        }
+        if ($condassert['before']) {
+            $list = $this->mergedbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+            if ($list[0] === qtype_preg_leaf::NEXT_CHAR_OK) {
+                $result = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+                if (count($result) != 0) {
+                    return array(qtype_preg_leaf::NEXT_CHAR_OK, $result[0]);    // TODO: возвращать нужно все-таки символ этого листа, а не то что было в ассерте
+                }
+            }
+        }
+
+        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+    }
+
+    public function is_start_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor() &&  empty($this->mergedbefore));
+    }
+
+    public function is_end_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor() &&  empty($this->mergedafter));
+    }
+
+    public function is_both_anchor() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_end_anchor() && !empty($this->mergedafter) ||
+                $this->pregleaf->is_start_anchor() && !empty($this->mergedbefore)));
+    }
+
+    /**
+     * Find intersection of asserts.
+     *
+     * @param other - the second assert for intersection.
+     * @return assert, which is intersection of ginen.
+     */
+    public function intersect_asserts($other) {
+
+        // Adding assert to array.
+        $thisclone = clone($this);
+        if ($this->is_start_anchor()) {
+            $this->mergedafter[] = $thisclone;
+        } else if ($this->is_end_anchor()) {
+            $this->mergedbefore[] = $thisclone;
+        }
+
+
+        $otherclone = clone($other);
+        if ($other->is_start_anchor()) {
+            $other->mergedafter[] = $otherclone;
+        } else if ($other->is_end_anchor()){
+            $other->mergedbefore[] = $otherclone;
+        }
+
+        $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
+        $resultafter = array_merge($this->mergedafter, $other->mergedafter);
+        // Removing same asserts.
+        for ($i = 0; $i < count($resultbefore); $i++) {
+            for ($j = ($i+1); $j < count($resultbefore); $j++) {
+                if ($resultbefore[$i]->pregleaf->subtype == $resultbefore[$j]->pregleaf->subtype) {
+                    unset($resultbefore[$j]);
+                    $resultbefore = array_values($resultbefore);
+                    $j--;
+                }
+            }
+        }
+
+        for ($i = 0; $i < count($resultafter); $i++) {
+            for ($j = ($i+1); $j < count($resultafter); $j++) {
+                if ($resultafter[$i]->pregleaf->subtype == $resultafter[$j]->pregleaf->subtype) {
+                    unset($resultafter[$j]);
+                    $resultafter = array_values($resultafter);
+                    $j--;
+                }
+            }
+        }
+
+        $resultbefore = array_values($resultbefore);
+        $resultafter = array_values($resultafter);
+        foreach ($resultbefore as $tran) {
+            $before[] = $tran->pregleaf;
+        }
+        foreach ($resultafter as $tran) {
+            $after[] = $tran->pregleaf;
+        }
+        foreach ($resultafter as $assert) {
+            $key = array_search($assert, $resultafter);
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                // Searching compatible asserts.
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_ESC_A, $after)) {
+                    unset($resultafter[$key]);
+                    $resultafter = array_values($resultafter);
+                }
+            }
+        }
+
+        foreach ($resultbefore as $assert) {
+            $key = array_search($assert, $resultbefore);
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                // Searching compatible asserts.
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $before) || qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z, $before)) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
+                }
+
+            }
+            if ($assert->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                // Searching compatible asserts.
+                if (qtype_preg_leaf::contains_node_of_subtype(qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z, $before)) {
+                    unset($resultbefore[$key]);
+                    $resultbefore = array_values($resultbefore);
+                }
+
+            }
+        }
+
+        // Getting result leaf.
+        if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET || $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+            $assert = clone $this;
+        } else if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+            $assert = clone $other;
+        } else {
+            if (count($resultbefore) != 0) {
+                $assert = clone $resultbefore[0];
+                unset($resultbefore[0]);
+            } else if (count($resultafter) != 0) {
+                $assert = $resultafter[0];
+                unset($resultafter[0]);
+            } else {
+                $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                $assert = new qtype_preg_fa_transition(0, $pregleaf, 1);
+            }
+        }
+        $assert->mergedbefore = $resultbefore;
+        $assert->mergedafter = $resultafter;
+        if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            if ($this->is_start_anchor()) {
+                unset($this->mergedafter[0]);
+            } else {
+                unset($this->mergedbefore[0]);
+            }
+        }
+        if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+            if ($other->is_start_anchor()) {
+                unset($other->mergedafter[0]);
+            } else {
+                unset($other->mergedbefore[0]);
+            }
+        }
+        return $assert;
     }
 
     /**
@@ -187,7 +366,8 @@ class qtype_preg_fa_transition {
     }
 
     public function clear_cache() {
-        $this->flattentags = null;
+        $this->allopentags = null;
+        $this->allclosetags = null;
     }
 
     public function is_merged() {
@@ -198,24 +378,51 @@ class qtype_preg_fa_transition {
         $this->ismerged = true;
     }
 
-    /**
-     * Returns 1-dimensional array of all tags from all sets in this transition.
-     */
-    public function flatten_tags() {
-        if ($this->flattentags !== null) {
-            return $this->flattentags;
+    public function all_open_tags() {
+        if ($this->allopentags !== null) {
+            return $this->allopentags;
         }
-        $this->flattentags = array();
-        foreach ($this->tagsets as $set) {
-            $this->flattentags = array_merge($this->flattentags, $set->tags);
+        $this->allopentags = array();
+        foreach ($this->mergedbefore as $merged) {
+            foreach ($merged->opentags as $tag) {
+                $this->allopentags[] = $tag;
+            }
         }
-        return $this->flattentags;
+        foreach ($this->opentags as $tag) {
+            $this->allopentags[] = $tag;
+        }
+        foreach ($this->mergedafter as $merged) {
+            foreach ($merged->opentags as $tag) {
+                $this->allopentags[] = $tag;
+            }
+        }
+        return $this->allopentags;
+    }
+
+    public function all_close_tags() {
+        if ($this->allclosetags !== null) {
+            return $this->allclosetags;
+        }
+        $this->allclosetags = array();
+        foreach ($this->mergedbefore as $merged) {
+            foreach ($merged->closetags as $tag) {
+                $this->allclosetags[] = $tag;
+            }
+        }
+        foreach ($this->closetags as $tag) {
+            $this->allclosetags[] = $tag;
+        }
+        foreach ($this->mergedafter as $merged) {
+            foreach ($merged->closetags as $tag) {
+                $this->allclosetags[] = $tag;
+            }
+        }
+        return $this->allclosetags;
     }
 
     public function get_label_for_dot($index1, $index2) {
         $clone = clone $this;
         $clone->clear_cache();
-        $clone->flatten_tags();
         $addedcharacters = '/(), ';
         if (strpbrk($index1, $addedcharacters) !== false) {
             $index1 = '"' . $index1 . '"';
@@ -230,11 +437,27 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
-        $open = $clone->open_tags_tohr();
-        $close = $clone->close_tags_tohr();
-        $lab = $this->pregleaf->leaf_tohr();
-        $lab = '"' . $open . ' ' . str_replace('"', '\"', $lab) . ' ' . $close . '"';
+        $lab = '"';
+        foreach ($clone->mergedbefore as $before) {
+            $open = $before->tags_before_transition();
+            $close = $before->tags_after_transition();
+            $label = $before->pregleaf->leaf_tohr();
+            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
+            $lab .= '(' . $before->from . ',' . $before->to . ')';
+        }
+        $open = $clone->tags_before_transition();
+        $close = $clone->tags_after_transition();
+        $label = $this->pregleaf->leaf_tohr();
+        $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
 
+        foreach ($clone->mergedafter as $after) {
+            $open = $after->tags_before_transition();
+            $close = $after->tags_after_transition();
+            $label = $after->pregleaf->leaf_tohr();
+            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close ;
+            $lab .= '(' . $after->from . ',' . $after->to . ')';
+        }
+        $lab .= '"';
         $thickness = 2;
         if ($this->greediness == self::GREED_LAZY) {
             $thickness = 1;
@@ -260,11 +483,13 @@ class qtype_preg_fa_transition {
     /**
      * Copies tags from other transition in this transition.
      */
-    public function unite_tags($other) {
-        // TODO
-        // По идее нужно объединять set'ы параллельным образом: нулевой с нулевым, первый с первым и т.д.
-        // И просто дописывать когда сеты в одном кончились, а в другом еще есть
-        $this->tagsets = array_values(array_merge($this->tagsets, $other->tagsets));
+    public function unite_tags($other, $result) {
+        $cloneother = clone $other;
+        $clonethis = clone $this;
+        //var_dump($this->get_label_for_dot(0,1));
+        // Normal intersection.
+        $result->opentags = array_merge($clonethis->opentags, $cloneother->opentags);
+        $result->closetags = array_merge($clonethis->closetags, $cloneother->closetags);
     }
 
     /**
@@ -276,6 +501,25 @@ class qtype_preg_fa_transition {
         $thishastags = $this->has_tags();
         $otherhastags = $other->has_tags();
         $resulttran = null;
+        // Consider that eps and transition which doesn't consume characters always intersect
+        if ($this->is_eps() && $other->consumeschars == false) {
+            $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
+            if ($resulttran !== null) {
+                $this->unite_tags($other, $resulttran);
+            }
+            return $resulttran;
+        }
+        if ($other->is_eps() && $this->consumeschars == false) {
+            $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
+            if ($resulttran !== null) {
+                $this->unite_tags($other, $resulttran);
+            }
+            return $resulttran;
+        }
+        if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
+            || $other->is_unmerged_assert() && $other->consumeschars == false && (!$this->is_eps() && !$this->is_unmerged_assert())) {
+            return null;
+        }
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
             if (($this->is_eps() || $this->is_unmerged_assert()) && (!$other->is_eps() && !$other->is_unmerged_assert())) {
@@ -286,8 +530,11 @@ class qtype_preg_fa_transition {
                 $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
             }
         }
-        if ($resulttran !== null) {
-            $resulttran->unite_tags($other);
+        if ($resulttran !== null ) {
+            $this->unite_tags($other, $resulttran);
+            $assert = $this->intersect_asserts($other);
+            $resulttran->mergedafter = $assert->mergedafter;
+            $resulttran->mergedbefore = $assert->mergedbefore;
         }
         return $resulttran;
     }
@@ -296,8 +543,9 @@ class qtype_preg_fa_transition {
      * Returns true if transition has any tag.
      */
     public function has_tags() {
-        $tmp = $this->flatten_tags();
-        return !empty($tmp);
+        $open = $this->all_open_tags();
+        $close = $this->all_close_tags();
+        return (!empty($open) || !empty($close));
     }
 
     /**
@@ -314,12 +562,8 @@ class qtype_preg_fa_transition {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_B  && $this->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_ESC_G);
     }
 
-    public function is_start_anchor() {
-        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor();
-    }
-
-    public function is_end_anchor() {
-        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor();
+    public function is_wordbreak() {
+        return $this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B;
     }
 
     /**
@@ -335,216 +579,33 @@ class qtype_preg_fa_transition {
         }
     }
 
-    public function open_tags_tohr() {
-        static $map = array(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION => array('(', ')'),
-                            qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
-                            qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
+    private function this_tags_tohr($open, $close) {
+        //return '';  // uncomment when needed
+
         $result = '';
-        foreach ($this->tagsets as $set) {
-            $numbers = array();
-            foreach ($set->tags as $tag) {
-                if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN) {
-                    $numbers[] = $tag->pregnode->subpattern;
-                }
+        if ($open) {
+            $result .= 'o:';
+            foreach ($this->opentags as $tag) {
+                $result .= $tag->subpattern . ',';
             }
-            if (!empty($numbers)) {
-                $result .= $map[$set->pos][0] . implode(',', $numbers) . $map[$set->pos][1];
+        }
+        if ($close) {
+            $result .= 'c:';
+            foreach ($this->closetags as $tag) {
+                $result .= $tag->subpattern . ',';
             }
         }
         return $result;
     }
 
-    public function close_tags_tohr() {
-        static $map = array(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION => array('(', ')'),
-                            qtype_preg_fa_tag_set::POS_AT_TRANSITION => array('[', ']'),
-                            qtype_preg_fa_tag_set::POS_AFTER_TRANSITION => array('{', '}'));
-        $result = '';
-        foreach ($this->tagsets as $set) {
-            $numbers = array();
-            foreach ($set->tags as $tag) {
-                if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE) {
-                    $numbers[] = $tag->pregnode->subpattern;
-                }
-            }
-            if (!empty($numbers)) {
-                $result .= $map[$set->pos][0] . implode(',', $numbers) . $map[$set->pos][1];
-            }
-        }
-        return $result;
+    public function tags_before_transition() {
+        return $this->this_tags_tohr(true, false);
+    }
+
+    public function tags_after_transition() {
+        return $this->this_tags_tohr(false, true);
     }
 }
-
-/**
- * Class for finite automaton group of states.
- */
- class qtype_preg_fa_group {
-    /** @var reference to qtype_preg_fa object this group of states belongs to. */
-    protected $fa;
-    /** @var array of int ids of states, which include in this group. */
-    protected $states;
-    /** @var first character on which it made transition to this group. */
-    protected $char;
-    /** @var array of qtype_preg_fa_group through which are in this group. */
-    public $prev_groups;
-
-    public function __construct($fa = null) {
-        $this->fa = $fa;
-        $this->states = array();
-        $this->char = 0;
-        $this->prev_groups = array();
-    }
-
-    /**
-     * Change reference to qtype_preg_fa object this group of states belongs to.
-     *
-     * @param fa - a reference to new automata.
-     */
-    public function set_fa($fa) {
-        $this->fa = $fa;
-    }
-
-    /**
-     * Return character on which it made transition to this group.
-     */
-    public function get_char() {
-        return $this->char;
-    }
-
-    /**
-     * Change character on which it made transition to this group.
-     *
-     * @param char - new character on which it made transition to this group.
-     */
-    public function set_char($char) {
-        $this->char = $char;
-    }
-
-    /**
-     * Return array of int ids of states, which include in this group.
-     */
-    public function get_states() {
-        return $this->states;
-    }
-
-    /**
-     * Append new state in group.
-     *
-     * @param state - new state, which include in this group.
-     */
-    public function add_state($state) {
-        $this->state[] = $state;
-    }
-
-    /**
-     * Return array of group through which are in this group.
-     */
-    public function get_prev_groups() {
-        return $this->prev_groups;
-    }
-
-    /**
-     * Fill array of group through which are in this group.
-     *
-     * @param prev_groups - new array of group through which are in this group.
-     */
-    public function fill_prev_groups($prev_groups) {
-        $this->prev_groups = $prev_groups;
-    }
-
-    /**
-     * Compare two groups.
-     *
-     * @param another - group of states for compare.
-     */
-    public function cmpgroup($another) {
-        if (count($this->states) != count($another->states)) {
-            return false;
-        }
-        foreach ($this->states as $thisstate) {
-            $find = false;
-            foreach ($another->states as $anotherstate) {
-                if ($thisstate == $anotherstate) {
-                    $find = true;
-                }
-            }
-            if ($find != true) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public function is_empty() {
-        return (count($this->states) == 0);
-    }
-
-    public function has_end_states() {
-        $endstates = $this->fa->end_states();
-        foreach ($this->states as $thisstate) {
-            foreach ($endstates as $endstate) {
-                if ($thisstate == $endstate) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Create string with way.
-     *
-     * @param another - group of states from another automata.
-     */
-    public function way_to_string($another) {
-        $string = '';
-        for ($i = 0; $i < count($this->prev_groups); $i++) {
-            if($i != 0) {
-                $string .= '-['.$this->prev_groups[$i]->char.']->';
-            }
-            $string .= '[(';
-            for ($j = 0; $j < count($this->prev_groups[$i]->states); $j++) {
-                $string .= $this->fa->statenumbers[$this->prev_groups[$i]->states[$j]];
-                if ($j != count($this->prev_groups[$i]->states) - 1) {
-                    $string .= ',';
-                }
-            }
-            $string .= '),(';
-            for ($j = 0; $j < count($another->prev_groups[$i]->states); $j++) {
-                $string .= $another->fa->statenumbers[$another->prev_groups[$i]->states[$j]];
-                if ($j != count($another->prev_groups[$i]->states) - 1) {
-                    $string .= ',';
-                }
-            }
-            $string .= ')]';
-        }
-        $string .= '-['.$this->char.']->';
-        if (count($this->states) == 0) {
-            $string .= 'no';
-        }
-        else {
-            for ($j = 0; $j < count($this->states); $j++) {
-                $string .= $this->fa->statenumbers[$this->states[$j]];
-                if ($j != count($this->states) - 1) {
-                    $string .= ',';
-                }
-            }
-        }
-        $string .= '),(';
-        if (count($another->states) == 0) {
-            $string .= 'no';
-        }
-        else {
-            for ($j = 0; $j < count($another->prev_groups[$i]->states); $j++) {
-                $string .= $another->fa->statenumbers[$another->prev_groups[$i]->states[$j]];
-                if ($j != count($another->prev_groups[$i]->states) - 1) {
-                    $string .= ',';
-                }
-            }
-        }
-        $string .= ')]';
-        return $string;
-    }
- }
 
 /**
  * Represents a finite automaton. Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa.
@@ -798,28 +859,30 @@ class qtype_preg_fa {
         foreach ($states as $state) {
             $outgoing = $this->get_adjacent_transitions($state, true);
             foreach ($outgoing as $transition) {
-                $tags = $transition->flatten_tags();
-                foreach ($tags as $tag) {
+                $opentags = $transition->all_open_tags();
+                $closetags = $transition->all_close_tags();
+                $alltags = array_merge($opentags, $closetags);
+                foreach ($alltags as $tag) {
                     // Skip all non-subpatterns
-                    if ($tag->pregnode->subpattern == -1) {
+                    if ($tag->subpattern == -1) {
                         continue;
                     }
-                    if ($subexpronly && $tag->pregnode->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->pregnode->subpattern != $this->handler->get_ast_root()->subpattern) {
+                    if ($subexpronly && $tag->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->subpattern != $this->handler->get_ast_root()->subpattern) {
                         continue;
                     }
                     $keys = array();
 
                     if ($subexpronly) {
                         // Add subexpression number as a key
-                        if ($tag->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
-                            $keys[] = $tag->pregnode->number;
+                        if ($tag->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+                            $keys[] = $tag->number;
                         }
-                        if ($tag->pregnode->subpattern == $this->handler->get_ast_root()->subpattern) {
+                        if ($tag->subpattern == $this->handler->get_ast_root()->subpattern) {
                             $keys[] = 0;
                         }
                     } else {
                         // Add subpattern number as a key
-                        $keys[] = $tag->pregnode->subpattern;
+                        $keys[] = $tag->subpattern;
                     }
 
                     $keys = array_values($keys);
@@ -830,10 +893,10 @@ class qtype_preg_fa {
                         if (!array_key_exists($key, $endstates)) {
                             $endstates[$key] = array();
                         }
-                        if ($tag->type == qtype_preg_fa_tag::TYPE_OPEN && !in_array($transition->from, $startstates[$key])) {
+                        if (in_array($tag, $opentags) && !in_array($transition->from, $startstates[$key])) {
                             $startstates[$key][] = $transition->from;
                         }
-                        if ($tag->type == qtype_preg_fa_tag::TYPE_CLOSE && !in_array($transition->to, $endstates[$key])) {
+                        if (in_array($tag, $closetags) && !in_array($transition->to, $endstates[$key])) {
                             $endstates[$key][] = $transition->to;
                         }
                     }
@@ -967,11 +1030,11 @@ class qtype_preg_fa {
                             ? $id
                             : $this->statenumbers[$id];
                 $tmp = '"' . $realnumber . '"';
-                if (in_array($id, $this->start_states())) {
+               /* if (in_array($id, $this->start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
                 } else if (in_array($id, $this->end_states())) {
                     $end .= "   {$tmp}[shape=doublecircle];\n";
-                }
+                }*/
 
                 $outgoing = $this->get_adjacent_transitions($id, true);
                 foreach ($outgoing as $transition) {
@@ -1139,17 +1202,22 @@ class qtype_preg_fa {
         // Remember transitions to be added and remove them.
         $toadd = array();
         foreach ($transitions as $transition) {
-            $toadd[] = $transition;
             $this->remove_transition($transition);
-        }
-
-        // Change "from" and "to" and add the transitions again.
-        foreach ($toadd as $transition) {
+            // Change "from" and "to" and add the transitions again.
             if ($transition->from == $oldstateid) {
                 $transition->from = $newstateid;
             }
             if ($transition->to == $oldstateid) {
                 $transition->to = $newstateid;
+            }
+            // Redirect merged transitions too.
+            foreach ($transition->mergedbefore as &$merged) {
+                $merged->from = $transition->from;
+                $merged->to = $transition->to;
+            }
+            foreach ($transition->mergedafter as &$merged) {
+                $merged->from = $transition->from;
+                $merged->to = $transition->to;
             }
             $this->add_transition($transition);
         }
@@ -1433,88 +1501,8 @@ class qtype_preg_fa {
      * @return boolean true if this FA equal to $another.
      */
     public function compare_fa($another, &$differences) {
-        // TODO - streltsov.
+        // TODO
         return false;
-        if ($P->has_end_states() != $Q->has_end_states()) {
-            $P->way_to_string($Q);
-            if ($P->has_end_states()) {
-                $error = $error.' Only first automata has endstate.';
-            }
-            else {
-                $error = $error.' Only second automata has endstate.';
-            }
-            $differences[] = $error;
-
-        }
-        else {
-            // Append pair of groups in fifo and stack of groups
-        }
-            unset($fifo[count($fifo)-1]);
-            $P = $fifo[count($fifo)-1];
-            unset($fifo[count($fifo)-1]);
-            // Convert transition.
-            $firsttransitionto = array();
-            $secondtransitionto = array();
-            $states = $P->get_states();
-            foreach ($states as $state) {
-                foreach ($this->get_adjacent_transitions($state, true) as $transit) {
-                    $firsttransitionto[] = $transit->to;
-                    // TODO - convert ranges.
-                }
-            }
-            $states = $Q->get_states();
-            foreach ($states as $state) {
-                foreach ($another->get_adjacent_transitions($state, true) as $transit) {
-                    $firsttransitionto[] = $transit->to;
-                    // TODO - convert ranges.
-                }
-            }
-            // Creates pairs of groups.
-            $allend = true;
-            while($allend == false) {
-                // TODO - Search next pair.
-                $p = new qtype_preg_fa_group($this);
-                $q = new qtype_preg_fa_group($another);
-                // Check pair.
-                $ismet = false;
-                /* TODO
-                for ($i = 0; $i < count($stack) - 1; $i++) {
-                    if ($p->cmpgroup($stack[$i]) && $q->cmpgroup($stack[$i + 1])) {
-                        $ismet = true;
-                    }
-                }*/
-                if ($ismet == true) {
-                    if ($p->is_empty() != $q->is_empty()) {
-                        $error = $p->way_to_string($q);
-                        if ($p->is_empty()) {
-                            $error .= ' Only first automata has transition.';
-                        }
-                        else {
-                            $error .= ' Only second automata has transition.';
-                        }
-                        $differences[] = $error;
-                        $isequiv = false;
-                    }
-                    else if ($p->has_end_states() != $q->has_end_states()) {
-                        $error = $p->way_to_string($q);
-                        if ($p->has_end_states()) {
-                            $error .= ' Only first automata has endstates.';
-                        }
-                        else {
-                            $error .= ' Only second automata has endstates.';
-                        }
-                        $differences[] = $error;
-                        $isequiv = false;
-                    }
-                    if ((count($differences) == 0) && $isequiv == true) {
-                        // Append pair of groups in fifo and stack of groups
-                        $fifo[] = $P;
-                        $fifo[] = $Q;
-                        $stack[0][] = $P;
-                        $stack[1][] = $Q;
-                    }
-                }
-            }
     }
 
     /**
@@ -1574,358 +1562,6 @@ class qtype_preg_fa {
         return $issuccessful;
     }
 
-    /**
-     * Define wether merging is necessary or not.
-     *
-     * @return - boolean flag wether merging is necessary or not.
-     */
-    public function merging_is_necessary() {
-        $states = $this->get_states();
-        foreach ($states as $state) {
-            $transitions = $this->get_adjacent_transitions($state, true);
-            foreach ($transitions as $tran) {
-                if ($tran->is_unmerged_assert()) {
-                    if ($tran->pregleaf->is_start_anchor() && !in_array($tran->from, $this->start_states())) {
-                        return true;
-                    } else if ($tran->pregleaf->is_end_anchor() && !in_array($tran->to, $this->end_states())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Merging transitions without merging states.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    public function go_round_transitions($del) {
-        $clonetransitions = array();
-        $tagsets = array();
-        $oppositetransitions = array();
-
-
-        if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
-            $transitions = $this->get_adjacent_transitions($del->from, false);
-        } else {
-            $transitions = $this->get_adjacent_transitions($del->to, true);
-            if ($del->is_unmerged_assert() && $del->pregleaf->is_both_anchor()) {
-                $oppositetransitions = $this->get_adjacent_transitions($del->from, false);
-                if (empty($oppositetransitions)) {
-                    return false;
-                }
-                // Copy after-tags.
-                $sets = array();
-                foreach ($del->tagsets as &$set) {
-                    $copytags = array();
-                    foreach ($set->tags as $tag) {
-                        if ($tag->pos == qtype_preg_fa_tag_set::POS_AFTER_TRANSITION) {
-                            $copytags[] = $tag;
-                            unset($set->tags[array_search($tag, $set->tags)]);
-                        }
-                    }
-                    $newset = new qtype_preg_fa_tag_set(qtype_preg_fa_tag_set::POS_AT_TRANSITION);  // TODO!!!
-                    $newset->tags = $copytags;
-                    $sets[] = $newset;
-                    if (empty($set->tags)) {
-                        unset($del->tagsets[array_search($set, $del->tagsets)]);
-                    }
-                }
-                foreach ($oppositetransitions as $opposite) {
-                    // Copy after assertions.
-                    $leaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-                    $leaf->assertionsafter = $del->pregleaf->assertionsafter;
-                    $newleaf = $opposite->pregleaf->intersect_asserts($leaf);
-                    $opposite->pregleaf = $newleaf;
-                    $del->pregleaf->assertionsafter = array();
-
-                    $tagsets = array_merge($opposite->tagsets, $sets);
-                    $opposite->tagsets = $tagsets;
-                }
-            }
-        }
-        // Changing leafs in case of merging.
-        foreach ($transitions as $transition) {
-            if ($transition->from != $transition->to || $transition->is_merged() == false) {
-                $tran = clone($transition);
-                $tran->greediness = qtype_preg_fa_transition::min_greediness($transition->greediness, $del->greediness);
-                $tagsets = array();
-                // Work with tags.
-                if ($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor() || ($del->is_eps() && in_array($del->to, $this->end_states()))) {
-                    foreach ($del->tagsets as &$set) {
-                        $del->get_label_for_dot($del->from, $del->to);
-                        $set->set_tags_position(qtype_preg_fa_tag_set::POS_AFTER_TRANSITION);
-                    }
-                    $tagsets = array_merge($transition->tagsets, $del->tagsets);
-                } else {
-                    foreach ($del->tagsets as &$set) {
-                        //$del->get_label_for_dot($del->from, $del->to);
-                        $set->set_tags_position(qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION);
-                    }
-                    $tagsets = array_merge($del->tagsets, $transition->tagsets);
-                }
-                $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
-                $tran->pregleaf = $newleaf;
-                $tran->tagsets = $tagsets;
-
-                $clonetransitions[] = $tran;
-            }
-        }
-        // Has deleting or changing transitions.
-        if (count($transitions) != 0) {
-            if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to,$this->end_states()))) {
-                foreach ($clonetransitions as $tran) {
-                    $tran->from = $del->from;
-                    $tran->make_merged();
-                    $this->add_transition($tran);
-                }
-            } else {
-                foreach ($clonetransitions as $tran) {
-                    $tran->to = $del->to;
-                    $tran->make_merged();
-                    $this->add_transition($tran);
-
-                }
-            }
-            $this->remove_transition($del);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Merging states connected by uncapturing transition.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    public function merge_states($del) {
-        // Getting real numbers of new merged state.
-        $numbers = array();
-        // Merging intersection states.
-        if ($this->is_intersectionstate($del->from)) {
-            $fromnumbers = explode(',', $this->statenumbers[$del->from], 2);
-            $tonumbers = explode(',', $this->statenumbers[$del->to], 2);
-            for ($i = 0; $i < 2; $i++) {
-                $numbers[] = $fromnumbers[$i] . '   ' . $tonumbers[$i];
-            }
-            $number = $numbers[0] . ',' . $numbers[1];
-        } else {
-            // Merging simple state.
-            $number = $this->statenumbers[$del->from] . '   ' . $this->statenumbers[$del->to];
-        }
-
-        $this->statenumbers[$del->from] = $number;
-    }
-
-    /**
-     * Merging transitions with merging states.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    public function merge_transitions($del) {
-        $waschanged = false;
-        // Cycle with empty transition
-        if ($del->to == $del->from && $del->is_eps()) {
-            $this-> remove_transition($del);
-        }
-
-        // Transition for merging isn't cycle.
-        if ($del->to != $del->from) {
-            $needredacting = false;
-            $needredactinginto = false;
-            $transitions = $this->get_adjacent_transitions($del->to, true);
-            $intotransitions = $this->get_adjacent_transitions($del->from, false);
-
-            if (($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) || (count($intotransitions) != 0 &&
-                count($del->pregleaf->assertionsbefore) == 0 && $del->pregleaf->type != qtype_preg_node::TYPE_LEAF_ASSERT
-                && !$del->has_tags())) {
-                // Possibility of merging with intotransitions.
-                $transitions = $intotransitions;
-                $needredactinginto = true;
-            } else if (count($transitions) != 0 && $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-                // Possibility of merging with outtransitions.
-                $needredacting = true;
-            } else if ($this->statecount == 2 && $del->is_eps()) {
-                // Possibility to get automata with one state.
-                $this->merge_states($del);
-                // Checking if start state was merged.
-                if ($this->has_endstate($del->to)) {
-                    $this->endstates[0][array_search($del->to, $this->endstates[0])] = $del->from;
-                }
-                $this->remove_state($del->to);
-                $waschanged = true;
-            }
-
-            // Changing leafs in case of merging.
-            foreach ($transitions as $tran) {
-                $tran->unite_tags($del);
-                $newleaf = $tran->pregleaf->intersect_asserts($del->pregleaf);
-                $tran->pregleaf = $newleaf;
-            }
-            // Has deleting or changing transitions.
-            if (count($transitions) !=0) {
-                $this->merge_states($del);
-                // Adding intotransitions from merged state.
-                $intotransitions = $this->get_adjacent_transitions($del->to, false);
-                foreach ($intotransitions as $tran) {
-                    if ($tran != $del) {
-                        $tran->to = $del->from;
-                        $this->add_transition($tran);
-                    }
-                }
-
-                // Adding outtransitions from merged state.
-                if ($needredacting) {
-                    foreach ($transitions as $tran) {
-                        if ($tran->to == $del->from) {
-                            $tran->to = $del->from;
-                        }
-                        $tran->from = $del->from;
-                        $this->add_transition($tran);
-                    }
-                }
-                // Adding intotransitions from merged state if we merge back.
-                if ($needredactinginto) {
-                    $outtransitions = $this->get_adjacent_transitions($del->to, true);
-                    foreach ($outtransitions as $outtran) {
-                        $outtran->from = $del->from;
-                        $this->add_transition($outtran);
-                    }
-                }
-                // Checking if start state was merged.
-                if ($this->has_endstate($del->to)) {
-                    $this->endstates[0][array_search($del->to, $this->endstates[0])] = $del->from;
-                }
-                $this->remove_state($del->to);
-                $waschanged = true;
-            }
-        }
-        return $waschanged;
-    }
-
-    /**
-     * Merging all possible uncaptaring transitions in automata.
-     *
-     * @param transitiontype - type of uncapturing transitions for deleting(eps or simple assertions).
-     * @param stateindex integer index of state of $this automaton with which to start intersection if it is nessessary.
-     */
-    public function merge_uncapturing_transitions($transitiontype) {
-        $newfront = array();
-        $stateschecked = array();
-        // Getting types of uncaptyring transitions.
-        if ($transitiontype == qtype_preg_fa_transition::TYPE_TRANSITION_BOTH) {
-            $trantype1 = qtype_preg_fa_transition::TYPE_TRANSITION_EPS;
-            $trantype2 = qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT;
-        } else {
-            $trantype1 = $transitiontype;
-            $trantype2 = $transitiontype;
-        }
-        $oldfront = $this->start_states();
-        $endstates = $this->end_states();
-        $endmerged = 1;
-
-        foreach ($endstates as $state)
-        {
-            $transitions = $this->get_adjacent_transitions($state, false);
-            foreach ($transitions as $tran) {
-                $tran->set_transition_type();
-                if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
-                    $this->go_round_transitions($tran);
-                }
-            }
-        }
-
-        $i = 0;
-        while (count($oldfront) != 0) {
-            $waschanged = false;
-            // Analysis transitions of each state.
-            foreach ($oldfront as $state) {
-                if (!$waschanged && array_search($state, $stateschecked) === false) {
-                    $transitions = $this->get_adjacent_transitions($state, true);
-                    // Searching transition of given type.
-                    foreach ($transitions as $tran) {
-                        $tran->set_transition_type();
-                        if (($tran->type == $trantype1 || $tran->type == $trantype2)) {
-                            //printf($tran->get_label_for_dot($tran->from, $tran->to));
-                            // Choice of merging way
-                            //$intotransitions = $this->get_adjacent_transitions($tran->to, false);
-                            //if ($stateindex !== null && $tran->from == $stateindex && count($intotransitions) > 1) {
-                             //$newfront[] = $tran->to;
-                                if ($this->go_round_transitions($tran)) {
-                                    $nexttrans = $this->get_adjacent_transitions($state, true);
-                                    if (empty($nexttrans) && !$this->has_endstate($state)) {
-                                        $newfront = array_merge($newfront, array_keys($this->get_adjacent_transitions($state, false)));
-                                        foreach ($newfront as $newstate) {
-                                            if (in_array($newstate, $stateschecked)) {
-                                                $nexttrans = $this->get_adjacent_transitions($newstate, true);
-                                                foreach ($nexttrans as $newtran) {
-                                                    $newfront[] = $newtran->to;
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        while (in_array($state, $stateschecked)) {
-                                            unset($stateschecked[array_search($state, $stateschecked)]);
-                                        }
-                                        $newfront[] = $state;
-                                    }
-
-                                } else {
-                                    $newfront[] = $tran->to;
-                                }
-                               // printf($this->fa_to_dot());
-                                //$waschanged = true;
-                            //} else {
-                              //  if ($tran->to == $stateindex) {
-                                //    $stateindex = $tran->from;
-                                //}
-                                //$waschanged = $this->merge_transitions($tran);
-                            //}
-                            // Adding changed state to new wavefront.
-                            //$newfront[] = $state;
-                            //$addedstate = array_search($state, $stateschecked);
-                            //if ($addedstate !== false) {
-                              //  unset($stateschecked[$addedstate]);
-                            //}
-                            // If nothing changes in automata state is checked.
-                            //if (!$waschanged) {
-                                //$stateschecked[] = $state;
-                                   // $newfront[] = $tran->to;
-
-                            //}
-                            //$outtransitions = $this->get_adjacent_transitions($state, true);
-                            // Delete cycle of uncapturing transition.
-                            //$wasdel = false;
-                            //foreach ($outtransitions as $outtran) {
-                                //if (!$wasdel) {
-                                    //if ($outtran->to == $outtran->from && $outtran->is_unmerged_assert()) {
-                                        //$this-> remove_transition($outtran);
-                                        //unset($newfront[count($newfront)-1]);
-                                        //$wasdel = true;
-                                    //}
-                                //}
-                            //}
-                        } else {
-                            $newfront[] = $tran->to;
-                            //if (array_search($state, $newfront) === false) {
-                                //$newfront[] = $tran->to;
-                                $stateschecked[] = $state;
-                            //}
-                        }
-                    }
-                }
-            }
-            $oldfront = $newfront;
-            $newfront = array();
-            //printf ($this->fa_to_dot());
-            $i++;
-        }
-        //printf ($this->fa_to_dot());
-        $this->remove_unreachable_states();
-        //printf ($this->fa_to_dot());
-    }
 
     /**
      * Get connected with given states in given direction.
@@ -2276,193 +1912,6 @@ class qtype_preg_fa {
         return $transitions;
     }
 
-    public static function get_wordbreaks_transitions($negative, $isinto) {
-
-        $result = array();
-        // Create transitions which can replace \b and \B.
-        // Create \w.
-        $flagbigw = new qtype_preg_charset_flag();
-        $flagbigw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
-        $charsetbigw = new qtype_preg_leaf_charset();
-        $charsetbigw->flags = array(array($flagbigw));
-        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W));
-        $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1);
-        // Create \W.
-        $flagbigw = clone $flagbigw;
-        $flagbigw->negative = true;
-        $charsetbigw = new qtype_preg_leaf_charset();
-        $charsetbigw->flags = array(array($flagbigw));
-        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
-        $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1);
-        // Create ^.
-        $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
-        $transitioncircumflex = new qtype_preg_fa_transition(0, $assertcircumflex, 1);
-        // Create $.
-        $assertdollar = new qtype_preg_leaf_assert_dollar();
-        $transitiondollar = new qtype_preg_fa_transition(0, $assertdollar, 1);
-
-        // Incoming transitions.
-        if ($isinto) {
-            $result[] = $tranbigw;
-            $result[] = $tranbigw;
-            $result[] = $transitioncircumflex;
-            // Case \b.
-            if (!$negative) {
-                $result[] = $tranbigw;
-            } else {
-                // Case \B.
-                $result[] = $tranbigw;
-            }
-        } else {
-            // Outcoming transitions.
-            // Case \b.
-            if (!$negative) {
-                $result[] = $tranbigw;
-                $result[] = $tranbigw;
-                $result[] = $tranbigw;
-            } else {
-                // Case \B.
-                $result[] = $tranbigw;
-                $result[] = $tranbigw;
-                $result[] = $tranbigw;
-            }
-            $result[] = $transitiondollar;
-        }
-
-        return $result;
-    }
-
-    public function merge_wordbreaks($tran) {
-        $fromdel = true;
-        $todel = true;
-        $outtransitions = $this->get_adjacent_transitions($tran->to, true);
-        $intotransitions = $this->get_adjacent_transitions($tran->from, false);
-        $startstates = $this->start_states();
-
-        // Add empty transitions if ot's nessesaary.
-        if (count($outtransitions) == 0) {
-            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $transition = new qtype_preg_fa_transition($tran->to, $pregleaf, 1, $tran->origin, $tran->consumeschars);
-            $outtransitions[] = $transition;
-            $todel = false;
-        }
-        if (count($intotransitions) == 0) {
-            $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $transition = new qtype_preg_fa_transition(0, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
-            $intotransitions[] = $transition;
-            $fromdel = false;
-        }
-
-        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
-        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
-
-        // Intersect transitions.
-        for ($i = 0; $i < count($wordbreakinto); $i++) {
-            foreach ($intotransitions as $intotran) {
-                $resultinto = $intotran->intersect($wordbreakinto[$i]);
-                if ($resultinto !== null) {
-                    foreach ($outtransitions as $outtran) {
-                        $resultout = $outtran->intersect($wordbreakout[$i]);
-                        if ($resultout !== null) {
-                            // Add state and transition
-                            $statenum = '/' . $i;
-                            $statenumbers = $this->get_state_numbers();
-                            while (array_search($statenum, $statenumbers) !== false) {
-                                $statenum = '/' . $statenum;
-                            }
-                            $state = $this->add_state($statenum);
-                            // Check if we should delete start state.
-                            if (in_array($tran->to, $startstates)) {
-                                $this->add_start_state($state);
-                            }
-                            if ($fromdel) {
-                                // Copy transitions from deleting states.
-                                $copiedout = $this->get_adjacent_transitions($tran->from, true);
-                                foreach ($copiedout as $copytran) {
-                                    if ($copytran !== $tran) {
-                                        $copytran->from = $state;
-                                        $this->add_transition($copytran);
-                                    }
-                                }
-                            }
-                            if ($todel) {
-                                // Copy transitions from deleting states.
-                                $copiedinto = $this->get_adjacent_transitions($tran->to, false);
-                                foreach ($copiedinto as $copytran) {
-                                    if ($copytran !== $tran) {
-                                        $copytran->to = $state;
-                                        $this->add_transition($copytran);
-                                    }
-                                }
-                            }
-                            // If result should be one cycled state.
-                            if ($intotran->from == $tran->to) {
-                                $resulttran = new qtype_preg_fa_transition($state, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
-                                $this->add_transition($resulttran);
-                            } else {
-                                $resulttran = new qtype_preg_fa_transition($intotran->from, $resultinto->pregleaf, $state, $tran->origin, $tran->consumeschars);
-                                $this->add_transition($resulttran);
-                                $resulttran = new qtype_preg_fa_transition($state, $resultout->pregleaf, $outtran->to, $tran->origin, $tran->consumeschars);
-                                $this->add_transition($resulttran);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // Check if we should delete end state.
-        $endstates = $this->end_states();
-        if (in_array($tran->from, $endstates)) {
-            $endtran = $this->get_adjacent_transitions($tran->from, false);
-            foreach ($endtran as $end) {
-                $this->add_end_state($end->from);
-            }
-        }
-        if ($fromdel) {
-            $this->remove_state($tran->from);
-        }
-        if ($todel) {
-            $this->remove_state($tran->to);
-        }
-        $startstates = array_values($this->start_states());
-        if (count($this->end_states()) == 0) {
-            $this->add_end_state($startstates[0]);
-        }
-    }
-
-    /**
-     * Changes automaton to not contain wordbreak  simple assertions (\b and \B).
-     */
-    public function avoid_wordbreaks() {
-        $stateschecked = array();
-        $oldfront = $this->start_states();
-
-        while (count($oldfront) != 0) {
-            // Analysis transitions of each state.
-            foreach ($oldfront as $state) {
-                if (array_search($state, $stateschecked) === false && !$this->is_empty()) {
-                    $transitions = $this->get_adjacent_transitions($state, true);
-                    // Searching transition of given type.
-                    foreach ($transitions as $tran) {
-                        if ($tran->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B) {
-                            // Add states to new front.
-                            $outtransitions = $this->get_adjacent_transitions($tran->to, true);
-                            foreach ($outtransitions as $outtran) {
-                                $newfront[] = $outtran->to;
-                            }
-                            $this->merge_wordbreaks($tran);
-                            $this->remove_unreachable_states();
-                        } else {
-                            $newfront[] = $tran->to;
-                        }
-                        $stateschecked[] = $state;
-                    }
-                }
-            }
-            $oldfront = $newfront;
-            $newfront = array();
-        }
-    }
 
     /**
      * Generate real number of state from intersection part.
@@ -2929,15 +2378,7 @@ class qtype_preg_fa {
         }
         // Prepare automata for intersection.
         $this->remove_unreachable_states();
-        $this->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $number);
-        if ($isstart == 0) {
-            $number2 = $anotherfa->start_states();
-        } else {
-            $number2 = $anotherfa->end_states();
-        }
-        $secnumber = $number2[0];
         $anotherfa->remove_unreachable_states();
-        $anotherfa->merge_uncapturing_transitions(qtype_preg_fa_transition::TYPE_TRANSITION_BOTH, $secnumber);
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
