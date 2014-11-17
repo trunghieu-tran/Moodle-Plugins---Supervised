@@ -461,6 +461,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0);
     }
 
+    /*
+
+TODO: это надо перенести в тесты переходов
+
     function test_match_string_ends() {
         $str = new qtype_poasquestion_string("a\n");
         $length = 0;
@@ -604,17 +608,19 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $pos = 1;
         $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
         $this->assertEquals($length, 0, 'Return length is not equal to expected');
-    }
+    }*/
+
+////////////////////////////////////////// next_character
 
     function test_generation_empty_string() {
         $str = new qtype_poasquestion_string("ax");
         $length = 1;
         $lexer = $this->create_lexer("[ab\n\\x1]");
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_circumflex;
-        $leaf->assertionsafter[] = $assert;
+        $dollar = false;
+        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -623,10 +629,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_circumflex;
-        $leaf->assertionsafter[] = $assert;
+        $dollar = false;
+        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -635,10 +641,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 2;
         $lexer = $this->create_lexer("[ab\n]");
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_dollar;
-        $leaf->assertionsbefore[] = $assert;
+        $dollar = true;
+        $circumflex = false;
         $pos = 2;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -647,10 +653,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_dollar;
-        $leaf->assertionsbefore[] = $assert;
+        $dollar = true;
+        $circumflex = false;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -660,7 +666,9 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer("[x-z]");
         $leaf = $lexer->nextToken()->value;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        $dollar = false;
+        $circumflex = false;
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, 'x', 'Return character is not equal to expected');
     }
 
@@ -669,7 +677,9 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $leaf = new qtype_preg_leaf_assert_circumflex;
         $pos = 0;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        $dollar = false;
+        $circumflex = false;
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, '', 'Return character is not equal to expected');
     }
 
@@ -678,12 +688,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 1;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
-        $assert1 = new qtype_preg_leaf_assert_dollar;
-        $assert2 = new qtype_preg_leaf_assert_circumflex;
-        $leaf->assertionsbefore[] = $assert1;
-        $leaf->assertionsafter[] = $assert2;
+        $dollar = true;
+        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -692,12 +700,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 1;
         $lexer = $this->create_lexer("[a-z\n]");
         $leaf = $lexer->nextToken()->value;
-        $assert1 = new qtype_preg_leaf_assert_dollar;
-        $assert2 = new qtype_preg_leaf_assert_circumflex;
-        $leaf->assertionsbefore[] = $assert1;
-        $leaf->assertionsafter[] = $assert2;
+        $dollar = true;
+        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -706,7 +712,9 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 2;
         $leaf = new qtype_preg_leaf_assert_dollar;
         $pos = 2;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        $dollar = false;
+        $circumflex = false;
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return character is not equal to expected');
     }
 
@@ -715,14 +723,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 1;
         $lexer = $this->create_lexer("[c\n]");
         $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_circumflex;
-        $leaf->assertionsafter[] = $assert;
+        $dollar = false;
+        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
-    function test_generation_last_character() {
+    /*function test_generation_last_character() {           TODO: этот тест надо перенести в тест переходов
         $str = new qtype_poasquestion_string("a\n");
         $length = 1;
         $lexer = $this->create_lexer("[\n]");
@@ -730,10 +738,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_capital_esc_z;
         $leaf->assertionsbefore[] = $assert;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return flag is not equal to expected');
-    }
+    }*/
 
 /***************************************** Tests for charset *****************************************/
 
@@ -757,7 +765,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_charflag_flag_d_match() {
-        $lexer = $this->create_lexer("\\d");
+        $lexer = $this->create_lexer("[[:digit:]]");
         $flag = $lexer->nextToken()->value;
         $length = 0;
         $this->assertTrue($flag->match(new qtype_poasquestion_string('12Afg'), 0, $length));
@@ -944,7 +952,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_poasquestion_string("ab 5\0"), 4, $length));
     }
 
-    function test_charflag_flag_punct_match() {
+    /*function test_charflag_flag_punct_match() {
         $lexer = $this->create_lexer("[[:punct:]]");
         $flag = $lexer->nextToken()->value;
         $length = 0;
@@ -1015,7 +1023,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         list($flag, $ch) = $charset->next_character($str, $str, 0);
         $this->assertTrue(strlen($ch)==1, 'Not one character got by next_character()!');
         $this->assertTrue($charset->match($ch, 0, $l), 'Next character is unmatched!');
-    }
+    }*////////////
 
     /*function test_charset_intersect() {
         //create elemenntary charclasses
@@ -1064,48 +1072,5 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 2, $l, true), 'Incorrect matching');
         $this->assertTrue($result->match(new qtype_poasquestion_string('(b@%)'), 3, $l, true), 'Incorrect matching');
         $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 4, $l, true), 'Incorrect matching');
-    }
-
-    function test_charset_substract() {
-        //create elemenntary charclasses
-        $a = new qtype_preg_charset_flag;
-        $b = new qtype_preg_charset_flag;
-        $c = new qtype_preg_charset_flag;
-        $d = new qtype_preg_charset_flag;
-        $e = new qtype_preg_charset_flag;
-        $f = new qtype_preg_charset_flag;
-        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%('));
-        $b->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('s@'));
-        $c->negative = true;
-        $d->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $d->negative = true;
-        $e->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('a%'));
-        $e->negative = true;
-        $f->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%)'));
-        //form charsets
-        $charset1 = new qtype_preg_leaf_charset;
-        $charset1->flags[0][0] = $a;
-        $charset1->flags[1][0] = $b;
-        $charset1->flags[1][1] = $c;
-        $charset1->negative = true;
-        $charset2 = new qtype_preg_leaf_charset;
-        $charset2->flags[0][0] = $d;
-        $charset2->flags[0][1] = $e;
-        $charset2->flags[1][0] = $f;
-        $charset2->negative = false;
-        //intersect them
-        $result = $charset1->substract($charset2);
-        //verify result
-        $this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->type===qtype_preg_charset_flag::TYPE_SET, 'Not set instead first set in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in substraction of ^[b%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->set=='s', '\"s\" not exist in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 0, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 1, $l, true), 'Incorrect matching');
-        $this->assertTrue($result->match(new qtype_poasquestion_string('(bs%)'), 2, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 3, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(bs%)'), 4, $l, true), 'Incorrect matching');
     }*/
 }

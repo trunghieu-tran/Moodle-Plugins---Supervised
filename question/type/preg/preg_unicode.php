@@ -37,6 +37,11 @@ class qtype_preg_unicode extends core_text {
     public static function max_possible_code() {
         return 0x10FFFD;
     }
+
+    public static function minmax_ranges() {
+        return array(array(0=>self::min_possible_code(), 1=>self::max_possible_code()));
+    }
+
     public static function dot_ranges() {
         return array(array(0=>0x0000, 1=>0x10FFFD));
     }
