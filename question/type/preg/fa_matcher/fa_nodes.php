@@ -513,8 +513,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
         }
 
-        self::intersect($borderstate, $automaton);
-
+        self::intersect($borderstate, $automaton);  // TODO: а что тут с конечным состоянием, по аналогии с бесконечными квантификаторами?
     }
 
     protected static function intersect($borderstate, $automaton) {
@@ -730,6 +729,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         $this->operands[0]->create_automaton($automaton, $stack, $transform);
         $body = array_pop($stack);
         $prevtrans = $automaton->get_adjacent_transitions($body['end'], false);
+
         // Now, clone all transitions from the start state to the end state.
         $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
@@ -746,7 +746,9 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             }
         }
 
-        $change = parent::intersect($body['end'], $automaton);
+        $modified = $transform
+                  ? self::intersect($body['end'], $automaton)
+                  : false;
 
         foreach ($prevtrans as $transition) {
             $transition->set_transition_type();
@@ -762,7 +764,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         $automaton->add_transition($transition);
 
         // Change end states if automaton was rebuilt with intersection.
-        if ($change) {
+        if ($modified) {
             $body['end'] = $prevtrans[0]->from;
         }
 
@@ -790,7 +792,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->loopsback = true;
                     $automaton->add_transition($newtransition);
                     $newtransition->set_transition_type();
-                    if ($newtransition->is_wordbreak()) {
+                    if ($transform && $newtransition->is_wordbreak()) {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur);
                     }
                     if ($transform && ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
@@ -799,19 +801,23 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
 
                 }
 
-                $change = parent::intersect($cur['end'], $automaton);
+                $modified = $transform
+                          ? self::intersect($cur['end'], $automaton)
+                          : false;
+
                 $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
                 foreach ($prevtrans as $transition) {
                     $transition->set_transition_type();
-                    if ($newtransition->is_wordbreak()) {
+                    if ($transform && $newtransition->is_wordbreak()) {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur);
                     }
                     if ($transform && ($transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $transition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
                         qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($cur['end']));
                     }
                 }
+
                 // Change end states if automaton was rebuilt with intersection.
-                if ($change) {
+                if ($modified) {
                     $prevtrans = $automaton->get_adjacent_transitions($prevtrans[0]->from, false);
                     $cur['end'] = $prevtrans[0]->from;
                 }
